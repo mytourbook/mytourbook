@@ -130,11 +130,11 @@ public class Messages extends NLS {
 
    public static String        Font_Editor_Label_FontSize;
 
-   public static String        Format_DateTime_yyyymmdd_hhmmss;
+   static String               Format_DateTime_yyyymmdd_hhmmss;
 
-   public static String        Format_TimeDuration_hh;
-   public static String        Format_TimeDuration_hhmm;
-   public static String        Format_TimeDuration_hhmmss;
+   static String               Format_TimeDuration_hh;
+   static String               Format_TimeDuration_hhmm;
+   static String               Format_TimeDuration_hhmmss;
 
    public static String        Graph_Label_Altimeter;
    public static String        Graph_Label_Altitude;
@@ -213,36 +213,36 @@ public class Messages extends NLS {
    public static String        Measurement_System_Profile_Other3;
    public static String        Measurement_System_Tooltip;
 
-   public static String        Period_Format_Space;
-   public static String        Period_Format_Comma;
-   public static String        Period_Format_CommaAndAnd;
-   public static String        Period_Format_CommaSpaceAnd;
-   public static String        Period_Format_CommaSpace;
-   public static String        Period_Format_SpaceAndSpace;
-   public static String        Period_Format_Year;
-   public static String        Period_Format_Years;
-   public static String        Period_Format_Year_Short;
-   public static String        Period_Format_Month;
-   public static String        Period_Format_Months;
-   public static String        Period_Format_Month_Short;
-   public static String        Period_Format_Week;
-   public static String        Period_Format_Weeks;
-   public static String        Period_Format_Week_Short;
-   public static String        Period_Format_Day;
-   public static String        Period_Format_Days;
-   public static String        Period_Format_Day_Short;
-   public static String        Period_Format_Hour;
-   public static String        Period_Format_Hours;
+   static String               Period_Format_Space;
+   static String               Period_Format_Comma;
+   static String               Period_Format_CommaAndAnd;
+   static String               Period_Format_CommaSpaceAnd;
+   static String               Period_Format_CommaSpace;
+   static String               Period_Format_SpaceAndSpace;
+   static String               Period_Format_Year;
+   static String               Period_Format_Years;
+   static String               Period_Format_Year_Short;
+   static String               Period_Format_Month;
+   static String               Period_Format_Months;
+   static String               Period_Format_Month_Short;
+   static String               Period_Format_Week;
+   static String               Period_Format_Weeks;
+   static String               Period_Format_Week_Short;
+   static String               Period_Format_Day;
+   static String               Period_Format_Days;
+   static String               Period_Format_Day_Short;
+   static String               Period_Format_Hour;
+   static String               Period_Format_Hours;
    public static String        Period_Format_Hour_Short;
-   public static String        Period_Format_Minute;
-   public static String        Period_Format_Minutes;
+   static String               Period_Format_Minute;
+   static String               Period_Format_Minutes;
    public static String        Period_Format_Minute_Short;
-   public static String        Period_Format_Second;
-   public static String        Period_Format_Seconds;
-   public static String        Period_Format_Second_Short;
-   public static String        Period_Format_Millisecond;
-   public static String        Period_Format_Milliseconds;
-   public static String        Period_Format_Millisecond_Short;
+   static String               Period_Format_Second;
+   static String               Period_Format_Seconds;
+   static String               Period_Format_Second_Short;
+   static String               Period_Format_Millisecond;
+   static String               Period_Format_Milliseconds;
+   static String               Period_Format_Millisecond_Short;
 
    public static String        Pref_System_Label_Distance;
    public static String        Pref_System_Label_Distance_Info;
