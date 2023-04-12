@@ -206,15 +206,15 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       try {
          response = OAuth2Utils.httpClient.send(request, BodyHandlers.ofString());
 
-         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
+         if (response.statusCode() != HttpURLConnection.HTTP_OK &&
+               response.statusCode() != HttpURLConnection.HTTP_CREATED) {
             //   logVendorError(response.body());
          }
 
          return response.body();
 
       } catch (IOException | InterruptedException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       final CompletableFuture<WorkoutUpload> workoutUpload =
@@ -254,8 +254,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
                .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get(tourAbsoluteFilePath)))
                .build();
       } catch (final FileNotFoundException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       return sendAsyncRequest(tourData, request);
