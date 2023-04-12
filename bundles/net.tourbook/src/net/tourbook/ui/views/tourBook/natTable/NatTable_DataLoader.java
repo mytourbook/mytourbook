@@ -396,7 +396,7 @@ public class NatTable_DataLoader {
    private int fetchNumberOfTours() {
 
 //    TourDatabase.enableRuntimeStatistics(conn);
-      
+
       int numTours = 0;
 
       String sql = null;
@@ -414,7 +414,6 @@ public class NatTable_DataLoader {
             if (isFirstRun == false) {
                sqlCollectionFilter = UI.EMPTY_STRING;
             }
-
 
             PreparedStatement prepStmt;
 
@@ -512,11 +511,11 @@ public class NatTable_DataLoader {
                if (sqlCollectionFilter.length() == 0) {
 
                   /**
-                   * The 2st run would be the same as the 1nd run -> skip 2nd rund otherwise this
+                   * The 2st run would be the same as the 1nd run -> skip 2nd run otherwise this
                    * warning occurs:
                    * <p>
-                   * [main] INFO com.mchange.v2.c3p0.stmt.GooGooStatementCache - Multiply-cached
-                   * PreparedStatement:
+                   * [main] INFO com.mchange.v2.c3p0.stmt.GooGooStatementCache -
+                   * Multiply-cached PreparedStatement:
                    */
 
                   _numToursWithoutCollectionFilter = numTours;
@@ -536,7 +535,7 @@ public class NatTable_DataLoader {
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       }
-      
+
 //    TourDatabase.disableRuntimeStatistic(conn);
 
       return numTours;

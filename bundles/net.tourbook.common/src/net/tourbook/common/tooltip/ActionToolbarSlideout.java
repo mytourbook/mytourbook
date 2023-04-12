@@ -331,6 +331,11 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       updateUI_Tooltip();
    }
 
+   public void setTooltip(final String object) {
+
+      _actionToolItem.setToolTipText(object);
+   }
+
    public void showDefaultEnabledImage() {
 
       _actionToolItem.setImage(_actionImage_Enabled);

@@ -2292,6 +2292,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
+   public static String        Slideout_TourCollectionFilter_Action_Tooltip;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfAppFilterTours;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfCollectedTours;
    public static String        Slideout_TourCollectionFilter_Label_Title;

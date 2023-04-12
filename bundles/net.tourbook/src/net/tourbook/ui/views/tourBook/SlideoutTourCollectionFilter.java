@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.ui.views.tourBook.TourBookView.ActionTourCollectionFilter;
 import net.tourbook.ui.views.tourBook.TourBookView.CollectionFilterType;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -182,6 +183,12 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
    private void enableControls() {
 
+      final ActionTourCollectionFilter actionTourCollectionFilter = _tourBookView.getActionTourCollectionFilter();
+      final boolean isFilterActive = actionTourCollectionFilter.getSelection();
+
+      _rdoShowAppFilterTours.setEnabled(isFilterActive);
+      _rdoShowCollectedTours.setEnabled(isFilterActive);
+      _rdoShowNotCollectedTours.setEnabled(isFilterActive);
    }
 
    private void initUI() {

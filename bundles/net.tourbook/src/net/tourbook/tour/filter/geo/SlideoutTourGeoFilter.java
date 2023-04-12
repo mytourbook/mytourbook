@@ -887,7 +887,14 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
             final TourGeoFilter item = (TourGeoFilter) cell.getElement();
 
-            cell.setText(item.filterName);
+            if (UI.IS_SCRAMBLE_DATA) {
+
+               cell.setText(UI.scrambleText(item.filterName));
+
+            } else {
+
+               cell.setText(item.filterName);
+            }
          }
       });
    }
