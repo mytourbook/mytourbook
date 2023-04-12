@@ -9243,7 +9243,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public int[] getRecordedTimeSerie() {
 
       if (recordedTimeSerie != null) {
-//         return recordedTimeSerie;
+         return recordedTimeSerie;
       }
 
       // check if data are available
@@ -9328,8 +9328,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   // set pause in the next slice because the pause flag is set before the pause
                   nextSlicePausedTime = isAutoPause
 
-                        // auto pauses are ignored
-                        ? 0
+//                      // auto pauses are ignored
+//                      ? 0
+
+                        // auto pauses are not ignored
+                        // https://github.com/mytourbook/mytourbook/issues/502#issuecomment-1498240431
+                        ? timeDiff
 
                         // pause is triggered by a user
                         : timeDiff;
