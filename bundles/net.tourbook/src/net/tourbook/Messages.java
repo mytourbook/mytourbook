@@ -2283,6 +2283,15 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
+   public static String        Slideout_TourCollectionFilter_Action_Tooltip;
+   public static String        Slideout_TourCollectionFilter_Label_NumberOfAllTours;
+   public static String        Slideout_TourCollectionFilter_Label_NumberOfCollectedTours;
+   public static String        Slideout_TourCollectionFilter_Label_Title;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowAllTours;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowAllTours_Tooltip;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowCollectedTours;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowNotCollectedTours;
+
    public static String        Slideout_TourEditor_Checkbox_KeepDistance;
    public static String        Slideout_TourEditor_Checkbox_KeepDistance_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_KeepTime;
@@ -2303,6 +2312,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Label_Title;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height_Tooltip;
+
    public static String        Slideout_TourFilter_Action_ActivateAll;
    public static String        Slideout_TourFilter_Action_ActivateAll_Tooltip;
    public static String        Slideout_TourFilter_Action_AddProfile;
@@ -2338,6 +2348,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
    public static String        Slideout_TourGeoFilter_Action_Delete_WithoutName;
    public static String        Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
+   public static String        Slideout_TourGeoFilter_Action_ToggleReadEditMode_Tooltip;
    public static String        Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String        Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String        Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;

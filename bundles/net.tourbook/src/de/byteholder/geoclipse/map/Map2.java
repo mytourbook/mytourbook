@@ -2939,6 +2939,8 @@ public class Map2 extends Canvas {
 
       } else if (_isShowHoveredOrSelectedTour
             && _isShowBreadcrumbs
+
+            // check if breadcrumb is hit
             && _tourBreadcrumb.onMouseDown(devMousePosition)) {
 
          // a crumb is selected

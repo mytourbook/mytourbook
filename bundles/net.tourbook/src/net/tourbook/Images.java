@@ -184,7 +184,7 @@ public class Images {
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.png";                                     //$NON-NLS-1$
-   public static final String ModelPlayer                                = "model-player.png";                                      //$NON-NLS-1$
+   public static final String ModelPlayer                                = "model-player.png";                                    //$NON-NLS-1$
    public static final String MyTourbook16                               = "tourbook16.png";                                      //$NON-NLS-1$
    public static final String POI_Anchor                                 = "anchor.png";                                          //$NON-NLS-1$
    public static final String POI_Car                                    = "car.png";                                             //$NON-NLS-1$
@@ -322,6 +322,12 @@ public class Images {
    public static final String TourElevationCompareFilter_NotSaved        = "tour-elevation-compare-filter-not-saved.png";         //$NON-NLS-1$
    public static final String TourFilter                                 = "tour-filter.png";                                     //$NON-NLS-1$
    public static final String TourFilter_Disabled                        = "tour-filter-disabled.png";                            //$NON-NLS-1$
+   public static final String TourFilter_Collected_All                   = "tour-filter-collected-all.png";                        //$NON-NLS-1$
+   public static final String TourFilter_Collected_All_Disabled          = "tour-filter-collected-all-disabled.png";               //$NON-NLS-1$
+   public static final String TourFilter_Collected_Not                   = "tour-filter-collected-not.png";                        //$NON-NLS-1$
+   public static final String TourFilter_Collected_Not_Disabled          = "tour-filter-collected-not-disabled.png";               //$NON-NLS-1$
+   public static final String TourFilter_Collected_Selected              = "tour-filter-collected-selected.png";                   //$NON-NLS-1$
+   public static final String TourFilter_Collected_Selected_Disabled     = "tour-filter-collected-selected-disabled.png";          //$NON-NLS-1$
    public static final String TourFilter_TourWithPhotos                  = "tour-filter-tour-with-photos.png";                    //$NON-NLS-1$
    public static final String TourFilter_TourWithPhotos_Disabled         = "tour-filter-tour-with-photos-disabled.png";           //$NON-NLS-1$
    public static final String TourFilter_TourWithNotSavedPhotos          = "tour-filter-tour-with-not-saved-photos.png";          //$NON-NLS-1$

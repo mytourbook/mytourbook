@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
@@ -102,6 +101,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       if (actionImageDisabled == null) {
 
          if (_actionImage_Disabled != null) {
+
             _actionImage_Disabled.dispose();
             _actionImage_Disabled = null;
          }
@@ -331,7 +331,13 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       updateUI_Tooltip();
    }
 
+   public void setTooltip(final String object) {
+
+      _actionToolItem.setToolTipText(object);
+   }
+
    public void showDefaultEnabledImage() {
+
       _actionToolItem.setImage(_actionImage_Enabled);
    }
 

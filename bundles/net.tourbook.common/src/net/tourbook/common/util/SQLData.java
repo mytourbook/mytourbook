@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,16 +19,29 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+
 /**
  * Common class to keep a sql statement and it's parameters together, this can be used as return
  * value from a method.
  */
 public class SQLData {
 
+   private static final char NL = UI.NEW_LINE;
+
    private String            _sqlString;
    private ArrayList<Object> _parameters;
 
    private int               _lastParameterIndex;
+
+   /**
+    * Setup with empty sql data
+    */
+   public SQLData() {
+
+      _sqlString = UI.EMPTY_STRING;
+      _parameters = new ArrayList<>();
+   }
 
    public SQLData(final String sqlString, final ArrayList<Object> parameters) {
 
@@ -60,9 +73,10 @@ public class SQLData {
     * @param statement
     * @param startIndex
     *           Sets the parameter start index, the first parameter is 1
+    * @return Returns the next parameter index which is the last paramter index +1
     * @throws SQLException
     */
-   public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
+   public int setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
       int parameterIndex = startIndex;
 
@@ -99,16 +113,18 @@ public class SQLData {
          }
       }
 
-      _lastParameterIndex = parameterIndex;
+      return _lastParameterIndex = parameterIndex;
    }
 
    @Override
    public String toString() {
 
-      return "SQLData [\n" // //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + ("_sqlString=" + _sqlString + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_parameters=" + _parameters + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + "SQLData [" + NL //                        //$NON-NLS-1$
+
+            + "_sqlString  =" + _sqlString + NL //       //$NON-NLS-1$
+            + "_parameters =" + _parameters + NL //      //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

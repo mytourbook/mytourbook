@@ -347,7 +347,7 @@ public class ActionDeleteTour extends Action {
       if (isLayoutNatTable) {
 
          // select tour at the same position as the first deleted tour
-         _tourBookView.selectTours_NatTable(firstDeletePosition, true, true, false);
+         _tourBookView.selectTours_NatTable(firstDeletePosition, true, true, true);
 
       } else {
 

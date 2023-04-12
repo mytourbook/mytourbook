@@ -31,9 +31,14 @@ New
 Tour Weather (Frederic)
   - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
+
 Improvements
 ============
 
+* Tour Book View
+  - Filter tours which are collected/not collected
+    https://github.com/mytourbook/mytourbook/issues/1050
+  
 * Tour Chart
   - Show "Recorded Time" in the value point tooltip 
     https://github.com/mytourbook/mytourbook/issues/502
@@ -46,6 +51,9 @@ Improvements
   
 * Tour Pauses View (Frederic)
   - Added a Pause Type column
+
+* Tour Geo Filter
+  - Toggle name in the filter history viewer between read and edit mode
 
 Changes
 =======

@@ -1321,17 +1321,18 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _map.addBreadcrumbListener    (this::mapListener_Breadcrumb);
-      _map.addHoveredTourListener   (this::mapListener_HoveredTour);
-      _map.addMapGridBoxListener    (this::mapListener_MapGridBox);
-      _map.addMapInfoListener       (this::mapListener_MapInfo);
-      _map.addMapPositionListener   (this::mapListener_MapPosition);
-      _map.addMapSelectionListener  (this::mapListener_MapSelection);
-      _map.addMousePositionListener (this::mapListener_MousePosition);
-      _map.addPOIListener           (this::mapListener_POI);
-      _map.addTourSelectionListener (this::mapListener_InsideMap);
+      _map.addBreadcrumbListener    (()                        -> mapListener_Breadcrumb());
+      _map.addHoveredTourListener   (mapHoveredTourEvent       -> mapListener_HoveredTour(mapHoveredTourEvent));
+      _map.addMapInfoListener       ((mapCenter, mapZoomLevel) -> mapListener_MapInfo(mapCenter, mapZoomLevel));
+      _map.addMapSelectionListener  (selection                 -> mapListener_MapSelection(selection));
+      _map.addMousePositionListener (mapGeoPositionEvent       -> mapListener_MousePosition(mapGeoPositionEvent));
+      _map.addPOIListener           (mapPOIEvent               -> mapListener_POI(mapPOIEvent));
+      _map.addTourSelectionListener (selection                 -> mapListener_InsideMap(selection));
 
-      _map.addControlListener       (controlResizedAdapter(this::mapListener_ControlResize));
+      _map.addMapGridBoxListener    ((mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData)     -> mapListener_MapGridBox(mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData));
+      _map.addMapPositionListener   ((mapCenter, mapZoomLevel, isZoomed)                           -> mapListener_MapPosition(mapCenter, mapZoomLevel, isZoomed));
+
+      _map.addControlListener       (controlResizedAdapter(controlEvent -> mapListener_ControlResize(controlEvent)));
 
 // SET_FORMATTING_ON
 
@@ -2346,6 +2347,10 @@ public class Map2View extends ViewPart implements
 
    private void geoFilter_10_Loader(final MapGridData mapGridData,
                                     final TourGeoFilter tourGeoFilter) {
+
+      if (mapGridData == null) {
+         return;
+      }
 
       final org.eclipse.swt.graphics.Point geoParts_TopLeft_E2 = mapGridData.geoParts_TopLeft_E2;
       final org.eclipse.swt.graphics.Point geoParts_BottomRight_E2 = mapGridData.geoParts_BottomRight_E2;

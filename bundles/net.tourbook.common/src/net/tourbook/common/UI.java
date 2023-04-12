@@ -152,6 +152,7 @@ public class UI {
    public static final String       SPACE2                             = "  ";                  //$NON-NLS-1$
    public static final String       SPACE3                             = "   ";                 //$NON-NLS-1$
    public static final String       SPACE4                             = "    ";                //$NON-NLS-1$
+   public static final String       SPACE8                             = "        ";            //$NON-NLS-1$
    public static final String       TAB1                               = "\t";                  //$NON-NLS-1$
    public static final String       ZERO                               = "0";                   //$NON-NLS-1$
 
@@ -2297,12 +2298,12 @@ public class UI {
          }
       };
 
-      TableViewerEditor.create(//
+      TableViewerEditor.create(
             viewer,
             focusCellManager,
             actSupport,
-            ColumnViewerEditor.TABBING_HORIZONTAL //
-                  | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR //
+            ColumnViewerEditor.TABBING_HORIZONTAL
+                  | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
                   | ColumnViewerEditor.TABBING_VERTICAL
                   | ColumnViewerEditor.KEYBOARD_ACTIVATION);
    }
