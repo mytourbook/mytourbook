@@ -29,7 +29,6 @@ import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.Util;
 import net.tourbook.preferences.PrefPageTourTypeFilterList;
 import net.tourbook.web.WEB;
 

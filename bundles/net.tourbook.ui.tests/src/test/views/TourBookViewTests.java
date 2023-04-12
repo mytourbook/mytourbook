@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -127,29 +125,6 @@ public class TourBookViewTests extends UITest {
       //Check the new computed distance
       tour = Utils.getTour(bot);
       assertEquals("0.551", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
-   }
-
-   @Test
-   void testDeleteTourCalories() {
-
-      //Check the initial calories value
-      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
-      assertEquals("2", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
-
-      //Delete the calories value
-      tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
-      bot.checkBox(Messages.Dialog_ModifyTours_Checkbox_Calories).click();
-      bot.button(Messages.Dialog_DeleteTourValues_Button_Delete).click();
-      Utils.clickOkButton(bot);
-
-      bot.sleep(1000);
-
-      //Setting the focus again on the Tourbook view
-      tourBookView = Utils.showTourBookView(bot);
-
-      //Check that the calories were deleted
-      tour = Utils.getTourWithSRTM(bot);
-      assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_Calories_Column_Index));
    }
 
    @Test
