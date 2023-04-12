@@ -9,6 +9,15 @@ jobs:
     name: Build
     runs-on: windows-latest
     steps:
+      - name: Generate, mask, and output a secret
+        id: sets-a-secret
+        run: |
+          the_secret=$((RANDOM))
+          echo "::add-mask::$the_secret"
+          echo "secret-number=$the_secret" >> "$GITHUB_OUTPUT"
+      - name: Use that secret output (protected by a mask)
+        run: |
+          echo "the secret number is ${{ steps.sets-a-secret.outputs.secret-number }}"
       - name: Prepare Plugin Artifact
         id: artifact
         run: |
