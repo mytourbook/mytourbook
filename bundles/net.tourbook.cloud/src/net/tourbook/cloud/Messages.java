@@ -87,6 +87,9 @@ public class Messages extends NLS {
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
    public static String Dialog_UploadToursToSuunto_Message;
+   public static String Dialog_UploadWorkoutsToSuunto_SubTask;
+   public static String Dialog_UploadWorkoutsToSuunto_Task;
+   public static String Dialog_UploadWorkoutsToSuunto_Title;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String Filename_Component_ActivityType;
    public static String Filename_Component_ActivityType_Abbr;
@@ -123,6 +126,7 @@ public class Messages extends NLS {
    public static String Log_UploadRoutesToSuunto_002_NoGpsCoordinate;
    public static String Log_UploadRoutesToSuunto_003_UploadStatus;
    public static String Log_UploadRoutesToSuunto_004_UploadError;
+   public static String Log_UploadWorkoutsToSuunto_001_Start;
    public static String PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter;
    public static String PrefPage_SuuntoWorkouts_DatesFilter_Tooltip;
    public static String PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter;
