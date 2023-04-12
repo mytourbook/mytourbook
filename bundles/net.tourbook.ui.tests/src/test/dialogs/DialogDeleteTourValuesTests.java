@@ -17,9 +17,8 @@ package dialogs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.byteholder.geoclipse.map.UI;
-
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
