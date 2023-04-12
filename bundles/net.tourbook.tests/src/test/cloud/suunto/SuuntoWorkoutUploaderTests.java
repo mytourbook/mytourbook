@@ -15,6 +15,8 @@
  *******************************************************************************/
 package cloud.suunto;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
@@ -86,7 +88,7 @@ public class SuuntoWorkoutUploaderTests {
 
             // Look at the shell title to see if it is the one we want
 
-            if (Messages.Dialog_UploadRoutesToSuunto_Title.equals(shell.getText())) {
+            if (Messages.Dialog_UploadWorkoutsToSuunto_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
                Display.getDefault().asyncExec(shell::close);
@@ -123,8 +125,7 @@ public class SuuntoWorkoutUploaderTests {
       httpClientMock.verify().put(blobUrl).called();
 
       final List<?> logs = TourLogManager.getLogs();
-      //todo fb
-//      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-//            "7/4/2020, 5:00 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "7/4/2020, 5:00 AM -> Uploaded Workout Id: \"642c5admtced4c09af1c49e6\""))); //$NON-NLS-1$
    }
 }

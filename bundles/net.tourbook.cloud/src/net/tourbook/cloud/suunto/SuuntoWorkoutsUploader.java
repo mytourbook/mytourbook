@@ -338,7 +338,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          if (StringUtils.hasContent(workoutUploadId)) {
 
             TourLogManager.log_OK(NLS.bind(
-                  Messages.Log_UploadRoutesToSuunto_003_UploadStatus,
+                  Messages.Log_UploadWorkoutsToSuunto_003_UploadStatus,
                   TourManager.getTourDateTimeShort(tourData),
                   workoutUploadId));
 
