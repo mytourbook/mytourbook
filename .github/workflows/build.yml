@@ -9,9 +9,18 @@ jobs:
     name: Build
     runs-on: windows-latest
     steps:
+      - name: Prepare Plugin Artifact
+        id: artifact
+        shell: bash
+        run: |
+          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
+          echo "artifactFileName=$FILENAME" >> $GITHUB_OUTPUT
+      - name: Upload artifactefgreger
+        run: |
+          echo ${{ steps.artifact.outputs.filename }}
       - name: echo-default-env-variables
         run: |
-          FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
+          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
           echo "artifactFileName=$FILENAME" >> $GITHUB_OUTPUT
           echo "github.workspace = ${{ github.workspace }}"
           echo "toto = $FILENAME"
