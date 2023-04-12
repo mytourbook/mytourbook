@@ -9,17 +9,6 @@ jobs:
     name: Build
     runs-on: windows-latest
     steps:
-      - name: Prepare Plugin Artifact
-        id: artifact
-        run: |
-          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
-          echo "artifactFileName=$FILENAME" | Out-File -FilePath $env:GITHUB_ENV -Append
-      - name: Upload JaCoCod file
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.artifactFileName }}
-          path: C:\Program Files\Git\bin\git.exe
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
@@ -63,12 +52,12 @@ jobs:
         id: generate-artifact-name
         run: |
           $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
-          echo "artifactFileName=$FILENAME" >> $GITHUB_OUTPUT
+          echo "artifactFileName=$FILENAME" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Upload JaCoCo file
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.generate-artifact-name.outputs.artifactFileName }}
+          name: ${{ env.artifactFileName }}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
       - name: Test Report
