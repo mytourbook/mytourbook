@@ -215,6 +215,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
       final CompletableFuture<WorkoutUpload> workoutUpload =

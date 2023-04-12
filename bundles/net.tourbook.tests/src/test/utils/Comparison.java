@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.tourbook.common.util.FileUtils;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
@@ -75,7 +76,7 @@ public class Comparison {
          assertLinesMatch(controlFileContent, testFileContentArray);
 
       } catch (final IOException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
    }
 
@@ -167,7 +168,7 @@ public class Comparison {
 
       } catch (final IOException | InterruptedException e) {
          Thread.currentThread().interrupt();
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
    }
 
