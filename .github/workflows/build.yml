@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: echo-default-env-variables
         run: |
-          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
+          FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
           echo "artifactFileName=$FILENAME" >> $GITHUB_OUTPUT
           echo "github.workspace = ${{ github.workspace }}"
           echo "toto = $FILENAME"
