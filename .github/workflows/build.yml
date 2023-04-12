@@ -14,7 +14,7 @@ jobs:
         run: |
           $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
           echo "artifactFileName=$FILENAME" >> $GITHUB_OUTPUT
-      - name: Upload JaCoCo file
+      - name: Upload JaCoCod file
         if: success()
         uses: actions/upload-artifact@v3
         with:
