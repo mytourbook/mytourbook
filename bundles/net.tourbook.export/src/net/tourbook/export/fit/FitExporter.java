@@ -357,6 +357,10 @@ public class FitExporter {
          sport = Sport.RUNNING;
          break;
 
+      case "cycling":
+         sport = Sport.CYCLING;
+         break;
+
       case "walking":
          sport = Sport.WALKING;
          break;
