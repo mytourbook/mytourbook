@@ -20,7 +20,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.ui.views.tourBook.TourBookView.ActionTourCollectionFilter;
-import net.tourbook.ui.views.tourBook.TourBookView.CollectionFilterType;
+import net.tourbook.ui.views.tourBook.TourBookView.TourCollectionFilter;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -45,7 +45,7 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
     */
    private Composite _shellContainer;
 
-   private Button    _rdoShowAppFilterTours;
+   private Button    _rdoShowAllTours;
    private Button    _rdoShowCollectedTours;
    private Button    _rdoShowNotCollectedTours;
 
@@ -118,19 +118,22 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
    private void createUI_20_Filter(final Composite parent) {
 
+      final String showAllTours_Tooltip = Messages.Slideout_TourCollectionFilter_Radio_ShowAllTours_Tooltip;
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
-             * Radio: Show only selected tours
+             * Radio: Show all tours
              */
-            _rdoShowAppFilterTours = new Button(container, SWT.RADIO);
-            _rdoShowAppFilterTours.setText(Messages.Slideout_TourCollectionFilter_Radio_ShowAppFilterTours);
-            _rdoShowAppFilterTours.addSelectionListener(_defaultSelectionListener);
+            _rdoShowAllTours = new Button(container, SWT.RADIO);
+            _rdoShowAllTours.setText(Messages.Slideout_TourCollectionFilter_Radio_ShowAllTours);
+            _rdoShowAllTours.setToolTipText(showAllTours_Tooltip);
+            _rdoShowAllTours.addSelectionListener(_defaultSelectionListener);
 
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoShowAppFilterTours);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoShowAllTours);
          }
          {
             /*
@@ -158,11 +161,13 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
              * Label: Number of all tours
              */
             _lblNumAllTours = new Label(container, SWT.NONE);
-            _lblNumAllTours.setText(Messages.Slideout_TourCollectionFilter_Label_NumberOfAppFilterTours);
+            _lblNumAllTours.setText(Messages.Slideout_TourCollectionFilter_Label_NumberOfAllTours);
+            _lblNumAllTours.setToolTipText(showAllTours_Tooltip);
             GridDataFactory.fillDefaults().applyTo(_lblNumAllTours);
 
             _lblNumAllTours_Value = new Label(container, SWT.NONE);
             _lblNumAllTours_Value.setText(UI.SPACE8);
+            _lblNumAllTours_Value.setToolTipText(showAllTours_Tooltip);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumAllTours_Value);
          }
          {
@@ -186,7 +191,7 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
       final ActionTourCollectionFilter actionTourCollectionFilter = _tourBookView.getActionTourCollectionFilter();
       final boolean isFilterActive = actionTourCollectionFilter.getSelection();
 
-      _rdoShowAppFilterTours.setEnabled(isFilterActive);
+      _rdoShowAllTours.setEnabled(isFilterActive);
       _rdoShowCollectedTours.setEnabled(isFilterActive);
       _rdoShowNotCollectedTours.setEnabled(isFilterActive);
    }
@@ -198,19 +203,19 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
    private void onChangeUI() {
 
-      CollectionFilterType selectionFilter;
+      TourCollectionFilter selectionFilter;
 
       if (_rdoShowCollectedTours.getSelection()) {
 
-         selectionFilter = CollectionFilterType.COLLECTED_TOURS;
+         selectionFilter = TourCollectionFilter.COLLECTED_TOURS;
 
       } else if (_rdoShowNotCollectedTours.getSelection()) {
 
-         selectionFilter = CollectionFilterType.NOT_COLLECTED_TOURS;
+         selectionFilter = TourCollectionFilter.NOT_COLLECTED_TOURS;
 
       } else {
 
-         selectionFilter = CollectionFilterType.APP_FILTER_TOURS;
+         selectionFilter = TourCollectionFilter.ALL_TOURS;
       }
 
       _tourBookView.updateTourSelectionFilter(selectionFilter, true);
@@ -218,7 +223,7 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
    private void restoreState() {
 
-      switch (_tourBookView.getSlideoutData_TourSelectionFilter()) {
+      switch (_tourBookView.getSlideoutData_TourCollectionFilter()) {
 
       case NOT_COLLECTED_TOURS:
 
@@ -232,10 +237,10 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
          break;
 
-      case APP_FILTER_TOURS:
+      case ALL_TOURS:
       default:
 
-         _rdoShowAppFilterTours.setSelection(true);
+         _rdoShowAllTours.setSelection(true);
          break;
       }
 
@@ -244,7 +249,7 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
    void updateUI() {
 
-      if (_lblNumAllTours_Value.isDisposed()) {
+      if (_lblNumAllTours_Value != null && _lblNumAllTours_Value.isDisposed()) {
          return;
       }
 

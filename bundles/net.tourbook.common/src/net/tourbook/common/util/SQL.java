@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,6 +64,28 @@ public final class SQL {
             SQL.showException(e);
          }
       }
+   }
+
+   public static String createParameterList(final int numItems) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      boolean isFirst = true;
+
+      for (int listIndex = 0; listIndex < numItems; listIndex++) {
+
+         if (isFirst) {
+
+            sb.append('?');
+
+            isFirst = false;
+
+         } else {
+            sb.append(", ?"); //$NON-NLS-1$
+         }
+      }
+
+      return sb.toString();
    }
 
    /**

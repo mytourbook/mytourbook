@@ -2293,10 +2293,11 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
    public static String        Slideout_TourCollectionFilter_Action_Tooltip;
-   public static String        Slideout_TourCollectionFilter_Label_NumberOfAppFilterTours;
+   public static String        Slideout_TourCollectionFilter_Label_NumberOfAllTours;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfCollectedTours;
    public static String        Slideout_TourCollectionFilter_Label_Title;
-   public static String        Slideout_TourCollectionFilter_Radio_ShowAppFilterTours;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowAllTours;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowAllTours_Tooltip;
    public static String        Slideout_TourCollectionFilter_Radio_ShowCollectedTours;
    public static String        Slideout_TourCollectionFilter_Radio_ShowNotCollectedTours;
 

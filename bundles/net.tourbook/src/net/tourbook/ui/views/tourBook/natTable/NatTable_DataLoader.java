@@ -43,7 +43,7 @@ import net.tourbook.ui.views.tourBook.LazyTourLoaderItem;
 import net.tourbook.ui.views.tourBook.TVITourBookItem;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
-import net.tourbook.ui.views.tourBook.TourBookView.CollectionFilterType;
+import net.tourbook.ui.views.tourBook.TourBookView.TourCollectionFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
@@ -1130,11 +1130,11 @@ public class NatTable_DataLoader {
       _tourCollectionFilter = EMPTY_SQL_DATA;
    }
 
-   public void setTourCollectionFilter(final CollectionFilterType collectionFilterType, final ArrayList<Long> allTourIds) {
+   public void setTourCollectionFilter(final TourCollectionFilter tourCollectionFilter, final ArrayList<Long> allTourIds) {
 
       final int numIDs = allTourIds.size();
 
-      if (numIDs < 1 || collectionFilterType == CollectionFilterType.APP_FILTER_TOURS) {
+      if (numIDs < 1 || tourCollectionFilter == TourCollectionFilter.ALL_TOURS) {
 
          _tourCollectionFilter = EMPTY_SQL_DATA;
 
@@ -1142,38 +1142,27 @@ public class NatTable_DataLoader {
       }
 
       String sqlStatement;
-      final ArrayList<Object> sqlParameters = new ArrayList<>();
-      sqlParameters.addAll(allTourIds);
 
-      boolean isFirst = true;
-      final StringBuilder sqlList = new StringBuilder();
+      final ArrayList<Object> allSqlParameters = new ArrayList<>();
+      allSqlParameters.addAll(allTourIds);
 
-      for (int listIndex = 0; listIndex < numIDs; listIndex++) {
+      final String parameterList = SQL.createParameterList(numIDs);
 
-         if (isFirst) {
-            isFirst = false;
-         } else {
-            sqlList.append(',');
-         }
-
-         sqlList.append('?');
-      }
-
-      switch (collectionFilterType) {
+      switch (tourCollectionFilter) {
 
       case COLLECTED_TOURS:
 
-         sqlStatement = "AND TourData.tourId IN (" + sqlList.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+         sqlStatement = "AND TourData.tourId IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
-         _tourCollectionFilter = new SQLData(sqlStatement, sqlParameters);
+         _tourCollectionFilter = new SQLData(sqlStatement, allSqlParameters);
 
          break;
 
       case NOT_COLLECTED_TOURS:
 
-         sqlStatement = "AND TourData.tourId NOT IN (" + sqlList.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+         sqlStatement = "AND TourData.tourId NOT IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
-         _tourCollectionFilter = new SQLData(sqlStatement, sqlParameters);
+         _tourCollectionFilter = new SQLData(sqlStatement, allSqlParameters);
 
          break;
 
@@ -1184,6 +1173,8 @@ public class NatTable_DataLoader {
          break;
       }
    }
+
+
 
    /**
     * Sets sort column id/direction but first cleanup the previous loaded tours.

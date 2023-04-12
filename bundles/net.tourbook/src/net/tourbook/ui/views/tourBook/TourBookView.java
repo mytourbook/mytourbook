@@ -229,11 +229,13 @@ public class TourBookView extends ViewPart implements
    //
    private static final String           STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";           //$NON-NLS-1$
    private static final String           STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";         //$NON-NLS-1$
+   private static final String           STATE_IS_SELECTED_TOUR_COLLECTION_FILTER        = "STATE_IS_SELECTED_TOUR_COLLECTION_FILTER"; //$NON-NLS-1$
    static final String                   STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";                //$NON-NLS-1$
    static final String                   STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";  //$NON-NLS-1$
    private static final String           STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                     //$NON-NLS-1$
    private static final String           STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                     //$NON-NLS-1$
    private static final String           STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                      //$NON-NLS-1$
+   private static final String           STATE_TOUR_COLLECTION_FILTER                    = "STATE_TOUR_COLLECTION_FILTER";             //$NON-NLS-1$
    private static final String           STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                        //$NON-NLS-1$
    //
    private static final String           STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
@@ -261,7 +263,8 @@ public class TourBookView extends ViewPart implements
     * The header column id needs a different id than the body column otherwise drag&drop or column
     * selection shows the 1st row image :-(
     */
-   private static final String             HEADER_COLUMN_ID_POSTFIX            = "_HEADER";                           //$NON-NLS-1$
+   private static final String HEADER_COLUMN_ID_POSTFIX = "_HEADER"; //$NON-NLS-1$
+
    //
    private static TourBookViewLayout       _viewLayout;
    //
@@ -308,7 +311,8 @@ public class TourBookView extends ViewPart implements
    private int                             _selectedYear                       = -1;
    private int                             _selectedYearSub                    = -1;
    private final ArrayList<Long>           _selectedTourIds                    = new ArrayList<>();
-   private CollectionFilterType            _tourSelectionFilterInSlideout      = CollectionFilterType.COLLECTED_TOURS;
+   //
+   private TourCollectionFilter            _tourCollectionFilter               = TourCollectionFilter.COLLECTED_TOURS;
    //
    private boolean                         _isCollapseOthers;
    private boolean                         _isInFireSelection;
@@ -453,23 +457,8 @@ public class TourBookView extends ViewPart implements
 
          super.onSelect();
 
-         updateTourSelectionFilter(CollectionFilterType.APP_FILTER_TOURS, false);
+         updateTourSelectionFilter(TourCollectionFilter.ALL_TOURS, false);
       }
-   }
-
-   public enum CollectionFilterType {
-
-      APP_FILTER_TOURS,
-
-      /**
-       * Only tours are displayed which are selected
-       */
-      COLLECTED_TOURS,
-
-      /**
-       * Only tours are displayed which are not selected
-       */
-      NOT_COLLECTED_TOURS
    }
 
    private class ContentProvider_Tree implements ITreeContentProvider {
@@ -930,6 +919,24 @@ public class TourBookView extends ViewPart implements
             });
          }
       }
+   }
+
+   public enum TourCollectionFilter {
+
+      /**
+       * All tours but they are filtered by the app filters
+       */
+      ALL_TOURS,
+
+      /**
+       * Only tours are displayed which are selected/collected
+       */
+      COLLECTED_TOURS,
+
+      /**
+       * Only tours are displayed which are not selected/collected
+       */
+      NOT_COLLECTED_TOURS
    }
 
    public class ViewerData {
@@ -2078,7 +2085,7 @@ public class TourBookView extends ViewPart implements
    }
 
    public ActionTourCollectionFilter getActionTourCollectionFilter() {
-      
+
       return _actionTourCollectionFilter;
    }
 
@@ -2290,8 +2297,8 @@ public class TourBookView extends ViewPart implements
       return Integer.toString(_selectedTourIds.size());
    }
 
-   CollectionFilterType getSlideoutData_TourSelectionFilter() {
-      return _tourSelectionFilterInSlideout;
+   TourCollectionFilter getSlideoutData_TourCollectionFilter() {
+      return _tourCollectionFilter;
    }
 
    IDialogSettings getState() {
@@ -2803,7 +2810,7 @@ public class TourBookView extends ViewPart implements
             _selectedTourIds.clear();
             _selectedTourIds.add(tourId);
 
-            reselectTourViewer();
+            reselectTourViewer(false);
 
          } else {
 
@@ -2817,7 +2824,7 @@ public class TourBookView extends ViewPart implements
          _selectedTourIds.clear();
          _selectedTourIds.addAll(selectionTourIds.getTourIds());
 
-         reselectTourViewer();
+         reselectTourViewer(false);
 
       } else if (selection instanceof StructuredSelection) {
 
@@ -3028,15 +3035,26 @@ public class TourBookView extends ViewPart implements
     */
    private void reselectTourViewer_NatTable(final boolean isFireSelection) {
 
-      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
+      final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
 
-         selectTours_NatTable(allRowPositions,
+      if (isFilterActive) {
 
-               true, // isClearSelection
-               true, // isScrollIntoView
-               isFireSelection // isFireSelection
-         );
-      });
+         // filter tour data
+
+         updateUI_NatTable(_tourCollectionFilter);
+
+      } else {
+
+         _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
+
+            selectTours_NatTable(allRowPositions,
+
+                  true, // isClearSelection
+                  true, // isScrollIntoView
+                  isFireSelection // isFireSelection
+            );
+         });
+      }
    }
 
    private void reselectTourViewer_Tree() {
@@ -3154,6 +3172,13 @@ public class TourBookView extends ViewPart implements
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT);
 
       /*
+       * Tour collection filter
+       */
+      _tourCollectionFilter = (TourCollectionFilter) Util.getStateEnum(_state,
+            STATE_TOUR_COLLECTION_FILTER,
+            TourCollectionFilter.ALL_TOURS);
+
+      /*
        * View layout
        */
       _viewLayout = (TourBookViewLayout) Util.getStateEnum(_state, STATE_VIEW_LAYOUT, TourBookViewLayout.CATEGORY_MONTH);
@@ -3208,6 +3233,9 @@ public class TourBookView extends ViewPart implements
        * (button is not pressed). Could not figure out why this occurs after debugging this issue
        */
       _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
+
+      _actionTourCollectionFilter.setSelection(_state.getBoolean(STATE_IS_SELECTED_TOUR_COLLECTION_FILTER));
+      updateUI_TourCollectionFilterIcons(_tourCollectionFilter);
    }
 
    private void restoreState_SortColumns() {
@@ -3258,6 +3286,10 @@ public class TourBookView extends ViewPart implements
       // sort columns
       _state.put(STATE_SORT_COLUMN_ID, _natTable_DataLoader.getSortColumnIds());
       Util.setStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, _natTable_DataLoader.getSortDirections());
+
+      // tour collection filter
+      _state.put(STATE_IS_SELECTED_TOUR_COLLECTION_FILTER, _actionTourCollectionFilter.getSelection());
+      Util.setStateEnum(_state, STATE_TOUR_COLLECTION_FILTER, _tourCollectionFilter);
 
       _columnManager_Tree.saveState(_state_Tree);
 
@@ -3582,42 +3614,29 @@ public class TourBookView extends ViewPart implements
       reloadViewer();
    }
 
-   void updateTourSelectionFilter(final CollectionFilterType selectionFilter, final boolean isFromSlideout) {
+   void updateTourSelectionFilter(final TourCollectionFilter selectionFilter, final boolean isFromSlideout) {
 
       if (isFromSlideout) {
 
-         _tourSelectionFilterInSlideout = selectionFilter;
+         _tourCollectionFilter = selectionFilter;
       }
 
 //      final boolean isFilterActive = true;//_actionTourSelectionFilter.getSelection();
       final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
 
-      CollectionFilterType tourSelectionFilterInDataLoader;
+      TourCollectionFilter tourCollectionFilter_InDataLoader;
 
       if (isFilterActive) {
 
-         tourSelectionFilterInDataLoader = _tourSelectionFilterInSlideout;
+         tourCollectionFilter_InDataLoader = _tourCollectionFilter;
 
-         if (tourSelectionFilterInDataLoader == CollectionFilterType.COLLECTED_TOURS) {
-
-            _actionTourCollectionFilter.showOtherEnabledImage(1);
-
-         } else if (tourSelectionFilterInDataLoader == CollectionFilterType.NOT_COLLECTED_TOURS) {
-
-            _actionTourCollectionFilter.showOtherEnabledImage(2);
-
-         } else {
-
-            // SelectionFilterType.ALL_IS_DISPLAYED
-
-            _actionTourCollectionFilter.showOtherEnabledImage(0);
-         }
+         updateUI_TourCollectionFilterIcons(tourCollectionFilter_InDataLoader);
 
       } else {
 
          // filter is not active -> show all
 
-         tourSelectionFilterInDataLoader = CollectionFilterType.APP_FILTER_TOURS;
+         tourCollectionFilter_InDataLoader = TourCollectionFilter.ALL_TOURS;
 
          _actionTourCollectionFilter.showOtherEnabledImage(0);
       }
@@ -3625,25 +3644,48 @@ public class TourBookView extends ViewPart implements
       // run async that the slideout UI is updated immediately
       _parent.getDisplay().asyncExec(() -> {
 
-         _natTable_DataLoader.resetTourItems();
-
-         _natTable_DataLoader.setTourCollectionFilter(tourSelectionFilterInDataLoader, _selectedTourIds);
-
-         /*
-          * Found no simple way to update the tabel otherwise an exceptions occurs somewhere in the
-          * deep nattable layers
-          */
-         _tourViewer_NatTable.setRedraw(false);
-         _isInSelection = true;
-         {
-            _tourViewer_NatTable.refresh();
-         }
-         _isInSelection = false;
-         _tourViewer_NatTable.setRedraw(true);
-
-         // update number of tours
-         _actionTourCollectionFilter.slideoutTourSelectionFilter.updateUI();
+         updateUI_NatTable(tourCollectionFilter_InDataLoader);
       });
+   }
+
+   private void updateUI_NatTable(final TourCollectionFilter tourSelectionFilterInDataLoader) {
+
+      _natTable_DataLoader.resetTourItems();
+
+      _natTable_DataLoader.setTourCollectionFilter(tourSelectionFilterInDataLoader, _selectedTourIds);
+
+      /*
+       * Found no simple way to update the tabel otherwise an exceptions occurs somewhere in the
+       * deep nattable layers
+       */
+      _tourViewer_NatTable.setRedraw(false);
+      _isInSelection = true;
+      {
+         _tourViewer_NatTable.refresh();
+      }
+      _isInSelection = false;
+      _tourViewer_NatTable.setRedraw(true);
+
+      // update number of tours
+      _actionTourCollectionFilter.slideoutTourSelectionFilter.updateUI();
+   }
+
+   private void updateUI_TourCollectionFilterIcons(final TourCollectionFilter tourCollectionFilter) {
+
+      if (tourCollectionFilter == TourCollectionFilter.COLLECTED_TOURS) {
+
+         _actionTourCollectionFilter.showOtherEnabledImage(1);
+
+      } else if (tourCollectionFilter == TourCollectionFilter.NOT_COLLECTED_TOURS) {
+
+         _actionTourCollectionFilter.showOtherEnabledImage(2);
+
+      } else {
+
+         // TourCollectionFilter.ALL_TOURS
+
+         _actionTourCollectionFilter.showOtherEnabledImage(0);
+      }
    }
 
    private void updateUI_TourViewerColumns_Tree() {
