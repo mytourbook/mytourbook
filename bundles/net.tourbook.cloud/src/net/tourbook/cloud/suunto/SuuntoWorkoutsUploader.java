@@ -206,8 +206,8 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       try {
          request = HttpRequest.newBuilder()
                .uri(URI.create(workoutUpload.getUrl()))
-               .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType())
-               .header(OAuth2Constants.CONTENT_TYPE, "application/octet-stream")
+               .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType()) //$NON-NLS-1$
+               .header(OAuth2Constants.CONTENT_TYPE, "application/octet-stream") //$NON-NLS-1$
                .timeout(Duration.ofMinutes(5))
                .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get(tourAbsoluteFilePath)))
                .build();
@@ -216,11 +216,8 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       }
 
       final HttpResponse<String> response = sendAsyncRequest(request);
-      if (response == null) {
-         return false;
-      }
 
-      return response.statusCode() == 201;
+      return (response != null && response.statusCode() == 201);
    }
 
    /**
