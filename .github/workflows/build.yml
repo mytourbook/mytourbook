@@ -10,7 +10,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: echo-default-env-variables
-        run: echo "github.workspace = ${{ github.workspace }}"
+        run: |
+          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
+          echo "artifactFileName=$FILENAME" >> $GITHUB_OUTPUT
+          echo "github.workspace = ${{ github.workspace }}"
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
