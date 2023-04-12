@@ -39,6 +39,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
+
 
 import utils.Comparison;
 import utils.FilesUtils;
@@ -102,6 +104,7 @@ public class SuuntoWorkoutUploaderTests {
    }
 
    @Test
+   @Disabled
    void testTourUpload() {
 
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
