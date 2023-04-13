@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,14 +27,14 @@ public class PrefPageGeneralTests extends UITest {
 
    private SWTBotTreeItem getGeneralTreeItem() {
 
-      return bot.tree().getTreeItem("General");
+      return bot.tree().getTreeItem("General"); //$NON-NLS-1$
    }
 
    @Test
    void openComputedValuesPage() {
 
       Utils.openPreferences(bot);
-      getGeneralTreeItem().expand().getNode("Computed Values").select();
+      getGeneralTreeItem().expand().getNode("Computed Values").select(); //$NON-NLS-1$
 
       bot.cTabItem(Messages.Compute_Values_Group_Smoothing).activate();
       bot.cTabItem(Messages.Compute_BreakTime_Group_BreakTime).activate();
@@ -64,7 +64,7 @@ public class PrefPageGeneralTests extends UITest {
    void openTourPage() {
 
       Utils.openPreferences(bot);
-      getGeneralTreeItem().expand().getNode("Tour").select();
+      getGeneralTreeItem().expand().getNode("Tour").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }

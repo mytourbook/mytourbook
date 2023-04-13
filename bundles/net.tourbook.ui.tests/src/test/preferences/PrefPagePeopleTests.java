@@ -52,7 +52,7 @@ public class PrefPagePeopleTests extends UITest {
       bot.button(Messages.Dialog_HRZone_Button_EditHrZones).click();
       Utils.clickOkButton(bot);
       Utils.clickApplyAndCloseButton(bot);
-      bot.button("Yes").click();
+      bot.button("Yes").click(); //$NON-NLS-1$
       Utils.clickOkButton(bot);
    }
 
