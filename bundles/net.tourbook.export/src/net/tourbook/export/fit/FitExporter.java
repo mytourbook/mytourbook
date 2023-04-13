@@ -52,7 +52,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourType;
 import net.tourbook.export.Activator;
 
 import org.osgi.framework.Version;
@@ -273,7 +272,8 @@ public class FitExporter {
       sessionMesg.setStartTime(startTime);
       sessionMesg.setTotalElapsedTime((float) _tourData.getTourDeviceTime_Elapsed());
       sessionMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
-      setSport(sessionMesg);
+      final Sport sport = FitSportMapper.mapTourTypeToSport(_tourData.getTourType());
+      sessionMesg.setSport(sport);
       sessionMesg.setFirstLapIndex(0);
       sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
       setAvgValues(sessionMesg);
@@ -338,39 +338,5 @@ public class FitExporter {
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
-   }
-
-   private void setSport(final SessionMesg sessionMesg) {
-
-      final TourType tourType = _tourData.getTourType();
-
-      Sport sport = Sport.GENERIC;
-      sessionMesg.setSport(sport);
-
-      if (tourType == null) {
-         return;
-      }
-
-      final String tourTypeName = tourType.getName();
-
-      switch (tourTypeName.toLowerCase().trim()) {
-      case "running":
-         sport = Sport.RUNNING;
-         break;
-
-      case "cycling":
-         sport = Sport.CYCLING;
-         break;
-
-      case "walking":
-         sport = Sport.WALKING;
-         break;
-
-      default:
-         sport = Sport.GENERIC;
-         break;
-      }
-
-      sessionMesg.setSport(sport);
    }
 }

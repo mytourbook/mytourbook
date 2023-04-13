@@ -14,9 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package export;
-//todo fb 
-//get status
-//static class to do the garmin fit sport mapping
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
