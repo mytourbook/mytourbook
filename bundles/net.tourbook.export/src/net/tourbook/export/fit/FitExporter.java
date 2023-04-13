@@ -137,25 +137,26 @@ public class FitExporter {
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
       final long[] pausedTime_End = _tourData.getPausedTime_End();
 
-      if (pausedTime_Start != null && pausedTime_Start.length > 0) {
-
-         for (int index = 0; index < pausedTime_Start.length; ++index) {
-
-            final EventMesg eventMesgStop = new EventMesg();
-            eventMesgStop.setTimestamp(new DateTime(pausedTime_End[index]));
-            eventMesgStop.setEvent(Event.TIMER);
-            eventMesgStop.setEventType(EventType.STOP);
-
-            eventMessages.add(eventMesgStop);
-
-            final EventMesg eventMesgStart = new EventMesg();
-            eventMesgStart.setTimestamp(new DateTime(pausedTime_Start[index]));
-            eventMesgStart.setEvent(Event.TIMER);
-            eventMesgStart.setEventType(EventType.START);
-
-            eventMessages.add(eventMesgStart);
-         }
-      }
+      //todo fb this is the last piece that I know that makes an internal error
+//      if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+//
+//         for (int index = 0; index < pausedTime_Start.length; ++index) {
+//
+//            final EventMesg eventMesgStop = new EventMesg();
+//            eventMesgStop.setTimestamp(new DateTime(pausedTime_End[index]));
+//            eventMesgStop.setEvent(Event.TIMER);
+//            eventMesgStop.setEventType(EventType.STOP);
+//
+//            eventMessages.add(eventMesgStop);
+//
+//            final EventMesg eventMesgStart = new EventMesg();
+//            eventMesgStart.setTimestamp(new DateTime(pausedTime_Start[index]));
+//            eventMesgStart.setEvent(Event.TIMER);
+//            eventMesgStart.setEventType(EventType.START);
+//
+//            eventMessages.add(eventMesgStart);
+//         }
+//      }
 
       final EventMesg eventMesgStop = new EventMesg();
       eventMesgStop.setTimestamp(timestamp);
@@ -198,6 +199,7 @@ public class FitExporter {
 
          final LapMesg lapMesg = new LapMesg();
          lapMesg.setMessageIndex(index);
+         lapMesg.setTimestamp(timestamp);
          lapMesg.setStartTime(startTime);
          lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
          lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
@@ -339,4 +341,5 @@ public class FitExporter {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
    }
+
 }
