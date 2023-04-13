@@ -105,11 +105,17 @@ public class SuuntoWorkoutUploaderTests {
    @Test
    void testTourUpload() {
 
-      final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
-            + "WorkoutUpload-Response.json"); //$NON-NLS-1$
+      final String workoutUploadInitializationResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
+            + "WorkoutUploadInitialization-Response.json"); //$NON-NLS-1$
       httpClientMock.onPost(
             OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload").toString()) //$NON-NLS-1$
-            .doReturn(workoutsResponse)
+            .doReturn(workoutUploadInitializationResponse)
+            .withStatus(HttpURLConnection.HTTP_OK);
+      final String WorkoutUploadStatusCheckResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
+            + "WorkoutUploadStatusCheck-Response.json"); //$NON-NLS-1$
+      httpClientMock.onGet(
+            OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload/642c5admtced4c09af1c49e6").toString()) //$NON-NLS-1$
+            .doReturn(WorkoutUploadStatusCheckResponse)
             .withStatus(HttpURLConnection.HTTP_OK);
       final String blobUrl =
             "https://askoworkout001.blob.core.windows.net/fit6/642c5admtced4c09af1c49e6?sv=2019-02-02&se=2023-04-05T05%3A14%3A03Z&sr=b&sp=racwd&sig=lLSJzHaMa6EEN%2FYdFQJyCDEBzO0LuM%2BTyWVt4Bf%2BmoU%3D"; //$NON-NLS-1$
@@ -123,6 +129,7 @@ public class SuuntoWorkoutUploaderTests {
 
       httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().put(blobUrl).called();
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload/642c5admtced4c09af1c49e6").toString()).called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(

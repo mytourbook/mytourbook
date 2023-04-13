@@ -271,7 +271,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       uploadFitFile(tourData, tourAbsoluteFilePath, workoutUpload);
 
       try {
-         Thread.sleep(3000);
+         Thread.sleep(5000);
       } catch (final InterruptedException e) {
          StatusUtil.log(e);
          Thread.currentThread().interrupt();
@@ -363,7 +363,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          final WorkoutUpload workoutUpload = uploadTour(compressedTourAbsoluteFilePath, tourData);
 
          if (workoutUpload == null ||
-               workoutUpload.getStatus().equalsIgnoreCase("error")) {
+               workoutUpload.getStatus().equalsIgnoreCase("error")) { //$NON-NLS-1$
 
             final String message = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getMessage();
             final String workoutId = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getId();
@@ -377,7 +377,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             TourLogManager.log_OK(NLS.bind(
                   Messages.Log_UploadWorkoutsToSuunto_003_UploadStatus,
                   TourManager.getTourDateTimeShort(tourData),
-                  workoutUpload.getMessage()));
+                  workoutUpload.getId()));
 
             ++numberOfUploadedTours;
          }
