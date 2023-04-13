@@ -229,8 +229,8 @@ public class FitExporter {
 
       // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
       final byte[] appId = convertUUIDToBytes(UUID.fromString("e1b60f54-e7cb-46d9-88df-ced1fe7ecf0f")); //$NON-NLS-1$
-      for (int i = 0; i < appId.length; i++) {
-         developerIdMesg.setApplicationId(i, appId[i]);
+      for (int index = 0; index < appId.length; index++) {
+         developerIdMesg.setApplicationId(index, appId[index]);
       }
 
       developerIdMesg.setDeveloperDataIndex((short) 0);
@@ -294,6 +294,7 @@ public class FitExporter {
       sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
       sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
       sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
+      //todo fb do the rest
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
