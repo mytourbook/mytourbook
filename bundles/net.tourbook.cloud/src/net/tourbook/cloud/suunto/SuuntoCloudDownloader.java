@@ -374,7 +374,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          queryParameters.insert(0, '?');
       }
 
-      final URI oAuthPasseurAppUri = OAuth2Utils.createOAuthPasseurUri("/suunto/workouts" + queryParameters);
+      final URI oAuthPasseurAppUri = OAuth2Utils.createOAuthPasseurUri("/suunto/workouts" + queryParameters); //$NON-NLS-1$
 
       try {
 
