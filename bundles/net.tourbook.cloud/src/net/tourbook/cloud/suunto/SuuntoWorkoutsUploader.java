@@ -71,6 +71,23 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       super(CLOUD_UPLOADER_ID, Messages.VendorName_Suunto_Workouts);
    }
 
+   private WorkoutUpload checkUploadStatus(final TourData tourData, final String workoutUploadId) {
+
+      final HttpRequest request = HttpRequest.newBuilder()
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload/" + workoutUploadId))//$NON-NLS-1$
+            .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
+            .timeout(Duration.ofMinutes(5))
+            .GET()
+            .build();
+
+      final HttpResponse<String> response = sendAsyncRequest(tourData, request);
+      if (response == null) {
+         return null;
+      }
+
+      return serializeWorkoutUpload(response);
+   }
+
    private String createTourFile_Fit(final TourData tourData) {
 
       final String absoluteTourFilePath = FileUtils.createTemporaryFile(
@@ -145,14 +162,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          return null;
       }
 
-      WorkoutUpload workoutUpload = null;
-      try {
-         workoutUpload = new ObjectMapper().readValue(response.body(), WorkoutUpload.class);
-      } catch (final IllegalArgumentException | JsonProcessingException e) {
-         StatusUtil.log(e);
-      }
-
-      return workoutUpload;
+      return serializeWorkoutUpload(response);
    }
 
    @Override
@@ -209,9 +219,20 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return response;
    }
 
-   private boolean uploadFitFile(final TourData tourData,
-                                 final String tourAbsoluteFilePath,
-                                 final WorkoutUpload workoutUpload) {
+   private WorkoutUpload serializeWorkoutUpload(final HttpResponse<String> response) {
+
+      WorkoutUpload workoutUpload = null;
+      try {
+         workoutUpload = new ObjectMapper().readValue(response.body(), WorkoutUpload.class);
+      } catch (final IllegalArgumentException | JsonProcessingException e) {
+         StatusUtil.log(e);
+      }
+      return workoutUpload;
+   }
+
+   private void uploadFitFile(final TourData tourData,
+                              final String tourAbsoluteFilePath,
+                              final WorkoutUpload workoutUpload) {
 
       HttpRequest request = null;
       try {
@@ -226,9 +247,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          StatusUtil.log(e);
       }
 
-      final HttpResponse<String> response = sendAsyncRequest(tourData, request);
-
-      return (response != null && response.statusCode() == 201);
+      sendAsyncRequest(tourData, request);
    }
 
    /**
@@ -238,22 +257,30 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
     * @param tourData
     * @return
     */
-   private String uploadTour(final String tourAbsoluteFilePath,
-                             final TourData tourData) {
+   private WorkoutUpload uploadTour(final String tourAbsoluteFilePath,
+                                    final TourData tourData) {
 
       // Initialize workout upload
-      final WorkoutUpload workoutUpload = initializeWorkoutUpload(tourData);
+      WorkoutUpload workoutUpload = initializeWorkoutUpload(tourData);
 
       if (workoutUpload == null) {
-         return UI.EMPTY_STRING;
+         return null;
       }
 
       // Upload FIT file
-      if (uploadFitFile(tourData, tourAbsoluteFilePath, workoutUpload)) {
-         return workoutUpload.getId();
+      uploadFitFile(tourData, tourAbsoluteFilePath, workoutUpload);
+
+      try {
+         Thread.sleep(3000);
+      } catch (final InterruptedException e) {
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
-      return UI.EMPTY_STRING;
+      // Check upload status
+      workoutUpload = checkUploadStatus(tourData, workoutUpload.getId());
+
+      return workoutUpload;
    }
 
    @Override
@@ -333,14 +360,24 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
          final TourData tourData = tourToUpload.getValue();
 
-         final String workoutUploadId = uploadTour(compressedTourAbsoluteFilePath, tourData);
+         final WorkoutUpload workoutUpload = uploadTour(compressedTourAbsoluteFilePath, tourData);
 
-         if (StringUtils.hasContent(workoutUploadId)) {
+         if (workoutUpload == null ||
+               workoutUpload.getStatus().equalsIgnoreCase("error")) {
+
+            final String message = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getMessage();
+            final String workoutId = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getId();
+
+            TourLogManager.log_ERROR(NLS.bind(
+                  Messages.Log_UploadWorkoutsToSuunto_004_UploadError,
+                  new Object[] { TourManager.getTourDateTimeShort(tourData), workoutId, message }));
+
+         } else {
 
             TourLogManager.log_OK(NLS.bind(
                   Messages.Log_UploadWorkoutsToSuunto_003_UploadStatus,
                   TourManager.getTourDateTimeShort(tourData),
-                  workoutUploadId));
+                  workoutUpload.getMessage()));
 
             ++numberOfUploadedTours;
          }

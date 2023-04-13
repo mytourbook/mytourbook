@@ -22,6 +22,8 @@ class WorkoutUpload {
 
    private String  id;
    private String  url;
+   private String  status;
+   private String  message;
 
    private Headers headers;
 
@@ -31,6 +33,14 @@ class WorkoutUpload {
 
    public String getId() {
       return id;
+   }
+
+   public String getMessage() {
+      return message;
+   }
+
+   public String getStatus() {
+      return status;
    }
 
    public String getUrl() {
