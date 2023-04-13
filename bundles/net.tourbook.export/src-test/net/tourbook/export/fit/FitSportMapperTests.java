@@ -32,6 +32,7 @@ public class FitSportMapperTests {
       assertAll(
             () -> assertEquals(Sport.CYCLING, FitSportMapper.mapTourTypeToSport(new TourType("Cycling"))), //$NON-NLS-1$
             () -> assertEquals(Sport.WALKING, FitSportMapper.mapTourTypeToSport(new TourType("WALKING"))), //$NON-NLS-1$
+            () -> assertEquals(Sport.GENERIC, FitSportMapper.mapTourTypeToSport(new TourType("crosscountry"))), //$NON-NLS-1$
             () -> assertEquals(Sport.GENERIC, FitSportMapper.mapTourTypeToSport(null)));
    }
 }
