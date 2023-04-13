@@ -295,6 +295,7 @@ public class FitExporter {
       sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
       sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
       sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
+      //sessionMesg.setAvgTemperature((byte) _tourData.getWeather_Temperature_Average_Device());
       //todo fb do the rest
    }
 
