@@ -137,6 +137,7 @@ public class TourExporter {
 
    private boolean      _isFIT;
    private boolean      _isGPX;
+   private boolean      _isMT;
    private boolean      _isTCX;
 
    public TourExporter(final String formatTemplate) {
@@ -144,9 +145,11 @@ public class TourExporter {
       _formatTemplate = formatTemplate;
 
       if (net.tourbook.common.util.StringUtils.hasContent(formatTemplate)) {
-         _isGPX = formatTemplate.toLowerCase().contains("gpx"); //$NON-NLS-1$
-         _isTCX = formatTemplate.toLowerCase().contains("tcx"); //$NON-NLS-1$
+
          _isFIT = formatTemplate.equalsIgnoreCase("fit"); //$NON-NLS-1$
+         _isGPX = formatTemplate.toLowerCase().contains("gpx"); //$NON-NLS-1$
+         _isMT = formatTemplate.toLowerCase().contains("mt"); //$NON-NLS-1$
+         _isTCX = formatTemplate.toLowerCase().contains("tcx"); //$NON-NLS-1$
       }
 
       // .tcx files always contain absolute distances
@@ -239,7 +242,7 @@ public class TourExporter {
          serieData = _tourData.getSerieData();
       }
 
-      if (_isGPX || _isTCX) {
+      if (_isGPX || _isTCX || _isMT) {
          /*
           * Setup context
           */
