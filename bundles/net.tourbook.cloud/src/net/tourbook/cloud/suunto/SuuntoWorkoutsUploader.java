@@ -270,15 +270,13 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       // Upload FIT file
       uploadFitFile(tourData, tourAbsoluteFilePath, workoutUpload);
 
-      try {
-         Thread.sleep(5000);
-      } catch (final InterruptedException e) {
-         StatusUtil.log(e);
-         Thread.currentThread().interrupt();
-      }
-
       // Check upload status
-      workoutUpload = checkUploadStatus(tourData, workoutUpload.getId());
+      while (workoutUpload != null &&
+            (StringUtils.isNullOrEmpty(workoutUpload.getStatus()) ||
+                  workoutUpload.getStatus().equalsIgnoreCase("new"))) { //$NON-NLS-1$
+
+         workoutUpload = checkUploadStatus(tourData, workoutUpload.getId());
+      }
 
       return workoutUpload;
    }
