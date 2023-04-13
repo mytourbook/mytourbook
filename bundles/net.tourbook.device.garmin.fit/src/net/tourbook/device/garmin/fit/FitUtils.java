@@ -21,7 +21,7 @@ public class FitUtils {
 
    /**
     * Convert Garmin time into java time
-    * Note: This also works
+    * Note: This also works as an equivalent
     * getTimestamp().getDate().toInstant().toEpochMilli();
     */
    public static long convertGarminTimeToJavaTime(final long timeStamp) {
