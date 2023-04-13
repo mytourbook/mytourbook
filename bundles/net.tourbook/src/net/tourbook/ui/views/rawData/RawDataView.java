@@ -184,6 +184,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
@@ -235,7 +236,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                   //$NON-NLS-1$
    //
    private static final String           WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                        //$NON-NLS-1$
-   //   private static final String   WEB_RESOURCE_TITLE_FONT                        = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
+   //   private static final String      WEB_RESOURCE_TITLE_FONT                    = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                    //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                        //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                   //$NON-NLS-1$
@@ -243,26 +244,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           CSS_IMPORT_BACKGROUND                      = "div.import-background";                  //$NON-NLS-1$
    private static final String           CSS_IMPORT_TILE                            = "a.import-tile";                          //$NON-NLS-1$
    //
+   public static final String            STATE_DEFAULT_CADENCE_MULTIPLIER           = "STATE_DEFAULT_CADENCE_MULTIPLIER";       //$NON-NLS-1$
+   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT   = CadenceMultiplier.RPM;
+   public static final String            STATE_IMPORT_UI                            = "importUI";                               //$NON-NLS-1$
+   public static final ImportUI          STATE_IMPORT_UI_DEFAULT                    = ImportUI.EASY_IMPORT_FANCY;
    private static final String           STATE_IMPORTED_FILENAMES                   = "importedFilenames";                      //$NON-NLS-1$
    private static final String           STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                    //$NON-NLS-1$
    //
+   public static final String            STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";     //$NON-NLS-1$
+   public static final boolean           STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
    public static final String            STATE_IS_CHECKSUM_VALIDATION               = "isChecksumValidation";                   //$NON-NLS-1$
    public static final boolean           STATE_IS_CHECKSUM_VALIDATION_DEFAULT       = true;
    public static final String            STATE_IS_CONVERT_WAYPOINTS                 = "STATE_IS_CONVERT_WAYPOINTS";             //$NON-NLS-1$
    public static final boolean           STATE_IS_CONVERT_WAYPOINTS_DEFAULT         = true;
    public static final String            STATE_IS_CREATE_TOUR_ID_WITH_TIME          = "isCreateTourIdWithTime";                 //$NON-NLS-1$
    public static final boolean           STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT  = false;
-   public static final String            STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";     //$NON-NLS-1$
-   public static final boolean           STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
-   private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
-   public static final String            STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                          //$NON-NLS-1$
-   public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT              = false;
    public static final String            STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                    //$NON-NLS-1$
    public static final boolean           STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
+   public static final String            STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                          //$NON-NLS-1$
+   public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT              = false;
+   private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
    public static final String            STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                        //$NON-NLS-1$
    public static final boolean           STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
-   public static final String            STATE_DEFAULT_CADENCE_MULTIPLIER           = "STATE_DEFAULT_CADENCE_MULTIPLIER";       //$NON-NLS-1$
-   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT   = CadenceMultiplier.RPM;
    //
    private static final String           HREF_TOKEN                                 = "#";                                      //$NON-NLS-1$
    private static final String           PAGE_ABOUT_BLANK                           = "about:blank";                            //$NON-NLS-1$
@@ -387,7 +390,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionSaveTourInDatabase       _actionSaveTourWithPerson;
    private ActionSetupImport              _actionSetupImport;
    private ActionSetTourTypeMenu          _actionSetTourType;
-   private ActionToggleFossilOrEasyImport _actionToggleFossilOrEasyImportUI;
+   private ActionToggleFossilOrEasyImport _actionToggleImportUI;
    private ActionUpload                   _actionUploadTour;
    //
    private TourPerson                     _activePerson;
@@ -435,7 +438,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private boolean                       _isBrowserCompleted;
    private boolean                       _isInUIStartup;
    private boolean                       _isInUpdate;
-   private boolean                       _isEasyImportUI;
+   //
+   private ImportUI                      _importUI;
 
    /**
     * When <code>false</code> then the background WatchStores task must set it valid. Only when it
@@ -469,26 +473,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    //
    private PixelConverter                _pc;
    private List<TourbookCloudDownloader> _cloudDownloadersList       = CloudDownloaderManager.getCloudDownloaderList();
+   //
+   private DialogEasyImportConfig        _dialogImportConfig;
 
    /*
-    * resources
+    * Resources
     */
-   private ImageRegistry          _images;
-
-   private DialogEasyImportConfig _dialogImportConfig;
+   private ImageRegistry _images;
 
    /*
     * UI controls
     */
-   private PageBook  _topPageBook;
-   private Composite _topPage_Dashboard;
+   private PageBook  _topPage_PageBook;
    private Composite _topPage_ImportViewer;
-   private Composite _topPage_OldUI;
    private Composite _topPage_Startup;
 
-   private PageBook  _dashboard_PageBook;
-   private Composite _dashboardPage_NoBrowser;
-   private Composite _dashboardPage_WithBrowser;
+   private Composite _topPage_ImportUI_EasyImport_Fancy;
+   private Composite _topPage_ImportUI_EasyImport_Simple;
+   private Composite _topPage_ImportUI_FossilUI;
+
+   private PageBook  _easyImportFancy_PageBook;
+   private Composite _easyImportFancy_Page_NoBrowser;
+   private Composite _easyImportFancy_Page_WithBrowser;
 
    private Composite _parent;
    private Composite _viewerContainer;
@@ -505,13 +511,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       public ActionToggleFossilOrEasyImport() {
 
-         setToolTipText(Messages.Import_Data_Action_ImportUI_Easy_Tooltip);
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy));
+         setToolTipText(Messages.Import_Data_Action_ImportUI_Tooltip);
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy));
       }
 
       @Override
-      public void run() {
-         actionToggle_SimpleOrEasy_ImportUI();
+      public void runWithEvent(final Event event) {
+
+         actionToggle_ImportUI(event);
       }
    }
 
@@ -661,6 +668,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    }
 
+   private enum ImportUI {
+
+      /**
+       * Dashboard with the browser
+       */
+      EASY_IMPORT_FANCY,
+
+      /**
+       * Dashboard with SWT widget, to fix issues when the browser is sometimes not working
+       * correctly
+       */
+      EASY_IMPORT_SIMPLE,
+
+      /**
+       * Just a simple import of files without easy import features
+       */
+      FOSSIL
+   }
+
    private class JS_OnSelectImportConfig extends BrowserFunction {
 
       JS_OnSelectImportConfig(final Browser browser, final String name) {
@@ -791,7 +817,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          updateModel_EasyConfig_Dashboard(_dialogImportConfig.getModifiedConfig());
 
          _isDeviceStateValid = false;
-         updateUI_2_Dashboard();
+         updateUI_2_EasyImport_Fancy();
       }
 
       _dialogImportConfig = null;
@@ -896,20 +922,60 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       saveImportedTours(getAnySelectedTours(), person);
    }
 
-   private void actionToggle_SimpleOrEasy_ImportUI() {
+   /**
+    * Toggle between different UI's
+    *
+    * @param event
+    */
+   private void actionToggle_ImportUI(final Event event) {
 
-      if (_isEasyImportUI) {
+      final boolean isForward = UI.isCtrlKey(event) == false;
 
-         // show fossil UI
+// SET_FORMATTING_OFF
 
-         onSelectUI_Fossil();
+      boolean isFancy  = false;
+      boolean isSimple = false;
+      boolean isFossil = false;
 
-      } else {
+      switch (_importUI) {
 
-         // show easy UI
+      case EASY_IMPORT_FANCY:
 
-         onSelectUI_EasyImport();
+         if (isForward) {     isSimple = true;  }
+         else {               isFossil = true;  }
+
+         break;
+
+      case EASY_IMPORT_SIMPLE:
+
+         if (isForward) {     isFossil = true;  }
+         else {               isFancy  = true;  }
+
+         break;
+
+      case FOSSIL:
+      default:
+
+         if (isForward) {     isFancy  = true;  }
+         else {               isSimple = true;  }
+
+         break;
       }
+
+      if (isFancy) {
+
+         onSelectUI_EasyImport_Fancy(ImportUI.EASY_IMPORT_FANCY);
+
+      } else if (isSimple) {
+
+         onSelectUI_EasyImport_Other(ImportUI.EASY_IMPORT_SIMPLE);
+
+      } else if (isFossil) {
+
+         onSelectUI_EasyImport_Other(ImportUI.FOSSIL);
+      }
+
+// SET_FORMATTING_ON
    }
 
    private void addPartListener() {
@@ -1113,7 +1179,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _actionEditImportPreferences        = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
 
-      _actionToggleFossilOrEasyImportUI   = new ActionToggleFossilOrEasyImport();
       _actionClearView                    = new ActionClearView(this);
       _actionDeleteTourFile               = new ActionDeleteTourFiles(this);
       _actionEditTour                     = new ActionEditTour(this);
@@ -1133,6 +1198,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionSaveTourWithPerson           = new ActionSaveTourInDatabase(this, true);
       _actionSetupImport                  = new ActionSetupImport(this);
       _actionSetTourType                  = new ActionSetTourTypeMenu(this);
+      _actionToggleImportUI               = new ActionToggleFossilOrEasyImport();
       _actionUploadTour                   = new ActionUpload(this);
 
 // SET_FORMATTING_ON
@@ -2456,18 +2522,50 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void createUI(final Composite parent) {
 
-      _topPageBook = new PageBook(parent, SWT.NONE);
+      _topPage_PageBook = new PageBook(parent, SWT.NONE);
 
-      _topPage_OldUI = createUI_05_Page_OldUI(_topPageBook);
-      _topPage_Startup = createUI_10_Page_Startup(_topPageBook);
-      _topPage_ImportViewer = createUI_90_Page_TourViewer(_topPageBook);
+// SET_FORMATTING_OFF
 
-      _topPageBook.showPage(_topPage_Startup);
+      _topPage_Startup                    = createUI_00_Page_Startup    (_topPage_PageBook);
+      _topPage_ImportUI_FossilUI          = createUI_10_Page_FossilUI   (_topPage_PageBook);
+      _topPage_ImportUI_EasyImport_Simple = createUI_50_Page_SimpleUI   (_topPage_PageBook);
+
+      _topPage_ImportViewer               = createUI_90_Page_TourViewer (_topPage_PageBook);
+
+// SET_FORMATTING_ON
+
+      _topPage_PageBook.showPage(_topPage_Startup);
    }
 
-   private Composite createUI_05_Page_OldUI(final Composite parent) {
+   /**
+    * This page is displayed until the first page of the browser is loaded.
+    *
+    * @param parent
+    * @return
+    */
+   private Composite createUI_00_Page_Startup(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      {
+//         final Label label = new Label(container, SWT.NONE);
+//         GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(label);
+//         label.setText("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST "); //$NON-NLS-1$
+//      }
+
+      return container;
+   }
+
+   private Composite createUI_10_Page_FossilUI(final Composite parent) {
 
       final int defaultWidth = 300;
+
+      final GridDataFactory linkGridData = GridDataFactory.fillDefaults()
+            .hint(defaultWidth, SWT.DEFAULT)
+            .align(SWT.FILL, SWT.CENTER)
+            .grab(true, false)
+            .indent(0, 10);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -2486,7 +2584,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   .span(2, 1)
                   .applyTo(label);
          }
-
          {
             /*
              * Import
@@ -2497,7 +2594,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             GridDataFactory.fillDefaults()
                   .indent(0, 10)
                   .align(SWT.CENTER, SWT.BEGINNING)
-//                  .grab(true, false)
                   .applyTo(iconImport);
 
             // link
@@ -2505,14 +2601,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             _linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
             _linkImport.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> _rawDataMgr.actionImportFromFile()));
-            GridDataFactory.fillDefaults()
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(_linkImport);
+            linkGridData.applyTo(_linkImport);
          }
-
          {
             /*
              * Data transfer
@@ -2522,7 +2612,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             iconTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER));
             GridDataFactory.fillDefaults()
                   .align(SWT.CENTER, SWT.BEGINNING)
-//                  .grab(true, false)
                   .indent(0, 10)
                   .applyTo(iconTransfer);
 
@@ -2531,14 +2620,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
             linkTransfer.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> _rawDataMgr.actionImportFromDevice()));
-            GridDataFactory.fillDefaults()
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-//                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(linkTransfer);
+            linkGridData.applyTo(linkTransfer);
          }
-
          {
             /*
              * Direct data transfer
@@ -2548,7 +2631,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             iconDirectTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER_DIRECT));
             GridDataFactory.fillDefaults()
                   .align(SWT.CENTER, SWT.BEGINNING)
-//                  .grab(true, false)
                   .indent(0, 10)
                   .applyTo(iconDirectTransfer);
 
@@ -2557,14 +2639,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
             linkTransferDirect.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> _rawDataMgr.actionImportFromDeviceDirect()));
-            GridDataFactory.fillDefaults()
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(linkTransferDirect);
+            linkGridData.applyTo(linkTransferDirect);
          }
-
          {
             /*
              * New UI
@@ -2578,15 +2654,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final Link link = new Link(container, SWT.NONE);
             link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
             link.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onSelectUI_EasyImport()));
-            GridDataFactory.fillDefaults()
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(link);
+                  selectionEvent -> onSelectUI_EasyImport_Fancy(ImportUI.EASY_IMPORT_FANCY)));
+            linkGridData.applyTo(link);
          }
-
          {
             /*
              * Hint
@@ -2605,39 +2675,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return container;
    }
 
-   /**
-    * This page is displayed until the first page of the browser is loaded.
-    *
-    * @param parent
-    * @return
-    */
-   private Composite createUI_10_Page_Startup(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      {
-//         final Label label = new Label(container, SWT.NONE);
-//         GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(label);
-//         label.setText("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST "); //$NON-NLS-1$
-//      }
-
-      return container;
-   }
-
-   private Composite createUI_20_Page_Dashboard(final Composite parent) {
+   private Composite createUI_20_Page_EasyImporFancy(final Composite parent) {
 
       final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 
-      _dashboard_PageBook = new PageBook(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboard_PageBook);
+      _easyImportFancy_PageBook = new PageBook(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_easyImportFancy_PageBook);
 
-      _dashboardPage_NoBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
-      _dashboardPage_NoBrowser.setBackground(bgColor);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboardPage_NoBrowser);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_dashboardPage_NoBrowser);
+      /*
+       * Page: Browser error
+       */
+      _easyImportFancy_Page_NoBrowser = new Composite(_easyImportFancy_PageBook, SWT.NONE);
+      _easyImportFancy_Page_NoBrowser.setBackground(bgColor);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_easyImportFancy_Page_NoBrowser);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_easyImportFancy_Page_NoBrowser);
       {
-         _txtNoBrowser = new Text(_dashboardPage_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
+         _txtNoBrowser = new Text(_easyImportFancy_Page_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
          _txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
          _txtNoBrowser.setBackground(bgColor);
          GridDataFactory.fillDefaults()
@@ -2646,13 +2699,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                .applyTo(_txtNoBrowser);
       }
 
-      _dashboardPage_WithBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(_dashboardPage_WithBrowser);
+      /*
+       * Page: Browser for fancy UI
+       */
+      _easyImportFancy_Page_WithBrowser = new Composite(_easyImportFancy_PageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_easyImportFancy_Page_WithBrowser);
       {
-         createUI_22_Browser(_dashboardPage_WithBrowser);
+         createUI_22_Browser(_easyImportFancy_Page_WithBrowser);
       }
 
-      return _dashboard_PageBook;
+      return _easyImportFancy_PageBook;
    }
 
    private void createUI_22_Browser(final Composite parent) {
@@ -2715,6 +2771,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          showFailbackUI();
       }
+   }
+
+   private Composite createUI_50_Page_SimpleUI(final Composite parent) {
+      // TODO Auto-generated method stub
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.WRAP);
+         label.setText("Simple UI");
+      }
+
+      return container;
    }
 
    private Composite createUI_90_Page_TourViewer(final Composite parent) {
@@ -2815,18 +2885,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       });
 
       return tableContextMenu;
-   }
-
-   private void createUI_NewUI() {
-
-      /*
-       * Create new UI only when it is used to prevent that the app is crashing when the old UI is
-       * used
-       */
-      if (_topPage_Dashboard == null) {
-
-         _topPage_Dashboard = createUI_20_Page_Dashboard(_topPageBook);
-      }
    }
 
    /**
@@ -3588,7 +3646,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       updateModel_EasyConfig_Dashboard(dialogImportConfig.getModifiedConfig());
 
       _isDeviceStateValid = false;
-      updateUI_2_Dashboard();
+      updateUI_2_EasyImport_Fancy();
    }
 
    private void enableActions() {
@@ -3731,8 +3789,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // import setup
       _actionClearView                    .setEnabled(isTourImported);
-      _actionSetupImport                  .setEnabled(!isTourImported);
-      _actionToggleFossilOrEasyImportUI   .setEnabled(!isTourImported);
+      _actionSetupImport                  .setEnabled(isTourImported == false);
+      _actionToggleImportUI               .setEnabled(isTourImported == false);
 
       // actions for tags/tour types
       _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
@@ -3806,7 +3864,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tbm.add(new GroupMarker("import")); //$NON-NLS-1$
       tbm.add(new Separator());
 
-      tbm.add(_actionToggleFossilOrEasyImportUI);
+      tbm.add(_actionToggleImportUI);
       tbm.add(_actionClearView);
       tbm.add(_actionOpenTourLogView);
       tbm.add(_actionSetupImport);
@@ -4316,7 +4374,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
-         onSelectUI_Fossil();
+         onSelectUI_EasyImport_Other(ImportUI.FOSSIL);
 
       } else {
 
@@ -4365,9 +4423,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       setWatcher_Off();
       easyConfig.setActiveImportConfig(selectedConfig);
       _isDeviceStateValid = false;
-      updateUI_2_Dashboard();
+      updateUI_2_EasyImport_Fancy();
       setWatcher_On();
-      updateUI_2_Dashboard();
+      updateUI_2_EasyImport_Fancy();
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -4404,28 +4462,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void onSelectUI_EasyImport() {
+   private void onSelectUI_EasyImport_Fancy(final ImportUI importUI) {
 
-      _isEasyImportUI = true;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
+      _importUI = importUI;
 
       updateUI_1_TopPage(true);
 
       showFailbackUI();
 
-      updateUI_EasyFossilAction();
+      updateUI_ImportUI_Action();
    }
 
-   private void onSelectUI_Fossil() {
+   private void onSelectUI_EasyImport_Other(final ImportUI importUI) {
+
+      _importUI = importUI;
 
       resetEasyImport();
 
-      _isEasyImportUI = false;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isEasyImportUI);
-
       updateUI_1_TopPage(true);
 
-      updateUI_EasyFossilAction();
+      updateUI_ImportUI_Action();
    }
 
    private void recreateViewer() {
@@ -4437,7 +4493,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
       _isDeviceStateValid = false;
-      updateUI_2_Dashboard();
+      updateUI_2_EasyImport_Fancy();
    }
 
    @Override
@@ -4682,15 +4738,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void resetEasyImport() {
 
       setWatcher_Off();
+
       EasyImportManager.getInstance().reset();
    }
 
    private void restoreState() {
 
-      _isEasyImportUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
+      _importUI = (ImportUI) Util.getStateEnum(_state, STATE_IMPORT_UI, STATE_IMPORT_UI_DEFAULT);
 
-      _actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
-            _state,
+      _actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(_state,
             STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED,
             true));
 
@@ -4716,7 +4772,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
 
       // auto open import log view
-      final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
+      final boolean isAutoOpenLogView = Util.getStateBoolean(_state,
             STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
             RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
       _rawDataMgr.setState_IsOpenImportLogView(isAutoOpenLogView);
@@ -4726,7 +4782,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _rawDataMgr.setIsHAC4_5_ChecksumValidation(isValidation);
 
       updateToolTipState();
-      updateUI_EasyFossilAction();
+      updateUI_ImportUI_Action();
 
       Display.getCurrent().asyncExec(() -> reimportAllImportFiles(true));
    }
@@ -5099,7 +5155,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void runEasyImport_007_ReplaceElevationFromSRTM(final ImportLauncher importLauncher,
                                                            final ArrayList<TourData> importedTours) {
-      // TODO Auto-generated method stub
 
       // "7. Replace elevation up/down total values from SRTM data"
       TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM);
@@ -5585,12 +5640,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void saveState() {
 
       // check if UI is disposed
-      final Table table = _tourViewer.getTable();
-      if (table.isDisposed()) {
+      if (_parent.isDisposed()) {
          return;
       }
 
       EasyImportManager.getInstance().saveEasyConfig(getEasyConfig());
+
+      Util.setStateEnum(_state, STATE_IMPORT_UI, _importUI);
 
       /*
        * save imported file names
@@ -5608,7 +5664,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _state.put(STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED, isRemoveToursWhenClosed);
 
       // keep selected tours
-      Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
+      Util.setState(_state, STATE_SELECTED_TOUR_INDICES, _tourViewer.getTable().getSelectionIndices());
 
       _columnManager.saveState(_state);
    }
@@ -5648,15 +5704,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else {
 
-         if (_isEasyImportUI) {
+         switch (_importUI) {
 
+         case EASY_IMPORT_FANCY:
             if (_browser != null) {
                _browser.setFocus();
             }
+            break;
 
-         } else {
+         case EASY_IMPORT_SIMPLE:
+            break;
 
-            _topPageBook.setFocus();
+         case FOSSIL:
+         default:
+            _topPage_PageBook.setFocus();
+            break;
          }
       }
 
@@ -5713,7 +5775,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // check again because the browser could be set
             if (_browser == null || _browser.isDisposed()) {
-               onSelectUI_Fossil();
+
+               onSelectUI_EasyImport_Other(ImportUI.EASY_IMPORT_SIMPLE);
             }
          });
       }
@@ -6128,26 +6191,36 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          thread_FolderWatcher_Deactivate();
 
-         _topPageBook.showPage(_topPage_ImportViewer);
+         _topPage_PageBook.showPage(_topPage_ImportViewer);
 
       } else {
 
-         /*
-          * !!! Run async that the first page in the top pagebook is visible and to prevent
-          * flickering when the view toolbar is first drawn on the left side of the view !!!
-          */
+         switch (_importUI) {
 
-         if (_isEasyImportUI) {
+         case EASY_IMPORT_FANCY:
+
+            /*
+             * !!! Run async that the first page in the top pagebook is visible and to prevent
+             * flickering when the view toolbar is first drawn on the left side of the view !!!
+             */
 
             _parent.getDisplay().asyncExec(() -> {
 
                _isInUIStartup = isInStartUp;
 
-               createUI_NewUI();
-               _topPageBook.showPage(_topPage_Dashboard);
+               /*
+                * Create new UI only when it is used to prevent that the app is crashing when
+                * another import UI is used
+                */
+               if (_topPage_ImportUI_EasyImport_Fancy == null) {
+
+                  _topPage_ImportUI_EasyImport_Fancy = createUI_20_Page_EasyImporFancy(_topPage_PageBook);
+               }
+
+               _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Fancy);
 
                // create dashboard UI
-               updateUI_2_Dashboard();
+               updateUI_2_EasyImport_Fancy();
 
                if (_browser == null) {
 
@@ -6158,12 +6231,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                // the watcher is started in onBrowser_Completed
             });
+            break;
 
-         } else {
+         case EASY_IMPORT_SIMPLE:
 
-            _topPageBook.showPage(_topPage_OldUI);
+            _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Simple);
+
+            break;
+
+         case FOSSIL:
+         default:
+
+            _topPage_PageBook.showPage(_topPage_ImportUI_FossilUI);
 
             _linkImport.setFocus();
+            break;
          }
       }
    }
@@ -6171,9 +6253,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /**
     * Set/create dashboard page.
     */
-   private void updateUI_2_Dashboard() {
+   private void updateUI_2_EasyImport_Fancy() {
 
-      if (_dashboard_PageBook == null) {
+      if (_easyImportFancy_PageBook == null) {
 
          /*
           * This occurs when the app is started the first time and the measurement selection dialog
@@ -6186,19 +6268,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isBrowserAvailable = _browser != null;
 
       // set dashboard page
-      _dashboard_PageBook.showPage(isBrowserAvailable
-            ? _dashboardPage_WithBrowser
-            : _dashboardPage_NoBrowser);
+      _easyImportFancy_PageBook.showPage(isBrowserAvailable
+            ? _easyImportFancy_Page_WithBrowser
+            : _easyImportFancy_Page_NoBrowser);
 
-      if (!isBrowserAvailable) {
-         return;
+      if (isBrowserAvailable) {
+
+         final String html = createHTML();
+
+         _isBrowserCompleted = false;
+
+         _browser.setText(html);
       }
-
-      final String html = createHTML();
-
-      _isBrowserCompleted = false;
-
-      _browser.setText(html);
    }
 
    private void updateUI_DeviceState() {
@@ -6245,26 +6326,36 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void updateUI_EasyFossilAction() {
+   private void updateUI_ImportUI_Action() {
 
-      if (_isEasyImportUI) {
+// SET_FORMATTING_OFF
 
-         // show fossil UI
+      switch (_importUI) {
 
-         _actionToggleFossilOrEasyImportUI.setToolTipText(Messages.Import_Data_Action_ImportUI_Fossil_Tooltip);
+      case EASY_IMPORT_FANCY:
 
-         _actionToggleFossilOrEasyImportUI.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil));
-         _actionToggleFossilOrEasyImportUI.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil_Disabled));
+         _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy));
+         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy_Disabled));
 
-      } else {
+         break;
 
-         // show easy UI
+      case EASY_IMPORT_SIMPLE:
 
-         _actionToggleFossilOrEasyImportUI.setToolTipText(Messages.Import_Data_Action_ImportUI_Easy_Tooltip);
+         _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Simple));
+         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Simple_Disabled));
 
-         _actionToggleFossilOrEasyImportUI.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy));
-         _actionToggleFossilOrEasyImportUI.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Disabled));
+         break;
+
+      case FOSSIL:
+      default:
+
+         _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil));
+         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil_Disabled));
+
+         break;
       }
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -6294,7 +6385,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void updateUI_WatcherAnimation(final String domClassState) {
 
-      if (_isShowWatcherAnimation && _browser != null && !_browser.isDisposed() && _isBrowserCompleted) {
+      if (_isShowWatcherAnimation
+            && _browser != null
+            && _browser.isDisposed() == false
+            && _isBrowserCompleted) {
 
          _isShowWatcherAnimation = false;
 

@@ -1044,8 +1044,7 @@ public class Messages extends NLS {
    public static String        import_data_action_clear_view_tooltip;
    public static String        Import_Data_Action_DeleteTourFiles;
    public static String        Import_Data_Action_EditImportPreferences;
-   public static String        Import_Data_Action_ImportUI_Easy_Tooltip;
-   public static String        Import_Data_Action_ImportUI_Fossil_Tooltip;
+   public static String        Import_Data_Action_ImportUI_Tooltip;
    public static String        Import_Data_Action_OpenLogView;
    public static String        Import_Data_Action_OpenLogView_Tooltip;
    public static String        Import_Data_Action_RemoveTour;
