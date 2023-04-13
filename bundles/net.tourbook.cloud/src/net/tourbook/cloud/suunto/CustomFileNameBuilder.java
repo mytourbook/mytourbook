@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-class CustomFileNameBuilder {
+public class CustomFileNameBuilder {
 
    private static IPreferenceStore _prefStore =
          Activator.getDefault().getPreferenceStore();
@@ -50,7 +50,7 @@ class CustomFileNameBuilder {
     * @param suuntoFileName
     * @return
     */
-   static String buildCustomizedFileName(final Payload workoutPayload,
+   public static String buildCustomizedFileName(final Payload workoutPayload,
                                                 final String suuntoFileName) {
 
       final String suuntoFilenameComponents =
@@ -142,7 +142,7 @@ class CustomFileNameBuilder {
       return customizedFileName.toString();
    }
 
-   static List<String> extractFileNameComponents(final String suuntoFilenameComponents) {
+   public static List<String> extractFileNameComponents(final String suuntoFilenameComponents) {
 
       //This pattern looks for all the substrings in between '{' and '}'
       final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
@@ -157,7 +157,7 @@ class CustomFileNameBuilder {
       return fileNameComponents;
    }
 
-   static PART_TYPE getPartTypeFromComponent(final String fileNameComponent) {
+   public static PART_TYPE getPartTypeFromComponent(final String fileNameComponent) {
 
       final PART_TYPE partType = fileNameComponent.startsWith(
             PART_TYPE.USER_TEXT.toString())
