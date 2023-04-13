@@ -54,11 +54,11 @@ public class Comparison {
       //Convert the test FIT file to CSV for a human readable comparison
       convertFitToCsvFile(testTourFilePathFit);
 
-      final String testTourFilePathCsv = testTourFilePathFit.replace(".fit", ".csv");
+      final String testTourFilePathCsv = testTourFilePathFit.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
       final Path testTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
       assertTrue(Files.exists(testTourAbsoluteFilePathCsv));
 
-      final String controlTourFilePathCsv = controlTourFilePath.replace(".fit", ".csv");
+      final String controlTourFilePathCsv = controlTourFilePath.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
       final Path controlTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePathCsv));
       assertTrue(Files.exists(controlTourAbsoluteFilePathCsv));
 
@@ -71,7 +71,7 @@ public class Comparison {
          if (!controlFileContent.equals(testFileContentArray)) {
 
             final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
-            writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$
+            writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$ //$NON-NLS-2$
          }
          assertLinesMatch(controlFileContent, testFileContentArray);
 
@@ -155,11 +155,11 @@ public class Comparison {
       final File fileToConvert = new File(fitFilePath);
 
       final String fitCsvToolFilePath = FilesUtils.getAbsoluteFilePath(
-            FilesUtils.rootPath + "utils/files/FitCSVTool.jar");
+            FilesUtils.rootPath + "utils/files/FitCSVTool.jar"); //$NON-NLS-1$
 
       final ProcessBuilder processBuilder = new ProcessBuilder(
-            "java",
-            "-jar",
+            "java", //$NON-NLS-1$
+            "-jar", //$NON-NLS-1$
             fitCsvToolFilePath,
             fileToConvert.getAbsolutePath());
       try {
