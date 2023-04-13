@@ -130,11 +130,11 @@ public class Messages extends NLS {
 
    public static String        Font_Editor_Label_FontSize;
 
-   static String               Format_DateTime_yyyymmdd_hhmmss;
+   public static String        Format_DateTime_yyyymmdd_hhmmss;
 
-   static String               Format_TimeDuration_hh;
-   static String               Format_TimeDuration_hhmm;
-   static String               Format_TimeDuration_hhmmss;
+   public static String        Format_TimeDuration_hh;
+   public static String        Format_TimeDuration_hhmm;
+   public static String        Format_TimeDuration_hhmmss;
 
    public static String        Graph_Label_Altimeter;
    public static String        Graph_Label_Altitude;
