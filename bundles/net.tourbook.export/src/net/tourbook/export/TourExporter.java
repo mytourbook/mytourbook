@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-///TODO FB: Idea: Have a single "Export Tour" contextual menu that opens a single dialog
-//where a top combo will contain all the possible formats (TCX, GPX, MT, FIT) and
-//when each combo is selected, then the dialogs below it will get drawn
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
