@@ -39,6 +39,7 @@ import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.util.SemicirclesConverter;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
@@ -130,36 +131,45 @@ public class FitExporter {
       return userProfileMesg;
    }
 
-   private List<EventMesg> createEventMessages(final DateTime timestamp) {
+   private List<EventMesg> createEventMessages(final DateTime startTime, final DateTime finalTimestamp) {
 
       final List<EventMesg> eventMessages = new ArrayList<>();
+
+      EventMesg eventMesgStart = new EventMesg();
+      eventMesgStart.setTimestamp(startTime);
+      eventMesgStart.setEvent(Event.TIMER);
+      eventMesgStart.setEventType(EventType.STOP_ALL);
+      eventMessages.add(eventMesgStart);
 
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
       final long[] pausedTime_End = _tourData.getPausedTime_End();
 
-      //todo fb this is the last piece that I know that makes an internal error
-//      if (pausedTime_Start != null && pausedTime_Start.length > 0) {
-//
-//         for (int index = 0; index < pausedTime_Start.length; ++index) {
-//
-//            final EventMesg eventMesgStop = new EventMesg();
-//            eventMesgStop.setTimestamp(new DateTime(pausedTime_End[index]));
-//            eventMesgStop.setEvent(Event.TIMER);
-//            eventMesgStop.setEventType(EventType.STOP);
-//
-//            eventMessages.add(eventMesgStop);
-//
-//            final EventMesg eventMesgStart = new EventMesg();
-//            eventMesgStart.setTimestamp(new DateTime(pausedTime_Start[index]));
-//            eventMesgStart.setEvent(Event.TIMER);
-//            eventMesgStart.setEventType(EventType.START);
-//
-//            eventMessages.add(eventMesgStart);
-//         }
-//      }
+      if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+
+         for (int index = 0; index < pausedTime_Start.length; ++index) {
+
+            final EventMesg eventMesgStop = new EventMesg();
+            final Date pausedTime_Start_Date = Date.from(Instant.ofEpochMilli(pausedTime_Start[index]));
+            eventMesgStop.setTimestamp(new DateTime(pausedTime_Start_Date));
+            // By default: eventData == 1: auto-stop
+            eventMesgStop.setData(1L);
+            eventMesgStop.setEvent(Event.TIMER);
+            eventMesgStop.setEventType(EventType.STOP);
+
+            eventMessages.add(eventMesgStop);
+
+            eventMesgStart = new EventMesg();
+            final Date pausedTime_End_Date = Date.from(Instant.ofEpochMilli(pausedTime_End[index]));
+            eventMesgStart.setTimestamp(new DateTime(pausedTime_End_Date));
+            eventMesgStart.setEvent(Event.TIMER);
+            eventMesgStart.setEventType(EventType.START);
+
+            eventMessages.add(eventMesgStart);
+         }
+      }
 
       final EventMesg eventMesgStop = new EventMesg();
-      eventMesgStop.setTimestamp(timestamp);
+      eventMesgStop.setTimestamp(finalTimestamp);
       eventMesgStop.setEvent(Event.TIMER);
       eventMesgStop.setEventType(EventType.STOP_ALL);
       eventMessages.add(eventMesgStop);
@@ -167,7 +177,7 @@ public class FitExporter {
       return eventMessages;
    }
 
-   private List<LapMesg> createLapMessages(final DateTime startTime, final DateTime timestamp) {
+   private List<LapMesg> createLapMessages(final DateTime startTime) {
 
       final List<LapMesg> lapMessages = new ArrayList<>();
 
@@ -193,17 +203,6 @@ public class FitExporter {
          lapMessage.setEvent(Event.LAP);
 
          lapMessages.add(lapMessage);
-      }
-
-      if (lapMessages.isEmpty()) {
-
-         final LapMesg lapMesg = new LapMesg();
-         lapMesg.setMessageIndex(index);
-         lapMesg.setTimestamp(timestamp);
-         lapMesg.setStartTime(startTime);
-         lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-         lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-         lapMessages.add(lapMesg);
       }
 
       return lapMessages;
@@ -262,10 +261,10 @@ public class FitExporter {
          previousTimeSerieValue = _tourData.timeSerie[index];
       }
 
-      final List<EventMesg> eventMessages = createEventMessages(timestamp);
+      final List<EventMesg> eventMessages = createEventMessages(startTime, timestamp);
       messages.addAll(eventMessages);
 
-      final List<LapMesg> lapMessages = createLapMessages(startTime, timestamp);
+      final List<LapMesg> lapMessages = createLapMessages(startTime);
       messages.addAll(lapMessages);
 
       // Every FIT ACTIVITY file MUST contain at least one Session message
@@ -340,6 +339,10 @@ public class FitExporter {
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
-   }
 
+      final float[] temperatureSerie = _tourData.temperatureSerie;
+      if (temperatureSerie != null) {
+         recordMesg.setTemperature((byte) temperatureSerie[index]);
+      }
+   }
 }
