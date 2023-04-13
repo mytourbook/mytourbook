@@ -32,15 +32,15 @@ public class FitSportMapper {
       final String tourTypeName = tourType.getName();
 
       switch (tourTypeName.toLowerCase().trim()) {
-      case "running":
+      case "running": //$NON-NLS-1$
          sport = Sport.RUNNING;
          break;
 
-      case "cycling":
+      case "cycling": //$NON-NLS-1$
          sport = Sport.CYCLING;
          break;
 
-      case "walking":
+      case "walking": //$NON-NLS-1$
          sport = Sport.WALKING;
          break;
 
