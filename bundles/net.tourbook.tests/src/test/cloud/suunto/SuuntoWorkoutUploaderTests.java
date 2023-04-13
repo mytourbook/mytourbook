@@ -112,7 +112,7 @@ public class SuuntoWorkoutUploaderTests {
             .doReturn(workoutsResponse)
             .withStatus(HttpURLConnection.HTTP_OK);
       final String blobUrl =
-            "https://askoworkout001.blob.core.windows.net/fit6/642c5admtced4c09af1c49e6?sv=2019-02-02&se=2023-04-05T05%3A14%3A03Z&sr=b&sp=racwd&sig=lLSJzHaMa6EEN%2FYdFQJyCDEBzO0LuM%2BTyWVt4Bf%2BmoU%3D";
+            "https://askoworkout001.blob.core.windows.net/fit6/642c5admtced4c09af1c49e6?sv=2019-02-02&se=2023-04-05T05%3A14%3A03Z&sr=b&sp=racwd&sig=lLSJzHaMa6EEN%2FYdFQJyCDEBzO0LuM%2BTyWVt4Bf%2BmoU%3D"; //$NON-NLS-1$
       httpClientMock.onPut(
             blobUrl)
             .doReturn(UI.EMPTY_STRING)

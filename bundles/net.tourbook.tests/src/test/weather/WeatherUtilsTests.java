@@ -50,8 +50,8 @@ public class WeatherUtilsTests {
             ZoneId.of(andorraZoneId));
 
       final String fullWeatherDataString = WeatherUtils.buildFullWeatherDataString(6.09f,
-            "⛅",
-            "Partly cloudy",
+            "⛅", //$NON-NLS-1$
+            "Partly cloudy", //$NON-NLS-1$
             8.52f,
             9.216f,
             156,
