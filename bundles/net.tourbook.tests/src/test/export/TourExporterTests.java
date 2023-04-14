@@ -29,7 +29,6 @@ import net.tourbook.export.TourExporter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -97,7 +96,6 @@ public class TourExporterTests {
             attributesToFilter);
    }
 
-   @DisplayName("Tour Export in FIT format")
    @Test
    void exportTour_Fit() {
 
