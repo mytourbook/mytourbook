@@ -249,7 +249,7 @@ public class FitExporter {
 
          for (int index = 0; index < timeSerie.length; ++index) {
 
-            timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
+            timestamp.add((long) _tourData.timeSerie[index] - previousTimeSerieValue);
 
             // Create a new Record message and set the timestamp
             final RecordMesg recordMesg = new RecordMesg();
@@ -347,7 +347,6 @@ public class FitExporter {
       // Totals
       sessionMesg.setTotalCalories(_tourData.getCalories());
       sessionMesg.setTotalDistance(_tourData.getTourDistance());
-
 
       //Averages
       sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
