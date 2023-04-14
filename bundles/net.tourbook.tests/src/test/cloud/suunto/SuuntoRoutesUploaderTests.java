@@ -97,7 +97,7 @@ public class SuuntoRoutesUploaderTests {
    }
 
    @AfterEach
-   public void cleanUpEach() {
+   void tearDown() {
       TourLogManager.clear();
    }
 

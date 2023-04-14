@@ -138,22 +138,22 @@ public class SuuntoCloudDownloaderTests {
       });
    }
 
-   @AfterEach
-   public void cleanUpEach() {
-
-      TourLogManager.clear();
-   }
-
-   @BeforeEach
-   void InitializeEach() {
-
-      httpClientMock.reset();
-   }
-
    private void setTokenRetrievalDateInThePast() {
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
             "973701086000"); //$NON-NLS-1$
+   }
+
+   @BeforeEach
+   void setUp() {
+
+      httpClientMock.reset();
+   }
+
+   @AfterEach
+   void tearDown() {
+
+      TourLogManager.clear();
    }
 
    //We set the access token issue date time in the past to trigger the retrieval

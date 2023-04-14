@@ -99,7 +99,7 @@ public class StravaUploaderTests {
    }
 
    @AfterEach
-   public void cleanUpEach() {
+   void tearDown() {
       TourLogManager.clear();
       selectedTours.clear();
    }

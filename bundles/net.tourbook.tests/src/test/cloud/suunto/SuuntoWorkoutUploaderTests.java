@@ -98,7 +98,7 @@ public class SuuntoWorkoutUploaderTests {
    }
 
    @AfterEach
-   public void cleanUpEach() {
+   void tearDown() {
       TourLogManager.clear();
    }
 

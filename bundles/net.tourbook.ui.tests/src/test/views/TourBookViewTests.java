@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
@@ -107,7 +106,7 @@ public class TourBookViewTests extends UITest {
    }
 
    @BeforeEach
-   void InitializeEach() {
+   void setUp() {
 
       tourBookView = Utils.showTourBookView(bot);
    }
