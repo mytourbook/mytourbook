@@ -56,6 +56,9 @@ public class TourExporterTests {
       final TourType tourType = new TourType();
       tourType.setName("Running"); //$NON-NLS-1$
       _tour.setTourType(tourType);
+
+      _tour.setBodyWeight(77.7f); // 77.7kg
+      _tour.setCalories(1282000); // 1282 kcal / 1282000 calories
    }
 
    @AfterEach
@@ -99,6 +102,15 @@ public class TourExporterTests {
             attributesToFilter);
    }
 
+   @Test
+   void ExportTour_In_FIT_Format() {
+
+      initializeTourExporterFit();
+
+      final String controlTourFileName = "LongsPeakFit.fit"; //$NON-NLS-1$
+      executeFitTest(controlTourFileName);
+   }
+
    private void initializeTourExporterFit() {
 
       _tourExporter = new TourExporter("fit").useTourData(_tour); //$NON-NLS-1$
@@ -118,15 +130,6 @@ public class TourExporterTests {
    }
 
    @Test
-   void shouldExportTourFitFormat() {
-
-      initializeTourExporterFit();
-
-      final String controlTourFileName = "LongsPeakFit.fit"; //$NON-NLS-1$
-      executeFitTest(controlTourFileName);
-   }
-
-   @Test
    void testGpxExportAllOptions() {
 
       initializeTourExporterGpx();
@@ -139,8 +142,6 @@ public class TourExporterTests {
       _tourExporter.setIsExportWithBarometer(true);
       _tourExporter.setIsCamouflageSpeed(true);
       _tourExporter.setCamouflageSpeed(15 / 3.6f); // 15km/h
-      _tour.setBodyWeight(77.7f); // 77.7kg
-      _tour.setCalories(1282000); // 1282 kcal / 1282000 calories
 
       executeGpxTest(controlTourFileName);
    }
