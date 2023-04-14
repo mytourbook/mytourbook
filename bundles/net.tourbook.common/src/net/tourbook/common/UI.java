@@ -1286,13 +1286,12 @@ public class UI {
       return label;
    }
 
-   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+public static void createSpacer_Horizontal(final Composite parent, final int columns) {
 
-      final Label label = new Label(parent, SWT.NONE);
+   final Label label = new Label(parent, SWT.NONE);
 
-      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
-   }
-
+   GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+}
    public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
 
       final Label label = new Label(parent, SWT.NONE);
@@ -1312,9 +1311,10 @@ public class UI {
    public static void createToolbarAction(final Composite parent, final Action action) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-
       final ToolBarManager tbm = new ToolBarManager(toolbar);
+
       tbm.add(action);
+
       tbm.update(true);
    }
 
@@ -3170,7 +3170,6 @@ public class UI {
          }
       };
    }
-
 }
 
 //this conversion is not working for all png images, found SWT2Dutil.java

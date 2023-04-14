@@ -63,6 +63,7 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -70,7 +71,9 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -92,6 +95,7 @@ import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
+import net.tourbook.importdata.EasyLauncher;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
 import net.tourbook.importdata.ImportState_Easy;
@@ -104,6 +108,8 @@ import net.tourbook.importdata.TourTypeConfig;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
+import net.tourbook.tag.TagContentLayout;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -162,6 +168,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -181,16 +188,20 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
@@ -236,7 +247,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                   //$NON-NLS-1$
    //
    private static final String           WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                        //$NON-NLS-1$
-   //   private static final String      WEB_RESOURCE_TITLE_FONT                    = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                    //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                        //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                   //$NON-NLS-1$
@@ -339,70 +349,73 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _saveTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
    }
    //
-   private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore         _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore           _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore           _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings            _state                          = TourbookPlugin.getState(ID);
+   private final IDialogSettings            _stateSimpleUI                  = TourbookPlugin.getState(ID + "_SimpleUI"); //$NON-NLS-1$
    //
-   private RawDataManager                 _rawDataMgr                     = RawDataManager.getInstance();
+   private RawDataManager                   _rawDataMgr                     = RawDataManager.getInstance();
 
-   private TableViewer                    _tourViewer;
-   private TableViewerTourInfoToolTip     _tourInfoToolTip;
-   private ColumnManager                  _columnManager;
-   private SelectionListener              _columnSortListener;
-   private TableColumnDefinition          _timeZoneOffsetColDef;
-   private ImportComparator               _importComparator;
+   private TableViewer                      _tourViewer;
+   private TableViewerTourInfoToolTip       _tourInfoToolTip;
+   private ColumnManager                    _columnManager;
+   private SelectionListener                _columnSortListener;
+   private TableColumnDefinition            _timeZoneOffsetColDef;
+   private ImportComparator                 _importComparator;
    //
-   private String                         _columnId_DeviceName;
-   private String                         _columnId_ImportFileName;
-   private String                         _columnId_Marker;
-   private String                         _columnId_TimeZone;
-   private String                         _columnId_Title;
-   private String                         _columnId_TourStartDate;
+   private String                           _columnId_DeviceName;
+   private String                           _columnId_ImportFileName;
+   private String                           _columnId_Marker;
+   private String                           _columnId_TimeZone;
+   private String                           _columnId_Title;
+   private String                           _columnId_TourStartDate;
    //
-   private PostSelectionProvider          _postSelectionProvider;
-   private IPartListener2                 _partListener;
-   private ISelectionListener             _postSelectionListener;
-   private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListener_Common;
-   private ITourEventListener             _tourEventListener;
+   private PostSelectionProvider            _postSelectionProvider;
+   private IPartListener2                   _partListener;
+   private ISelectionListener               _postSelectionListener;
+   private IPropertyChangeListener          _prefChangeListener;
+   private IPropertyChangeListener          _prefChangeListener_Common;
+   private ITourEventListener               _tourEventListener;
    //
-   private TagMenuManager                 _tagMenuManager;
-   private MenuManager                    _viewerMenuManager;
-   private IContextMenuProvider           _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private TagMenuManager                   _tagMenuManager;
+   private MenuManager                      _viewerMenuManager;
+   private IContextMenuProvider             _tableViewerContextMenuProvider = new TableContextMenuProvider();
    //
-   private ActionClearView                _actionClearView;
-   private ActionOpenTourLogView          _actionOpenTourLogView;
-   private ActionDeleteTourFiles          _actionDeleteTourFile;
-   private ActionExport                   _actionExportTour;
-   private ActionEditQuick                _actionEditQuick;
-   private ActionEditTour                 _actionEditTour;
-   private ActionJoinTours                _actionJoinTours;
-   private ActionMergeIntoMenu            _actionMergeIntoTour;
-   private ActionMergeTour                _actionMergeTour;
-   private ActionOpenTour                 _actionOpenTour;
-   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
-   private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
-   private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private ActionReimportTours            _actionReimportTours;
-   private ActionRemoveTour               _actionRemoveTour;
-   private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
-   private ActionSaveTourInDatabase       _actionSaveTour;
-   private ActionSaveTourInDatabase       _actionSaveTourWithPerson;
-   private ActionSetupImport              _actionSetupImport;
-   private ActionSetTourTypeMenu          _actionSetTourType;
-   private ActionToggleFossilOrEasyImport _actionToggleImportUI;
-   private ActionUpload                   _actionUploadTour;
+   private ActionClearView                  _actionClearView;
+   private ActionOpenTourLogView            _actionOpenTourLogView;
+   private ActionDeleteTourFiles            _actionDeleteTourFile;
+   private ActionExport                     _actionExportTour;
+   private ActionEditQuick                  _actionEditQuick;
+   private ActionEditTour                   _actionEditTour;
+   private ActionJoinTours                  _actionJoinTours;
+   private ActionMergeIntoMenu              _actionMergeIntoTour;
+   private ActionMergeTour                  _actionMergeTour;
+   private ActionOpenTour                   _actionOpenTour;
+   private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
+   private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
+   private ActionOpenPrefDialog             _actionEditImportPreferences;
+   private ActionReimportTours              _actionReimportTours;
+   private ActionRemoveTour                 _actionRemoveTour;
+   private ActionRemoveToursWhenClosed      _actionRemoveToursWhenClosed;
+   private ActionSaveTourInDatabase         _actionSaveTour;
+   private ActionSaveTourInDatabase         _actionSaveTourWithPerson;
+   private ActionSetupImport                _actionSetupImport;
+   private ActionSetTourTypeMenu            _actionSetTourType;
+   private ActionSimpleUI_DeviceState       _actionSimpleUI_DeviceState;
+   private ActionSimpleUI_StartStopWatching _actionSimpleUI_StartStopWatching;
+   private ActionToggleFossilOrEasyImport   _actionToggleImportUI;
+   private ActionUpload                     _actionUploadTour;
    //
-   private TourPerson                     _activePerson;
-   private TourPerson                     _newActivePerson;
+   private TourPerson                       _activePerson;
+   private TourPerson                       _newActivePerson;
    //
-   private boolean                        _isPartVisible                  = false;
-   private boolean                        _isViewerPersonDataDirty        = false;
+   private boolean                          _isPartVisible                  = false;
+   private boolean                          _isViewerPersonDataDirty        = false;
    //
-   private final NumberFormat             _nf1;
-   private final NumberFormat             _nf3;
+   private final NumberFormat               _nf1;
+   private final NumberFormat               _nf3;
    //
-   private final PeriodType               _durationTemplate;
+   private final PeriodType                 _durationTemplate;
    {
       _nf1 = NumberFormat.getNumberInstance();
       _nf3 = NumberFormat.getNumberInstance();
@@ -477,6 +490,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private DialogEasyImportConfig        _dialogImportConfig;
 
    /*
+    * Simple easy impor
+    */
+   private TableViewer           _simpleUI_Viewer;
+   private SimpleUI_ColumnViewer _simpleUI_ColumnViewer = new SimpleUI_ColumnViewer();
+   private ColumnManager         _simpleUI_ColumnManager;
+   private EasyLauncher          _simpleUI_EasyLauncher = new EasyLauncher();
+   private int                   _simpleUI_ColumnIndexConfigImage;
+
+   /*
     * Resources
     */
    private ImageRegistry _images;
@@ -498,6 +520,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private Composite _parent;
    private Composite _viewerContainer;
+   private Composite _ilViewerContainer;
+
+   private Combo     _comboSimpleUI_Config;
 
    private Text      _txtNoBrowser;
 
@@ -506,6 +531,38 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Browser   _browser;
 
    private Menu      _tableContextMenu;
+
+   private class ActionSimpleUI_DeviceState extends Action {
+
+      public ActionSimpleUI_DeviceState() {
+
+         setToolTipText(Messages.Import_Data_Action_ImportUI_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder));
+      }
+
+      @Override
+      public void run() {
+
+         action_Easy_SetDeviceWatching_OnOff();
+      }
+   }
+
+   private class ActionSimpleUI_StartStopWatching extends Action {
+
+      public ActionSimpleUI_StartStopWatching() {
+
+         setToolTipText(Messages.Import_Data_Action_ImportUI_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOn));
+      }
+
+      @Override
+      public void run() {
+
+         action_Easy_SetDeviceWatching_OnOff();
+      }
+   }
 
    private class ActionToggleFossilOrEasyImport extends Action {
 
@@ -709,6 +766,87 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
+   public class SimpleUI_ColumnViewer implements ITourViewer {
+
+      @Override
+      public ColumnManager getColumnManager() {
+         return _simpleUI_ColumnManager;
+      }
+
+      @Override
+      public ColumnViewer getViewer() {
+         return _simpleUI_Viewer;
+      }
+
+      @Override
+      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+         _ilViewerContainer.setRedraw(false);
+         {
+            final ISelection selection = _simpleUI_Viewer.getSelection();
+
+            _simpleUI_Viewer.getTable().dispose();
+
+            createUI_57_SimpleUI_ViewerTable(_ilViewerContainer);
+            _ilViewerContainer.layout();
+
+            // update viewer
+            reloadViewer();
+
+            _simpleUI_Viewer.setSelection(selection);
+         }
+         _ilViewerContainer.setRedraw(true);
+
+         return _simpleUI_Viewer;
+      }
+
+      @Override
+      public void reloadViewer() {
+
+         _simpleUI_Viewer.setInput(this);
+      }
+
+      @Override
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
+   }
+
+   private class SimpleUI_ContentProvider implements IStructuredContentProvider {
+
+      public SimpleUI_ContentProvider() {}
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object parent) {
+
+         final ArrayList<ImportLauncher> configItems = getEasyConfig().importLaunchers;
+
+         return configItems.toArray(new ImportLauncher[configItems.size()]);
+      }
+
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   private class SimpleUI_Filter extends ViewerFilter {
+
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+
+         if (element instanceof ImportLauncher) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) element;
+
+            if (importLauncher.isShowInDashboard) {
+               return true;
+            }
+         }
+
+         return false;
+      }
+   }
+
    private class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
@@ -758,7 +896,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void action_Easy_SetDeviceWatching_OnOff() {
 
-      _isShowWatcherAnimation = true;
+      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         _isShowWatcherAnimation = true;
+      }
 
       if (isWatchingOn()) {
 
@@ -964,15 +1105,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       if (isFancy) {
 
-         onSelectUI_EasyImport_Fancy(ImportUI.EASY_IMPORT_FANCY);
+         onSelect_ImportUI(ImportUI.EASY_IMPORT_FANCY);
 
       } else if (isSimple) {
 
-         onSelectUI_EasyImport_Other(ImportUI.EASY_IMPORT_SIMPLE);
+         onSelect_ImportUI(ImportUI.EASY_IMPORT_SIMPLE);
 
       } else if (isFossil) {
 
-         onSelectUI_EasyImport_Other(ImportUI.FOSSIL);
+         onSelect_ImportUI(ImportUI.FOSSIL);
       }
 
 // SET_FORMATTING_ON
@@ -1200,6 +1341,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionSetTourType                  = new ActionSetTourTypeMenu(this);
       _actionToggleImportUI               = new ActionToggleFossilOrEasyImport();
       _actionUploadTour                   = new ActionUpload(this);
+      _actionSimpleUI_DeviceState         = new ActionSimpleUI_DeviceState();
+      _actionSimpleUI_StartStopWatching   = new ActionSimpleUI_StartStopWatching();
 
 // SET_FORMATTING_ON
    }
@@ -2384,9 +2527,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _columnManager.setIsCategoryAvailable(true);
       defineAllColumns();
 
-      createUI(parent);
       createActions();
+      createUI(parent);
 
+      fillUI();
       fillToolbar();
 
       addPartListener();
@@ -2491,29 +2635,33 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                + "</style>" + NL //      //$NON-NLS-1$
          ;
 
+// SET_FORMATTING_OFF
+
          /*
           * Image urls
           */
-         _imageUrl_ImportFromFile = getIconUrl(Images.Import_Files);
-         _imageUrl_SerialPort_Configured = getIconUrl(Images.RawData_Transfer);
-         _imageUrl_SerialPort_Directly = getIconUrl(Images.RawData_TransferDirect);
+         _imageUrl_ImportFromFile            = getIconUrl(Images.Import_Files);
+         _imageUrl_SerialPort_Configured     = getIconUrl(Images.RawData_Transfer);
+         _imageUrl_SerialPort_Directly       = getIconUrl(Images.RawData_TransferDirect);
 
-         _imageUrl_State_AdjustTemperature = getIconUrl(Images.State_AdjustTemperature);
+         _imageUrl_State_AdjustTemperature   = getIconUrl(Images.State_AdjustTemperature);
          _imageUrl_State_RetrieveWeatherData = getIconUrl(Images.State_RetrieveWeatherData);
-         _imageUrl_State_Error = getIconUrl(Images.State_Error);
-         _imageUrl_State_OK = getIconUrl(Images.State_OK);
-         _imageUrl_State_MovedFiles = getIconUrl(Images.State_MovedTour);
-         _imageUrl_State_SaveTour = getIconUrl(Images.State_SaveTour);
-         _imageUrl_State_TourMarker = getIconUrl(Images.State_TourMarker);
+         _imageUrl_State_Error               = getIconUrl(Images.State_Error);
+         _imageUrl_State_OK                  = getIconUrl(Images.State_OK);
+         _imageUrl_State_MovedFiles          = getIconUrl(Images.State_MovedTour);
+         _imageUrl_State_SaveTour            = getIconUrl(Images.State_SaveTour);
+         _imageUrl_State_TourMarker          = getIconUrl(Images.State_TourMarker);
 
-         _imageUrl_Device_TurnOff = getIconUrl(Images.RawData_Device_TurnOff);
-         _imageUrl_Device_TurnOn = getIconUrl(Images.RawData_Device_TurnOn);
+         _imageUrl_Device_TurnOff            = getIconUrl(Images.RawData_Device_TurnOff);
+         _imageUrl_Device_TurnOn             = getIconUrl(Images.RawData_Device_TurnOn);
 
-         _imageUrl_DeviceFolder_OK = getIconUrl(Images.RawData_DeviceFolder);
-         _imageUrl_DeviceFolder_Disabled = getIconUrl(Images.RawData_DeviceFolder_Disabled);
+         _imageUrl_DeviceFolder_OK           = getIconUrl(Images.RawData_DeviceFolder);
+         _imageUrl_DeviceFolder_Disabled     = getIconUrl(Images.RawData_DeviceFolder_Disabled);
          _imageUrl_DeviceFolder_NotAvailable = getIconUrl(Images.RawData_DeviceFolder_NotDefined);
-         _imageUrl_DeviceFolder_NotChecked = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
-         _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
+         _imageUrl_DeviceFolder_NotChecked   = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
+         _imageUrl_DeviceFolder_NotSetup     = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
+
+// SET_FORMATTING_ON
 
       } catch (final IOException e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
@@ -2654,7 +2802,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final Link link = new Link(container, SWT.NONE);
             link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
             link.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onSelectUI_EasyImport_Fancy(ImportUI.EASY_IMPORT_FANCY)));
+                  selectionEvent -> onSelect_ImportUI(ImportUI.EASY_IMPORT_FANCY)));
             linkGridData.applyTo(link);
          }
          {
@@ -2778,13 +2926,132 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
       {
-         final Label label = new Label(container, SWT.WRAP);
-         label.setText("Simple UI");
+         createUI_51_SimpleUI_Header(container);
+         createUI_56_SimpleUI_Viewer(container);
       }
 
       return container;
+   }
+
+   private void createUI_51_SimpleUI_Header(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4)
+            .spacing(15, 5)
+            .applyTo(container);
+      {
+         {
+            /*
+             * Action: Start/stop watching import folder
+             */
+            UI.createToolbarAction(container, _actionSimpleUI_StartStopWatching);
+         }
+         {
+            /*
+             * Title: Easy Import
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Import_Data_HTML_EasyImport);
+            MTFont.setBannerFont(label);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+         }
+         {
+            /*
+             * Action: Device state
+             */
+            UI.createToolbarAction(container, _actionSimpleUI_DeviceState);
+         }
+         {
+            /*
+             * Combo: Configuration
+             */
+            _comboSimpleUI_Config = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboSimpleUI_Config.setVisibleItemCount(20);
+            _comboSimpleUI_Config.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_SimpleUIConfig()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_comboSimpleUI_Config);
+         }
+      }
+   }
+
+   private void createUI_56_SimpleUI_Viewer(final Composite parent) {
+
+      // define all columns for the viewer
+      _simpleUI_ColumnManager = new ColumnManager(_simpleUI_ColumnViewer, _stateSimpleUI);
+      _simpleUI_EasyLauncher.defineAll_ILColumns(_simpleUI_ColumnManager, _pc);
+
+      _ilViewerContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .applyTo(_ilViewerContainer);
+      GridLayoutFactory.fillDefaults().applyTo(_ilViewerContainer);
+//      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         createUI_57_SimpleUI_ViewerTable(_ilViewerContainer);
+      }
+   }
+
+   private void createUI_57_SimpleUI_ViewerTable(final Composite parent) {
+
+      /*
+       * Create table
+       */
+      final Table table = new Table(parent,
+            SWT.H_SCROLL
+                  | SWT.V_SCROLL
+//                  | SWT.BORDER
+                  | SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+      table.setHeaderVisible(true);
+
+      /*
+       * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+       * critical for performance that these methods be as efficient as possible.
+       */
+      final Listener paintListener = event -> {
+
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+
+            onPaint_SimpleUIViewer(event);
+         }
+      };
+      table.addListener(SWT.MeasureItem, paintListener);
+      table.addListener(SWT.PaintItem, paintListener);
+
+      /*
+       * Create viewer
+       */
+      _simpleUI_Viewer = new TableViewer(table);
+
+      _simpleUI_ColumnManager.createColumns(_simpleUI_Viewer);
+
+      _simpleUI_ColumnIndexConfigImage = _simpleUI_EasyLauncher.getColDef_TourTypeImage().getCreateIndex();
+
+      _simpleUI_Viewer.setUseHashlookup(true);
+      _simpleUI_Viewer.setContentProvider(new SimpleUI_ContentProvider());
+      _simpleUI_Viewer.addFilter(new SimpleUI_Filter());
+
+//    _ilViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_IL(selectionChangedEvent.getSelection()));
+//    _ilViewer.addDoubleClickListener(doubleClickEvent -> onIL_DblClick());
+
+      createUI_58_SimpleUI_ContextMenu();
+   }
+
+   /**
+    * create the views context menu
+    */
+   private void createUI_58_SimpleUI_ContextMenu() {
+
+      final Table table = _simpleUI_Viewer.getTable();
+
+      _simpleUI_ColumnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
    }
 
    private Composite createUI_90_Page_TourViewer(final Composite parent) {
@@ -3879,6 +4146,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    }
 
+   private void fillUI() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      for (final ImportConfig importConfig : easyConfig.importConfigs) {
+         _comboSimpleUI_Config.add(importConfig.name);
+      }
+   }
+
    private void fireSelectedTour() {
 
       if (_parent != null && _parent.isDisposed()) {
@@ -4029,7 +4305,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   final Image ttImage = TourTypeImage.getTourTypeImage(vertex.tourTypeId);
 
-                  gcImage.drawImage(ttImage, //
+                  gcImage.drawImage(ttImage,
                         0,
                         0,
                         imageSize,
@@ -4108,6 +4384,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    @Override
    public PostSelectionProvider getPostSelectionProvider() {
       return _postSelectionProvider;
+   }
+
+   private TagContentLayout getSelectedTagContentLayout() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboTagContent.getSelectionIndex());
+
+      return TagManager.ALL_TAG_CONTENT_LAYOUT[selectionIndex].tagContentLayout;
    }
 
    @Override
@@ -4374,7 +4658,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
-         onSelectUI_EasyImport_Other(ImportUI.FOSSIL);
+         onSelect_ImportUI(ImportUI.FOSSIL);
 
       } else {
 
@@ -4385,6 +4669,70 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                .filter(cd -> cd.getId().equals(hrefAction))
                .forEach(TourbookCloudDownloader::downloadTours);
       }
+   }
+
+   private void onPaint_SimpleUIViewer(final Event event) {
+
+      if (event.index != _simpleUI_ColumnIndexConfigImage) {
+         return;
+      }
+
+      final TableItem item = (TableItem) event.item;
+      final ImportLauncher importLauncher = (ImportLauncher) item.getData();
+
+      switch (event.type) {
+      case SWT.MeasureItem:
+
+         /*
+          * Set height also for color def, when not set and all is collapsed, the color def size
+          * will be adjusted when an item is expanded.
+          */
+
+         event.width += importLauncher.imageWidth;
+//         event.height = PROFILE_IMAGE_HEIGHT;
+
+         break;
+
+      case SWT.PaintItem:
+
+         final Image image = getImportConfigImage(importLauncher);
+
+         if (image != null && !image.isDisposed()) {
+
+            final Rectangle rect = image.getBounds();
+
+            final int x = event.x + event.width;
+            final int yOffset = Math.max(0, (event.height - rect.height) / 2);
+
+            event.gc.drawImage(image, x, event.y + yOffset);
+         }
+
+         break;
+      }
+   }
+
+   private void onSelect_ImportUI(final ImportUI importUI) {
+
+      _importUI = importUI;
+
+      if (importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         updateUI_1_TopPage(true);
+
+         showFailbackUI();
+
+      } else {
+
+         resetEasyImport();
+
+         updateUI_1_TopPage(true);
+      }
+
+      updateUI_ImportUI_Action();
+   }
+
+   private void onSelect_SimpleUIConfig() {
+      // TODO Auto-generated method stub
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -4421,9 +4769,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
       setWatcher_Off();
-      easyConfig.setActiveImportConfig(selectedConfig);
-      _isDeviceStateValid = false;
-      updateUI_2_EasyImport_Fancy();
+      {
+         easyConfig.setActiveImportConfig(selectedConfig);
+         _isDeviceStateValid = false;
+         updateUI_2_EasyImport_Fancy();
+      }
       setWatcher_On();
       updateUI_2_EasyImport_Fancy();
    }
@@ -4460,28 +4810,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             _isViewerPersonDataDirty = true;
          }
       }
-   }
-
-   private void onSelectUI_EasyImport_Fancy(final ImportUI importUI) {
-
-      _importUI = importUI;
-
-      updateUI_1_TopPage(true);
-
-      showFailbackUI();
-
-      updateUI_ImportUI_Action();
-   }
-
-   private void onSelectUI_EasyImport_Other(final ImportUI importUI) {
-
-      _importUI = importUI;
-
-      resetEasyImport();
-
-      updateUI_1_TopPage(true);
-
-      updateUI_ImportUI_Action();
    }
 
    private void recreateViewer() {
@@ -4783,6 +5111,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       updateToolTipState();
       updateUI_ImportUI_Action();
+
+      // load lauchner items into the viewer
+      _simpleUI_Viewer.setInput(new Object());
 
       Display.getCurrent().asyncExec(() -> reimportAllImportFiles(true));
    }
@@ -5707,17 +6038,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          switch (_importUI) {
 
          case EASY_IMPORT_FANCY:
+
             if (_browser != null) {
                _browser.setFocus();
             }
+
             break;
 
          case EASY_IMPORT_SIMPLE:
+
+            _simpleUI_Viewer.getTable().setFocus();
+
             break;
 
          case FOSSIL:
          default:
+
             _topPage_PageBook.setFocus();
+
             break;
          }
       }
@@ -5733,7 +6071,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       if (isWatchingOn()) {
 
-         // !!! Store watching must be canceled before the watch folder thread because it could launch a new watch folder thread !!!
+         /*
+          * !!! Store watching must be canceled before the watch folder thread because it could
+          * launch a new watch folder thread !!!
+          */
          thread_WatchStores_Cancel();
          // thread_WatchFolders(false);
 
@@ -5752,6 +6093,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void setWatcher_On() {
 
       if (isWatchingOn()) {
+
          // do not start twice
          return;
       }
@@ -5776,7 +6118,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // check again because the browser could be set
             if (_browser == null || _browser.isDisposed()) {
 
-               onSelectUI_EasyImport_Other(ImportUI.EASY_IMPORT_SIMPLE);
+               onSelect_ImportUI(ImportUI.EASY_IMPORT_SIMPLE);
             }
          });
       }
@@ -6023,6 +6365,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     * Thread cannot be interrupted, it could cause SQL exceptions, so set flag and wait.
     */
    private void thread_WatchStores_Cancel() {
+
       _isDeviceStateValid = false;
       _isStopWatchingStoresThread = true;
 
@@ -6040,8 +6383,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   final int waitingTime = 10000; // in ms
 
                   THREAD_WATCHER_LOCK.lock();
-                  _watchingStoresThread.interrupt();
+                  {
+                     _watchingStoresThread.interrupt();
+                  }
                   THREAD_WATCHER_LOCK.unlock();
+
                   _watchingStoresThread.join(waitingTime); // must unlock then join
 
                   if (_watchingStoresThread.isAlive()) {
@@ -6067,7 +6413,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void thread_WatchStores_Start() {
+
       _watchingStoresThread = new Thread("WatchingStores") { //$NON-NLS-1$
+
          @Override
          public void run() {
 
@@ -6107,25 +6455,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   }
 
                   Thread.sleep(1000);
+
                } catch (final InterruptedException e) {
 
                   if (_isStopWatchingStoresThread) {
                      _isStopWatchingStoresThread = false;
                      break;
                   }
+
                   // interrupt();
+
                } catch (final Exception e) {
                   TourLogManager.log_EXCEPTION_WithStacktrace(e);
                }
-
             }
+
             _isStopWatchingStoresThread = false;
 
             // StoreWatcher going down, need to take down DeviceFolderWatcher
             thread_WatchFolders_Cancel();
          }
-
       };
+
       _isDeviceStateValid = false;
       _watchingStoresThread.setDaemon(true);
       _watchingStoresThread.start();
@@ -6237,6 +6588,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Simple);
 
+            _simpleUI_Viewer.getTable().setFocus();
+
             break;
 
          case FOSSIL:
@@ -6284,19 +6637,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void updateUI_DeviceState() {
 
-      Display.getDefault().asyncExec(() -> {
+      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
-         if (_browser.isDisposed()) {
-            // this occurred
-            return;
-         }
+         _parent.getDisplay().asyncExec(() -> {
 
-         if (_isBrowserCompleted) {
-            updateUI_DeviceState_DOM();
-         } else {
-            _isDeviceStateUpdateDelayed.set(true);
-         }
-      });
+            if (_browser.isDisposed()) {
+               // this occurred
+               return;
+            }
+
+            if (_isBrowserCompleted) {
+               updateUI_DeviceState_DOM();
+            } else {
+               _isDeviceStateUpdateDelayed.set(true);
+            }
+         });
+
+      } else {
+
+      }
    }
 
    private void updateUI_DeviceState_DOM() {
@@ -6384,6 +6743,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void updateUI_WatcherAnimation(final String domClassState) {
+
+      if (_importUI != ImportUI.EASY_IMPORT_FANCY) {
+         return;
+      }
 
       if (_isShowWatcherAnimation
             && _browser != null

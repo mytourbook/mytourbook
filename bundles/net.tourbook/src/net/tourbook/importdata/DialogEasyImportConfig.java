@@ -20,7 +20,6 @@ import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,7 +78,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -134,8 +132,6 @@ import org.joda.time.PeriodType;
 public class DialogEasyImportConfig extends TitleAreaDialog implements IActionResetToDefault {
 
    public static final String           ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
-   //
-   private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                        //$NON-NLS-1$
    //
    private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
@@ -194,9 +190,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
    private ColumnManager                _icColumnManager;
    private ColumnManager                _ilColumnManager;
+   private EasyLauncher                 _ilEasyLauncher                   = new EasyLauncher();
    //
-   private TableColumnDefinition        _colDefProfileImage;
-   private int                          _columnIndexConfigImage;
+   private int                          _ilColumnIndexConfigImage;
    //
    private HashMap<Long, Image>         _configImages                     = new HashMap<>();
    private HashMap<Long, Integer>       _configImageHash                  = new HashMap<>();
@@ -211,25 +207,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private int                          _initialTab;
 
-   private final NumberFormat           _nf1                              = NumberFormat.getNumberInstance();
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
+   private final PeriodType             _durationTemplate                 = PeriodType
 
-   private final PeriodType         _durationTemplate    = PeriodType
          .yearMonthDayTime()
-         //      // hide these components
+
+         // hide these components
          .withMillisRemoved();
 
-   private Color                    COLOR_RED;
-   private Color                    COLOR_FOREGROUND;
+   private Color                        COLOR_RED;
+   private Color                        COLOR_FOREGROUND;
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
-   private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
+   private final ArrayList<Control>     _firstColumnControls              = new ArrayList<>();
 
    /*
     * UI controls
@@ -1509,7 +1501,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // define all columns for the viewer
       _ilColumnManager = new ColumnManager(_ilColumnViewer, _stateIL);
-      defineAll_ILColumns();
+      _ilEasyLauncher.defineAll_ILColumns(_ilColumnManager, _pc);
 
       _ilViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1526,7 +1518,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private void createUI_512_IL_ViewerTable(final Composite parent) {
 
       /*
-       * Create tree
+       * Create table
        */
       final Table table = new Table(parent,
             SWT.H_SCROLL
@@ -1544,6 +1536,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Listener paintListener = event -> {
 
          if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+
             onPaintViewer(event);
          }
       };
@@ -1551,13 +1544,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       table.addListener(SWT.PaintItem, paintListener);
 
       /*
-       * Create tree viewer
+       * Create viewer
        */
       _ilViewer = new TableViewer(table);
 
       _ilColumnManager.createColumns(_ilViewer);
 
-      _columnIndexConfigImage = _colDefProfileImage.getCreateIndex();
+      _ilColumnIndexConfigImage = _ilEasyLauncher.getColDef_TourTypeImage().getCreateIndex();
 
       _ilViewer.setUseHashlookup(true);
       _ilViewer.setContentProvider(new ILContentProvider());
@@ -2790,19 +2783,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       defineColumnIC_99_TurnOFF();
    }
 
-   private void defineAll_ILColumns() {
-
-      defineColumnIL_10_LauncherName();
-      defineColumnIL_20_ColorImage();
-      defineColumnIL_30_LastMarkerDistance();
-      defineColumnIL_40_AdjustTemperature();
-      defineColumnIL_50_RetrieveWeatherData();
-      defineColumnIL_80_IsSaveTour();
-      defineColumnIL_82_IsAdjustElevation();
-      defineColumnIL_90_IsShowInDashboard();
-      defineColumnIL_99_Description();
-   }
-
    /**
     * Column: Item name
     */
@@ -2974,270 +2954,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   importConfig.isTurnOffWatching
                         ? Messages.Dialog_ImportConfig_State_OFF
                         : Messages.Dialog_ImportConfig_State_ON);
-         }
-      });
-   }
-
-   /**
-    * Column: Item name
-    */
-   private void defineColumnIL_10_LauncherName() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "launcherName", SWT.LEAD); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(17));
-      colDef.setColumnWeightData(new ColumnWeightData(17));
-
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-            cell.setText(((ImportLauncher) cell.getElement()).name);
-         }
-      });
-   }
-
-   /**
-    * Column: Tour type
-    */
-   private void defineColumnIL_20_ColorImage() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
-      _colDefProfileImage = colDef;
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourType);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_TourType);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
-      colDef.setColumnWeightData(new ColumnWeightData(12));
-
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         // !!! set dummy label provider, otherwise an error occurs !!!
-         @Override
-         public void update(final ViewerCell cell) {}
-      });
-   }
-
-   /**
-    * Column: Set last marker
-    */
-   private void defineColumnIL_30_LastMarkerDistance() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_LastMarker_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_LastMarker_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_LastMarker_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-
-            if (importLauncher.isSetLastMarker) {
-
-               final double distance = getMarkerDistanceValue(importLauncher);
-
-               cell.setText(_nf1.format(distance));
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Adjust temperature
-    */
-   private void defineColumnIL_40_AdjustTemperature() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(
-            _ilColumnManager,
-            "isAdjustTemperature", //$NON-NLS-1$
-            SWT.CENTER);
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-
-            if (importLauncher.isAdjustTemperature) {
-
-               final float temperature = importLauncher.tourAvgTemperature;
-
-               final String logText = NLS.bind(
-                     COLUMN_ADJUST_TEMPERATURE,
-                     new Object[] {
-                           importLauncher.temperatureAdjustmentDuration,
-                           (int) (UI.convertTemperatureFromMetric(temperature) + 0.5),
-                           UI.UNIT_LABEL_TEMPERATURE });
-
-               cell.setText(logText);
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Retrieve weather data
-    */
-   private void defineColumnIL_50_RetrieveWeatherData() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isRetrieveWeatherData", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_RetrieveWeatherData_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_RetrieveWeatherData_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-
-            cell.setText(importLauncher.isRetrieveWeatherData
-                  ? Messages.App_Label_BooleanYes
-                  : UI.EMPTY_STRING);
-         }
-      });
-   }
-
-   /**
-    * Column: Is save tour
-    */
-   private void defineColumnIL_80_IsSaveTour() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-
-            cell.setText(importLauncher.isSaveTour
-                  ? Messages.App_Label_BooleanYes
-                  : UI.EMPTY_STRING);
-         }
-      });
-   }
-
-   /**
-    * Column: Is adjust elevation
-    */
-   private void defineColumnIL_82_IsAdjustElevation() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isAdjustElevation", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustElevation_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustElevation_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((ImportLauncher) cell.getElement()).isReplaceFirstTimeSliceElevation
-                  ? Messages.App_Label_BooleanYes
-                  : UI.EMPTY_STRING);
-         }
-      });
-   }
-
-   /**
-    * Column: Show in dashboard
-    */
-   private void defineColumnIL_90_IsShowInDashboard() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_ShowInDash_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_ShowInDash_Header);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-      colDef.setColumnWeightData(new ColumnWeightData(8));
-
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(
-                  ((ImportLauncher) cell.getElement()).isShowInDashboard
-                        ? Messages.App_Label_BooleanYes
-                        : UI.EMPTY_STRING);
-         }
-      });
-   }
-
-   /**
-    * Column: Item description
-    */
-   private void defineColumnIL_99_Description() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Description);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Description);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
-      colDef.setColumnWeightData(new ColumnWeightData(25));
-
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-            cell.setText(((ImportLauncher) cell.getElement()).description);
          }
       });
    }
@@ -3997,7 +3713,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void onPaintViewer(final Event event) {
 
-      if (event.index != _columnIndexConfigImage) {
+      if (event.index != _ilColumnIndexConfigImage) {
          return;
       }
 
