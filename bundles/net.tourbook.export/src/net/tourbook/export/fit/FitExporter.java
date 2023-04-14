@@ -240,25 +240,30 @@ public class FitExporter {
       messages.add(developerIdMesg);
 
       // Every FIT ACTIVITY file MUST contain Record messages
-      int previousTimeSerieValue = 0;
 
       final DateTime timestamp = new DateTime(startTime);
-      for (int index = 0; index < _tourData.timeSerie.length; ++index) {
+      final int[] timeSerie = _tourData.timeSerie;
+      if (timeSerie != null) {
 
-         timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
+         int previousTimeSerieValue = 0;
 
-         // Create a new Record message and set the timestamp
-         final RecordMesg recordMesg = new RecordMesg();
-         recordMesg.setTimestamp(timestamp);
+         for (int index = 0; index < timeSerie.length; ++index) {
 
-         setDataSerieValue(index, recordMesg);
+            timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
 
-         // Write the Record message to the output stream
-         messages.add(recordMesg);
+            // Create a new Record message and set the timestamp
+            final RecordMesg recordMesg = new RecordMesg();
+            recordMesg.setTimestamp(timestamp);
 
-         // Increment the timestamp by the number of seconds between the previous
-         // timestamp and the current one
-         previousTimeSerieValue = _tourData.timeSerie[index];
+            setDataSerieValue(index, recordMesg);
+
+            // Write the Record message to the output stream
+            messages.add(recordMesg);
+
+            // Increment the timestamp by the number of seconds between the previous
+            // timestamp and the current one
+            previousTimeSerieValue = _tourData.timeSerie[index];
+         }
       }
 
       final List<EventMesg> eventMessages = createEventMessages(startTime, timestamp);
@@ -273,13 +278,10 @@ public class FitExporter {
       sessionMesg.setStartTime(startTime);
       sessionMesg.setTotalElapsedTime((float) _tourData.getTourDeviceTime_Elapsed());
       sessionMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
-      final Sport sport = FitSportMapper.mapTourTypeToSport(_tourData.getTourType());
-      sessionMesg.setSport(sport);
       sessionMesg.setFirstLapIndex(0);
       sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
-      setAvgValues(sessionMesg);
+      setValues(sessionMesg);
       messages.add(sessionMesg);
-      sessionMesg.setTotalDistance(_tourData.getTourDistance());
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
@@ -287,16 +289,6 @@ public class FitExporter {
       messages.add(activityMesg);
 
       createFitFile(messages, exportFilePath, startTime, version);
-   }
-
-   private void setAvgValues(final SessionMesg sessionMesg) {
-
-      sessionMesg.setTotalCalories(_tourData.getCalories());
-      sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
-      sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
-      sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
-      sessionMesg.setAvgTemperature((byte) _tourData.getWeather_Temperature_Average_Device());
-      //todo fb do the rest
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
@@ -345,5 +337,22 @@ public class FitExporter {
       if (temperatureSerie != null) {
          recordMesg.setTemperature((byte) temperatureSerie[index]);
       }
+   }
+
+   private void setValues(final SessionMesg sessionMesg) {
+
+      final Sport sport = FitSportMapper.mapTourTypeToSport(_tourData.getTourType());
+      sessionMesg.setSport(sport);
+
+      // Totals
+      sessionMesg.setTotalCalories(_tourData.getCalories());
+      sessionMesg.setTotalDistance(_tourData.getTourDistance());
+
+
+      //Averages
+      sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
+      sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
+      sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
+      sessionMesg.setAvgTemperature((byte) _tourData.getWeather_Temperature_Average_Device());
    }
 }
