@@ -31,7 +31,7 @@
              <product>org.eclipse.platform.ide</product>
              <skipTests>true</skipTests>
              <!--
-             <argLine>-Djunit.jupiter.displayname.generator.default=org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores</argLine>
+             <argLine>${tycho.testArgLine} -Djunit.jupiter.displayname.generator.default=org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores</argLine>
              -->
          </configuration>
       </plugin>
