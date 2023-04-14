@@ -44,7 +44,7 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    @Test
-   void adustTourValues_RetrieveWeatherData() {
+   void adustTourValues_RetrieveWeatherData_OpenWeatherMap() {
 
       // Select OpenWeatherMap to make sure the air quality is retrieved
 
