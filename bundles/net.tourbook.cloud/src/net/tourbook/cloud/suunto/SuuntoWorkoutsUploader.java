@@ -116,7 +116,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       _tourExporter.useTourData(tourData).export(absoluteTourFilePath);
    }
 
-   //todo fb refactor in a unique place ?
    private String getAccessToken() {
 
       if (_useActivePerson) {
