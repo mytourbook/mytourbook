@@ -99,15 +99,6 @@ public class TourExporterTests {
             attributesToFilter);
    }
 
-   @Test
-   void givenTour_WhenExportFit_ThenFitFileExists() {
-
-      initializeTourExporterFit();
-
-      final String controlTourFileName = "LongsPeakFit.fit"; //$NON-NLS-1$
-      executeFitTest(controlTourFileName);
-   }
-
    private void initializeTourExporterFit() {
 
       _tourExporter = new TourExporter("fit").useTourData(_tour); //$NON-NLS-1$
@@ -124,6 +115,15 @@ public class TourExporterTests {
 
       _tourExporter = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE).useTourData(_tour);
       _tourExporter.setActivityType(_tour.getTourType().getName());
+   }
+
+   @Test
+   void shouldExportTourFitFormat() {
+
+      initializeTourExporterFit();
+
+      final String controlTourFileName = "LongsPeakFit.fit"; //$NON-NLS-1$
+      executeFitTest(controlTourFileName);
    }
 
    @Test
