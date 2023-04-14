@@ -71,15 +71,14 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.json.JSONObject;
 
-//todo fb use the fit export instead so that activity types can be better mapped
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
+   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                 //$NON-NLS-1$
 
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter     = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
-   private static String           CLOUD_UPLOADER_ID = "Strava";                                                             //$NON-NLS-1$
+   private static String           CLOUD_UPLOADER_ID = "Strava";                                        //$NON-NLS-1$
 
    // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
    private static final List<String> StravaManualActivityTypes       = List.of(
