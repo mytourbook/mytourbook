@@ -29,12 +29,15 @@ import net.tourbook.export.TourExporter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class TourExporterTests {
 
    private static final String FILES_PATH           = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
@@ -97,7 +100,7 @@ public class TourExporterTests {
    }
 
    @Test
-   void exportTour_Fit() {
+   void givenTour_WhenExportFit_ThenFitFileExists() {
 
       initializeTourExporterFit();
 
