@@ -103,7 +103,7 @@ public class TourExporterTests {
    }
 
    @Test
-   void ExportTour_In_FIT_Format() {
+   void Export_Tour_In_FIT_Format() {
 
       initializeTourExporterFit();
 
