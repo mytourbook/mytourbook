@@ -28,7 +28,7 @@ import net.tourbook.export.ExportTourTCX;
 import net.tourbook.export.TourExporter;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -46,29 +46,8 @@ public class TourExporterTests {
    private static final String _testTourFilePathTcx = FILES_PATH + "TCXExport.tcx";          //$NON-NLS-1$
    private static final String _testTourFilePathGpx = FILES_PATH + "GPXExport.gpx";          //$NON-NLS-1$
 
-   private static TourData     _tour;
+   private TourData            _tour;
    private TourExporter        _tourExporter;
-
-   @BeforeAll
-   static void initAll() {
-
-      _tour = Initializer.importTour();
-      final TourType tourType = new TourType();
-      tourType.setName("Running"); //$NON-NLS-1$
-      _tour.setTourType(tourType);
-
-      _tour.setBodyWeight(77.7f); // 77.7kg
-      _tour.setCalories(1282000); // 1282 kcal / 1282000 calories
-   }
-
-   @AfterEach
-   void afterEach() {
-
-      FileUtils.deleteIfExists(Paths.get(_testTourFilePathFit));
-      FileUtils.deleteIfExists(Paths.get(_testTourFilePathCsv));
-      FileUtils.deleteIfExists(Paths.get(_testTourFilePathGpx));
-      FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
-   }
 
    private void executeFitTest(final String controlTourFileName) {
 
@@ -129,6 +108,26 @@ public class TourExporterTests {
       _tourExporter.setActivityType(_tour.getTourType().getName());
    }
 
+   @BeforeEach
+   void setUp() {
+
+      _tour = Initializer.importTour();
+      final TourType tourType = new TourType();
+      tourType.setName("Running"); //$NON-NLS-1$
+      _tour.setTourType(tourType);
+      _tour.setBodyWeight(77.7f); // 77.7kg
+      _tour.setCalories(1282000); // 1282 kcal / 1282000 calories
+   }
+
+   @AfterEach
+   void tearDown() {
+
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathFit));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathCsv));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathGpx));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
+   }
+
    @Test
    void testGpxExportAllOptions() {
 
@@ -167,6 +166,7 @@ public class TourExporterTests {
       _tourExporter.setActivityType("Biking"); //$NON-NLS-1$
       _tourExporter.setIsCamouflageSpeed(true);
       _tourExporter.setCamouflageSpeed(15 / 3.6f);
+      _tour.setCalories(0);
 
       final String controlTourFileName = "LongsPeak-CamouflageSpeed-15kmh-BikingActivity.tcx"; //$NON-NLS-1$
       executeTcxTest(controlTourFileName);
