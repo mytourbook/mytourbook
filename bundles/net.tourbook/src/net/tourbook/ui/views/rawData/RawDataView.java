@@ -108,8 +108,6 @@ import net.tourbook.importdata.TourTypeConfig;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
-import net.tourbook.tag.TagContentLayout;
-import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -449,7 +447,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private HashMap<Long, Integer>        _configImageHash            = new HashMap<>();
    //
    private boolean                       _isBrowserCompleted;
-   private boolean                       _isInUIStartup;
+   private boolean                       _isInFancyUIStartup;
    private boolean                       _isInUpdate;
    //
    private ImportUI                      _importUI;
@@ -506,6 +504,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /*
     * UI controls
     */
+   private Browser   _browser;
+
    private PageBook  _topPage_PageBook;
    private Composite _topPage_ImportViewer;
    private Composite _topPage_Startup;
@@ -524,11 +524,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private Combo     _comboSimpleUI_Config;
 
-   private Text      _txtNoBrowser;
+   private Label     _lblSimpleUI_NumNotImportedFiles;
 
    private Link      _linkImport;
 
-   private Browser   _browser;
+   private Text      _txtNoBrowser;
 
    private Menu      _tableContextMenu;
 
@@ -536,7 +536,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       public ActionSimpleUI_DeviceState() {
 
-         setToolTipText(Messages.Import_Data_Action_ImportUI_Tooltip);
+//         setToolTipText(Messages.Import_Data_Action_ _Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder));
       }
@@ -544,7 +544,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       @Override
       public void run() {
 
-         action_Easy_SetDeviceWatching_OnOff();
       }
    }
 
@@ -552,7 +551,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       public ActionSimpleUI_StartStopWatching() {
 
-         setToolTipText(Messages.Import_Data_Action_ImportUI_Tooltip);
+         setToolTipText(Messages.Import_Data_HTML_DeviceOn_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOn));
       }
@@ -560,7 +559,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       @Override
       public void run() {
 
-         action_Easy_SetDeviceWatching_OnOff();
+         onSelect_DeviceWatching_OnOff();
       }
    }
 
@@ -755,7 +754,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          final int selectedIndex = ((Number) arguments[0]).intValue();
 
-         Display.getCurrent().asyncExec(() -> onSelectImportConfig(selectedIndex));
+         Display.getCurrent().asyncExec(() -> onSelect_ImportConfig_Fancy(selectedIndex));
 
 //// this can be used to show created JS in the debugger
 //         if (true) {
@@ -892,76 +891,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    public static boolean isStopWatchingStoresThread() {
       return _isStopWatchingStoresThread;
-   }
-
-   private void action_Easy_SetDeviceWatching_OnOff() {
-
-      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
-
-         _isShowWatcherAnimation = true;
-      }
-
-      if (isWatchingOn()) {
-
-         // stop watching
-
-         setWatcher_Off();
-
-      } else {
-
-         // start watching
-
-         setWatcher_On();
-      }
-
-      updateUI_DeviceState();
-   }
-
-   /**
-    * @param selectedTab
-    *           Tab which should be selected when config dialog is opened, -1 will select the
-    *           restored tab index.
-    */
-   void action_Easy_SetupImport(final int selectedTab) {
-
-      // prevent that the dialog is opened multiple times, this occurred when testing
-      if (_dialogImportConfig != null) {
-         return;
-      }
-
-      final Shell shell = Display.getDefault().getActiveShell();
-
-      final EasyConfig easyConfig = getEasyConfig();
-
-      _dialogImportConfig = new DialogEasyImportConfig(shell, easyConfig, this, selectedTab);
-
-      boolean isOK = false;
-
-      if (_dialogImportConfig.open() == Window.OK) {
-         isOK = true;
-      }
-
-      if (isOK) {
-
-         // keep none live update values
-
-         final EasyConfig modifiedEasyConfig = _dialogImportConfig.getModifiedConfig();
-
-         easyConfig.setActiveImportConfig(modifiedEasyConfig.getActiveImportConfig());
-
-         easyConfig.importConfigs.clear();
-         easyConfig.importConfigs.addAll(modifiedEasyConfig.importConfigs);
-
-         easyConfig.importLaunchers.clear();
-         easyConfig.importLaunchers.addAll(modifiedEasyConfig.importLaunchers);
-
-         updateModel_EasyConfig_Dashboard(_dialogImportConfig.getModifiedConfig());
-
-         _isDeviceStateValid = false;
-         updateUI_2_EasyImport_Fancy();
-      }
-
-      _dialogImportConfig = null;
    }
 
    void actionClearView() {
@@ -1554,18 +1483,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             + "<div class='auto-import-header'>" + NL //          //$NON-NLS-1$
             + "   <table border=0><tbody><tr>" + NL //            //$NON-NLS-1$
 
-            // device state on/off
+            // device on/off
             + "      <td>" + NL //                                //$NON-NLS-1$
-            + "         <div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_DeviceState_OnOff() + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "         <div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_Device_OnOff() + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             + "      </td>" + NL //                               //$NON-NLS-1$
 
             // title
             + "      <td><span class='title'>" + Messages.Import_Data_HTML_EasyImport + "</span></td>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-            // state icon
+            // device folder
             + "      <td>" + NL //                                //$NON-NLS-1$
             + "         <div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:25px;' class='" + watchClass + "'>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + createHTML_54_DeviceState()
+            + createHTML_54_DeviceFolder()
             + "         </div>" + NL //                           //$NON-NLS-1$
             + "      </td>" + NL //                               //$NON-NLS-1$
 
@@ -1582,7 +1511,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       sb.append(html);
    }
 
-   private String createHTML_52_DeviceState_OnOff() {
+   private String createHTML_52_Device_OnOff() {
 
       final boolean isWatchingOn = isWatchingOn();
 
@@ -1593,14 +1522,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tooltip = UI.replaceHTML_NewLine(tooltip);
 
       // show red image when off
-      final String imageUrl = isWatchingOn //
+      final String imageUrl = isWatchingOn
             ? _imageUrl_Device_TurnOn
             : _imageUrl_Device_TurnOff;
 
       final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
       final String onOffImage = createHTML_BgImageStyle(imageUrl);
 
-      final String html = UI.EMPTY_STRING//
+      final String html = UI.EMPTY_STRING
 
             + "<a class='onOffIcon dash-action'" //                  //$NON-NLS-1$
             + "title='" + tooltip + "'" //                           //$NON-NLS-1$ //$NON-NLS-2$
@@ -1614,7 +1543,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return html;
    }
 
-   private String createHTML_54_DeviceState() {
+   private String createHTML_54_DeviceFolder() {
 
       final String hrefSetupAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
@@ -1625,7 +1554,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final boolean isWatchAnything = importConfig.isWatchAnything();
 
-      if (!isWatchingOn()) {
+      if (isWatchingOn() == false) {
 
          // watching is off
 
@@ -1647,7 +1576,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (isWatchAnything && _isDeviceStateValid) {
 
-         html = createHTML_55_DeviceState_IsValid(easyConfig, hrefSetupAction);
+         html = createHTML_55_DeviceFolder_IsValid(easyConfig, hrefSetupAction);
 
       } else {
 
@@ -1681,7 +1610,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return html;
    }
 
-   private String createHTML_55_DeviceState_IsValid(final EasyConfig easyConfig, final String hrefAction) {
+   private String createHTML_55_DeviceFolder_IsValid(final EasyConfig easyConfig, final String hrefAction) {
 
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
@@ -1735,7 +1664,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          }
 
-         createHTML_56_FolderState(//
+         createHTML_56_FolderState(
                sb,
                htmlBackupFolder,
                isBackupFolderOK,
@@ -1869,9 +1798,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final String htmlTooltip = sb.toString();
 
       /*
-       * All states
+       * State values
        */
-      final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
+      final String imageUrl = isFolderOK
+            ? _imageUrl_DeviceFolder_OK
+            : _imageUrl_DeviceFolder_NotAvailable;
+
       final String stateImage = createHTML_BgImageStyle(imageUrl);
       final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImportedFiles) : UI.EMPTY_STRING;
 
@@ -1919,7 +1851,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isOSFolderValid) {
 
          htmlErrorState = UI.EMPTY_STRING;
-         htmlFolderInfo = folderInfo == null //
+         htmlFolderInfo = folderInfo == null
                ? UI.EMPTY_STRING
                : "<span class='folderInfo'>" + folderInfo + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1929,11 +1861,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          htmlFolderInfo = UI.EMPTY_STRING;
       }
 
-      final String paddingTop = isTopMargin //
+      final String paddingTop = isTopMargin
             ? HTML_STYLE_TITLE_VERTICAL_PADDING
             : UI.EMPTY_STRING;
 
-      final String imageUrl = isOSFolderValid //
+      final String imageUrl = isOSFolderValid
             ? _imageUrl_State_OK
             : _imageUrl_State_Error;
 
@@ -2657,7 +2589,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          _imageUrl_DeviceFolder_OK           = getIconUrl(Images.RawData_DeviceFolder);
          _imageUrl_DeviceFolder_Disabled     = getIconUrl(Images.RawData_DeviceFolder_Disabled);
-         _imageUrl_DeviceFolder_NotAvailable = getIconUrl(Images.RawData_DeviceFolder_NotDefined);
+         _imageUrl_DeviceFolder_NotAvailable   = getIconUrl(Images.RawData_DeviceFolder_NotDefined);
          _imageUrl_DeviceFolder_NotChecked   = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
          _imageUrl_DeviceFolder_NotSetup     = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
@@ -2922,7 +2854,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private Composite createUI_50_Page_SimpleUI(final Composite parent) {
-      // TODO Auto-generated method stub
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -2939,7 +2870,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(4)
+      GridLayoutFactory.fillDefaults().numColumns(5)
             .spacing(15, 5)
             .applyTo(container);
       {
@@ -2968,11 +2899,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
          {
             /*
+             * Label: Number of not imported files
+             */
+            _lblSimpleUI_NumNotImportedFiles = new Label(container, SWT.NONE);
+            _lblSimpleUI_NumNotImportedFiles.setText(UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+                  .applyTo(_lblSimpleUI_NumNotImportedFiles);
+         }
+         {
+            /*
              * Combo: Configuration
              */
             _comboSimpleUI_Config = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
             _comboSimpleUI_Config.setVisibleItemCount(20);
-            _comboSimpleUI_Config.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_SimpleUIConfig()));
+            _comboSimpleUI_Config.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ImportConfig_SimpleUI()));
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_comboSimpleUI_Config);
@@ -4074,6 +4016,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 // SET_FORMATTING_ON
    }
 
+   private void enableSimpleUI(final boolean isEnabled) {
+
+// SET_FORMATTING_OFF
+      
+      _actionSimpleUI_DeviceState      .setEnabled(isEnabled);
+      _comboSimpleUI_Config            .setEnabled(isEnabled);
+      _lblSimpleUI_NumNotImportedFiles .setEnabled(isEnabled);
+      _simpleUI_Viewer.getTable()      .setEnabled(isEnabled);
+      
+// SET_FORMATTING_ON
+   }
+
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       // hide tour info tooltip, this is displayed when the mouse context menu should be created
@@ -4386,14 +4340,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return _postSelectionProvider;
    }
 
-   private TagContentLayout getSelectedTagContentLayout() {
-
-      // get valid index
-      final int selectionIndex = Math.max(0, _comboTagContent.getSelectionIndex());
-
-      return TagManager.ALL_TAG_CONTENT_LAYOUT[selectionIndex].tagContentLayout;
-   }
-
    @Override
    public Set<Long> getSelectedTourIDs() {
 
@@ -4580,9 +4526,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _isBrowserCompleted = true;
 
-      if (_isInUIStartup) {
+      if (_isInFancyUIStartup) {
 
-         _isInUIStartup = false;
+         _isInFancyUIStartup = false;
 
          // a redraw MUST be done otherwise nothing is displayed
          _browser.setRedraw(true);
@@ -4591,7 +4537,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _browser.setFocus();
 
          // dashboard is visible, activate background task
-         setWatcher_On();
+         setWatcher_1_On();
 
          // make the import tiles visible otherwise they are 'hidden' after the startup
          _isShowWatcherAnimation = true;
@@ -4638,11 +4584,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
 
-         action_Easy_SetupImport(-1);
+         onSelect_SetupEasyImport(-1);
 
       } else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
 
-         action_Easy_SetDeviceWatching_OnOff();
+         onSelect_DeviceWatching_OnOff();
 
       } else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
@@ -4711,6 +4657,76 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
+   private void onSelect_DeviceWatching_OnOff() {
+
+      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         _isShowWatcherAnimation = true;
+      }
+
+      if (isWatchingOn()) {
+
+         // stop watching
+
+         setWatcher_2_Off();
+
+      } else {
+
+         // start watching
+
+         setWatcher_1_On();
+      }
+
+      updateUI_DeviceState();
+   }
+
+   /**
+    * Import config is selected in the dashboard.
+    *
+    * @param selectedIndex
+    */
+   private void onSelect_ImportConfig_Fancy(final int selectedIndex) {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
+
+      setWatcher_2_Off();
+      {
+         easyConfig.setActiveImportConfig(selectedConfig);
+
+         _isDeviceStateValid = false;
+
+         updateUI_2_EasyImport_Fancy();
+      }
+      setWatcher_1_On();
+
+      updateUI_2_EasyImport_Fancy();
+   }
+
+   /**
+    * Import config is selected in the simple UI.
+    */
+   private void onSelect_ImportConfig_SimpleUI() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboSimpleUI_Config.getSelectionIndex());
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectionIndex);
+
+      setWatcher_2_Off();
+      {
+         easyConfig.setActiveImportConfig(selectedConfig);
+
+         _isDeviceStateValid = false;
+
+//         updateUI_2_EasyImport_SimpleUI();
+      }
+      setWatcher_1_On();
+   }
+
    private void onSelect_ImportUI(final ImportUI importUI) {
 
       _importUI = importUI;
@@ -4731,8 +4747,51 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       updateUI_ImportUI_Action();
    }
 
-   private void onSelect_SimpleUIConfig() {
-      // TODO Auto-generated method stub
+   /**
+    * @param selectedTab
+    *           Tab which should be selected when config dialog is opened, -1 will select the
+    *           restored tab index.
+    */
+   void onSelect_SetupEasyImport(final int selectedTab) {
+
+      // prevent that the dialog is opened multiple times, this occurred when testing
+      if (_dialogImportConfig != null) {
+         return;
+      }
+
+      final Shell shell = Display.getDefault().getActiveShell();
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      _dialogImportConfig = new DialogEasyImportConfig(shell, easyConfig, this, selectedTab);
+
+      boolean isOK = false;
+
+      if (_dialogImportConfig.open() == Window.OK) {
+         isOK = true;
+      }
+
+      if (isOK) {
+
+         // keep none live update values
+
+         final EasyConfig modifiedEasyConfig = _dialogImportConfig.getModifiedConfig();
+
+         easyConfig.setActiveImportConfig(modifiedEasyConfig.getActiveImportConfig());
+
+         easyConfig.importConfigs.clear();
+         easyConfig.importConfigs.addAll(modifiedEasyConfig.importConfigs);
+
+         easyConfig.importLaunchers.clear();
+         easyConfig.importLaunchers.addAll(modifiedEasyConfig.importLaunchers);
+
+         updateModel_EasyConfig_Dashboard(_dialogImportConfig.getModifiedConfig());
+
+         _isDeviceStateValid = false;
+         updateUI_2_EasyImport_Fancy();
+      }
+
+      _dialogImportConfig = null;
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -4755,27 +4814,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _isInUpdate = false;
       }
       _viewerContainer.setRedraw(true);
-   }
-
-   /**
-    * Import config is selected in the dashboard.
-    *
-    * @param selectedIndex
-    */
-   private void onSelectImportConfig(final int selectedIndex) {
-
-      final EasyConfig easyConfig = getEasyConfig();
-
-      final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
-
-      setWatcher_Off();
-      {
-         easyConfig.setActiveImportConfig(selectedConfig);
-         _isDeviceStateValid = false;
-         updateUI_2_EasyImport_Fancy();
-      }
-      setWatcher_On();
-      updateUI_2_EasyImport_Fancy();
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -5065,7 +5103,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void resetEasyImport() {
 
-      setWatcher_Off();
+      setWatcher_2_Off();
 
       EasyImportManager.getInstance().reset();
    }
@@ -5237,7 +5275,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // open import config dialog to solve problems
          if (importState_Easy.isOpenSetup) {
 
-            _parent.getDisplay().asyncExec(() -> action_Easy_SetupImport(0));
+            _parent.getDisplay().asyncExec(() -> onSelect_SetupEasyImport(0));
 
             return;
          }
@@ -5314,7 +5352,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
 
-            setWatcher_Off();
+            setWatcher_2_Off();
          }
 
          /*
@@ -6067,7 +6105,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void setWatcher_Off() {
+   private void setWatcher_1_On() {
+
+      if (isWatchingOn()) {
+
+         // do not start twice
+         return;
+      }
+
+      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         updateUI_WatcherAnimation(DOM_CLASS_DEVICE_ON_ANIMATED);
+
+      } else {
+
+         // simple UI
+
+         enableSimpleUI(true);
+      }
+
+      thread_WatchStores_Start();
+      thread_FolderWatcher_Activate();
+   }
+
+   private void setWatcher_2_Off() {
 
       if (isWatchingOn()) {
 
@@ -6078,7 +6139,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          thread_WatchStores_Cancel();
          // thread_WatchFolders(false);
 
-         updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+         if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+            updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+
+         } else {
+
+            // simple UI
+
+            enableSimpleUI(false);
+         }
 
          try {
             if (_watchingStoresThread != null) {
@@ -6088,20 +6158,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
-   }
-
-   private void setWatcher_On() {
-
-      if (isWatchingOn()) {
-
-         // do not start twice
-         return;
-      }
-
-      updateUI_WatcherAnimation(DOM_CLASS_DEVICE_ON_ANIMATED);
-
-      thread_WatchStores_Start();
-      thread_FolderWatcher_Activate();
    }
 
    private void showFailbackUI() {
@@ -6557,7 +6613,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             _parent.getDisplay().asyncExec(() -> {
 
-               _isInUIStartup = isInStartUp;
+               _isInFancyUIStartup = isInStartUp;
 
                /*
                 * Create new UI only when it is used to prevent that the app is crashing when
@@ -6577,7 +6633,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   // deactivate background task
 
-                  setWatcher_Off();
+                  setWatcher_2_Off();
                }
 
                // the watcher is started in onBrowser_Completed
@@ -6587,6 +6643,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          case EASY_IMPORT_SIMPLE:
 
             _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Simple);
+
+            setWatcher_1_On();
 
             _simpleUI_Viewer.getTable().setFocus();
 
@@ -6627,6 +6685,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       if (isBrowserAvailable) {
 
+         // the html is created completely for every UI update
          final String html = createHTML();
 
          _isBrowserCompleted = false;
@@ -6637,11 +6696,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void updateUI_DeviceState() {
 
-      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+      // must be running in the UI thread, is called from other threads
+      _parent.getDisplay().asyncExec(() -> {
 
-         _parent.getDisplay().asyncExec(() -> {
+         if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
             if (_browser.isDisposed()) {
+
                // this occurred
                return;
             }
@@ -6651,22 +6712,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             } else {
                _isDeviceStateUpdateDelayed.set(true);
             }
-         });
 
-      } else {
+         } else {
 
-      }
+            // simple UI
+
+            updateUI_DeviceState_SimpleUI();
+         }
+      });
    }
 
    private void updateUI_DeviceState_DOM() {
 
-      final String htmlDeviceOnOff = createHTML_52_DeviceState_OnOff();
-      String jsDeviceOnOff = UI.replaceJS_QuotaMark(htmlDeviceOnOff);
-      jsDeviceOnOff = UI.replaceHTML_NewLine(jsDeviceOnOff);
+// SET_FORMATTING_OFF
 
-      final String htmlDeviceState = createHTML_54_DeviceState();
-      String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
-      jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
+      final String htmlDeviceOnOff  = createHTML_52_Device_OnOff();
+      String jsDeviceOnOff          = UI.replaceJS_QuotaMark(htmlDeviceOnOff);
+      jsDeviceOnOff                 = UI.replaceHTML_NewLine(jsDeviceOnOff);
+
+      final String htmlDeviceState  = createHTML_54_DeviceFolder();
+      String jsDeviceState          = UI.replaceJS_QuotaMark(htmlDeviceState);
+      jsDeviceState                 = UI.replaceHTML_NewLine(jsDeviceState);
+
+// SET_FORMATTING_ON
 
       final String js = NL
 
@@ -6679,10 +6747,117 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final boolean isSuccess = _browser.execute(js);
 
-      if (!isSuccess) {
+      if (isSuccess == false) {
          System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
                + ("\tupdateDOM_DeviceState: " + isSuccess + js)); //$NON-NLS-1$
       }
+   }
+
+   private void updateUI_DeviceState_SimpleUI() {
+      // TODO Auto-generated method stub
+
+      /*
+       * Device watching On/Off
+       */
+      final boolean isWatchingOn = isWatchingOn();
+
+      String tooltip = isWatchingOn
+            ? Messages.Import_Data_HTML_DeviceOff_Tooltip
+            : Messages.Import_Data_HTML_DeviceOn_Tooltip;
+
+      // show red image when off
+      final String imageDescriptor = isWatchingOn
+            ? Images.RawData_Device_TurnOn
+            : Images.RawData_Device_TurnOff;
+
+      _actionSimpleUI_StartStopWatching.setToolTipText(tooltip);
+      _actionSimpleUI_StartStopWatching.setImageDescriptor(TourbookPlugin.getImageDescriptor(imageDescriptor));
+
+      /*
+       * Device state/folder
+       */
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+      final boolean isWatchAnything = importConfig.isWatchAnything();
+
+      if (isWatchingOn() == false) {
+
+         // watching is off
+
+         _actionSimpleUI_DeviceState.setToolTipText(Messages.Import_Data_HTML_WatchingIsOff);
+         _actionSimpleUI_DeviceState.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_Disabled));
+
+      } else if (isWatchAnything && _isDeviceStateValid) {
+
+         updateUI_DeviceState_SimpleUI_IsValid();
+
+      } else {
+
+         /*
+          * On startup, set the folder state without device info because this is retrieved in a
+          * background thread, if not, it is blocking the UI !!!
+          */
+
+         final String stateImage = isWatchAnything
+               ? Images.RawData_DeviceFolder_NotChecked
+               : Images.RawData_DeviceFolder_NotSetup;
+
+         tooltip = isWatchAnything
+               ? Messages.Import_Data_HTML_AcquireDeviceInfo
+               : Messages.Import_Data_HTML_NothingIsWatched;
+
+         _actionSimpleUI_DeviceState.setToolTipText(tooltip);
+         _actionSimpleUI_DeviceState.setImageDescriptor(TourbookPlugin.getImageDescriptor(stateImage));
+      }
+   }
+
+   private void updateUI_DeviceState_SimpleUI_IsValid() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+      final String deviceOSFolder = importConfig.getDeviceOSFolder();
+      final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
+
+      final int numDeviceFiles = easyConfig.numDeviceFiles;
+      final int numMovedFiles = easyConfig.movedFiles.size();
+      final int numNotImportedFiles = notImportedFiles.size();
+      final int numAllFiles = numDeviceFiles + numMovedFiles;
+
+      final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
+      boolean isFolderOK = true;
+
+      /*
+       * Backup folder
+       */
+      final boolean isCreateBackup = importConfig.isCreateBackup;
+      if (isCreateBackup) {
+
+         // check OS folder
+         final String backupOSFolder = importConfig.getBackupOSFolder();
+         final boolean isBackupFolderOK = isOSFolderValid(backupOSFolder);
+         isFolderOK &= isBackupFolderOK;
+      }
+
+      isFolderOK &= isDeviceFolderOK;
+
+      /*
+       * Update UI
+       */
+      final String stateImage = isFolderOK
+            ? Images.RawData_DeviceFolder
+            : Images.RawData_DeviceFolder_NotDefined;
+
+      final String numNotImportedFilesAsText = isDeviceFolderOK
+            ? Integer.toString(numNotImportedFiles)
+            : UI.EMPTY_STRING;
+
+      _actionSimpleUI_DeviceState.setToolTipText("");
+      _actionSimpleUI_DeviceState.setImageDescriptor(TourbookPlugin.getImageDescriptor(stateImage));
+
+      _lblSimpleUI_NumNotImportedFiles.setText(numNotImportedFilesAsText);
    }
 
    private void updateUI_ImportUI_Action() {
