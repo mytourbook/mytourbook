@@ -347,6 +347,8 @@ public class FitExporter {
       // Totals
       sessionMesg.setTotalCalories(_tourData.getCalories());
       sessionMesg.setTotalDistance(_tourData.getTourDistance());
+      sessionMesg.setTotalAscent(_tourData.getTourAltUp());
+      sessionMesg.setTotalDescent(_tourData.getTourAltDown());
 
       //Averages
       sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
