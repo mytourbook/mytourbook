@@ -142,6 +142,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       // check if gear data are available, it can be null
       if (gearChangeData != null) {
 
+         //todo fb
          // create gear data for the current time
          final GearData gearData = new GearData();
 

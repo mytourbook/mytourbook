@@ -337,6 +337,31 @@ public class FitExporter {
       if (temperatureSerie != null) {
          recordMesg.setTemperature((byte) temperatureSerie[index]);
       }
+
+      final float[] stanceTimeSerie = _tourData.getRunDyn_StanceTime();
+      if (stanceTimeSerie != null) {
+         recordMesg.setStanceTime(stanceTimeSerie[index]);
+      }
+
+      final float[] stanceTimeBalanceSerie = _tourData.getRunDyn_StanceTimeBalance();
+      if (stanceTimeBalanceSerie != null) {
+         recordMesg.setStanceTimeBalance(stanceTimeBalanceSerie[index]);
+      }
+
+      final float[] stepLengthSerie = _tourData.getRunDyn_StepLength();
+      if (stepLengthSerie != null) {
+         recordMesg.setStepLength(stepLengthSerie[index]);
+      }
+
+      final float[] verticalOscillationSerie = _tourData.getRunDyn_VerticalOscillation();
+      if (verticalOscillationSerie != null) {
+         recordMesg.setVerticalOscillation(verticalOscillationSerie[index]);
+      }
+
+      final float[] verticalRatioSerie = _tourData.getRunDyn_VerticalRatio();
+      if (verticalRatioSerie != null) {
+         recordMesg.setVerticalRatio(verticalRatioSerie[index]);
+      }
    }
 
    private void setValues(final SessionMesg sessionMesg) {
@@ -349,11 +374,28 @@ public class FitExporter {
       sessionMesg.setTotalDistance(_tourData.getTourDistance());
       sessionMesg.setTotalAscent(_tourData.getTourAltUp());
       sessionMesg.setTotalDescent(_tourData.getTourAltDown());
+      sessionMesg.setTotalWork(_tourData.getPower_TotalWork());
+      sessionMesg.setTotalAnaerobicTrainingEffect(_tourData.getTraining_TrainingEffect_Anaerob());
 
       //Averages
       sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
       sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
       sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
       sessionMesg.setAvgTemperature((byte) _tourData.getWeather_Temperature_Average_Device());
+
+      // Maximums
+      sessionMesg.setMaxPower(_tourData.getPower_Max());
+
+      // Misc
+      sessionMesg.setNormalizedPower(_tourData.getPower_Normalized());
+      sessionMesg.setLeftRightBalance(_tourData.getPower_PedalLeftRightBalance());
+      sessionMesg.setAvgLeftTorqueEffectiveness(_tourData.getPower_AvgLeftTorqueEffectiveness());
+      sessionMesg.setAvgRightTorqueEffectiveness(_tourData.getPower_AvgRightTorqueEffectiveness());
+      sessionMesg.setAvgLeftPedalSmoothness(_tourData.getPower_AvgLeftPedalSmoothness());
+      sessionMesg.setAvgRightPedalSmoothness(_tourData.getPower_AvgRightPedalSmoothness());
+      sessionMesg.setTrainingStressScore(_tourData.getPower_TrainingStressScore());
+      sessionMesg.setIntensityFactor(_tourData.getPower_IntensityFactor());
+      sessionMesg.setThresholdPower(_tourData.getPower_FTP());
+      sessionMesg.setTotalTrainingEffect(_tourData.getTraining_TrainingEffect_Aerob());
    }
 }
