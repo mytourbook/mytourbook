@@ -465,6 +465,7 @@ public class Map2View extends ViewPart implements
    private EnumMap<MapGraphId, Action>       _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
    private ActionTourColor                   _actionTourColor_Elevation;
    private ActionTourColor                   _actionTourColor_Gradient;
+   private ActionTourColor                   _actionTourColor_Power;
    private ActionTourColor                   _actionTourColor_Pulse;
    private ActionTourColor                   _actionTourColor_Speed;
    private ActionTourColor                   _actionTourColor_Pace;
@@ -1714,6 +1715,13 @@ public class Map2View extends ViewPart implements
             Images.Graph_Gradient,
             Images.Graph_Gradient_Disabled);
 
+      _actionTourColor_Power = new ActionTourColor(
+            this,
+            MapGraphId.Power,
+            Messages.map_action_tour_color_power_tooltip,
+            Images.Graph_Power,
+            Images.Graph_Power_Disabled);
+
       _actionTourColor_Pulse = new ActionTourColor(
             this,
             MapGraphId.Pulse,
@@ -1753,6 +1761,7 @@ public class Map2View extends ViewPart implements
 
       _allTourColor_Actions.put(MapGraphId.Altitude,           _actionTourColor_Elevation);
       _allTourColor_Actions.put(MapGraphId.Gradient,           _actionTourColor_Gradient);
+      _allTourColor_Actions.put(MapGraphId.Power,              _actionTourColor_Power);
       _allTourColor_Actions.put(MapGraphId.Pulse,              _actionTourColor_Pulse);
       _allTourColor_Actions.put(MapGraphId.Speed,              _actionTourColor_Speed);
       _allTourColor_Actions.put(MapGraphId.Pace,               _actionTourColor_Pace);
@@ -2139,6 +2148,7 @@ public class Map2View extends ViewPart implements
 
          _actionTourColor_Elevation          .setEnabled(false);
          _actionTourColor_Gradient           .setEnabled(false);
+         _actionTourColor_Power              .setEnabled(false);
          _actionTourColor_Pulse              .setEnabled(false);
          _actionTourColor_Speed              .setEnabled(false);
          _actionTourColor_Pace               .setEnabled(false);
@@ -2149,6 +2159,7 @@ public class Map2View extends ViewPart implements
 
          _actionTourColor_Elevation          .setEnabled(true);
          _actionTourColor_Gradient           .setEnabled(true);
+         _actionTourColor_Power              .setEnabled(true);
          _actionTourColor_Pulse              .setEnabled(true);
          _actionTourColor_Speed              .setEnabled(true);
          _actionTourColor_Pace               .setEnabled(true);
@@ -2163,6 +2174,7 @@ public class Map2View extends ViewPart implements
 
          _actionTourColor_Elevation          .setEnabled(true);
          _actionTourColor_Gradient           .setEnabled(oneTourData.getGradientSerie() != null);
+         _actionTourColor_Power              .setEnabled(oneTourData.getPowerSerie() != null);
          _actionTourColor_Pulse              .setEnabled(isPulse);
          _actionTourColor_Speed              .setEnabled(oneTourData.getSpeedSerie() != null);
          _actionTourColor_Pace               .setEnabled(oneTourData.getPaceSerie() != null);
@@ -2173,6 +2185,7 @@ public class Map2View extends ViewPart implements
 
          _actionTourColor_Elevation          .setEnabled(false);
          _actionTourColor_Gradient           .setEnabled(false);
+         _actionTourColor_Power              .setEnabled(false);
          _actionTourColor_Pulse              .setEnabled(false);
          _actionTourColor_Speed              .setEnabled(false);
          _actionTourColor_Pace               .setEnabled(false);
@@ -4264,6 +4277,10 @@ public class Map2View extends ViewPart implements
 
          case Pace:
             _actionTourColor_Pace.setChecked(true);
+            break;
+
+         case Power:
+            _actionTourColor_Power.setChecked(true);
             break;
 
          case Pulse:
