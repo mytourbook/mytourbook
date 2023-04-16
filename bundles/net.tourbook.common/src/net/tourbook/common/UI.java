@@ -46,6 +46,7 @@ import net.tourbook.common.weather.IWeather;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -1318,7 +1319,7 @@ public class UI {
    }
 
    /**
-    * Creates one action in a toolbar.
+    * Creates one {@link Action} in it's own toolbar.
     *
     * @param parent
     * @param action
@@ -1329,6 +1330,22 @@ public class UI {
       final ToolBarManager tbm = new ToolBarManager(toolbar);
 
       tbm.add(action);
+
+      tbm.update(true);
+   }
+
+   /**
+    * Creates one {@link ContributionItem} in it' own toolbar.
+    *
+    * @param parent
+    * @param contribItem
+    */
+   public static void createToolbarAction(final Composite parent, final ContributionItem contribItem) {
+
+      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+      final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+      tbm.add(contribItem);
 
       tbm.update(true);
    }
@@ -2038,7 +2055,7 @@ public class UI {
 
    public static String replaceHTML_BackSlash(final String filePath) {
 
-      return filePath.replace(//
+      return filePath.replace(
             SYMBOL_BACKSLASH,
             SYMBOL_HTML_BACKSLASH);
    }
@@ -2055,7 +2072,7 @@ public class UI {
 
    public static String replaceJS_BackSlash(final String filePath) {
 
-      return filePath.replace(//
+      return filePath.replace(
             SYMBOL_BACKSLASH,
             JS_BACKSLASH_REPLACEMENT);
    }

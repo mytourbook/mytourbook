@@ -27,8 +27,6 @@ import java.util.HashMap;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.CommonImages;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
@@ -281,7 +279,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private ComboViewerCadence[] _comboTT_Cadence;
    //
    private Image                _imageFileSystem;
-   private Image                _imageAppOptions;
    //
    private Label                _lblIC_FileSystemImage;
    private Label                _lblIC_ConfigName;
@@ -612,9 +609,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
-
-      _imageAppOptions = CommonActivator.getThemedImageDescriptor(CommonImages.App_Options).createImage();
-      setDefaultImage(_imageAppOptions);
 
       cloneEasyConfig(easyConfig);
    }
@@ -2971,7 +2965,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _configImageHash.clear();
 
       UI.disposeResource(_imageFileSystem);
-      UI.disposeResource(_imageAppOptions);
    }
 
    /**

@@ -52,7 +52,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
     * This tooltip will be displayed when the action is not selected which causes that the slideout
     * is not displayed.
     */
-   protected String         notSelectedTooltip = UI.EMPTY_STRING;
+   public String            notSelectedTooltip = UI.EMPTY_STRING;
 
    private boolean          _isCreatedImage_EnabledDisabled;
    private boolean          _isCreatedImage_Selected;
