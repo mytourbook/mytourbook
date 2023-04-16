@@ -209,10 +209,10 @@ public class Images {
    public static final String PhotoTimeAdjustment_Disabled               = "photo-time-adjustment-disabled.png";                  //$NON-NLS-1$
    public static final String PulseZones                                 = "pulse-zones.png";                                     //$NON-NLS-1$
    public static final String PulseZones_Disabled                        = "pulse-zones-disabled.png";                            //$NON-NLS-1$
-   public static final String RawData_DeviceFolder                       = "device-folder.png";                                   //$NON-NLS-1$
-   public static final String RawData_DeviceFolder_Disabled              = "device-folder-disabled.png";                          //$NON-NLS-1$
-   public static final String RawData_DeviceFolder_NotChecked            = "device-folder-not-checked.png";                       //$NON-NLS-1$
-   public static final String RawData_DeviceFolder_NotDefined            = "device-folder-not-defined.png";                       //$NON-NLS-1$
+   public static final String RawData_DeviceFolder_Off                   = "device-folder-off.png";                               //$NON-NLS-1$
+   public static final String RawData_DeviceFolder_OK                    = "device-folder-OK.png";                                //$NON-NLS-1$
+   public static final String RawData_DeviceFolder_Error                 = "device-folder-error.png";                             //$NON-NLS-1$
+   public static final String RawData_DeviceFolder_IsChecking            = "device-folder-is-checking.png";                       //$NON-NLS-1$
    public static final String RawData_DeviceFolder_NotSetup              = "device-folder-not-setup.png";                         //$NON-NLS-1$
    public static final String RawData_Device_TurnOff                     = "device-turn-off.png";                                 //$NON-NLS-1$
    public static final String RawData_Device_TurnOn                      = "device-turn-on.png";                                  //$NON-NLS-1$

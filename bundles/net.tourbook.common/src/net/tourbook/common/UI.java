@@ -654,6 +654,12 @@ public class UI {
    public static Color           SYS_COLOR_DARK_GRAY;
    public static Color           SYS_COLOR_DARK_GREEN;
 
+   public static Color           SYS_COLOR_LIST_BACKGROUND;
+
+   public static Color           SYS_COLOR_WIDGET_FOREGROUND;
+   public static Color           SYS_COLOR_WIDGET_DARK_SHADOW;
+   public static Color           SYS_COLOR_WIDGET_BACKGROUND;
+
 // SET_FORMATTING_ON
 
    public static final ImageRegistry     IMAGE_REGISTRY;
@@ -687,21 +693,28 @@ public class UI {
 
 // SET_FORMATTING_OFF
 
-      IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,                    CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
-      IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(CommonImages.App_EmptyIcon_Placeholder));
+      IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,  CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
+      IMAGE_REGISTRY.put(IMAGE_EMPTY_16,           CommonActivator.getImageDescriptor(CommonImages.App_EmptyIcon_Placeholder));
 
-      SYS_COLOR_BLACK       = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
-      SYS_COLOR_BLUE        = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-      SYS_COLOR_CYAN        = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
-      SYS_COLOR_GRAY        = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
-      SYS_COLOR_GREEN       = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
-      SYS_COLOR_MAGENTA     = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
-      SYS_COLOR_RED         = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-      SYS_COLOR_WHITE       = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-      SYS_COLOR_YELLOW      = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
+      final Display display = Display.getCurrent();
 
-      SYS_COLOR_DARK_GRAY   = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
-      SYS_COLOR_DARK_GREEN  = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+      SYS_COLOR_BLACK               = display.getSystemColor(SWT.COLOR_BLACK);
+      SYS_COLOR_BLUE                = display.getSystemColor(SWT.COLOR_BLUE);
+      SYS_COLOR_CYAN                = display.getSystemColor(SWT.COLOR_CYAN);
+      SYS_COLOR_GRAY                = display.getSystemColor(SWT.COLOR_GRAY);
+      SYS_COLOR_GREEN               = display.getSystemColor(SWT.COLOR_GREEN);
+      SYS_COLOR_MAGENTA             = display.getSystemColor(SWT.COLOR_MAGENTA);
+      SYS_COLOR_RED                 = display.getSystemColor(SWT.COLOR_RED);
+      SYS_COLOR_WHITE               = display.getSystemColor(SWT.COLOR_WHITE);
+      SYS_COLOR_YELLOW              = display.getSystemColor(SWT.COLOR_YELLOW);
+
+      SYS_COLOR_DARK_GRAY           = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+      SYS_COLOR_DARK_GREEN          = display.getSystemColor(SWT.COLOR_DARK_GREEN);
+
+      SYS_COLOR_LIST_BACKGROUND     = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+      SYS_COLOR_WIDGET_BACKGROUND   = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+      SYS_COLOR_WIDGET_DARK_SHADOW  = display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+      SYS_COLOR_WIDGET_FOREGROUND   = display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
 
       TRANSFORM_OPACITY_MAX = _prefStore_Common.getInt(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX);
 
@@ -721,6 +734,7 @@ public class UI {
       final String commaSpace = Messages.Period_Format_CommaSpace;
       final String space2 = Messages.Period_Format_SpaceAndSpace;
       final String[] variants = {
+
             Messages.Period_Format_Space,
             Messages.Period_Format_Comma,
             Messages.Period_Format_CommaAndAnd,
@@ -1286,12 +1300,13 @@ public class UI {
       return label;
    }
 
-public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
 
-   final Label label = new Label(parent, SWT.NONE);
+      final Label label = new Label(parent, SWT.NONE);
 
-   GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
-}
+      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+   }
+
    public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
 
       final Label label = new Label(parent, SWT.NONE);

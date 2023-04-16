@@ -319,13 +319,13 @@ public class ThemeUtil {
          display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);         //$NON-NLS-1$
-         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);             //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor     : null);         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
-         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);          //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor         : null);  //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);  //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);                                         //$NON-NLS-1$

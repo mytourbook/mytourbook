@@ -63,6 +63,7 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
@@ -186,6 +187,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
@@ -443,8 +445,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private AtomicBoolean                 _isDeviceStateUpdateDelayed = new AtomicBoolean();
    private ReentrantLock                 WATCH_LOCK                  = new ReentrantLock();
    //
-   private HashMap<Long, Image>          _configImages               = new HashMap<>();
-   private HashMap<Long, Integer>        _configImageHash            = new HashMap<>();
+   private HashMap<String, Image>        _configImages               = new HashMap<>();
+   private HashMap<String, Integer>      _configImageHash            = new HashMap<>();
    //
    private boolean                       _isBrowserCompleted;
    private boolean                       _isInFancyUIStartup;
@@ -467,9 +469,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private String                        _imageUrl_Device_TurnOff;
    private String                        _imageUrl_Device_TurnOn;
    private String                        _imageUrl_DeviceFolder_OK;
-   private String                        _imageUrl_DeviceFolder_Disabled;
-   private String                        _imageUrl_DeviceFolder_NotAvailable;
-   private String                        _imageUrl_DeviceFolder_NotChecked;
+   private String                        _imageUrl_DeviceFolder_Off;
+   private String                        _imageUrl_DeviceFolder_Error;
+   private String                        _imageUrl_DeviceFolder_IsChecking;
    private String                        _imageUrl_DeviceFolder_NotSetup;
    private String                        _imageUrl_ImportFromFile;
    private String                        _imageUrl_SerialPort_Configured;
@@ -538,12 +540,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 //         setToolTipText(Messages.Import_Data_Action_ _Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_OK));
       }
 
       @Override
       public void run() {
 
+         onSelect_SetupEasyImport(-1);
       }
    }
 
@@ -1558,7 +1561,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // watching is off
 
-         final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Disabled);
+         final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Off);
          final String htmlTooltip = Messages.Import_Data_HTML_WatchingIsOff;
 
          html = "" + NL //                                                 //$NON-NLS-1$
@@ -1586,7 +1589,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
 
          final String stateImage = createHTML_BgImageStyle(isWatchAnything
-               ? _imageUrl_DeviceFolder_NotChecked
+               ? _imageUrl_DeviceFolder_IsChecking
                : _imageUrl_DeviceFolder_NotSetup);
 
          final String htmlTooltip = isWatchAnything
@@ -1802,7 +1805,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        */
       final String imageUrl = isFolderOK
             ? _imageUrl_DeviceFolder_OK
-            : _imageUrl_DeviceFolder_NotAvailable;
+            : _imageUrl_DeviceFolder_Error;
 
       final String stateImage = createHTML_BgImageStyle(imageUrl);
       final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImportedFiles) : UI.EMPTY_STRING;
@@ -2065,7 +2068,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Tile image
        */
-      final Image tileImage = getImportConfigImage(importTile);
+      final Image tileImage = getImportConfigImage(importTile, true);
       String htmlImage = UI.EMPTY_STRING;
       if (tileImage != null) {
 
@@ -2587,10 +2590,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_Device_TurnOff            = getIconUrl(Images.RawData_Device_TurnOff);
          _imageUrl_Device_TurnOn             = getIconUrl(Images.RawData_Device_TurnOn);
 
-         _imageUrl_DeviceFolder_OK           = getIconUrl(Images.RawData_DeviceFolder);
-         _imageUrl_DeviceFolder_Disabled     = getIconUrl(Images.RawData_DeviceFolder_Disabled);
-         _imageUrl_DeviceFolder_NotAvailable   = getIconUrl(Images.RawData_DeviceFolder_NotDefined);
-         _imageUrl_DeviceFolder_NotChecked   = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
+         _imageUrl_DeviceFolder_OK           = getIconUrl(Images.RawData_DeviceFolder_OK);
+         _imageUrl_DeviceFolder_Off          = getIconUrl(Images.RawData_DeviceFolder_Off);
+         _imageUrl_DeviceFolder_Error        = getIconUrl(Images.RawData_DeviceFolder_Error);
+         _imageUrl_DeviceFolder_IsChecking   = getIconUrl(Images.RawData_DeviceFolder_IsChecking);
          _imageUrl_DeviceFolder_NotSetup     = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
 // SET_FORMATTING_ON
@@ -2886,6 +2889,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              */
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Import_Data_HTML_EasyImport);
+            label.setForeground(UI.SYS_COLOR_WIDGET_DARK_SHADOW);
             MTFont.setBannerFont(label);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
@@ -2926,7 +2930,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // define all columns for the viewer
       _simpleUI_ColumnManager = new ColumnManager(_simpleUI_ColumnViewer, _stateSimpleUI);
-      _simpleUI_EasyLauncher.defineAll_ILColumns(_simpleUI_ColumnManager, _pc);
+      _simpleUI_EasyLauncher.defineAllColumns(_simpleUI_ColumnManager, _pc);
 
       _ilViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -2947,7 +2951,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final Table table = new Table(parent,
             SWT.H_SCROLL
                   | SWT.V_SCROLL
-//                  | SWT.BORDER
                   | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -4018,14 +4021,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void enableSimpleUI(final boolean isEnabled) {
 
+      if (_parent.isDisposed()) {
+         return;
+      }
+
+      final Table viewerTable = _simpleUI_Viewer.getTable();
+
 // SET_FORMATTING_OFF
-      
+
       _actionSimpleUI_DeviceState      .setEnabled(isEnabled);
       _comboSimpleUI_Config            .setEnabled(isEnabled);
       _lblSimpleUI_NumNotImportedFiles .setEnabled(isEnabled);
-      _simpleUI_Viewer.getTable()      .setEnabled(isEnabled);
-      
+
+      viewerTable                      .setEnabled(isEnabled);
+
 // SET_FORMATTING_ON
+
+      if (UI.IS_DARK_THEME) {
+
+         viewerTable.setHeaderForeground(isEnabled
+               ? ThemeUtil.getDefaultForegroundColor_TableHeader()
+               : ThemeUtil.getDefaultBackgroundColor_Combo());
+
+         viewerTable.setHeaderBackground(isEnabled
+               ? ThemeUtil.getDefaultBackgroundColor_TableHeader()
+               : ThemeUtil.getDefaultBackgroundColor_Table());
+
+      } else {
+
+         // bright theme
+
+         viewerTable.setHeaderForeground(isEnabled
+               ? UI.SYS_COLOR_WIDGET_FOREGROUND
+               : UI.SYS_COLOR_WIDGET_DARK_SHADOW);
+
+         viewerTable.setHeaderBackground(UI.SYS_COLOR_WIDGET_BACKGROUND);
+
+         _topPage_ImportUI_EasyImport_Simple.setBackground(isEnabled
+               ? UI.SYS_COLOR_LIST_BACKGROUND
+               : UI.SYS_COLOR_WIDGET_BACKGROUND);
+      }
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -4220,7 +4255,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return EasyImportManager.getInstance().getEasyConfig();
    }
 
-   public Image getImportConfigImage(final ImportLauncher importConfig) {
+   public Image getImportConfigImage(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
 
       final int imageWidth = importConfig.imageWidth;
 
@@ -4228,11 +4263,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return null;
       }
 
-      final long configId = importConfig.getId();
-      Image image = _configImages.get(configId);
+      /**
+       * Color which is transparent in the combined tour type images
+       */
+      final RGB TRANSPARENT_COLOR = isDarkTransparentColor
 
-      if (isConfigImageValid(image, importConfig)) {
-         return image;
+            ? new RGB(67, 67, 67)
+            : new RGB(0xff, 0xfe, 0xff);
+
+      final long configId = importConfig.getId();
+      final String configImageId = Long.toString(configId) + UI.SPACE + Boolean.toString(isDarkTransparentColor);
+
+      Image configImage = _configImages.get(configImageId);
+
+      if (isConfigImageValid(configImage, importConfig, configImageId)) {
+         return configImage;
       }
 
       final Display display = _parent.getDisplay();
@@ -4247,7 +4292,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final Image tempImage = new Image(display, imageWidth, imageSize);
          {
             final GC gcImage = new GC(tempImage);
-            final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+            final Color colorTransparent = new Color(display, TRANSPARENT_COLOR);
             {
                // fill with transparent color
                gcImage.setBackground(colorTransparent);
@@ -4278,9 +4323,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * set transparency
              */
             final ImageData imageData = tempImage.getImageData();
-            imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
+            imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR);
 
-            image = new Image(display, imageData);
+            configImage = new Image(display, imageData);
          }
          tempImage.dispose();
 
@@ -4295,7 +4340,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             {
 
                final GC gcImage = new GC(tempImage);
-               final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+               final Color colorTransparent = new Color(display, TRANSPARENT_COLOR);
                {
                   // fill with transparent color
                   gcImage.setBackground(colorTransparent);
@@ -4311,9 +4356,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                 * set transparency
                 */
                final ImageData imageData = tempImage.getImageData();
-               imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
+               imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR);
 
-               image = new Image(display, imageData);
+               configImage = new Image(display, imageData);
 
             }
             tempImage.dispose();
@@ -4326,13 +4371,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       // keep image in the cache
-      final Image oldImage = _configImages.put(configId, image);
+      final Image oldImage = _configImages.put(configImageId, configImage);
 
       UI.disposeResource(oldImage);
 
-      _configImageHash.put(configId, importConfig.imageHash);
+      _configImageHash.put(configImageId, importConfig.imageHash);
 
-      return image;
+      return configImage;
    }
 
    @Override
@@ -4475,17 +4520,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /**
     * @param image
     * @param importConfig
+    * @param configImageId
     * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when the
     *         profile image must be created,
     */
-   private boolean isConfigImageValid(final Image image, final ImportLauncher importConfig) {
+   private boolean isConfigImageValid(final Image image,
+                                      final ImportLauncher importConfig,
+                                      final String configImageId) {
 
       if (image == null || image.isDisposed()) {
 
          return false;
       }
 
-      final Integer imageHash = _configImageHash.get(importConfig.getId());
+      final Integer imageHash = _configImageHash.get(configImageId);
 
       if (imageHash == null || imageHash != importConfig.imageHash) {
 
@@ -4641,7 +4689,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       case SWT.PaintItem:
 
-         final Image image = getImportConfigImage(importLauncher);
+         final Image image = getImportConfigImage(importLauncher, UI.IS_DARK_THEME);
 
          if (image != null && !image.isDisposed()) {
 
@@ -6036,6 +6084,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       Util.setState(_state, STATE_SELECTED_TOUR_INDICES, _tourViewer.getTable().getSelectionIndices());
 
       _columnManager.saveState(_state);
+      _simpleUI_ColumnManager.saveState(_stateSimpleUI);
    }
 
    /**
@@ -6754,7 +6803,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void updateUI_DeviceState_SimpleUI() {
-      // TODO Auto-generated method stub
 
       /*
        * Device watching On/Off
@@ -6786,7 +6834,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // watching is off
 
          _actionSimpleUI_DeviceState.setToolTipText(Messages.Import_Data_HTML_WatchingIsOff);
-         _actionSimpleUI_DeviceState.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_Disabled));
+         _actionSimpleUI_DeviceState.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_Off));
 
       } else if (isWatchAnything && _isDeviceStateValid) {
 
@@ -6800,7 +6848,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
 
          final String stateImage = isWatchAnything
-               ? Images.RawData_DeviceFolder_NotChecked
+               ? Images.RawData_DeviceFolder_Error
                : Images.RawData_DeviceFolder_NotSetup;
 
          tooltip = isWatchAnything
@@ -6847,8 +6895,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        * Update UI
        */
       final String stateImage = isFolderOK
-            ? Images.RawData_DeviceFolder
-            : Images.RawData_DeviceFolder_NotDefined;
+            ? Images.RawData_DeviceFolder_OK
+            : Images.RawData_DeviceFolder_Error;
 
       final String numNotImportedFilesAsText = isDeviceFolderOK
             ? Integer.toString(numNotImportedFiles)

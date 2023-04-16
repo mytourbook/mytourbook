@@ -48,14 +48,6 @@ public class TourType implements Comparable<Object>, Serializable {
    /** Width/height of the tour type image. */
    public static final int            TOUR_TYPE_IMAGE_SIZE                  = 16;
 
-   /**
-    * Color which is transparent in the combined tour type images
-    */
-   public static final RGB            TRANSPARENT_COLOR                     = UI.IS_DARK_THEME
-
-         ? new RGB(67, 67, 67)
-         : new RGB(0xff, 0xfe, 0xff);
-
    public static final long           IMAGE_KEY_DIALOG_SELECTION            = -2;
 
    /**

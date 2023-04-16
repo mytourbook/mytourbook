@@ -36,7 +36,7 @@ public class EasyLauncher {
 
    private static final String   COLUMN_ADJUST_TEMPERATURE = "{0} - {1} {2}";                 //$NON-NLS-1$
 
-   private ColumnManager         _ilColumnManager;
+   private ColumnManager         _columnManager;
    private TableColumnDefinition _colDef_TourTypeImage;
 
    private PixelConverter        _pc;
@@ -47,28 +47,28 @@ public class EasyLauncher {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   public void defineAll_ILColumns(final ColumnManager columnManager, final PixelConverter pc) {
+   public void defineAllColumns(final ColumnManager columnManager, final PixelConverter pc) {
 
-      _ilColumnManager = columnManager;
+      _columnManager = columnManager;
       _pc = pc;
 
-      defineColumnIL_10_LauncherName();
-      defineColumnIL_20_TourTypeImage();
-      defineColumnIL_30_LastMarkerDistance();
-      defineColumnIL_40_AdjustTemperature();
-      defineColumnIL_50_RetrieveWeatherData();
-      defineColumnIL_80_IsSaveTour();
-      defineColumnIL_82_IsAdjustElevation();
-      defineColumnIL_90_IsShowInDashboard();
-      defineColumnIL_99_Description();
+      defineColumn_10_LauncherName();
+      defineColumn_20_TourTypeImage();
+      defineColumn_30_LastMarkerDistance();
+      defineColumn_40_AdjustTemperature();
+      defineColumn_50_RetrieveWeatherData();
+      defineColumn_80_IsSaveTour();
+      defineColumn_82_IsAdjustElevation();
+      defineColumn_90_IsShowInDashboard();
+      defineColumn_99_Description();
    }
 
    /**
     * Column: Item name
     */
-   private void defineColumnIL_10_LauncherName() {
+   private void defineColumn_10_LauncherName() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "launcherName", SWT.LEAD); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "launcherName", SWT.LEAD); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
@@ -90,9 +90,9 @@ public class EasyLauncher {
    /**
     * Column: Tour type
     */
-   private void defineColumnIL_20_TourTypeImage() {
+   private void defineColumn_20_TourTypeImage() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
       _colDef_TourTypeImage = colDef;
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourType);
@@ -115,9 +115,9 @@ public class EasyLauncher {
    /**
     * Column: Set last marker
     */
-   private void defineColumnIL_30_LastMarkerDistance() {
+   private void defineColumn_30_LastMarkerDistance() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_LastMarker_Label);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_LastMarker_Header);
@@ -151,10 +151,10 @@ public class EasyLauncher {
    /**
     * Column: Adjust temperature
     */
-   private void defineColumnIL_40_AdjustTemperature() {
+   private void defineColumn_40_AdjustTemperature() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(
-            _ilColumnManager,
+            _columnManager,
             "isAdjustTemperature", //$NON-NLS-1$
             SWT.CENTER);
 
@@ -197,9 +197,9 @@ public class EasyLauncher {
    /**
     * Column: Retrieve weather data
     */
-   private void defineColumnIL_50_RetrieveWeatherData() {
+   private void defineColumn_50_RetrieveWeatherData() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isRetrieveWeatherData", SWT.CENTER); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isRetrieveWeatherData", SWT.CENTER); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_RetrieveWeatherData_Label);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_RetrieveWeatherData_Header);
@@ -226,9 +226,9 @@ public class EasyLauncher {
    /**
     * Column: Is save tour
     */
-   private void defineColumnIL_80_IsSaveTour() {
+   private void defineColumn_80_IsSaveTour() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save_Label);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save_Header);
@@ -255,9 +255,9 @@ public class EasyLauncher {
    /**
     * Column: Is adjust elevation
     */
-   private void defineColumnIL_82_IsAdjustElevation() {
+   private void defineColumn_82_IsAdjustElevation() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isAdjustElevation", SWT.CENTER); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isAdjustElevation", SWT.CENTER); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustElevation_Label);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustElevation_Header);
@@ -282,9 +282,9 @@ public class EasyLauncher {
    /**
     * Column: Show in dashboard
     */
-   private void defineColumnIL_90_IsShowInDashboard() {
+   private void defineColumn_90_IsShowInDashboard() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.CENTER); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "showInDash", SWT.CENTER); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_ShowInDash_Label);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_ShowInDash_Header);
@@ -308,9 +308,9 @@ public class EasyLauncher {
    /**
     * Column: Item description
     */
-   private void defineColumnIL_99_Description() {
+   private void defineColumn_99_Description() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Description);
       colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Description);

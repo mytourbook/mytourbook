@@ -1501,7 +1501,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // define all columns for the viewer
       _ilColumnManager = new ColumnManager(_ilColumnViewer, _stateIL);
-      _ilEasyLauncher.defineAll_ILColumns(_ilColumnManager, _pc);
+      _ilEasyLauncher.defineAllColumns(_ilColumnManager, _pc);
 
       _ilViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -3729,13 +3729,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
 
          event.width += importLauncher.imageWidth;
-//         event.height = PROFILE_IMAGE_HEIGHT;
+//       event.height = PROFILE_IMAGE_HEIGHT;
 
          break;
 
       case SWT.PaintItem:
 
-         final Image image = _rawDataView.getImportConfigImage(importLauncher);
+         final Image image = _rawDataView.getImportConfigImage(importLauncher, UI.IS_DARK_THEME);
 
          if (image != null && !image.isDisposed()) {
 
@@ -3859,13 +3859,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       if (_comboIC_DeviceType == null) {
          return;
       }
-      final int deviceIndex = _comboIC_DeviceType.getSelectionIndex();
 
       if (_lblIC_DeviceFolder == null) {
          return;
       }
 
+      final int deviceIndex = _comboIC_DeviceType.getSelectionIndex();
       final boolean isDeviceLocal = deviceIndex == 0; //Local device
+
       _lblIC_DeviceFolder.setEnabled(isDeviceLocal);
       _comboIC_DeviceFolder.setEnabled(isDeviceLocal);
 
@@ -3874,40 +3875,53 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       //We update the file system icon
       UI.disposeResource(_imageFileSystem);
       if (isDeviceLocal) {
-         _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
+
+         _imageFileSystem = TourbookPlugin.getThemedImageDescriptor(Images.EasyImport_Harddrive).createImage();
+
       } else if (NIO.isTourBookFileSystem(_comboIC_DeviceType.getText())) {
-         final ImageDescriptor fileSystemImageDescriptor = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText())
-               .getFileSystemImageDescriptor();
-         _imageFileSystem = fileSystemImageDescriptor.createImage();
+
+         _imageFileSystem = FileSystemManager
+               .getTourbookFileSystem(_comboIC_DeviceType.getText())
+               .getFileSystemImageDescriptor()
+               .createImage();
       }
 
       if (_imageFileSystem != null && !_imageFileSystem.isDisposed()) {
+
          _lblIC_FileSystemImage.setImage(_imageFileSystem);
       }
 
       if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
+
          deviceFolder = UI.EMPTY_STRING;
-      } else if (!isDeviceLocal &&
-            !NIO.isTourBookFileSystem(deviceFolder)) {
+
+      } else if (isDeviceLocal == false && NIO.isTourBookFileSystem(deviceFolder) == false) {
+
          deviceFolder = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText()).getDisplayId();
       }
+
       _comboIC_DeviceFolder.setText(deviceFolder);
 
       _chkIC_CreateBackup.setEnabled(isDeviceLocal);
       _chkIC_DeleteDeviceFiles.setEnabled(isDeviceLocal);
 
-      if (!isDeviceLocal) {
+      if (isDeviceLocal) {
+
+         enable_IC_Controls();
+
+      } else {
+
          _comboIC_BackupFolder.setText(UI.EMPTY_STRING);
          _comboIC_BackupFolder.setEnabled(false);
+
          _chkIC_CreateBackup.setSelection(false);
          _chkIC_DeleteDeviceFiles.setSelection(false);
          _lblIC_DeleteFilesInfo.setText(UI.EMPTY_STRING);
          _lblIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
+
          _backupHistoryItems.setIsValidateFolder(false);
          _backupHistoryItems.validateModifiedPath();
-      } else {
-         enable_IC_Controls();
       }
    }
 
