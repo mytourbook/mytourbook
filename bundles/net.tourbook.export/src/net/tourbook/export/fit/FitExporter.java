@@ -370,7 +370,7 @@ public class FitExporter {
       sessionMesg.setSport(sport);
 
       // Totals
-      sessionMesg.setTotalCalories(_tourData.getCalories());
+      sessionMesg.setTotalCalories(_tourData.getCalories() / 1000);
       sessionMesg.setTotalDistance(_tourData.getTourDistance());
       sessionMesg.setTotalAscent(_tourData.getTourAltUp());
       sessionMesg.setTotalDescent(_tourData.getTourAltDown());
