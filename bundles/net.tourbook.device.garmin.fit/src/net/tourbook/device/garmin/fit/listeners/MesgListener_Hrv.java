@@ -43,7 +43,6 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
     * @param mesg
     */
    private void onMesg_Hrv(final HrvMesg mesg) {
-      //todo fb
 
       final IntArrayList pulseTime = new IntArrayList();
 

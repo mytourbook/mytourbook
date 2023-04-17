@@ -29,6 +29,7 @@ import com.garmin.fit.FileIdMesg;
 import com.garmin.fit.Fit;
 import com.garmin.fit.FitRuntimeException;
 import com.garmin.fit.Gender;
+import com.garmin.fit.HrvMesg;
 import com.garmin.fit.LapMesg;
 import com.garmin.fit.Manufacturer;
 import com.garmin.fit.Mesg;
@@ -174,6 +175,55 @@ public class FitExporter {
       eventMesgStop.setEventType(EventType.STOP_ALL);
       eventMessages.add(eventMesgStop);
 
+      final long[] gearSerie = _tourData.gearSerie;
+      if (gearSerie != null) {
+
+         final int[] timeSerie = _tourData.timeSerie;
+         final DateTime timeStamp = new DateTime(startTime);
+
+         for (int index = 0; index < gearSerie.length; ++index) {
+
+            final EventMesg eventMesg = new EventMesg();
+            eventMesg.setGearChangeData(gearSerie[index]);
+
+            timeStamp.add(timeSerie[index]);
+            eventMesg.setTimestamp(timeStamp);
+
+            eventMessages.add(eventMesg);
+         }
+      }
+
+      return eventMessages;
+   }
+
+   private List<HrvMesg> createHrvMessages() {
+
+      final List<HrvMesg> eventMessages = new ArrayList<>();
+
+      final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
+      final int[] pulseTime_TimeIndex = _tourData.pulseTime_TimeIndex;
+      if (pulseTime_Milliseconds != null) {
+
+         int previousTimeIndex = 0;
+         for (int index = 0; index < pulseTime_TimeIndex.length; ++index) {
+
+            final int timeIndex = pulseTime_TimeIndex[index];
+            final HrvMesg hrvMesg = new HrvMesg();
+            for (int valuesIndex = 0; valuesIndex < (timeIndex - previousTimeIndex) &&
+                  index < pulseTime_TimeIndex.length &&
+                  valuesIndex < pulseTime_Milliseconds.length; ++valuesIndex) {
+
+               hrvMesg.setTime(pulseTime_TimeIndex[index], pulseTime_Milliseconds[valuesIndex] / 1000.0f);
+            }
+            final Float[] titi = hrvMesg.getTime();
+            if (titi != null) {
+               eventMessages.add(hrvMesg);
+            }
+
+            previousTimeIndex = pulseTime_TimeIndex[index];
+         }
+      }
+
       return eventMessages;
    }
 
@@ -246,7 +296,7 @@ public class FitExporter {
       if (timeSerie != null) {
 
          int previousTimeSerieValue = 0;
-
+         int valuesIndex = 0;
          for (int index = 0; index < timeSerie.length; ++index) {
 
             timestamp.add((long) _tourData.timeSerie[index] - previousTimeSerieValue);
@@ -260,6 +310,22 @@ public class FitExporter {
             // Write the Record message to the output stream
             messages.add(recordMesg);
 
+            final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
+            final int[] pulseTime_TimeIndex = _tourData.pulseTime_TimeIndex;
+            if (pulseTime_Milliseconds != null && pulseTime_TimeIndex != null) {
+
+               final HrvMesg hrvMesg = new HrvMesg();
+
+               for (int index2 = 0; valuesIndex < pulseTime_TimeIndex[index]; ++valuesIndex, ++index2) {
+
+                  hrvMesg.setTime(index2, pulseTime_Milliseconds[valuesIndex] / 1000.0f);
+               }
+               final Float[] titi = hrvMesg.getTime();
+               if (titi != null) {
+                  messages.add(hrvMesg);
+               }
+            }
+
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
             previousTimeSerieValue = _tourData.timeSerie[index];
@@ -271,6 +337,9 @@ public class FitExporter {
 
       final List<LapMesg> lapMessages = createLapMessages(startTime);
       messages.addAll(lapMessages);
+
+//      final List<HrvMesg> hrvMessages = createHrvMessages();
+//      messages.addAll(hrvMessages);
 
       // Every FIT ACTIVITY file MUST contain at least one Session message
       final SessionMesg sessionMesg = new SessionMesg();
