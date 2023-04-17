@@ -196,35 +196,27 @@ public class FitExporter {
       return eventMessages;
    }
 
-   private List<HrvMesg> createHrvMessages() {
-
-      final List<HrvMesg> eventMessages = new ArrayList<>();
+   private int createHrvMessage(final List<Mesg> messages, int pulseSerieIndex, final int timeSerieIndex) {
 
       final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
       final int[] pulseTime_TimeIndex = _tourData.pulseTime_TimeIndex;
-      if (pulseTime_Milliseconds != null) {
 
-         int previousTimeIndex = 0;
-         for (int index = 0; index < pulseTime_TimeIndex.length; ++index) {
+      if (pulseTime_Milliseconds != null && pulseTime_TimeIndex != null) {
 
-            final int timeIndex = pulseTime_TimeIndex[index];
-            final HrvMesg hrvMesg = new HrvMesg();
-            for (int valuesIndex = 0; valuesIndex < (timeIndex - previousTimeIndex) &&
-                  index < pulseTime_TimeIndex.length &&
-                  valuesIndex < pulseTime_Milliseconds.length; ++valuesIndex) {
+         final HrvMesg hrvMesg = new HrvMesg();
 
-               hrvMesg.setTime(pulseTime_TimeIndex[index], pulseTime_Milliseconds[valuesIndex] / 1000.0f);
-            }
-            final Float[] titi = hrvMesg.getTime();
-            if (titi != null) {
-               eventMessages.add(hrvMesg);
-            }
+         for (int timeIndex = 0; pulseSerieIndex < pulseTime_TimeIndex[timeSerieIndex]; ++pulseSerieIndex, ++timeIndex) {
 
-            previousTimeIndex = pulseTime_TimeIndex[index];
+            hrvMesg.setTime(timeIndex, pulseTime_Milliseconds[pulseSerieIndex] / 1000.0f);
+         }
+
+         final Float[] hrvMesgTime = hrvMesg.getTime();
+         if (hrvMesgTime != null) {
+            messages.add(hrvMesg);
          }
       }
 
-      return eventMessages;
+      return pulseSerieIndex;
    }
 
    private List<LapMesg> createLapMessages(final DateTime startTime) {
@@ -296,7 +288,7 @@ public class FitExporter {
       if (timeSerie != null) {
 
          int previousTimeSerieValue = 0;
-         int valuesIndex = 0;
+         int pulseSerieIndex = 0;
          for (int index = 0; index < timeSerie.length; ++index) {
 
             timestamp.add((long) _tourData.timeSerie[index] - previousTimeSerieValue);
@@ -310,21 +302,7 @@ public class FitExporter {
             // Write the Record message to the output stream
             messages.add(recordMesg);
 
-            final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
-            final int[] pulseTime_TimeIndex = _tourData.pulseTime_TimeIndex;
-            if (pulseTime_Milliseconds != null && pulseTime_TimeIndex != null) {
-
-               final HrvMesg hrvMesg = new HrvMesg();
-
-               for (int index2 = 0; valuesIndex < pulseTime_TimeIndex[index]; ++valuesIndex, ++index2) {
-
-                  hrvMesg.setTime(index2, pulseTime_Milliseconds[valuesIndex] / 1000.0f);
-               }
-               final Float[] titi = hrvMesg.getTime();
-               if (titi != null) {
-                  messages.add(hrvMesg);
-               }
-            }
+            pulseSerieIndex = createHrvMessage(messages, pulseSerieIndex, index);
 
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
@@ -337,9 +315,6 @@ public class FitExporter {
 
       final List<LapMesg> lapMessages = createLapMessages(startTime);
       messages.addAll(lapMessages);
-
-//      final List<HrvMesg> hrvMessages = createHrvMessages();
-//      messages.addAll(hrvMessages);
 
       // Every FIT ACTIVITY file MUST contain at least one Session message
       final SessionMesg sessionMesg = new SessionMesg();
