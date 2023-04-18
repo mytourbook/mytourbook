@@ -215,6 +215,16 @@ public class FitExporter {
       return previousGearData;
    }
 
+   /**
+    * Depending on the current heart rate there may be between 1 and 5 values
+    * Source:
+    * https://forums.garmin.com/developer/fit-sdk/f/discussion/255690/fit-file-hrv-data-array-interpretation
+    *
+    * @param messages
+    * @param pulseSerieIndex
+    * @param timeSerieIndex
+    * @return
+    */
    private int createHrvMessage(final List<Mesg> messages, int pulseSerieIndex, final int timeSerieIndex) {
 
       final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
