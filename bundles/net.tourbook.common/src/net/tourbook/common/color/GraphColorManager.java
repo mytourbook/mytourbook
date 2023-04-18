@@ -176,7 +176,7 @@ public class GraphColorManager {
             true,
             0,
             true,
-            1000);
+            800);
 
       MAP_COLOR_PULSE = new Map2ColorProfile(
 
@@ -293,8 +293,6 @@ public class GraphColorManager {
    private static GraphColorManager _instance;
 
    private static ColorDefinition[] _allGraphColorDefinitions;
-
-   public GraphColorManager() {}
 
    /**
     * Create graph default colors
