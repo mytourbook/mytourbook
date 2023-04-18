@@ -51,6 +51,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.GearData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -175,25 +176,43 @@ public class FitExporter {
       eventMesgStop.setEventType(EventType.STOP_ALL);
       eventMessages.add(eventMesgStop);
 
+      return eventMessages;
+   }
+
+   private GearData createGearEvent(final List<Mesg> messages,
+                                    final DateTime timestamp,
+                                    GearData previousGearData,
+                                    final int timeSerieIndex) {
+
       final long[] gearSerie = _tourData.gearSerie;
-      if (gearSerie != null) {
-
-         final int[] timeSerie = _tourData.timeSerie;
-         final DateTime timeStamp = new DateTime(startTime);
-
-         for (int index = 0; index < gearSerie.length; ++index) {
-
-            final EventMesg eventMesg = new EventMesg();
-            eventMesg.setGearChangeData(gearSerie[index]);
-
-            timeStamp.add(timeSerie[index]);
-            eventMesg.setTimestamp(timeStamp);
-
-            eventMessages.add(eventMesg);
-         }
+      if (gearSerie == null) {
+         return null;
       }
 
-      return eventMessages;
+      final long currentGear = gearSerie[timeSerieIndex];
+
+      if (previousGearData == null ||
+            previousGearData.gears != currentGear) {
+
+         final EventMesg gearEventMesg = new EventMesg();
+         gearEventMesg.setTimestamp(timestamp);
+         gearEventMesg.setGearChangeData(currentGear);
+
+         final GearData gearData = new GearData();
+         gearData.gears = currentGear;
+
+         final Event event = previousGearData != null &&
+               previousGearData.getFrontGearTeeth() != gearData.getFrontGearTeeth()
+                     ? Event.FRONT_GEAR_CHANGE
+                     : Event.REAR_GEAR_CHANGE;
+         gearEventMesg.setEvent(event);
+
+         messages.add(gearEventMesg);
+
+         previousGearData = gearData;
+      }
+
+      return previousGearData;
    }
 
    private int createHrvMessage(final List<Mesg> messages, int pulseSerieIndex, final int timeSerieIndex) {
@@ -205,7 +224,7 @@ public class FitExporter {
 
          final HrvMesg hrvMesg = new HrvMesg();
 
-         for (int timeIndex = 0; pulseSerieIndex < pulseTime_TimeIndex[timeSerieIndex]; ++pulseSerieIndex, ++timeIndex) {
+         for (int timeIndex = 0; pulseSerieIndex < pulseTime_TimeIndex[timeSerieIndex] && timeIndex < 5; ++pulseSerieIndex, ++timeIndex) {
 
             hrvMesg.setTime(timeIndex, pulseTime_Milliseconds[pulseSerieIndex] / 1000.0f);
          }
@@ -289,6 +308,7 @@ public class FitExporter {
 
          int previousTimeSerieValue = 0;
          int pulseSerieIndex = 0;
+         GearData previousGearData = null;
          for (int index = 0; index < timeSerie.length; ++index) {
 
             timestamp.add((long) _tourData.timeSerie[index] - previousTimeSerieValue);
@@ -303,6 +323,8 @@ public class FitExporter {
             messages.add(recordMesg);
 
             pulseSerieIndex = createHrvMessage(messages, pulseSerieIndex, index);
+
+            previousGearData = createGearEvent(messages, timestamp, previousGearData, index);
 
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
