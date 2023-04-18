@@ -274,6 +274,7 @@ public class Map2View extends ViewPart implements
    static final String           STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE                     = "STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE";                   //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_GRADIENT                     = "STATE_IS_SHOW_IN_TOOLBAR_GRADIENT";                   //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_PACE                         = "STATE_IS_SHOW_IN_TOOLBAR_PACE";                       //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_POWER                        = "STATE_IS_SHOW_IN_TOOLBAR_POWER";                      //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_PULSE                        = "STATE_IS_SHOW_IN_TOOLBAR_PULSE";                      //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_SPEED                        = "STATE_IS_SHOW_IN_TOOLBAR_SPEED";                      //$NON-NLS-1$
    static final String           STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE                      = "STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE";                    //$NON-NLS-1$
@@ -282,6 +283,7 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT             = true;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT             = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT                 = false;
+   static final boolean          STATE_IS_SHOW_IN_TOOLBAR_POWER_DEFAULT                = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT                = true;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT                = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT              = false;
@@ -331,6 +333,7 @@ public class Map2View extends ViewPart implements
          MapGraphId.Altitude,
          MapGraphId.Gradient,
          MapGraphId.Pace,
+         MapGraphId.Power,
          MapGraphId.Pulse,
          MapGraphId.Speed,
 
@@ -2319,6 +2322,12 @@ public class Map2View extends ViewPart implements
             MapGraphId.Speed,
             STATE_IS_SHOW_IN_TOOLBAR_SPEED,
             STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT);
+
+      fillToolbar_TourColors_Color(
+            tbm,
+            MapGraphId.Power,
+            STATE_IS_SHOW_IN_TOOLBAR_POWER,
+            STATE_IS_SHOW_IN_TOOLBAR_POWER_DEFAULT);
 
       fillToolbar_TourColors_Color(
             tbm,
