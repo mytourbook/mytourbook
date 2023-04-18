@@ -34,11 +34,14 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
@@ -46,10 +49,12 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public class SlideoutDeviceState extends AdvancedSlideout {
 
-   private RawDataView    _rawDataView;
-   private ToolItem       _toolItem;
+   private static final int HTML_STYLE_TITLE_VERTICAL_PADDING = 10;
 
-   private PixelConverter _pc;
+   private RawDataView      _rawDataView;
+   private ToolItem         _toolItem;
+
+   private PixelConverter   _pc;
 
    /*
     * UI controls
@@ -311,32 +316,51 @@ public class SlideoutDeviceState extends AdvancedSlideout {
          htmlFolderInfo = UI.EMPTY_STRING;
       }
 
-      final String paddingTop = isTopMargin
+      final int paddingTop = isTopMargin
             ? HTML_STYLE_TITLE_VERTICAL_PADDING
-            : UI.EMPTY_STRING;
+            : 0;
 
-      final String imageUrl = isOSFolderValid
-            ? _imageUrl_State_OK
-            : _imageUrl_State_Error;
+      final ImageRegistry images = _rawDataView.getImages();
+
+      final Image stateImage = isOSFolderValid
+            ? images.get(RawDataView.IMAGE_STATE_OK)
+            : images.get(RawDataView.IMAGE_STATE_ERROR);
 
       final String folderStateIcon = "<img src='" //$NON-NLS-1$
-            + imageUrl
+            + stateImage
             + "' style='padding-left:5px; vertical-align:text-bottom;'>"; //$NON-NLS-1$
 
-      UI.createLabel(parent, folderTitle);
+      final GridDataFactory gd = GridDataFactory.fillDefaults().indent(0, paddingTop);
 
-      sb.append(HTML_TR);
-      sb.append(HTML_TD_SPACE + paddingTop + " class='folderTitle'>" + folderTitle + HTML_TD_END); //$NON-NLS-1$
-      sb.append(HTML_TD_SPACE + paddingTop + " class='folderLocation'>" + folderLocation + folderStateIcon); //$NON-NLS-1$
-      sb.append(htmlErrorState);
-      sb.append(HTML_TD_END);
-      sb.append(HTML_TR_END);
+      /*
+       *
+       */
+      final Label labelName = UI.createLabel(parent, folderTitle);
+      gd.applyTo(labelName);
 
-      sb.append(HTML_TR);
-      sb.append("<td></td>"); //$NON-NLS-1$
-      sb.append(HTML_TD + htmlFolderInfo + HTML_TD_END);
-      sb.append(HTML_TR_END);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         final Label labelLocation = UI.createLabel(container, folderLocation);
+         gd.applyTo(labelLocation);
 
+         final Label labelStateIcon = UI.createLabel(container, folderLocation);
+         labelStateIcon.setImage(stateImage);
+         gd.applyTo(labelStateIcon);
+      }
+
+//      sb.append(HTML_TR);
+//      sb.append(HTML_TD_SPACE + paddingTop + " class='folderTitle'>" + folderTitle + HTML_TD_END); //$NON-NLS-1$
+//      sb.append(HTML_TD_SPACE + paddingTop + " class='folderLocation'>" + folderLocation + folderStateIcon); //$NON-NLS-1$
+//      sb.append(htmlErrorState);
+//      sb.append(HTML_TD_END);
+//      sb.append(HTML_TR_END);
+//
+//      sb.append(HTML_TR);
+//      sb.append("<td></td>"); //$NON-NLS-1$
+//      sb.append(HTML_TD + htmlFolderInfo + HTML_TD_END);
+//      sb.append(HTML_TR_END);
    }
 
    private void enableActions() {

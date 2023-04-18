@@ -248,12 +248,16 @@ public class RawDataView extends ViewPart implements
    private static final String           IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";             //$NON-NLS-1$
    private static final String           IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                //$NON-NLS-1$
    private static final String           IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                           //$NON-NLS-1$
-   // Simple easy import
-   private static final String           IMAGE_DEVICE_FOLDER_ERROR                  = "IMAGE_DEVICE_FOLDER_ERROR";
-   private static final String           IMAGE_DEVICE_FOLDER_IS_CHECKING            = "IMAGE_DEVICE_FOLDER_IS_CHECKING";
-   private static final String           IMAGE_DEVICE_FOLDER_NOT_SETUP              = "IMAGE_DEVICE_FOLDER_NOT_SETUP";
-   private static final String           IMAGE_DEVICE_FOLDER_OFF                    = "IMAGE_DEVICE_FOLDER_OFF";
-   private static final String           IMAGE_DEVICE_FOLDER_OK                     = "IMAGE_DEVICE_FOLDER_OK";
+   // simple easy import
+   private static final String           IMAGE_DEVICE_FOLDER_ERROR                  = "IMAGE_DEVICE_FOLDER_ERROR";              //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_IS_CHECKING            = "IMAGE_DEVICE_FOLDER_IS_CHECKING";        //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_NOT_SETUP              = "IMAGE_DEVICE_FOLDER_NOT_SETUP";          //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_OFF                    = "IMAGE_DEVICE_FOLDER_OFF";                //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_OK                     = "IMAGE_DEVICE_FOLDER_OK";                 //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_TURN_ON                       = "IMAGE_DEVICE_TURN_ON";                   //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_TURN_OFF                      = "IMAGE_DEVICE_TURN_OFF";                  //$NON-NLS-1$
+   static final String                   IMAGE_STATE_OK                             = "IMAGE_STATE_OK";                         //$NON-NLS-1$
+   static final String                   IMAGE_STATE_ERROR                          = "IMAGE_STATE_ERROR";                      //$NON-NLS-1$
    //
    private static final String           HTML_TD                                    = "<td>";                                   //$NON-NLS-1$
    private static final String           HTML_TD_SPACE                              = "<td ";                                   //$NON-NLS-1$
@@ -1292,7 +1296,7 @@ public class RawDataView extends ViewPart implements
     */
    @Override
    public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-      
+
       _openDialogManager.closeOpenedDialogs(openingDialog);
    }
 
@@ -2575,6 +2579,10 @@ public class RawDataView extends ViewPart implements
       _images.put(IMAGE_DEVICE_FOLDER_NOT_SETUP,   TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_NotSetup));
       _images.put(IMAGE_DEVICE_FOLDER_OFF,         TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_Off));
       _images.put(IMAGE_DEVICE_FOLDER_OK,          TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_OK));
+      _images.put(IMAGE_DEVICE_TURN_ON,            TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOn));
+      _images.put(IMAGE_DEVICE_TURN_OFF,           TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOff));
+      _images.put(IMAGE_STATE_OK,                  TourbookPlugin.getImageDescriptor(Images.State_OK));
+      _images.put(IMAGE_STATE_ERROR,               TourbookPlugin.getImageDescriptor(Images.State_Error));
 
 // SET_FORMATTING_ON
    }
@@ -4330,6 +4338,11 @@ public class RawDataView extends ViewPart implements
    EasyConfig getEasyConfig() {
 
       return EasyImportManager.getInstance().getEasyConfig();
+   }
+
+   public ImageRegistry getImages() {
+
+      return _images;
    }
 
    public Image getImportConfigImage(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
