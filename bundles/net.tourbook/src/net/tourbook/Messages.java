@@ -1092,6 +1092,7 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_DeleteDeviceFiles_Yes;
    public static String        Import_Data_HTML_DeleteFilesNO;
    public static String        Import_Data_HTML_DeleteFilesYES;
+   public static String        Import_Data_HTML_DeleteFilesYES_NoHTML;
    public static String        Import_Data_HTML_DeviceOff_Tooltip;
    public static String        Import_Data_HTML_DeviceOn_Tooltip;
    public static String        Import_Data_HTML_EasyImport;

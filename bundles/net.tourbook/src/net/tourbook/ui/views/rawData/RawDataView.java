@@ -254,8 +254,8 @@ public class RawDataView extends ViewPart implements
    private static final String           IMAGE_DEVICE_FOLDER_NOT_SETUP              = "IMAGE_DEVICE_FOLDER_NOT_SETUP";          //$NON-NLS-1$
    private static final String           IMAGE_DEVICE_FOLDER_OFF                    = "IMAGE_DEVICE_FOLDER_OFF";                //$NON-NLS-1$
    private static final String           IMAGE_DEVICE_FOLDER_OK                     = "IMAGE_DEVICE_FOLDER_OK";                 //$NON-NLS-1$
-   private static final String           IMAGE_DEVICE_TURN_ON                       = "IMAGE_DEVICE_TURN_ON";                   //$NON-NLS-1$
-   private static final String           IMAGE_DEVICE_TURN_OFF                      = "IMAGE_DEVICE_TURN_OFF";                  //$NON-NLS-1$
+   static final String                   IMAGE_DEVICE_TURN_ON                       = "IMAGE_DEVICE_TURN_ON";                   //$NON-NLS-1$
+   static final String                   IMAGE_DEVICE_TURN_OFF                      = "IMAGE_DEVICE_TURN_OFF";                  //$NON-NLS-1$
    static final String                   IMAGE_STATE_OK                             = "IMAGE_STATE_OK";                         //$NON-NLS-1$
    static final String                   IMAGE_STATE_ERROR                          = "IMAGE_STATE_ERROR";                      //$NON-NLS-1$
    //
@@ -2574,15 +2574,15 @@ public class RawDataView extends ViewPart implements
       /*
        * Simple easy UI
        */
-      _images.put(IMAGE_DEVICE_FOLDER_ERROR,       TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_Error));
-      _images.put(IMAGE_DEVICE_FOLDER_IS_CHECKING, TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_IsChecking));
-      _images.put(IMAGE_DEVICE_FOLDER_NOT_SETUP,   TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_NotSetup));
-      _images.put(IMAGE_DEVICE_FOLDER_OFF,         TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_Off));
-      _images.put(IMAGE_DEVICE_FOLDER_OK,          TourbookPlugin.getImageDescriptor(Images.RawData_DeviceFolder_OK));
-      _images.put(IMAGE_DEVICE_TURN_ON,            TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOn));
-      _images.put(IMAGE_DEVICE_TURN_OFF,           TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOff));
-      _images.put(IMAGE_STATE_OK,                  TourbookPlugin.getImageDescriptor(Images.State_OK));
-      _images.put(IMAGE_STATE_ERROR,               TourbookPlugin.getImageDescriptor(Images.State_Error));
+      _images.put(IMAGE_DEVICE_FOLDER_ERROR,       TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_Error));
+      _images.put(IMAGE_DEVICE_FOLDER_IS_CHECKING, TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_IsChecking));
+      _images.put(IMAGE_DEVICE_FOLDER_NOT_SETUP,   TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_NotSetup));
+      _images.put(IMAGE_DEVICE_FOLDER_OFF,         TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_Off));
+      _images.put(IMAGE_DEVICE_FOLDER_OK,          TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_OK));
+      _images.put(IMAGE_DEVICE_TURN_ON,            TourbookPlugin.getImageDescriptor      (Images.RawData_Device_TurnOn));
+      _images.put(IMAGE_DEVICE_TURN_OFF,           TourbookPlugin.getImageDescriptor      (Images.RawData_Device_TurnOff));
+      _images.put(IMAGE_STATE_OK,                  TourbookPlugin.getThemedImageDescriptor(Images.State_OK));
+      _images.put(IMAGE_STATE_ERROR,               TourbookPlugin.getThemedImageDescriptor(Images.State_Error));
 
 // SET_FORMATTING_ON
    }
@@ -4172,6 +4172,15 @@ public class RawDataView extends ViewPart implements
       enableActions();
    }
 
+   private void fillSimpleUI() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      for (final ImportConfig importConfig : easyConfig.importConfigs) {
+         _comboSimpleUI_Config.add(importConfig.name);
+      }
+   }
+
    private void fillToolbar() {
 
       /*
@@ -4204,11 +4213,7 @@ public class RawDataView extends ViewPart implements
 
    private void fillUI() {
 
-      final EasyConfig easyConfig = getEasyConfig();
-
-      for (final ImportConfig importConfig : easyConfig.importConfigs) {
-         _comboSimpleUI_Config.add(importConfig.name);
-      }
+      fillSimpleUI();
    }
 
    private void fireSelectedTour() {
@@ -4863,7 +4868,8 @@ public class RawDataView extends ViewPart implements
 
          _isDeviceStateValid = false;
 
-         updateUI_2_EasyImport_SimpleUI();
+         // close slideout to remove old content
+         _actionSimpleUI_DeviceState.__slideoutDeviceState.close();
       }
       setWatcher_1_On();
    }
@@ -4906,13 +4912,7 @@ public class RawDataView extends ViewPart implements
 
       _dialogImportConfig = new DialogEasyImportConfig(shell, easyConfig, this, selectedTab);
 
-      boolean isOK = false;
-
       if (_dialogImportConfig.open() == Window.OK) {
-         isOK = true;
-      }
-
-      if (isOK) {
 
          // keep none live update values
 
@@ -4929,7 +4929,12 @@ public class RawDataView extends ViewPart implements
          updateModel_EasyConfig_Dashboard(_dialogImportConfig.getModifiedConfig());
 
          _isDeviceStateValid = false;
+
          updateUI_2_EasyImport_Fancy();
+
+         // update simple UI config combo
+         _comboSimpleUI_Config.removeAll();
+         fillSimpleUI();
       }
 
       _dialogImportConfig = null;
@@ -6837,11 +6842,6 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private void updateUI_2_EasyImport_SimpleUI() {
-      // TODO Auto-generated method stub
-
-   }
-
    private void updateUI_DeviceState() {
 
       // must be running in the UI thread, is called from other threads
@@ -6968,10 +6968,7 @@ public class RawDataView extends ViewPart implements
       final String deviceOSFolder = importConfig.getDeviceOSFolder();
       final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
 
-      final int numDeviceFiles = easyConfig.numDeviceFiles;
-      final int numMovedFiles = easyConfig.movedFiles.size();
       final int numNotImportedFiles = notImportedFiles.size();
-      final int numAllFiles = numDeviceFiles + numMovedFiles;
 
       final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
       boolean isFolderOK = true;

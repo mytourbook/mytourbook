@@ -561,10 +561,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    }
 
    public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
+      
       _slideoutLocation = slideoutLocation;
    }
 
    protected void setTitleText(final String titleText) {
+
       _titleText = titleText;
    }
 
