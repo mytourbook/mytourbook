@@ -115,6 +115,7 @@ public class Messages extends NLS {
    public static String map_action_tour_color_altitude_tooltip;
    public static String map_action_tour_color_gradient_tooltip;
    public static String map_action_tour_color_pace_tooltip;
+   public static String map_action_tour_color_power_tooltip;
    public static String map_action_tour_color_pulse_tooltip;
    public static String map_action_tour_color_speed_tooltip;
    public static String map_action_zoom_in;

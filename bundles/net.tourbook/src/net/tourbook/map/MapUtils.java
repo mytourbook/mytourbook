@@ -269,6 +269,65 @@ public class MapUtils {
 
          break;
 
+      case Power:
+
+         minValue = Float.MIN_VALUE;
+         maxValue = Float.MAX_VALUE;
+
+         setInitialValue = true;
+
+         for (final TourData tourData : allTourData_ThreadSafe) {
+
+            final float[] dataSerie = tourData.getPowerSerie();
+            if ((dataSerie == null) || (dataSerie.length == 0)) {
+               continue;
+            }
+
+            /*
+             * get min/max values
+             */
+            for (final float dataValue : dataSerie) {
+
+               if (dataValue == 0 || dataValue == Float.MIN_VALUE) {
+                  continue;
+               }
+
+               if (setInitialValue) {
+                  setInitialValue = false;
+                  minValue = maxValue = dataValue;
+               }
+
+               minValue = (minValue <= dataValue) ? minValue : dataValue;
+               maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+            }
+         }
+
+         if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+            return false;
+         }
+
+         if (colorProvider instanceof Map3GradientColorProvider) {
+
+            // the colorProvider already contains the active color profile
+
+         } else {
+
+            setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_POWER);
+         }
+
+         mapUnits.numberFormatDigits = 0;
+         mapUnits.unitFormat = LegendUnitFormat.Number;
+
+         colorProvider.configureColorProvider(
+               config,
+               legendHeight,
+               minValue,
+               maxValue,
+               UI.UNIT_POWER,
+               LegendUnitFormat.Number);
+
+         break;
+
       case Pulse:
 
          minValue = Float.MIN_VALUE;

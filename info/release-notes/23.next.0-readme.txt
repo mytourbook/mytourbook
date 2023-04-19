@@ -55,6 +55,10 @@ Improvements
 * Tour Geo Filter
   - Toggle name in the filter history viewer between read and edit mode
 
+* 2D Map (Meinhard)
+  - Make power a selectable option for coloring the tour graph 
+    https://github.com/mytourbook/mytourbook/issues/1071
+
 Changes
 =======
 
