@@ -16,6 +16,7 @@
 package net.tourbook.export.fit;
 
 import com.garmin.fit.Sport;
+import com.garmin.fit.SubSport;
 
 import net.tourbook.data.TourType;
 
@@ -32,12 +33,13 @@ public class FitSportMapper {
       final String tourTypeName = tourType.getName();
 
       switch (tourTypeName.toLowerCase().trim()) {
-      case "running": //$NON-NLS-1$
-         sport = Sport.RUNNING;
-         break;
 
       case "cycling": //$NON-NLS-1$
          sport = Sport.CYCLING;
+         break;
+
+      case "running": //$NON-NLS-1$
+         sport = Sport.RUNNING;
          break;
 
       case "walking": //$NON-NLS-1$
@@ -50,5 +52,29 @@ public class FitSportMapper {
       }
 
       return sport;
+   }
+
+   public static SubSport mapTourTypeToSubSport(final TourType tourType) {
+
+      SubSport subSport = SubSport.GENERIC;
+
+      if (tourType == null) {
+         return subSport;
+      }
+
+      final String tourTypeName = tourType.getName();
+
+      switch (tourTypeName.toLowerCase().trim()) {
+
+      case "trail": //$NON-NLS-1$
+         subSport = SubSport.TRAIL;
+         break;
+
+      default:
+         subSport = SubSport.GENERIC;
+         break;
+      }
+
+      return subSport;
    }
 }

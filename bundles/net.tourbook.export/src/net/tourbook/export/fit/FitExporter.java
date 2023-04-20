@@ -36,6 +36,7 @@ import com.garmin.fit.Mesg;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.SessionMesg;
 import com.garmin.fit.Sport;
+import com.garmin.fit.SubSport;
 import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.util.SemicirclesConverter;
 
@@ -444,6 +445,8 @@ public class FitExporter {
 
       final Sport sport = FitSportMapper.mapTourTypeToSport(_tourData.getTourType());
       sessionMesg.setSport(sport);
+      final SubSport subSport = FitSportMapper.mapTourTypeToSubSport(_tourData.getTourType());
+      sessionMesg.setSubSport(subSport);
 
       // Totals
       sessionMesg.setTotalCalories(_tourData.getCalories() / 1000);
