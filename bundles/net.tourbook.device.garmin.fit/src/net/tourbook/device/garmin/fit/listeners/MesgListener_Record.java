@@ -28,7 +28,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitData;
-import net.tourbook.device.garmin.fit.FitUtils;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.device.garmin.fit.Messages;
 
@@ -110,8 +109,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
          boolean isCreateExceededMarker = false;
 
-         final long sliceJavaTime = FitUtils.convertGarminTimeToJavaTime(
-               garminTime.getTimestamp());
+         final long sliceJavaTime = new DateTime(garminTime.getTimestamp()).getDate().getTime();
 
          absoluteTime = sliceJavaTime;
          long timeDiff = 0;
@@ -268,13 +266,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-
+      
       //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
       //	|| fieldName.equals("step_length") //				    1526.0  mm
       // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
       // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
-
+      
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();
