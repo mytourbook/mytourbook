@@ -88,17 +88,12 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
 
          final String garminProductName = GarminProduct.getStringFromValue(garminProductId);
 
-         if (garminProductName.length() > 0) {
+         if (StringUtils.hasContent(garminProductName)) {
 
             fitData.setGarminProduct(garminProductName);
 
-         } else if (garminProductId == 2713) {
-
-            // Garmin Edge 1030 is not yet in the product list
-
-            fitData.setGarminProduct("EDGE 1030"); //$NON-NLS-1$
-
          } else {
+
             fitData.setGarminProduct(garminProductId.toString());
          }
       } else {
