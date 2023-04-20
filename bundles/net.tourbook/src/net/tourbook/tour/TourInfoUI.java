@@ -137,6 +137,7 @@ public class TourInfoUI {
    private boolean        _hasDescription;
    private boolean        _hasGears;
    private boolean        _hasRunDyn;
+   private boolean        _hasSensorValues;
    private boolean        _hasTags;
    private boolean        _hasTourType;
    private boolean        _hasWeather;
@@ -371,13 +372,18 @@ public class TourInfoUI {
             ? null
             : TourDatabase.getTourTypeName(tourType.getTypeId());
 
-      _hasDescription = tourDescription != null && tourDescription.length() > 0;
-      _hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
-      _hasRecordingDeviceBattery = tourData.getBattery_Percentage_Start() != -1;
-      _hasRunDyn = _tourData.isRunDynAvailable();
-      _hasTags = tourTags != null && tourTags.size() > 0;
-      _hasTourType = tourType != null;
-      _hasWeather = _tourData.getWeather().length() > 0;
+// SET_FORMATTING_OFF
+
+      _hasDescription               = tourDescription != null && tourDescription.length() > 0;
+      _hasGears                     = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
+      _hasRecordingDeviceBattery    = tourData.getBattery_Percentage_Start() != -1;
+      _hasRunDyn                    = _tourData.isRunDynAvailable();
+      _hasTags                      = tourTags != null && tourTags.size() > 0;
+      _hasTourType                  = tourType != null;
+      _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
+      _hasWeather                   = _tourData.getWeather().length() > 0;
+
+// SET_FORMATTING_ON
 
       final Composite container = createUI(parent);
 
@@ -1618,9 +1624,9 @@ public class TourInfoUI {
       _lblTitle.setText(tourTitle);
 
       /*
-       * Lower part container contains weather, tour type, tags and description
+       * Lower part container contains sensor values, weather, tour type, tags and description
        */
-      showHideControl(_lowerPartContainer, _hasWeather || _hasTourType || _hasTags || _hasDescription);
+      showHideControl(_lowerPartContainer, _hasSensorValues || _hasWeather || _hasTourType || _hasTags || _hasDescription);
 
       /*
        * Weather

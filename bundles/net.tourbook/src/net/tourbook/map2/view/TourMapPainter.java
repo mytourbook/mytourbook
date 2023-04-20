@@ -3014,6 +3014,10 @@ public class TourMapPainter extends Map2Painter {
          _dataSerie = tourData.getGradientSerie();
          break;
 
+      case Power:
+         _dataSerie = tourData.getPowerSerie();
+         break;
+
       case Pulse:
          _dataSerie = tourData.pulseSerie;
          break;
