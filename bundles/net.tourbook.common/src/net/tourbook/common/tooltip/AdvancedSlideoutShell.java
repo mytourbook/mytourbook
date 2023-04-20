@@ -1303,6 +1303,14 @@ public abstract class AdvancedSlideoutShell {
       }
 
       final Shell resizeShell = _rrShellWithResize.getShell();
+
+      if (resizeShell == null) {
+
+         // fixed NPE which happened during debugging
+         
+         return;
+      }
+
       final Point shellLocation = resizeShell.getLocation();
 
       // ensure tooltip is not too large

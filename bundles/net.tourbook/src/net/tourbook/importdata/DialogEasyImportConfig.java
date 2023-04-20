@@ -34,6 +34,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -2773,7 +2774,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       defineColumnIC_20_Backup();
       defineColumnIC_30_DeviceFolder();
       defineColumnIC_32_DeviceFiles();
-      defineColumnIC_90_DeleteDeviceFiles();
+      defineColumnIC_90_DeviceFiles_Delete();
       defineColumnIC_99_TurnOFF();
    }
 
@@ -2885,7 +2886,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Delete device files
     */
-   private void defineColumnIC_90_DeleteDeviceFiles() {
+   private void defineColumnIC_90_DeviceFiles_Delete() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "deleteFiles", SWT.CENTER); //$NON-NLS-1$
 
@@ -2912,8 +2913,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                      : Messages.App_Label_BooleanNo);
 
                cell.setForeground(isDeleteDeviceFiles
-                     ? COLOR_RED
-                     : COLOR_FOREGROUND);
+                     ? UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : COLOR_RED
+                     : ThemeUtil.getDefaultForegroundColor_Table());
             } else {
 
                cell.setText(UI.EMPTY_STRING);
@@ -2923,7 +2924,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    }
 
    /**
-    * Column: Turn OFF watching
+    * Column: Turn watching OFF
     */
    private void defineColumnIC_99_TurnOFF() {
 

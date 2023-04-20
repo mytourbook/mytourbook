@@ -52,33 +52,34 @@ public class ImportLauncher implements Cloneable {
    /**
     * When <code>true</code>, assigns a type to the tour.
     */
-   public boolean                  isSetTourType                 = false;
+   public boolean                  isSetTourType;
 
    /**
     * When <code>true</code> save the tour for the active person.
     */
-   public boolean                  isSaveTour                    = false;
+   public boolean                  isSaveTour;
 
    /**
     * When <code>true</code> then the text of the last marker is set.
     */
-   public boolean                  isSetLastMarker               = false;
+   public boolean                  isSetLastMarker;
+
    /**
     * Last marker distance in meters.
     */
-   public int                      lastMarkerDistance            = 0;
+   public int                      lastMarkerDistance;
 
    public String                   lastMarkerText                = UI.EMPTY_STRING;
 
    /**
     * When <code>true</code> then the tour start temperature is adjusted.
     */
-   public boolean                  isAdjustTemperature           = false;
+   public boolean                  isAdjustTemperature;
 
    /**
     * When <code>true</code>, the weather data is saved in the tour.
     */
-   public boolean                  isRetrieveWeatherData         = false;
+   public boolean                  isRetrieveWeatherData;
 
    /**
     * Duration in seconds during which the temperature is adjusted.
