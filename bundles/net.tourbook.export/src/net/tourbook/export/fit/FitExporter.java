@@ -235,9 +235,14 @@ public class FitExporter {
 
          final HrvMesg hrvMesg = new HrvMesg();
 
-         for (int timeIndex = 0; pulseSerieIndex < pulseTime_TimeIndex[timeSerieIndex] && timeIndex < 5; ++pulseSerieIndex, ++timeIndex) {
+         for (int timeIndex = 0; pulseSerieIndex < pulseTime_TimeIndex[timeSerieIndex]; ++pulseSerieIndex, ++timeIndex) {
 
-            hrvMesg.setTime(timeIndex, pulseTime_Milliseconds[pulseSerieIndex] / 1000.0f);
+            //Possible case: if more than 5 values are consecutive, we skip the next ones
+            //as it means that no time stamp data is associated with them
+            if (timeIndex < 5) {
+
+               hrvMesg.setTime(timeIndex, pulseTime_Milliseconds[pulseSerieIndex] / 1000.0f);
+            }
          }
 
          final Float[] hrvMesgTime = hrvMesg.getTime();
