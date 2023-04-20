@@ -39,6 +39,7 @@ public class FitSportMapper {
          break;
 
       case "running": //$NON-NLS-1$
+      case "trail": //$NON-NLS-1$
          sport = Sport.RUNNING;
          break;
 
