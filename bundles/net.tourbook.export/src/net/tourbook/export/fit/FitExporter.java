@@ -24,6 +24,7 @@ import com.garmin.fit.Event;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventType;
 import com.garmin.fit.Factory;
+import com.garmin.fit.Field;
 import com.garmin.fit.File;
 import com.garmin.fit.FileEncoder;
 import com.garmin.fit.FileIdMesg;
@@ -147,9 +148,16 @@ public class FitExporter {
          final short[] battery_Percentage = _tourData.getBattery_Percentage();
 
          final Mesg mesg = Factory.createMesg(104);
+         final ActivityMesg activityMesg = new ActivityMesg();
+         activityMesg.setTimestamp(timestamp);
+         final Field timeStampFieldToCopy = activityMesg.getField(253);
+         //mesg.setFieldValue(253, timestamp.getTimestamp());
+         final Field toto = new Field(timeStampFieldToCopy);
+         mesg.setField(toto);
+         //  mesg.addField(new Field("unknown", 253, 134, 1.0, 0.0, "", false, Profile.Type.UINT32));
          mesg.setFieldValue(2, battery_Percentage[batteryTimeIndex]);
          //todo fb, this one doesn't get exported for some reason
-         mesg.setFieldValue(253, timestamp.getTimestamp());
+         //  mesg.setFieldValue(253, 0, timestamp.getTimestamp(), Fit.FIELD_NUM_TIMESTAMP);
 
          messages.add(mesg);
       }
