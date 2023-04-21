@@ -143,7 +143,7 @@ public class FitExporter {
       if (battery_Time != null &&
             battery_Time.length > 0 &&
             batteryTimeIndex < battery_Time.length &&
-            battery_Time[batteryTimeIndex] / 1000 == timeSerieValue) {
+            battery_Time[batteryTimeIndex] / 1000 >= timeSerieValue) {
 
          final short[] battery_Percentage = _tourData.getBattery_Percentage();
 
