@@ -208,10 +208,8 @@ public class SlideoutDeviceState extends AdvancedSlideout {
                   Messages.Import_Data_HTML_Title_Backup, //   folderTitle
                   folderInfo //                                folderInfo
             );
-
          }
       }
-
       {
          /*
           * Device folder
@@ -231,25 +229,25 @@ public class SlideoutDeviceState extends AdvancedSlideout {
                folderInfo);
 
       }
-
-      /*
-       * Moved files
-       */
-      if (numMovedFiles > 0) {
-
-         // label
-         Label label = UI.createLabel(parent, Messages.Import_Data_HTML_Title_Moved);
-         gd.applyTo(label);
-
-         // state
-         label = UI.createLabel(parent, NLS.bind(Messages.Import_Data_HTML_MovedFiles, numMovedFiles));
-         gd.applyTo(label);
-      }
-
-      /*
-       * Device files
-       */
       {
+         /*
+          * Moved files
+          */
+         if (numMovedFiles > 0) {
+
+            // label
+            Label label = UI.createLabel(parent, Messages.Import_Data_HTML_Title_Moved);
+            gd.applyTo(label);
+
+            // state
+            label = UI.createLabel(parent, NLS.bind(Messages.Import_Data_HTML_MovedFiles, numMovedFiles));
+            gd.applyTo(label);
+         }
+      }
+      {
+         /*
+          * Device files
+          */
          final String deviceFiles = activeConfig.fileGlobPattern.trim().length() == 0
                ? ImportConfig.DEVICE_FILES_DEFAULT
                : activeConfig.fileGlobPattern;
@@ -262,11 +260,10 @@ public class SlideoutDeviceState extends AdvancedSlideout {
          label = UI.createLabel(parent, deviceFiles);
          gd.applyTo(label);
       }
-
-      /*
-       * 100. Delete device files
-       */
       {
+         /*
+          * 100. Delete device files
+          */
          final boolean isDeleteDeviceFiles = activeConfig.isDeleteDeviceFiles;
 
          final String deleteFiles = isDeleteDeviceFiles
@@ -281,11 +278,10 @@ public class SlideoutDeviceState extends AdvancedSlideout {
          label = UI.createLabel(parent, deleteFiles);
          gd.applyTo(label);
       }
-
-      /*
-       * 101. Turn off device watching
-       */
       {
+         /*
+          * 101. Turn off device watching
+          */
          final boolean isWatchingOff = activeConfig.isTurnOffWatching;
 
          final String watchingText = isWatchingOff
@@ -306,12 +302,13 @@ public class SlideoutDeviceState extends AdvancedSlideout {
          final Label label = UI.createLabel(parent, watchingText);
          gd.align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
       }
-
-      /*
-       * Import files
-       */
-      if (numNotImportedFiles > 0) {
-         createUI_14_NotImportedFiles(parent, notImportedFiles);
+      {
+         /*
+          * Import files
+          */
+         if (numNotImportedFiles > 0) {
+            createUI_14_NotImportedFiles(parent, notImportedFiles);
+         }
       }
    }
 

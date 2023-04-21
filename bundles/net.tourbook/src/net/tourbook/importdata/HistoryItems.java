@@ -641,8 +641,7 @@ class HistoryItems {
          }
 
          _linkFolderInfo.setText(folderInfoMessage.toString());
-
-         _linkFolderInfo.setForeground(ThemeUtil.getColor_Error());
+         _linkFolderInfo.setForeground(ThemeUtil.getErrorColor());
       }
    }
 }

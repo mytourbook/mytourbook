@@ -2789,8 +2789,8 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="457.40972"
-     inkscape:cx="104.91697"
+     inkscape:cy="625.17081"
+     inkscape:cx="200.19962"
      inkscape:zoom="5.656854"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -6581,7 +6581,7 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\hard-drive.png"
        inkscape:export-xdpi="95.998901"
        inkscape:export-ydpi="95.998901" /><circle
-       style="display:inline;fill:none;stroke:#bfbfbf;stroke-width:1.99999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:none;stroke:#d9d9d9;stroke-width:1.99999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path1996-1-0"
        cx="219"
        cy="611"
@@ -6589,7 +6589,7 @@
        inkscape:export-filename="..\icons\hard-drive-dark.png"
        inkscape:export-xdpi="95.998901"
        inkscape:export-ydpi="95.998901" /><rect
-       style="display:inline;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.999998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.515151"
+       style="display:inline;fill:#ff3333;fill-opacity:1;stroke:none;stroke-width:0.999998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.515151"
        id="rect1998-1-5"
        width="2.0000174"
        height="2.0000081"
@@ -6614,13 +6614,13 @@
        cy="611"
        cx="219"
        id="path1996-1-1-8"
-       style="display:inline;fill:none;stroke:#bfbfbf;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
+       style="display:inline;fill:none;stroke:#d9d9d9;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
        inkscape:export-ydpi="95.998901"
        inkscape:export-xdpi="95.998901"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\hard-drive.png"
        id="path5344-1-9-4"
        d="m 210.91848,616.50278 7.59532,-5.01799 -4.97324,7.60343 z"
-       style="display:inline;fill:none;stroke:#19f5ff;stroke-width:1.162;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:none;stroke:#ffee00;stroke-width:1.162;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
        sodipodi:nodetypes="cccc" /><rect
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#abfe11;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="rect4471-81-9-1-1-2-8-0-3-8"

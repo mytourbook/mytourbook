@@ -97,7 +97,6 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -107,7 +106,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -212,9 +210,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          // hide these components
          .withMillisRemoved();
-
-   private Color                        COLOR_RED;
-   private Color                        COLOR_FOREGROUND;
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
@@ -1442,7 +1437,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              * Label: Delete Info
              */
             _lblIC_DeleteFilesInfo = new Label(container, SWT.NONE);
-            _lblIC_DeleteFilesInfo.setForeground(COLOR_RED);
+            _lblIC_DeleteFilesInfo.setForeground(ThemeUtil.getErrorColor());
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(convertWidthInCharsToPixels(1), 0)
@@ -2913,7 +2908,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                      : Messages.App_Label_BooleanNo);
 
                cell.setForeground(isDeleteDeviceFiles
-                     ? UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : COLOR_RED
+                     ? ThemeUtil.getErrorColor()
                      : ThemeUtil.getDefaultForegroundColor_Table());
             } else {
 
@@ -3277,10 +3272,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _leftPadding = convertHorizontalDLUsToPixels(11);
       _defaultPaneWidth = convertWidthInCharsToPixels(50);
 
-      COLOR_FOREGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
-      COLOR_RED = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-
-//      FONT_BOLD = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+//    FONT_BOLD = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
       parent.addDisposeListener(disposeEvent -> onDispose());
 

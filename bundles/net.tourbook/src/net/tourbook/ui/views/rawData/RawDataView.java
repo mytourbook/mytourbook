@@ -379,10 +379,10 @@ public class RawDataView extends ViewPart implements
 
    private TableViewer                      _tourViewer;
    private TableViewerTourInfoToolTip       _tourInfoToolTip;
-   private ColumnManager                    _columnManager;
+   private ColumnManager                    _tourViewer_ColumnManager;
    private SelectionListener                _columnSortListener;
    private TableColumnDefinition            _timeZoneOffsetColDef;
-   private ImportComparator                 _importComparator;
+   private TourViewer_Comparator            _tourViewer_Comparator;
    //
    private String                           _columnId_DeviceName;
    private String                           _columnId_ImportFileName;
@@ -399,8 +399,8 @@ public class RawDataView extends ViewPart implements
    private ITourEventListener               _tourEventListener;
    //
    private TagMenuManager                   _tagMenuManager;
-   private MenuManager                      _viewerMenuManager;
-   private IContextMenuProvider             _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager                      _tourViewer_MenuManager;
+   private IContextMenuProvider             _tourViewer_ContextMenuProvider = new TourViewer_ContextMenuProvider();
    //
    private ActionClearView                  _actionClearView;
    private ActionOpenTourLogView            _actionOpenTourLogView;
@@ -513,14 +513,14 @@ public class RawDataView extends ViewPart implements
    /*
     * Simple easy import
     */
-   private TableViewer           _simpleUI_ImportLauncher_Viewer;
-   private SimpleUI_ColumnViewer _simpleUI_ImportLauncher_ColumnViewer = new SimpleUI_ColumnViewer();
-   private ColumnManager         _simpleUI_ImportLauncher_ColumnManager;
-   private EasyLauncher          _simpleUI_EasyLauncher                = new EasyLauncher();
-   private int                   _simpleUI_ColumnIndexConfigImage;
-   private long                  _lastSimpleUIConfigSelection;
+   private TableViewer                    _simpleUI_ImportLauncher_Viewer;
+   private SimpleUI_ImportLauncher_Viewer _simpleUI_ImportLauncher_ColumnViewer = new SimpleUI_ImportLauncher_Viewer();
+   private ColumnManager                  _simpleUI_ImportLauncher_ColumnManager;
+   private EasyLauncher                   _simpleUI_ImportLauncher              = new EasyLauncher();
+   private int                            _simpleUI_ColumnIndexConfigImage;
+   private long                           _lastSimpleUIConfigSelection;
    //
-   private OpenDialogManager     _openDialogManager                    = new OpenDialogManager();
+   private OpenDialogManager              _openDialogManager                    = new OpenDialogManager();
 
    /*
     * Resources
@@ -545,8 +545,8 @@ public class RawDataView extends ViewPart implements
    private Composite _easyImportFancy_Page_WithBrowser;
 
    private Composite _parent;
-   private Composite _viewerContainer;
-   private Composite _ilViewerContainer;
+   private Composite _tourViewer_Container;
+   private Composite _simpleUI_ViewerContainer;
 
    private Combo     _comboSimpleUI_Config;
 
@@ -556,7 +556,7 @@ public class RawDataView extends ViewPart implements
 
    private Text      _txtNoBrowser;
 
-   private Menu      _tableContextMenu;
+   private Menu      _tourViewer_ContextMenu;
 
    private class ActionSimpleUI_DeviceState extends ActionToolbarSlideoutAdv {
 
@@ -625,7 +625,129 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private class ImportComparator extends ViewerComparator {
+   private enum ImportUI {
+
+      /**
+       * Dashboard with the browser
+       */
+      EASY_IMPORT_FANCY,
+
+      /**
+       * Dashboard with SWT widget, to fix issues when the browser is sometimes not working
+       * correctly
+       */
+      EASY_IMPORT_SIMPLE,
+
+      /**
+       * Just a simple import of files without easy import features
+       */
+      FOSSIL
+   }
+
+   private class JS_OnSelectImportConfig extends BrowserFunction {
+
+      JS_OnSelectImportConfig(final Browser browser, final String name) {
+         super(browser, name);
+      }
+
+      @Override
+      public Object function(final Object[] arguments) {
+
+         final int selectedIndex = ((Number) arguments[0]).intValue();
+
+         _parent.getDisplay().asyncExec(() -> onSelect_ImportConfig_Fancy(selectedIndex));
+
+//// this can be used to show created JS in the debugger
+//         if (true) {
+//            throw new RuntimeException();
+//         }
+
+         return null;
+      }
+   }
+
+   private class SimpleUI_ImportLauncher_ContentProvider implements IStructuredContentProvider {
+
+      public SimpleUI_ImportLauncher_ContentProvider() {}
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object parent) {
+
+         final ArrayList<ImportLauncher> configItems = getEasyConfig().importLaunchers;
+
+         return configItems.toArray(new ImportLauncher[configItems.size()]);
+      }
+
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   public class SimpleUI_ImportLauncher_Viewer implements ITourViewer {
+
+      @Override
+      public ColumnManager getColumnManager() {
+         return _simpleUI_ImportLauncher_ColumnManager;
+      }
+
+      @Override
+      public ColumnViewer getViewer() {
+         return _simpleUI_ImportLauncher_Viewer;
+      }
+
+      @Override
+      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+         _simpleUI_ViewerContainer.setRedraw(false);
+         {
+            final ISelection selection = _simpleUI_ImportLauncher_Viewer.getSelection();
+
+            _simpleUI_ImportLauncher_Viewer.getTable().dispose();
+
+            createUI_57_SimpleUI_ViewerTable(_simpleUI_ViewerContainer);
+            _simpleUI_ViewerContainer.layout();
+
+            // update viewer
+            reloadViewer();
+
+            _simpleUI_ImportLauncher_Viewer.setSelection(selection);
+         }
+         _simpleUI_ViewerContainer.setRedraw(true);
+
+         return _simpleUI_ImportLauncher_Viewer;
+      }
+
+      @Override
+      public void reloadViewer() {
+
+         _simpleUI_ImportLauncher_Viewer.setInput(this);
+      }
+
+      @Override
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
+   }
+
+   private class SimpleUI_ImportLauncher_ViewerFilter extends ViewerFilter {
+
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+
+         if (element instanceof ImportLauncher) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) element;
+
+            if (importLauncher.isShowInDashboard) {
+               return true;
+            }
+         }
+
+         return false;
+      }
+   }
+
+   private class TourViewer_Comparator extends ViewerComparator {
 
       static final int         ASCENDING  = 0;
       private static final int DESCENDING = 1;
@@ -771,158 +893,9 @@ public class RawDataView extends ViewPart implements
 
    }
 
-   private enum ImportUI {
+   private class TourViewer_ContentProvider implements IStructuredContentProvider {
 
-      /**
-       * Dashboard with the browser
-       */
-      EASY_IMPORT_FANCY,
-
-      /**
-       * Dashboard with SWT widget, to fix issues when the browser is sometimes not working
-       * correctly
-       */
-      EASY_IMPORT_SIMPLE,
-
-      /**
-       * Just a simple import of files without easy import features
-       */
-      FOSSIL
-   }
-
-   private class JS_OnSelectImportConfig extends BrowserFunction {
-
-      JS_OnSelectImportConfig(final Browser browser, final String name) {
-         super(browser, name);
-      }
-
-      @Override
-      public Object function(final Object[] arguments) {
-
-         final int selectedIndex = ((Number) arguments[0]).intValue();
-
-         _parent.getDisplay().asyncExec(() -> onSelect_ImportConfig_Fancy(selectedIndex));
-
-//// this can be used to show created JS in the debugger
-//         if (true) {
-//            throw new RuntimeException();
-//         }
-
-         return null;
-      }
-   }
-
-   public class SimpleUI_ColumnViewer implements ITourViewer {
-
-      @Override
-      public ColumnManager getColumnManager() {
-         return _simpleUI_ImportLauncher_ColumnManager;
-      }
-
-      @Override
-      public ColumnViewer getViewer() {
-         return _simpleUI_ImportLauncher_Viewer;
-      }
-
-      @Override
-      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
-
-         _ilViewerContainer.setRedraw(false);
-         {
-            final ISelection selection = _simpleUI_ImportLauncher_Viewer.getSelection();
-
-            _simpleUI_ImportLauncher_Viewer.getTable().dispose();
-
-            createUI_57_SimpleUI_ViewerTable(_ilViewerContainer);
-            _ilViewerContainer.layout();
-
-            // update viewer
-            reloadViewer();
-
-            _simpleUI_ImportLauncher_Viewer.setSelection(selection);
-         }
-         _ilViewerContainer.setRedraw(true);
-
-         return _simpleUI_ImportLauncher_Viewer;
-      }
-
-      @Override
-      public void reloadViewer() {
-
-         _simpleUI_ImportLauncher_Viewer.setInput(this);
-      }
-
-      @Override
-      public void updateColumnHeader(final ColumnDefinition colDef) {}
-   }
-
-   private class SimpleUI_ImportLauncher_ContentProvider implements IStructuredContentProvider {
-
-      public SimpleUI_ImportLauncher_ContentProvider() {}
-
-      @Override
-      public void dispose() {}
-
-      @Override
-      public Object[] getElements(final Object parent) {
-
-         final ArrayList<ImportLauncher> configItems = getEasyConfig().importLaunchers;
-
-         return configItems.toArray(new ImportLauncher[configItems.size()]);
-      }
-
-      @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
-   }
-
-   private class SimpleUI_ImportLauncher_Filter extends ViewerFilter {
-
-      @Override
-      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-
-         if (element instanceof ImportLauncher) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) element;
-
-            if (importLauncher.isShowInDashboard) {
-               return true;
-            }
-         }
-
-         return false;
-      }
-   }
-
-   private class TableContextMenuProvider implements IContextMenuProvider {
-
-      @Override
-      public void disposeContextMenu() {
-
-         if (_tableContextMenu != null) {
-            _tableContextMenu.dispose();
-         }
-      }
-
-      @Override
-      public Menu getContextMenu() {
-         return _tableContextMenu;
-      }
-
-      @Override
-      public Menu recreateContextMenu() {
-
-         disposeContextMenu();
-
-         _tableContextMenu = createUI_96_CreateViewerContextMenu();
-
-         return _tableContextMenu;
-      }
-
-   }
-
-   private class TourDataContentProvider implements IStructuredContentProvider {
-
-      public TourDataContentProvider() {}
+      public TourViewer_ContentProvider() {}
 
       @Override
       public void dispose() {}
@@ -934,6 +907,33 @@ public class RawDataView extends ViewPart implements
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   private class TourViewer_ContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tourViewer_ContextMenu != null) {
+            _tourViewer_ContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _tourViewer_ContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tourViewer_ContextMenu = createUI_96_CreateViewerContextMenu();
+
+         return _tourViewer_ContextMenu;
+      }
+
    }
 
    public static boolean isStopWatchingStoresThread() {
@@ -1986,7 +1986,7 @@ public class RawDataView extends ViewPart implements
          sb.append(deviceFile.size);
          sb.append(HTML_TD_END);
 
-         // this is for debugging
+         // this is useful for debugging
          if (easyConfig.stateToolTipDisplayAbsoluteFilePath) {
 
             if (NIO.isTourBookFileSystem(filePathName)) {
@@ -2501,9 +2501,9 @@ public class RawDataView extends ViewPart implements
 
       _tagMenuManager = new TagMenuManager(this, true);
 
-      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(this::fillContextMenu);
+      _tourViewer_MenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _tourViewer_MenuManager.setRemoveAllWhenShown(true);
+      _tourViewer_MenuManager.addMenuListener(this::fillContextMenu);
    }
 
    @Override
@@ -2513,8 +2513,8 @@ public class RawDataView extends ViewPart implements
       createMenuManager();
 
       // define all columns
-      _columnManager = new ColumnManager(this, _state);
-      _columnManager.setIsCategoryAvailable(true);
+      _tourViewer_ColumnManager = new ColumnManager(this, _state);
+      _tourViewer_ColumnManager.setIsCategoryAvailable(true);
       defineAllColumns();
 
       createActions();
@@ -3005,18 +3005,18 @@ public class RawDataView extends ViewPart implements
 
    private void createUI_56_SimpleUI_Viewer(final Composite parent) {
 
-      // define all columns for the viewer
+      // define all columns for this viewer
       _simpleUI_ImportLauncher_ColumnManager = new ColumnManager(_simpleUI_ImportLauncher_ColumnViewer, _stateSimpleUI);
-      _simpleUI_EasyLauncher.defineAllColumns(_simpleUI_ImportLauncher_ColumnManager, _pc);
+      _simpleUI_ImportLauncher.defineAllColumns(_simpleUI_ImportLauncher_ColumnManager, _pc);
 
-      _ilViewerContainer = new Composite(parent, SWT.NONE);
+      _simpleUI_ViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .applyTo(_ilViewerContainer);
-      GridLayoutFactory.fillDefaults().applyTo(_ilViewerContainer);
+            .applyTo(_simpleUI_ViewerContainer);
+      GridLayoutFactory.fillDefaults().applyTo(_simpleUI_ViewerContainer);
 //      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         createUI_57_SimpleUI_ViewerTable(_ilViewerContainer);
+         createUI_57_SimpleUI_ViewerTable(_simpleUI_ViewerContainer);
       }
    }
 
@@ -3025,10 +3025,7 @@ public class RawDataView extends ViewPart implements
       /*
        * Create table
        */
-      final Table table = new Table(parent,
-            SWT.H_SCROLL
-                  | SWT.V_SCROLL
-                  | SWT.FULL_SELECTION);
+      final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
       table.setHeaderVisible(true);
@@ -3053,38 +3050,26 @@ public class RawDataView extends ViewPart implements
       _simpleUI_ImportLauncher_Viewer = new TableViewer(table);
 
       _simpleUI_ImportLauncher_ColumnManager.createColumns(_simpleUI_ImportLauncher_Viewer);
+      _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
 
-      _simpleUI_ColumnIndexConfigImage = _simpleUI_EasyLauncher.getColDef_TourTypeImage().getCreateIndex();
+      _simpleUI_ColumnIndexConfigImage = _simpleUI_ImportLauncher.getColDef_TourTypeImage().getCreateIndex();
 
       _simpleUI_ImportLauncher_Viewer.setUseHashlookup(true);
       _simpleUI_ImportLauncher_Viewer.setContentProvider(new SimpleUI_ImportLauncher_ContentProvider());
-      _simpleUI_ImportLauncher_Viewer.addFilter(new SimpleUI_ImportLauncher_Filter());
+      _simpleUI_ImportLauncher_Viewer.addFilter(new SimpleUI_ImportLauncher_ViewerFilter());
 
-//    _simpleUI_ImportLauncher_Viewer.addSelectionChangedListener(selectionChangedEvent -> runEasyImport());
       _simpleUI_ImportLauncher_Viewer.addDoubleClickListener(doubleClickEvent -> runEasyImport());
-
-      createUI_58_SimpleUI_ContextMenu();
-   }
-
-   /**
-    * create the views context menu
-    */
-   private void createUI_58_SimpleUI_ContextMenu() {
-
-      final Table table = _simpleUI_ImportLauncher_Viewer.getTable();
-
-      _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
    }
 
    private Composite createUI_90_Page_TourViewer(final Composite parent) {
 
-      _viewerContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      _tourViewer_Container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_tourViewer_Container);
       {
-         createUI_92_TourViewer(_viewerContainer);
+         createUI_92_TourViewer(_tourViewer_Container);
       }
 
-      return _viewerContainer;
+      return _tourViewer_Container;
    }
 
    /**
@@ -3100,11 +3085,11 @@ public class RawDataView extends ViewPart implements
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
       _tourViewer = new TableViewer(table);
-      _columnManager.createColumns(_tourViewer);
+      _tourViewer_ColumnManager.createColumns(_tourViewer);
 
       // table viewer
-      _tourViewer.setContentProvider(new TourDataContentProvider());
-      _tourViewer.setComparator(_importComparator);
+      _tourViewer.setContentProvider(new TourViewer_ContentProvider());
+      _tourViewer.setComparator(_tourViewer_Comparator);
 
       _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 
@@ -3130,13 +3115,13 @@ public class RawDataView extends ViewPart implements
       /*
        * Setup tour comparator
        */
-      _importComparator.__sortColumnId = _columnId_TourStartDate;
-      _importComparator.__sortDirection = ImportComparator.ASCENDING;
+      _tourViewer_Comparator.__sortColumnId = _columnId_TourStartDate;
+      _tourViewer_Comparator.__sortDirection = TourViewer_Comparator.ASCENDING;
 
       // show the sorting indicator in the viewer
       updateUI_ShowSortDirection(
-            _importComparator.__sortColumnId,
-            _importComparator.__sortDirection);
+            _tourViewer_Comparator.__sortColumnId,
+            _tourViewer_Comparator.__sortDirection);
 
       createUI_94_ContextMenu();
    }
@@ -3146,20 +3131,20 @@ public class RawDataView extends ViewPart implements
     */
    private void createUI_94_ContextMenu() {
 
-      _tableContextMenu = createUI_96_CreateViewerContextMenu();
+      _tourViewer_ContextMenu = createUI_96_CreateViewerContextMenu();
 
       final Table table = (Table) _tourViewer.getControl();
 
-      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+      _tourViewer_ColumnManager.createHeaderContextMenu(table, _tourViewer_ContextMenuProvider);
 
       // this is from the beginning of the MT development and may not be needed
-      getSite().registerContextMenu(_viewerMenuManager, _tourViewer);
+      getSite().registerContextMenu(_tourViewer_MenuManager, _tourViewer);
    }
 
    private Menu createUI_96_CreateViewerContextMenu() {
 
       final Table table = (Table) _tourViewer.getControl();
-      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+      final Menu tableContextMenu = _tourViewer_MenuManager.createContextMenu(table);
 
       tableContextMenu.addMenuListener(new MenuAdapter() {
          @Override
@@ -3229,7 +3214,7 @@ public class RawDataView extends ViewPart implements
    private void defineColumn_Altitude_Down() {
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(
-            _columnManager,
+            _tourViewer_ColumnManager,
             _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3250,7 +3235,7 @@ public class RawDataView extends ViewPart implements
    private void defineColumn_Altitude_Up() {
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(
-            _columnManager,
+            _tourViewer_ColumnManager,
             _pc);
 
       colDef.setIsDefaultColumn();
@@ -3271,7 +3256,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Body_Calories() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_CALORIES.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3290,7 +3275,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Data_ImportFileName() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3314,7 +3299,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Data_ImportFilePath() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_PATH.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_PATH.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3335,7 +3320,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Date_TimeInterval() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DATA_TIME_INTERVAL.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3350,7 +3335,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Device_Name() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3378,7 +3363,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Device_Profile() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DEVICE_PROFILE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3393,7 +3378,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Motion_AvgPace() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3424,7 +3409,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Motion_AvgSpeed() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_tourViewer_ColumnManager, _pc);
 
       // show avg speed to verify the tour type by speed
       colDef.setIsDefaultColumn();
@@ -3454,7 +3439,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Motion_Distance() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3474,7 +3459,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_State_Database() {
 
-      final ColumnDefinition colDef = TableColumnFactory.STATE_DB_STATUS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.STATE_DB_STATUS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3496,7 +3481,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_State_Import() {
 
-      final ColumnDefinition colDef = TableColumnFactory.STATE_IMPORT_STATE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.STATE_IMPORT_STATE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3517,7 +3502,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3536,7 +3521,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3554,7 +3539,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Time_TimeZone() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.TIME_TIME_ZONE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3576,7 +3561,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Time_TimeZoneDifference() {
 
-      _timeZoneOffsetColDef = TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE.createColumn(_columnManager, _pc);
+      _timeZoneOffsetColDef = TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE.createColumn(_tourViewer_ColumnManager, _pc);
 
       _timeZoneOffsetColDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3595,7 +3580,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Time_TourDate() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_DATE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_DATE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3629,7 +3614,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Time_TourStartTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3670,7 +3655,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Tour_Marker() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3707,7 +3692,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Tour_Tags() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -3751,7 +3736,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Tour_Title() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3782,7 +3767,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Tour_Type() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3814,7 +3799,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Tour_TypeText() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_tourViewer_ColumnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3834,7 +3819,7 @@ public class RawDataView extends ViewPart implements
     */
    private void defineColumn_Weather_Clouds() {
 
-      final ColumnDefinition colDef = TableColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.WEATHER_CLOUDS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -4339,7 +4324,7 @@ public class RawDataView extends ViewPart implements
 
    @Override
    public ColumnManager getColumnManager() {
-      return _columnManager;
+      return _tourViewer_ColumnManager;
    }
 
    private String getDurationText(final ImportLauncher importLauncher) {
@@ -4618,7 +4603,7 @@ public class RawDataView extends ViewPart implements
       createResources_Image();
       createResources_Web();
 
-      _importComparator = new ImportComparator();
+      _tourViewer_Comparator = new TourViewer_Comparator();
       _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
@@ -4982,13 +4967,13 @@ public class RawDataView extends ViewPart implements
 
    private void onSelect_SortColumn(final SelectionEvent e) {
 
-      _viewerContainer.setRedraw(false);
+      _tourViewer_Container.setRedraw(false);
       {
          // keep selection
          final ISelection selectionBackup = _tourViewer.getSelection();
 
          // update viewer with new sorting
-         _importComparator.setSortColumn(e.widget);
+         _tourViewer_Comparator.setSortColumn(e.widget);
          _tourViewer.refresh();
 
          // reselect
@@ -4999,7 +4984,7 @@ public class RawDataView extends ViewPart implements
          }
          _isInUpdate = false;
       }
-      _viewerContainer.setRedraw(true);
+      _tourViewer_Container.setRedraw(true);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -5031,15 +5016,19 @@ public class RawDataView extends ViewPart implements
             reloadViewer();
 
          } else {
+
             _isViewerPersonDataDirty = true;
          }
+
+         // it's important to update this state otherwise deleted tours are not counted !!!
+         updateUI_DeviceState();
       }
    }
 
    private void recreateViewer() {
 
-      _columnManager.saveState(_state);
-      _columnManager.clearColumns();
+      _tourViewer_ColumnManager.saveState(_state);
+      _tourViewer_ColumnManager.clearColumns();
       defineAllColumns();
 
       _tourViewer = (TableViewer) recreateViewer(_tourViewer);
@@ -5252,7 +5241,7 @@ public class RawDataView extends ViewPart implements
 
       updateUI_1_TopPage(false);
 
-      // update tour data viewer
+      // update tour viewer
       final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
       _tourViewer.setInput(rawData);
 
@@ -5365,7 +5354,7 @@ public class RawDataView extends ViewPart implements
 
    /**
     * Launch easy import from the fancy UI
-    * 
+    *
     * @param launcherId
     */
    private void runEasyImport(final long launcherId) {
@@ -5585,7 +5574,7 @@ public class RawDataView extends ViewPart implements
 
          // update viewer when required
 
-         Display.getDefault().asyncExec(importState_Process::runPostProcess);
+         Display.getDefault().asyncExec(() -> importState_Process.runPostProcess());
 
          if (importState_Easy.isUpdateImportViewer) {
 
@@ -6254,7 +6243,7 @@ public class RawDataView extends ViewPart implements
       // keep selected tours
       Util.setState(_state, STATE_SELECTED_TOUR_INDICES, _tourViewer.getTable().getSelectionIndices());
 
-      _columnManager.saveState(_state);
+      _tourViewer_ColumnManager.saveState(_state);
       _simpleUI_ImportLauncher_ColumnManager.saveState(_stateSimpleUI);
    }
 
@@ -7097,6 +7086,9 @@ public class RawDataView extends ViewPart implements
       _actionSimpleUI_DeviceState.getActionToolItem().setImage(stateImage);
 
       _lblSimpleUI_NumNotImportedFiles.setText(numNotImportedFilesAsText);
+
+      // close state slideout to remove old content
+      _actionSimpleUI_DeviceState.__slideoutDeviceState.close();
    }
 
    private void updateUI_ImportUI_Action() {
@@ -7143,7 +7135,7 @@ public class RawDataView extends ViewPart implements
       final TableColumn tc = getSortColumn(sortColumnId);
 
       table.setSortColumn(tc);
-      table.setSortDirection(sortDirection == ImportComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+      table.setSortDirection(sortDirection == TourViewer_Comparator.ASCENDING ? SWT.UP : SWT.DOWN);
    }
 
    private void updateUI_TourViewerColumns() {
