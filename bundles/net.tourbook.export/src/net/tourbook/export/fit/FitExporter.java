@@ -23,6 +23,7 @@ import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.Event;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventType;
+import com.garmin.fit.Factory;
 import com.garmin.fit.File;
 import com.garmin.fit.FileEncoder;
 import com.garmin.fit.FileIdMesg;
@@ -132,6 +133,28 @@ public class FitExporter {
       userProfileMesg.setFriendlyName(activePerson.getName());
 
       return userProfileMesg;
+   }
+
+   private int createBatteryEvent(final List<Mesg> messages, final DateTime timestamp, final int batteryTimeIndex, final int timeSerieValue) {
+
+      final int[] battery_Time = _tourData.getBattery_Time();
+
+      if (battery_Time != null &&
+            battery_Time.length > 0 &&
+            batteryTimeIndex < battery_Time.length &&
+            battery_Time[batteryTimeIndex] / 1000 == timeSerieValue) {
+
+         final short[] battery_Percentage = _tourData.getBattery_Percentage();
+
+         final Mesg mesg = Factory.createMesg(104);
+         mesg.setFieldValue(2, battery_Percentage[batteryTimeIndex]);
+         //todo fb, this one doesn't get exported for some reason
+         mesg.setFieldValue(253, timestamp.getTimestamp());
+
+         messages.add(mesg);
+      }
+
+      return batteryTimeIndex;
    }
 
    private List<EventMesg> createEventMessages(final DateTime startTime, final DateTime finalTimestamp) {
@@ -324,10 +347,13 @@ public class FitExporter {
 
          int previousTimeSerieValue = 0;
          int pulseSerieIndex = 0;
+         int batteryTimeIndex = 0;
          GearData previousGearData = null;
          for (int index = 0; index < timeSerie.length; ++index) {
 
-            timestamp.add((long) _tourData.timeSerie[index] - previousTimeSerieValue);
+            final int currentTimeSerieValue = _tourData.timeSerie[index];
+
+            timestamp.add((long) currentTimeSerieValue - previousTimeSerieValue);
 
             // Create a new Record message and set the timestamp
             final RecordMesg recordMesg = new RecordMesg();
@@ -342,9 +368,11 @@ public class FitExporter {
 
             previousGearData = createGearEvent(messages, timestamp, previousGearData, index);
 
+            batteryTimeIndex = createBatteryEvent(messages, timestamp, batteryTimeIndex, currentTimeSerieValue);
+
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
-            previousTimeSerieValue = _tourData.timeSerie[index];
+            previousTimeSerieValue = currentTimeSerieValue;
          }
       }
 

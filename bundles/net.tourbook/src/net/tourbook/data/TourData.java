@@ -7826,7 +7826,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns battery time in seconds, relative to the tour start time
+    * @return Returns battery time in milliseconds, relative to the tour start time
     */
    public int[] getBattery_Time() {
       return battery_Time;

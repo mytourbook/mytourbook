@@ -747,7 +747,7 @@ public class FitDataReader extends TourbookDevice {
             final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
             fitData.getBattery_Time().add(javaTime);
-            fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
+            fitData.getBattery_Percentage().add(batteryPercentage);
          }
       }
    }
