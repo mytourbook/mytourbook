@@ -48,12 +48,15 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.DeviceSensor;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -75,6 +78,7 @@ public class FitExporter {
    }
 
    private static void createFitFile(final List<Mesg> messages,
+                                     final List<DeviceInfoMesg> deviceInfoMessages,
                                      final String filename,
                                      final DateTime startTime,
                                      final Float version) {
@@ -108,6 +112,8 @@ public class FitExporter {
       fileIdMesg.setTimeCreated(startTime);
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
+
+      deviceInfoMessages.forEach(deviceInfoMessage -> fileEncoder.write(deviceInfoMessages));
 
       messages.forEach(fileEncoder::write);
 
@@ -162,6 +168,42 @@ public class FitExporter {
       }
 
       return batteryTimeIndex;
+   }
+
+   private DeviceInfoMesg createDeviceInfoMesg(final DateTime timeStamp, final DeviceSensorValue deviceSensorValue) {
+
+      final DeviceInfoMesg deviceInfoMesg = new DeviceInfoMesg();
+
+      deviceInfoMesg.setTimestamp(timeStamp);
+
+      final DeviceSensor deviceSensor = deviceSensorValue.getDeviceSensor();
+      deviceInfoMesg.setSerialNumber(deviceSensor.getSerialNumberAsLong());
+      deviceInfoMesg.setManufacturer(deviceSensor.getManufacturerNumber());
+      deviceInfoMesg.setProduct(deviceSensor.getProductNumber());
+
+      return deviceInfoMesg;
+   }
+
+   private DeviceInfoMesg createDeviceInfoMesgEnd(final DateTime timeStamp, final DeviceSensorValue deviceSensorValue) {
+
+      final DeviceInfoMesg deviceInfoMesg = createDeviceInfoMesg(timeStamp, deviceSensorValue);
+
+      deviceInfoMesg.setBatteryLevel((short) deviceSensorValue.getBatteryLevel_End());
+      deviceInfoMesg.setBatteryStatus((short) deviceSensorValue.getBatteryStatus_End());
+      deviceInfoMesg.setBatteryVoltage(deviceSensorValue.getBatteryVoltage_End());
+
+      return deviceInfoMesg;
+   }
+
+   private DeviceInfoMesg createDeviceInfoMesgStart(final DateTime timeStamp, final DeviceSensorValue deviceSensorValue) {
+
+      final DeviceInfoMesg deviceInfoMesg = createDeviceInfoMesg(timeStamp, deviceSensorValue);
+
+      deviceInfoMesg.setBatteryLevel((short) deviceSensorValue.getBatteryLevel_Start());
+      deviceInfoMesg.setBatteryStatus((short) deviceSensorValue.getBatteryStatus_Start());
+      deviceInfoMesg.setBatteryVoltage(deviceSensorValue.getBatteryVoltage_Start());
+
+      return deviceInfoMesg;
    }
 
    private List<EventMesg> createEventMessages(final DateTime startTime, final DateTime finalTimestamp) {
@@ -405,7 +447,21 @@ public class FitExporter {
       activityMesg.setNumSessions(1);
       messages.add(activityMesg);
 
-      createFitFile(messages, exportFilePath, startTime, version);
+      final List<DeviceInfoMesg> deviceInfoMessages = new ArrayList<>();
+      final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
+      if (deviceSensorValues != null) {
+
+         for (final DeviceSensorValue deviceSensorValue : deviceSensorValues) {
+
+            final DeviceInfoMesg deviceInfoMesgStart = createDeviceInfoMesgStart(startTime, deviceSensorValue);
+            deviceInfoMessages.add(deviceInfoMesgStart);
+
+            final DeviceInfoMesg deviceInfoMesgEnd = createDeviceInfoMesgEnd(startTime, deviceSensorValue);
+            deviceInfoMessages.add(deviceInfoMesgEnd);
+         }
+      }
+
+      createFitFile(messages, deviceInfoMessages, exportFilePath, startTime, version);
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
