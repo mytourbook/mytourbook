@@ -136,7 +136,7 @@ public class FitExporter {
       return userProfileMesg;
    }
 
-   private int createBatteryEvent(final List<Mesg> messages, final DateTime timestamp, final int batteryTimeIndex, final int timeSerieValue) {
+   private int createBatteryEvent(final List<Mesg> messages, final DateTime timestamp, int batteryTimeIndex, final int timeSerieValue) {
 
       final int[] battery_Time = _tourData.getBattery_Time();
 
@@ -148,18 +148,17 @@ public class FitExporter {
          final short[] battery_Percentage = _tourData.getBattery_Percentage();
 
          final Mesg mesg = Factory.createMesg(104);
+
          final ActivityMesg activityMesg = new ActivityMesg();
          activityMesg.setTimestamp(timestamp);
-         final Field timeStampFieldToCopy = activityMesg.getField(253);
-         //mesg.setFieldValue(253, timestamp.getTimestamp());
-         final Field toto = new Field(timeStampFieldToCopy);
-         mesg.setField(toto);
-         //  mesg.addField(new Field("unknown", 253, 134, 1.0, 0.0, "", false, Profile.Type.UINT32));
+         final Field timeStampField = new Field(activityMesg.getField(253));
+         mesg.setField(timeStampField);
+
          mesg.setFieldValue(2, battery_Percentage[batteryTimeIndex]);
-         //todo fb, this one doesn't get exported for some reason
-         //  mesg.setFieldValue(253, 0, timestamp.getTimestamp(), Fit.FIELD_NUM_TIMESTAMP);
 
          messages.add(mesg);
+
+         ++batteryTimeIndex;
       }
 
       return batteryTimeIndex;
