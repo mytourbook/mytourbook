@@ -65,6 +65,7 @@ import net.tourbook.export.Activator;
 
 import org.osgi.framework.Version;
 
+//todo fb fix the number of markers and finish the sensor values export
 public class FitExporter {
 
    private TourData _tourData;
