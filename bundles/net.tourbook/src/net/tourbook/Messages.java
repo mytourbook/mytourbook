@@ -2769,6 +2769,8 @@ public class Messages extends NLS {
    public static String        Tour_Data_LoadTourData_Monitor;
    public static String        Tour_Data_LogInfo_SRTM_DataAreNotAvailable;
    public static String        Tour_Data_LogInfo_SRTM_UsingDeviceElevationValues;
+   public static String        Tour_Data_RetrievingWeatherData_Monitor;
+   public static String        Tour_Data_RetrievingWeatherData_Monitor_Subtask;
    public static String        Tour_Data_SaveTour_Monitor;
    public static String        Tour_Data_SaveTour_MonitorSubtask;
    public static String        Tour_Data_Text_AltitudeValues;
