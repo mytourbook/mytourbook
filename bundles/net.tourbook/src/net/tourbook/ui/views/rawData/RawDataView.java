@@ -77,7 +77,6 @@ import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
@@ -101,7 +100,7 @@ import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
-import net.tourbook.importdata.EasyLauncher;
+import net.tourbook.importdata.EasyLauncherUtils;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
 import net.tourbook.importdata.ImportState_Easy;
@@ -423,6 +422,7 @@ public class RawDataView extends ViewPart implements
    private ActionSetupImport                _actionSetupImport;
    private ActionSetTourTypeMenu            _actionSetTourType;
    private ActionSimpleUI_DeviceState       _actionSimpleUI_DeviceState;
+   private ActionSimpleUI_StartEasyImport   _actionSimpleUI_StartEasyImport;
    private ActionSimpleUI_StartStopWatching _actionSimpleUI_StartStopWatching;
    private ActionToggleFossilOrEasyImport   _actionToggleImportUI;
    private ActionUpload                     _actionUploadTour;
@@ -514,13 +514,16 @@ public class RawDataView extends ViewPart implements
     * Simple easy import
     */
    private TableViewer                    _simpleUI_ImportLauncher_Viewer;
-   private SimpleUI_ImportLauncher_Viewer _simpleUI_ImportLauncher_ColumnViewer = new SimpleUI_ImportLauncher_Viewer();
+   private SimpleUI_ImportLauncher_Viewer _simpleUI_ImportLauncher_ColumnViewer        = new SimpleUI_ImportLauncher_Viewer();
    private ColumnManager                  _simpleUI_ImportLauncher_ColumnManager;
-   private EasyLauncher                   _simpleUI_ImportLauncher              = new EasyLauncher();
+   private IContextMenuProvider           _simpleUI_ImportLauncher_ContextMenuProvider = new SimpleUI_ImportLauncher_ContextMenuProvider();
+   private MenuManager                    _simpleUI_ImportLauncher_MenuManager;
+   private EasyLauncherUtils              _simpleUI_ImportLauncher_Utils               = new EasyLauncherUtils();
+   //
    private int                            _simpleUI_ColumnIndexConfigImage;
    private long                           _lastSimpleUIConfigSelection;
    //
-   private OpenDialogManager              _openDialogManager                    = new OpenDialogManager();
+   private OpenDialogManager              _openDialogManager                           = new OpenDialogManager();
 
    /*
     * Resources
@@ -550,6 +553,7 @@ public class RawDataView extends ViewPart implements
 
    private Combo     _comboSimpleUI_Config;
 
+   private Label     _lblSimpleUI_EasyImportTitle;
    private Label     _lblSimpleUI_NumNotImportedFiles;
 
    private Link      _linkImport;
@@ -557,6 +561,7 @@ public class RawDataView extends ViewPart implements
    private Text      _txtNoBrowser;
 
    private Menu      _tourViewer_ContextMenu;
+   private Menu      _simpleUI_ImportLauncher_ContextMenu;
 
    private class ActionSimpleUI_DeviceState extends ActionToolbarSlideoutAdv {
 
@@ -591,6 +596,20 @@ public class RawDataView extends ViewPart implements
          __slideoutDeviceState.close();
 
          onSelect_SetupEasyImport(-1);
+      }
+   }
+
+   private class ActionSimpleUI_StartEasyImport extends Action {
+
+      public ActionSimpleUI_StartEasyImport() {
+
+         setText(Messages.Import_Data_Action_StartEasyImport);
+      }
+
+      @Override
+      public void run() {
+
+         runEasyImport();
       }
    }
 
@@ -683,6 +702,33 @@ public class RawDataView extends ViewPart implements
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   private class SimpleUI_ImportLauncher_ContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_simpleUI_ImportLauncher_ContextMenu != null) {
+            _simpleUI_ImportLauncher_ContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _simpleUI_ImportLauncher_ContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _simpleUI_ImportLauncher_ContextMenu = createUI_62_SimpleUI_CreateContextMenu();
+
+         return _simpleUI_ImportLauncher_ContextMenu;
+      }
+
    }
 
    public class SimpleUI_ImportLauncher_Viewer implements ITourViewer {
@@ -1329,6 +1375,7 @@ public class RawDataView extends ViewPart implements
       _actionToggleImportUI               = new ActionToggleFossilOrEasyImport();
       _actionUploadTour                   = new ActionUpload(this);
       _actionSimpleUI_DeviceState         = new ActionSimpleUI_DeviceState();
+      _actionSimpleUI_StartEasyImport     = new ActionSimpleUI_StartEasyImport();
       _actionSimpleUI_StartStopWatching   = new ActionSimpleUI_StartStopWatching();
 
 // SET_FORMATTING_ON
@@ -2503,7 +2550,11 @@ public class RawDataView extends ViewPart implements
 
       _tourViewer_MenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _tourViewer_MenuManager.setRemoveAllWhenShown(true);
-      _tourViewer_MenuManager.addMenuListener(this::fillContextMenu);
+      _tourViewer_MenuManager.addMenuListener(menuManager -> fillTourViewer_ContextMenu(menuManager));
+
+      _simpleUI_ImportLauncher_MenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _simpleUI_ImportLauncher_MenuManager.setRemoveAllWhenShown(true);
+      _simpleUI_ImportLauncher_MenuManager.addMenuListener(menuManager -> fillSimpleUI_ContextMenu(menuManager));
    }
 
    @Override
@@ -2956,13 +3007,13 @@ public class RawDataView extends ViewPart implements
             /*
              * Title: Easy Import
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Import_Data_HTML_EasyImport);
-            label.setForeground(UI.SYS_COLOR_WIDGET_DARK_SHADOW);
-            MTFont.setBannerFont(label);
+            _lblSimpleUI_EasyImportTitle = new Label(container, SWT.NONE);
+            _lblSimpleUI_EasyImportTitle.setText(Messages.Import_Data_HTML_EasyImport);
+            _lblSimpleUI_EasyImportTitle.setForeground(UI.SYS_COLOR_WIDGET_DARK_SHADOW);
+            MTFont.setBannerFont(_lblSimpleUI_EasyImportTitle);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
+                  .applyTo(_lblSimpleUI_EasyImportTitle);
          }
          {
             /*
@@ -3007,7 +3058,7 @@ public class RawDataView extends ViewPart implements
 
       // define all columns for this viewer
       _simpleUI_ImportLauncher_ColumnManager = new ColumnManager(_simpleUI_ImportLauncher_ColumnViewer, _stateSimpleUI);
-      _simpleUI_ImportLauncher.defineAllColumns(_simpleUI_ImportLauncher_ColumnManager, _pc);
+      _simpleUI_ImportLauncher_Utils.defineAllColumns(_simpleUI_ImportLauncher_ColumnManager, _pc);
 
       _simpleUI_ViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -3050,15 +3101,37 @@ public class RawDataView extends ViewPart implements
       _simpleUI_ImportLauncher_Viewer = new TableViewer(table);
 
       _simpleUI_ImportLauncher_ColumnManager.createColumns(_simpleUI_ImportLauncher_Viewer);
-      _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
+//    _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
 
-      _simpleUI_ColumnIndexConfigImage = _simpleUI_ImportLauncher.getColDef_TourTypeImage().getCreateIndex();
+      _simpleUI_ColumnIndexConfigImage = _simpleUI_ImportLauncher_Utils.getColDef_TourTypeImage().getCreateIndex();
 
       _simpleUI_ImportLauncher_Viewer.setUseHashlookup(true);
       _simpleUI_ImportLauncher_Viewer.setContentProvider(new SimpleUI_ImportLauncher_ContentProvider());
       _simpleUI_ImportLauncher_Viewer.addFilter(new SimpleUI_ImportLauncher_ViewerFilter());
 
       _simpleUI_ImportLauncher_Viewer.addDoubleClickListener(doubleClickEvent -> runEasyImport());
+
+      createUI_60_SimpleUI_ContextMenu();
+   }
+
+   /**
+    * Create the launcher context menu
+    */
+   private void createUI_60_SimpleUI_ContextMenu() {
+
+      _simpleUI_ImportLauncher_ContextMenu = createUI_62_SimpleUI_CreateContextMenu();
+
+      final Table table = (Table) _simpleUI_ImportLauncher_Viewer.getControl();
+
+      _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, _simpleUI_ImportLauncher_ContextMenuProvider);
+   }
+
+   private Menu createUI_62_SimpleUI_CreateContextMenu() {
+
+      final Table table = (Table) _simpleUI_ImportLauncher_Viewer.getControl();
+      final Menu tableContextMenu = _simpleUI_ImportLauncher_MenuManager.createContextMenu(table);
+
+      return tableContextMenu;
    }
 
    private Composite createUI_90_Page_TourViewer(final Composite parent) {
@@ -3880,7 +3953,7 @@ public class RawDataView extends ViewPart implements
    @Override
    public void dispose() {
 
-      resetEasyImport();
+      resetEasyImport(false);
 
       _images.dispose();
 
@@ -4093,6 +4166,7 @@ public class RawDataView extends ViewPart implements
 
       _actionSimpleUI_DeviceState      .setEnabled(isEnabled);
       _comboSimpleUI_Config            .setEnabled(isEnabled);
+      _lblSimpleUI_EasyImportTitle     .setEnabled(isEnabled);
       _lblSimpleUI_NumNotImportedFiles .setEnabled(isEnabled);
 
       viewerTable                      .setEnabled(isEnabled);
@@ -4125,7 +4199,61 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private void fillContextMenu(final IMenuManager menuMgr) {
+   private void fillSimpleUI() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      for (final ImportConfig importConfig : easyConfig.importConfigs) {
+         _comboSimpleUI_Config.add(importConfig.name);
+      }
+   }
+
+   private void fillSimpleUI_ContextMenu(final IMenuManager menuManager) {
+
+      // update import action text
+      final Object firstElement = _simpleUI_ImportLauncher_Viewer.getStructuredSelection().getFirstElement();
+      if (firstElement instanceof ImportLauncher) {
+
+         _actionSimpleUI_StartEasyImport.setText(NLS.bind(
+
+               Messages.Import_Data_Action_StartEasyImport,
+               ((ImportLauncher) firstElement).name));
+      }
+
+      menuManager.add(_actionSimpleUI_StartEasyImport);
+   }
+
+   private void fillToolbar() {
+
+      /*
+       * fill view toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_actionSaveTourWithPerson);
+      tbm.add(_actionSaveTour);
+      tbm.add(new Separator());
+
+      // place for import and transfer actions
+      tbm.add(new GroupMarker("import")); //$NON-NLS-1$
+      tbm.add(new Separator());
+
+      tbm.add(_actionToggleImportUI);
+      tbm.add(_actionClearView);
+      tbm.add(_actionOpenTourLogView);
+      tbm.add(_actionSetupImport);
+
+      /*
+       * fill view menu
+       */
+      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+      menuMgr.add(_actionRemoveToursWhenClosed);
+      menuMgr.add(_actionEditImportPreferences);
+
+   }
+
+   private void fillTourViewer_ContextMenu(final IMenuManager menuMgr) {
 
       // hide tour info tooltip, this is displayed when the mouse context menu should be created
       _tourInfoToolTip.hide();
@@ -4165,45 +4293,6 @@ public class RawDataView extends ViewPart implements
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
       enableActions();
-   }
-
-   private void fillSimpleUI() {
-
-      final EasyConfig easyConfig = getEasyConfig();
-
-      for (final ImportConfig importConfig : easyConfig.importConfigs) {
-         _comboSimpleUI_Config.add(importConfig.name);
-      }
-   }
-
-   private void fillToolbar() {
-
-      /*
-       * fill view toolbar
-       */
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(_actionSaveTourWithPerson);
-      tbm.add(_actionSaveTour);
-      tbm.add(new Separator());
-
-      // place for import and transfer actions
-      tbm.add(new GroupMarker("import")); //$NON-NLS-1$
-      tbm.add(new Separator());
-
-      tbm.add(_actionToggleImportUI);
-      tbm.add(_actionClearView);
-      tbm.add(_actionOpenTourLogView);
-      tbm.add(_actionSetupImport);
-
-      /*
-       * fill view menu
-       */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(_actionRemoveToursWhenClosed);
-      menuMgr.add(_actionEditImportPreferences);
-
    }
 
    private void fillUI() {
@@ -4912,7 +5001,7 @@ public class RawDataView extends ViewPart implements
 
       } else {
 
-         resetEasyImport();
+         resetEasyImport(true);
 
          updateUI_1_TopPage(true);
       }
@@ -5080,6 +5169,7 @@ public class RawDataView extends ViewPart implements
 
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
+
                true,
                canCancelProcess,
 
@@ -5276,9 +5366,9 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private void resetEasyImport() {
+   private void resetEasyImport(final boolean isUpdateUI) {
 
-      setWatcher_2_Off();
+      setWatcher_2_Off(isUpdateUI);
 
       EasyImportManager.getInstance().reset();
    }
@@ -5337,6 +5427,7 @@ public class RawDataView extends ViewPart implements
     */
    private void runEasyImport() {
 
+      // get selected launcher
       final Object firstElement = _simpleUI_ImportLauncher_Viewer.getStructuredSelection().getFirstElement();
       if (firstElement instanceof ImportLauncher) {
 
@@ -6339,6 +6430,14 @@ public class RawDataView extends ViewPart implements
 
    private void setWatcher_2_Off() {
 
+      setWatcher_2_Off(true);
+   }
+
+   /**
+    * @param isUpdateUI
+    */
+   private void setWatcher_2_Off(final boolean isUpdateUI) {
+
       if (isWatchingOn()) {
 
          /*
@@ -6346,23 +6445,31 @@ public class RawDataView extends ViewPart implements
           * launch a new watch folder thread !!!
           */
          thread_WatchStores_Cancel();
+
          // thread_WatchFolders(false);
 
-         if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
-
-            updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
-
-         } else {
-
-            // simple UI
-
-            enableSimpleUI(false);
-         }
-
          try {
+
             if (_watchingStoresThread != null) {
                _watchingStoresThread.join();
             }
+
+            if (isUpdateUI) {
+
+               if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+                  updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+
+               } else {
+
+                  // simple UI
+
+                  updateUI_DeviceState_SimpleUI();
+
+                  enableSimpleUI(false);
+               }
+            }
+
          } catch (final InterruptedException e) {
             TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
@@ -6634,7 +6741,7 @@ public class RawDataView extends ViewPart implements
       _isDeviceStateValid = false;
       _isStopWatchingStoresThread = true;
 
-      // run with progress, duration can be 0...5 seconds
+      // run with progress, duration can be 0...10 seconds
       try {
 
          final IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -6659,6 +6766,7 @@ public class RawDataView extends ViewPart implements
                      _watchingStoresThread.join(waitingTime); // must unlock then join
 
                      if (_watchingStoresThread.isAlive()) {
+
                         StatusUtil.logInfo(NLS.bind(
                               Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
                               waitingTime / 1000));
@@ -6728,7 +6836,11 @@ public class RawDataView extends ViewPart implements
                } catch (final InterruptedException e) {
 
                   if (_isStopWatchingStoresThread) {
+
+                     // an interrupt request is performed
+
                      _isStopWatchingStoresThread = false;
+
                      break;
                   }
 
@@ -6857,9 +6969,17 @@ public class RawDataView extends ViewPart implements
 
             _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Simple);
 
-            setWatcher_1_On();
+            if (isWatchingOn()) {
 
-            _simpleUI_ImportLauncher_Viewer.getTable().setFocus();
+               _simpleUI_ImportLauncher_Viewer.getTable().setFocus();
+            }
+
+            if (isInStartUp) {
+
+               setWatcher_1_On();
+
+               updateUI_DeviceState_SimpleUI();
+            }
 
             break;
 
@@ -6869,6 +6989,7 @@ public class RawDataView extends ViewPart implements
             _topPage_PageBook.showPage(_topPage_ImportUI_FossilUI);
 
             _linkImport.setFocus();
+
             break;
          }
       }
@@ -6912,16 +7033,6 @@ public class RawDataView extends ViewPart implements
     */
    private void updateUI_2_EasyImport_Simple() {
 
-      if (_easyImportFancy_PageBook == null) {
-
-         /*
-          * This occurs when the app is started the first time and the measurement selection dialog
-          * fires an event
-          */
-
-         return;
-      }
-
       _comboSimpleUI_Config.removeAll();
 
       fillSimpleUI();
@@ -6930,6 +7041,10 @@ public class RawDataView extends ViewPart implements
    }
 
    private void updateUI_DeviceState() {
+
+      if (_parent.isDisposed()) {
+         return;
+      }
 
       // must be running in the UI thread, is called from other threads
       _parent.getDisplay().asyncExec(() -> {
@@ -7012,7 +7127,7 @@ public class RawDataView extends ViewPart implements
 
       final boolean isWatchAnything = importConfig.isWatchAnything();
 
-      if (isWatchingOn() == false) {
+      if (isWatchingOn == false) {
 
          // watching is off
 

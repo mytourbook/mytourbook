@@ -1053,6 +1053,7 @@ public class Messages extends NLS {
    public static String        import_data_action_save_tour_for_person;
    public static String        import_data_action_save_tour_with_person;
    public static String        Import_Data_Action_SetupEasyImport_Tooltip;
+   public static String        Import_Data_Action_StartEasyImport;
    public static String        Import_Data_Combo_SimpleUIConfig_Tooltip;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;

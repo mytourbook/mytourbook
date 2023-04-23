@@ -32,7 +32,7 @@ import org.eclipse.swt.SWT;
 /**
  * Provides items for the easy (i)mport (l)auncher (IL)
  */
-public class EasyLauncher {
+public class EasyLauncherUtils {
 
    private static final String   COLUMN_ADJUST_TEMPERATURE = "{0} - {1} {2}";                 //$NON-NLS-1$
 

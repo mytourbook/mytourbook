@@ -187,7 +187,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
    private ColumnManager                _icColumnManager;
    private ColumnManager                _ilColumnManager;
-   private EasyLauncher                 _ilEasyLauncher                   = new EasyLauncher();
+   private EasyLauncherUtils            _ilEasyLauncherUtils              = new EasyLauncherUtils();
    //
    private int                          _ilColumnIndexConfigImage;
    //
@@ -1491,7 +1491,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // define all columns for the viewer
       _ilColumnManager = new ColumnManager(_ilColumnViewer, _stateIL);
-      _ilEasyLauncher.defineAllColumns(_ilColumnManager, _pc);
+      _ilEasyLauncherUtils.defineAllColumns(_ilColumnManager, _pc);
 
       _ilViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1540,7 +1540,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       _ilColumnManager.createColumns(_ilViewer);
 
-      _ilColumnIndexConfigImage = _ilEasyLauncher.getColDef_TourTypeImage().getCreateIndex();
+      _ilColumnIndexConfigImage = _ilEasyLauncherUtils.getColDef_TourTypeImage().getCreateIndex();
 
       _ilViewer.setUseHashlookup(true);
       _ilViewer.setContentProvider(new ILContentProvider());
@@ -3361,7 +3361,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       update_Model_From_UI_IC();
 
       // update model
-      final ArrayList<ImportConfig> icItems = _dialogEasyConfig.importConfigs;
+      final ArrayList<ImportConfig> allConfigItems = _dialogEasyConfig.importConfigs;
       ImportConfig newIC;
 
       if (isCopy) {
@@ -3376,7 +3376,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          newIC = new ImportConfig();
       }
 
-      icItems.add(newIC);
+      allConfigItems.add(newIC);
 
       // update UI
       _icViewer.refresh();
@@ -3480,12 +3480,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final ImportConfig selectedConfig = (ImportConfig) selection.getFirstElement();
 
       int selectedIndex = -1;
-      final ArrayList<ImportConfig> configItems = _dialogEasyConfig.importConfigs;
+      final ArrayList<ImportConfig> allConfigItems = _dialogEasyConfig.importConfigs;
 
       // get index of the selected config
-      for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
+      for (int configIndex = 0; configIndex < allConfigItems.size(); configIndex++) {
 
-         final ImportConfig config = configItems.get(configIndex);
+         final ImportConfig config = allConfigItems.get(configIndex);
 
          if (config.equals(selectedConfig)) {
             selectedIndex = configIndex;
@@ -3500,19 +3500,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
 
       // update model
-      configItems.remove(selectedIndex);
+      allConfigItems.remove(selectedIndex);
 
       // update UI
       _icViewer.refresh();
 
       // select config at the same position
-      if (configItems.size() > 0) {
+      if (allConfigItems.size() > 0) {
 
-         if (selectedIndex >= configItems.size()) {
+         if (selectedIndex >= allConfigItems.size()) {
             selectedIndex--;
          }
 
-         final ImportConfig nextConfig = configItems.get(selectedIndex);
+         final ImportConfig nextConfig = allConfigItems.get(selectedIndex);
 
          _icViewer.setSelection(new StructuredSelection(nextConfig), true);
       }
