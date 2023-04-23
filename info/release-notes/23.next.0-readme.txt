@@ -38,6 +38,7 @@ Improvements
 * Tour Book View
   - Filter tours which are collected/not collected
     https://github.com/mytourbook/mytourbook/issues/1050
+  - Delete tours with the keyboard <Ctrl><Shift><Delete>
   
 * Tour Chart
   - Show "Recorded Time" in the value point tooltip 

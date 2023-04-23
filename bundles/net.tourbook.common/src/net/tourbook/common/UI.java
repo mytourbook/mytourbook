@@ -1890,28 +1890,17 @@ public class UI {
     */
    public static boolean isCtrlKey(final Event event) {
 
-      boolean isCtrlKey;
+      return (event.stateMask & SWT.MOD1) > 0;
+   }
 
-      if (UI.IS_OSX) {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-      } else {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-      }
+   public static boolean isCtrlKey(final KeyEvent keyEvent) {
 
-      return isCtrlKey;
+      return (keyEvent.stateMask & SWT.MOD1) > 0;
    }
 
    public static boolean isCtrlKey(final MouseEvent event) {
 
-      boolean isCtrlKey;
-
-      if (IS_OSX) {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-      } else {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-      }
-
-      return isCtrlKey;
+      return (event.stateMask & SWT.MOD1) > 0;
    }
 
    /**
@@ -1937,6 +1926,19 @@ public class UI {
       }
 
       return false;
+   }
+
+   public static boolean isShiftKey(final KeyEvent keyEvent) {
+
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isShiftKey = (keyEvent.stateMask & SWT.MOD3) > 0;
+      } else {
+         isShiftKey = (keyEvent.stateMask & SWT.MOD2) > 0;
+      }
+
+      return isShiftKey;
    }
 
    public static boolean isShiftKey(final MouseEvent event) {
