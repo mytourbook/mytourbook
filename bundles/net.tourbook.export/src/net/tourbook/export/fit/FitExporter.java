@@ -65,7 +65,7 @@ import net.tourbook.export.Activator;
 
 import org.osgi.framework.Version;
 
-//todo fb fix the number of markers and finish the sensor values export
+//todo fb  finish the sensor values export
 public class FitExporter {
 
    private TourData _tourData;
@@ -335,8 +335,6 @@ public class FitExporter {
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
       float previousTotalDistance = 0;
       float lapDistance = 0;
-      int previousMarkerTime = 0;
-      int previousMarkerSerieIndex = 0;
       for (int index = 0; index < markers.size(); ++index) {
 
          final TourMarker tourMarker = markers.get(index);
@@ -351,16 +349,14 @@ public class FitExporter {
          lapDistance = tourMarker.getDistance() - previousTotalDistance;
          lapMessage.setTotalDistance(lapDistance);
 
-         final int pausedTime = _tourData.getPausedTime(previousMarkerSerieIndex, tourMarker.getSerieIndex());
+         final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
          //this seemed to be the missing link
-         lapMessage.setTotalTimerTime((float) tourMarker.getTime() /*- pausedTime*/);
+         lapMessage.setTotalTimerTime((float) tourMarker.getTime() - pausedTime);
          lapMessage.setEvent(Event.LAP);
 
          lapMessages.add(lapMessage);
 
          previousTotalDistance = tourMarker.getDistance();
-         previousMarkerTime = tourMarker.getTime();
-         previousMarkerSerieIndex = tourMarker.getSerieIndex();
       }
 
       return lapMessages;
