@@ -65,7 +65,6 @@ import net.tourbook.export.Activator;
 
 import org.osgi.framework.Version;
 
-//todo fb  finish the sensor values export
 public class FitExporter {
 
    private TourData _tourData;
@@ -79,7 +78,6 @@ public class FitExporter {
    }
 
    private static void createFitFile(final List<Mesg> messages,
-                                     final List<DeviceInfoMesg> deviceInfoMessages,
                                      final String filename,
                                      final DateTime startTime,
                                      final Float version) {
@@ -113,8 +111,6 @@ public class FitExporter {
       fileIdMesg.setTimeCreated(startTime);
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
-
-      deviceInfoMessages.forEach(deviceInfoMessage -> fileEncoder.write(deviceInfoMessages));
 
       messages.forEach(fileEncoder::write);
 
@@ -191,7 +187,8 @@ public class FitExporter {
 
       deviceInfoMesg.setBatteryLevel((short) deviceSensorValue.getBatteryLevel_End());
       deviceInfoMesg.setBatteryStatus((short) deviceSensorValue.getBatteryStatus_End());
-      deviceInfoMesg.setBatteryVoltage(deviceSensorValue.getBatteryVoltage_End());
+      final float batteryVoltage_End = deviceSensorValue.getBatteryVoltage_End();
+      deviceInfoMesg.setBatteryVoltage(batteryVoltage_End < 0 ? null : batteryVoltage_End);
 
       return deviceInfoMesg;
    }
@@ -202,7 +199,8 @@ public class FitExporter {
 
       deviceInfoMesg.setBatteryLevel((short) deviceSensorValue.getBatteryLevel_Start());
       deviceInfoMesg.setBatteryStatus((short) deviceSensorValue.getBatteryStatus_Start());
-      deviceInfoMesg.setBatteryVoltage(deviceSensorValue.getBatteryVoltage_Start());
+      final float batteryVoltage_Start = deviceSensorValue.getBatteryVoltage_Start();
+      deviceInfoMesg.setBatteryVoltage(batteryVoltage_Start < 0 ? null : batteryVoltage_Start);
 
       return deviceInfoMesg;
    }
@@ -452,21 +450,20 @@ public class FitExporter {
       activityMesg.setNumSessions(1);
       messages.add(activityMesg);
 
-      final List<DeviceInfoMesg> deviceInfoMessages = new ArrayList<>();
       final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
       if (deviceSensorValues != null) {
 
          for (final DeviceSensorValue deviceSensorValue : deviceSensorValues) {
 
             final DeviceInfoMesg deviceInfoMesgStart = createDeviceInfoMesgStart(startTime, deviceSensorValue);
-            deviceInfoMessages.add(deviceInfoMesgStart);
+            messages.add(deviceInfoMesgStart);
 
             final DeviceInfoMesg deviceInfoMesgEnd = createDeviceInfoMesgEnd(timestamp, deviceSensorValue);
-            deviceInfoMessages.add(deviceInfoMesgEnd);
+            messages.add(deviceInfoMesgEnd);
          }
       }
 
-      createFitFile(messages, deviceInfoMessages, exportFilePath, startTime, version);
+      createFitFile(messages, exportFilePath, startTime, version);
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
