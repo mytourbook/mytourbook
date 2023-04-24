@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,6 @@ public class DialogReimportTourTests extends UITest {
       bot.button("Yes").click(); //$NON-NLS-1$
       Utils.clickOkButton(bot);
 
-      bot.sleep(10000);
+      bot.sleep(20000);
    }
 }
