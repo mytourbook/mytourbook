@@ -155,7 +155,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
       ) {
 
-         final long javaTime = new DateTime(timestamp.getTimestamp()).getDate().getTime();
+         final long javaTime = timestamp.getDate().getTime();
 
          System.out.println(String.format(UI.EMPTY_STRING
 

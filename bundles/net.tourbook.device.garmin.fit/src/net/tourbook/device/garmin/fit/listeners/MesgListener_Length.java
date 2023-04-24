@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
-import com.garmin.fit.DateTime;
 import com.garmin.fit.LengthMesg;
 import com.garmin.fit.LengthMesgListener;
 import com.garmin.fit.LengthType;
@@ -51,7 +50,7 @@ public class MesgListener_Length extends AbstractMesgListener implements LengthM
       final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
 
       // convert garmin time into java time
-      final long javaTime = new DateTime(garminTime.getTimestamp()).getDate().getTime();
+      final long javaTime = garminTime.getDate().getTime();
 
       final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
       final LengthType lengthType = mesg.getLengthType();

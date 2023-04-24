@@ -109,7 +109,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
          boolean isCreateExceededMarker = false;
 
-         final long sliceJavaTime = new DateTime(garminTime.getTimestamp()).getDate().getTime();
+         final long sliceJavaTime = garminTime.getDate().getTime();
 
          absoluteTime = sliceJavaTime;
          long timeDiff = 0;
