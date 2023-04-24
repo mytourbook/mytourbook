@@ -5,6 +5,7 @@ TODO's
 ======               
 
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
+                    Released: 23.3
 
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
@@ -27,6 +28,10 @@ Experimental
 
 New
 ===
+
+* Easy Import
+  - Simple UI to start an easy import launcher
+    https://github.com/mytourbook/mytourbook/issues/1065
 
 Tour Weather (Frederic)
   - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
