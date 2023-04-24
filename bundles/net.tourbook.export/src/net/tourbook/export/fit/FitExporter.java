@@ -335,8 +335,8 @@ public class FitExporter {
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
       int index = 0;
       final DateTime currentTimeStamp = new DateTime(startTime.getDate());
-      float previousLapDistance = 0;
-      float totalDistance = 0;
+      float previousTotalDistance = 0;
+      float lapDistance = 0;
       for (; index < markers.size(); ++index) {
 
          final TourMarker tourMarker = markers.get(index);
@@ -346,8 +346,8 @@ public class FitExporter {
 
          currentTimeStamp.add(tourMarker.getTime());
          lapMessage.setStartTime(startTime);
-         totalDistance = tourMarker.getDistance() - previousLapDistance;
-         lapMessage.setTotalDistance(totalDistance);
+         lapDistance = tourMarker.getDistance() - previousTotalDistance;
+         lapMessage.setTotalDistance(lapDistance);
          lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
 
          final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
@@ -357,7 +357,7 @@ public class FitExporter {
 
          lapMessages.add(lapMessage);
 
-         previousLapDistance = totalDistance;
+         previousTotalDistance = tourMarker.getDistance();
       }
 
       return lapMessages;
