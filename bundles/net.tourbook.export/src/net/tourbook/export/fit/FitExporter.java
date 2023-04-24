@@ -333,7 +333,6 @@ public class FitExporter {
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
-      final DateTime currentTimeStamp = new DateTime(startTime.getDate());
       float previousTotalDistance = 0;
       float lapDistance = 0;
       int previousMarkerTime = 0;
@@ -346,12 +345,11 @@ public class FitExporter {
          lapMessage.setMessageIndex(index);
 
          lapMessage.setStartTime(startTime);
-         currentTimeStamp.add(tourMarker.getTime());
-         lapMessage.setTimestamp(currentTimeStamp);
+         final Date timestamp = Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime()));
+         lapMessage.setTimestamp(new DateTime(timestamp));
+
          lapDistance = tourMarker.getDistance() - previousTotalDistance;
          lapMessage.setTotalDistance(lapDistance);
-         final int totalElapsedTime = (tourMarker.getTime() - previousMarkerTime);
-         lapMessage.setTotalElapsedTime((float) totalElapsedTime);
 
          final int pausedTime = _tourData.getPausedTime(previousMarkerSerieIndex, tourMarker.getSerieIndex());
          //this seemed to be the missing link
