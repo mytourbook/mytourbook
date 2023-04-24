@@ -33,27 +33,32 @@ New
   - Simple UI to start an easy import launcher
     https://github.com/mytourbook/mytourbook/issues/1065
 
-Tour Weather (Frederic)
+* Tour Weather (Frederic)
   - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
 
 Improvements
 ============
 
+* Tour Reimport (Frederic)
+  - Added the ability to reimport weather information (clouds and description)
+
 * Tour Book View
-  - Filter tours which are collected/not collected
+  - Filter tours which are collected or not collected
     https://github.com/mytourbook/mytourbook/issues/1050
   - Delete tours with the keyboard <Ctrl><Shift><Delete>
+
+* 2D Map (Meinhard)
+  - Make power a selectable option for coloring the tour graph 
+    https://github.com/mytourbook/mytourbook/issues/1071
+
+* Tour Info Tooltip
+  - Adjust width of the tour info tooltip
+    https://github.com/mytourbook/mytourbook/issues/1077
   
 * Tour Chart
   - Show "Recorded Time" in the value point tooltip 
     https://github.com/mytourbook/mytourbook/issues/502
-
-* Tour Reimport (Frederic)
-  - Added the ability to reimport weather information (clouds and description)
-
-* Weather (Frederic)
-  - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
   
 * Tour Pauses View (Frederic)
   - Added a Pause Type column
@@ -61,9 +66,8 @@ Improvements
 * Tour Geo Filter
   - Toggle name in the filter history viewer between read and edit mode
 
-* 2D Map (Meinhard)
-  - Make power a selectable option for coloring the tour graph 
-    https://github.com/mytourbook/mytourbook/issues/1071
+* Weather (Frederic)
+  - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
 
 Changes
 =======

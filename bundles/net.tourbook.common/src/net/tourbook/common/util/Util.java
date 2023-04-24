@@ -61,7 +61,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
@@ -162,17 +161,6 @@ public class Util {
       }
 
       return sb.toString();
-   }
-
-   public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
-
-      // accelerate with Ctrl + Shift key
-      final int accelerator = getKeyAccelerator(event);
-
-      final Scale scale = (Scale) event.widget;
-      final int newValueDiff = event.count > 0 ? accelerator : -accelerator;
-
-      return scale.getSelection() + newValueDiff;
    }
 
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
@@ -1284,6 +1272,7 @@ public class Util {
          return stateValue;
 
       } catch (final NumberFormatException e) {
+
          return defaultValue;
       }
    }
