@@ -70,6 +70,8 @@ public class ActionDeleteTour extends Action {
 
       _tourBookView = tourBookView;
 
+      tourBookView.setActionDeleteTour(this);
+
       setText(Messages.Tour_Book_Action_delete_selected_tours);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));

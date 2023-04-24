@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 public class ImportConfig implements Cloneable {
+
+   private static final char  NL                   = UI.NEW_LINE;
 
    public static final String DEVICE_FILES_DEFAULT = "*";                 //$NON-NLS-1$
 
@@ -176,18 +178,19 @@ public class ImportConfig implements Cloneable {
    @Override
    public String toString() {
 
-      return "ImportConfig [\n" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + ("name=" + name + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("isCreateBackup=" + isCreateBackup + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("isDeleteDeviceFiles=" + isDeleteDeviceFiles + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("isTurnOffWatching=" + isTurnOffWatching + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_id=" + _id + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_backupFolder=" + _backupFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_deviceType=" + _deviceType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_deviceFolder=" + _deviceFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("deviceFiles=" + fileGlobPattern) //$NON-NLS-1$
+            + "ImportConfig" + NL //                                    //$NON-NLS-1$
 
-            + "\n]"; //$NON-NLS-1$
+            + "name                 =" + name + NL //                   //$NON-NLS-1$
+            + "isCreateBackup       =" + isCreateBackup + NL //         //$NON-NLS-1$
+            + "isDeleteDeviceFiles  =" + isDeleteDeviceFiles + NL //    //$NON-NLS-1$
+            + "isTurnOffWatching    =" + isTurnOffWatching + NL //      //$NON-NLS-1$
+            + "_id                  =" + _id + NL //                    //$NON-NLS-1$
+            + "_backupFolder        =" + _backupFolder + NL //          //$NON-NLS-1$
+            + "_deviceType          =" + _deviceType + NL //            //$NON-NLS-1$
+            + "_deviceFolder        =" + _deviceFolder + NL //          //$NON-NLS-1$
+            + "deviceFiles          =" + fileGlobPattern + NL //        //$NON-NLS-1$
+      ;
    }
 }

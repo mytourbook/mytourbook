@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -177,8 +179,10 @@ import org.eclipse.nebula.widgets.nattable.style.theme.DarkNatTableThemeConfigur
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.theme.ThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
+import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
@@ -186,6 +190,7 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
@@ -219,6 +224,7 @@ public class TourBookView extends ViewPart implements
 
    //
    private static final IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
+
    private static final IPreferenceStore _prefStore_Common                               = CommonActivator.getPrefStore();
    //
    private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
@@ -257,7 +263,6 @@ public class TourBookView extends ViewPart implements
                "Using simple format when exporting tours in CSV format"); //$NON-NLS-1$
       }
    }
-
    //
    /**
     * The header column id needs a different id than the body column otherwise drag&drop or column
@@ -266,7 +271,8 @@ public class TourBookView extends ViewPart implements
    private static final String HEADER_COLUMN_ID_POSTFIX = "_HEADER"; //$NON-NLS-1$
 
    //
-   private static TourBookViewLayout       _viewLayout;
+   private static TourBookViewLayout _viewLayout;
+
    //
    private TourBook_ColumnFactory          _columnFactory;
    private ColumnManager                   _columnManager_NatTable;
@@ -340,7 +346,8 @@ public class TourBookView extends ViewPart implements
    private ActionExpandSelection           _actionExpandSelection;
    private ActionExport                    _actionExportTour;
    private ActionExportViewCSV             _actionExportViewCSV;
-   private ActionDeleteTourMenu            _actionDeleteTour;
+   private ActionDeleteTour                _actionDeleteTour;
+   private ActionDeleteTourMenu            _actionDeleteTourMenu;
    private ActionDeleteTourValues          _actionDeleteTourValues;
    private ActionEditTour                  _actionEditTour;
    private ActionJoinTours                 _actionJoinTours;
@@ -871,8 +878,8 @@ public class TourBookView extends ViewPart implements
          // default selection style
          this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
          this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
-//         this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
-//         this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
+//       this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
+//       this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
 
          // show sort column indicator in black than in white
          final SortableHeaderTextPainter interiorPainter = new SortableHeaderTextPainter(
@@ -896,6 +903,16 @@ public class TourBookView extends ViewPart implements
 
          // freeze column separator
          this.freezeSeparatorColor = GUIHelper.COLOR_WIDGET_BORDER;
+      }
+   }
+
+   private class NatTable_KeyAction_DeleteTours implements IKeyAction {
+
+      @Override
+      public void run(final NatTable natTable, final KeyEvent event) {
+
+         // call action which is deleting selected tours
+         _actionDeleteTour.run();
       }
    }
 
@@ -1303,7 +1320,7 @@ public class TourBookView extends ViewPart implements
       _actionCollapseAll               = new ActionCollapseAll(this);
       _actionCollapseOthers            = new ActionCollapseOthers(this);
       _actionDuplicateTour             = new ActionDuplicateTour(this);
-      _actionDeleteTour                = new ActionDeleteTourMenu(this);
+      _actionDeleteTourMenu            = new ActionDeleteTourMenu(this);
       _actionDeleteTourValues          = new ActionDeleteTourValues(this);
       _actionEditQuick                 = new ActionEditQuick(this);
       _actionEditTour                  = new ActionEditTour(this);
@@ -1570,6 +1587,15 @@ public class TourBookView extends ViewPart implements
       // prevent sorting columns with Alt key which sorting is disabled
       uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.MOD3), null);
 
+      uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(
+
+            // <Ctrl><Shift>
+            SWT.MOD1 | SWT.MOD2,
+
+            SWT.DEL),
+
+            new NatTable_KeyAction_DeleteTours());
+
       /*
        * Setup NatTable configuration
        */
@@ -1582,8 +1608,8 @@ public class TourBookView extends ViewPart implements
       // add the style configuration for hover
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
 
-//      // add debug menu, this will hide MT context menu
-//      _tourViewer_NatTable.addConfiguration(new DebugMenuConfiguration(_tourViewer_NatTable));
+//    // add debug menu, this will hide MT context menu
+//    _tourViewer_NatTable.addConfiguration(new DebugMenuConfiguration(_tourViewer_NatTable));
 
       _tourViewer_NatTable.configure();
 
@@ -1691,6 +1717,17 @@ public class TourBookView extends ViewPart implements
             }
          }
       });
+
+      _tourViewer_Tree.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
+
+         if (UI.isCtrlKey(keyEvent) && UI.isShiftKey(keyEvent)
+
+               && keyEvent.keyCode == SWT.DEL) {
+
+            // call action which is deleting selected tours
+            _actionDeleteTour.run();
+         }
+      }));
 
       /*
        * The context menu must be created after the viewer is created which is also done after the
@@ -1915,7 +1952,7 @@ public class TourBookView extends ViewPart implements
 
       // re-import and tour values deletion can be run on all/selected/between dates tours
       _actionReimport_Tours.setEnabled(true);
-      _actionDeleteTour.setEnabled(true);
+      _actionDeleteTourMenu.setEnabled(true);
       _actionDeleteTourValues.setEnabled(true);
 
       _actionEditQuick.setEnabled(isOneTour);
@@ -2030,7 +2067,7 @@ public class TourBookView extends ViewPart implements
       menuMgr.add(_actionDeleteTourValues);
       menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionSetOtherPerson);
-      menuMgr.add(_actionDeleteTour);
+      menuMgr.add(_actionDeleteTourMenu);
 
       enableActions();
    }
@@ -3379,7 +3416,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3397,13 +3434,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 
@@ -3498,6 +3535,11 @@ public class TourBookView extends ViewPart implements
             _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
          }
       });
+   }
+
+   void setActionDeleteTour(final ActionDeleteTour actionDeleteTour) {
+
+      _actionDeleteTour = actionDeleteTour;
    }
 
    public void setActiveYear(final int activeYear) {

@@ -432,7 +432,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       ownerControl.addDisposeListener(new DisposeListener() {
          @Override
          public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
+
+            AdvancedSlideout.this.onDispose();
          }
       });
    }
@@ -560,10 +561,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    }
 
    public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
+      
       _slideoutLocation = slideoutLocation;
    }
 
    protected void setTitleText(final String titleText) {
+
       _titleText = titleText;
    }
 

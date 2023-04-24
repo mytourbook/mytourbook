@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -530,11 +530,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Pref page: Map3 color
        */
       store.setDefault(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, true);
-
-      /*
-       * Tour import
-       */
-      store.setDefault(ITourbookPreferences.IMPORT_IS_NEW_UI, false);
 
       /*
        * Adjust temperature

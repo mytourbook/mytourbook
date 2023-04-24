@@ -789,6 +789,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       // default for number of columns is 0
       int numColumns = 0;
 
+// SET_FORMATTING_OFF
+
       final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
       final TourFilterFieldType fieldType = fieldConfig.fieldType;
 
@@ -802,23 +804,23 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          switch (fieldType) {
          case DATE:
-            numColumns += createUI_Field_Date(uiFieldContainer, filterProperty, 1);
+            numColumns += createUI_Field_Date            (uiFieldContainer, filterProperty, 1);
             break;
 
          case TIME:
-            numColumns += createUI_Field_Time(uiFieldContainer, filterProperty, 1);
+            numColumns += createUI_Field_Time            (uiFieldContainer, filterProperty, 1);
             break;
 
          case DURATION:
-            numColumns += createUI_Field_Duration(uiFieldContainer, filterProperty, 1, true);
+            numColumns += createUI_Field_Duration        (uiFieldContainer, filterProperty, 1, true);
             break;
 
          case NUMBER_INTEGER:
-            numColumns += createUI_Field_Number_Integer(uiFieldContainer, filterProperty, fieldConfig, 1, true);
+            numColumns += createUI_Field_Number_Integer  (uiFieldContainer, filterProperty, fieldConfig, 1, true);
             break;
 
          case NUMBER_FLOAT:
-            numColumns += createUI_Field_Number_Float(uiFieldContainer, filterProperty, fieldConfig, 1, true);
+            numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
             break;
 
          case TEXT:
@@ -834,41 +836,41 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          switch (fieldType) {
          case DATE:
-            numColumns += createUI_Field_Date(uiFieldContainer, filterProperty, 1);
-            numColumns += createUI_Operator_And(uiFieldContainer);
-            numColumns += createUI_Field_Date(uiFieldContainer, filterProperty, 2);
+            numColumns += createUI_Field_Date            (uiFieldContainer, filterProperty, 1);
+            numColumns += createUI_Operator_And          (uiFieldContainer);
+            numColumns += createUI_Field_Date            (uiFieldContainer, filterProperty, 2);
             break;
 
          case TIME:
-            numColumns += createUI_Field_Time(uiFieldContainer, filterProperty, 1);
-            numColumns += createUI_Operator_And(uiFieldContainer);
-            numColumns += createUI_Field_Time(uiFieldContainer, filterProperty, 2);
+            numColumns += createUI_Field_Time            (uiFieldContainer, filterProperty, 1);
+            numColumns += createUI_Operator_And          (uiFieldContainer);
+            numColumns += createUI_Field_Time            (uiFieldContainer, filterProperty, 2);
             break;
 
          case DURATION:
-            numColumns += createUI_Field_Duration(uiFieldContainer, filterProperty, 1, false);
-            numColumns += createUI_Operator_And(uiFieldContainer);
-            numColumns += createUI_Field_Duration(uiFieldContainer, filterProperty, 2, true);
+            numColumns += createUI_Field_Duration        (uiFieldContainer, filterProperty, 1, false);
+            numColumns += createUI_Operator_And          (uiFieldContainer);
+            numColumns += createUI_Field_Duration        (uiFieldContainer, filterProperty, 2, true);
             break;
 
          case NUMBER_INTEGER:
-            numColumns += createUI_Field_Number_Integer(uiFieldContainer, filterProperty, fieldConfig, 1, false);
-            numColumns += createUI_Operator_And(uiFieldContainer);
-            numColumns += createUI_Field_Number_Integer(uiFieldContainer, filterProperty, fieldConfig, 2, true);
+            numColumns += createUI_Field_Number_Integer  (uiFieldContainer, filterProperty, fieldConfig, 1, false);
+            numColumns += createUI_Operator_And          (uiFieldContainer);
+            numColumns += createUI_Field_Number_Integer  (uiFieldContainer, filterProperty, fieldConfig, 2, true);
             break;
 
          case NUMBER_FLOAT:
-            numColumns += createUI_Field_Number_Float(uiFieldContainer, filterProperty, fieldConfig, 1, false);
-            numColumns += createUI_Operator_And(uiFieldContainer);
-            numColumns += createUI_Field_Number_Float(uiFieldContainer, filterProperty, fieldConfig, 2, true);
+            numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, false);
+            numColumns += createUI_Operator_And          (uiFieldContainer);
+            numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 2, true);
             break;
 
          case SEASON:
-            numColumns += createUI_Field_SeasonDay(uiFieldContainer, filterProperty, 1);
-            numColumns += createUI_Field_SeasonMonth(uiFieldContainer, filterProperty, 1);
-            numColumns += createUI_Operator_And(uiFieldContainer);
-            numColumns += createUI_Field_SeasonDay(uiFieldContainer, filterProperty, 2);
-            numColumns += createUI_Field_SeasonMonth(uiFieldContainer, filterProperty, 2);
+            numColumns += createUI_Field_SeasonDay       (uiFieldContainer, filterProperty, 1);
+            numColumns += createUI_Field_SeasonMonth     (uiFieldContainer, filterProperty, 1);
+            numColumns += createUI_Operator_And          (uiFieldContainer);
+            numColumns += createUI_Field_SeasonDay       (uiFieldContainer, filterProperty, 2);
+            numColumns += createUI_Field_SeasonMonth     (uiFieldContainer, filterProperty, 2);
             break;
 
          case TEXT:
@@ -879,8 +881,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          break;
 
       case MOST_RECENT:
-         numColumns += createUI_Field_Number_Integer(uiFieldContainer, filterProperty, fieldConfig, 1, false);
-         numColumns += createUI_Field_MostRecent(uiFieldContainer, filterProperty);
+         numColumns += createUI_Field_Number_Integer     (uiFieldContainer, filterProperty, fieldConfig, 1, false);
+         numColumns += createUI_Field_MostRecent         (uiFieldContainer, filterProperty);
          break;
 
       case STARTS_WITH:
@@ -898,7 +900,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          switch (fieldType) {
          case TEXT:
-            numColumns += createUI_Field_Text(uiFieldContainer);
+            numColumns += createUI_Field_Text            (uiFieldContainer);
             break;
 
          case SEASON:
@@ -928,15 +930,17 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          break;
 
       case SEASON_MONTH:
-         numColumns += createUI_Field_SeasonMonth(uiFieldContainer, filterProperty, 1);
+         numColumns += createUI_Field_SeasonMonth        (uiFieldContainer, filterProperty, 1);
          break;
 
       case SEASON_UNTIL_TODAY_FROM_DATE:
       case SEASON_TODAY_UNTIL_DATE:
-         numColumns += createUI_Field_SeasonDay(uiFieldContainer, filterProperty, 1);
-         numColumns += createUI_Field_SeasonMonth(uiFieldContainer, filterProperty, 1);
+         numColumns += createUI_Field_SeasonDay          (uiFieldContainer, filterProperty, 1);
+         numColumns += createUI_Field_SeasonMonth        (uiFieldContainer, filterProperty, 1);
          break;
       }
+
+// SET_FORMATTING_ON
 
       final GridLayout gl = (GridLayout) uiFieldContainer.getLayout();
       gl.numColumns = numColumns;
@@ -1071,9 +1075,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       return 1;
    }
 
-   private int createUI_Field_MostRecent(final Composite fieldContainer, final TourFilterProperty filterProperty) {
+   private int createUI_Field_MostRecent(final Composite parent,
+                                         final TourFilterProperty filterProperty) {
 
-      final Combo comboDurationUnit = new Combo(fieldContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+      final Combo comboDurationUnit = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
       comboDurationUnit.setData(filterProperty);
       comboDurationUnit.setVisibleItemCount(99);
@@ -1089,7 +1094,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       filterProperty.uiCombo_MostRecent = comboDurationUnit;
 
       // !!! set most recent unit otherwise it is not working when only the number of units are modified !!!
-      filterProperty.textValue1 = TourFilterManager.MOST_RECENT_UNITS[0].name();
+      final String textValue = filterProperty.textValue1;
+      if (textValue.length() == 0) {
+
+         // set a valid value
+         filterProperty.textValue1 = TourFilterManager.MOST_RECENT_UNITS[0].name();
+      }
 
       return 1;
    }

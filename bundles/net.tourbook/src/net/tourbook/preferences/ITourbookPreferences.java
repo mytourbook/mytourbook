@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -595,11 +595,6 @@ public interface ITourbookPreferences {
     * Tour segmenter
     */
    public static final String TOUR_SEGMENTER_CHART_VALUE_FONT = "TOUR_SEGMENTER_CHART_VALUE_FONT"; //$NON-NLS-1$
-
-   /*
-    * Tour import
-    */
-   public static final String IMPORT_IS_NEW_UI = "IMPORT_IS_NEW_UI"; //$NON-NLS-1$
 
    /*
     * Adjust temperature

@@ -1044,8 +1044,7 @@ public class Messages extends NLS {
    public static String        import_data_action_clear_view_tooltip;
    public static String        Import_Data_Action_DeleteTourFiles;
    public static String        Import_Data_Action_EditImportPreferences;
-   public static String        Import_Data_Action_ImportUI_Easy_Tooltip;
-   public static String        Import_Data_Action_ImportUI_Fossil_Tooltip;
+   public static String        Import_Data_Action_ImportUI_Tooltip;
    public static String        Import_Data_Action_OpenLogView;
    public static String        Import_Data_Action_OpenLogView_Tooltip;
    public static String        Import_Data_Action_RemoveTour;
@@ -1054,6 +1053,8 @@ public class Messages extends NLS {
    public static String        import_data_action_save_tour_for_person;
    public static String        import_data_action_save_tour_with_person;
    public static String        Import_Data_Action_SetupEasyImport_Tooltip;
+   public static String        Import_Data_Action_StartEasyImport;
+   public static String        Import_Data_Combo_SimpleUIConfig_Tooltip;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
@@ -1093,6 +1094,7 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_DeleteDeviceFiles_Yes;
    public static String        Import_Data_HTML_DeleteFilesNO;
    public static String        Import_Data_HTML_DeleteFilesYES;
+   public static String        Import_Data_HTML_DeleteFilesYES_NoHTML;
    public static String        Import_Data_HTML_DeviceOff_Tooltip;
    public static String        Import_Data_HTML_DeviceOn_Tooltip;
    public static String        Import_Data_HTML_EasyImport;
@@ -1129,6 +1131,7 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_WatchingOn;
    public static String        import_data_importTours_subTask;
    public static String        import_data_importTours_task;
+   public static String        Import_Data_Label_NumNotImportedFiles;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_TourNotFoundInFile_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
@@ -2767,6 +2770,8 @@ public class Messages extends NLS {
    public static String        Tour_Data_LoadTourData_Monitor;
    public static String        Tour_Data_LogInfo_SRTM_DataAreNotAvailable;
    public static String        Tour_Data_LogInfo_SRTM_UsingDeviceElevationValues;
+   public static String        Tour_Data_RetrievingWeatherData_Monitor;
+   public static String        Tour_Data_RetrievingWeatherData_Monitor_Subtask;
    public static String        Tour_Data_SaveTour_Monitor;
    public static String        Tour_Data_SaveTour_MonitorSubtask;
    public static String        Tour_Data_Text_AltitudeValues;
