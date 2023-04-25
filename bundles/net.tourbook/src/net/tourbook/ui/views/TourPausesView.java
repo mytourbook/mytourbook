@@ -126,7 +126,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private Menu      _tableContextMenu;
 
-   private class DevicePause {
+   public class DevicePause {
 
       long type;
 
@@ -680,6 +680,10 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionSetPausesType);
+
+      // set the pause currently selected by the user
+      final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+      _actionSetPausesType.setTourPauses(selectedIndices);
 
       enableActions();
    }

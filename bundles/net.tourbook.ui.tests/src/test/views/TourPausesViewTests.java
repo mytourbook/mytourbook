@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -30,5 +33,22 @@ public class TourPausesViewTests extends UITest {
       Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
 
       bot.table().select("15:40"); //$NON-NLS-1$
+   }
+
+   @Test
+   void When_PauseTypeSetToManual_Expect_ExpectedManualPauseType() {
+
+      // arrange
+      Utils.getTour(bot);
+      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      final SWTBotTable pausesViewTable = bot.table();
+      pausesViewTable.select(0);
+
+      // act
+      pausesViewTable.contextMenu("Set pauses type").menu("automatic").click();
+
+      // assert
+      assertEquals("", pausesViewTable.cell(0, 0));
+
    }
 }
