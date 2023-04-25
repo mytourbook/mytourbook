@@ -128,7 +128,7 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
       final Shell shell = Display.getCurrent().getActiveShell();
-      if (selectedTours == null || selectedTours.isEmpty()) {
+      if (selectedTours == null || selectedTours.isEmpty() || _tourPausesIndices.length == 0) {
 
          // a tour is not selected
          MessageDialog.openInformation(
@@ -148,7 +148,7 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
             final long[] pausedTime_Start = tourData.getPausedTime_Start();
 
             pausedTime_Data = new long[pausedTime_Start.length];
-            Arrays.setAll(pausedTime_Data, i -> 1);
+            Arrays.setAll(pausedTime_Data, value -> 1);
          }
 
          pausedTime_Data[_tourPausesIndices[0]] = isAutoPause ? 1 : 0;
