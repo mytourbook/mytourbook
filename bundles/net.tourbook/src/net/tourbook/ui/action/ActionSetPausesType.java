@@ -72,6 +72,7 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
 
       _tourProvider = tourProvider;
    }
+
    private void addActionToMenu(final Action action, final Menu menu) {
 
       final ActionContributionItem item = new ActionContributionItem(action);
@@ -108,11 +109,11 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
 
          // dispose old menu items
          for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
-                  menuItem.dispose();
-               }
+            menuItem.dispose();
+         }
 
-               fillMenu(_menu);
-            }));
+         fillMenu(_menu);
+      }));
 
       return _menu;
    }
@@ -151,7 +152,10 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
             Arrays.setAll(pausedTime_Data, value -> 1);
          }
 
-         pausedTime_Data[_tourPausesIndices[0]] = isAutoPause ? 1 : 0;
+         for (int index = 0; index < _tourPausesIndices.length; index++) {
+
+            pausedTime_Data[_tourPausesIndices[index]] = isAutoPause ? 1 : 0;
+         }
 
          tourData.setPausedTime_Data(pausedTime_Data);
 
