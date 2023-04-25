@@ -48,17 +48,18 @@ jobs:
           path: |
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
-            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.json
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.*
           retention-days: 5
       - name: Generate artifact name
         id: generate-artifact-name
         run: |
-          echo "::set-output name=artifactFileName::Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)"
+          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
+          echo "artifactFileName=$FILENAME" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Upload JaCoCo file
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.generate-artifact-name.outputs.artifactFileName }}
+          name: ${{ env.artifactFileName }}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
       - name: Test Report

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -243,14 +243,13 @@ public class DialogExportTour extends TitleAreaDialog {
     * @param tourStartIndex
     * @param tourEndIndex
     * @param formatTemplate
-    * @param isOptionDistance
     */
-   public DialogExportTour(final Shell parentShell,
-                           final ExportTourExtension exportExtensionPoint,
-                           final List<TourData> tourDataList,
-                           final int tourStartIndex,
-                           final int tourEndIndex,
-                           final String formatTemplate) {
+   DialogExportTour(final Shell parentShell,
+                    final ExportTourExtension exportExtensionPoint,
+                    final List<TourData> tourDataList,
+                    final int tourStartIndex,
+                    final int tourEndIndex,
+                    final String formatTemplate) {
 
       super(parentShell);
 
@@ -1234,7 +1233,6 @@ public class DialogExportTour extends TitleAreaDialog {
     *
     * @param monitor
     * @param exportFileName
-    * @param exported
     * @param tourSize
     * @throws IOException
     */

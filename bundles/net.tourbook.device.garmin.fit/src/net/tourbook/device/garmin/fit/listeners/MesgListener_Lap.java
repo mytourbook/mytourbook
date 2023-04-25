@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,6 @@ import com.garmin.fit.DateTime;
 import com.garmin.fit.LapMesg;
 import com.garmin.fit.LapMesgListener;
 import com.garmin.fit.Mesg;
-
-import java.util.Date;
 
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.FitData;
@@ -79,9 +77,7 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       final DateTime garminTime = lapMesg.getTimestamp();
       if (garminTime != null) {
 
-         final Date javaTime = garminTime.getDate();
-
-         tourMarker.setDeviceLapTime(javaTime.getTime());
+         tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
 
       } else {
 

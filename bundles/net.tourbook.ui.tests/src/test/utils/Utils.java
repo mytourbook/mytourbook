@@ -20,12 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
 
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
@@ -38,7 +37,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   private static HttpClient  _httpClient             = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    public static final String DIRECTORY               = "Directory";                                                          //$NON-NLS-1$
    public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                                        //$NON-NLS-1$
    public static final String STATISTICS_VIEW_NAME    = "Statistics";                                                         //$NON-NLS-1$
@@ -109,7 +107,7 @@ public class Utils {
             .build();
 
       try {
-         final HttpResponse<String> response = _httpClient.send(request, BodyHandlers.ofString());
+         final HttpResponse<String> response = OAuth2Utils.httpClient.send(request, BodyHandlers.ofString());
 
          return response.statusCode() == HttpURLConnection.HTTP_OK;
       } catch (IOException | InterruptedException e) {

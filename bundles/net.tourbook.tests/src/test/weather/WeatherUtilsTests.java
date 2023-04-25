@@ -17,11 +17,10 @@ package weather;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.weather.WeatherUtils;
@@ -51,8 +50,8 @@ public class WeatherUtilsTests {
             ZoneId.of(andorraZoneId));
 
       final String fullWeatherDataString = WeatherUtils.buildFullWeatherDataString(6.09f,
-            "⛅",
-            "Partly cloudy",
+            "⛅", //$NON-NLS-1$
+            "Partly cloudy", //$NON-NLS-1$
             8.52f,
             9.216f,
             156,

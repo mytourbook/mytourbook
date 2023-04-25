@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
+import com.garmin.fit.DateTime;
 import com.garmin.fit.Decode;
 import com.garmin.fit.DeveloperField;
 import com.garmin.fit.Field;
@@ -719,7 +720,7 @@ public class FitDataReader extends TourbookDevice {
             final Long garminTimestamp = (Long) fieldValue_Time;
             final Integer batteryPercentage = (Integer) fieldValue_0;
 
-            final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+            final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
             fitData.getBattery_Time().add(javaTime);
             fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
@@ -743,10 +744,10 @@ public class FitDataReader extends TourbookDevice {
             final Long garminTimestamp = (Long) fieldValue_Time;
             final Short batteryPercentage = (Short) fieldValue_Percentage;
 
-            final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+            final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
             fitData.getBattery_Time().add(javaTime);
-            fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
+            fitData.getBattery_Percentage().add(batteryPercentage);
          }
       }
    }
@@ -845,7 +846,7 @@ public class FitDataReader extends TourbookDevice {
             continue;
          }
 
-         final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+         final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
          final String logMessage = String.format(UI.EMPTY_STRING
 
@@ -913,7 +914,7 @@ public class FitDataReader extends TourbookDevice {
             continue;
          }
 
-         final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+         final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
          System.out.println(String.format(UI.EMPTY_STRING
 

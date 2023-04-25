@@ -44,7 +44,7 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    @Test
-   void adustTourValues_RetrieveWeatherData() {
+   void adustTourValues_RetrieveWeatherData_OpenWeatherMap() {
 
       // Select OpenWeatherMap to make sure the air quality is retrieved
 
@@ -64,6 +64,8 @@ public class TourBookViewTests extends UITest {
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
             .menu(Messages.tour_editor_section_weather)
             .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+
+      bot.sleep(5000);
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
@@ -106,7 +108,7 @@ public class TourBookViewTests extends UITest {
    }
 
    @BeforeEach
-   void InitializeEach() {
+   void setUp() {
 
       tourBookView = Utils.showTourBookView(bot);
    }

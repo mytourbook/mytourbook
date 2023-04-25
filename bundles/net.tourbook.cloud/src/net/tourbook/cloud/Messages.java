@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -83,10 +83,13 @@ public class Messages extends NLS {
    public static String Dialog_DownloadWorkoutsFromSuunto_SubTask;
    public static String Dialog_DownloadWorkoutsFromSuunto_Task;
    public static String Dialog_DownloadWorkoutsFromSuunto_Title;
-   public static String Dialog_UploadRoutesToSuunto_Message;
    public static String Dialog_UploadRoutesToSuunto_SubTask;
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
+   public static String Dialog_UploadToursToSuunto_Message;
+   public static String Dialog_UploadWorkoutsToSuunto_SubTask;
+   public static String Dialog_UploadWorkoutsToSuunto_Task;
+   public static String Dialog_UploadWorkoutsToSuunto_Title;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String Filename_Component_ActivityType;
    public static String Filename_Component_ActivityType_Abbr;
@@ -123,6 +126,10 @@ public class Messages extends NLS {
    public static String Log_UploadRoutesToSuunto_002_NoGpsCoordinate;
    public static String Log_UploadRoutesToSuunto_003_UploadStatus;
    public static String Log_UploadRoutesToSuunto_004_UploadError;
+   public static String Log_UploadWorkoutsToSuunto_001_Start;
+   public static String Log_UploadWorkoutsToSuunto_002_RetrievalError;
+   public static String Log_UploadWorkoutsToSuunto_003_UploadStatus;
+   public static String Log_UploadWorkoutsToSuunto_004_UploadError;
    public static String PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter;
    public static String PrefPage_SuuntoWorkouts_DatesFilter_Tooltip;
    public static String PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter;
@@ -130,8 +137,9 @@ public class Messages extends NLS {
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
    public static String SuuntoCloud_Group_AccountInformation;
    public static String SuuntoCloud_Group_FileNameCustomization;
-   public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
+   public static String VendorName_Suunto_Routes;
+   public static String VendorName_Suunto_Workouts;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

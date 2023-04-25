@@ -30,6 +30,7 @@
              <useUIThread>true</useUIThread>
              <product>org.eclipse.platform.ide</product>
              <skipTests>true</skipTests>
+             <argLine>${tycho.testArgLine} -Djunit.jupiter.displayname.generator.default=org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores</argLine>
          </configuration>
       </plugin>
       

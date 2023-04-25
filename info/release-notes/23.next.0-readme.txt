@@ -36,6 +36,11 @@ New
 * Tour Weather (Frederic)
   - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
+Tour Export (Frederic)
+  - Added the ability to export tours in FIT format
+  
+Suunto App Integration (Frederic)
+  - Added the ability to upload tours as workouts
 
 Improvements
 ============

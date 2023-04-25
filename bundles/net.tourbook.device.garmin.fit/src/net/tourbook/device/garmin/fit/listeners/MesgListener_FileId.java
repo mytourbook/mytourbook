@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import com.garmin.fit.FileIdMesgListener;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.tour.TourLogManager;
 
@@ -87,18 +88,20 @@ public class MesgListener_FileId extends AbstractMesgListener implements FileIdM
 
          final String garminProductName = GarminProduct.getStringFromValue(garminProductId);
 
-         if (garminProductName.length() > 0) {
+         if (StringUtils.hasContent(garminProductName)) {
 
             fitData.setGarminProduct(garminProductName);
 
-         } else if (garminProductId == 2713) {
-
-            // Garmin Edge 1030 is not yet in the product list
-
-            fitData.setGarminProduct("EDGE 1030"); //$NON-NLS-1$
-
          } else {
+
             fitData.setGarminProduct(garminProductId.toString());
+         }
+      } else {
+
+         final String productName = mesg.getProductName();
+         if (StringUtils.hasContent(productName)) {
+
+            fitData.setGarminProduct(productName);
          }
       }
    }

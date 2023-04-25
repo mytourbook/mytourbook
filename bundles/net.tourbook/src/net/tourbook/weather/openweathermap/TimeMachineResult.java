@@ -17,12 +17,11 @@ package net.tourbook.weather.openweathermap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import net.tourbook.common.UI;
 import net.tourbook.weather.WeatherUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

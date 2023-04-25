@@ -17,9 +17,9 @@ package net.tourbook.weather.openweathermap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.util.List;
+
+import net.tourbook.common.UI;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Current {

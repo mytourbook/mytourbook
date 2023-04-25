@@ -35,9 +35,9 @@ public class StringUtilsTests {
 
       final String fileName = "/\\:*?\"<>|filename#_.txt"; //$NON-NLS-1$
 
-      String expectedValue = "---------filename#_.txt";
+      String expectedValue = "---------filename#_.txt"; //$NON-NLS-1$
       if (UI.IS_LINUX) {
-         expectedValue = "-\\:*?\"<>|filename#_.txt";
+         expectedValue = "-\\:*?\"<>|filename#_.txt"; //$NON-NLS-1$
       }
 
       assertEquals(expectedValue, StringUtils.sanitizeFileName(fileName));

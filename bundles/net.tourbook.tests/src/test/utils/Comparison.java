@@ -16,6 +16,7 @@
 package utils;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedWriter;
@@ -23,10 +24,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 import net.tourbook.common.util.FileUtils;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
@@ -42,8 +48,40 @@ public class Comparison {
 
    private static final String JSON = ".json"; //$NON-NLS-1$
 
+   public static void compareFitAgainstControl(final String controlTourFilePath,
+                                               final String testTourFilePathFit) {
+
+      //Convert the test FIT file to CSV for a human readable comparison
+      convertFitToCsvFile(testTourFilePathFit);
+
+      final String testTourFilePathCsv = testTourFilePathFit.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
+      final Path testTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
+      assertTrue(Files.exists(testTourAbsoluteFilePathCsv));
+
+      final String controlTourFilePathCsv = controlTourFilePath.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
+      final Path controlTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePathCsv));
+      assertTrue(Files.exists(controlTourAbsoluteFilePathCsv));
+
+      try {
+
+         final List<String> testFileContentArray = Files.readAllLines(testTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
+         final List<String> controlFileContent = Files.readAllLines(controlTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
+
+         //Compare with the control file
+         if (!controlFileContent.equals(testFileContentArray)) {
+
+            final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
+            writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$ //$NON-NLS-2$
+         }
+         assertLinesMatch(controlFileContent, testFileContentArray);
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+   }
+
    /**
-    * Compares a test transaction against a control transaction.
+    * Compares a test tour against a control tour.
     *
     * @param testTourData
     *           The generated test TourData object.
@@ -110,6 +148,28 @@ public class Comparison {
       }
 
       assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
+   }
+
+   private static void convertFitToCsvFile(final String fitFilePath) {
+
+      final File fileToConvert = new File(fitFilePath);
+
+      final String fitCsvToolFilePath = FilesUtils.getAbsoluteFilePath(
+            FilesUtils.rootPath + "utils/files/FitCSVTool.jar"); //$NON-NLS-1$
+
+      final ProcessBuilder processBuilder = new ProcessBuilder(
+            "java", //$NON-NLS-1$
+            "-jar", //$NON-NLS-1$
+            fitCsvToolFilePath,
+            fileToConvert.getAbsolutePath());
+      try {
+         final Process process = processBuilder.start();
+         process.waitFor();
+
+      } catch (final IOException | InterruptedException e) {
+         Thread.currentThread().interrupt();
+         StatusUtil.log(e);
+      }
    }
 
    public static String readFileContent(final String controlDocumentFileName) {

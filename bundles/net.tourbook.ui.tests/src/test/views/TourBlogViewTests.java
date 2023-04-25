@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ public class TourBlogViewTests extends UITest {
       Utils.getTour(bot);
 
       bot.menu("Tour").menu("Tour Blog").click(); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView tourBlogView = bot.viewByTitle("Tour Blog");
+      final SWTBotView tourBlogView = bot.viewByTitle("Tour Blog"); //$NON-NLS-1$
 
       tourBlogView.show();
    }

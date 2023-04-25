@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
@@ -74,13 +73,12 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
+   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                 //$NON-NLS-1$
 
-   private static HttpClient       _httpClient       = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter     = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
-   private static String           CLOUD_UPLOADER_ID = "Strava";                                                             //$NON-NLS-1$
+   private static String           CLOUD_UPLOADER_ID = "Strava";                                        //$NON-NLS-1$
 
    // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
    private static final List<String> StravaManualActivityTypes       = List.of(
@@ -144,7 +142,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final String responseBody = OAuth2Utils.getTokens(_httpClient,
+      final String responseBody = OAuth2Utils.getTokens(
             authorizationCode,
             isRefreshToken,
             refreshToken,
@@ -466,7 +464,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final String tourDate = TourManager.getTourDateTimeShort(tour);
 
-      final CompletableFuture<ActivityUpload> activityUpload = _httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+      final CompletableFuture<ActivityUpload> activityUpload = OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(name -> convertResponseToUpload(name, tourDate))
             .exceptionally(e -> {
                final ActivityUpload errorUpload = new ActivityUpload();

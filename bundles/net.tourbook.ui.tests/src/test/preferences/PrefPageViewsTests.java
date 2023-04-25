@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,10 +28,10 @@ public class PrefPageViewsTests extends UITest {
 
       Utils.openPreferences(bot);
 
-      final SWTBotTreeItem viewTreeItem = bot.tree().getTreeItem("View").select();
+      final SWTBotTreeItem viewTreeItem = bot.tree().getTreeItem("View").select(); //$NON-NLS-1$
       viewTreeItem.expand();
 
-      viewTreeItem.getNode("Color").select();
+      viewTreeItem.getNode("Color").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }

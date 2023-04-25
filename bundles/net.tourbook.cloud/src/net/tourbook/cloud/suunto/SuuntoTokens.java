@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,42 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.tourbook.cloud.oauth2.Tokens;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SuuntoTokens extends Tokens {
+class SuuntoTokens extends Tokens {
 
-   public String token_type;
-   public String scope;
-   public String ukv;
-   public String uk;
-   public String user;
-   public String jti;
+   private String token_type;
+
+   private String scope;
+
+   private String ukv;
+
+   private String uk;
+
+   private String user;
+
+   private String jti;
+
+   public String getJti() {
+      return jti;
+   }
+
+   public String getScope() {
+      return scope;
+   }
+
+   public String getToken_type() {
+      return token_type;
+   }
+
+   public String getUk() {
+      return uk;
+   }
+
+   public String getUkv() {
+      return ukv;
+   }
+
+   public String getUser() {
+      return user;
+   }
 
 }

@@ -29,6 +29,7 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.NatTable_LabelProvider;
 import net.tourbook.common.util.NatTable_LabelProvider_WithTourTooltip;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.data.TourData;
@@ -948,7 +949,7 @@ class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             final String dbValue = ((TVITourBookItem) element).colDeviceName;
 
-            if (dbValue == null) {
+            if (StringUtils.isNullOrEmpty(dbValue)) {
                cell.setText(UI.EMPTY_STRING);
             } else {
                cell.setText(dbValue);

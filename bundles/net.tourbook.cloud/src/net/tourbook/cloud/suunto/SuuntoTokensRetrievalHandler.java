@@ -18,9 +18,6 @@ package net.tourbook.cloud.suunto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.net.http.HttpClient;
-import java.time.Duration;
-
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
@@ -33,8 +30,6 @@ import net.tourbook.common.util.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
-
-   private static HttpClient       _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
    private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
 
@@ -77,7 +72,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    private static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final String responseBody = OAuth2Utils.getTokens(_httpClient,
+      final String responseBody = OAuth2Utils.getTokens(
             authorizationCode,
             isRefreshToken,
             refreshToken,

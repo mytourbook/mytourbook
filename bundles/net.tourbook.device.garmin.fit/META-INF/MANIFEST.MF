@@ -14,8 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Bundle-ClassPath: .,
- fit-21.105.00.jar
+Bundle-ClassPath: .
 Import-Package: net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,

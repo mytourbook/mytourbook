@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,17 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device.garmin.fit;
+package net.tourbook.cloud.suunto;
 
-import com.garmin.fit.DateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public class FitUtils {
+@JsonIgnoreProperties(ignoreUnknown = true)
+class WorkoutUpload {
 
-   /**
-    * Convert Garmin time into java time
-    */
-   public static long convertGarminTimeToJavaTime(final long timeStamp) {
+   private String  id;
+   private String  url;
+   private String  status;
+   private String  message;
 
-      return timeStamp * 1000 + DateTime.OFFSET;
+   private Headers headers;
+
+   public Headers getHeaders() {
+      return headers;
+   }
+
+   public String getId() {
+      return id;
+   }
+
+   public String getMessage() {
+      return message;
+   }
+
+   public String getStatus() {
+      return status;
+   }
+
+   public String getUrl() {
+      return url;
    }
 }
