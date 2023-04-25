@@ -56,6 +56,7 @@ public class TourPausesViewTests extends UITest {
 
       // clean-up
       pausesViewTable.contextMenu("Set pauses type").menu("Automatic").click();
+      pausesViewTable = bot.table();
       assertEquals("Automatic", pausesViewTable.cell(0, 1));
 
    }
