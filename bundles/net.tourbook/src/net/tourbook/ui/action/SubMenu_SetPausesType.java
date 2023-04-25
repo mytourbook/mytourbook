@@ -44,6 +44,9 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
    private List<ActionSetPausesType> _actionsSetPausesType = new ArrayList<>();
 
+   private ActionSetPausesType       _actionSetAutomaticPauseType;
+   private ActionSetPausesType       _actionSetManualPauseType;
+
    private class ActionSetPausesType extends Action {
 
       public ActionSetPausesType(final String text) {
@@ -65,8 +68,11 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
       _tourProvider = tourProvider;
 
-      _actionsSetPausesType.add(new ActionSetPausesType("Manual"));
-      _actionsSetPausesType.add(new ActionSetPausesType("Automatic"));
+      _actionSetAutomaticPauseType = new ActionSetPausesType("Automatic");
+      _actionSetManualPauseType = new ActionSetPausesType("Manual");
+
+      _actionsSetPausesType.add(_actionSetManualPauseType);
+      _actionsSetPausesType.add(_actionSetAutomaticPauseType);
    }
 
    @Override
@@ -80,6 +86,8 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       _menu = null;
 
    }
+
+
 
    private void fillMenu(final Menu menu) {
 

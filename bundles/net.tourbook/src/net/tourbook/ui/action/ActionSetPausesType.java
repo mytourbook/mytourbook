@@ -40,10 +40,12 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ActionSetPausesType extends Action implements IMenuCreator {
 
-   private Menu          _menu;
+   private Menu                 _menu;
 
-   private ITourProvider _tourProvider;
-   private int[]         _tourPausesIndices;
+   private ITourProvider        _tourProvider;
+   private int[]                _tourPausesIndices;
+   private ActionSetPausesType2 _actionSetAutomaticPauseType;
+   private ActionSetPausesType2 _actionSetManualPauseType;
 
    private class ActionSetPausesType2 extends Action {
 
@@ -66,6 +68,8 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
 
       //todo fb
       //todo fb: Grey out the pause type that is already selected
+
+      //do the same for the weather clouds
       super("Set pauses type", AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
@@ -81,16 +85,45 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
 
    @Override
    public void dispose() {
+
       if (_menu != null) {
          _menu.dispose();
          _menu = null;
       }
    }
 
+   private void enableActions() {
+
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      if (selectedTours.size() > 1) {
+
+         _actionSetAutomaticPauseType.setChecked(false);
+         _actionSetManualPauseType.setChecked(false);
+
+      } else if (selectedTours.size() == 1 && _tourPausesIndices.length > 0) {
+
+         final TourData tourData = selectedTours.get(0);
+         final long[] pausedTime_Data = tourData.getPausedTime_Data();
+         if (pausedTime_Data == null) {
+            _actionSetAutomaticPauseType.setChecked(true);
+            _actionSetManualPauseType.setChecked(false);
+            return;
+         }
+
+         final boolean isPauseTypeAutomatic = pausedTime_Data[_tourPausesIndices[0]] == 1;
+         _actionSetAutomaticPauseType.setChecked(isPauseTypeAutomatic);
+         _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
+
+      }
+   }
+
    private void fillMenu(final Menu menu) {
 
-      addActionToMenu(new ActionSetPausesType2("Manual", false), menu);
-      addActionToMenu(new ActionSetPausesType2("Automatic", true), menu);
+      _actionSetAutomaticPauseType = new ActionSetPausesType2("Automatic", true);
+      _actionSetManualPauseType = new ActionSetPausesType2("Manual", false);
+
+      addActionToMenu(_actionSetManualPauseType, menu);
+      addActionToMenu(_actionSetAutomaticPauseType, menu);
    }
 
    @Override
@@ -113,6 +146,8 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
          }
 
          fillMenu(_menu);
+
+         enableActions();
       }));
 
       return _menu;
