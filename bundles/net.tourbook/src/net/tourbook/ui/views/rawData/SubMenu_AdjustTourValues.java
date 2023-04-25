@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,7 @@ public class SubMenu_AdjustTourValues extends Action implements IMenuCreator {
       _subMenu_Cadence = new SubMenu_Cadence(tourProvider);
       _subMenu_Elevation = new SubMenu_Elevation(tourProvider, tourProviderById);
       _subMenu_Weather = new SubMenu_Weather(tourProvider);
+      //todo fb _subMenu = new SubMenu_Pauses(tourProvider);
 
       _action_ComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
       _action_MultiplyCaloriesBy1000 = new ActionMultiplyCaloriesBy1000(tourProvider);
