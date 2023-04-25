@@ -41,21 +41,22 @@ public class TourPausesViewTests extends UITest {
       // arrange
       Utils.getTour(bot);
       Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
-      final SWTBotTable pausesViewTable = bot.table();
+      SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
 
       // assert initial state
-      assertEquals("Manual", pausesViewTable.cell(0, 1));
-
-      // act
-      pausesViewTable.contextMenu("Set pauses type").menu("Automatic").click();
-
-      // assert
       assertEquals("Automatic", pausesViewTable.cell(0, 1));
 
-      // clean-up
+      // act
       pausesViewTable.contextMenu("Set pauses type").menu("Manual").click();
+
+      // assert
+      pausesViewTable = bot.table();
       assertEquals("Manual", pausesViewTable.cell(0, 1));
+
+      // clean-up
+      pausesViewTable.contextMenu("Set pauses type").menu("Automatic").click();
+      assertEquals("Automatic", pausesViewTable.cell(0, 1));
 
    }
 }
