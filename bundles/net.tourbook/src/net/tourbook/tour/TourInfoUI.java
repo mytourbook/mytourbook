@@ -1773,10 +1773,10 @@ public class TourInfoUI {
          _lblBreakTime_Unit.setVisible(breakTime > 0);
 
          _lblElapsedTime.setText(FormatManager.formatElapsedTime(elapsedTime));
-         _lblRecordedTime.setText(FormatManager.formatMovingTime(recordedTime));
+         _lblRecordedTime.setText(FormatManager.formatRecordedTime(recordedTime));
          _lblPausedTime.setText(FormatManager.formatPausedTime(pausedTime));
          _lblMovingTime.setText(FormatManager.formatMovingTime(movingTime));
-         _lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
+         _lblBreakTime.setText(FormatManager.formatBreakTime(breakTime));
 
          /*
           * Time zone

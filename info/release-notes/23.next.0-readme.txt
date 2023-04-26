@@ -86,6 +86,9 @@ Bugfix
 * Tour Import
   - "distanceSerie" is null                  https://github.com/mytourbook/mytourbook/issues/1044
 
+* Tour Info Tooltip (Frederic)
+  - Fixed a bug where the time formats were not correctly applied
+
 
 Translation    
 ===========
