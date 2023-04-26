@@ -31,11 +31,11 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class SubMenu_Pauses extends Action implements IMenuCreator {
 
-   private Menu                           _menu;
+   private Menu                  _menu;
 
    private SubMenu_SetPausesType _subMenu_SetPausesType;
 
-   private ITourProvider2                 _tourProvider;
+   private ITourProvider2        _tourProvider;
 
    public SubMenu_Pauses(final ITourProvider2 tourViewer) {
 
