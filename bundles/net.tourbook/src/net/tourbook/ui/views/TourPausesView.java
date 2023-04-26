@@ -46,7 +46,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.action.ActionSetPausesType;
+import net.tourbook.ui.action.SubMenu_SetPausesType;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -114,7 +114,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private ZonedDateTime           _tourStartTime;
 
-   private ActionSetPausesType     _actionSetPausesType;
+   private SubMenu_SetPausesType   _subMenu_SetPauseType;
 
    /*
     * UI controls
@@ -361,7 +361,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
-      _actionSetPausesType = new ActionSetPausesType(this);
+      _subMenu_SetPauseType = new SubMenu_SetPausesType(this);
 
    }
 
@@ -679,11 +679,11 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionSetPausesType);
+      menuMgr.add(_subMenu_SetPauseType);
 
       // set the pause currently selected by the user
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-      _actionSetPausesType.setTourPauses(selectedIndices);
+      _subMenu_SetPauseType.setTourPauses(selectedIndices);
 
       enableActions();
    }

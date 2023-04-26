@@ -18,13 +18,12 @@ package net.tourbook.ui.action;
 import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Arrays;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -38,66 +37,88 @@ import org.eclipse.swt.widgets.Shell;
 
 public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
-   private Menu                             _menu;
+   private Menu                 _menu;
 
-   private final ITourProvider2             _tourProvider;
+   private ITourProvider        _tourProvider;
+   private int[]                _tourPausesIndices;
+   private ActionSetPausesType2 _actionSetAutomaticPauseType;
+   private ActionSetPausesType2 _actionSetManualPauseType;
 
-   private List<ActionSetPausesType> _actionsSetPausesType = new ArrayList<>();
+   private class ActionSetPausesType2 extends Action {
 
-   private ActionSetPausesType       _actionSetAutomaticPauseType;
-   private ActionSetPausesType       _actionSetManualPauseType;
+      boolean _isAutoPause;
 
-   private class ActionSetPausesType extends Action {
+      public ActionSetPausesType2(final String text, final boolean isAutoPause) {
 
-      public ActionSetPausesType(final String text) {
+         super(text, AS_CHECK_BOX);
 
-         super(text, AS_PUSH_BUTTON);
+         _isAutoPause = isAutoPause;
       }
 
       @Override
       public void run() {
-         // setWeatherConditions(_weatherId);
+         setPausesType(_isAutoPause);
       }
    }
 
-   public SubMenu_SetPausesType(final ITourProvider2 tourProvider) {
+   public SubMenu_SetPausesType(final ITourProvider tourProvider) {
 
-      super("Messages.Tour_Action_SetWeatherConditions", AS_DROP_DOWN_MENU);
+      //todo fb
+      //DONE: Grey out the pause type that is already selected
+
+      //do the same for the weather clouds
+      super("Set pauses type", AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
 
       _tourProvider = tourProvider;
 
-      _actionSetAutomaticPauseType = new ActionSetPausesType("Automatic");
-      _actionSetManualPauseType = new ActionSetPausesType("Manual");
-
-      _actionsSetPausesType.add(_actionSetManualPauseType);
-      _actionsSetPausesType.add(_actionSetAutomaticPauseType);
+      _actionSetAutomaticPauseType = new ActionSetPausesType2("Automatic", true);
+      _actionSetManualPauseType = new ActionSetPausesType2("Manual", false);
    }
 
    @Override
    public void dispose() {
 
-      if (_menu == null) {
-         return;
+      if (_menu != null) {
+         _menu.dispose();
+         _menu = null;
       }
-
-      _menu.dispose();
-      _menu = null;
-
    }
 
+   private void enableActions() {
 
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      if (selectedTours.size() > 1) {
+
+         _actionSetAutomaticPauseType.setChecked(false);
+         _actionSetManualPauseType.setChecked(false);
+
+      } else if (selectedTours.size() == 1 && _tourPausesIndices.length > 0) {
+
+         final TourData tourData = selectedTours.get(0);
+         final long[] pausedTime_Data = tourData.getPausedTime_Data();
+         if (pausedTime_Data == null) {
+            _actionSetAutomaticPauseType.setChecked(true);
+            _actionSetManualPauseType.setChecked(false);
+            return;
+         }
+
+         final boolean isPauseTypeAutomatic = pausedTime_Data[_tourPausesIndices[0]] == 1;
+         _actionSetAutomaticPauseType.setChecked(isPauseTypeAutomatic);
+         _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
+
+      }
+   }
 
    private void fillMenu(final Menu menu) {
 
-      for (final ActionSetPausesType actionSetPausesType : _actionsSetPausesType) {
-         new ActionContributionItem(actionSetPausesType).fill(menu, -1);
-      }
+      new ActionContributionItem(_actionSetAutomaticPauseType).fill(menu, -1);
+      new ActionContributionItem(_actionSetManualPauseType).fill(menu, -1);
    }
 
    @Override
-   public Menu getMenu(final Control arg0) {
+   public Menu getMenu(final Control parent) {
       return null;
    }
 
@@ -105,10 +126,9 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
    public Menu getMenu(final Menu parent) {
 
       dispose();
-
       _menu = new Menu(parent);
 
-      // Add listener to re-populate the menu each time
+      // Add listener to repopulate the menu each time
       _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
          // dispose old menu items
@@ -117,12 +137,14 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
          }
 
          fillMenu(_menu);
+
+         enableActions();
       }));
 
       return _menu;
    }
 
-   public void setWeatherConditions(final String weatherDescription) {
+   public void setPausesType(final boolean isAutoPause) {
 
       // check if the tour editor contains a modified tour
       if (TourManager.isTourEditorModified()) {
@@ -133,7 +155,7 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
       final Shell shell = Display.getCurrent().getActiveShell();
-      if (selectedTours == null || selectedTours.isEmpty()) {
+      if (selectedTours == null || selectedTours.isEmpty() || _tourPausesIndices.length == 0) {
 
          // a tour is not selected
          MessageDialog.openInformation(
@@ -146,13 +168,22 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
       for (final TourData tourData : selectedTours) {
 
-         if (Objects.equals(tourData.getWeather_Clouds(), weatherDescription)) {
-            continue;
+         long[] pausedTime_Data = tourData.getPausedTime_Data();
+
+         if (pausedTime_Data == null) {
+
+            final long[] pausedTime_Start = tourData.getPausedTime_Start();
+
+            pausedTime_Data = new long[pausedTime_Start.length];
+            Arrays.setAll(pausedTime_Data, value -> 1);
          }
 
-         // Weather description is not the same
+         for (int index = 0; index < _tourPausesIndices.length; index++) {
 
-         tourData.setWeather_Clouds(weatherDescription);
+            pausedTime_Data[_tourPausesIndices[index]] = isAutoPause ? 1 : 0;
+         }
+
+         tourData.setPausedTime_Data(pausedTime_Data);
 
          modifiedTours.add(tourData);
       }
@@ -161,5 +192,10 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
          TourManager.saveModifiedTours(modifiedTours);
       }
 
+   }
+
+   public void setTourPauses(final int[] selectedIndices) {
+
+      _tourPausesIndices = selectedIndices;
    }
 }

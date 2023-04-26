@@ -52,6 +52,7 @@ public class SubMenu_Pauses extends Action implements IMenuCreator {
    public void dispose() {
 
       if (_menu != null) {
+
          _menu.dispose();
          _menu = null;
       }
