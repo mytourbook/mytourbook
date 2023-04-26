@@ -17,6 +17,8 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
@@ -35,20 +37,26 @@ public class TourPausesViewTests extends UITest {
       pausesViewTable.select(0);
 
       // assert initial state
-      assertEquals("Automatic", pausesViewTable.cell(0, 1));
+      assertEquals(Messages.Tour_Pauses_Column_TypeValue_Automatic, pausesViewTable.cell(0, 1));
 
       // act
-      pausesViewTable.contextMenu("Set pauses type").menu("Manual").click();
+      pausesViewTable
+            .contextMenu(Messages.Action_PauseType_Set)
+            .menu(Messages.Action_PauseType_Set_Manual)
+            .click();
 
       // assert
       pausesViewTable = bot.table();
-      assertEquals("Manual", pausesViewTable.cell(0, 1));
+      assertEquals(Messages.Tour_Pauses_Column_TypeValue_Manual, pausesViewTable.cell(0, 1));
 
       // clean-up
       pausesViewTable.select(0);
-      pausesViewTable.contextMenu("Set pauses type").menu("Automatic").click();
+      pausesViewTable
+            .contextMenu(Messages.Action_PauseType_Set)
+            .menu(Messages.Action_PauseType_Set_Automatic)
+            .click();
       pausesViewTable = bot.table();
-      assertEquals("Automatic", pausesViewTable.cell(0, 1));
+      assertEquals(Messages.Tour_Pauses_Column_TypeValue_Automatic, pausesViewTable.cell(0, 1));
 
    }
 

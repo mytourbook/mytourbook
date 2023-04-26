@@ -37,10 +37,10 @@ import org.eclipse.swt.widgets.Shell;
 
 public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
-   private Menu                 _menu;
+   private Menu                _menu;
 
-   private ITourProvider        _tourProvider;
-   private int[]                _tourPausesIndices;
+   private ITourProvider       _tourProvider;
+   private int[]               _tourPausesIndices;
    private ActionSetPausesType _actionSetAutomaticPauseType;
    private ActionSetPausesType _actionSetManualPauseType;
 
@@ -69,7 +69,7 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       //DONE: Grey out the pause type that is already selected
 
       //do the same for the weather clouds
-      super("Set pauses type", AS_DROP_DOWN_MENU);
+      super(Messages.Action_PauseType_Set, AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
 
@@ -77,14 +77,15 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
       _changeAllTourPauses = changeAllTourPauses;
 
-      _actionSetAutomaticPauseType = new ActionSetPausesType("Automatic", true);
-      _actionSetManualPauseType = new ActionSetPausesType("Manual", false);
+      _actionSetAutomaticPauseType = new ActionSetPausesType(Messages.Action_PauseType_Set_Automatic, true);
+      _actionSetManualPauseType = new ActionSetPausesType(Messages.Action_PauseType_Set_Manual, false);
    }
 
    @Override
    public void dispose() {
 
       if (_menu != null) {
+
          _menu.dispose();
          _menu = null;
       }
@@ -102,20 +103,20 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
          if (!_changeAllTourPauses && _tourPausesIndices.length > 0) {
 
-         final TourData tourData = selectedTours.get(0);
-         final long[] pausedTime_Data = tourData.getPausedTime_Data();
-         if (pausedTime_Data == null) {
-            _actionSetAutomaticPauseType.setChecked(true);
-            _actionSetManualPauseType.setChecked(false);
-            return;
+            final TourData tourData = selectedTours.get(0);
+            final long[] pausedTime_Data = tourData.getPausedTime_Data();
+            if (pausedTime_Data == null) {
+               _actionSetAutomaticPauseType.setChecked(true);
+               _actionSetManualPauseType.setChecked(false);
+               return;
+            }
+
+            final boolean isPauseTypeAutomatic = pausedTime_Data[_tourPausesIndices[0]] == 1;
+            _actionSetAutomaticPauseType.setChecked(isPauseTypeAutomatic);
+            _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
+
          }
-
-         final boolean isPauseTypeAutomatic = pausedTime_Data[_tourPausesIndices[0]] == 1;
-         _actionSetAutomaticPauseType.setChecked(isPauseTypeAutomatic);
-         _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
-
       }
-   }
    }
 
    private void fillMenu(final Menu menu) {
@@ -195,11 +196,11 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
          } else {
 
-         for (int index = 0; index < _tourPausesIndices.length; index++) {
+            for (int index = 0; index < _tourPausesIndices.length; index++) {
 
-            pausedTime_Data[_tourPausesIndices[index]] = isAutoPause ? 1 : 0;
+               pausedTime_Data[_tourPausesIndices[index]] = isAutoPause ? 1 : 0;
+            }
          }
-      }
 
          tourData.setPausedTime_Data(pausedTime_Data);
 
