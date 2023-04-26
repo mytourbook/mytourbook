@@ -30,7 +30,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,17 +48,11 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
-import net.tourbook.export.DialogExportTour;
-import net.tourbook.export.ExportTourTCX;
 import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeFilterManager;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.TourTypeFilterSet;
 import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -76,7 +69,7 @@ public class StravaUploader extends TourbookCloudUploader {
    private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                 //$NON-NLS-1$
 
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter     = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+   private static TourExporter     _tourExporter     = new TourExporter("fit"); //$NON-NLS-1$
 
    private static String           CLOUD_UPLOADER_ID = "Strava";                                        //$NON-NLS-1$
 
@@ -109,8 +102,6 @@ public class StravaUploader extends TourbookCloudUploader {
          "Windsurf",                                                                                       //$NON-NLS-1$
          "Workout",                                                                                        //$NON-NLS-1$
          "Yoga");                                                                                          //$NON-NLS-1$
-
-   private String                    STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
 
    public StravaUploader() {
 
@@ -211,15 +202,15 @@ public class StravaUploader extends TourbookCloudUploader {
       return title;
    }
 
-   private void createCompressedTcxTourFile(final IProgressMonitor monitor,
+   private void createCompressedFitTourFile(final IProgressMonitor monitor,
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
 
       final String absoluteTourFilePath = FileUtils.createTemporaryFile(
             String.valueOf(tourData.getTourId()),
-            "tcx"); //$NON-NLS-1$
+            "fit"); //$NON-NLS-1$
 
-      final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
+      final String exportedTcxGzFile = exportFitGzFile(tourData, absoluteTourFilePath);
       if (StringUtils.hasContent(exportedTcxGzFile)) {
 
          toursWithTimeSeries.put(exportedTcxGzFile, tourData);
@@ -230,27 +221,13 @@ public class StravaUploader extends TourbookCloudUploader {
       monitor.worked(1);
    }
 
-   private List<TourTypeFilter> createStravaTourTypeFilters() {
-
-      final List<TourTypeFilter> stravaTourTypeFilters = new ArrayList<>();
-
-      Arrays.asList(DialogExportTour.StravaActivityTypes).forEach(
-            stravaActivityType -> {
-               final TourTypeFilterSet tourTypeFilterSet = new TourTypeFilterSet();
-               tourTypeFilterSet.setName(STRAVA_TOURTYPEFILTERSET_PREFIX + stravaActivityType);
-               stravaTourTypeFilters.add(new TourTypeFilter(tourTypeFilterSet));
-            });
-
-      return stravaTourTypeFilters;
-   }
-
    private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
 
       tourFiles.keySet().forEach(tourFilePath -> FileUtils.deleteIfExists(Paths.get(
             tourFilePath)));
    }
 
-   private String exportTcxGzFile(final TourData tourData, final String absoluteTourFilePath) {
+   private String exportFitGzFile(final TourData tourData, final String absoluteTourFilePath) {
 
       _tourExporter.useTourData(tourData).export(absoluteTourFilePath);
 
@@ -267,17 +244,6 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private String getRefreshToken() {
       return _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN);
-   }
-
-   @Override
-   public List<TourTypeFilter> getTourTypeFilters() {
-
-      final List<TourTypeFilter> stravaTourTypeFilters =
-            _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)
-                  ? createStravaTourTypeFilters()
-                  : new ArrayList<>();
-
-      return stravaTourTypeFilters;
    }
 
    private boolean getValidTokens() {
@@ -351,48 +317,6 @@ public class StravaUploader extends TourbookCloudUploader {
             .orElse(StravaManualActivityTypes.get(4));
    }
 
-   /**
-    * Returns the Strava activity name from a given tour type
-    *
-    * @param tourType
-    */
-   private List<String> mapTourTypeToStravaActivity(final TourType tourType) {
-
-      final List<String> matchingStravaActivityNames = new ArrayList<>();
-
-      if (tourType == null || StringUtils.isNullOrEmpty(tourType.getName())) {
-         return matchingStravaActivityNames;
-      }
-
-      final List<TourTypeFilter> tourTypeFilters = TourTypeFilterManager.readTourTypeFilters();
-
-      tourTypeFilters.forEach(tourTypeFilter -> {
-
-         final TourTypeFilterSet tourTypeSet = tourTypeFilter.getTourTypeSet();
-
-         if (tourTypeSet != null &&
-               tourTypeSet.getName().toLowerCase().startsWith(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase())) {
-
-            Arrays.asList(tourTypeSet.getTourTypes()).forEach(tourTypeItem -> {
-
-               if (tourTypeItem instanceof TourType &&
-                     ((TourType) tourTypeItem).getName().equals(tourType.getName())) {
-
-                  String name = tourTypeSet.getName();
-                  final int activityNameIndex =
-                        name.toLowerCase().lastIndexOf(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase());
-                  name = name.substring(
-                        activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length())
-                        .trim();
-                  matchingStravaActivityNames.add(name);
-               }
-            });
-         }
-      });
-
-      return matchingStravaActivityNames;
-   }
-
    private void processManualTour(final IProgressMonitor monitor,
                                   final TourData tourData,
                                   final Map<TourData, String> manualTours) {
@@ -424,38 +348,12 @@ public class StravaUploader extends TourbookCloudUploader {
             return;
          }
 
-         if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
-
-            final TourType tourType = tourData.getTourType();
-
-            final List<String> stravaActivityNames = mapTourTypeToStravaActivity(tourType);
-
-            final boolean useActivityType = stravaActivityNames.size() == 1;
-
-            if (stravaActivityNames.size() > 1) {
-
-               TourLogManager.log_ERROR(NLS.bind(
-                     Messages.Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes,
-                     new Object[] {
-                           TourManager.getTourDateTimeShort(tourData),
-                           tourType.getName(),
-                           String.join(UI.COMMA_SPACE, stravaActivityNames) }));
-
-               continue;
-            }
-            _tourExporter.setUseActivityType(useActivityType);
-
-            if (useActivityType) {
-               _tourExporter.setActivityType(stravaActivityNames.get(0));
-            }
-         }
-
          if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 
             processManualTour(monitor, tourData, manualTours);
          } else {
 
-            createCompressedTcxTourFile(monitor, toursWithTimeSeries, tourData);
+            createCompressedFitTourFile(monitor, toursWithTimeSeries, tourData);
          }
       }
    }
@@ -500,7 +398,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final String title = buildFormattedTitle(tourData);
 
       final MultiPartBodyPublisher publisher = new MultiPartBodyPublisher()
-            .addPart("data_type", "tcx.gz") //$NON-NLS-1$ //$NON-NLS-2$
+            .addPart("data_type", "fit.gz") //$NON-NLS-1$ //$NON-NLS-2$
             .addPart("name", title) //$NON-NLS-1$
             .addPart("file", Paths.get(compressedTourAbsoluteFilePath)); //$NON-NLS-1$
 

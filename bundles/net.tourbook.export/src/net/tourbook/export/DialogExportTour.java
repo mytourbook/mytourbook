@@ -120,17 +120,6 @@ public class DialogExportTour extends TitleAreaDialog {
       _nf3.setGroupingUsed(false);
    }
 
-   // Source: https://developers.strava.com/docs/uploads/#tcx-training-center-database-xml
-   public static final String[]      StravaActivityTypes = new String[] {
-
-         "Biking",                                                                                      //$NON-NLS-1$
-         "Running",                                                                                     //$NON-NLS-1$
-         "Hiking",                                                                                      //$NON-NLS-1$
-         "Walking",                                                                                     //$NON-NLS-1$
-         "Swimming",                                                                                    //$NON-NLS-1$
-         "Other"                                                                                        //$NON-NLS-1$
-   };
-
    private String                    _dlgDefaultMessage;
 
    private final IDialogSettings     _state              = TourbookPlugin.getState("DialogExportTour"); //$NON-NLS-1$

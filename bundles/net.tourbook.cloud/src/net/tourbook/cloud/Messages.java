@@ -64,7 +64,6 @@ public class Messages extends NLS {
    public static String Log_UploadToursToStrava_003_ActivityLink;
    public static String Log_UploadToursToStrava_003_UploadStatus;
    public static String Log_UploadToursToStrava_004_UploadError;
-   public static String Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes;
    public static String PrefPage_AccountInformation_Label_AthleteName;
    public static String PrefPage_AccountInformation_Label_AthleteWebPage;
    public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
