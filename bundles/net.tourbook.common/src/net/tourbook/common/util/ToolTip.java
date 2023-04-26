@@ -49,6 +49,8 @@ public abstract class ToolTip {
     */
    public static final int             NO_RECREATE            = 1 << 1;
 
+   private int                         _swtResizeFlag         = 0;
+
    private Control                     _control;
    private Shell                       _controlShell;
 
@@ -269,6 +271,14 @@ public abstract class ToolTip {
     */
    protected void afterHideToolTip(final Event event) {
 
+   }
+
+   /**
+    * @return Returns <code>true</code> when the tooltip can be resized
+    */
+   public boolean canResizeTooltip() {
+
+      return _swtResizeFlag != 0;
    }
 
    /**
@@ -505,6 +515,11 @@ public abstract class ToolTip {
       }
    }
 
+   public void setCanResizeTooltip(final boolean canResize) {
+
+      _swtResizeFlag = canResize ? SWT.RESIZE : 0;
+   }
+
    /**
     * Restore arbitrary data under the given key
     *
@@ -704,7 +719,15 @@ public abstract class ToolTip {
 
       if (shouldCreateToolTip(event)) {
 
-         final Shell shell = new Shell(_controlShell, SWT.ON_TOP | SWT.TOOL | SWT.NO_FOCUS);
+         final Shell shell = new Shell(_controlShell,
+
+               SWT.ON_TOP
+                     | SWT.TOOL
+                     | SWT.NO_FOCUS
+
+                     | _swtResizeFlag
+
+         );
          shell.setLayout(new FillLayout());
 
          toolTipOpen(shell, event);

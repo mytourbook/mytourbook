@@ -79,6 +79,8 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
       setHideOnMouseDown(false);
       setPopupDelay(20);
+
+      setCanResizeTooltip(true);
    }
 
    @Override

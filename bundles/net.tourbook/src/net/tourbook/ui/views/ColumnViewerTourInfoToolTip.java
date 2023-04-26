@@ -65,6 +65,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
       _ttControl = control;
       _columnViewer = columnViewer;
 
+      setCanResizeTooltip(true);
       setHideOnMouseDown(false);
    }
 

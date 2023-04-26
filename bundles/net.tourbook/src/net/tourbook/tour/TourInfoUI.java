@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
@@ -76,6 +77,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -92,28 +94,32 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String            ID                                    = "net.tourbook.tour.TourInfoUI";                               //$NON-NLS-1$
+   private static final String ID = "net.tourbook.tour.TourInfoUI"; //$NON-NLS-1$
 
-   private static final String            STATE_TEXT_WITH_IN_CHARACTERS         = "STATE_TEXT_WITH_IN_CHARACTERS";                              //$NON-NLS-1$
-   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT = 75;
-   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MIN     = 20;
-   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MAX     = 1000;
+//   private static final String            STATE_TEXT_WITH_IN_CHARACTERS         = "STATE_TEXT_WITH_IN_CHARACTERS";                              //$NON-NLS-1$
+//   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT = 75;
+//   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MIN     = 20;
+//   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MAX     = 1000;
+   private static final String            STATE_TEXT_WITH_IN_PIXEL         = "STATE_TEXT_WITH_IN_PIXEL";                                   //$NON-NLS-1$
+   private static final int               STATE_TEXT_WITH_IN_PIXEL_DEFAULT = 300;
+   private static final int               STATE_TEXT_WITH_IN_PIXEL_MIN     = 200;
+   private static final int               STATE_TEXT_WITH_IN_PIXEL_MAX     = 2000;
 
-   private static final int               SHELL_MARGIN                          = 5;
-   private static final int               MAX_DATA_WIDTH                        = 300;
+   private static final int               SHELL_MARGIN                     = 5;
+   private static final int               MAX_DATA_WIDTH                   = 300;
 
-   private static final String            BATTERY_FORMAT                        = "... %d %%";                                                  //$NON-NLS-1$
-   private static final String            GEAR_SHIFT_FORMAT                     = "%d / %d";                                                    //$NON-NLS-1$
+   private static final String            BATTERY_FORMAT                   = "... %d %%";                                                  //$NON-NLS-1$
+   private static final String            GEAR_SHIFT_FORMAT                = "%d / %d";                                                    //$NON-NLS-1$
 
-   private static final IPreferenceStore  _prefStoreCommon                      = CommonActivator.getPrefStore();
+   private static final IPreferenceStore  _prefStoreCommon                 = CommonActivator.getPrefStore();
 
-   private static final GridDataFactory   _gridDataHint_Zero                    = GridDataFactory.fillDefaults().hint(0, 0);
-   private static final GridDataFactory   _gridDataHint_Default                 = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
+   private static final GridDataFactory   _gridDataHint_Zero               = GridDataFactory.fillDefaults().hint(0, 0);
+   private static final GridDataFactory   _gridDataHint_Default            = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
 
-   private static final DateTimeFormatter _dtHistoryFormatter                   = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL,
+   private static final DateTimeFormatter _dtHistoryFormatter              = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL,
          FormatStyle.MEDIUM);
 
-   private static PeriodType              _tourPeriodTemplate                   = PeriodType.yearMonthDayTime()
+   private static PeriodType              _tourPeriodTemplate              = PeriodType.yearMonthDayTime()
 
          // hide these components
          // .withMinutesRemoved()
@@ -123,13 +129,13 @@ public class TourInfoUI {
 //
    ;
 
-   private static final IPreferenceStore  _prefStore                            = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings   _state                                = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore  _prefStore                       = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state                           = TourbookPlugin.getState(ID);
 
-   private final NumberFormat             _nf0                                  = NumberFormat.getNumberInstance();
-   private final NumberFormat             _nf1                                  = NumberFormat.getInstance();
-   private final NumberFormat             _nf2                                  = NumberFormat.getInstance();
-   private final NumberFormat             _nf3                                  = NumberFormat.getInstance();
+   private final NumberFormat             _nf0                             = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1                             = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                             = NumberFormat.getInstance();
+   private final NumberFormat             _nf3                             = NumberFormat.getInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -154,7 +160,10 @@ public class TourInfoUI {
    private boolean        _hasTourType;
    private boolean        _hasWeather;
 
-   private int            _textWidthInCharacters;
+   private boolean        _isInShellResize;
+   private int            _shellTrimWidth;
+   private int            _shellTrimHeight;
+// private int            _textWidthInCharacters;
    private int            _textWidthInPixel;
 
    private int            _descriptionLineCount;
@@ -404,6 +413,9 @@ public class TourInfoUI {
 
 // SET_FORMATTING_ON
 
+      setTrimSize();
+      _parent.addControlListener(controlResizedAdapter(controlEvent -> onParentResize()));
+
       restoreState_BeforeUI();
       initUI(parent);
 
@@ -492,7 +504,7 @@ public class TourInfoUI {
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(4)
+            .numColumns(3)
             .applyTo(container);
       {
          {
@@ -523,21 +535,21 @@ public class TourInfoUI {
                   .applyTo(_lblTitle);
             MTFont.setBannerFont(_lblTitle);
          }
-         {
-            /*
-             * Text width in characters
-             */
-            _spinnerTextWidth = new Spinner(container, SWT.BORDER);
-            _spinnerTextWidth.setMinimum(STATE_TEXT_WITH_IN_CHARACTERS_MIN);
-            _spinnerTextWidth.setMaximum(STATE_TEXT_WITH_IN_CHARACTERS_MAX);
-            _spinnerTextWidth.setIncrement(1);
-            _spinnerTextWidth.setPageIncrement(10);
-            _spinnerTextWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TextWidth()));
-            _spinnerTextWidth.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-               onSelect_TextWidth();
-            });
-         }
+//         {
+//            /*
+//             * Text width in characters
+//             */
+//            _spinnerTextWidth = new Spinner(container, SWT.BORDER);
+//            _spinnerTextWidth.setMinimum(STATE_TEXT_WITH_IN_CHARACTERS_MIN);
+//            _spinnerTextWidth.setMaximum(STATE_TEXT_WITH_IN_CHARACTERS_MAX);
+//            _spinnerTextWidth.setIncrement(1);
+//            _spinnerTextWidth.setPageIncrement(10);
+//            _spinnerTextWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TextWidth()));
+//            _spinnerTextWidth.addMouseWheelListener(mouseEvent -> {
+//               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+//               onSelect_TextWidth();
+//            });
+//         }
          {
             /*
              * Action toolbar in the top right corner
@@ -1474,7 +1486,7 @@ public class TourInfoUI {
        * !!! It is important that the width value is not too large otherwise empty lines (because of
        * the default width) are added below the text control when there is a lot of content
        */
-      _textWidthInPixel = _pc.convertWidthInCharsToPixels(_textWidthInCharacters);
+//      _textWidthInPixel = _pc.convertWidthInCharsToPixels(_textWidthInCharacters);
 
       _descriptionScroll_Height = _pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
@@ -1487,6 +1499,64 @@ public class TourInfoUI {
       final boolean isSingleTour = !_tourData.isMultipleTours();
 
       return isShortTour || isSingleTour;
+   }
+
+   private void onParentResize() {
+
+      if (_isInShellResize) {
+         return;
+      }
+
+      final Shell shell = _parent.getShell();
+      final Rectangle shellBounds = shell.getBounds();
+      final Rectangle clientArea = shell.getClientArea();
+
+      System.out.println(UI.timeStamp()
+            + " shell: " + shellBounds.width
+            + " container: " + _ttContainer.getBounds().width
+            + " client: " + clientArea.width);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      // 100 chars:      6x100 = 600
+      // shell bounds:           630
+      // shell measured:         618
+
+      _textWidthInPixel = shellBounds.width - 30;
+
+      _state.put(STATE_TEXT_WITH_IN_PIXEL, _textWidthInPixel);
+
+      System.out.println(UI.timeStamp() + " _textWidthInPixel: " + _textWidthInPixel);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      updateUI();
+      updateUI_Layout();
+
+//      if (isResizeAdjusted) {
+//         _isInShellResize = true;
+//         {
+//            _rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
+//         }
+//         _isInShellResize = false;
+//      }
+
+      final Shell parentShell = _parent.getShell();
+      final Shell appShell = TourbookPlugin.getAppShell();
+
+      if (parentShell == appShell) {
+
+         _parent.layout(true, true);
+
+      } else {
+
+         // tour info is within a tooltip
+
+         _isInShellResize = true;
+         {
+            parentShell.pack(true);
+         }
+         _isInShellResize = false;
+      }
+
    }
 
    /**
@@ -1525,43 +1595,54 @@ public class TourInfoUI {
 
    private void onSelect_TextWidth() {
 
-      final int numTextCharacters = _spinnerTextWidth.getSelection();
-
-      _textWidthInPixel = _pc.convertWidthInCharsToPixels(numTextCharacters);
-
-      _state.put(STATE_TEXT_WITH_IN_CHARACTERS, numTextCharacters);
-
-      updateUI();
-      updateUI_Layout();
-
-      final Shell parentShell = _parent.getShell();
-      final Shell appShell = TourbookPlugin.getAppShell();
-
-      if (parentShell == appShell) {
-
-         _parent.layout(true, true);
-
-      } else {
-
-         // tour info is within a tooltip
-
-         parentShell.pack(true);
-      }
+//      final int numTextCharacters = _spinnerTextWidth.getSelection();
+//
+//      _textWidthInPixel = _pc.convertWidthInCharsToPixels(numTextCharacters);
+//
+//      _state.put(STATE_TEXT_WITH_IN_CHARACTERS, numTextCharacters);
+//
+//      updateUI();
+//      updateUI_Layout();
+//
+//      final Shell parentShell = _parent.getShell();
+//      final Shell appShell = TourbookPlugin.getAppShell();
+//
+//      if (parentShell == appShell) {
+//
+//         _parent.layout(true, true);
+//
+//      } else {
+//
+//         // tour info is within a tooltip
+//
+//         parentShell.pack(true);
+//      }
    }
 
    private void restoreState() {
 
-      _spinnerTextWidth.setSelection(_textWidthInCharacters);
+//      _spinnerTextWidth.setSelection(_textWidthInCharacters);
    }
 
    private void restoreState_BeforeUI() {
 
-      _textWidthInCharacters = Util.getStateInt(_state,
+//      _textWidthInCharacters = Util.getStateInt(_state,
+//
+//            STATE_TEXT_WITH_IN_CHARACTERS,
+//            STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT,
+//            STATE_TEXT_WITH_IN_CHARACTERS_MIN,
+//            STATE_TEXT_WITH_IN_CHARACTERS_MAX);
 
-            STATE_TEXT_WITH_IN_CHARACTERS,
-            STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT,
-            STATE_TEXT_WITH_IN_CHARACTERS_MIN,
-            STATE_TEXT_WITH_IN_CHARACTERS_MAX);
+      _textWidthInPixel = Util.getStateInt(_state,
+
+            STATE_TEXT_WITH_IN_PIXEL,
+            STATE_TEXT_WITH_IN_PIXEL_DEFAULT,
+            STATE_TEXT_WITH_IN_PIXEL_MIN,
+            STATE_TEXT_WITH_IN_PIXEL_MAX);
+
+      System.out.println(UI.timeStamp() + " _textWidthInPixel: " + _textWidthInPixel);
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    /**
@@ -1594,6 +1675,19 @@ public class TourInfoUI {
 
    public void setPart(final IWorkbenchPart part) {
       _part = part;
+   }
+
+   private void setTrimSize() {
+
+      final int contentSize = 200;
+
+      final Rectangle contentWithTrim = _parent.computeTrim(0, 0, contentSize, contentSize);
+
+      final int shellTrimWidth = contentWithTrim.width - contentSize;
+      final int shellTrimHeight = contentWithTrim.height - contentSize;
+
+      _shellTrimWidth = shellTrimWidth / 2;
+      _shellTrimHeight = shellTrimHeight / 2;
    }
 
    /**
