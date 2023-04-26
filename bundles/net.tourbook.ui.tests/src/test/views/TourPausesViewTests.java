@@ -26,17 +26,7 @@ import utils.Utils;
 public class TourPausesViewTests extends UITest {
 
    @Test
-   void testTourPausesView() {
-
-      Utils.getTour(bot);
-
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
-
-      bot.table().select("15:40"); //$NON-NLS-1$
-   }
-
-   @Test
-   void When_PauseTypeSetToManual_Expect_ExpectedManualPauseType() {
+   void Given_PauseTypeAutomatic_When_ChangeToManual_Expect_PauseTypeManual() {
 
       // arrange
       Utils.getTour(bot);
@@ -60,5 +50,15 @@ public class TourPausesViewTests extends UITest {
       pausesViewTable = bot.table();
       assertEquals("Automatic", pausesViewTable.cell(0, 1));
 
+   }
+
+   @Test
+   void testTourPausesView() {
+
+      Utils.getTour(bot);
+
+      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+
+      bot.table().select("15:40"); //$NON-NLS-1$
    }
 }
