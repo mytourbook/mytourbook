@@ -16,6 +16,7 @@
 package net.tourbook.tag.tour.filter;
 
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,8 +83,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -133,7 +133,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private ToolItem                              _tourTagFilterItem;
 
    private ModifyListener                        _defaultModifyListener;
-   private SelectionAdapter                      _defaultSelectionListener;
+   private SelectionListener                     _defaultSelectionListener;
    private ITourEventListener                    _tourEventListener;
 
    private boolean                               _tagViewerItem_IsChecked;
@@ -852,19 +852,15 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       table.setLayout(new TableLayout());
 
-      table.addSelectionListener(new SelectionAdapter() {
+      table.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
+         /*
+          * The tag cloud viewer selection event can have another selection !!!
+          */
 
-            /*
-             * The tag cloud viewer selection event can have another selection !!!
-             */
-
-            _tagCloudViewerItem_IsChecked = event.detail == SWT.CHECK;
-            _tagCloudViewerItem_Data = event.item.getData();
-         }
-      });
+         _tagCloudViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
+         _tagCloudViewerItem_Data = selectionEvent.item.getData();
+      }));
 
       table.addKeyListener(new KeyAdapter() {
 
@@ -1026,36 +1022,26 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       tree.setHeaderVisible(false);
 
-      tree.addSelectionListener(new SelectionAdapter() {
+      tree.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
+         /*
+          * The tag treeviewer selection event can have another selection !!!
+          */
+
+         _tagViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
+
+         if (_tagViewerItem_IsChecked) {
 
             /*
-             * The tag treeviewer selection event can have another selection !!!
+             * Item can be null when <ctrl>+A is pressed !!!
              */
+            final Widget item = selectionEvent.item;
 
-            _tagViewerItem_IsChecked = event.detail == SWT.CHECK;
-
-            if (_tagViewerItem_IsChecked) {
-
-               /*
-                * Item can be null when <ctrl>+A is pressed !!!
-                */
-               final Widget item = event.item;
-
-               _tagViewerItem_Data = item.getData();
-            }
+            _tagViewerItem_Data = item.getData();
          }
-      });
+      }));
 
-      tree.addKeyListener(new KeyAdapter() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-            _tagViewerItem_IsKeyPressed = true;
-         }
-      });
+      tree.addKeyListener(keyPressedAdapter(keyEvent -> _tagViewerItem_IsKeyPressed = true));
 
       layoutContainer.addTraverseListener(traverseEvent -> onTraverse_TagContainer(tree, traverseEvent));
 
@@ -1166,12 +1152,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             _btnNewProfile = new Button(container, SWT.PUSH);
             _btnNewProfile.setText(Messages.Slideout_TourFilter_Action_AddProfile);
             _btnNewProfile.setToolTipText(Messages.Slideout_TourTagFilter_Action_AddProfile_Tooltip);
-            _btnNewProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onProfile_Add();
-               }
-            });
+            _btnNewProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_Add()));
 
             // set button default width
             UI.setButtonLayoutData(_btnNewProfile);
@@ -1183,12 +1164,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             _btnCopyProfile = new Button(container, SWT.PUSH);
             _btnCopyProfile.setText(Messages.Slideout_TourFilter_Action_CopyProfile);
             _btnCopyProfile.setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
-            _btnCopyProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onProfile_Copy();
-               }
-            });
+            _btnCopyProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_Copy()));
 
             // set button default width
             UI.setButtonLayoutData(_btnCopyProfile);
@@ -1200,12 +1176,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             _btnDeleteProfile = new Button(container, SWT.PUSH);
             _btnDeleteProfile.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
             _btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
-            _btnDeleteProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onProfile_Delete();
-               }
-            });
+            _btnDeleteProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_Delete()));
 
             // set button default width
             UI.setButtonLayoutData(_btnDeleteProfile);
@@ -1226,12 +1197,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
             _chkLiveUpdate.setToolTipText(Messages.Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip);
-            _chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  doLiveUpdate();
-               }
-            });
+            _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> doLiveUpdate()));
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -1244,12 +1210,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
              */
             _btnApply = new Button(container, SWT.PUSH);
             _btnApply.setText(Messages.Slideout_TourFilter_Action_Apply);
-            _btnApply.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  TourTagFilterManager.fireFilterModifyEvent();
-               }
-            });
+            _btnApply.addSelectionListener(widgetSelectedAdapter(selectionEvent -> TourTagFilterManager.fireFilterModifyEvent()));
 
             // set button default width
             UI.setButtonLayoutData(_btnApply);
@@ -1493,14 +1454,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       _defaultModifyListener = modifyEvent -> onProfile_Modify();
 
-      _defaultSelectionListener = new SelectionAdapter() {
-
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onProfile_Modify();
-            fireModifyEvent();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> {
+         onProfile_Modify();
+         fireModifyEvent();
+      });
    }
 
    /**
