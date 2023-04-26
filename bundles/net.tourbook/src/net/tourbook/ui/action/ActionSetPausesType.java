@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Set person for a tour
+ * Set the pause type(s) for a tour
  */
 public class ActionSetPausesType extends Action implements IMenuCreator {
 
@@ -53,7 +53,7 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
 
       public ActionSetPausesType2(final String text, final boolean isAutoPause) {
 
-         super(text, AS_PUSH_BUTTON);
+         super(text, AS_CHECK_BOX);
 
          _isAutoPause = isAutoPause;
       }
@@ -67,7 +67,7 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
    public ActionSetPausesType(final ITourProvider tourProvider) {
 
       //todo fb
-      //todo fb: Grey out the pause type that is already selected
+      //DONE: Grey out the pause type that is already selected
 
       //do the same for the weather clouds
       super("Set pauses type", AS_DROP_DOWN_MENU);
@@ -75,12 +75,9 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
       setMenuCreator(this);
 
       _tourProvider = tourProvider;
-   }
 
-   private void addActionToMenu(final Action action, final Menu menu) {
-
-      final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(menu, -1);
+      _actionSetAutomaticPauseType = new ActionSetPausesType2("Automatic", true);
+      _actionSetManualPauseType = new ActionSetPausesType2("Manual", false);
    }
 
    @Override
@@ -119,11 +116,8 @@ public class ActionSetPausesType extends Action implements IMenuCreator {
 
    private void fillMenu(final Menu menu) {
 
-      _actionSetAutomaticPauseType = new ActionSetPausesType2("Automatic", true);
-      _actionSetManualPauseType = new ActionSetPausesType2("Manual", false);
-
-      addActionToMenu(_actionSetManualPauseType, menu);
-      addActionToMenu(_actionSetAutomaticPauseType, menu);
+      new ActionContributionItem(_actionSetAutomaticPauseType).fill(menu, -1);
+      new ActionContributionItem(_actionSetManualPauseType).fill(menu, -1);
    }
 
    @Override
