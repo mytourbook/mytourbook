@@ -41,14 +41,16 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
    private ITourProvider        _tourProvider;
    private int[]                _tourPausesIndices;
-   private ActionSetPausesType2 _actionSetAutomaticPauseType;
-   private ActionSetPausesType2 _actionSetManualPauseType;
+   private ActionSetPausesType _actionSetAutomaticPauseType;
+   private ActionSetPausesType _actionSetManualPauseType;
 
-   private class ActionSetPausesType2 extends Action {
+   private boolean             _changeAllTourPauses;
+
+   private class ActionSetPausesType extends Action {
 
       boolean _isAutoPause;
 
-      public ActionSetPausesType2(final String text, final boolean isAutoPause) {
+      public ActionSetPausesType(final String text, final boolean isAutoPause) {
 
          super(text, AS_CHECK_BOX);
 
@@ -61,7 +63,7 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       }
    }
 
-   public SubMenu_SetPausesType(final ITourProvider tourProvider) {
+   public SubMenu_SetPausesType(final ITourProvider tourProvider, final boolean changeAllTourPauses) {
 
       //todo fb
       //DONE: Grey out the pause type that is already selected
@@ -73,8 +75,10 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
       _tourProvider = tourProvider;
 
-      _actionSetAutomaticPauseType = new ActionSetPausesType2("Automatic", true);
-      _actionSetManualPauseType = new ActionSetPausesType2("Manual", false);
+      _changeAllTourPauses = changeAllTourPauses;
+
+      _actionSetAutomaticPauseType = new ActionSetPausesType("Automatic", true);
+      _actionSetManualPauseType = new ActionSetPausesType("Manual", false);
    }
 
    @Override
@@ -94,7 +98,9 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
          _actionSetAutomaticPauseType.setChecked(false);
          _actionSetManualPauseType.setChecked(false);
 
-      } else if (selectedTours.size() == 1 && _tourPausesIndices.length > 0) {
+      } else if (selectedTours.size() == 1) {
+
+         if (!_changeAllTourPauses && _tourPausesIndices.length > 0) {
 
          final TourData tourData = selectedTours.get(0);
          final long[] pausedTime_Data = tourData.getPausedTime_Data();
@@ -109,6 +115,7 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
          _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
 
       }
+   }
    }
 
    private void fillMenu(final Menu menu) {
@@ -155,7 +162,7 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
       final Shell shell = Display.getCurrent().getActiveShell();
-      if (selectedTours == null || selectedTours.isEmpty() || _tourPausesIndices.length == 0) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
          MessageDialog.openInformation(
@@ -168,6 +175,10 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
 
       for (final TourData tourData : selectedTours) {
 
+         if (tourData.getTourDeviceTime_Paused() == 0) {
+            continue;
+         }
+
          long[] pausedTime_Data = tourData.getPausedTime_Data();
 
          if (pausedTime_Data == null) {
@@ -178,10 +189,17 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
             Arrays.setAll(pausedTime_Data, value -> 1);
          }
 
+         if (_changeAllTourPauses) {
+
+            Arrays.setAll(pausedTime_Data, value -> isAutoPause ? 1 : 0);
+
+         } else {
+
          for (int index = 0; index < _tourPausesIndices.length; index++) {
 
             pausedTime_Data[_tourPausesIndices[index]] = isAutoPause ? 1 : 0;
          }
+      }
 
          tourData.setPausedTime_Data(pausedTime_Data);
 

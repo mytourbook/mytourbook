@@ -361,8 +361,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
-      _subMenu_SetPauseType = new SubMenu_SetPausesType(this);
-
+      _subMenu_SetPauseType = new SubMenu_SetPausesType(this, false);
    }
 
    private void createMenuManager() {

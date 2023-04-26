@@ -45,7 +45,7 @@ public class SubMenu_Pauses extends Action implements IMenuCreator {
 
       _tourProvider = tourViewer;
 
-      _subMenu_SetPausesType = new SubMenu_SetPausesType(_tourProvider);
+      _subMenu_SetPausesType = new SubMenu_SetPausesType(_tourProvider, true);
    }
 
    @Override
@@ -62,7 +62,6 @@ public class SubMenu_Pauses extends Action implements IMenuCreator {
 
       new ActionContributionItem(_subMenu_SetPausesType).fill(menu, -1);
    }
-
    @Override
    public Menu getMenu(final Control parent) {
       return null;
