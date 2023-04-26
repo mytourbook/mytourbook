@@ -87,5 +87,4 @@ public class SubMenu_Pauses extends Action implements IMenuCreator {
 
       return _menu;
    }
-
 }
