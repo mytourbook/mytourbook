@@ -42,6 +42,17 @@ public class FitSportMapper {
       case "trail": //$NON-NLS-1$
          sport = Sport.RUNNING;
          break;
+         
+          case "snowshoeing": //$NON-NLS-1$
+         sport = Sport.SNOWSHOEING;
+         break;
+         
+       case "skating":
+              case "cross-country":
+       case "skate-skiing":
+
+       sport = Sport.CROSS_COUNTRY_SKIING;
+       break;
 
       case "walking": //$NON-NLS-1$
          sport = Sport.WALKING;
@@ -67,6 +78,10 @@ public class FitSportMapper {
 
       switch (tourTypeName.toLowerCase().trim()) {
 
+ case "skating": //$NON-NLS-1$
+         subSport = SubSport.SKATE_SKIING;
+         break;
+         
       case "trail": //$NON-NLS-1$
          subSport = SubSport.TRAIL;
          break;
