@@ -73,6 +73,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -85,7 +86,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchPart;
@@ -94,12 +94,8 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String ID = "net.tourbook.tour.TourInfoUI"; //$NON-NLS-1$
+   private static final String            ID                               = "net.tourbook.tour.TourInfoUI";                               //$NON-NLS-1$
 
-//   private static final String            STATE_TEXT_WITH_IN_CHARACTERS         = "STATE_TEXT_WITH_IN_CHARACTERS";                              //$NON-NLS-1$
-//   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT = 75;
-//   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MIN     = 20;
-//   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MAX     = 1000;
    private static final String            STATE_TEXT_WITH_IN_PIXEL         = "STATE_TEXT_WITH_IN_PIXEL";                                   //$NON-NLS-1$
    private static final int               STATE_TEXT_WITH_IN_PIXEL_DEFAULT = 300;
    private static final int               STATE_TEXT_WITH_IN_PIXEL_MIN     = 200;
@@ -161,9 +157,7 @@ public class TourInfoUI {
    private boolean        _hasWeather;
 
    private boolean        _isInShellResize;
-   private int            _shellTrimWidth;
-   private int            _shellTrimHeight;
-// private int            _textWidthInCharacters;
+   private int            _shellWidth              = -1;
    private int            _textWidthInPixel;
 
    private int            _descriptionLineCount;
@@ -340,8 +334,6 @@ public class TourInfoUI {
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
 
-   private Spinner          _spinnerTextWidth;
-
    private class ActionCloseTooltip extends Action {
 
       public ActionCloseTooltip() {
@@ -383,6 +375,8 @@ public class TourInfoUI {
       _tourToolTipProvider = tourToolTipProvider;
       _tourProvider = tourProvider;
 
+      _parent.addControlListener(controlResizedAdapter(controlEvent -> onResize(controlEvent)));
+
       final Display display = parent.getDisplay();
 
       _bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
@@ -412,9 +406,6 @@ public class TourInfoUI {
       _hasWeather                   = _tourData.getWeather().length() > 0;
 
 // SET_FORMATTING_ON
-
-      setTrimSize();
-      _parent.addControlListener(controlResizedAdapter(controlEvent -> onParentResize()));
 
       restoreState_BeforeUI();
       initUI(parent);
@@ -535,21 +526,6 @@ public class TourInfoUI {
                   .applyTo(_lblTitle);
             MTFont.setBannerFont(_lblTitle);
          }
-//         {
-//            /*
-//             * Text width in characters
-//             */
-//            _spinnerTextWidth = new Spinner(container, SWT.BORDER);
-//            _spinnerTextWidth.setMinimum(STATE_TEXT_WITH_IN_CHARACTERS_MIN);
-//            _spinnerTextWidth.setMaximum(STATE_TEXT_WITH_IN_CHARACTERS_MAX);
-//            _spinnerTextWidth.setIncrement(1);
-//            _spinnerTextWidth.setPageIncrement(10);
-//            _spinnerTextWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TextWidth()));
-//            _spinnerTextWidth.addMouseWheelListener(mouseEvent -> {
-//               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-//               onSelect_TextWidth();
-//            });
-//         }
          {
             /*
              * Action toolbar in the top right corner
@@ -1482,12 +1458,6 @@ public class TourInfoUI {
 
       _pc = new PixelConverter(parent);
 
-      /*
-       * !!! It is important that the width value is not too large otherwise empty lines (because of
-       * the default width) are added below the text control when there is a lot of content
-       */
-//      _textWidthInPixel = _pc.convertWidthInCharsToPixels(_textWidthInCharacters);
-
       _descriptionScroll_Height = _pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
 
@@ -1501,43 +1471,46 @@ public class TourInfoUI {
       return isShortTour || isSingleTour;
    }
 
-   private void onParentResize() {
+   /**
+    * @param controlEvent
+    */
+   private void onResize(final ControlEvent controlEvent) {
 
       if (_isInShellResize) {
          return;
       }
 
-      final Shell shell = _parent.getShell();
-      final Rectangle shellBounds = shell.getBounds();
-      final Rectangle clientArea = shell.getClientArea();
+      final Rectangle shellBounds = _parent.getShell().getBounds();
 
-      System.out.println(UI.timeStamp()
-            + " shell: " + shellBounds.width
-            + " container: " + _ttContainer.getBounds().width
-            + " client: " + clientArea.width);
-// TODO remove SYSTEM.OUT.PRINTLN
+      final int shellWidth = shellBounds.width;
+      int shellWidthDiff = 0;
+
+      if (_shellWidth != -1) {
+
+         shellWidthDiff = shellWidth - _shellWidth;
+      }
+
+      _shellWidth = shellWidth;
+
+      _textWidthInPixel += shellWidthDiff;
+
+//      System.out.println(UI.EMPTY_STRING
+//            + " shell: " + shellWidth
+//            + " container: " + _ttContainer.getBounds().width
+//            + " client: " + clientArea.width
+//            + "   "
+//            + " shellWidthDiff: " + shellWidthDiff
+//            + " _textWidthInPixel: " + _textWidthInPixel);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       // 100 chars:      6x100 = 600
       // shell bounds:           630
       // shell measured:         618
 
-      _textWidthInPixel = shellBounds.width - 30;
-
       _state.put(STATE_TEXT_WITH_IN_PIXEL, _textWidthInPixel);
-
-      System.out.println(UI.timeStamp() + " _textWidthInPixel: " + _textWidthInPixel);
-// TODO remove SYSTEM.OUT.PRINTLN
 
       updateUI();
       updateUI_Layout();
-
-//      if (isResizeAdjusted) {
-//         _isInShellResize = true;
-//         {
-//            _rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
-//         }
-//         _isInShellResize = false;
-//      }
 
       final Shell parentShell = _parent.getShell();
       final Shell appShell = TourbookPlugin.getAppShell();
@@ -1593,45 +1566,11 @@ public class TourInfoUI {
       }
    }
 
-   private void onSelect_TextWidth() {
-
-//      final int numTextCharacters = _spinnerTextWidth.getSelection();
-//
-//      _textWidthInPixel = _pc.convertWidthInCharsToPixels(numTextCharacters);
-//
-//      _state.put(STATE_TEXT_WITH_IN_CHARACTERS, numTextCharacters);
-//
-//      updateUI();
-//      updateUI_Layout();
-//
-//      final Shell parentShell = _parent.getShell();
-//      final Shell appShell = TourbookPlugin.getAppShell();
-//
-//      if (parentShell == appShell) {
-//
-//         _parent.layout(true, true);
-//
-//      } else {
-//
-//         // tour info is within a tooltip
-//
-//         parentShell.pack(true);
-//      }
-   }
-
    private void restoreState() {
 
-//      _spinnerTextWidth.setSelection(_textWidthInCharacters);
    }
 
    private void restoreState_BeforeUI() {
-
-//      _textWidthInCharacters = Util.getStateInt(_state,
-//
-//            STATE_TEXT_WITH_IN_CHARACTERS,
-//            STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT,
-//            STATE_TEXT_WITH_IN_CHARACTERS_MIN,
-//            STATE_TEXT_WITH_IN_CHARACTERS_MAX);
 
       _textWidthInPixel = Util.getStateInt(_state,
 
@@ -1675,19 +1614,6 @@ public class TourInfoUI {
 
    public void setPart(final IWorkbenchPart part) {
       _part = part;
-   }
-
-   private void setTrimSize() {
-
-      final int contentSize = 200;
-
-      final Rectangle contentWithTrim = _parent.computeTrim(0, 0, contentSize, contentSize);
-
-      final int shellTrimWidth = contentWithTrim.width - contentSize;
-      final int shellTrimHeight = contentWithTrim.height - contentSize;
-
-      _shellTrimWidth = shellTrimWidth / 2;
-      _shellTrimHeight = shellTrimHeight / 2;
    }
 
    /**
