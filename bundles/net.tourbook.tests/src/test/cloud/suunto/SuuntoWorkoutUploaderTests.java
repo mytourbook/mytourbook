@@ -76,9 +76,9 @@ public class SuuntoWorkoutUploaderTests {
 
       suuntoWorkoutsUploader = new SuuntoWorkoutsUploader();
 
-  //    final Field activePersonField = suuntoWorkoutsUploader.getClass().getDeclaredField("_useActivePerson"); //$NON-NLS-1$
-  //    activePersonField.setAccessible(true);
-   //   activePersonField.set(suuntoWorkoutsUploader, true);
+      final Field activePersonField = suuntoWorkoutsUploader.getClass().getDeclaredField("_useActivePerson"); //$NON-NLS-1$
+      activePersonField.setAccessible(true);
+      activePersonField.set(suuntoWorkoutsUploader, true);
 
       Display.getDefault().addFilter(SWT.Activate, event -> {
          // Is this a Shell being activated?
