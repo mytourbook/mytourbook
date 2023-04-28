@@ -46,8 +46,8 @@ public class FitSportMapperTests {
 
       assertAll(
             () -> assertEquals(SubSport.SKATE_SKIING, FitSportMapper.mapTourTypeToSubSport(new TourType("Skating"))), //$NON-NLS-1$
-            () -> assertEquals(SubSport.TRAIL, FitSportMapper.mapTourTypeToSport(new TourType("Trail"))), //$NON-NLS-1$
-            () -> assertEquals(SubSport.VIRTUAL_ACTIVITY, FitSportMapper.mapTourTypeToSport(new TourType("Trainer"))), //$NON-NLS-1$
-            () -> assertEquals(SubSport.GENERIC, FitSportMapper.mapTourTypeToSport(null)));
+            () -> assertEquals(SubSport.TRAIL, FitSportMapper.mapTourTypeToSubSport(new TourType("Trail"))), //$NON-NLS-1$
+            () -> assertEquals(SubSport.VIRTUAL_ACTIVITY, FitSportMapper.mapTourTypeToSubSport(new TourType("Trainer"))), //$NON-NLS-1$
+            () -> assertEquals(SubSport.GENERIC, FitSportMapper.mapTourTypeToSubSport(null)));
    }
 }
