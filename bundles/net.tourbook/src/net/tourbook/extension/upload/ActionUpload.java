@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -58,7 +57,7 @@ public class ActionUpload extends Action implements IMenuCreator {
       public ActionUploadTour(final TourbookCloudUploader tourbookCloudUploader) {
 
          super(tourbookCloudUploader.getName());
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SetFavoritePosition));
+         setImageDescriptor(tourbookCloudUploader.getImageDescriptor());
 
          _tourbookCloudUploader = tourbookCloudUploader;
       }

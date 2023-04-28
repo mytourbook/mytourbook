@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
@@ -68,7 +70,9 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
    public SuuntoWorkoutsUploader() {
 
-      super(CLOUD_UPLOADER_ID, Messages.VendorName_Suunto_Workouts);
+      super(CLOUD_UPLOADER_ID,
+            Messages.VendorName_Suunto_Workouts,
+            Activator.getImageDescriptor(CloudImages.Cloud_Suunto));
    }
 
    private WorkoutUpload checkUploadStatus(final TourData tourData, final String workoutUploadId) {
