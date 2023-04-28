@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -57,6 +58,7 @@ public class ActionUpload extends Action implements IMenuCreator {
       public ActionUploadTour(final TourbookCloudUploader tourbookCloudUploader) {
 
          super(tourbookCloudUploader.getName());
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SetFavoritePosition));
 
          _tourbookCloudUploader = tourbookCloudUploader;
       }
@@ -110,6 +112,7 @@ public class ActionUpload extends Action implements IMenuCreator {
    }
 
    private void addActionToMenu(final Action action) {
+
       final ActionContributionItem item = new ActionContributionItem(action);
       item.fill(_menu, -1);
    }
