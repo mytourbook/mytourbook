@@ -38,6 +38,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.nebula.widgets.opal.switchbutton.SwitchButton;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -82,7 +83,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Button             _chkSendDescription;
    private Button             _chkSendWeatherDataInDescription;
 
-   private Button             _chkShowHideTokens;
+   private SwitchButton       _chkShowHideTokens;
    private Button             _chkUseTourTypeMapping;
    private Label              _labelAccessToken;
    private Label              _labelAthleteName;
@@ -261,7 +262,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _chkShowHideTokens = new Button(group, SWT.CHECK);
+            _chkShowHideTokens = new SwitchButton(group, SWT.NONE);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
             _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
