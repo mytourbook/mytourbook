@@ -83,7 +83,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Button             _chkSendDescription;
    private Button             _chkSendWeatherDataInDescription;
 
-   private SwitchButton       _chkShowHideTokens;
    private Button             _chkUseTourTypeMapping;
    private Label              _labelAccessToken;
    private Label              _labelAthleteName;
@@ -95,6 +94,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Link               _linkAthleteWebPage;
    private Link               _linkRevokeAccess;
    private PreferenceLinkArea _linkTourTypeFilters;
+   private SwitchButton       _chkShowHideTokens;
    private Text               _txtAccessToken_Value;
    private Text               _txtRefreshToken_Value;
 
