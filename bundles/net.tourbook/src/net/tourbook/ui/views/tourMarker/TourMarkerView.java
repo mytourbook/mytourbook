@@ -94,7 +94,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-//todo fb add strava and suunto icons to contextual menu
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
    public static final String       ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
