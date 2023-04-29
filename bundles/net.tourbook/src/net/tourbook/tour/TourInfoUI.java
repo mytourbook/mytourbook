@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.OtherMessages;
@@ -42,6 +43,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -616,6 +618,7 @@ public class TourInfoUI {
          createUI_32_Time(container);
          createUI_34_DistanceAltitude(container);
          createUI_36_Misc(container);
+         createUI_37_HeartRateZoned(container);
 
          // gear data
          _lblGear_Spacer = createUI_Spacer(container);
@@ -783,6 +786,24 @@ public class TourInfoUI {
 
          createUI_Label(container, UI.UNIT_LABEL_WEIGHT);
       }
+   }
+
+   private void createUI_37_HeartRateZoned(final Composite container) {
+
+      createUI_Spacer(container);
+
+      final List<TourPersonHRZone> toto = _tourData.getDataPerson().getHrZonesSorted();
+
+      toto.forEach(hrZone -> {
+
+         createUI_Label(container, hrZone.getNameLong());
+
+         createUI_Label(container, " x % - y h:m:s");
+
+         // spacer
+         createUI_LabelValue(container, SWT.TRAIL);
+      });
+
    }
 
    private void createUI_38_Gears(final Composite parent) {
