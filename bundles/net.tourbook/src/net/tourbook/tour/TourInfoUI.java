@@ -92,28 +92,28 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String            ID                                    = "net.tourbook.tour.TourInfoUI";                               //$NON-NLS-1$
+   private static final String            ID                      = "net.tourbook.tour.TourInfoUI";                               //$NON-NLS-1$
 
-   private static final String            STATE_TEXT_WITH_IN_CHARACTERS         = "STATE_TEXT_WITH_IN_CHARACTERS";                              //$NON-NLS-1$
-   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT = 75;
-   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MIN     = 20;
-   private static final int               STATE_TEXT_WITH_IN_CHARACTERS_MAX     = 1000;
+   private static final String            STATE_TEXT_WITH         = "STATE_TEXT_WITH";                                            //$NON-NLS-1$
+   private static final int               STATE_TEXT_WITH_DEFAULT = 600;
+   private static final int               STATE_TEXT_WITH_MIN     = 100;
+   private static final int               STATE_TEXT_WITH_MAX     = 3000;
 
-   private static final int               SHELL_MARGIN                          = 5;
-   private static final int               MAX_DATA_WIDTH                        = 300;
+   private static final int               SHELL_MARGIN            = 5;
+   private static final int               MAX_DATA_WIDTH          = 300;
 
-   private static final String            BATTERY_FORMAT                        = "... %d %%";                                                  //$NON-NLS-1$
-   private static final String            GEAR_SHIFT_FORMAT                     = "%d / %d";                                                    //$NON-NLS-1$
+   private static final String            BATTERY_FORMAT          = "... %d %%";                                                  //$NON-NLS-1$
+   private static final String            GEAR_SHIFT_FORMAT       = "%d / %d";                                                    //$NON-NLS-1$
 
-   private static final IPreferenceStore  _prefStoreCommon                      = CommonActivator.getPrefStore();
+   private static final IPreferenceStore  _prefStoreCommon        = CommonActivator.getPrefStore();
 
-   private static final GridDataFactory   _gridDataHint_Zero                    = GridDataFactory.fillDefaults().hint(0, 0);
-   private static final GridDataFactory   _gridDataHint_Default                 = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
+   private static final GridDataFactory   _gridDataHint_Zero      = GridDataFactory.fillDefaults().hint(0, 0);
+   private static final GridDataFactory   _gridDataHint_Default   = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
 
-   private static final DateTimeFormatter _dtHistoryFormatter                   = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL,
+   private static final DateTimeFormatter _dtHistoryFormatter     = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL,
          FormatStyle.MEDIUM);
 
-   private static PeriodType              _tourPeriodTemplate                   = PeriodType.yearMonthDayTime()
+   private static PeriodType              _tourPeriodTemplate     = PeriodType.yearMonthDayTime()
 
          // hide these components
          // .withMinutesRemoved()
@@ -123,13 +123,13 @@ public class TourInfoUI {
 //
    ;
 
-   private static final IPreferenceStore  _prefStore                            = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings   _state                                = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore  _prefStore              = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state                  = TourbookPlugin.getState(ID);
 
-   private final NumberFormat             _nf0                                  = NumberFormat.getNumberInstance();
-   private final NumberFormat             _nf1                                  = NumberFormat.getInstance();
-   private final NumberFormat             _nf2                                  = NumberFormat.getInstance();
-   private final NumberFormat             _nf3                                  = NumberFormat.getInstance();
+   private final NumberFormat             _nf0                    = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1                    = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                    = NumberFormat.getInstance();
+   private final NumberFormat             _nf3                    = NumberFormat.getInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -154,7 +154,6 @@ public class TourInfoUI {
    private boolean        _hasTourType;
    private boolean        _hasWeather;
 
-   private int            _textWidthInCharacters;
    private int            _textWidthInPixel;
 
    private int            _descriptionLineCount;
@@ -492,7 +491,7 @@ public class TourInfoUI {
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(4)
+            .numColumns(3)
             .applyTo(container);
       {
          {
@@ -525,31 +524,19 @@ public class TourInfoUI {
          }
          {
             /*
-             * Text width in characters
-             */
-            _spinnerTextWidth = new Spinner(container, SWT.BORDER);
-            _spinnerTextWidth.setMinimum(STATE_TEXT_WITH_IN_CHARACTERS_MIN);
-            _spinnerTextWidth.setMaximum(STATE_TEXT_WITH_IN_CHARACTERS_MAX);
-            _spinnerTextWidth.setIncrement(1);
-            _spinnerTextWidth.setPageIncrement(10);
-            _spinnerTextWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TextWidth()));
-            _spinnerTextWidth.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-               onSelect_TextWidth();
-            });
-         }
-         {
-            /*
              * Action toolbar in the top right corner
              */
             createUI_12_Toolbar(container);
          }
+
+         // LINE 2
+
          {
             /*
              * Date
              */
             _lblDate = createUI_LabelValue(container, SWT.LEAD);
-            GridDataFactory.fillDefaults().span(4, 1).applyTo(_lblDate);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_lblDate);
          }
       }
    }
@@ -1310,46 +1297,71 @@ public class TourInfoUI {
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(2)
-            .equalWidth(true)
+            .numColumns(3)
             .spacing(20, 5)
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
-         final Composite containerCreated = new Composite(container, SWT.NONE);
-         containerCreated.setForeground(_fgColor);
-         containerCreated.setBackground(_bgColor);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerCreated);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerCreated);
          {
             /*
-             * date/time created
+             * Date/time created
              */
-            createUI_Label(containerCreated, Messages.Tour_Tooltip_Label_DateTimeCreated);
-
-            _lblDateTimeCreatedValue = createUI_LabelValue(containerCreated, SWT.LEAD);
-            GridDataFactory.fillDefaults().applyTo(_lblDateTimeCreatedValue);
-         }
-
-         final Composite containerModified = new Composite(container, SWT.NONE);
-         containerModified.setForeground(_fgColor);
-         containerModified.setBackground(_bgColor);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerModified);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerModified);
-         {
-            /*
-             * date/time modified
-             */
-            _lblDateTimeModified = createUI_Label(containerModified, Messages.Tour_Tooltip_Label_DateTimeModified);
+            final Composite containerCreated = new Composite(container, SWT.NONE);
+            containerCreated.setForeground(_fgColor);
+            containerCreated.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_lblDateTimeModified);
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(containerCreated);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerCreated);
+            {
+               createUI_Label(containerCreated, Messages.Tour_Tooltip_Label_DateTimeCreated);
 
-            _lblDateTimeModifiedValue = createUI_LabelValue(containerModified, SWT.TRAIL);
+               _lblDateTimeCreatedValue = createUI_LabelValue(containerCreated, SWT.LEAD);
+               GridDataFactory.fillDefaults().applyTo(_lblDateTimeCreatedValue);
+            }
+         }
+         {
+            /*
+             * Date/time modified
+             */
+            final Composite containerModified = new Composite(container, SWT.NONE);
+            containerModified.setForeground(_fgColor);
+            containerModified.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_lblDateTimeModifiedValue);
+                  .grab(true, false)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(containerModified);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerModified);
+            {
+               _lblDateTimeModified = createUI_Label(containerModified, Messages.Tour_Tooltip_Label_DateTimeModified);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .align(SWT.END, SWT.FILL)
+                     .applyTo(_lblDateTimeModified);
+
+               _lblDateTimeModifiedValue = createUI_LabelValue(containerModified, SWT.TRAIL);
+               GridDataFactory.fillDefaults()
+                     .align(SWT.END, SWT.FILL)
+                     .applyTo(_lblDateTimeModifiedValue);
+            }
+         }
+         {
+            /*
+             * Text width in pixel
+             */
+            _spinnerTextWidth = new Spinner(container, SWT.BORDER);
+            _spinnerTextWidth.setMinimum(STATE_TEXT_WITH_MIN);
+            _spinnerTextWidth.setMaximum(STATE_TEXT_WITH_MAX);
+            _spinnerTextWidth.setIncrement(10);
+            _spinnerTextWidth.setPageIncrement(50);
+            _spinnerTextWidth.setToolTipText(Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
+            _spinnerTextWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TextWidth()));
+            _spinnerTextWidth.addMouseWheelListener(mouseEvent -> {
+
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_TextWidth();
+            });
          }
       }
    }
@@ -1470,12 +1482,6 @@ public class TourInfoUI {
 
       _pc = new PixelConverter(parent);
 
-      /*
-       * !!! It is important that the width value is not too large otherwise empty lines (because of
-       * the default width) are added below the text control when there is a lot of content
-       */
-      _textWidthInPixel = _pc.convertWidthInCharsToPixels(_textWidthInCharacters);
-
       _descriptionScroll_Height = _pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
 
@@ -1525,11 +1531,9 @@ public class TourInfoUI {
 
    private void onSelect_TextWidth() {
 
-      final int numTextCharacters = _spinnerTextWidth.getSelection();
+      _textWidthInPixel = _spinnerTextWidth.getSelection();
 
-      _textWidthInPixel = _pc.convertWidthInCharsToPixels(numTextCharacters);
-
-      _state.put(STATE_TEXT_WITH_IN_CHARACTERS, numTextCharacters);
+      _state.put(STATE_TEXT_WITH, _textWidthInPixel);
 
       updateUI();
       updateUI_Layout();
@@ -1551,17 +1555,17 @@ public class TourInfoUI {
 
    private void restoreState() {
 
-      _spinnerTextWidth.setSelection(_textWidthInCharacters);
+      _spinnerTextWidth.setSelection(_textWidthInPixel);
    }
 
    private void restoreState_BeforeUI() {
 
-      _textWidthInCharacters = Util.getStateInt(_state,
+      _textWidthInPixel = Util.getStateInt(_state,
 
-            STATE_TEXT_WITH_IN_CHARACTERS,
-            STATE_TEXT_WITH_IN_CHARACTERS_DEFAULT,
-            STATE_TEXT_WITH_IN_CHARACTERS_MIN,
-            STATE_TEXT_WITH_IN_CHARACTERS_MAX);
+            STATE_TEXT_WITH,
+            STATE_TEXT_WITH_DEFAULT,
+            STATE_TEXT_WITH_MIN,
+            STATE_TEXT_WITH_MAX);
    }
 
    /**
