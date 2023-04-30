@@ -1288,6 +1288,10 @@ public class TourInfoUI {
 
    private void createUI_99_CreateModifyTime(final Composite parent) {
 
+//      if (_uiDtCreated == null && _uiDtModified == null) {
+//         return;
+//      }
+
       final Composite container = new Composite(parent, SWT.NONE);
       container.setForeground(_fgColor);
       container.setBackground(_bgColor);
