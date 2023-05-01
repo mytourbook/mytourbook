@@ -39,6 +39,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.zip.GZIPOutputStream;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
@@ -114,7 +115,9 @@ public class StravaUploader extends TourbookCloudUploader {
 
    public StravaUploader() {
 
-      super(CLOUD_UPLOADER_ID, Messages.VendorName_Strava);
+      super(CLOUD_UPLOADER_ID,
+            Messages.VendorName_Strava,
+            Activator.getImageDescriptor(CloudImages.Cloud_Strava));
 
       VelocityService.init();
    }

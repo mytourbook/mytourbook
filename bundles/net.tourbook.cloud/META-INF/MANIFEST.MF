@@ -30,6 +30,7 @@ Import-Package: com.fasterxml.jackson.core,
  net.tourbook.tour,
  net.tourbook.web,
  org.apache.commons.io,
+ org.eclipse.nebula.widgets.opal.switchbutton,
  org.json
 Automatic-Module-Name: net.tourbook.cloud
 Export-Package: net.tourbook.cloud,

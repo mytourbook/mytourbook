@@ -485,7 +485,7 @@ public class FitExporter {
 
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
       if (speedSerie != null) {
-         recordMesg.setSpeed(speedSerie[index]);
+         recordMesg.setSpeed(UI.convertSpeed_FromKphToMps(speedSerie[index]));
       }
 
       final float[] pulseSerie = _tourData.pulseSerie;

@@ -35,12 +35,28 @@ public class FitSportMapper {
       switch (tourTypeName.toLowerCase().trim()) {
 
       case "cycling": //$NON-NLS-1$
+      case "trainer": //$NON-NLS-1$
          sport = Sport.CYCLING;
+         break;
+
+      case "hiking": //$NON-NLS-1$
+         sport = Sport.HIKING;
          break;
 
       case "running": //$NON-NLS-1$
       case "trail": //$NON-NLS-1$
          sport = Sport.RUNNING;
+         break;
+
+      case "snowshoeing": //$NON-NLS-1$
+         sport = Sport.SNOWSHOEING;
+         break;
+
+      case "skating": //$NON-NLS-1$
+      case "cross-country": //$NON-NLS-1$
+      case "skate-skiing": //$NON-NLS-1$
+
+         sport = Sport.CROSS_COUNTRY_SKIING;
          break;
 
       case "walking": //$NON-NLS-1$
@@ -67,8 +83,16 @@ public class FitSportMapper {
 
       switch (tourTypeName.toLowerCase().trim()) {
 
+      case "skating": //$NON-NLS-1$
+         subSport = SubSport.SKATE_SKIING;
+         break;
+
       case "trail": //$NON-NLS-1$
          subSport = SubSport.TRAIL;
+         break;
+
+      case "trainer": //$NON-NLS-1$
+         subSport = SubSport.VIRTUAL_ACTIVITY;
          break;
 
       default:

@@ -1202,6 +1202,17 @@ public class UI {
    }
 
    /**
+    * Convert a speed value from km/h to m/s
+    *
+    * @param speed
+    * @return Returns the speed value in m/s.
+    */
+   public static float convertSpeed_FromKphToMps(final float speed) {
+
+      return speed * 0.277777778f;
+   }
+
+   /**
     * @param speed
     * @return Returns the speed value in the current measurement system.
     */

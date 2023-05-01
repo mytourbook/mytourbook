@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
@@ -63,12 +65,15 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    private static TourExporter _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
 
+   private static String       CLOUD_UPLOADER_ID             = "Suunto";                                                 //$NON-NLS-1$
    private boolean             _useActivePerson;
    private boolean             _useAllPeople;
 
    public SuuntoRoutesUploader() {
 
-      super("SUUNTO", Messages.VendorName_Suunto_Routes); //$NON-NLS-1$
+      super(CLOUD_UPLOADER_ID,
+            Messages.VendorName_Suunto_Routes,
+            Activator.getImageDescriptor(CloudImages.Cloud_Suunto));
 
       _tourExporter.setUseDescription(true);
 

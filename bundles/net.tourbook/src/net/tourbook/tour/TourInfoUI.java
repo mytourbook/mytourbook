@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.OtherMessages;
@@ -42,6 +43,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -616,6 +618,7 @@ public class TourInfoUI {
          createUI_32_Time(container);
          createUI_34_DistanceAltitude(container);
          createUI_36_Misc(container);
+         createUI_37_HeartRateZones(container);
 
          // gear data
          _lblGear_Spacer = createUI_Spacer(container);
@@ -783,6 +786,51 @@ public class TourInfoUI {
 
          createUI_Label(container, UI.UNIT_LABEL_WEIGHT);
       }
+   }
+
+   private void createUI_37_HeartRateZones(final Composite container) {
+
+      createUI_Spacer(container);
+
+      if (_tourData.getNumberOfHrZones() == 0) {
+         return;
+      }
+
+      final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
+
+      final long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
+
+      final int[] timeInHrZones = new int[10];
+      final int[] index = new int[1];
+      timeInHrZones[index[0]++] = _tourData.getHrZone0();
+      timeInHrZones[index[0]++] = _tourData.getHrZone1();
+      timeInHrZones[index[0]++] = _tourData.getHrZone2();
+      timeInHrZones[index[0]++] = _tourData.getHrZone3();
+      timeInHrZones[index[0]++] = _tourData.getHrZone4();
+      timeInHrZones[index[0]++] = _tourData.getHrZone5();
+      timeInHrZones[index[0]++] = _tourData.getHrZone6();
+      timeInHrZones[index[0]++] = _tourData.getHrZone7();
+      timeInHrZones[index[0]++] = _tourData.getHrZone8();
+      timeInHrZones[index[0]] = _tourData.getHrZone9();
+
+      index[0] = 0;
+
+      tourPersonHrZones.forEach(hrZone -> {
+
+         final int timeInTimeZone = timeInHrZones[index[0]++];
+
+         createUI_Label(container, hrZone.getNameShort());
+
+         final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
+         final float zonePercentage = timeInTimeZone * 100f / tourDeviceTime_Recorded;
+         final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage)) + UI.SPACE + UI.SYMBOL_PERCENTAGE;
+         lblPercentage.setText(timeInTimeZone > 0 ? zonePercentageTimeText : UI.EMPTY_STRING);
+
+         final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
+         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone) + UI.SPACE + Messages.Tour_Tooltip_Label_Hour;
+         lblTime.setText(timeInTimeZone > 0 ? lblTimeText : UI.EMPTY_STRING);
+      });
+
    }
 
    private void createUI_38_Gears(final Composite parent) {
@@ -1773,10 +1821,10 @@ public class TourInfoUI {
          _lblBreakTime_Unit.setVisible(breakTime > 0);
 
          _lblElapsedTime.setText(FormatManager.formatElapsedTime(elapsedTime));
-         _lblRecordedTime.setText(FormatManager.formatMovingTime(recordedTime));
+         _lblRecordedTime.setText(FormatManager.formatRecordedTime(recordedTime));
          _lblPausedTime.setText(FormatManager.formatPausedTime(pausedTime));
          _lblMovingTime.setText(FormatManager.formatMovingTime(movingTime));
-         _lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
+         _lblBreakTime.setText(FormatManager.formatBreakTime(breakTime));
 
          /*
           * Time zone
