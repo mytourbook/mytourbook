@@ -56,9 +56,6 @@ public class Messages extends NLS {
    public static String Dialog_UploadToursToStrava_SubTask;
    public static String Dialog_UploadToursToStrava_Task;
    public static String Dialog_UploadToursToStrava_Title;
-   public static String Dialog_UseTourTypeMappingModified_Title;
-   public static String Dialog_UseTourTypeMappingActivated_Message;
-   public static String Dialog_UseTourTypeMappingDeactivated_Message;
    public static String Log_UploadToursToStrava_001_Start;
    public static String Log_UploadToursToStrava_002_NoTourTitle;
    public static String Log_UploadToursToStrava_003_ActivityLink;
