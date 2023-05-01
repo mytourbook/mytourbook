@@ -213,10 +213,10 @@ public class StravaUploader extends TourbookCloudUploader {
             String.valueOf(tourData.getTourId()),
             "fit"); //$NON-NLS-1$
 
-      final String exportedTcxGzFile = exportFitGzFile(tourData, absoluteTourFilePath);
-      if (StringUtils.hasContent(exportedTcxGzFile)) {
+      final String exportedFitGzFile = exportFitGzFile(tourData, absoluteTourFilePath);
+      if (StringUtils.hasContent(exportedFitGzFile)) {
 
-         toursWithTimeSeries.put(exportedTcxGzFile, tourData);
+         toursWithTimeSeries.put(exportedFitGzFile, tourData);
       }
 
       FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
