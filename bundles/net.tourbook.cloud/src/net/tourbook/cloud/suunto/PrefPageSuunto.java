@@ -384,7 +384,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             _chkShowHideTokens = new SwitchButton(_groupCloudAccount, SWT.NONE);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(!_chkShowHideTokens
                   .getSelection())));
             GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
@@ -755,6 +755,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
       _chkShowHideTokens.setEnabled(isAuthorized);
+      _chkShowHideTokens.setSelection(true);
       _labelDownloadFolder.setEnabled(isAuthorized);
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);

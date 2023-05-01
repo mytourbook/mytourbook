@@ -215,7 +215,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             _chkShowHideTokens = new SwitchButton(_group, SWT.NONE);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(!_chkShowHideTokens
                   .getSelection())));
             GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
@@ -241,6 +241,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
       _chkShowHideTokens.setEnabled(isAuthorized);
+      _chkShowHideTokens.setSelection(true);
       _linkRevokeAccess.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
    }

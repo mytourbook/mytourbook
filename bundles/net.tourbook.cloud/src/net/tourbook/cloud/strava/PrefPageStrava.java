@@ -266,7 +266,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkShowHideTokens = new SwitchButton(group, SWT.NONE);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(!_chkShowHideTokens
                   .getSelection())));
             GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
@@ -368,6 +368,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _labelExpiresAt.setEnabled(isAuthorized);
       _linkRevokeAccess.setEnabled(isAuthorized);
       _chkShowHideTokens.setEnabled(isAuthorized);
+      _chkShowHideTokens.setSelection(true);
       _chkAddWeatherIconInTitle.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
       _chkSendWeatherDataInDescription.setEnabled(isAuthorized);
@@ -375,6 +376,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _btnCleanup.setEnabled(isAuthorized);
 
       _linkTourTypeFilters.getControl().setEnabled(_chkUseTourTypeMapping.getSelection());
+
    }
 
    private String getLocalExpireAtDateTime() {
