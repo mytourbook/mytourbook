@@ -76,5 +76,4 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
 
       testImportFile(fitDataReader, FILES_PATH + "Bye_bye_Silverton", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
    }
-
 }
