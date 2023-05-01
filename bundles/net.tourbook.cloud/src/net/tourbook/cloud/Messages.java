@@ -63,7 +63,6 @@ public class Messages extends NLS {
    public static String Log_UploadToursToStrava_004_UploadError;
    public static String PrefPage_AccountInformation_Label_AthleteName;
    public static String PrefPage_AccountInformation_Label_AthleteWebPage;
-   public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
    public static String PrefPage_UploadConfiguration_Button_AddWeatherIconInTitle;
    public static String PrefPage_UploadConfiguration_Button_SendDescription;
    public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription;

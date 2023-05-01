@@ -29,7 +29,6 @@ import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.preferences.PrefPageTourTypeFilterList;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -49,8 +48,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.dialogs.PreferenceLinkArea;
-import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -73,24 +70,23 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
-   private Button             _btnCleanup;
-   private Button             _chkAddWeatherIconInTitle;
-   private Button             _chkSendDescription;
-   private Button             _chkSendWeatherDataInDescription;
+   private Button       _btnCleanup;
+   private Button       _chkAddWeatherIconInTitle;
+   private Button       _chkSendDescription;
+   private Button       _chkSendWeatherDataInDescription;
 
-   private Label              _labelAccessToken;
-   private Label              _labelAthleteName;
-   private Label              _labelAthleteName_Value;
-   private Label              _labelAthleteWebPage;
-   private Label              _labelExpiresAt;
-   private Label              _labelExpiresAt_Value;
-   private Label              _labelRefreshToken;
-   private Link               _linkAthleteWebPage;
-   private Link               _linkRevokeAccess;
-   private PreferenceLinkArea _linkTourTypeFilters;
-   private SwitchButton       _chkShowHideTokens;
-   private Text               _txtAccessToken_Value;
-   private Text               _txtRefreshToken_Value;
+   private Label        _labelAccessToken;
+   private Label        _labelAthleteName;
+   private Label        _labelAthleteName_Value;
+   private Label        _labelAthleteWebPage;
+   private Label        _labelExpiresAt;
+   private Label        _labelExpiresAt_Value;
+   private Label        _labelRefreshToken;
+   private Link         _linkAthleteWebPage;
+   private Link         _linkRevokeAccess;
+   private SwitchButton _chkShowHideTokens;
+   private Text         _txtAccessToken_Value;
+   private Text         _txtRefreshToken_Value;
 
    private String constructAthleteWebPageLink(final String athleteId) {
 
@@ -310,19 +306,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
             _chkSendWeatherDataInDescription.setText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription);
             _chkSendWeatherDataInDescription.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip);
-         }
-         {
-            _linkTourTypeFilters = new PreferenceLinkArea(
-                  group,
-                  SWT.MULTI | SWT.WRAP,
-                  PrefPageTourTypeFilterList.ID,
-                  Messages.PrefPage_TourTypeFilter_Link_StravaTourTypes,
-                  (IWorkbenchPreferenceContainer) getContainer(),
-                  new PrefPageTourTypeFilterList());
-
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(_linkTourTypeFilters.getControl());
          }
       }
    }
