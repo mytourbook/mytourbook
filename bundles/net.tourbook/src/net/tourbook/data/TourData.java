@@ -465,7 +465,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
     * have up to 10 HR zones, when HR zone value is <code>-1</code> then this zone is not set.
     * <p>
-    * These values are used in the statistic views.
+    * These values are used in the statistic views and the tour info tooltip.
     */
    private int                   hrZone0                        = -1;                     // db-version 16
    private int                   hrZone1                        = -1;                     // db-version 16
