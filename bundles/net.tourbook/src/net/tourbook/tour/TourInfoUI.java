@@ -822,11 +822,13 @@ public class TourInfoUI {
          createUI_Label(container, hrZone.getNameShort());
 
          final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
-         final int zonePercentage = (int) (timeInTimeZone * 100f / tourDeviceTime_Recorded);
-         lblPercentage.setText(String.valueOf(zonePercentage) + UI.SPACE + UI.SYMBOL_PERCENTAGE);
+         final float zonePercentage = timeInTimeZone * 100f / tourDeviceTime_Recorded;
+         final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage)) + UI.SPACE + UI.SYMBOL_PERCENTAGE;
+         lblPercentage.setText(timeInTimeZone > 0 ? zonePercentageTimeText : UI.EMPTY_STRING);
 
          final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
-         lblTime.setText(FormatManager.formatRecordedTime(timeInTimeZone) + UI.SPACE + Messages.Tour_Tooltip_Label_Hour);
+         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone) + UI.SPACE + Messages.Tour_Tooltip_Label_Hour;
+         lblTime.setText(timeInTimeZone > 0 ? lblTimeText : UI.EMPTY_STRING);
       });
 
    }
