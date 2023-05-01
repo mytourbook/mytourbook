@@ -799,25 +799,26 @@ public class TourInfoUI {
       final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
       final int[] timeInHrZones = new int[10];
-      int index = 0;
-      timeInHrZones[index++] = _tourData.getHrZone0();
-      timeInHrZones[index++] = _tourData.getHrZone1();
-      timeInHrZones[index++] = _tourData.getHrZone2();
-      timeInHrZones[index++] = _tourData.getHrZone3();
-      timeInHrZones[index++] = _tourData.getHrZone4();
-      timeInHrZones[index++] = _tourData.getHrZone5();
-      timeInHrZones[index++] = _tourData.getHrZone6();
-      timeInHrZones[index++] = _tourData.getHrZone7();
-      timeInHrZones[index++] = _tourData.getHrZone8();
-      timeInHrZones[index] = _tourData.getHrZone9();
+      int[] index = new int[1];
+      timeInHrZones[index[0]++] = _tourData.getHrZone0();
+      timeInHrZones[index[0]++] = _tourData.getHrZone1();
+      timeInHrZones[index[0]++] = _tourData.getHrZone2();
+      timeInHrZones[index[0]++] = _tourData.getHrZone3();
+      timeInHrZones[index[0]++] = _tourData.getHrZone4();
+      timeInHrZones[index[0]++] = _tourData.getHrZone5();
+      timeInHrZones[index[0]++] = _tourData.getHrZone6();
+      timeInHrZones[index[0]++] = _tourData.getHrZone7();
+      timeInHrZones[index[0]++] = _tourData.getHrZone8();
+      timeInHrZones[index[0]] = _tourData.getHrZone9();
 
+      index[0] = 0;
       tourPersonHrZones.forEach(hrZone -> {
 
          final Label zoneName = createUI_LabelValue(container, SWT.TRAIL);
          zoneName.setText(hrZone.getNameLong());
 
          final Label percentageAndTime = createUI_LabelValue(container, SWT.LEAD);
-         percentageAndTime.setText(" x %  " + timeInHrZones[0] + " h:m:s");
+         percentageAndTime.setText(" x %  " + FormatManager.formatRecordedTime(timeInHrZones[index[0]++]) + " h:m:s");
 
          // spacer
          createUI_LabelValue(container, SWT.TRAIL);
