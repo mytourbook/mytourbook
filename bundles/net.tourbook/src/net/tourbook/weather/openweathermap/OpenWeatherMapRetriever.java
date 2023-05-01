@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -180,26 +181,23 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   tour.getTimeZoneId());
 
             final boolean isDisplayEmptyValues = !isCompressed;
-            String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
-                  0,
-                  UI.EMPTY_STRING,
-                  UI.EMPTY_STRING,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  airQualityIndex,
-                  tourDateTime,
-                  isDisplayEmptyValues);
 
-            if (isCompressed) {
-               fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+            final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
+
+            String airQuality = UI.EMPTY_STRING;
+            if (airQualityIndex > 0 || isDisplayEmptyValues) {
+
+               airQuality = tourTime + UI.SPACE3
+                     + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality
+                     + UI.SPACE
+                     + airQualityIndex;
             }
 
-            fullWeatherDataList.add(fullWeatherData);
+            if (isCompressed) {
+               airQuality = airQuality.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+            }
+
+            fullWeatherDataList.add(airQuality);
          }
       }
 

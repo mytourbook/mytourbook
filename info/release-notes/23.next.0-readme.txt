@@ -36,10 +36,10 @@ New
 * Tour Weather (Frederic)
   - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
-Tour Export (Frederic)
+* Tour Export (Frederic)
   - Added the ability to export tours in FIT format
   
-Suunto App Integration (Frederic)
+* Suunto App Integration (Frederic)
   - Added the ability to upload tours as workouts
 
 Improvements
@@ -60,6 +60,7 @@ Improvements
 * Tour Info Tooltip
   - Adjust width of the tour info tooltip
     https://github.com/mytourbook/mytourbook/issues/1077
+  - Added, when available, the time and percentage of time spent in each HR zone (Frederic)
   
 * Tour Chart
   - Show "Recorded Time" in the value point tooltip 
@@ -85,6 +86,9 @@ Bugfix
 
 * Tour Import
   - "distanceSerie" is null                  https://github.com/mytourbook/mytourbook/issues/1044
+
+* Tour Info Tooltip (Frederic)
+  - Fixed a bug where the time formats were not correctly applied
 
 
 Translation    

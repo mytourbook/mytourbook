@@ -129,7 +129,7 @@ public class SuuntoWorkoutUploaderTests {
 
       httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().put(blobUrl).called();
-      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload/642c5admtced4c09af1c49e6").toString()).called();
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload/642c5admtced4c09af1c49e6").toString()).called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(

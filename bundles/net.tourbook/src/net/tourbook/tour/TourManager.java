@@ -2727,7 +2727,7 @@ public class TourManager {
 
    /**
     * @param allTourData
-    * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
+    * @return Returns a list of all modified tours
     */
    public static List<TourData> retrieveWeatherData(final List<TourData> allTourData) {
 
@@ -2737,65 +2737,60 @@ public class TourManager {
          return allModifiedTours;
       }
 
-      TourLogManager.showLogView();
-
       final long start = System.currentTimeMillis();
 
-      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      final String weatherProvider = _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
-         @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+      TourLogManager.showLogView();
+      TourLogManager.subLog_INFO(NLS.bind(LOG_RETRIEVE_WEATHER_DATA_001_START, weatherProvider));
 
-            int monitorCounter = 0;
-            final int numTours = allTourData.size();
+      final int numTours = allTourData.size();
 
-            monitor.beginTask(Messages.Tour_Data_RetrievingWeatherData_Monitor, numTours);
+      if (numTours < 2) {
 
-            final String weatherProvider = _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+         BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-            TourLogManager.subLog_INFO(NLS.bind(
-                  LOG_RETRIEVE_WEATHER_DATA_001_START,
-                  weatherProvider));
+            retrieveWeatherData_OneTour(allTourData.get(0), allModifiedTours, weatherProvider);
+         });
 
-            // loop: all tours
-            for (final TourData tourData : allTourData) {
+      } else {
 
-               monitor.subTask(NLS.bind(
-                     Messages.Tour_Data_RetrievingWeatherData_Monitor_Subtask,
-                     ++monitorCounter,
-                     numTours));
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-               if (monitor.isCanceled()) {
-                  break;
-               }
+            @Override
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-               monitor.worked(1);
+               int monitorCounter = 0;
 
-               // ensure data is available
-               if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+               monitor.beginTask(Messages.Tour_Data_RetrievingWeatherData_Monitor, numTours);
 
-                  TourLogManager.subLog_ERROR(String.format(
-                        LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-                        getTourDateTimeShort(tourData)));
+               // loop: all tours
+               for (final TourData tourData : allTourData) {
 
-                  continue;
-               }
+                  monitor.subTask(NLS.bind(
+                        Messages.Tour_Data_RetrievingWeatherData_Monitor_Subtask,
+                        ++monitorCounter,
+                        numTours));
 
-               if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
+                  if (monitor.isCanceled()) {
+                     break;
+                  }
 
-                  allModifiedTours.add(tourData);
+                  monitor.worked(1);
+
+                  retrieveWeatherData_OneTour(tourData, allModifiedTours, weatherProvider);
                }
             }
+         };
+
+         try {
+
+            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+
+         } catch (InvocationTargetException | InterruptedException e) {
+
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
-      };
-
-      try {
-
-         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
-
-      } catch (InvocationTargetException | InterruptedException e) {
-
-         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       TourLogManager.subLog_INFO(String.format(
@@ -2803,6 +2798,31 @@ public class TourManager {
             (System.currentTimeMillis() - start) / 1000.0));
 
       return allModifiedTours;
+   }
+
+   /**
+    * @param tourData
+    * @param allModifiedTours
+    * @param weatherProvider
+    */
+   private static void retrieveWeatherData_OneTour(final TourData tourData,
+                                                   final List<TourData> allModifiedTours,
+                                                   final String weatherProvider) {
+
+      // ensure data is available
+      if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+
+         TourLogManager.subLog_ERROR(String.format(
+               LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+               getTourDateTimeShort(tourData)));
+
+         return;
+      }
+
+      if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
+
+         allModifiedTours.add(tourData);
+      }
    }
 
    /**

@@ -109,28 +109,29 @@ public class TimeTools {
     */
    public static String[]                        month_Full;
 
+   public static final DateTimeFormatter         Formatter_Date_S;
+
 // SET_FORMATTING_OFF
 
-   public static final DateTimeFormatter   Formatter_Date_S;
    public static final DateTimeFormatter   Formatter_Date_M             = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_Date_L             = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_Date_F             = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
-
    public static final DateTimeFormatter   Formatter_Time_S             = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+
    public static final DateTimeFormatter   Formatter_Time_M             = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_Time_F             = DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL);
-
    public static final DateTimeFormatter   Formatter_DateTime_S;
+
    public static final DateTimeFormatter   Formatter_DateTime_SM;
    public static final DateTimeFormatter   Formatter_DateTime_M         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_DateTime_MS        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
    public static final DateTimeFormatter   Formatter_DateTime_ML        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_DateTime_F         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
-
-
    public static final DateTimeFormatter   Formatter_FileName           = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");    //$NON-NLS-1$
 
+
    public static final DateTimeFormatter   Formatter_Day                = DateTimeFormatter.ofPattern("d");                      //$NON-NLS-1$
+
    public static final DateTimeFormatter   Formatter_DayMonth           = DateTimeFormatter.ofPattern("d MMM");                  //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_DayMonthYear       = DateTimeFormatter.ofPattern("d MMM uu");               //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_Month              = DateTimeFormatter.ofPattern("MMM");                    //$NON-NLS-1$
@@ -139,12 +140,11 @@ public class TimeTools {
    public static final DateTimeFormatter   Formatter_Weekday            = DateTimeFormatter.ofPattern("E");                      //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_Weekday_L          = DateTimeFormatter.ofPattern("EEEE");                   //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_YearMonthDay       = DateTimeFormatter.ofPattern("yyyy-MM-dd");             //$NON-NLS-1$
-
    public static final DateTimeFormatter   Formatter_DayTimeSecondsAmPm = DateTimeFormatter.ofPattern("h:mm:ss a");              //$NON-NLS-1$
 
-// SET_FORMATTING_ON
-
    public static final DateTimeFormatter  Formatter_Time_ISO;
+
+// SET_FORMATTING_ON
 
    private static final IPreferenceStore  _prefStoreCommon     = CommonActivator.getPrefStore();
 
@@ -204,11 +204,11 @@ public class TimeTools {
       }
 
 // SET_FORMATTING_OFF
-      
+
       Formatter_Date_S        = DateTimeFormatter.ofPattern(shortDatePattern,             defaultLocale);
       Formatter_DateTime_S    = DateTimeFormatter.ofPattern(shortDateTimePattern,         defaultLocale);
       Formatter_DateTime_SM   = DateTimeFormatter.ofPattern(shortDateMediumTimePattern,   defaultLocale);
-      
+
 // SET_FORMATTING_ON
 
       Formatter_Time_ISO = new DateTimeFormatterBuilder()
@@ -292,6 +292,8 @@ public class TimeTools {
             weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
       };
    }
+
+   private TimeTools() {}
 
    /**
     * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
