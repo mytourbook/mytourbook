@@ -35,6 +35,8 @@ public class OAuth2Utils {
 
    public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
+   private OAuth2Utils() {}
+
    public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime,
                                                          final long accessTokenExpiresIn) {
 

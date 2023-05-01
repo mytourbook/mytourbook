@@ -898,6 +898,13 @@ public class TrainingView extends ViewPart {
             final Label label = _lblHRZoneColor[zoneIndex];
             final Color zoneColor = _hrZoneColors[zoneIndex];
 
+            if (label.isDisposed()) {
+
+               // this happened when closing the training view
+               
+               continue;
+            }
+
             label.setBackground(zoneColor);
          }
       });
