@@ -60,7 +60,7 @@ Improvements
 * Tour Info Tooltip
   - Adjust width of the tour info tooltip
     https://github.com/mytourbook/mytourbook/issues/1077
-  - Added, when available, the time and percentage of time spent in each HR zone
+  - Added, when available, the time and percentage of time spent in each HR zone (Frederic)
   
 * Tour Chart
   - Show "Recorded Time" in the value point tooltip 
