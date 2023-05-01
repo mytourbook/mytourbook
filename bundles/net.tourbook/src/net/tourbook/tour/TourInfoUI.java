@@ -798,10 +798,10 @@ public class TourInfoUI {
 
       final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
-      long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
+      final long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
 
       final int[] timeInHrZones = new int[10];
-      int[] index = new int[1];
+      final int[] index = new int[1];
       timeInHrZones[index[0]++] = _tourData.getHrZone0();
       timeInHrZones[index[0]++] = _tourData.getHrZone1();
       timeInHrZones[index[0]++] = _tourData.getHrZone2();
@@ -817,13 +817,13 @@ public class TourInfoUI {
 
       tourPersonHrZones.forEach(hrZone -> {
 
-         int timeInTimeZone = timeInHrZones[index[0]++];
+         final int timeInTimeZone = timeInHrZones[index[0]++];
 
          createUI_Label(container, hrZone.getNameShort());
 
          final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
-         int zonePercentage = (int) (timeInTimeZone * 100f / tourDeviceTime_Recorded);
-         lblPercentage.setText(zonePercentage + UI.SPACE + UI.SYMBOL_PERCENTAGE);
+         final int zonePercentage = (int) (timeInTimeZone * 100f / tourDeviceTime_Recorded);
+         lblPercentage.setText(String.valueOf(zonePercentage) + UI.SPACE + UI.SYMBOL_PERCENTAGE);
 
          final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
          lblTime.setText(FormatManager.formatRecordedTime(timeInTimeZone) + UI.SPACE + Messages.Tour_Tooltip_Label_Hour);
