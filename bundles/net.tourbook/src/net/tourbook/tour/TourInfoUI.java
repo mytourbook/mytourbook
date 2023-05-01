@@ -618,7 +618,7 @@ public class TourInfoUI {
          createUI_32_Time(container);
          createUI_34_DistanceAltitude(container);
          createUI_36_Misc(container);
-         createUI_37_HeartRateZoned(container);
+         createUI_37_HeartRateZones(container);
 
          // gear data
          _lblGear_Spacer = createUI_Spacer(container);
@@ -788,17 +788,36 @@ public class TourInfoUI {
       }
    }
 
-   private void createUI_37_HeartRateZoned(final Composite container) {
+   private void createUI_37_HeartRateZones(final Composite container) {
 
       createUI_Spacer(container);
 
-      final List<TourPersonHRZone> toto = _tourData.getDataPerson().getHrZonesSorted();
+      if (_tourData.getNumberOfHrZones() == 0) {
+         return;
+      }
 
-      toto.forEach(hrZone -> {
+      final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
-         createUI_Label(container, hrZone.getNameLong());
+      final int[] timeInHrZones = new int[10];
+      int index = 0;
+      timeInHrZones[index++] = _tourData.getHrZone0();
+      timeInHrZones[index++] = _tourData.getHrZone1();
+      timeInHrZones[index++] = _tourData.getHrZone2();
+      timeInHrZones[index++] = _tourData.getHrZone3();
+      timeInHrZones[index++] = _tourData.getHrZone4();
+      timeInHrZones[index++] = _tourData.getHrZone5();
+      timeInHrZones[index++] = _tourData.getHrZone6();
+      timeInHrZones[index++] = _tourData.getHrZone7();
+      timeInHrZones[index++] = _tourData.getHrZone8();
+      timeInHrZones[index] = _tourData.getHrZone9();
 
-         createUI_Label(container, " x % - y h:m:s");
+      tourPersonHrZones.forEach(hrZone -> {
+
+         final Label zoneName = createUI_LabelValue(container, SWT.TRAIL);
+         zoneName.setText(hrZone.getNameLong());
+
+         final Label percentageAndTime = createUI_LabelValue(container, SWT.LEAD);
+         percentageAndTime.setText(" x %  " + timeInHrZones[0] + " h:m:s");
 
          // spacer
          createUI_LabelValue(container, SWT.TRAIL);

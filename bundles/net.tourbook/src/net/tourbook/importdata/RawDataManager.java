@@ -1767,6 +1767,7 @@ public class RawDataManager {
                tourData.pulseTime_Milliseconds = null;
                tourData.pulseTime_TimeIndex = null;
                tourData.setAvgPulse(0);
+               tourData.setNumberOfHrZones(0);
                break;
 
             case TIME_SLICES__POWER_AND_SPEED:
