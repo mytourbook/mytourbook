@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -67,8 +69,7 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -162,7 +163,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private void checkCalendarWeek() {
 
       if ((_backupFirstDayOfWeek != _currentFirstDayOfWeek)
-            | (_backupMinimalDaysInFirstWeek != _currentMinimalDaysInFirstWeek)) {
+            || (_backupMinimalDaysInFirstWeek != _currentMinimalDaysInFirstWeek)) {
 
          if (MessageDialog.openQuestion(
                Display.getCurrent().getActiveShell(),
@@ -233,12 +234,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
              */
             _chkSystem_ShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
             _chkSystem_ShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
-            _chkSystem_ShowMeasurementInAppToolbar.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSystemItem_Select();
-               }
-            });
+            _chkSystem_ShowMeasurementInAppToolbar.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSystemItem_Select()));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(0, _pc.convertVerticalDLUsToPixels(20))
@@ -258,26 +254,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final GridDataFactory gridData_Combo = GridDataFactory.fillDefaults().grab(true, false);
       final GridDataFactory gridData_Label = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
-      final SelectionAdapter itemListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSystemItem_Select();
-         }
-      };
+      final SelectionListener itemListener = widgetSelectedAdapter(selectionEvent -> onSystemItem_Select());
 
-      final SelectionAdapter profileListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSystemProfile_Select(true);
-         }
-      };
+      final SelectionListener profileListener = widgetSelectedAdapter(selectionEvent -> onSystemProfile_Select(true));
 
-      final ModifyListener modifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onSystemProfile_Modify(e);
-         }
-      };
+      final ModifyListener modifyListener = modifyEvent -> onSystemProfile_Modify(modifyEvent);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
@@ -502,16 +483,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       final String defaultTimeZoneId = ZoneId.systemDefault().getId();
 
-      final SelectionAdapter timeZoneListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      final SelectionListener timeZoneListener = widgetSelectedAdapter(selectionEvent -> {
 
-            updateModel_TimeZone();
-            enableControls();
+         updateModel_TimeZone();
+         enableControls();
 
-            doTimeZoneLiveUpdate();
-         }
-      };
+         doTimeZoneLiveUpdate();
+      });
 
       final int columnIndent = 16;
       final int verticalSpacing = 5;
@@ -669,12 +647,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             _chkTimeZone_LiveUpdate = new Button(container, SWT.CHECK);
             _chkTimeZone_LiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
             _chkTimeZone_LiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
-            _chkTimeZone_LiveUpdate.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  doTimeZoneLiveUpdate();
-               }
-            });
+            _chkTimeZone_LiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> doTimeZoneLiveUpdate()));
             GridDataFactory
                   .fillDefaults()//
                   .grab(true, true)
@@ -708,12 +681,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          _comboWeek_FirstDay = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
          _comboWeek_FirstDay.setVisibleItemCount(10);
-         _comboWeek_FirstDay.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectCalendarWeek();
-            }
-         });
+         _comboWeek_FirstDay.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectCalendarWeek()));
 
          // fill combo
          final int mondayValue = DayOfWeek.MONDAY.getValue();
@@ -740,12 +708,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          _comboWeek_MinDaysInFirstWeek = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
          _comboWeek_MinDaysInFirstWeek.setVisibleItemCount(10);
-         _comboWeek_MinDaysInFirstWeek.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectCalendarWeek();
-            }
-         });
+         _comboWeek_MinDaysInFirstWeek.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectCalendarWeek()));
 
          // fill combo
          for (int dayIndex = 1; dayIndex < 8; dayIndex++) {
@@ -764,12 +727,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
           */
          final Button button = new Button(container, SWT.NONE);
          button.setText(Messages.Pref_General_Button_ComputeCalendarWeek);
-         button.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onComputeCalendarWeek();
-            }
-         });
+         button.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onComputeCalendarWeek()));
          GridDataFactory
                .fillDefaults()//
                .align(SWT.BEGINNING, SWT.FILL)
