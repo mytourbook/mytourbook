@@ -1173,6 +1173,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             _spinMinZoom.setSelection(Map2.UI_MIN_ZOOM_LEVEL);
             _spinMinZoom.addMouseWheelListener(mouseWheelListener);
             _spinMinZoom.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
                if (_isInitUI) {
                   return;
                }
@@ -1200,6 +1201,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             _spinMaxZoom.setSelection(Map2.UI_MAX_ZOOM_LEVEL);
             _spinMaxZoom.addMouseWheelListener(mouseWheelListener);
             _spinMaxZoom.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
                if (_isInitUI) {
                   return;
                }
@@ -1249,6 +1251,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _chkLiveView.setText(Messages.Dialog_MapConfig_Button_LiveView);
          _chkLiveView.setToolTipText(Messages.Dialog_MapConfig_Button_LiveView_Tooltip);
          _chkLiveView.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
             _isLiveView = _chkLiveView.getSelection();
             _map.setLiveView(_isLiveView);
 
@@ -1264,6 +1267,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                .applyTo(_chkShowTileInfo);
          _chkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
          _chkShowTileInfo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
             final boolean isTileInfo = _chkShowTileInfo.getSelection();
             _map.setShowDebugInfo(isTileInfo, isTileInfo);
          }));
