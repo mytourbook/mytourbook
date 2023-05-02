@@ -787,24 +787,12 @@ public class TourInfoUI {
 
       final long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
 
-      int numHrZones = tourPersonHrZones.size();
-      final int[] timeInHrZones = new int[numHrZones];
-      timeInHrZones[numHrZones--] = _tourData.getHrZone9();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone8();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone7();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone6();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone5();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone4();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone3();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone2();
-      timeInHrZones[numHrZones--] = _tourData.getHrZone1();
-      timeInHrZones[numHrZones] = _tourData.getHrZone0();
+      final int numHrZones = tourPersonHrZones.size();
+      final int[] timeInHrZones = _tourData.getHrZones();
 
-      numHrZones = tourPersonHrZones.size();
+      for (int hrZonedIndex = numHrZones - 1; hrZonedIndex >= 0; --hrZonedIndex) {
 
-      for (int hrZonedIndex = numHrZones - 1; hrZonedIndex >= 0; --hrZonedIndex)
-      {
-         final TourPersonHRZone currentHrZone = tourPersonHrZones.get(hrZonedIndex) ;
+         final TourPersonHRZone currentHrZone = tourPersonHrZones.get(hrZonedIndex);
 
          final int timeInTimeZone = timeInHrZones[hrZonedIndex];
 
@@ -812,11 +800,15 @@ public class TourInfoUI {
 
          final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
          final float zonePercentage = timeInTimeZone * 100f / tourDeviceTime_Recorded;
-         final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage)) + UI.SPACE + UI.SYMBOL_PERCENTAGE;
+         final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage))
+               + UI.SPACE
+               + UI.SYMBOL_PERCENTAGE;
          lblPercentage.setText(timeInTimeZone > 0 ? zonePercentageTimeText : UI.EMPTY_STRING);
 
          final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
-         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone) + UI.SPACE + Messages.Tour_Tooltip_Label_Hour;
+         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone)
+               + UI.SPACE
+               + Messages.Tour_Tooltip_Label_Hour;
          lblTime.setText(timeInTimeZone > 0 ? lblTimeText : UI.EMPTY_STRING);
       }
    }
