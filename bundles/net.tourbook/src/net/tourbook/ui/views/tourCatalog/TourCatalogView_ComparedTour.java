@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -459,11 +459,12 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
     */
    private void fireChangeEvent(final int startIndex, final int endIndex) {
 
+      final float avgAltimeter = _tourData.computeAvg_FromValues(_tourData.getAltimeterSerie(), _movedStartIndex, _movedEndIndex);
       final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
       final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
       final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, startIndex, endIndex);
 
-      fireChangeEvent(startIndex, endIndex, avgPulse, speed, elapsedTime, false);
+      fireChangeEvent(startIndex, endIndex, avgAltimeter, avgPulse, speed, elapsedTime, false);
    }
 
    /**
@@ -476,6 +477,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
     */
    private void fireChangeEvent(final int startIndex,
                                 final int endIndex,
+                                final float avgAltimeter,
                                 final float avgPulse,
                                 final float speed,
                                 final int tourDeviceTime_Elapsed,
@@ -490,6 +492,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
             isDataSaved,
             _comparedTourItem);
 
+      customData.avgAltimeter = avgAltimeter;
       customData.avgPulse = avgPulse;
       customData.speed = speed;
       customData.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
@@ -621,12 +624,14 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
       final EntityTransaction ts = em.getTransaction();
 
       try {
+
          final TourCompared comparedTour = em.find(TourCompared.class, _comparedTour_CompareId);
 
          if (comparedTour != null) {
 
             final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
 
+            final float avgAltimeter = _tourData.computeAvg_FromValues(_tourData.getAltimeterSerie(), _movedStartIndex, _movedEndIndex);
             final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
             final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
             final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, _movedStartIndex, _movedEndIndex);
@@ -634,6 +639,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
             // set new data in entity
             comparedTour.setStartIndex(_movedStartIndex);
             comparedTour.setEndIndex(_movedEndIndex);
+            comparedTour.setAvgAltimeter(avgAltimeter);
             comparedTour.setAvgPulse(avgPulse);
             comparedTour.setTourSpeed(speed);
 
@@ -660,7 +666,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
             _tourChart.updateChart(chartDataModel, true);
             enableActions();
 
-            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, elapsedTime, true);
+            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgAltimeter, avgPulse, speed, elapsedTime, true);
          }
       } catch (final Exception e) {
          e.printStackTrace();

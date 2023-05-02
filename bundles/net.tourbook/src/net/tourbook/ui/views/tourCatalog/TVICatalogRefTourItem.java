@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -165,22 +165,22 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
       final String sql = UI.EMPTY_STRING
 
-            + "SELECT" + NL //                                 //$NON-NLS-1$
+            + "SELECT" + NL //                                   //$NON-NLS-1$
 
             + " TourCompared.comparedId," + NL //              1 //$NON-NLS-1$
             + " TourCompared.tourId," + NL //                  2 //$NON-NLS-1$
             + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
-            + " TourCompared.avgPulse," + NL //                4 //$NON-NLS-1$
-            + " TourCompared.tourSpeed," + NL //               5 //$NON-NLS-1$
-            + " TourCompared.startIndex," + NL //              6 //$NON-NLS-1$
-            + " TourCompared.endIndex," + NL //                7 //$NON-NLS-1$
+            + " TourCompared.avgAltimeter," + NL //            4 //$NON-NLS-1$
+            + " TourCompared.avgPulse," + NL //                5 //$NON-NLS-1$
+            + " TourCompared.tourSpeed," + NL //               6 //$NON-NLS-1$
+            + " TourCompared.startIndex," + NL //              7 //$NON-NLS-1$
+            + " TourCompared.endIndex," + NL //                8 //$NON-NLS-1$
+            + " TourCompared.tourDeviceTime_Elapsed," + NL //  9 //$NON-NLS-1$
 
-            + " TourData.tourTitle," + NL //                   8 //$NON-NLS-1$
-            + " TourData.tourType_typeId," + NL //             9 //$NON-NLS-1$
+            + " TourData.tourTitle," + NL //                  10 //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //            11 //$NON-NLS-1$
 
-            + " jTdataTtag.TourTag_tagId," + NL //             10 //$NON-NLS-1$
-
-            + " TourCompared.tourDeviceTime_Elapsed" + NL //   11 //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId" + NL //             12 //$NON-NLS-1$
 
             + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -212,8 +212,12 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
          while (result.next()) {
 
-            final long tourId = result.getLong(2);
-            final Object resultTagId = result.getObject(10);
+// SET_FORMATTING_OFF
+
+            final long tourId          = result.getLong(2);
+            final Object resultTagId   = result.getObject(12);
+
+// SET_FORMATTING_ON
 
             if (tourId == lastTourId) {
 
@@ -225,27 +229,34 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
             } else {
 
-               // new tour is in the resultset
+               // a new tour is in the resultset
 
                final TVICatalogComparedTour tourItem = new TVICatalogComparedTour(parentItem);
                children.add(tourItem);
 
+// SET_FORMATTING_OFF
+
                tourItem.refId = refId;
 
-               tourItem.compareId = result.getLong(1);
+               // from TourCompared
+               tourItem.compareId                  = result.getLong(1);
                tourItem.setTourId(tourId);
 
-               final Date tourDate = result.getDate(3);
+               final Date tourDate                 = result.getDate(3);
 
-               tourItem.avgPulse = result.getFloat(4);
-               tourItem.tourSpeed = result.getFloat(5);
-               tourItem.tourDeviceTime_Elapsed = result.getInt(11);
+               tourItem.avgAltimeter               = result.getFloat(4);
+               tourItem.avgPulse                   = result.getFloat(5);
+               tourItem.tourSpeed                  = result.getFloat(6);
 
-               tourItem.startIndex = result.getInt(6);
-               tourItem.endIndex = result.getInt(7);
+               tourItem.startIndex                 = result.getInt(7);
+               tourItem.endIndex                   = result.getInt(8);
+               tourItem.tourDeviceTime_Elapsed     = result.getInt(9);
 
-               tourItem.tourTitle = result.getString(8);
-               final Object tourTypeId = result.getObject(9);
+               // from TourData
+               tourItem.tourTitle                  = result.getString(10);
+               final Object tourTypeId             = result.getObject(11);
+
+// SET_FORMATTING_ON
 
                // tour date
                if (tourDate != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,6 +51,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    float           tourSpeed;
    int             tourDeviceTime_Elapsed;
 
+   double          avgAltimeter;
    float           avgPulse;
 
    ArrayList<Long> tagIds;
@@ -83,6 +84,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    @Override
    protected void fetchChildren() {}
+
+   public double getAvgAltimeter() {
+      return avgAltimeter;
+   }
 
    public float getAvgPulse() {
       return avgPulse;
@@ -135,6 +140,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
       if (unfetchedChildren != null) {
          unfetchedChildren.remove(this);
       }
+   }
+
+   public void setAvgAltimeter(final double avgAltimeter) {
+      this.avgAltimeter = avgAltimeter;
    }
 
    public void setAvgPulse(final float avgPulse) {

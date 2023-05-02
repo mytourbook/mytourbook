@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,10 +23,13 @@ import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
@@ -525,6 +528,7 @@ public class TourCatalogView extends ViewPart implements
                      comparedTour.setStartIndex(compareTourProperty.startIndex);
                      comparedTour.setEndIndex(compareTourProperty.endIndex);
 
+                     comparedTour.setAvgAltimeter(compareTourProperty.avgAltimeter);
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
                      comparedTour.setTourSpeed(compareTourProperty.speed);
                      comparedTour.setTourDeviceTime_Elapsed(compareTourProperty.tourDeviceTime_Elapsed);
@@ -754,6 +758,7 @@ public class TourCatalogView extends ViewPart implements
       defineColumn_Speed();
       defineColumn_Time_ElapsedTime();
       defineColumn_AvgPulse();
+      defineColumn_AvgVerticalSpeed();
    }
 
    /**
@@ -834,7 +839,7 @@ public class TourCatalogView extends ViewPart implements
    }
 
    /**
-    * column: Avg pulse
+    * Column: Avg pulse
     */
    private void defineColumn_AvgPulse() {
 
@@ -847,9 +852,47 @@ public class TourCatalogView extends ViewPart implements
             final Object element = cell.getElement();
             if (element instanceof TVICatalogComparedTour) {
 
-               final float value = ((TVICatalogComparedTour) element).getAvgPulse();
+               final float value = ((TVICatalogComparedTour) element).avgPulse;
 
                colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Avg vertical speed (VAM average ascent speed)
+    */
+   private void defineColumn_AvgVerticalSpeed() {
+
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "motionAltimeter", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_MOTION);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTIMETER);
+      colDef.setColumnUnit(UI.UNIT_LABEL_ALTIMETER);
+      colDef.setColumnHeaderToolTipText(OtherMessages.COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
+      colDef.setColumnLabel(OtherMessages.COLUMN_FACTORY_MOTION_ALTIMETER);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setValueFormats(
+            ValueFormatSet.Number,
+            ValueFormat.NUMBER_1_0,
+            _columnManager);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVICatalogComparedTour) {
+
+               final TVICatalogComparedTour compareItem = (TVICatalogComparedTour) element;
+
+               final double value = compareItem.avgAltimeter;
+
+               colDef.printDetailValue(cell, value);
             }
          }
       });
