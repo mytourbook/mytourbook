@@ -674,6 +674,17 @@ public class TourInfoUI {
 
          {
             /*
+             * Timezone
+             */
+            createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
+
+            _lblTimeZone_Value = createUI_LabelValue(container, SWT.TRAIL);
+
+            // spacer
+            createUI_LabelValue(container, SWT.TRAIL);
+         }
+         {
+            /*
              * Timezone difference
              */
 
@@ -686,17 +697,6 @@ public class TourInfoUI {
 
             // hour
             createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
-         }
-         {
-            /*
-             * Timezone
-             */
-            createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
-
-            _lblTimeZone_Value = createUI_LabelValue(container, SWT.TRAIL);
-
-            // spacer
-            createUI_LabelValue(container, SWT.TRAIL);
          }
       }
    }
@@ -785,7 +785,7 @@ public class TourInfoUI {
 
       final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
-      final long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
+      final long movingTime = _tourData.getTourComputedTime_Moving();
 
       final int numHrZones = tourPersonHrZones.size();
       final int[] timeInHrZones = _tourData.getHrZones();
@@ -795,20 +795,25 @@ public class TourInfoUI {
          final TourPersonHRZone currentHrZone = tourPersonHrZones.get(hrZonedIndex);
 
          final int timeInTimeZone = timeInHrZones[hrZonedIndex];
+         final float zonePercentage = timeInTimeZone * 100f / movingTime;
 
-         createUI_Label(container, currentHrZone.getNameShort());
-
-         final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
-         final float zonePercentage = timeInTimeZone * 100f / tourDeviceTime_Recorded;
          final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage))
                + UI.SPACE
                + UI.SYMBOL_PERCENTAGE;
-         lblPercentage.setText(timeInTimeZone > 0 ? zonePercentageTimeText : UI.EMPTY_STRING);
 
-         final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
          final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone)
                + UI.SPACE
                + Messages.Tour_Tooltip_Label_Hour;
+
+         // label: HR zone
+         createUI_Label(container, currentHrZone.getNameShort());
+
+         // label: nn %
+         final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
+         lblPercentage.setText(timeInTimeZone > 0 ? zonePercentageTimeText : UI.EMPTY_STRING);
+
+         // label: hh:mm:ss
+         final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
          lblTime.setText(timeInTimeZone > 0 ? lblTimeText : UI.EMPTY_STRING);
       }
    }
