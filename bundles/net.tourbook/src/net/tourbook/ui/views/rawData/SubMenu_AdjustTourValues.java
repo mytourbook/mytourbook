@@ -78,6 +78,12 @@ public class SubMenu_AdjustTourValues extends Action implements IMenuCreator {
       }
    }
 
+   public void enableSubMenu_Pauses_Actions() {
+
+      final boolean enableActions = _subMenu_Pauses.enableActions();
+      _subMenu_Pauses.setEnabled(enableActions);
+   }
+
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_action_ComputeDistanceValuesFromGeoposition).fill(menu, -1);

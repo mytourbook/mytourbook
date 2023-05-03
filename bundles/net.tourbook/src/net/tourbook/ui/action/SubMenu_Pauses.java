@@ -17,7 +17,10 @@ package net.tourbook.ui.action;
 
 import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
@@ -58,10 +61,27 @@ public class SubMenu_Pauses extends Action implements IMenuCreator {
       }
    }
 
+   public boolean enableActions() {
+
+      final boolean enableActions = false;
+
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      for (final TourData selectedTour : selectedTours) {
+
+         final long[] pausedTime_Start = selectedTour.getPausedTime_Start();
+         if (pausedTime_Start != null) {
+            return true;
+         }
+      }
+
+      return enableActions;
+   }
+
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_subMenu_SetPausesType).fill(menu, -1);
    }
+
    @Override
    public Menu getMenu(final Control parent) {
       return null;
