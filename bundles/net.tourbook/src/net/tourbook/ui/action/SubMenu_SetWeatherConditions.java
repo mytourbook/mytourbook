@@ -45,7 +45,7 @@ public class SubMenu_SetWeatherConditions extends SubMenu {
 
       public ActionSetWeatherConditions(final String text, final String weatherId) {
 
-         super(text, AS_PUSH_BUTTON);
+         super(text, AS_CHECK_BOX);
 
          _weatherId = weatherId;
          setImageDescriptor(UI.IMAGE_REGISTRY.getDescriptor(_weatherId));
@@ -71,7 +71,17 @@ public class SubMenu_SetWeatherConditions extends SubMenu {
    }
 
    @Override
-   public void enableActions() {}
+   public void enableActions() {
+
+      _actionsSetWeatherConditions.forEach(actionsSetWeatherConditions -> actionsSetWeatherConditions.setChecked(false));
+
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      if (selectedTours.size() == 1) {
+
+         final int currentWeatherIndex = selectedTours.get(0).getWeatherIndex();
+         _actionsSetWeatherConditions.get(currentWeatherIndex).setChecked(true);
+      }
+   }
 
    @Override
    public void fillMenu(final Menu menu) {

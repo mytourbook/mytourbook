@@ -58,10 +58,6 @@ public class SubMenu_SetPausesType extends SubMenu {
 
    public SubMenu_SetPausesType(final ITourProvider tourProvider, final boolean changeAllTourPauses) {
 
-      //todo fb
-      //DONE: Grey out the pause type that is already selected
-
-      //do the same for the weather clouds
       super(Messages.Action_PauseType_Set, AS_DROP_DOWN_MENU);
 
       _tourProvider = tourProvider;
