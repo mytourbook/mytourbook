@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,6 @@ import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -531,13 +530,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-
-            fillContextMenu(manager);
-         }
-      });
+      _viewerMenuManager.addMenuListener(menuManager -> fillContextMenu(menuManager));
    }
 
    @Override
@@ -1093,9 +1086,9 @@ public class SensorView extends ViewPart implements ITourViewer {
                sensorItem.usedFirstTime = dbUsedFirstTime;
                sensorItem.usedLastTime = dbUsedLastTime;
 
-               sensorItem.isBatteryLevelAvailable = dbMaxLevel_Start > 0 | dbMaxLevel_End > 0;
-               sensorItem.isBatteryStatusAvailable = dbMaxStatus_Start > 0 | dbMaxStatus_End > 0;
-               sensorItem.isBatteryVoltageAvailable = dbMaxVoltage_Start > 0 | dbMaxVoltage_End > 0;
+               sensorItem.isBatteryLevelAvailable = dbMaxLevel_Start > 0 || dbMaxLevel_End > 0;
+               sensorItem.isBatteryStatusAvailable = dbMaxStatus_Start > 0 || dbMaxStatus_End > 0;
+               sensorItem.isBatteryVoltageAvailable = dbMaxVoltage_Start > 0 || dbMaxVoltage_End > 0;
             }
          }
 

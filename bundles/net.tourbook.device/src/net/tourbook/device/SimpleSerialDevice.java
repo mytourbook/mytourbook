@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -147,7 +147,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
           * if receiving data was started and no more data are coming in, stop receiving
           * additional data
           */
-         if (isReceivingStarted && receiveTimer == 10 & rawDataSize == receivedData) {
+         if (isReceivingStarted && receiveTimer == 10 && rawDataSize == receivedData) {
             break;
          }
 

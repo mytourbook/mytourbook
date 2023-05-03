@@ -31,7 +31,6 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorManager;
@@ -72,15 +71,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -97,7 +93,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -105,7 +100,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class TrainingView extends ViewPart {
-
 
    public static final String  ID                                   = "net.tourbook.training.TrainingView"; //$NON-NLS-1$
 
@@ -298,32 +292,29 @@ public class TrainingView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * set a new chart configuration when the preferences has changed
-             */
-            if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         /*
+          * set a new chart configuration when the preferences has changed
+          */
+         if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+               || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               onModifyPerson();
+            onModifyPerson();
 
-            } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-            //
-            ) {
+         } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+         //
+         ) {
 
-               setChartProperties();
+            setChartProperties();
 
-               // grid has changed, update chart
-               updateUI_30_HrZonesFromModel();
-            }
+            // grid has changed, update chart
+            updateUI_30_HrZonesFromModel();
          }
       };
 
@@ -335,54 +326,47 @@ public class TrainingView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (part, selection) -> {
 
-            if (part == TrainingView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (part == TrainingView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
+      _tourEventListener = (part, tourEventId, eventData) -> {
 
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         if (part == TrainingView.this) {
+            return;
+         }
 
-            if (part == TrainingView.this) {
-               return;
+         if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
+         } else if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+
+            if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+               updateUI_20(modifiedTours.get(0));
             }
+         } else if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-            if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+            if (_tourData != null) {
 
-               clearView();
+               _tourData.clearComputedSeries();
 
-            } else if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-                  updateUI_20(modifiedTours.get(0));
-               }
-            } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-
-               if (_tourData != null) {
-
-                  _tourData.clearComputedSeries();
-
-                  updateUI_20(_tourData);
-               }
+               updateUI_20(_tourData);
             }
          }
       };
@@ -549,12 +533,7 @@ public class TrainingView extends ViewPart {
          final Link link = new Link(container, SWT.WRAP);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(link);
          link.setText(Messages.Training_View_Link_NoHrZones);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionEditHrZones();
-            }
-         });
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionEditHrZones()));
          _tk.adapt(link, true, true);
       }
 
@@ -642,12 +621,9 @@ public class TrainingView extends ViewPart {
 
       setChartProperties();
 
-      _chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
-         @Override
-         public void selectionChanged(final int serieIndex, final int valueIndex) {
+      _chartHrTime.addBarSelectionListener((serieIndex, valueIndex) -> {
 
 //               _postSelectionProvider.setSelection(selection);
-         }
       });
    }
 
@@ -827,7 +803,7 @@ public class TrainingView extends ViewPart {
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
 
-      // an NPE occured when the part could not be created
+      // an NPE occurred when the part could not be created
       if (_partListener != null) {
          getViewSite().getPage().removePartListener(_partListener);
       }
@@ -901,7 +877,7 @@ public class TrainingView extends ViewPart {
             if (label.isDisposed()) {
 
                // this happened when closing the training view
-               
+
                continue;
             }
 
@@ -1505,8 +1481,7 @@ public class TrainingView extends ViewPart {
                      + Messages.HRMax_Label
                      + UI.SPACE
                      + zoneContext.hrMax
-                     + OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT
-         ;
+                     + OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT;
 
          // % values
          _lblHrZonePercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));

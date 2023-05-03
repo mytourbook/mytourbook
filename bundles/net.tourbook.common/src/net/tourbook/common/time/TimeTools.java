@@ -109,10 +109,9 @@ public class TimeTools {
     */
    public static String[]                        month_Full;
 
-   public static final DateTimeFormatter         Formatter_Date_S;
-
 // SET_FORMATTING_OFF
 
+   public static final DateTimeFormatter   Formatter_Date_S;
    public static final DateTimeFormatter   Formatter_Date_M             = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_Date_L             = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_Date_F             = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);

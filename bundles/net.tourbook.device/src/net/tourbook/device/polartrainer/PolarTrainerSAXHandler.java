@@ -523,7 +523,7 @@ class PolarTrainerSAXHandler extends DefaultHandler {
 
             // get distance from speed, speed is not saved it is always computed
 
-            final float speedMeterSecond = UI.convertSpeed_FromKphToMps(speedValues[valueIndex]);
+            final float speedMeterSecond = UI.convertSpeed_KmhToMs(speedValues[valueIndex]);
             final float distanceDiff = speedMeterSecond * timeInterval;
 
             absoluteDistance += distanceDiff;
