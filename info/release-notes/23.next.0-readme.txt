@@ -42,6 +42,9 @@ New
 * Suunto App Integration (Frederic)
   - Added the ability to upload tours as workouts
 
+* Tour Pauses (Frederic)
+  - Added the ability to change pause types individually (Tour Pauses view) and in bulk (Tour Book view)
+
 Improvements
 ============
 
