@@ -22,7 +22,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Menu;
 
 public class SubMenu_SetPausesType extends SubMenu {
 
-   private ITourProvider2      _tourProvider;
+   private ITourProvider       _tourProvider;
    private int[]               _tourPausesIndices;
    private ActionSetPausesType _actionSetAutomaticPauseType;
    private ActionSetPausesType _actionSetManualPauseType;
@@ -56,7 +56,7 @@ public class SubMenu_SetPausesType extends SubMenu {
       }
    }
 
-   public SubMenu_SetPausesType(final ITourProvider2 tourProvider, final boolean changeAllTourPauses) {
+   public SubMenu_SetPausesType(final ITourProvider tourProvider, final boolean changeAllTourPauses) {
 
       //todo fb
       //DONE: Grey out the pause type that is already selected
