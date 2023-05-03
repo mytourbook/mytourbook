@@ -94,7 +94,9 @@ public class FitExporter {
       FileEncoder fileEncoder;
 
       try {
-         fileEncoder = new FileEncoder(new java.io.File(filename), Fit.ProtocolVersion.V2_0);
+         fileEncoder = new FileEncoder(
+               new java.io.File(filename),
+               Fit.ProtocolVersion.V2_0);
       } catch (final FitRuntimeException e) {
          StatusUtil.log(e);
          return;
@@ -132,14 +134,20 @@ public class FitExporter {
       final UserProfileMesg userProfileMesg = new UserProfileMesg();
       userProfileMesg.setGender(activePerson.getGender() == 0 ? Gender.MALE : Gender.FEMALE);
       userProfileMesg.setWeight(activePerson.getWeight());
-      final int age = Period.between(TimeTools.now().toLocalDate(), TimeTools.getZonedDateTime(activePerson.getBirthDay()).toLocalDate()).getYears();
+      final int age = Period.between(
+            TimeTools.now().toLocalDate(),
+            TimeTools.getZonedDateTime(
+                  activePerson.getBirthDay()).toLocalDate()).getYears();
       userProfileMesg.setAge((short) age);
       userProfileMesg.setFriendlyName(activePerson.getName());
 
       return userProfileMesg;
    }
 
-   private int createBatteryEvent(final List<Mesg> messages, final DateTime timestamp, int batteryTimeIndex, final int timeSerieValue) {
+   private int createBatteryEvent(final List<Mesg> messages,
+                                  final DateTime timestamp,
+                                  int batteryTimeIndex,
+                                  final int timeSerieValue) {
 
       final int[] battery_Time = _tourData.getBattery_Time();
 
@@ -167,7 +175,8 @@ public class FitExporter {
       return batteryTimeIndex;
    }
 
-   private DeviceInfoMesg createDeviceInfoMesg(final DateTime timeStamp, final DeviceSensorValue deviceSensorValue) {
+   private DeviceInfoMesg createDeviceInfoMesg(final DateTime timeStamp,
+                                               final DeviceSensorValue deviceSensorValue) {
 
       final DeviceInfoMesg deviceInfoMesg = new DeviceInfoMesg();
 
@@ -181,7 +190,8 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private DeviceInfoMesg createDeviceInfoMesgEnd(final DateTime timeStamp, final DeviceSensorValue deviceSensorValue) {
+   private DeviceInfoMesg createDeviceInfoMesgEnd(final DateTime timeStamp,
+                                                  final DeviceSensorValue deviceSensorValue) {
 
       final DeviceInfoMesg deviceInfoMesg = createDeviceInfoMesg(timeStamp, deviceSensorValue);
 
@@ -193,7 +203,8 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private DeviceInfoMesg createDeviceInfoMesgStart(final DateTime timeStamp, final DeviceSensorValue deviceSensorValue) {
+   private DeviceInfoMesg createDeviceInfoMesgStart(final DateTime timeStamp,
+                                                    final DeviceSensorValue deviceSensorValue) {
 
       final DeviceInfoMesg deviceInfoMesg = createDeviceInfoMesg(timeStamp, deviceSensorValue);
 
@@ -205,14 +216,15 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private List<EventMesg> createEventMessages(final DateTime startTime, final DateTime finalTimestamp) {
+   private List<EventMesg> createEventMessages(final DateTime startTime,
+                                               final DateTime finalTimestamp) {
 
       final List<EventMesg> eventMessages = new ArrayList<>();
 
       EventMesg eventMesgStart = new EventMesg();
       eventMesgStart.setTimestamp(startTime);
       eventMesgStart.setEvent(Event.TIMER);
-      eventMesgStart.setEventType(EventType.STOP_ALL);
+      eventMesgStart.setEventType(EventType.START);
       eventMessages.add(eventMesgStart);
 
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
@@ -297,7 +309,9 @@ public class FitExporter {
     * @param timeSerieIndex
     * @return
     */
-   private int createHrvMessage(final List<Mesg> messages, int pulseSerieIndex, final int timeSerieIndex) {
+   private int createHrvMessage(final List<Mesg> messages,
+                                int pulseSerieIndex,
+                                final int timeSerieIndex) {
 
       final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
       final int[] pulseTime_TimeIndex = _tourData.pulseTime_TimeIndex;
@@ -485,7 +499,7 @@ public class FitExporter {
 
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
       if (speedSerie != null) {
-         recordMesg.setSpeed(UI.convertSpeed_FromKphToMps(speedSerie[index]));
+         recordMesg.setSpeed(UI.convertSpeed_KmhToMs(speedSerie[index]));
       }
 
       final float[] pulseSerie = _tourData.pulseSerie;

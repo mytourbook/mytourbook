@@ -20,7 +20,7 @@
       </dependency>
       <dependency>
          <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.9.2</version>
+                                                                        <version>5.9.3</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
@@ -203,7 +203,7 @@
       
       <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.9</version>
+                                                               <version>0.8.10</version>
          <executions>
             <execution>
                <goals>

@@ -178,13 +178,13 @@ public class UITests {
    }
 
    @Test
-   void testConvertSpeed_FromKphToMps() {
+   void testConvertSpeed_FromKmhToMs() {
 
       //10km/h -> 2.8m/s
-      assertEquals(2.777778f, UI.convertSpeed_FromKphToMps(10));
+      assertEquals(2.777778f, UI.convertSpeed_KmhToMs(10));
 
       //15.1km/h -> 4.2m/s
-      assertEquals(4.1944447f, UI.convertSpeed_FromKphToMps(15.1f));
+      assertEquals(4.1944447f, UI.convertSpeed_KmhToMs(15.1f));
    }
 
    @Test
