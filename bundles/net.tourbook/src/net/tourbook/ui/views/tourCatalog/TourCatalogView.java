@@ -530,6 +530,7 @@ public class TourCatalogView extends ViewPart implements
 
                      comparedTour.setAvgAltimeter(compareTourProperty.avgAltimeter);
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
+                     comparedTour.setMaxPulse(compareTourProperty.maxPulse);
                      comparedTour.setTourSpeed(compareTourProperty.speed);
                      comparedTour.setTourDeviceTime_Elapsed(compareTourProperty.tourDeviceTime_Elapsed);
 
@@ -758,7 +759,8 @@ public class TourCatalogView extends ViewPart implements
       defineColumn_Speed();
       defineColumn_Time_ElapsedTime();
       defineColumn_AvgPulse();
-      defineColumn_AvgVerticalSpeed();
+      defineColumn_MaxPulse();
+      defineColumn_AvgAltimeter();
    }
 
    /**
@@ -839,31 +841,9 @@ public class TourCatalogView extends ViewPart implements
    }
 
    /**
-    * Column: Avg pulse
-    */
-   private void defineColumn_AvgPulse() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            if (element instanceof TVICatalogComparedTour) {
-
-               final float value = ((TVICatalogComparedTour) element).avgPulse;
-
-               colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
-            }
-         }
-      });
-   }
-
-   /**
     * Column: Avg vertical speed (VAM average ascent speed)
     */
-   private void defineColumn_AvgVerticalSpeed() {
+   private void defineColumn_AvgAltimeter() {
 
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "motionAltimeter", SWT.TRAIL); //$NON-NLS-1$
 
@@ -899,6 +879,28 @@ public class TourCatalogView extends ViewPart implements
    }
 
    /**
+    * Column: Avg pulse
+    */
+   private void defineColumn_AvgPulse() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVICatalogComparedTour) {
+
+               final float value = ((TVICatalogComparedTour) element).avgPulse;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
+            }
+         }
+      });
+   }
+
+   /**
     * column: Count
     */
    private void defineColumn_Count() {
@@ -916,6 +918,30 @@ public class TourCatalogView extends ViewPart implements
                if (numberOfTours > 0) {
                   cell.setText(Integer.toString(numberOfTours));
                }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Max pulse
+    */
+   private void defineColumn_MaxPulse() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVICatalogComparedTour) {
+
+               final float value = ((TVICatalogComparedTour) element).maxPulse;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
             }
          }
       });

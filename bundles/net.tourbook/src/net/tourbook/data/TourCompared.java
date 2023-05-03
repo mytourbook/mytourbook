@@ -72,6 +72,11 @@ public class TourCompared {
    /**
     * @since Db version 50
     */
+   private float maxPulse;
+
+   /**
+    * @since Db version 50
+    */
    private float avgAltimeter;
 
    public float getAvgAltimeter() {
@@ -88,6 +93,10 @@ public class TourCompared {
 
    public int getEndIndex() {
       return endIndex;
+   }
+
+   public float getMaxPulse() {
+      return maxPulse;
    }
 
    public long getRefTourId() {
@@ -124,6 +133,10 @@ public class TourCompared {
 
    public void setEndIndex(final int endIndex) {
       this.endIndex = endIndex;
+   }
+
+   public void setMaxPulse(final float maxPulse) {
+      this.maxPulse = maxPulse;
    }
 
    public void setRefTourId(final long refTourId) {

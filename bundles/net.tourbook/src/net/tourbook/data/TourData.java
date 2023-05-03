@@ -4710,6 +4710,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             hrZone9 };
    }
 
+   public float computeMax_FromValues(final float[] valueSerie, final int firstIndex, int lastIndex) {
+
+      if (valueSerie == null) {
+         return 0;
+      }
+
+      float maxValue = 0;
+
+      lastIndex = Math.min(lastIndex, valueSerie.length - 1);
+
+      for (int serieIndex = firstIndex; serieIndex <= lastIndex; serieIndex++) {
+
+         final float value = valueSerie[serieIndex];
+
+         if (value > maxValue) {
+            maxValue = value;
+         }
+      }
+
+      return maxValue;
+   }
+
    private void computeMaxAltitude() {
 
       if (altitudeSerie == null) {

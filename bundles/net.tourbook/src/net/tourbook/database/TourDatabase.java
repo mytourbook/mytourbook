@@ -3799,7 +3799,8 @@ public class TourDatabase {
 
             // version 50 start
 
-            + "   AvgAltimeter            FLOAT       DEFAULT 0                        " + NL //$NON-NLS-1$
+            + "   AvgAltimeter            FLOAT       DEFAULT 0,                      " + NL //$NON-NLS-1$
+            + "   MaxPulse                FLOAT       DEFAULT 0                        " + NL //$NON-NLS-1$
 
             // version 50 end ---------
 
@@ -7766,7 +7767,7 @@ public class TourDatabase {
             /*
              * Table: TABLE_TOUR_COMPARED
              */
-            
+
             // add new columns
             SQL.AddColumn_Float(stmt, TABLE_TOUR_COMPARED, "AvgPulse", DEFAULT_0); //$NON-NLS-1$
          }
@@ -7774,7 +7775,7 @@ public class TourDatabase {
             /*
              * Table: TABLE_TOUR_WAYPOINT
              */
-            
+
             // add new columns
             SQL.AddColumn_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
             SQL.AddColumn_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
@@ -9445,7 +9446,7 @@ public class TourDatabase {
          /*
           * Table: TABLE_TOUR_DATA
           */
-         
+
          // add new columns
          SQL.AddColumn_VarCar(stmt, TABLE_TOUR_DATA, "weather_AirQuality", TourData.DB_LENGTH_WEATHER_AIRQUALITY); //$NON-NLS-1$
       }
@@ -9453,9 +9454,10 @@ public class TourDatabase {
          /*
           * Table: TABLE_TOUR_COMPARED
           */
-         
+
          // add new columns
          SQL.AddColumn_Float(stmt, TABLE_TOUR_COMPARED, "AvgAltimeter", DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float(stmt, TABLE_TOUR_COMPARED, "MaxPulse", DEFAULT_0); //$NON-NLS-1$
       }
       stmt.close();
 
@@ -9505,10 +9507,10 @@ public class TourDatabase {
 
                   + "SELECT" //                             //$NON-NLS-1$
 
-                  + " comparedId," //                    1  //$NON-NLS-1$
-                  + " tourId," //                        2  //$NON-NLS-1$
-                  + " startIndex," //                    3  //$NON-NLS-1$
-                  + " endIndex" //                       4  //$NON-NLS-1$
+                  + " ComparedId," //                    1  //$NON-NLS-1$
+                  + " TourId," //                        2  //$NON-NLS-1$
+                  + " StartIndex," //                    3  //$NON-NLS-1$
+                  + " EndIndex" //                       4  //$NON-NLS-1$
 
                   + " FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
 
@@ -9517,8 +9519,9 @@ public class TourDatabase {
                   + "UPDATE " + TABLE_TOUR_COMPARED //      //$NON-NLS-1$
 
                   + " SET" //                               //$NON-NLS-1$
-                  + " AvgAltimeter=?" //                 1  //$NON-NLS-1$
-                  + " WHERE comparedId=?" //             2  //$NON-NLS-1$
+                  + " AvgAltimeter=?," //                1  //$NON-NLS-1$
+                  + " MaxPulse=?" //                     2  //$NON-NLS-1$
+                  + " WHERE comparedId=?" //             3  //$NON-NLS-1$
             );
 
             result = stmtSelect.executeQuery();
@@ -9545,7 +9548,7 @@ public class TourDatabase {
                      lastUpdateTime = currentTime;
 
                      splashManager.setMessage(NLS.bind(
-                           Messages.Tour_Database_PostUpdate_050_SetAvgAltimeter,
+                           Messages.Tour_Database_PostUpdate_050_ComparedTour,
                            new Object[] { counter, numComparedTours }));
                   }
                }
@@ -9568,10 +9571,12 @@ public class TourDatabase {
                } else {
 
                   final float avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), startIndex, endIndex);
+                  final float maxPulse = tourData.computeMax_FromValues(tourData.getPulse_SmoothedSerie(), startIndex, endIndex);
 
                   // update average altimeter for the compared tour
                   stmtUpdate.setFloat(1, avgAltimeter);
-                  stmtUpdate.setLong(2, compareId);
+                  stmtUpdate.setFloat(2, maxPulse);
+                  stmtUpdate.setLong(3, compareId);
                   stmtUpdate.executeUpdate();
                }
             }

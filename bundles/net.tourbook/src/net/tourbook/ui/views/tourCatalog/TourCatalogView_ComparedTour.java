@@ -461,10 +461,11 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       final float avgAltimeter = _tourData.computeAvg_FromValues(_tourData.getAltimeterSerie(), _movedStartIndex, _movedEndIndex);
       final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
+      final float maxPulse = _tourData.computeMax_FromValues(_tourData.getPulse_SmoothedSerie(), startIndex, endIndex);
       final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
       final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, startIndex, endIndex);
 
-      fireChangeEvent(startIndex, endIndex, avgAltimeter, avgPulse, speed, elapsedTime, false);
+      fireChangeEvent(startIndex, endIndex, avgAltimeter, avgPulse, maxPulse, speed, elapsedTime, false);
    }
 
    /**
@@ -479,6 +480,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
                                 final int endIndex,
                                 final float avgAltimeter,
                                 final float avgPulse,
+                                final float maxPulse,
                                 final float speed,
                                 final int tourDeviceTime_Elapsed,
                                 final boolean isDataSaved) {
@@ -494,6 +496,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       customData.avgAltimeter = avgAltimeter;
       customData.avgPulse = avgPulse;
+      customData.maxPulse = maxPulse;
       customData.speed = speed;
       customData.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
 
@@ -633,6 +636,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
             final float avgAltimeter = _tourData.computeAvg_FromValues(_tourData.getAltimeterSerie(), _movedStartIndex, _movedEndIndex);
             final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
+            final float maxPulse = _tourData.computeMax_FromValues(_tourData.getPulse_SmoothedSerie(), _movedStartIndex, _movedEndIndex);
             final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
             final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, _movedStartIndex, _movedEndIndex);
 
@@ -641,6 +645,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
             comparedTour.setEndIndex(_movedEndIndex);
             comparedTour.setAvgAltimeter(avgAltimeter);
             comparedTour.setAvgPulse(avgPulse);
+            comparedTour.setMaxPulse(maxPulse);
             comparedTour.setTourSpeed(speed);
 
             // update entity
@@ -666,7 +671,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
             _tourChart.updateChart(chartDataModel, true);
             enableActions();
 
-            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgAltimeter, avgPulse, speed, elapsedTime, true);
+            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgAltimeter, avgPulse, maxPulse, speed, elapsedTime, true);
          }
       } catch (final Exception e) {
          e.printStackTrace();

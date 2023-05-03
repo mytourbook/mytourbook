@@ -172,15 +172,16 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
             + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
             + " TourCompared.avgAltimeter," + NL //            4 //$NON-NLS-1$
             + " TourCompared.avgPulse," + NL //                5 //$NON-NLS-1$
-            + " TourCompared.tourSpeed," + NL //               6 //$NON-NLS-1$
-            + " TourCompared.startIndex," + NL //              7 //$NON-NLS-1$
-            + " TourCompared.endIndex," + NL //                8 //$NON-NLS-1$
-            + " TourCompared.tourDeviceTime_Elapsed," + NL //  9 //$NON-NLS-1$
+            + " TourCompared.maxPulse," + NL //                6 //$NON-NLS-1$
+            + " TourCompared.tourSpeed," + NL //               7 //$NON-NLS-1$
+            + " TourCompared.startIndex," + NL //              8 //$NON-NLS-1$
+            + " TourCompared.endIndex," + NL //                9 //$NON-NLS-1$
+            + " TourCompared.tourDeviceTime_Elapsed," + NL // 10 //$NON-NLS-1$
 
-            + " TourData.tourTitle," + NL //                  10 //$NON-NLS-1$
-            + " TourData.tourType_typeId," + NL //            11 //$NON-NLS-1$
+            + " TourData.tourTitle," + NL //                  11 //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //            12 //$NON-NLS-1$
 
-            + " jTdataTtag.TourTag_tagId" + NL //             12 //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId" + NL //             13 //$NON-NLS-1$
 
             + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -215,7 +216,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 // SET_FORMATTING_OFF
 
             final long tourId          = result.getLong(2);
-            final Object resultTagId   = result.getObject(12);
+            final Object resultTagId   = result.getObject(13);
 
 // SET_FORMATTING_ON
 
@@ -246,15 +247,16 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
                tourItem.avgAltimeter               = result.getFloat(4);
                tourItem.avgPulse                   = result.getFloat(5);
-               tourItem.tourSpeed                  = result.getFloat(6);
+               tourItem.maxPulse                   = result.getFloat(6);
+               tourItem.tourSpeed                  = result.getFloat(7);
 
-               tourItem.startIndex                 = result.getInt(7);
-               tourItem.endIndex                   = result.getInt(8);
-               tourItem.tourDeviceTime_Elapsed     = result.getInt(9);
+               tourItem.startIndex                 = result.getInt(8);
+               tourItem.endIndex                   = result.getInt(9);
+               tourItem.tourDeviceTime_Elapsed     = result.getInt(10);
 
                // from TourData
-               tourItem.tourTitle                  = result.getString(10);
-               final Object tourTypeId             = result.getObject(11);
+               tourItem.tourTitle                  = result.getString(11);
+               final Object tourTypeId             = result.getObject(12);
 
 // SET_FORMATTING_ON
 

@@ -51,8 +51,9 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    float           tourSpeed;
    int             tourDeviceTime_Elapsed;
 
-   double          avgAltimeter;
+   float           avgAltimeter;
    float           avgPulse;
+   float           maxPulse;
 
    ArrayList<Long> tagIds;
 
@@ -85,7 +86,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    @Override
    protected void fetchChildren() {}
 
-   public double getAvgAltimeter() {
+   public float getAvgAltimeter() {
       return avgAltimeter;
    }
 
@@ -102,6 +103,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    public int getEndIndex() {
       return endIndex;
+   }
+
+   public float getMaxPulse() {
+      return maxPulse;
    }
 
    public long getRefId() {
@@ -142,7 +147,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
       }
    }
 
-   public void setAvgAltimeter(final double avgAltimeter) {
+   public void setAvgAltimeter(final float avgAltimeter) {
       this.avgAltimeter = avgAltimeter;
    }
 
@@ -152,6 +157,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    void setEndIndex(final int endIndex) {
       this.endIndex = endIndex;
+   }
+
+   public void setMaxPulse(final float maxPulse) {
+      this.maxPulse = maxPulse;
    }
 
    void setStartIndex(final int startIndex) {

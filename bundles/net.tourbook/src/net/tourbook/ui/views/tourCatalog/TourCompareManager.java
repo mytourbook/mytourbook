@@ -773,6 +773,11 @@ public class TourCompareManager {
             comparedTourItem.computedStartIndex,
             comparedTourItem.computedEndIndex);
 
+      final float maxPulse = tourData.computeMax_FromValues(
+            tourData.getPulse_SmoothedSerie(),
+            comparedTourItem.computedStartIndex,
+            comparedTourItem.computedEndIndex);
+
       final float speed = TourManager.computeTourSpeed(
             tourData,
             comparedTourItem.computedStartIndex,
@@ -795,6 +800,7 @@ public class TourCompareManager {
 
       comparedTour.setAvgAltimeter(avgAltimeter);
       comparedTour.setAvgPulse(avgPulse);
+      comparedTour.setMaxPulse(maxPulse);
       comparedTour.setTourSpeed(speed);
       comparedTour.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
 

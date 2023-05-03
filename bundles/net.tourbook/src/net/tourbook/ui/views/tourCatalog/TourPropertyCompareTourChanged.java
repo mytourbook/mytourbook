@@ -26,6 +26,7 @@ public class TourPropertyCompareTourChanged {
 
    float   avgAltimeter;
    float   avgPulse;
+   float   maxPulse;
    float   speed;
    int     tourDeviceTime_Elapsed;
 

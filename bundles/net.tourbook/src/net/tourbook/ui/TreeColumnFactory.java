@@ -338,6 +338,11 @@ public abstract class TreeColumnFactory {
             colDef.setColumnUnit(               Messages.ColumnFactory_max_pulse);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_0,
+                  ValueFormat.NUMBER_1_0,
+                  columnManager);
 
             return colDef;
          }
