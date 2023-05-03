@@ -787,37 +787,30 @@ public class TourInfoUI {
 
       final long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
 
-      final int[] timeInHrZones = new int[10];
-      final int[] index = new int[1];
-      timeInHrZones[index[0]++] = _tourData.getHrZone0();
-      timeInHrZones[index[0]++] = _tourData.getHrZone1();
-      timeInHrZones[index[0]++] = _tourData.getHrZone2();
-      timeInHrZones[index[0]++] = _tourData.getHrZone3();
-      timeInHrZones[index[0]++] = _tourData.getHrZone4();
-      timeInHrZones[index[0]++] = _tourData.getHrZone5();
-      timeInHrZones[index[0]++] = _tourData.getHrZone6();
-      timeInHrZones[index[0]++] = _tourData.getHrZone7();
-      timeInHrZones[index[0]++] = _tourData.getHrZone8();
-      timeInHrZones[index[0]] = _tourData.getHrZone9();
+      final int numHrZones = tourPersonHrZones.size();
+      final int[] timeInHrZones = _tourData.getHrZones();
 
-      index[0] = 0;
+      for (int hrZonedIndex = numHrZones - 1; hrZonedIndex >= 0; --hrZonedIndex) {
 
-      tourPersonHrZones.forEach(hrZone -> {
+         final TourPersonHRZone currentHrZone = tourPersonHrZones.get(hrZonedIndex);
 
-         final int timeInTimeZone = timeInHrZones[index[0]++];
+         final int timeInTimeZone = timeInHrZones[hrZonedIndex];
 
-         createUI_Label(container, hrZone.getNameShort());
+         createUI_Label(container, currentHrZone.getNameShort());
 
          final Label lblPercentage = createUI_LabelValue(container, SWT.TRAIL);
          final float zonePercentage = timeInTimeZone * 100f / tourDeviceTime_Recorded;
-         final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage)) + UI.SPACE + UI.SYMBOL_PERCENTAGE;
+         final String zonePercentageTimeText = String.valueOf(Math.round(zonePercentage))
+               + UI.SPACE
+               + UI.SYMBOL_PERCENTAGE;
          lblPercentage.setText(timeInTimeZone > 0 ? zonePercentageTimeText : UI.EMPTY_STRING);
 
          final Label lblTime = createUI_LabelValue(container, SWT.LEAD);
-         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone) + UI.SPACE + Messages.Tour_Tooltip_Label_Hour;
+         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone)
+               + UI.SPACE
+               + Messages.Tour_Tooltip_Label_Hour;
          lblTime.setText(timeInTimeZone > 0 ? lblTimeText : UI.EMPTY_STRING);
-      });
-
+      }
    }
 
    private void createUI_38_Gears(final Composite parent) {

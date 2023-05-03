@@ -1207,7 +1207,7 @@ public class UI {
     * @param speed
     * @return Returns the speed value in m/s.
     */
-   public static float convertSpeed_FromKphToMps(final float speed) {
+   public static float convertSpeed_KmhToMs(final float speed) {
 
       return speed * 0.277777778f;
    }
