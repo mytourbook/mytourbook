@@ -191,7 +191,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       @Override
       public Menu getContextMenu() {
-         return _tableContextMenu;
+
+         return _pausesViewer.getTable().getSelectionCount() > 0
+               ? _tableContextMenu : null;
       }
 
       @Override
