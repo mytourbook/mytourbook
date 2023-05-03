@@ -1946,7 +1946,8 @@ public class TourBookView extends ViewPart implements
        */
       _subMenu_AdjustTourValues.setEnabled(isTourSelected || isAllToursSelected);
       _subMenu_AdjustTourValues.getActionRetrieveWeatherData().setEnabled(isWeatherRetrievalActivated);
-      _subMenu_AdjustTourValues.enableSubMenu_Pauses_Actions();
+      _subMenu_AdjustTourValues.enableSubMenu_Pauses();
+      _subMenu_AdjustTourValues.enableSubMenu_Cadence();
 
       // re-import and tour values deletion can be run on all/selected/between dates tours
       _actionReimport_Tours.setEnabled(true);
@@ -3414,7 +3415,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3432,13 +3433,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 

@@ -15,53 +15,34 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
-
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider2;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
-/**
- */
-public class SubMenu_Pauses extends Action implements IMenuCreator {
-
-   private Menu                  _menu;
+public class SubMenu_Pauses extends SubMenu {
 
    private SubMenu_SetPausesType _subMenu_SetPausesType;
 
    private ITourProvider2        _tourProvider;
 
-   public SubMenu_Pauses(final ITourProvider2 tourViewer) {
+   public SubMenu_Pauses(final ITourProvider2 tourProvider) {
 
       super(Messages.Tour_Action_Pauses, AS_DROP_DOWN_MENU);
 
-      setMenuCreator(this);
-
-      _tourProvider = tourViewer;
+      _tourProvider = tourProvider;
 
       _subMenu_SetPausesType = new SubMenu_SetPausesType(_tourProvider, true);
    }
 
    @Override
-   public void dispose() {
+   public void enableActions() {}
 
-      if (_menu != null) {
-
-         _menu.dispose();
-         _menu = null;
-      }
-   }
-
-   public boolean enableActions() {
+   public boolean enableSubMenu() {
 
       final boolean enableActions = false;
 
@@ -77,34 +58,9 @@ public class SubMenu_Pauses extends Action implements IMenuCreator {
       return enableActions;
    }
 
-   private void fillMenu(final Menu menu) {
+   @Override
+   public void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_subMenu_SetPausesType).fill(menu, -1);
-   }
-
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-
-      _menu = new Menu(parent);
-
-      // Add listener to re-populate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
-
-         // dispose old menu items
-         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
-            menuItem.dispose();
-         }
-
-         fillMenu(_menu);
-      }));
-
-      return _menu;
    }
 }

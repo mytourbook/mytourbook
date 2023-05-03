@@ -78,10 +78,16 @@ public class SubMenu_AdjustTourValues extends Action implements IMenuCreator {
       }
    }
 
-   public void enableSubMenu_Pauses_Actions() {
+   public void enableSubMenu_Cadence() {
 
-      final boolean enableActions = _subMenu_Pauses.enableActions();
-      _subMenu_Pauses.setEnabled(enableActions);
+      final boolean enableSubMenu = _subMenu_Cadence.enableSubMenu();
+      _subMenu_Cadence.setEnabled(enableSubMenu);
+   }
+
+   public void enableSubMenu_Pauses() {
+
+      final boolean enableSubMenu = _subMenu_Pauses.enableSubMenu();
+      _subMenu_Pauses.setEnabled(enableSubMenu);
    }
 
    private void fillMenu(final Menu menu) {

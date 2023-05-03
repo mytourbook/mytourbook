@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,22 +22,17 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
-public class SubMenu_SetPausesType extends Action implements IMenuCreator {
+public class SubMenu_SetPausesType extends SubMenu {
 
-   private Menu                _menu;
-
-   private ITourProvider       _tourProvider;
+   private ITourProvider2      _tourProvider;
    private int[]               _tourPausesIndices;
    private ActionSetPausesType _actionSetAutomaticPauseType;
    private ActionSetPausesType _actionSetManualPauseType;
@@ -63,15 +56,13 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       }
    }
 
-   public SubMenu_SetPausesType(final ITourProvider tourProvider, final boolean changeAllTourPauses) {
+   public SubMenu_SetPausesType(final ITourProvider2 tourProvider, final boolean changeAllTourPauses) {
 
       //todo fb
       //DONE: Grey out the pause type that is already selected
 
       //do the same for the weather clouds
       super(Messages.Action_PauseType_Set, AS_DROP_DOWN_MENU);
-
-      setMenuCreator(this);
 
       _tourProvider = tourProvider;
 
@@ -82,16 +73,7 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
    }
 
    @Override
-   public void dispose() {
-
-      if (_menu != null) {
-
-         _menu.dispose();
-         _menu = null;
-      }
-   }
-
-   private void enableActions() {
+   public void enableActions() {
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
       if (selectedTours.size() > 1) {
@@ -117,40 +99,15 @@ public class SubMenu_SetPausesType extends Action implements IMenuCreator {
       }
    }
 
-   private void fillMenu(final Menu menu) {
+   @Override
+   public void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_actionSetAutomaticPauseType).fill(menu, -1);
       new ActionContributionItem(_actionSetManualPauseType).fill(menu, -1);
    }
 
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-      _menu = new Menu(parent);
-
-      // Add listener to repopulate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
-
-         // dispose old menu items
-         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
-            menuItem.dispose();
-         }
-
-         fillMenu(_menu);
-
-         enableActions();
-      }));
-
-      return _menu;
-   }
-
    private long[] getPausedTime_Data(final TourData tourData) {
+
       long[] pausedTime_Data = tourData.getPausedTime_Data();
 
       if (pausedTime_Data == null) {

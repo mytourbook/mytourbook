@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,17 +28,12 @@ import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
-public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator {
-
-   private Menu                             _menu;
+public class SubMenu_SetWeatherConditions extends SubMenu {
 
    private final ITourProvider2             _tourProvider;
 
@@ -68,8 +61,6 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       super(Messages.Tour_Action_SetWeatherConditions, AS_DROP_DOWN_MENU);
 
-      setMenuCreator(this);
-
       _tourProvider = tourProvider;
 
       for (int index = 0; index < IWeather.cloudText.length; ++index) {
@@ -80,48 +71,14 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
    }
 
    @Override
-   public void dispose() {
+   public void enableActions() {}
 
-      if (_menu == null) {
-         return;
-      }
-
-      _menu.dispose();
-      _menu = null;
-
-   }
-
-   private void fillMenu(final Menu menu) {
+   @Override
+   public void fillMenu(final Menu menu) {
 
       for (final ActionSetWeatherConditions actionSetWeatherConditions : _actionsSetWeatherConditions) {
          new ActionContributionItem(actionSetWeatherConditions).fill(menu, -1);
       }
-   }
-
-   @Override
-   public Menu getMenu(final Control arg0) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-
-      _menu = new Menu(parent);
-
-      // Add listener to re-populate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
-
-         // dispose old menu items
-         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
-            menuItem.dispose();
-         }
-
-         fillMenu(_menu);
-      }));
-
-      return _menu;
    }
 
    public void setWeatherConditions(final String weatherDescription) {
