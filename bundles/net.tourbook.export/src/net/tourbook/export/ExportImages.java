@@ -23,7 +23,7 @@ public class ExportImages {
    public static final String Export_FIT_Logo    = "FIT-logo.png";             //$NON-NLS-1$
    public static final String Export_Garmin_Logo = "Garmin-logo.png";          //$NON-NLS-1$
    public static final String Export_GPX_Logo    = "GPX-logo.png";             //$NON-NLS-1$
-   public static final String Export_MT_Logo     = "MT-logo.png";     //$NON-NLS-1$
+   public static final String Export_MT_Logo     = "MyTourbook-logo.png"; //$NON-NLS-1$
 
    private ExportImages() {}
 }
