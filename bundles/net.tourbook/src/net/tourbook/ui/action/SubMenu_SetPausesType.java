@@ -18,6 +18,8 @@ package net.tourbook.ui.action;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
@@ -33,7 +35,7 @@ import org.eclipse.swt.widgets.Menu;
 public class SubMenu_SetPausesType extends SubMenu {
 
    private ITourProvider       _tourProvider;
-   private int[]               _tourPausesIndices;
+   private int[]               _tourPausesViewSelectedIndices;
    private ActionSetPausesType _actionSetAutomaticPauseType;
    private ActionSetPausesType _actionSetManualPauseType;
 
@@ -43,11 +45,11 @@ public class SubMenu_SetPausesType extends SubMenu {
 
       boolean _isSetAutoPause;
 
-      public ActionSetPausesType(final String text, final boolean isAutoPause) {
+      public ActionSetPausesType(final String text, final boolean isSetAutoPause) {
 
          super(text, AS_CHECK_BOX);
 
-         _isSetAutoPause = isAutoPause;
+         _isSetAutoPause = isSetAutoPause;
       }
 
       @Override
@@ -77,9 +79,7 @@ public class SubMenu_SetPausesType extends SubMenu {
          _actionSetAutomaticPauseType.setChecked(false);
          _actionSetManualPauseType.setChecked(false);
 
-      } else if (selectedTours.size() == 1 &&
-            !_changeAllTourPauses &&
-            _tourPausesIndices.length > 0) {
+      } else if (selectedTours.size() == 1) {
 
          final TourData tourData = selectedTours.get(0);
          final long[] pausedTime_Data = tourData.getPausedTime_Data();
@@ -89,9 +89,25 @@ public class SubMenu_SetPausesType extends SubMenu {
             return;
          }
 
-         final boolean isPauseTypeAutomatic = pausedTime_Data[_tourPausesIndices[0]] == 1;
-         _actionSetAutomaticPauseType.setChecked(isPauseTypeAutomatic);
-         _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
+         // Pause type change request is coming from the Tour Pauses view
+         if (!_changeAllTourPauses &&
+               _tourPausesViewSelectedIndices.length > 0) {
+
+            final boolean isPauseTypeAutomatic = pausedTime_Data[_tourPausesViewSelectedIndices[0]] == 1;
+            _actionSetAutomaticPauseType.setChecked(isPauseTypeAutomatic);
+            _actionSetManualPauseType.setChecked(!isPauseTypeAutomatic);
+
+         } else {
+            // Pause type change request is coming from the Tour Book view
+
+            final Set<Long> distinct = Arrays.stream(pausedTime_Data).boxed().collect(Collectors.toSet());
+
+            final boolean allAutoPauses = distinct.size() == 1 && distinct.iterator().next() == 1;
+            _actionSetAutomaticPauseType.setChecked(allAutoPauses);
+
+            final boolean allManualPauses = distinct.size() == 1 && distinct.iterator().next() == 0;
+            _actionSetManualPauseType.setChecked(allManualPauses);
+         }
       }
    }
 
@@ -152,9 +168,9 @@ public class SubMenu_SetPausesType extends SubMenu {
 
    }
 
-   public void setTourPauses(final int[] selectedIndices) {
+   public void setTourPauses(final int[] tourPausesViewSelectedIndices) {
 
-      _tourPausesIndices = selectedIndices;
+      _tourPausesViewSelectedIndices = tourPausesViewSelectedIndices;
    }
 
    private ArrayList<TourData> setToursPausesType(final boolean isSetAutoPause,
@@ -171,9 +187,9 @@ public class SubMenu_SetPausesType extends SubMenu {
 
          } else {
 
-            for (int index = 0; index < _tourPausesIndices.length; index++) {
+            for (int index = 0; index < _tourPausesViewSelectedIndices.length; index++) {
 
-               pausedTime_Data[_tourPausesIndices[index]] = isSetAutoPause ? 1 : 0;
+               pausedTime_Data[_tourPausesViewSelectedIndices[index]] = isSetAutoPause ? 1 : 0;
             }
          }
 
