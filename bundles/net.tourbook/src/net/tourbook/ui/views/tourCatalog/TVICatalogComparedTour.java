@@ -47,13 +47,12 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    LocalDate       tourDate;
    int             year;
-
-   float           tourSpeed;
    int             tourDeviceTime_Elapsed;
 
    float           avgAltimeter;
    float           avgPulse;
    float           maxPulse;
+   float           avgSpeed;
 
    ArrayList<Long> tagIds;
 
@@ -118,7 +117,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    }
 
    public float getTourSpeed() {
-      return tourSpeed;
+      return avgSpeed;
    }
 
    @Override
@@ -172,7 +171,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    }
 
    void setTourSpeed(final float tourSpeed) {
-      this.tourSpeed = tourSpeed;
+      this.avgSpeed = tourSpeed;
    }
 
    @Override

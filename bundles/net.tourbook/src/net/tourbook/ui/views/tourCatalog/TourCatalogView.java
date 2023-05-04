@@ -756,11 +756,11 @@ public class TourCatalogView extends ViewPart implements
       defineColumn_TourType();
       defineColumn_Title();
       defineColumn_Tags();
-      defineColumn_Speed();
       defineColumn_Time_ElapsedTime();
+      defineColumn_AvgSpeed();
+      defineColumn_AvgAltimeter();
       defineColumn_AvgPulse();
       defineColumn_MaxPulse();
-      defineColumn_AvgAltimeter();
    }
 
    /**
@@ -901,6 +901,28 @@ public class TourCatalogView extends ViewPart implements
    }
 
    /**
+    * Column: Average speed
+    */
+   private void defineColumn_AvgSpeed() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVICatalogComparedTour) {
+
+               final double value = ((TVICatalogComparedTour) element).avgSpeed / UI.UNIT_VALUE_DISTANCE;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
+            }
+         }
+      });
+   }
+
+   /**
     * column: Count
     */
    private void defineColumn_Count() {
@@ -940,28 +962,6 @@ public class TourCatalogView extends ViewPart implements
             if (element instanceof TVICatalogComparedTour) {
 
                final float value = ((TVICatalogComparedTour) element).maxPulse;
-
-               colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
-            }
-         }
-      });
-   }
-
-   /**
-    * column: speed
-    */
-   private void defineColumn_Speed() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            if (element instanceof TVICatalogComparedTour) {
-
-               final double value = ((TVICatalogComparedTour) element).tourSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
             }

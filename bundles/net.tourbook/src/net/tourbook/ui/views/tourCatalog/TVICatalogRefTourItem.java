@@ -28,15 +28,17 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 /**
- * Contains a reference tours item
+ * Contains a reference tour
  */
 public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
    String      label;
    long        refId;
 
-   float       yearMapMinValue = Float.MIN_VALUE;
-   float       yearMapMaxValue;
+   float[]     avgAltimeter_MinMax = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
+   float[]     avgPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
+   float[]     maxPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
+   float[]     avgSpeed_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
 
    /**
     * Number of tours
@@ -248,7 +250,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
                tourItem.avgAltimeter               = result.getFloat(4);
                tourItem.avgPulse                   = result.getFloat(5);
                tourItem.maxPulse                   = result.getFloat(6);
-               tourItem.tourSpeed                  = result.getFloat(7);
+               tourItem.avgSpeed                   = result.getFloat(7);
 
                tourItem.startIndex                 = result.getInt(8);
                tourItem.endIndex                   = result.getInt(9);
@@ -329,9 +331,7 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
             + "label             = " + label + NL //                 //$NON-NLS-1$
             + "refId             = " + refId + NL //                 //$NON-NLS-1$
-            + "yearMapMinValue   = " + yearMapMinValue + NL //       //$NON-NLS-1$
-            + "yearMapMaxValue   = " + yearMapMaxValue + NL //       //$NON-NLS-1$
-            + "tourCounter       = " + numTours + NL //              //$NON-NLS-1$
+            + "numTours          = " + numTours + NL //              //$NON-NLS-1$
 
             + "]" + NL //                                            //$NON-NLS-1$
 

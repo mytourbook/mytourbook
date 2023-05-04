@@ -690,7 +690,7 @@ public class ChartComponentGraph extends Canvas {
    private void adjustYSlider() {
 
       /*
-       * check if the y slider was outside of the bounds, recompute the chart when necessary
+       * Check if the y slider was outside of the bounds, recompute the chart when necessary
        */
 
       final GraphDrawingData drawingData = _ySliderDragged.getDrawingData();
@@ -708,24 +708,39 @@ public class ChartComponentGraph extends Canvas {
       final int devYSliderLine1 = slider1.getDevYSliderLine();
       final int devYSliderLine2 = slider2.getDevYSliderLine();
 
+      final boolean isBottomToTop = drawingData.getYData().isYAxisDirection();
+
       double graphValue1 = 0;
       double graphValue2 = 0;
-      if (drawingData.getYData().isYAxisDirection()) {
+
+      if (isBottomToTop) {
+
          graphValue1 = (((double) devYBottom - devYSliderLine1) / scaleY + graphYBottom);
          graphValue2 = (((double) devYBottom - devYSliderLine2) / scaleY + graphYBottom);
+
       } else {
+
          graphValue1 = (((double) devYSliderLine1 - devYTop) / scaleY + graphYBottom);
          graphValue2 = (((double) devYSliderLine2 - devYTop) / scaleY + graphYBottom);
       }
 
+      boolean isAdjustedSlider1 = false;
+
       // get value which was adjusted
       if (_ySliderDragged == slider1) {
+
          yData.adjustedYValue = (float) graphValue1;
+
+         isAdjustedSlider1 = true;
+
       } else if (_ySliderDragged == slider2) {
+
          yData.adjustedYValue = (float) graphValue2;
+
       } else {
+
          // this case should not happen
-         System.out.println("y-slider is not set correctly\t");//$NON-NLS-1$
+         System.out.println("y-slider is not set correctly");//$NON-NLS-1$
          return;
       }
 
@@ -752,8 +767,41 @@ public class ChartComponentGraph extends Canvas {
          slider1.setDevYSliderLine(devYTop);
          slider2.setDevYSliderLine(devYBottom);
       }
+
       yData.setVisibleMinValue(minValue);
       yData.setVisibleMaxValue(maxValue);
+
+      /*
+       * Keep slider positions which are used to force these values when creating new chart data
+       */
+      final float[] sliderMinMaxValue = yData.getSliderMinMaxValue();
+      if (sliderMinMaxValue != null) {
+
+         // set only the adjusted value
+
+         if (isBottomToTop) {
+
+            if (isAdjustedSlider1) {
+
+               sliderMinMaxValue[1] = (float) maxValue;
+
+            } else {
+
+               sliderMinMaxValue[0] = (float) minValue;
+            }
+
+         } else {
+
+            if (isAdjustedSlider1) {
+
+               sliderMinMaxValue[0] = (float) minValue;
+
+            } else {
+
+               sliderMinMaxValue[1] = (float) maxValue;
+            }
+         }
+      }
 
       _ySliderDragged = null;
 
@@ -761,12 +809,12 @@ public class ChartComponentGraph extends Canvas {
 //      setCursorStyle();
 
       /*
-       * the hited slider could be outsite of the chart, hide the labels on the slider
+       * The hited slider could be outsite of the chart, hide the labels on the slider
        */
       _hitYSlider = null;
 
       /*
-       * when the chart is synchronized, the y-slider position is modified, so we overwrite the
+       * When the chart is synchronized, the y-slider position is modified, so we overwrite the
        * synchronized chart y-slider positions until the zoom in marker is overwritten
        */
       final SynchConfiguration synchedChartConfig = _chartComponents._synchConfigSrc;

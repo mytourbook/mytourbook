@@ -2208,6 +2208,11 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_Dialog_DeleteModel_Title;
    public static String        Slideout_MapModel_Label_Title;
 
+   public static String        Slideout_RefTour_Checkbox_AvgAltimeter;
+   public static String        Slideout_RefTour_Checkbox_AvgPulse;
+   public static String        Slideout_RefTour_Checkbox_AvgSpeed;
+   public static String        Slideout_RefTour_Checkbox_MaxPulse;
+   public static String        Slideout_RefTour_Group_Graphs;
    public static String        Slideout_RefTour_YearStatisticOptions_Label_Title;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;

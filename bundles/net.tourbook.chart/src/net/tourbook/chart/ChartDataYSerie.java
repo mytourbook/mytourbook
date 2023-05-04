@@ -108,9 +108,20 @@ public class ChartDataYSerie extends ChartDataSerie {
     */
    private IFillPainter           _customFillPainter;
 
+   /**
+    * Mostly the top slider
+    */
    private ChartYSlider           _ySlider1;
-
+   
+   /**
+    * Mostly the bottom Slider
+    */
    private ChartYSlider           _ySlider2;
+
+   /**
+    * Min/max value which is set when the slider is moved with the mouse
+    */
+   private float[]                _sliderMinMaxValue;
 
    private final ChartType        _chartType;
 
@@ -394,6 +405,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    public ISliderLabelProvider getSliderLabelProvider() {
       return _sliderLabelProvider;
+   }
+
+   public float[] getSliderMinMaxValue() {
+      return _sliderMinMaxValue;
    }
 
    public String getXTitle() {
@@ -819,6 +834,16 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    public void setSliderLabelProvider(final ISliderLabelProvider sliderLabelProvider) {
       _sliderLabelProvider = sliderLabelProvider;
+   }
+
+   /**
+    * These min/max values are set when a vertical slider is moved/dragged with the mouse.
+    *
+    * @param sliderMinMaxValue
+    */
+   public void setSliderMinMaxValue(final float[] sliderMinMaxValue) {
+
+      _sliderMinMaxValue = sliderMinMaxValue;
    }
 
    /**
