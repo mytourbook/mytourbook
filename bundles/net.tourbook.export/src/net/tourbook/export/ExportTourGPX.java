@@ -20,6 +20,7 @@ import java.util.List;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -34,7 +35,7 @@ public class ExportTourGPX extends ExportTourExtension {
     */
    public ExportTourGPX() {
 
-      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_GPX_Logo));
+      // setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_GPX_Logo));
    }
 
    @Override
@@ -47,6 +48,12 @@ public class ExportTourGPX extends ExportTourExtension {
             tourStartIndex,
             tourEndIndex,
             GPX_1_0_TEMPLATE).open();
+   }
+
+   @Override
+   public ImageDescriptor getIconImageDescriptor() {
+
+      return Activator.getImageDescriptor(getIcon());
    }
 
 }

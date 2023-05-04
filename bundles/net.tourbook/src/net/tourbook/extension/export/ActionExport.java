@@ -156,6 +156,7 @@ public class ActionExport extends Action implements IMenuCreator {
       }
 
       for (final IExtension extension : extPoint.getExtensions()) {
+
          for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
             if (configElement.getName().equalsIgnoreCase("export") == false) { //$NON-NLS-1$
@@ -171,6 +172,7 @@ public class ActionExport extends Action implements IMenuCreator {
                   exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
                   exportTourItem.setFileExtension(configElement.getAttribute("fileextension")); //$NON-NLS-1$
                   exportTourItem.setIcon(configElement.getAttribute("icon")); //$NON-NLS-1$
+                  exportTourItem.setImageDescriptor(exportTourItem.getIconImageDescriptor());
 
                   _exportExtensionPoints.add(exportTourItem);
                }

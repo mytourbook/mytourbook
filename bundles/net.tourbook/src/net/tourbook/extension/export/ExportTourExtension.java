@@ -52,6 +52,8 @@ public abstract class ExportTourExtension {
       return _icon;
    }
 
+   public abstract ImageDescriptor getIconImageDescriptor() ;
+
    public ImageDescriptor getImageDescriptor() {
       return _imageDescriptor;
    }
@@ -60,12 +62,12 @@ public abstract class ExportTourExtension {
       return _visibleName;
    }
 
-   public void setExportId(final String fExportId) {
-      this._exportId = fExportId;
+   public void setExportId(final String exportId) {
+      this._exportId = exportId;
    }
 
-   public void setFileExtension(final String fFileExtension) {
-      this._fileExtension = fFileExtension;
+   public void setFileExtension(final String fileExtension) {
+      this._fileExtension = fileExtension;
    }
 
    public void setIcon(final String icon) {
@@ -76,8 +78,8 @@ public abstract class ExportTourExtension {
       _imageDescriptor = imageDescriptor;
    }
 
-   public void setVisibleName(final String fVisibleName) {
-      this._visibleName = fVisibleName;
+   public void setVisibleName(final String visibleName) {
+      this._visibleName = visibleName;
    }
 
    @Override
