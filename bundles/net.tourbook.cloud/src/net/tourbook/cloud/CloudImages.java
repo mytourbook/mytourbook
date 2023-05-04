@@ -24,6 +24,7 @@ public class CloudImages {
    public static final String Cloud_Dropbox_Folder       = "dropbox-folder.png";               //$NON-NLS-1$
    public static final String Cloud_Dropbox_Logo         = "dropbox-logo.png";                 //$NON-NLS-1$
    public static final String Cloud_Dropbox_Parentfolder = "dropbox-parentfolder.png";         //$NON-NLS-1$
+   //todo fb rename
    public static final String Cloud_Strava               = "StravaIcon.png";                   //$NON-NLS-1$
    public static final String Cloud_Strava_Connect       = "btn_strava_connectwith_light.png"; //$NON-NLS-1$
    public static final String Cloud_Suunto               = "SuuntoAppIcon.png";                //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard and Contributors
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,36 +15,15 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.List;
-
-import net.tourbook.data.TourData;
-import net.tourbook.extension.export.ExportTourExtension;
-
-import org.eclipse.swt.widgets.Display;
-
 /**
- * Export tours in the FIT data format
+ * Contains image constants which do not need to be translated
  */
-public class ExportTourFIT extends ExportTourExtension {
+public class ExportImages {
 
-   /**
-    * Plugin extension constructor
-    */
-   public ExportTourFIT() {
+   public static final String Export_FIT_Logo    = "FIT-logo.png";             //$NON-NLS-1$
+   public static final String Export_Garmin_Logo = "Garmin-logo.png";          //$NON-NLS-1$
+   public static final String Export_GPX_Logo    = "GPX-logo.png";             //$NON-NLS-1$
+   public static final String Export_MT_Logo     = "MT-logo.png";     //$NON-NLS-1$
 
-      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_FIT_Logo));
-   }
-
-   @Override
-   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
-
-      new DialogExportTour(
-            Display.getCurrent().getActiveShell(),
-            this,
-            tourDataList,
-            tourStartIndex,
-            tourEndIndex,
-            "fit").open(); //$NON-NLS-1$
-   }
-
+   private ExportImages() {}
 }

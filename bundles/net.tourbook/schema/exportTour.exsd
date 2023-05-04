@@ -44,6 +44,16 @@
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="false"/>
+               </appInfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -80,6 +90,13 @@
             <annotation>
                <documentation>
                   File extension which is used to save the exported tour
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string" use="optional">
+            <annotation>
+               <documentation>
+                  The icon's filepath of the file format's vendor
                </documentation>
             </annotation>
          </attribute>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,7 @@ public class ActionExport extends Action implements IMenuCreator {
       public ActionExportTour(final ExportTourExtension exportTourExtension) {
 
          super(exportTourExtension.getVisibleName());
+         setImageDescriptor(exportTourExtension.getImageDescriptor());
 
          _exportTourExtension = exportTourExtension;
       }
@@ -169,6 +170,7 @@ public class ActionExport extends Action implements IMenuCreator {
                   exportTourItem.setExportId(configElement.getAttribute("id")); //$NON-NLS-1$
                   exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
                   exportTourItem.setFileExtension(configElement.getAttribute("fileextension")); //$NON-NLS-1$
+                  exportTourItem.setIcon(configElement.getAttribute("icon")); //$NON-NLS-1$
 
                   _exportExtensionPoints.add(exportTourItem);
                }
