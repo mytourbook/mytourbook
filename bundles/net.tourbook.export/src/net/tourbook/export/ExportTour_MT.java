@@ -34,7 +34,7 @@ public class ExportTour_MT extends ExportTourExtension {
     */
    public ExportTour_MT() {
 
-      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_MT_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_MyTourbook_Logo));
    }
 
    @Override
