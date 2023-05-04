@@ -56,11 +56,11 @@ public abstract class ExportTourExtension {
    }
 
    public void setExportId(final String exportId) {
-      this._exportId = exportId;
+      _exportId = exportId;
    }
 
    public void setFileExtension(final String fileExtension) {
-      this._fileExtension = fileExtension;
+      _fileExtension = fileExtension;
    }
 
    public void setImageDescriptor(final ImageDescriptor imageDescriptor) {
@@ -68,7 +68,7 @@ public abstract class ExportTourExtension {
    }
 
    public void setVisibleName(final String visibleName) {
-      this._visibleName = visibleName;
+      _visibleName = visibleName;
    }
 
    @Override
