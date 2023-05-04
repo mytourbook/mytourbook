@@ -93,5 +93,4 @@ public class Activator extends AbstractUIPlugin {
       plugin = null;
       super.stop(context);
    }
-
 }

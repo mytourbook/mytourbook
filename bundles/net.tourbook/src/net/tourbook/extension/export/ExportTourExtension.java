@@ -26,7 +26,6 @@ public abstract class ExportTourExtension {
    private String          _exportId;
    private String          _visibleName;
    private String          _fileExtension;
-   private String          _icon;
    private ImageDescriptor _imageDescriptor;
 
    /**
@@ -48,10 +47,6 @@ public abstract class ExportTourExtension {
       return _fileExtension;
    }
 
-   public String getIcon() {
-      return _icon;
-   }
-
    public ImageDescriptor getImageDescriptor() {
       return _imageDescriptor;
    }
@@ -66,10 +61,6 @@ public abstract class ExportTourExtension {
 
    public void setFileExtension(final String fileExtension) {
       this._fileExtension = fileExtension;
-   }
-
-   public void setIcon(final String icon) {
-      _icon = icon;
    }
 
    public void setImageDescriptor(final ImageDescriptor imageDescriptor) {
@@ -94,10 +85,6 @@ public abstract class ExportTourExtension {
             //
             .append("extension: ")//$NON-NLS-1$
             .append(_fileExtension)
-            .append(" \t") //$NON-NLS-1$
-            //
-            .append("icon: ")//$NON-NLS-1$
-            .append(_icon)
             .append(" \t") //$NON-NLS-1$
             //
             .toString();
