@@ -172,7 +172,6 @@ public class ActionExport extends Action implements IMenuCreator {
                   exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
                   exportTourItem.setFileExtension(configElement.getAttribute("fileextension")); //$NON-NLS-1$
                   exportTourItem.setIcon(configElement.getAttribute("icon")); //$NON-NLS-1$
-                  exportTourItem.setImageDescriptor(exportTourItem.getIconImageDescriptor());
 
                   _exportExtensionPoints.add(exportTourItem);
                }

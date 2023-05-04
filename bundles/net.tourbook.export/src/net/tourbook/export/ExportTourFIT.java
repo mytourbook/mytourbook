@@ -17,10 +17,10 @@ package net.tourbook.export;
 
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -33,7 +33,8 @@ public class ExportTourFIT extends ExportTourExtension {
     */
    public ExportTourFIT() {
 
-      //   setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_FIT_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(
+            UI.IS_DARK_THEME ? ExportImages.Export_FIT_Logo_Dark : ExportImages.Export_FIT_Logo));
    }
 
    @Override
@@ -47,11 +48,4 @@ public class ExportTourFIT extends ExportTourExtension {
             tourEndIndex,
             "fit").open(); //$NON-NLS-1$
    }
-
-   @Override
-   public ImageDescriptor getIconImageDescriptor() {
-
-      return Activator.getImageDescriptor(getIcon());
-   }
-
 }

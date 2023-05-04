@@ -20,10 +20,11 @@ package net.tourbook.export;
  */
 public class ExportImages {
 
-   public static final String Export_FIT_Logo    = "FIT-logo.png";             //$NON-NLS-1$
-   public static final String Export_Garmin_Logo = "Garmin-logo.png";          //$NON-NLS-1$
-   public static final String Export_GPX_Logo    = "GPX-logo.png";             //$NON-NLS-1$
-   public static final String Export_MT_Logo     = "MyTourbook-logo.png"; //$NON-NLS-1$
+   public static final String Export_FIT_Logo      = "fit-logo.png";        //$NON-NLS-1$
+   public static final String Export_FIT_Logo_Dark = "fit-logo-dark.png";   //$NON-NLS-1$
+   public static final String Export_Garmin_Logo   = "garmin-logo.png";     //$NON-NLS-1$
+   public static final String Export_GPX_Logo      = "gpx-logo.png";        //$NON-NLS-1$
+   public static final String Export_MT_Logo       = "mytourbook-logo.png"; //$NON-NLS-1$
 
    private ExportImages() {}
 }

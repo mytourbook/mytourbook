@@ -20,7 +20,6 @@ import java.util.List;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -35,7 +34,7 @@ public class ExportTourTCX extends ExportTourExtension {
     */
    public ExportTourTCX() {
 
-      // setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_Garmin_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_Garmin_Logo));
    }
 
    @Override
@@ -48,11 +47,5 @@ public class ExportTourTCX extends ExportTourExtension {
             tourStartIndex,
             tourEndIndex,
             TCX_2_0_TEMPLATE).open();
-   }
-
-   @Override
-   public ImageDescriptor getIconImageDescriptor() {
-
-      return Activator.getImageDescriptor(getIcon());
    }
 }

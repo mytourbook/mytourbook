@@ -20,7 +20,6 @@ import java.util.List;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -35,7 +34,7 @@ public class ExportTour_MT extends ExportTourExtension {
     */
    public ExportTour_MT() {
 
-      // setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_MT_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_MT_Logo));
    }
 
    @Override
@@ -48,11 +47,5 @@ public class ExportTour_MT extends ExportTourExtension {
             tourStartIndex,
             tourEndIndex,
             TEMPLATE).open();
-   }
-
-   @Override
-   public ImageDescriptor getIconImageDescriptor() {
-
-      return Activator.getImageDescriptor(getIcon());
    }
 }

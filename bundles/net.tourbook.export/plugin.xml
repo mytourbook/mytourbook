@@ -9,7 +9,6 @@
          class          ="net.tourbook.export.ExportTourGPX"
          name           ="GPX"
          fileextension  ="gpx"
-         icon           ="gpx-logo.png"
       />
 
       <export
@@ -17,7 +16,6 @@
          class          ="net.tourbook.export.ExportTourTCX"
          name           ="TCX"
          fileextension  ="tcx"
-         icon           ="garmin-logo.png"
       />
 
       <export
@@ -25,7 +23,6 @@
          class          ="net.tourbook.export.ExportTour_MT"
          name           ="MyTourbook (.mt)"
          fileextension  ="mt"
-         icon           ="mytourbook-logo.png"
       />
       
       <export
@@ -33,7 +30,6 @@
          class          ="net.tourbook.export.ExportTourFIT"
          name           ="FIT"
          fileextension  ="fit"
-         icon           ="fit-logo.png"
       />
       
    </extension>

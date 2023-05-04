@@ -52,8 +52,6 @@ public abstract class ExportTourExtension {
       return _icon;
    }
 
-   public abstract ImageDescriptor getIconImageDescriptor() ;
-
    public ImageDescriptor getImageDescriptor() {
       return _imageDescriptor;
    }
