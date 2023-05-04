@@ -72,7 +72,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
       super(CLOUD_UPLOADER_ID,
             Messages.VendorName_Suunto_Workouts,
-            Activator.getImageDescriptor(CloudImages.Cloud_Suunto));
+            Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo));
    }
 
    private WorkoutUpload checkUploadStatus(final TourData tourData, final String workoutUploadId) {
