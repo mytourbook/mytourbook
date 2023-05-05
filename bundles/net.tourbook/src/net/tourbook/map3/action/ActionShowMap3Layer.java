@@ -1,20 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -39,161 +40,159 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionShowMap3Layer extends ContributionItem implements IOpeningDialog {
 
-	private static final String	IMAGE_MAP_OPTIONS	= net.tourbook.Messages.Image__MapOptions;
+   private Map3View        _map3View;
 
-	private Map3View			_map3View;
+   private DialogMap3Layer _map3LayerDialog;
 
-	private DialogMap3Layer		_map3LayerDialog;
+   private ToolBar         _toolBar;
+   private ToolItem        _actionToolItem;
 
-	private ToolBar				_toolBar;
-	private ToolItem			_actionToolItem;
+   private String          _dialogId = getClass().getCanonicalName();
 
-	private String				_dialogId			= getClass().getCanonicalName();
+   /*
+    * UI controls
+    */
+   private Control _parent;
 
-	/*
-	 * UI controls
-	 */
-	private Control				_parent;
+   /*
+    * UI resources
+    */
+   private Image _actionImage;
 
-	/*
-	 * UI resources
-	 */
-	private Image				_actionImage;
+   public ActionShowMap3Layer(final Map3View map3View, final Control parent) {
 
-	public ActionShowMap3Layer(final Map3View map3View, final Control parent) {
+      _map3View = map3View;
 
-		_map3View = map3View;
+      _parent = parent;
 
-		_parent = parent;
+      _actionImage = TourbookPlugin.getThemedImageDescriptor(Images.MapOptions).createImage();
+   }
 
-		_actionImage = TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS).createImage();
-	}
+   @Override
+   public void fill(final ToolBar toolbar, final int index) {
 
-	@Override
-	public void fill(final ToolBar toolbar, final int index) {
+      if (_actionToolItem == null && toolbar != null) {
 
-		if (_actionToolItem == null && toolbar != null) {
+         // action is not yet created
 
-			// action is not yet created
+         _toolBar = toolbar;
 
-			_toolBar = toolbar;
+         toolbar.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               onDispose();
+            }
+         });
 
-			toolbar.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent e) {
-					onDispose();
-				}
-			});
+         toolbar.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(final MouseEvent e) {
 
-			toolbar.addMouseMoveListener(new MouseMoveListener() {
-				@Override
-				public void mouseMove(final MouseEvent e) {
+               final Point mousePosition = new Point(e.x, e.y);
+               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-					final Point mousePosition = new Point(e.x, e.y);
-					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+               onMouseMove(hoveredItem, e);
+            }
+         });
 
-					onMouseMove(hoveredItem, e);
-				}
-			});
+         _actionToolItem = new ToolItem(toolbar, SWT.PUSH);
 
-			_actionToolItem = new ToolItem(toolbar, SWT.PUSH);
+         // !!! image must be set before enable state is set
+         _actionToolItem.setImage(_actionImage);
 
-			// !!! image must be set before enable state is set
-			_actionToolItem.setImage(_actionImage);
+         _actionToolItem.setToolTipText(Messages.Map3_Action_OpenMap3PropertiesView);
 
-			_actionToolItem.setToolTipText(Messages.Map3_Action_OpenMap3PropertiesView);
+         _actionToolItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelect();
+            }
+         });
 
-			_actionToolItem.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelect();
-				}
-			});
+         _map3LayerDialog = new DialogMap3Layer(_parent, _toolBar);
 
-			_map3LayerDialog = new DialogMap3Layer(_parent, _toolBar);
+         updateUI_Tooltip();
+      }
+   }
 
-			updateUI_Tooltip();
-		}
-	}
+   @Override
+   public String getDialogId() {
+      return _dialogId;
+   }
 
-	@Override
-	public String getDialogId() {
-		return _dialogId;
-	}
+   @Override
+   public void hideDialog() {
+      _map3LayerDialog.hideNow();
+   }
 
-	@Override
-	public void hideDialog() {
-		_map3LayerDialog.hideNow();
-	}
+   private void onDispose() {
 
-	private void onDispose() {
+      _actionImage.dispose();
 
-		_actionImage.dispose();
+      _actionToolItem.dispose();
+      _actionToolItem = null;
+   }
 
-		_actionToolItem.dispose();
-		_actionToolItem = null;
-	}
+   private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
 
-	private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
+      final boolean isToolItemHovered = hoveredItem == _actionToolItem;
 
-		final boolean isToolItemHovered = hoveredItem == _actionToolItem;
+      Rectangle itemBounds = null;
 
-		Rectangle itemBounds = null;
+      if (isToolItemHovered) {
 
-		if (isToolItemHovered) {
+         itemBounds = hoveredItem.getBounds();
 
-			itemBounds = hoveredItem.getBounds();
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+         openLayerDialog(itemBounds, true);
+      }
+   }
 
-			openLayerDialog(itemBounds, true);
-		}
-	}
+   private void onSelect() {
 
-	private void onSelect() {
+      updateUI_Tooltip();
 
-		updateUI_Tooltip();
+      if (_map3LayerDialog.isToolTipVisible() == false) {
 
-		if (_map3LayerDialog.isToolTipVisible() == false) {
+         final Rectangle itemBounds = _actionToolItem.getBounds();
 
-			final Rectangle itemBounds = _actionToolItem.getBounds();
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+         openLayerDialog(itemBounds, false);
 
-			openLayerDialog(itemBounds, false);
+      } else {
 
-		} else {
+         _map3LayerDialog.close();
+      }
+   }
 
-			_map3LayerDialog.close();
-		}
-	}
+   private void openLayerDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-	private void openLayerDialog(final Rectangle itemBounds, final boolean isOpenDelayed) {
+      // ensure other dialogs are closed
+      _map3View.closeOpenedDialogs(this);
 
-		// ensure other dialogs are closed
-		_map3View.closeOpenedDialogs(this);
+      _map3LayerDialog.open(itemBounds, isOpenDelayed);
+   }
 
-		_map3LayerDialog.open(itemBounds, isOpenDelayed);
-	}
+   private void updateUI_Tooltip() {
 
-	private void updateUI_Tooltip() {
+      if (_actionToolItem.getSelection()) {
 
-		if (_actionToolItem.getSelection()) {
+         // hide tooltip because the track properties dialog is displayed
 
-			// hide tooltip because the track properties dialog is displayed
+         _actionToolItem.setToolTipText(UI.EMPTY_STRING);
 
-			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
+      } else {
 
-		} else {
-
-			_actionToolItem.setToolTipText(Messages.Map3_Action_OpenMap3PropertiesView);
-		}
-	}
+         _actionToolItem.setToolTipText(Messages.Map3_Action_OpenMap3PropertiesView);
+      }
+   }
 
 }

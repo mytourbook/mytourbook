@@ -1034,7 +1034,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                 */
                final String textSize = _nfMByte.format(photo.imageFileSize / 1024.0 / 1024.0)
                      + UI.SPACE
-                     + UI.UNIT_MBYTES;
+                     + UI.UNIT_MBYTE;
 
                /*
                 * date/time
@@ -1168,6 +1168,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
       gc.setForeground(_fgColor);
       gc.setBackground(_fullsizeBgColor);
+
+      /*
+       * With a dark theme, the background is painted not with a black color -> force black background
+       */
+      gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
 
       boolean isPainted = true;
 

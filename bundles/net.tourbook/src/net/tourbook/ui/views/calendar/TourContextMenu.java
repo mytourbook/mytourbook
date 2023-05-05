@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2021 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -35,13 +36,12 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionOpenTour;
-import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
+import net.tourbook.ui.action.ActionSetElevationValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -66,9 +66,10 @@ public class TourContextMenu {
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
    private ActionMergeTour                            _actionMergeTour;
    private ActionPrint                                _actionPrintTour;
-   private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
+   private ActionSetElevationValuesFromSRTM           _actionSetElevationFromSRTM;
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionSetTourTypeMenu                      _actionSetTourType;
+   private ActionUpload                               _actionUploadTour;
 
    public TourContextMenu() {}
 
@@ -85,13 +86,14 @@ public class TourContextMenu {
       _actionMergeTour = new ActionMergeTour(tourProvider);
       _actionJoinTours = new ActionJoinTours(tourProvider);
       _actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
-      _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(tourProvider);
+      _actionSetElevationFromSRTM = new ActionSetElevationValuesFromSRTM(tourProvider);
       _actionSetOtherPerson = new ActionSetPerson(tourProvider);
 
       _actionSetTourType = new ActionSetTourTypeMenu(tourProvider);
 
       _actionExportTour = new ActionExport(tourProvider);
       _actionPrintTour = new ActionPrint(tourProvider);
+      _actionUploadTour = new ActionUpload(tourProvider);
 
       _tagMenuMgr = new TagMenuManager(tourProvider, true);
 
@@ -108,15 +110,12 @@ public class TourContextMenu {
       final TagMenuManager tagMenuMgr = new TagMenuManager(calendarView, true);
 
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
+      menuMgr.addMenuListener(menuManager -> {
 
-            // hide tour tooltip when opened
-            calendarView.getTourInfoTooltip().hideToolTip();
+         // hide tour tooltip when opened
+         calendarView.getTourInfoTooltip().hideToolTip();
 
-            fillContextMenu(manager, calendarView, localActions);
-         }
+         fillContextMenu(menuManager, calendarView, localActions);
       });
 
       final Menu contextMenu = menuMgr.createContextMenu(control);
@@ -143,7 +142,7 @@ public class TourContextMenu {
       menuMgr.add(_actionMergeTour);
       // menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionSetElevationFromSRTM);
 
       tagMenuMgr.fillTagMenu(menuMgr, true);
 
@@ -153,6 +152,7 @@ public class TourContextMenu {
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, calendarView, true);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionUploadTour);
       menuMgr.add(_actionExportTour);
       menuMgr.add(_actionPrintTour);
 
@@ -191,7 +191,7 @@ public class TourContextMenu {
       // _tourDoubleClickState.canEditMarker = isOneTour;
       // _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-      _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
+      _actionDuplicateTour.setEnabled(isOneTour);
       _actionEditTour.setEnabled(isOneTour);
       _actionEditQuick.setEnabled(isOneTour);
       _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
@@ -204,7 +204,7 @@ public class TourContextMenu {
                   && firstSavedTour != null
                   && firstSavedTour.getMergeSourceTourId() != null);
       _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
-      _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
+      _actionSetElevationFromSRTM.setEnabled(isTourSelected);
 
       // enable delete ation when at least one tour is selected
 //		if (isTourSelected) {
@@ -218,11 +218,12 @@ public class TourContextMenu {
 
       _actionExportTour.setEnabled(isTourSelected);
       _actionPrintTour.setEnabled(isTourSelected);
+      _actionUploadTour.setEnabled(isTourSelected);
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-      Long tourTypeId = new Long(-1); // TODO -> NOTOUR
+      Long tourTypeId = Long.valueOf(-1); // TODO -> NOTOUR
       if (null != firstSavedTour) {
          final ArrayList<Long> tagIds = new ArrayList<>();
          for (final TourTag tag : firstSavedTour.getTourTags()) {
@@ -234,7 +235,7 @@ public class TourContextMenu {
          }
          TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
       } else {
-         _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, new ArrayList<Long>());
+         _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, new ArrayList<>());
          TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
       }
    }
@@ -261,7 +262,7 @@ public class TourContextMenu {
       menuMgr.add(_actionMergeTour);
       menuMgr.add(_actionJoinTours);
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionSetElevationFromSRTM);
 
       _tagMenuMgr.fillTagMenu(menuMgr, true);
 
@@ -271,6 +272,7 @@ public class TourContextMenu {
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionUploadTour);
       menuMgr.add(_actionExportTour);
       menuMgr.add(_actionPrintTour);
 

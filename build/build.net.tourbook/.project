@@ -7,7 +7,6 @@
 	<buildSpec>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
@@ -36,6 +35,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/features/pom.xml</locationURI>
 		</link>
 		<link>
+			<name>pom-JRE.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/features/feature.net.tourbook.jre/pom.xml</locationURI>
+		</link>
+		<link>
 			<name>pom-product.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/build/build.net.tourbook.product/pom.xml</locationURI>
@@ -49,6 +53,11 @@
 			<name>pom.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
+		</link>
+		<link>
+			<name>settings-bundles.gradle</name>
+			<type>1</type>
+			<location>PARENT-2-PROJECT_LOC/bundles/settings.gradle</location>
 		</link>
 	</linkedResources>
 </projectDescription>

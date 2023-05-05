@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,23 +27,23 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ExportTourGPX extends ExportTourExtension {
 
-	private static final String	GPX_1_0_TEMPLATE	= "/format-templates/gpx-1.0.vm";	//$NON-NLS-1$
+   public static final String GPX_1_0_TEMPLATE = "/format-templates/gpx-1.0.vm"; //$NON-NLS-1$
 
-	/**
-	 * plugin extension constructor
-	 */
-	public ExportTourGPX() {}
+   /**
+    * plugin extension constructor
+    */
+   public ExportTourGPX() {}
 
-	@Override
-	public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   @Override
+   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
-		new DialogExportTour(
-				Display.getCurrent().getActiveShell(),
-				this,
-				tourDataList,
-				tourStartIndex,
-				tourEndIndex,
-				GPX_1_0_TEMPLATE).open();
-	}
+      new DialogExportTour(
+            Display.getCurrent().getActiveShell(),
+            this,
+            tourDataList,
+            tourStartIndex,
+            tourEndIndex,
+            GPX_1_0_TEMPLATE).open();
+   }
 
 }

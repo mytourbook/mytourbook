@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,6 @@ package net.tourbook.map3.layer.tourtrack;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.cache.GpuResourceCache;
@@ -35,13 +33,13 @@ import java.awt.Color;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map3.view.Map3View;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.swt.graphics.RGB;
 
 public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
@@ -60,7 +58,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
    /** The angle of the arrowhead tip. */
    protected Angle             _arrowAngle        = Angle.fromDegrees(30.0);
 
-   private TIntArrayList       _arrowPositionIndizes;
+   private IntArrayList        _arrowPositionIndizes;
 
    private int                 _arrowPositionVboId;
    private int                 _arrowSurfaceVboId;
@@ -68,7 +66,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
    private int                 _numberOfDirectionArrows;
 
-   public TrackPathOptimized(final ArrayList<TourMap3Position> trackPositions) {
+   public TrackPathOptimized(final List<TourMap3Position> trackPositions) {
       super(trackPositions);
    }
 
@@ -205,7 +203,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
       //https://stackoverflow.com/questions/48693695/java-nio-buffer-not-loading-clear-method-on-runtime
 
       if (_arrowPositionIndizes == null || _arrowPositionIndizes.size() < polePositionSize) {
-         _arrowPositionIndizes = new TIntArrayList(polePositionSize);
+         _arrowPositionIndizes = new IntArrayList(polePositionSize);
       }
       _arrowPositionIndizes.clear();
 
@@ -298,7 +296,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
       final List<Position> tessellatedPositions = pathData.getTessellatedPositions();
 
-      int currentPositionIndex = _arrowPositionIndizes.get(0);
+      final int currentPositionIndex = _arrowPositionIndizes.get(0);
       final Position poleA = tessellatedPositions.get(currentPositionIndex);
       Vec4 polePtA = computePoint(terrain, poleA);
 
@@ -328,7 +326,6 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
                arrowBorderBuffer,
                pathData);
 
-         currentPositionIndex = nextPositionIndex;
          polePtA = polePtB;
       }
 
@@ -394,11 +391,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
       final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-      double arrowLength = _arrowLength;
-      double arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
-
-      arrowLength = config.directionArrowSize * pixelSize;
-      arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
+      final double arrowLength = config.directionArrowSize * pixelSize;
+      final double arrowBase = arrowLength * _arrowAngle.tanHalfAngle();
 
       // Don't draw an arrowhead if the path segment is smaller than the arrow
       if (poleDistance <= arrowLength) {
@@ -549,7 +543,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
             // Convert stride and offset from number of elements to number of bytes.
             gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
-            gl.glColorPointer(4, GL2.GL_FLOAT, 4 * stride, 4 * pathData.getColorOffset());
+            gl.glColorPointer(4, GL2.GL_FLOAT, 4 * stride, 4L * pathData.getColorOffset());
          }
 
          gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, count);
@@ -572,7 +566,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          }
 
          if (!isPickingMode && config.isShowDirectionArrows) {
-            drawDirectionArrows(dc, vboIds, pathData);
+            drawDirectionArrows(dc, vboIds);
          }
 
       } finally {
@@ -601,7 +595,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
     * @param pathData
     *           the current globe-specific path data.
     */
-   private void drawDirectionArrows(final DrawContext dc, final int[] vboIds, final PathData pathData) {
+   private void drawDirectionArrows(final DrawContext dc, final int[] vboIds) {
 
       if (_numberOfDirectionArrows < 1) {
          return;
@@ -685,7 +679,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
          {
             gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * vertexStride, 0);
-            gl.glColorPointer(4, GL2.GL_FLOAT, 4 * vertexStride, 4 * pathData.getColorOffset());
+            gl.glColorPointer(4, GL2.GL_FLOAT, 4 * vertexStride, 4L * pathData.getColorOffset());
 
             gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
          }
@@ -745,7 +739,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          // Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
          // positionColors is non-null. Convert the stride and offset from number of elements to number of bytes.
          gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
-         gl.glColorPointer(4, GL2.GL_FLOAT, 4 * pathData.getVertexStride(), 4 * pathData.getColorOffset());
+         gl.glColorPointer(4, GL2.GL_FLOAT, 4 * pathData.getVertexStride(), 4L * pathData.getColorOffset());
       }
 
       prepareToDrawPoints(dc);
@@ -822,18 +816,18 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
          final FloatBuffer vb = pathData.getRenderedPath();
          gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[0]);
-         gl.glBufferData(GL2.GL_ARRAY_BUFFER, vb.limit() * 4, vb.rewind(), GL2.GL_STATIC_DRAW);
+         gl.glBufferData(GL2.GL_ARRAY_BUFFER, vb.limit() * 4L, vb.rewind(), GL2.GL_STATIC_DRAW);
 
          if (pathData.isHasExtrusionPoints() && isDrawVerticals()) {
             final IntBuffer ib = pathData.getPolePositions();
             gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
-            gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4, ib.rewind(), GL2.GL_STATIC_DRAW);
+            gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4L, ib.rewind(), GL2.GL_STATIC_DRAW);
          }
 
          if (isShowPositions()) {
             final IntBuffer ib = pathData.getPositionPoints();
             gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
-            gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4, ib.rewind(), GL2.GL_STATIC_DRAW);
+            gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4L, ib.rewind(), GL2.GL_STATIC_DRAW);
          }
 
          if (config.isShowDirectionArrows) {
@@ -844,17 +838,17 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
             _arrowPositionVboId = vboIndex++;
             FloatBuffer fb = (FloatBuffer) pathData.getValue(ARROW_POSITION_KEY);
             gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowPositionVboId]);
-            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL2.GL_STATIC_DRAW);
+            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL2.GL_STATIC_DRAW);
 
             _arrowSurfaceVboId = vboIndex++;
             fb = (FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY);
             gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
-            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL2.GL_STATIC_DRAW);
+            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL2.GL_STATIC_DRAW);
 
             _arrowBorderVboId = vboIndex++;
             fb = (FloatBuffer) pathData.getValue(ARROW_BORDER_KEY);
             gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
-            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4, fb.rewind(), GL2.GL_STATIC_DRAW);
+            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL2.GL_STATIC_DRAW);
          }
 
       } finally {
@@ -866,7 +860,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
    @Override
    protected Color getColor(final Position pos, final Integer ordinal) {
-      return _tourTrack.getColor(pos, ordinal);
+      return _tourTrack.getColor(ordinal);
    }
 
    @Override
@@ -1003,7 +997,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
    @Override
    public void setPicked(final boolean isHovered, final Integer pickPositionIndex) {
 
-      _tourTrack.setHovered(isHovered, pickPositionIndex);
+      _tourTrack.setHovered(isHovered);
    }
 
    @Override

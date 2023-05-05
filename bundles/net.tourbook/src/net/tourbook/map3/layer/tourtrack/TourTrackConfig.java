@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,6 +16,7 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import gov.nasa.worldwind.WorldWind;
+
 import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.widgets.ComboEntry;
 import net.tourbook.map3.Messages;
@@ -24,234 +25,236 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TourTrackConfig implements Cloneable {
 
-	/*
-	 * Altitude mode
-	 */
-	public static final ComboEntry[]	ALTITUDE_MODE					= {
-			new ComboEntry(Messages.Track_Config_Altitude_Mode_Absolute, WorldWind.ABSOLUTE),
-			new ComboEntry(Messages.Track_Config_Altitude_Mode_ClampToGround, WorldWind.CLAMP_TO_GROUND),
-			new ComboEntry(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND) //
-																		};
+   /*
+    * Altitude mode
+    */
+   public static final ComboEntry[] ALTITUDE_MODE = {
 
-	/*
-	 * These texts are translated but currently not used, but to keep the translations, the text is
-	 * assigned to a public field. Later this may be removed, 11.11.2013.
-	 */
-	public static String				oldTranslatedText_1				= Messages.TourTrack_Properties_Label_PathResolution;
-	public static String				oldTranslatedText_2				= Messages.TourTrack_Properties_Label_PathResolution_Tooltip;
-//	public static String				oldTranslatedText_3				= Messages.TourTrack_Properties_Label_TrackColor;
-//	public static String				oldTranslatedText_4				= Messages.TourTrack_Properties_Label_TrackColor_Tooltip;
-	public static String				oldTranslatedText_5				= Messages.TourTrack_Properties_Label_TrackPositionSize;
-	public static String				oldTranslatedText_6				= Messages.TourTrack_Properties_Label_TrackPositionSize_Tooltip;
-	public static String				oldTranslatedText_7				= Messages.Track_Config_Path_Resolution_High;
-	public static String				oldTranslatedText_8				= Messages.Track_Config_Path_Resolution_Optimized;
-	public static String				oldTranslatedText_9				= Messages.Track_Config_Path_Resolution_Viewport;
+         new ComboEntry(Messages.Track_Config_Altitude_Mode_Absolute, WorldWind.ABSOLUTE),
+         new ComboEntry(Messages.Track_Config_Altitude_Mode_ClampToGround, WorldWind.CLAMP_TO_GROUND),
+         new ComboEntry(Messages.Track_Config_Altitude_Mode_RelativeToGround, WorldWind.RELATIVE_TO_GROUND)
+   };
 
-//	/*
-//	 * Path resolution
-//	 */
-//	public static final int				PATH_RESOLUTION_OPTIMIZED		= 0;
-//	public static final int				PATH_RESOLUTION_ALL_POSITIONS	= 1;
-//	public static final int				PATH_RESOLUTION_VIEWPORT		= 2;
-//	public static final ComboEntry[]	PATH_RESOLUTION					= {
-//			new ComboEntry(Messages.Track_Config_Path_Resolution_Optimized, PATH_RESOLUTION_OPTIMIZED),//
-//			new ComboEntry(Messages.Track_Config_Path_Resolution_High, PATH_RESOLUTION_ALL_POSITIONS),
-//			new ComboEntry(Messages.Track_Config_Path_Resolution_Viewport, PATH_RESOLUTION_VIEWPORT),//
-//																		//
-//																		};
+   /*
+    * These texts are translated but currently not used, but to keep the translations, the text is
+    * assigned to a public field. Later this may be removed, 11.11.2013.
+    */
+   public static String oldTranslatedText_1 = Messages.TourTrack_Properties_Label_PathResolution;
+   public static String oldTranslatedText_2 = Messages.TourTrack_Properties_Label_PathResolution_Tooltip;
+// public static String oldTranslatedText_3 = Messages.TourTrack_Properties_Label_TrackColor;
+// public static String oldTranslatedText_4 = Messages.TourTrack_Properties_Label_TrackColor_Tooltip;
+   public static String oldTranslatedText_5 = Messages.TourTrack_Properties_Label_TrackPositionSize;
+   public static String oldTranslatedText_6 = Messages.TourTrack_Properties_Label_TrackPositionSize_Tooltip;
+   public static String oldTranslatedText_7 = Messages.Track_Config_Path_Resolution_High;
+   public static String oldTranslatedText_8 = Messages.Track_Config_Path_Resolution_Optimized;
+   public static String oldTranslatedText_9 = Messages.Track_Config_Path_Resolution_Viewport;
 
-	/*
-	 * Tour track color mode
-	 */
+//   /*
+//    * Path resolution
+//    */
+//   public static final int            PATH_RESOLUTION_OPTIMIZED      = 0;
+//   public static final int            PATH_RESOLUTION_ALL_POSITIONS   = 1;
+//   public static final int            PATH_RESOLUTION_VIEWPORT      = 2;
+//   public static final ComboEntry[]   PATH_RESOLUTION               = {
+//
+//         new ComboEntry(Messages.Track_Config_Path_Resolution_Optimized, PATH_RESOLUTION_OPTIMIZED),
+//         new ComboEntry(Messages.Track_Config_Path_Resolution_High, PATH_RESOLUTION_ALL_POSITIONS),
+//         new ComboEntry(Messages.Track_Config_Path_Resolution_Viewport, PATH_RESOLUTION_VIEWPORT),
+//
+//       };
 
-	/**
-	 * Track is painted with track value color.
-	 */
-	public static final int				COLOR_MODE_TRACK_VALUE			= 0;
+   /*
+    * Tour track color mode
+    */
 
-	/**
-	 * Track is painted with a solid color.
-	 */
-	public static final int				COLOR_MODE_SOLID_COLOR			= 1;
+   /**
+    * Track is painted with track value color.
+    */
+   public static final int          COLOR_MODE_TRACK_VALUE = 0;
 
-	public static final ComboEntry[]	TRACK_COLOR_MODE				= {
-			new ComboEntry(Messages.Track_Config_TrackColorMode_Solid, COLOR_MODE_SOLID_COLOR),
-			new ComboEntry(Messages.Track_Config_TrackColorMode_Value, COLOR_MODE_TRACK_VALUE),
-																		//
-																		};
+   /**
+    * Track is painted with a solid color.
+    */
+   public static final int          COLOR_MODE_SOLID_COLOR = 1;
 
-	/**
-	 * Recreate tracks when <code>true</code>.
-	 */
-	private boolean						_isRecreateTracks;
+   public static final ComboEntry[] TRACK_COLOR_MODE       = {
 
-	/*
-	 * Set default values also here to ensure that a valid value is set. A default value would not
-	 * be set when an xml tag is not available.
-	 */
+         new ComboEntry(Messages.Track_Config_TrackColorMode_Solid, COLOR_MODE_SOLID_COLOR),
+         new ComboEntry(Messages.Track_Config_TrackColorMode_Value, COLOR_MODE_TRACK_VALUE),
+   };
 
-	public String						id								= Long.toString(System.nanoTime());
-	public String						defaultId						= TourTrackConfigManager.DEFAULT_ID_DEFAULT;
-	public String						name							= TourTrackConfigManager.CONFIG_NAME_UNKNOWN;
+   /**
+    * Recreate tracks when <code>true</code>.
+    */
+   private boolean                  _isRecreateTracks;
 
-	// outline
-	public double						outlineWidth					= TourTrackConfigManager.OUTLINE_WIDTH_DEFAULT;
-	public int							outlineColorMode				= TourTrackConfigManager.OUTLINE_COLOR_MODE_NORMAL_DEFAULT;
-	public int							outlineColorMode_Hovered		= TourTrackConfigManager.OUTLINE_COLOR_MODE_HOVERED_DEFAULT;
-	public int							outlineColorMode_Selected		= TourTrackConfigManager.OUTLINE_COLOR_MODE_SELECTED_DEFAULT;
-	public int							outlineColorMode_HovSel			= TourTrackConfigManager.OUTLINE_COLOR_MODE_HOV_SEL_DEFAULT;
+   /*
+    * Set default values also here to ensure that a valid value is set. A default value would not
+    * be set when an xml tag is not available.
+    */
 
-	public RGB							outlineColor					= TourTrackConfigManager.RGB_NORMAL_DEFAULT;
-	public RGB							outlineColor_Hovered			= TourTrackConfigManager.RGB_HOVERED_DEFAULT;
-	public RGB							outlineColor_Selected			= TourTrackConfigManager.RGB_SELECTED_DEFAULT;
-	public RGB							outlineColor_HovSel				= TourTrackConfigManager.RGB_HOV_SEL_DEFAULT;
+   public String id        = Long.toString(System.nanoTime());
+   public String defaultId = TourTrackConfigManager.DEFAULT_ID_DEFAULT;
+   public String name      = TourTrackConfigManager.CONFIG_NAME_UNKNOWN;
 
-	public double						outlineOpacity					= TourTrackConfigManager.OUTLINE_OPACITY_NORMAL_DEFAULT;
-	public double						outlineOpacity_Hovered			= TourTrackConfigManager.OUTLINE_OPACITY_HOVERED_DEFAULT;
-	public double						outlineOpacity_Selected			= TourTrackConfigManager.OUTLINE_OPACITY_SELECTED_DEFAULT;
-	public double						outlineOpacity_HovSel			= TourTrackConfigManager.OUTLINE_OPACITY_HOV_SEL_DEFAULT;
+   // outline
+   public double outlineWidth              = TourTrackConfigManager.OUTLINE_WIDTH_DEFAULT;
+   public int    outlineColorMode          = TourTrackConfigManager.OUTLINE_COLOR_MODE_NORMAL_DEFAULT;
+   public int    outlineColorMode_Hovered  = TourTrackConfigManager.OUTLINE_COLOR_MODE_HOVERED_DEFAULT;
+   public int    outlineColorMode_Selected = TourTrackConfigManager.OUTLINE_COLOR_MODE_SELECTED_DEFAULT;
+   public int    outlineColorMode_HovSel   = TourTrackConfigManager.OUTLINE_COLOR_MODE_HOV_SEL_DEFAULT;
 
-	// interior
-	public boolean						isShowInterior					= TourTrackConfigManager.IS_INTERIOR_VISIBLE_DEFAULT;
-	public boolean						isDrawVerticals					= TourTrackConfigManager.IS_DRAW_VERTICALS_DEFAULT;
+   public RGB    outlineColor              = TourTrackConfigManager.RGB_NORMAL_DEFAULT;
+   public RGB    outlineColor_Hovered      = TourTrackConfigManager.RGB_HOVERED_DEFAULT;
+   public RGB    outlineColor_Selected     = TourTrackConfigManager.RGB_SELECTED_DEFAULT;
+   public RGB    outlineColor_HovSel       = TourTrackConfigManager.RGB_HOV_SEL_DEFAULT;
 
-	public int							interiorColorMode				= TourTrackConfigManager.INTERIOR_COLOR_MODE_NORMAL_DEFAULT;
-	public int							interiorColorMode_Hovered		= TourTrackConfigManager.INTERIOR_COLOR_MODE_HOVERED_DEFAULT;
-	public int							interiorColorMode_Selected		= TourTrackConfigManager.INTERIOR_COLOR_MODE_SELECTED_DEFAULT;
-	public int							interiorColorMode_HovSel		= TourTrackConfigManager.INTERIOR_COLOR_MODE_HOV_SEL_DEFAULT;
+   public double outlineOpacity            = TourTrackConfigManager.OUTLINE_OPACITY_NORMAL_DEFAULT;
+   public double outlineOpacity_Hovered    = TourTrackConfigManager.OUTLINE_OPACITY_HOVERED_DEFAULT;
+   public double outlineOpacity_Selected   = TourTrackConfigManager.OUTLINE_OPACITY_SELECTED_DEFAULT;
+   public double outlineOpacity_HovSel     = TourTrackConfigManager.OUTLINE_OPACITY_HOV_SEL_DEFAULT;
 
-	public RGB							interiorColor					= TourTrackConfigManager.RGB_NORMAL_DEFAULT;
-	public RGB							interiorColor_Hovered			= TourTrackConfigManager.RGB_HOVERED_DEFAULT;
-	public RGB							interiorColor_Selected			= TourTrackConfigManager.RGB_SELECTED_DEFAULT;
-	public RGB							interiorColor_HovSel			= TourTrackConfigManager.RGB_HOV_SEL_DEFAULT;
+   // interior
+   public boolean isShowInterior             = TourTrackConfigManager.IS_INTERIOR_VISIBLE_DEFAULT;
+   public boolean isDrawVerticals            = TourTrackConfigManager.IS_DRAW_VERTICALS_DEFAULT;
 
-	public double						interiorOpacity					= TourTrackConfigManager.INTERIOR_OPACITY_NORMAL_DEFAULT;
-	public double						interiorOpacity_Hovered			= TourTrackConfigManager.INTERIOR_OPACITY_HOVERED_DEFAULT;
-	public double						interiorOpacity_Selected		= TourTrackConfigManager.INTERIOR_OPACITY_SELECTED_DEFAULT;
-	public double						interiorOpacity_HovSel			= TourTrackConfigManager.INTERIOR_OPACITY_HOV_SEL_DEFAULT;
+   public int     interiorColorMode          = TourTrackConfigManager.INTERIOR_COLOR_MODE_NORMAL_DEFAULT;
+   public int     interiorColorMode_Hovered  = TourTrackConfigManager.INTERIOR_COLOR_MODE_HOVERED_DEFAULT;
+   public int     interiorColorMode_Selected = TourTrackConfigManager.INTERIOR_COLOR_MODE_SELECTED_DEFAULT;
+   public int     interiorColorMode_HovSel   = TourTrackConfigManager.INTERIOR_COLOR_MODE_HOV_SEL_DEFAULT;
 
-	// direction arrows
-	public boolean						isShowDirectionArrows			= TourTrackConfigManager.IS_DIRECTION_ARROWS_VISIBLE_DEFAULT;
-	public double						directionArrowDistance			= TourTrackConfigManager.DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT;
-	public double						directionArrowSize				= TourTrackConfigManager.DIRECTION_ARROW_SIZE_DEFAULT;
+   public RGB     interiorColor              = TourTrackConfigManager.RGB_NORMAL_DEFAULT;
+   public RGB     interiorColor_Hovered      = TourTrackConfigManager.RGB_HOVERED_DEFAULT;
+   public RGB     interiorColor_Selected     = TourTrackConfigManager.RGB_SELECTED_DEFAULT;
+   public RGB     interiorColor_HovSel       = TourTrackConfigManager.RGB_HOV_SEL_DEFAULT;
 
-	// track positions
-	public boolean						isShowTrackPosition				= TourTrackConfigManager.IS_SHOW_TRACK_POSITION_DEFAULT;
-	public int							trackPositionThreshold			= TourTrackConfigManager.TRACK_POSITION_THRESHOLD_DEFAULT;
-	public double						trackPositionSize				= TourTrackConfigManager.TRACK_POSITION_SIZE_NORMAL_DEFAULT;
-	public double						trackPositionSize_Hovered		= TourTrackConfigManager.TRACK_POSITION_SIZE_HOVERED_DEFAULT;
-	public double						trackPositionSize_Selected		= TourTrackConfigManager.TRACK_POSITION_SIZE_SELECTED_DEFAULT;
-	public double						trackPositionSize_HovSel		= TourTrackConfigManager.TRACK_POSITION_SIZE_HOV_SEL_DEFAULT;
+   public double  interiorOpacity            = TourTrackConfigManager.INTERIOR_OPACITY_NORMAL_DEFAULT;
+   public double  interiorOpacity_Hovered    = TourTrackConfigManager.INTERIOR_OPACITY_HOVERED_DEFAULT;
+   public double  interiorOpacity_Selected   = TourTrackConfigManager.INTERIOR_OPACITY_SELECTED_DEFAULT;
+   public double  interiorOpacity_HovSel     = TourTrackConfigManager.INTERIOR_OPACITY_HOV_SEL_DEFAULT;
 
-	/*
-	 * Other properties
-	 */
-	public int							altitudeMode					= TourTrackConfigManager.ALTITUDE_MODE_DEFAULT;
+   // direction arrows
+   public boolean isShowDirectionArrows  = TourTrackConfigManager.IS_DIRECTION_ARROWS_VISIBLE_DEFAULT;
+   public double  directionArrowDistance = TourTrackConfigManager.DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT;
+   public double  directionArrowSize     = TourTrackConfigManager.DIRECTION_ARROW_SIZE_DEFAULT;
 
-	/**
-	 * Is <code>true</code> when altitude offset is enabled.
-	 */
-	public boolean						isAltitudeOffset				= TourTrackConfigManager.IS_ALTITUDE_OFFSET_DEFAULT;
+   // track positions
+   public boolean isShowTrackPosition        = TourTrackConfigManager.IS_SHOW_TRACK_POSITION_DEFAULT;
+   public int     trackPositionThreshold     = TourTrackConfigManager.TRACK_POSITION_THRESHOLD_DEFAULT;
+   public double  trackPositionSize          = TourTrackConfigManager.TRACK_POSITION_SIZE_NORMAL_DEFAULT;
+   public double  trackPositionSize_Hovered  = TourTrackConfigManager.TRACK_POSITION_SIZE_HOVERED_DEFAULT;
+   public double  trackPositionSize_Selected = TourTrackConfigManager.TRACK_POSITION_SIZE_SELECTED_DEFAULT;
+   public double  trackPositionSize_HovSel   = TourTrackConfigManager.TRACK_POSITION_SIZE_HOV_SEL_DEFAULT;
 
-	/**
-	 * When <code>true</code> the altitude offset value will be multiplied with the random number
-	 * 0.1...1.0
-	 */
-	public boolean						isAltitudeOffsetRandom			= TourTrackConfigManager.IS_ALTITUDE_OFFSET_RANDOM_DEFAULT;
+   /*
+    * Other properties
+    */
+   public int     altitudeMode                   = TourTrackConfigManager.ALTITUDE_MODE_DEFAULT;
 
-	public int							altitudeOffsetMode				= TourTrackConfigManager.ALTITUDE_OFFSET_MODE_DEFAULT;
+   /**
+    * Is <code>true</code> when altitude offset is enabled.
+    */
+   public boolean isAltitudeOffset               = TourTrackConfigManager.IS_ALTITUDE_OFFSET_DEFAULT;
 
-	/**
-	 * Vertical distance in m (meter).
-	 */
-	public int							altitudeOffsetDistanceAbsolute	= TourTrackConfigManager.ALTITUDE_OFFSET_ABSOLUTE_DEFAULT;
-	public int							altitudeOffsetDistanceRelative	= TourTrackConfigManager.ALTITUDE_OFFSET_RELATIVE_DEFAULT;
+   /**
+    * When <code>true</code> the altitude offset value will be multiplied with the random number
+    * 0.1...1.0
+    */
+   public boolean isAltitudeOffsetRandom         = TourTrackConfigManager.IS_ALTITUDE_OFFSET_RANDOM_DEFAULT;
 
-	public boolean						isFollowTerrain					= TourTrackConfigManager.CONFIG_IS_FOLLOW_TERRAIN_DEFAULT;
+   public int     altitudeOffsetMode             = TourTrackConfigManager.ALTITUDE_OFFSET_MODE_DEFAULT;
 
-	/**
-	 * Opacity 0...1.0 of the track color: outline/interior, separate colors are not yet supported,
-	 * it not a simple task.
-	 */
-	public double						trackColorOpacity				= Map3GradientColorManager.OPACITY_DEFAULT;
+   /**
+    * Vertical distance in m (meter).
+    */
+   public int     altitudeOffsetDistanceAbsolute = TourTrackConfigManager.ALTITUDE_OFFSET_ABSOLUTE_DEFAULT;
+   public int     altitudeOffsetDistanceRelative = TourTrackConfigManager.ALTITUDE_OFFSET_RELATIVE_DEFAULT;
 
-	TourTrackConfig() {}
+   public boolean isFollowTerrain                = TourTrackConfigManager.CONFIG_IS_FOLLOW_TERRAIN_DEFAULT;
 
-	public static int getValidAltitudeModeValue(final int stateAltitudeMode) {
+   /**
+    * Opacity 0...1.0 of the track color: outline/interior, separate colors are not yet supported,
+    * it not a simple task.
+    */
+   public double  trackColorOpacity              = Map3GradientColorManager.OPACITY_DEFAULT;
 
-		for (final ComboEntry altiMode : ALTITUDE_MODE) {
-			if (altiMode.value == stateAltitudeMode) {
-				return altiMode.value;
-			}
-		}
+   TourTrackConfig() {}
 
-		// return default value
-		return WorldWind.CLAMP_TO_GROUND;
-	}
+   public static int getValidAltitudeModeValue(final int stateAltitudeMode) {
 
-	/**
-	 * Compares this config with a previous config and sets a flag when tour tracks needs to be
-	 * recreated.
-	 * 
-	 * @param previousConfig
-	 *            Previous config, can be <code>null</code> which forces to recreate tour tracks.
-	 */
-	public void checkTrackRecreation(final TourTrackConfig previousConfig) {
+      for (final ComboEntry altiMode : ALTITUDE_MODE) {
+         if (altiMode.value == stateAltitudeMode) {
+            return altiMode.value;
+         }
+      }
 
-		if (previousConfig == null) {
+      // return default value
+      return WorldWind.CLAMP_TO_GROUND;
+   }
 
-			_isRecreateTracks = true;
+   /**
+    * Compares this config with a previous config and sets a flag when tour tracks needs to be
+    * recreated.
+    *
+    * @param previousConfig
+    *           Previous config, can be <code>null</code> which forces to recreate tour tracks.
+    */
+   public void checkTrackRecreation(final TourTrackConfig previousConfig) {
 
-		} else {
+      if (previousConfig == null) {
 
-			_isRecreateTracks = false;
-		}
-	}
+         _isRecreateTracks = true;
 
-	/**
-	 * Create a copy of this object.
-	 * 
-	 * @return a copy of this <code>Insets</code> object.
-	 */
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (final CloneNotSupportedException e) {
-			// this shouldn't happen, since we are Cloneable
-			throw new InternalError();
-		}
-	}
+      } else {
 
-	/**
-	 * @return Returns altitude mode index for the current altitude mode value.
-	 */
-	public int getAltitudeModeIndex() {
+         _isRecreateTracks = false;
+      }
+   }
 
-		for (int valueIndex = 0; valueIndex < ALTITUDE_MODE.length; valueIndex++) {
-			if (ALTITUDE_MODE[valueIndex].value == altitudeMode) {
-				return valueIndex;
-			}
-		}
+   /**
+    * Create a copy of this object.
+    *
+    * @return a copy of this <code>Insets</code> object.
+    */
+   @Override
+   public Object clone() {
+      try {
+         return super.clone();
+      } catch (final CloneNotSupportedException e) {
+         // this shouldn't happen, since we are Cloneable
+         throw new InternalError();
+      }
+   }
 
-		// return default value
-		return 0;
-	}
+   /**
+    * @return Returns altitude mode index for the current altitude mode value.
+    */
+   public int getAltitudeModeIndex() {
 
-	public int getColorModeIndex(final int colorMode) {
+      for (int valueIndex = 0; valueIndex < ALTITUDE_MODE.length; valueIndex++) {
+         if (ALTITUDE_MODE[valueIndex].value == altitudeMode) {
+            return valueIndex;
+         }
+      }
 
-		for (int valueIndex = 0; valueIndex < TRACK_COLOR_MODE.length; valueIndex++) {
-			if (TRACK_COLOR_MODE[valueIndex].value == colorMode) {
-				return valueIndex;
-			}
-		}
+      // return default value
+      return 0;
+   }
 
-		// return default value
-		return 0;
-	}
+   public int getColorModeIndex(final int colorMode) {
 
-	public boolean isRecreateTracks() {
-		return _isRecreateTracks;
-	}
+      for (int valueIndex = 0; valueIndex < TRACK_COLOR_MODE.length; valueIndex++) {
+         if (TRACK_COLOR_MODE[valueIndex].value == colorMode) {
+            return valueIndex;
+         }
+      }
+
+      // return default value
+      return 0;
+   }
+
+   public boolean isRecreateTracks() {
+      return _isRecreateTracks;
+   }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.device.suunto;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -29,6 +29,8 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -38,7 +40,9 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    private static final String MOVESCOUNT_TAG     = "<movescount";    //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES = "<samples>";      //$NON-NLS-1$
 
-   public SuuntoQuestDeviceDataReader() {}
+   public SuuntoQuestDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -112,16 +116,19 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       if (isValidSuuntoXMLFile(importFilePath) == false) {
-         return false;
+         return;
       }
 
       final SuuntoQuestSAXHandler saxHandler =
+
             new SuuntoQuestSAXHandler(
                   this,
                   importFilePath,
@@ -134,18 +141,16 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
 
          parser.parse(inputStream, saxHandler);
 
+         importState_File.isFileImportedWithValidData = saxHandler.isImported();
+
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);
-         return false;
       } catch (final Exception e) {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return false;
       } finally {
 
          saxHandler.dispose();
       }
-
-      return saxHandler.isImported();
    }
 
    @Override

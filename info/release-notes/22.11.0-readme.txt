@@ -1,0 +1,96 @@
+22.11.0                                                 20 November 2022
+
+
+New
+===
+
+* 2.5D Map
+  - Show direction arrows but this is still work in progress 
+                                                https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
+  
+* Map Player
+  - This player can play an animation in a map, currently only the 2.5D map is supported
+                                                https://github.com/mytourbook/mytourbook/issues/948
+
+* Weather (Frederic)
+  - Retrieve current weather (OpenWeatherMap)   https://github.com/mytourbook/mytourbook/issues/494
+  
+
+Improvements
+============
+
+* CRP Import (Frederic)
+  - Added the ability to import ZLib compressed files
+  - Added the support for file version greater than 9
+  - Added the support for cadence data import (present in file version greater than 9)
+  - Fixed an issue where the first marker was not created
+  - Fixed an issue where the marker distance values were erroneous
+  - Fixed an issue where the time values were erroneous when an activity 
+    overlapped over more than 1 day
+    https://github.com/mytourbook/mytourbook/issues/927
+
+* People Preference Page (Frederic)
+  - Added a BMI (Body Mass Index) field
+
+* SRTM Download 
+  - Improved UI when setting tour elevation values from SRTM to display 
+    the previous and new elevation gain values
+    https://github.com/mytourbook/mytourbook/issues/334
+
+* Cloud Integration (Frederic)
+  - Migrated the app that allows for the cloud integration in MT           
+    https://github.com/mytourbook/mytourbook/issues/915
+
+
+Changes
+=======
+
+* Forum Link (Frederic)
+  - Replaced the forum entry in the help menu with the new locations for 
+    the discussion forum and bugs/features on Github  
+    https://github.com/mytourbook/mytourbook/issues/951
+
+
+Bugfix
+======
+
+* Common import
+  - Fixed "Invalid thread access" which occurred when new tour types or 
+    tags were created during tour import
+    https://github.com/mytourbook/mytourbook/issues/938
+
+* Fit Import (Frederic)
+  - Fixed NPE when pauses data are missing      
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
+    
+* Hac4Linux Import (Frederic)
+  - Fixed an issue where tours were not importing anymore since v12.12.0	
+    https://github.com/mytourbook/mytourbook/discussions/939
+    
+* 2D Map
+  - Fixed: Can't download SRTM-Data             
+    https://github.com/mytourbook/mytourbook/issues/928
+
+* 2D Map WMS (Frederic)
+  - Fixed a bug where the import of a WMS provider would result into an exception 
+    https://github.com/mytourbook/mytourbook/issues/949
+
+* Tour Info toolip (Frederic)
+  - Fixed a bug where the wind's cardinal value was erroneous 
+    https://github.com/mytourbook/mytourbook/issues/942
+
+
+Translation    
+===========
+
+New texts are not translated in this version
+
+ 
+System   
+======
+
+* MyTourbook Milestone 22.11        https://github.com/mytourbook/mytourbook/milestone/6?closed=1
+* Eclipse 2022-06
+* NatTable 2.03                     https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.94
+* WorldWind 2.2.1                   https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

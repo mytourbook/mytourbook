@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,8 @@
 package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.util.ITreeViewer;
 
 import org.eclipse.jface.action.Action;
@@ -27,69 +28,70 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class ActionCollapseAll extends Action {
 
-	private ITreeViewer _treeViewerProvider;
+   private ITreeViewer _treeViewerProvider;
 
-	public ActionCollapseAll(final ITreeViewer treeViewerProvider) {
+   public ActionCollapseAll(final ITreeViewer treeViewerProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_treeViewerProvider = treeViewerProvider;
+      _treeViewerProvider = treeViewerProvider;
 
       setText(Messages.App_Action_CollapseAll);
-      setToolTipText(Messages.App_Action_CollapseAll_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
-	}
 
-	@Override
-	public void run() {
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_CollapseAll));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_CollapseAll_Disabled));
+   }
 
-		if (_treeViewerProvider == null) {
-			return;
-		}
+   @Override
+   public void run() {
 
-		final TreeViewer treeViewer = _treeViewerProvider.getTreeViewer();
+      if (_treeViewerProvider == null) {
+         return;
+      }
 
-		if (treeViewer == null) {
-			return;
-		}
+      final TreeViewer treeViewer = _treeViewerProvider.getTreeViewer();
 
-		final Tree tree = treeViewer.getTree();
+      if (treeViewer == null) {
+         return;
+      }
 
-		// disable redraw that the UI in not flickering
-		tree.setRedraw(false);
-		{
-			try {
-				treeViewer.collapseAll();
-			} catch (final Exception e) {
-				// this occured
-			}
-		}
-		tree.setRedraw(true);
+      final Tree tree = treeViewer.getTree();
 
-		try {
+      // disable redraw that the UI in not flickering
+      tree.setRedraw(false);
+      {
+         try {
+            treeViewer.collapseAll();
+         } catch (final Exception e) {
+            // this occured
+         }
+      }
+      tree.setRedraw(true);
 
-			final StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
-			if (selection != null) {
-				final Object firstElement = selection.getFirstElement();
-				if (firstElement != null) {
-					treeViewer.reveal(firstElement);
-				}
-			}
+      try {
 
-		} catch (final Exception e) {
+         final StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
+         if (selection != null) {
+            final Object firstElement = selection.getFirstElement();
+            if (firstElement != null) {
+               treeViewer.reveal(firstElement);
+            }
+         }
 
-			// this occured, ensure something is selected otherwise further NPEs occure
+      } catch (final Exception e) {
 
-			final TreeItem[] selection = tree.getSelection();
+         // this occured, ensure something is selected otherwise further NPEs occure
 
-			for (final TreeItem treeItem : selection) {
+         final TreeItem[] selection = tree.getSelection();
 
-				final Object itemData = treeItem.getData();
+         for (final TreeItem treeItem : selection) {
 
-				_treeViewerProvider.getTreeViewer().setSelection(new StructuredSelection(itemData), true);
+            final Object itemData = treeItem.getData();
 
-				break;
-			}
-		}
-	}
+            _treeViewerProvider.getTreeViewer().setSelection(new StructuredSelection(itemData), true);
+
+            break;
+         }
+      }
+   }
 }

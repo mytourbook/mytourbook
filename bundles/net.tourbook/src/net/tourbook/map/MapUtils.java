@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.map;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
@@ -41,7 +42,7 @@ public class MapUtils {
     * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
     *         when data are not available
     */
-   public static boolean configureColorProvider(final ArrayList<TourData> allTourData,
+   public static boolean configureColorProvider(final List<TourData> allTourData,
                                                 final IGradientColorProvider colorProvider,
                                                 final ColorProviderConfig config,
                                                 final int legendHeight) {
@@ -49,6 +50,22 @@ public class MapUtils {
       if (allTourData.isEmpty()) {
          return false;
       }
+
+      /**
+       * This occurred at least twice but is not reproducable <code>
+       *
+       * java.util.ConcurrentModificationException
+       * at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1043)
+       * at java.base/java.util.ArrayList$Itr.next(ArrayList.java:997)
+       * at net.tourbook.map.MapUtils.configureColorProvider(MapUtils.java:73)
+       * at net.tourbook.map2.view.Map2View.createLegendImage(Map2View.java:1662)
+       * at net.tourbook.map2.view.Map2View.restoreState_Map2_Options(Map2View.java:3845)
+       * at net.tourbook.map2.view.Map2View.restoreState(Map2View.java:3756)
+       * at net.tourbook.map2.view.Map2View.lambda$11(Map2View.java:1771)
+       *
+       * </code>
+       */
+      final List<TourData> allTourData_ThreadSafe = new ArrayList<>(allTourData);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -70,7 +87,7 @@ public class MapUtils {
 
          boolean setInitialValue = true;
 
-         for (final TourData tourData : allTourData) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getAltitudeSerie();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -82,7 +99,11 @@ public class MapUtils {
              */
             for (final float dataValue : dataSerie) {
 
-               if (dataValue == Float.MIN_VALUE) {
+               if (dataValue == Float.MIN_VALUE
+
+                     // 0 values can occure when multiple tours are displayed where some tours do not have an elevation
+                     || dataValue == 0) {
+
                   // skip invalid values
                   continue;
                }
@@ -131,7 +152,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourData) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getGradientSerie();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -191,7 +212,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourData) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getPaceSerieSeconds();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -248,6 +269,65 @@ public class MapUtils {
 
          break;
 
+      case Power:
+
+         minValue = Float.MIN_VALUE;
+         maxValue = Float.MAX_VALUE;
+
+         setInitialValue = true;
+
+         for (final TourData tourData : allTourData_ThreadSafe) {
+
+            final float[] dataSerie = tourData.getPowerSerie();
+            if ((dataSerie == null) || (dataSerie.length == 0)) {
+               continue;
+            }
+
+            /*
+             * get min/max values
+             */
+            for (final float dataValue : dataSerie) {
+
+               if (dataValue == 0 || dataValue == Float.MIN_VALUE) {
+                  continue;
+               }
+
+               if (setInitialValue) {
+                  setInitialValue = false;
+                  minValue = maxValue = dataValue;
+               }
+
+               minValue = (minValue <= dataValue) ? minValue : dataValue;
+               maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+            }
+         }
+
+         if ((minValue == Float.MIN_VALUE) || (maxValue == Float.MAX_VALUE)) {
+            return false;
+         }
+
+         if (colorProvider instanceof Map3GradientColorProvider) {
+
+            // the colorProvider already contains the active color profile
+
+         } else {
+
+            setMap2ColorProfile(colorProvider, GraphColorManager.PREF_GRAPH_POWER);
+         }
+
+         mapUnits.numberFormatDigits = 0;
+         mapUnits.unitFormat = LegendUnitFormat.Number;
+
+         colorProvider.configureColorProvider(
+               config,
+               legendHeight,
+               minValue,
+               maxValue,
+               UI.UNIT_POWER,
+               LegendUnitFormat.Number);
+
+         break;
+
       case Pulse:
 
          minValue = Float.MIN_VALUE;
@@ -255,7 +335,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourData) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.pulseSerie;
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -315,7 +395,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourData) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getSpeedSerie();
             if ((dataSerie == null) || (dataSerie.length == 0)) {
@@ -375,7 +455,7 @@ public class MapUtils {
 
          setInitialValue = true;
 
-         for (final TourData tourData : allTourData) {
+         for (final TourData tourData : allTourData_ThreadSafe) {
 
             final float[] dataSerie = tourData.getRunDyn_StepLength();
             if ((dataSerie == null) || (dataSerie.length == 0)) {

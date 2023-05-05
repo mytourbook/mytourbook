@@ -265,7 +265,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
                final MapBookmark bookmark = (MapBookmark) cell.getElement();
                final MapPosition mapPos = bookmark.getMapPosition();
 
-               cell.setText(Integer.toString(mapPos.zoomLevel));
+               cell.setText(Integer.toString(mapPos.zoomLevel + 1));
             }
          });
          tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(5), true));
@@ -541,6 +541,9 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
          addDialog.open();
       }
       setIsAnotherDialogOpened(false);
+
+      // set focus back to the viewer
+      _bookmarkViewer.getTable().setFocus();
 
       if (addDialog.getReturnCode() != Window.OK) {
          return;

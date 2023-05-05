@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,9 +41,7 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
             return (int) (result1.minAltitudeDiff - result2.minAltitudeDiff);
          }
-
       };
-
    }
 
    String                                    label;
@@ -51,6 +49,7 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
    long                                      tourId;
 
    RefTourItem                               refTourItem;
+
    /**
     * keeps the tourId's for all compared tours which have already been stored in the db
     */
@@ -104,7 +103,7 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
       _storedComparedTours = TourCompareManager.getComparedToursFromDb(refId);
 
-      final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
+      final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getComparedTours();
 
       // create children for one reference tour
       for (final TVICompareResultComparedTour compTour : comparedTours) {
@@ -117,21 +116,21 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
             compTour.setParentItem(this);
 
             /*
-             * set the status if the compared tour is already stored in the database and set the
+             * Set the status if the compared tour is already stored in the database and set the
              * id for the compared tour
              */
-            final Long comparedTourId = compTour.comparedTourData.getTourId();
+            final Long comparedTourId = compTour.getTourId();
             final boolean isStoredForRefTour = _storedComparedTours.containsKey(comparedTourId);
 
             if (isStoredForRefTour) {
                final StoredComparedTour storedComparedTour = _storedComparedTours.get(comparedTourId);
-               compTour.compId = storedComparedTour.comparedId;
+               compTour.compareId = storedComparedTour.comparedId;
                compTour.dbStartIndex = storedComparedTour.startIndex;
                compTour.dbEndIndex = storedComparedTour.endIndex;
                compTour.dbSpeed = storedComparedTour.tourSpeed;
                compTour.dbElapsedTime = storedComparedTour.tourElapsedTime;
             } else {
-               compTour.compId = -1;
+               compTour.compareId = -1;
             }
 
             children.add(compTour);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,30 +15,34 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.photo.PicDirView;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionNavigateHistoryForward extends Action {
 
-	private static final String	ACTION_ID	= "net.tourbook.command.PicDir.NavigateHistoryForward"; //$NON-NLS-1$
+   private static final String ACTION_ID = "net.tourbook.command.PicDir.NavigateHistoryForward"; //$NON-NLS-1$
 
-	private PicDirImages		_picDirImages;
+   private PicDirImages        _picDirImages;
 
-	public ActionNavigateHistoryForward(final PicDirImages picDirImages, final PicDirView picDirView) {
+   public ActionNavigateHistoryForward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
-		setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward_Tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Forward_Nav));
+      setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward_Tooltip);
 
-		setActionDefinitionId(ACTION_ID);
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right_Disabled));
 
-		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);
+      setActionDefinitionId(ACTION_ID);
 
-		_picDirImages = picDirImages;
-	}
+      picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);
 
-	@Override
-	public void run() {
-		_picDirImages.actionNavigateForward();
-	}
+      _picDirImages = picDirImages;
+   }
+
+   @Override
+   public void run() {
+      _picDirImages.actionNavigateForward();
+   }
 }

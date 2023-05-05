@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.io.File;
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -52,7 +53,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 
-public class Photo {
+public class Photo implements Serializable {
+
+   private static final long                           serialVersionUID               = 1L;
 
    public static final int                             MAP_IMAGE_DEFAULT_WIDTH_HEIGHT = 80;
 
@@ -76,6 +79,7 @@ public class Photo {
     * This is the image size which the user has selected to paint a photo image.
     */
    private static int                              PAINTED_MAP_IMAGE_WIDTH = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+
    private String                                  _uniqueId;
 
    /**
@@ -110,10 +114,14 @@ public class Photo {
 
    /**
     * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
-    * e.g. wrong time zone, wrong time is set in the camera.
+    * e.g. wrong time zone, wrong time is set in the camera. This time is saved in the tour photo.
     */
-   public long                                     adjustedTimeTour        = Long.MIN_VALUE;
-   public long                                     adjustedTimeLink        = Long.MIN_VALUE;
+   public long                                     adjustedTime_Tour       = Long.MIN_VALUE;
+
+   /**
+    * Time in ms which is set in the link view with the adjusted camera time
+    */
+   public long                                     adjustedTime_Camera     = Long.MIN_VALUE;
 
    public long                                     imageFileSize;
 
@@ -308,7 +316,7 @@ public class Photo {
       _photoServiceProvider = photoServiceProvider;
    }
 
-   public static void setupTimeZone() {
+   static void setupTimeZone() {
 
       _dtParser = DateTimeFormatter//
             .ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
@@ -459,7 +467,7 @@ public class Photo {
       return sb.toString();
    }
 
-   public void dumpTourReferences() {
+   void dumpTourReferences() {
 
       for (final TourPhotoReference ref : _tourPhotoRef.values()) {
          System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId); //$NON-NLS-1$
@@ -798,8 +806,8 @@ public class Photo {
       try {
 
          /*
-          * read metadata WITH thumbnail image info, this is the default when the pamameter is
-          * ommitted
+          * read metadata WITH thumbnail image info, this is the default when the parameter is
+          * omitted
           */
          final HashMap<String, Object> params = new HashMap<>();
          params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
@@ -823,7 +831,7 @@ public class Photo {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind(//
+         StatusUtil.logError(NLS.bind(
                "Could not read metadata from image \"{0}\"", //$NON-NLS-1$
                imageFile));
 
@@ -936,6 +944,18 @@ public class Photo {
       return _photoImageWidth;
    }
 
+   public long getPhotoTime() {
+
+      if (adjustedTime_Tour != Long.MIN_VALUE) {
+
+         return adjustedTime_Tour;
+
+      } else {
+
+         return imageExifTime;
+      }
+   }
+
    public AtomicReference<PhotoSqlLoadingState> getSqlLoadingState() {
       return _photoSqlLoadingState;
    }
@@ -1026,18 +1046,18 @@ public class Photo {
 
    /**
     * @param mapProvider
-    * @param projectionId
+    * @param projectionHash
     * @param zoomLevel
     * @param isLinkPhotoDisplayed
     * @return Returns the world position for this photo or <code>null</code> when geo position is
     *         not set.
     */
    public Point getWorldPosition(final CommonMapProvider mapProvider,
-                                 final String projectionId,
+                                 final int projectionHash,
                                  final int zoomLevel,
                                  final boolean isLinkPhotoDisplayed) {
 
-      final double latitude = isLinkPhotoDisplayed //
+      final double latitude = isLinkPhotoDisplayed
             ? getLinkLatitude()
             : getTourLatitude();
 
@@ -1045,9 +1065,9 @@ public class Photo {
          return null;
       }
 
-      final Integer hashKey = projectionId.hashCode() + zoomLevel;
+      final Integer hashKey = projectionHash + zoomLevel;
 
-      final Point worldPosition = isLinkPhotoDisplayed //
+      final Point worldPosition = isLinkPhotoDisplayed
             ? _linkWorldPosition.get(hashKey)
             : _tourWorldPosition.get(hashKey);
 
@@ -1128,7 +1148,7 @@ public class Photo {
       }
    }
 
-   public void replaceImageFile(final IPath newImageFilePathName) {
+   void replaceImageFile(final IPath newImageFilePathName) {
 
       // force loading of metadata
       _photoImageMetadata = null;
@@ -1150,7 +1170,7 @@ public class Photo {
       _linkWorldPosition.clear();
    }
 
-   public void resetTourExifState() {
+   private void resetTourExifState() {
 
       // photo is not saved any more in a tour
 
@@ -1321,7 +1341,7 @@ public class Photo {
       ;
    }
 
-   public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
+   void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
       _photoImageMetadata = photoImageMetadata;
 

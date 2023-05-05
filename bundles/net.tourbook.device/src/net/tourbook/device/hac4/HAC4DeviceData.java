@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@
 package net.tourbook.device.hac4;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 
 import net.tourbook.data.DataUtil;
@@ -32,150 +31,152 @@ import net.tourbook.ui.UI;
  */
 public class HAC4DeviceData {
 
+   private static final String NL = UI.NEW_LINE;
+
    /**
     * cccc (h) "B735"
     */
-   public String deviceType;
+   public String               deviceType;
 
    /**
     * pppp (h) wheel perimeter (mm)
     */
-   public int    wheelPerimeter;
+   public int                  wheelPerimeter;
 
    /**
     * wwww (h) weight (kg)
     */
-   public int    personWeight;
+   public int                  personWeight;
 
    /**
     * aaaa (h) home altitude (m) "FFFF" not set
     */
-   public int    homeAltitude;
+   public int                  homeAltitude;
 
    /**
     * bbbb (h) 1. pulse upper bound (bpm)
     */
-   public int    pulse1UpperBound;
+   public int                  pulse1UpperBound;
 
    /**
     * cccc (h) 1. pulse lower bound (bpm)
     */
-   public int    pulse1LowerBound;
+   public int                  pulse1LowerBound;
 
    /**
     * dddd (h) 2. pulse upper bound (bpm)
     */
-   public int    pulse2UpperBound;
+   public int                  pulse2UpperBound;
 
    /**
     * eeee (h) 2. pulse lower bound (bpm)
     */
-   public int    pulse2LowerBound;
+   public int                  pulse2LowerBound;
 
    /**
     * aa (d) 1. count down minutes
     */
-   public short  count1min;
+   public short                count1min;
 
    /**
     * bb (d) 1. count down seconds
     */
-   public short  count1sec;
+   public short                count1sec;
 
    /**
     * cc (d) 2. count down minutes
     */
-   public short  count2min;
+   public short                count2min;
 
    /**
     * dd (d) 2. count down seconds
     */
-   public short  count2sec;
+   public short                count2sec;
 
    /**
     * llll (h) total distance at end of last tour (km) * 2^16
     */
-   public int    totalDistanceHigh;
+   public int                  totalDistanceHigh;
 
    /**
     * kkkk (h) total distance at end of last tour (km)
     */
-   public int    totalDistanceLow;
+   public int                  totalDistanceLow;
 
    /**
     * eeee (h) altitude error correction
     */
-   public int    altitudeError;
+   public int                  altitudeError;
 
    /**
     * uuuu (h) total altitude up at end of last tour (m)
     */
-   public int    totalAltitudeUp;
+   public int                  totalAltitudeUp;
 
    /**
     * dddd (h) total altitude down at end of last tour (m)
     */
-   public int    totalAltitudeDown;
+   public int                  totalAltitudeDown;
 
    /**
     * aaaa (h) max altitude (m)
     */
-   public int    maxAltitude;
+   public int                  maxAltitude;
 
    /**
     * hh (d) hour of total travel time
     */
-   public short  totalTravelTimeHourLow;
+   public short                totalTravelTimeHourLow;
 
    /**
     * HH (d) hour of total travel time * 100
     */
-   public short  totalTravelTimeHourHigh;
+   public short                totalTravelTimeHourHigh;
 
    /**
     * ss (d) seconds of total travel time
     */
-   public short  totalTravelTimeSec;
+   public short                totalTravelTimeSec;
 
    /**
     * mm (d) minute of total travel time
     */
-   public short  totalTravelTimeMin;
+   public short                totalTravelTimeMin;
 
    /**
     * oooo (h) next free memory offset
     */
-   public int    offsetNextMemory;
+   public int                  offsetNextMemory;
 
    /**
     * cccc (o) offset of last CC-record
     */
-   public int    offsetCCRecord;
+   public int                  offsetCCRecord;
 
    /**
     * dddd (o) offset of last DD-record
     */
-   public int    offsetDDRecord;
+   public int                  offsetDDRecord;
 
    /**
     * eeee (o) offset of last compare record
     */
-   public int    offsetCompareRecord;
+   public int                  offsetCompareRecord;
 
    /**
     * yyyy (d) year of transfer
     */
-   public short  transferYear;
+   public short                transferYear;
 
    /**
     * mm (d) month of transfer
     */
-   public short  transferMonth;
+   public short                transferMonth;
 
    /**
     * dd (d) day of transfer
     */
-   public short  transferDay;
+   public short                transferDay;
 
    public HAC4DeviceData() {}
 
@@ -204,43 +205,48 @@ public class HAC4DeviceData {
 
    public void dumpData() {
 
-      final PrintStream out = System.out;
+      final String transferDate = transferDay + UI.SYMBOL_DOT + transferMonth + UI.SYMBOL_DOT + transferYear;
 
-      out.println("----------------------------------------------------"); //$NON-NLS-1$
-      out.println("DEVICE DATA"); //$NON-NLS-1$
-      out.println("----------------------------------------------------"); //$NON-NLS-1$
-      out.println("Transfer date:			" + transferDay + UI.SYMBOL_DOT + transferMonth + UI.SYMBOL_DOT + transferYear); //$NON-NLS-1$
-      out.println("Device:				" + deviceType); //$NON-NLS-1$
-      out.println("Wheel perimeter:		" + wheelPerimeter + " mm"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Person weight:			" + personWeight + " kg"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println();
-      out.println("Home altitude:			" + homeAltitude + " m"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Altitude error correction:	" + altitudeError); //$NON-NLS-1$
-      out.println("Max Altitude:			" + maxAltitude + " m"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println();
-      out.println("Pulse 1 upper bound		" + pulse1UpperBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Pulse 1 lower bound:		" + pulse1LowerBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Pulse 2 upper bound:		" + pulse2UpperBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Pulse 2 lower bound:		" + pulse2LowerBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println();
-      out.println("1. Count down:			" + count1min + UI.SYMBOL_COLON + count1sec); //$NON-NLS-1$
-      out.println("2. Count down:			" + count2min + UI.SYMBOL_COLON + count2sec); //$NON-NLS-1$
-      out.println();
-      out.println("Total distance:			" + ((totalDistanceHigh * (2 ^ 16)) + totalDistanceLow) //$NON-NLS-1$
-            + " km"); //$NON-NLS-1$
-      out.println("Total altitude up:		" + totalAltitudeUp + " m"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Total altitude down:		" + totalAltitudeDown + " m"); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("Total travel time: 		" //$NON-NLS-1$
-            + ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow)
-            + UI.SYMBOL_COLON
-            + totalTravelTimeMin
-            + UI.SYMBOL_COLON + totalTravelTimeSec);
-      out.println();
-      out.println("Offset last CC record:		" + offsetCCRecord); //$NON-NLS-1$
-      out.println("Offset last DD record:		" + offsetDDRecord); //$NON-NLS-1$
-      out.println("Offset next free memory:	" + offsetNextMemory); //$NON-NLS-1$
-      out.println("Offset compare record:		" + offsetCompareRecord); //$NON-NLS-1$
+      final String totalTravelTime = UI.EMPTY_STRING
 
+            + ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow) + UI.SYMBOL_COLON
+            + totalTravelTimeMin + UI.SYMBOL_COLON
+            + totalTravelTimeSec;
+
+      final String dump = UI.EMPTY_STRING
+
+            + "----------------------------------------------------" + NL //        //$NON-NLS-1$
+            + "DEVICE DATA" //                                                      //$NON-NLS-1$
+            + "----------------------------------------------------" + NL //        //$NON-NLS-1$
+            + "Transfer date:               " + transferDate + NL //                //$NON-NLS-1$
+            + "Device:                      " + deviceType + NL //                  //$NON-NLS-1$
+            + "Wheel perimeter:             " + wheelPerimeter + " mm" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+            + "Person weight:               " + personWeight + " kg" + NL //        //$NON-NLS-1$ //$NON-NLS-2$
+            + NL
+            + "Home altitude:               " + homeAltitude + " m" + NL //         //$NON-NLS-1$ //$NON-NLS-2$
+            + "Altitude error correction:   " + altitudeError + NL //               //$NON-NLS-1$
+            + "Max Altitude:                " + maxAltitude + " m" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
+            + NL
+            + "Pulse 1 upper bound          " + pulse1UpperBound + " bpm" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "Pulse 1 lower bound:         " + pulse1LowerBound + " bpm" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "Pulse 2 upper bound:         " + pulse2UpperBound + " bpm" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "Pulse 2 lower bound:         " + pulse2LowerBound + " bpm" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + NL
+            + "1. Count down:               " + count1min + UI.SYMBOL_COLON + count1sec + NL //         //$NON-NLS-1$
+            + "2. Count down:               " + count2min + UI.SYMBOL_COLON + count2sec + NL //         //$NON-NLS-1$
+            + NL
+            + "Total distance:              " + ((totalDistanceHigh * (2 ^ 16)) + totalDistanceLow) + " km" + NL //         //$NON-NLS-1$ //$NON-NLS-2$
+            + "Total altitude up:           " + totalAltitudeUp + " m" + NL //         //$NON-NLS-1$ //$NON-NLS-2$
+            + "Total altitude down:         " + totalAltitudeDown + " m" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
+            + "Total travel time:           " + totalTravelTime + NL //$NON-NLS-1$
+            + NL
+            + "Offset last CC record:       " + offsetCCRecord + NL //                 //$NON-NLS-1$
+            + "Offset last DD record:       " + offsetDDRecord + NL //                 //$NON-NLS-1$
+            + "Offset next free memory:     " + offsetNextMemory + NL //               //$NON-NLS-1$
+            + "Offset compare record:       " + offsetCompareRecord + NL //            //$NON-NLS-1$
+      ;
+
+      System.out.print(dump);
    }
 
    /**

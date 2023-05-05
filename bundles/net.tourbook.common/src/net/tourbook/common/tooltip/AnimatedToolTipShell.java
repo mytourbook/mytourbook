@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -37,1463 +37,1460 @@ import org.eclipse.swt.widgets.Widget;
  */
 public abstract class AnimatedToolTipShell {
 
-	public static final int				TOOLTIP_STYLE_RECREATE_CONTENT			= 0;
-	public static final int				TOOLTIP_STYLE_KEEP_CONTENT				= 1;
-
-	public static final int				MOUSE_OVER_BEHAVIOUR_NO_IGNORE			= 0;
-	public static final int				MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER		= 1;
-
-	/**
-	 * How long each tick is when fading in/out (in ms)
-	 */
-	private static final int			FADE_TIME_INTERVAL						= UI.IS_OSX ? 10 : 10;
-
-	/**
-	 * Number of steps when fading in
-	 */
-	private static final int			FADE_IN_STEPS							= 20;
-
-	/**
-	 * Number of steps when fading out
-	 */
-	private static final int			FADE_OUT_STEPS							= 10;
-
-	/**
-	 * Number of steps before fading out
-	 */
-	private static final int			FADE_OUT_DELAY_STEPS					= 20;
-
-	private static final int			MOVE_STEPS								= 20;
-
-	private static final int			AUTO_CLOSE_INTERVAL						= 700;
-
-	private static final int			ALPHA_OPAQUE							= 0xff;
-
-	private OwnerControlListener		_ownerControlListener;
-	private OwnerShellListener			_ownerShellListener;
-	private ToolTipShellListener		_ttShellListener;
-	private ToolTipAllControlsListener	_ttAllControlsListener;
-	private ToolTipDisplayListener		_ttDisplayListener;
-
-	/**
-	 * When <code>true</code> (default) the tooltip will be moved from the previous location to the
-	 * current location.
-	 */
-	private boolean						_isAnimateLocation						= true;
-
-	/**
-	 * When <code>true</code> the vertical position is not animated and the position is the bottom.
-	 */
-	private boolean						_isFixedBottomLocation;
-
-	/**
-	 * Keep track of added display listener that no more than <b>1</b> is set.
-	 */
-	private boolean						_isDisplayListenerSet;
-
-	/**
-	 * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
-	 */
-	private boolean						_isShellFadingOut;
-
-	/**
-	 * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
-	 */
-	private boolean						_isShellFadingIn;
-
-	/**
-	 * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
-	 * which creates a border. Set <code>false</code> to hide the border.
-	 */
-	private boolean						_isShowShellTrimStyle					= true;
-
-	/**
-	 * When <code>true</code> then the tooltip is <b>not</b> closed. This can be used when the
-	 * tooltip opens another dialog which prevents to close this tooltip, default is
-	 * <code>false</code>.
-	 */
-	private boolean						_isAnotherDialogOpened;
-
-	private Point						_shellStartLocation;
-	private Point						_shellEndLocation						= new Point(0, 0);
-
-	private int							_fadeOutDelayCounter;
-
-	private final AnimationTimer		_animationTimer;
-	private int							_animationMoveCounter;
-
-	private ToolTipAutoCloseTimer		_ttAutoCloseTimer;
-
-	private boolean						_isReceiveOnMouseExit;
-	private boolean						_isReceiveOnMouseMove;
-
-	/**
-	 * Number of {@link #FADE_IN_STEPS} until the tooltip starts to fade in.
-	 */
-	private int							_fadeInDelaySteps;
-
-	private int							_fadeInSteps							= FADE_IN_STEPS;
-	private int							_fadeInDelayCounter;
-	private int							_fadeOutSteps							= FADE_OUT_STEPS;
-	private int							_fadeOutDelaySteps						= FADE_OUT_DELAY_STEPS;
-
-	/*
-	 * these settings are modifying the default behaviour which was implemented to show a photo
-	 * gallery tooltip
-	 */
-	private int							_toolTipStyle							= TOOLTIP_STYLE_RECREATE_CONTENT;
-	private int							_mouseOverBehaviour						= MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
-	private boolean						_isKeepToolTipOpenWhenResizedOrMoved	= true;
-
-	/*
-	 * UI resources
-	 */
-	private Display						_display;
-
-	/**
-	 * Tooltip shell which is currently be visible
-	 */
-	private Shell						_shell;
-
-	private Control						_ownerControl;
-
-	private final class AnimationTimer implements Runnable {
-		@Override
-		public void run() {
-			animation20_Runnable();
-		}
-	}
-
-	private class OwnerControlListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onOwnerControlEvent(event);
-		}
-	}
-
-	private final class OwnerShellListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onOwnerShellEvent(event);
-		}
-	}
-
-	/**
-	 * This listener is added to ALL widgets within the tooltip shell.
-	 */
-	private class ToolTipAllControlsListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onTTAllControlsEvent(event);
-		}
-
-	}
-
-	/**
-	 * This checks if a mouse is above a tooltip. When mouse is above the 3D map or outside of this
-	 * application, mouse events are not captured and a tooltip keeps opened until other actions are
-	 * done.
-	 */
-	private final class ToolTipAutoCloseTimer implements Runnable {
-		@Override
-		public void run() {
-			onTTAutoCloseTimer();
-		}
-	}
-
-	private class ToolTipDisplayListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-
-			switch (event.type) {
-			case SWT.MouseMove:
-				onDisplayMouseMove();
-				break;
-			}
-		}
-	}
-
-	private final class ToolTipShellListener implements Listener {
-		@Override
-		public void handleEvent(final Event event) {
-			onTTShellEvent(event);
-		}
-	}
-
-	/**
-	 * Create new instance which add TooltipSupport to the widget
-	 * 
-	 * @param state
-	 * @param ownerControl
-	 *            the control on whose action the tooltip is shown
-	 */
-	public AnimatedToolTipShell(final Control ownerControl) {
-
-		_ownerControl = ownerControl;
-		_display = _ownerControl.getDisplay();
-
-		_ttAllControlsListener = new ToolTipAllControlsListener();
-		_ttShellListener = new ToolTipShellListener();
-		_ttDisplayListener = new ToolTipDisplayListener();
-
-		_ownerControlListener = new OwnerControlListener();
-		_ownerShellListener = new OwnerShellListener();
-
-		_animationTimer = new AnimationTimer();
-		_ttAutoCloseTimer = new ToolTipAutoCloseTimer();
-
-		addOwnerControlListener();
-		addOwnerShellListener();
-	}
-
-	private void addDisplayFilterListener() {
-
-		if (_isDisplayListenerSet) {
-			return;
-		}
-
-		_display.addFilter(SWT.MouseMove, _ttDisplayListener);
-
-		_isDisplayListenerSet = true;
-	}
-
-	/**
-	 * Activate tooltip support for this control
-	 */
-	private void addOwnerControlListener() {
-
-		removeOwnerControlsListener();
-
-		_ownerControl.addListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.addListener(SWT.Resize, _ownerControlListener);
-	}
-
-	private void addOwnerShellListener() {
-
-		final Shell ownerShell = _ownerControl.getShell();
-
-		ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
-		ownerShell.addListener(SWT.Move, _ownerShellListener);
-	}
-
-	/**
-	 * ########################### Recursive #########################################<br>
-	 * <p>
-	 * Add listener to all controls within the tooltip
-	 * <p>
-	 * ########################### Recursive #########################################<br>
-	 * 
-	 * @param control
-	 */
-	private void addTTAllControlsListener(final Control control) {
+   public static final int            TOOLTIP_STYLE_RECREATE_CONTENT    = 0;
+   public static final int            TOOLTIP_STYLE_KEEP_CONTENT        = 1;
+
+   public static final int            MOUSE_OVER_BEHAVIOUR_NO_IGNORE    = 0;
+   public static final int            MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER = 1;
+
+   /**
+    * How long each tick is when fading in/out (in ms)
+    */
+   private static final int           FADE_TIME_INTERVAL                = UI.IS_OSX ? 10 : 10;
+
+   /**
+    * Number of steps when fading in
+    */
+   private static final int           FADE_IN_STEPS                     = 20;
+
+   /**
+    * Number of steps when fading out
+    */
+   private static final int           FADE_OUT_STEPS                    = 10;
+
+   /**
+    * Number of steps before fading out
+    */
+   private static final int           FADE_OUT_DELAY_STEPS              = 20;
+
+   private static final int           MOVE_STEPS                        = 20;
+
+   private static final int           AUTO_CLOSE_INTERVAL               = 700;
+
+   private static final int           ALPHA_OPAQUE                      = 0xff;
+
+   private OwnerControlListener       _ownerControlListener;
+   private OwnerShellListener         _ownerShellListener;
+   private ToolTipShellListener       _ttShellListener;
+   private ToolTipAllControlsListener _ttAllControlsListener;
+   private ToolTipDisplayListener     _ttDisplayListener;
+
+   /**
+    * When <code>true</code> (default) the tooltip will be moved from the previous location to the
+    * current location.
+    */
+   private boolean                    _isAnimateLocation                = true;
+
+   /**
+    * When <code>true</code> the vertical position is not animated and the position is the bottom.
+    */
+   private boolean                    _isFixedBottomLocation;
+
+   /**
+    * Keep track of added display listener that no more than <b>1</b> is set.
+    */
+   private boolean                    _isDisplayListenerSet;
+
+   /**
+    * Is <code>true</code> when shell is fading out, otherwise <code>false</code>.
+    */
+   private boolean                    _isShellFadingOut;
+
+   /**
+    * Is <code>true</code> when shell is fading in, otherwise <code>false</code>.
+    */
+   private boolean                    _isShellFadingIn;
+
+   /**
+    * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
+    * which creates a border. Set <code>false</code> to hide the border.
+    */
+   private boolean                    _isShowShellTrimStyle             = true;
+
+   /**
+    * When <code>true</code> then the tooltip is <b>not</b> closed. This can be used when the
+    * tooltip opens another dialog which prevents to close this tooltip, default is
+    * <code>false</code>.
+    */
+   private boolean                    _isAnotherDialogOpened;
+
+   private Point                      _shellStartLocation;
+   private Point                      _shellEndLocation                 = new Point(0, 0);
+
+   private int                        _fadeOutDelayCounter;
+
+   private final AnimationTimer       _animationTimer;
+   private int                        _animationMoveCounter;
+
+   private ToolTipAutoCloseTimer      _ttAutoCloseTimer;
+
+   private boolean                    _isReceiveOnMouseExit;
+   private boolean                    _isReceiveOnMouseMove;
+
+   /**
+    * Number of {@link #FADE_IN_STEPS} until the tooltip starts to fade in.
+    */
+   private int                        _fadeInDelaySteps;
+
+   private int                        _fadeInSteps                      = FADE_IN_STEPS;
+   private int                        _fadeInDelayCounter;
+   private int                        _fadeOutSteps                     = FADE_OUT_STEPS;
+   private int                        _fadeOutDelaySteps                = FADE_OUT_DELAY_STEPS;
+
+   /*
+    * these settings are modifying the default behaviour which was implemented to show a photo
+    * gallery tooltip
+    */
+   private int     _toolTipStyle                        = TOOLTIP_STYLE_RECREATE_CONTENT;
+   private int     _mouseOverBehaviour                  = MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
+   private boolean _isKeepToolTipOpenWhenResizedOrMoved = true;
+
+   /*
+    * UI resources
+    */
+   private Display _display;
+
+   /**
+    * Tooltip shell which is currently be visible
+    */
+   private Shell   _shell;
+
+   private Control _ownerControl;
+
+   private final class AnimationTimer implements Runnable {
+      @Override
+      public void run() {
+         animation20_Runnable();
+      }
+   }
+
+   private class OwnerControlListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onOwnerControlEvent(event);
+      }
+   }
+
+   private final class OwnerShellListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onOwnerShellEvent(event);
+      }
+   }
+
+   /**
+    * This listener is added to ALL widgets within the tooltip shell.
+    */
+   private class ToolTipAllControlsListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onTTAllControlsEvent(event);
+      }
+
+   }
+
+   /**
+    * This checks if a mouse is above a tooltip. When mouse is above the 3D map or outside of this
+    * application, mouse events are not captured and a tooltip keeps opened until other actions are
+    * done.
+    */
+   private final class ToolTipAutoCloseTimer implements Runnable {
+      @Override
+      public void run() {
+         onTTAutoCloseTimer();
+      }
+   }
+
+   private class ToolTipDisplayListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+
+         switch (event.type) {
+         case SWT.MouseMove:
+            onDisplayMouseMove();
+            break;
+         }
+      }
+   }
+
+   private final class ToolTipShellListener implements Listener {
+      @Override
+      public void handleEvent(final Event event) {
+         onTTShellEvent(event);
+      }
+   }
+
+   /**
+    * Create new instance which add TooltipSupport to the widget
+    *
+    * @param state
+    * @param ownerControl
+    *           the control on whose action the tooltip is shown
+    */
+   public AnimatedToolTipShell(final Control ownerControl) {
+
+      _ownerControl = ownerControl;
+      _display = _ownerControl.getDisplay();
+
+      _ttAllControlsListener = new ToolTipAllControlsListener();
+      _ttShellListener = new ToolTipShellListener();
+      _ttDisplayListener = new ToolTipDisplayListener();
+
+      _ownerControlListener = new OwnerControlListener();
+      _ownerShellListener = new OwnerShellListener();
+
+      _animationTimer = new AnimationTimer();
+      _ttAutoCloseTimer = new ToolTipAutoCloseTimer();
+
+      addOwnerControlListener();
+      addOwnerShellListener();
+   }
+
+   private void addDisplayFilterListener() {
+
+      if (_isDisplayListenerSet) {
+         return;
+      }
+
+      _display.addFilter(SWT.MouseMove, _ttDisplayListener);
+
+      _isDisplayListenerSet = true;
+   }
+
+   /**
+    * Activate tooltip support for this control
+    */
+   private void addOwnerControlListener() {
+
+      removeOwnerControlsListener();
+
+      _ownerControl.addListener(SWT.Dispose, _ownerControlListener);
+      _ownerControl.addListener(SWT.Resize, _ownerControlListener);
+   }
+
+   private void addOwnerShellListener() {
+
+      final Shell ownerShell = _ownerControl.getShell();
+
+      ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
+      ownerShell.addListener(SWT.Move, _ownerShellListener);
+   }
+
+   /**
+    * ########################### Recursive #########################################<br>
+    * <p>
+    * Add listener to all controls within the tooltip
+    * <p>
+    * ########################### Recursive #########################################<br>
+    *
+    * @param control
+    */
+   private void addTTAllControlsListener(final Control control) {
 
-		control.addListener(SWT.KeyDown, _ttAllControlsListener);
+      control.addListener(SWT.KeyDown, _ttAllControlsListener);
 
-		control.addListener(SWT.MouseDown, _ttAllControlsListener);
-		control.addListener(SWT.MouseUp, _ttAllControlsListener);
-		control.addListener(SWT.MouseMove, _ttAllControlsListener);
-		control.addListener(SWT.MouseExit, _ttAllControlsListener);
-		control.addListener(SWT.MouseEnter, _ttAllControlsListener);
+      control.addListener(SWT.MouseDown, _ttAllControlsListener);
+      control.addListener(SWT.MouseUp, _ttAllControlsListener);
+      control.addListener(SWT.MouseMove, _ttAllControlsListener);
+      control.addListener(SWT.MouseExit, _ttAllControlsListener);
+      control.addListener(SWT.MouseEnter, _ttAllControlsListener);
 
-		if (control instanceof Composite) {
-			final Control[] children = ((Composite) control).getChildren();
-			for (final Control child : children) {
-				addTTAllControlsListener(child);
-			}
-		}
-	}
+      if (control instanceof Composite) {
+         final Control[] children = ((Composite) control).getChildren();
+         for (final Control child : children) {
+            addTTAllControlsListener(child);
+         }
+      }
+   }
 
-	private void addTTShellListener(final Shell shell) {
-		// hide tooltip if user selects outside of the shell
-		shell.addListener(SWT.Deactivate, _ttShellListener);
-		shell.addListener(SWT.Dispose, _ttShellListener);
-	}
+   private void addTTShellListener(final Shell shell) {
+      // hide tooltip if user selects outside of the shell
+      shell.addListener(SWT.Deactivate, _ttShellListener);
+      shell.addListener(SWT.Dispose, _ttShellListener);
+   }
 
-	private void animation10_Start() {
+   private void animation10_Start() {
 
-		int a = 0;
-		a++;
-		a++;
+      int a = 0;
+      a++;
+      a++;
 
-		if (a == 1) {
-			animation10_Start_Simple();
-		} else {
-			animation10_StartKomplex();
-		}
-	}
+      if (a == 1) {
+         animation10_Start_Simple();
+      } else {
+         animation10_StartKomplex();
+      }
+   }
 
-	private void animation10_Start_Simple() {
+   private void animation10_Start_Simple() {
 
-		if (_isShellFadingIn) {
+      if (_isShellFadingIn) {
 
-			// show tool tip
+         // show tool tip
 
-			final Point size = _shell.getSize();
-			final Point defaultLocation = getToolTipLocation(size);
+         final Point size = _shell.getSize();
+         final Point defaultLocation = getToolTipLocation(size);
 
-			final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
+         final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
-			_shell.setLocation(shellLocation.x, shellLocation.y);
-			setShellAlpha(_shell, 0xff);
+         _shell.setLocation(shellLocation.x, shellLocation.y);
+         setShellAlpha(_shell, 0xff);
 
-			setShellVisible(true);
+         setShellVisible(true);
 
-		} else {
+      } else {
 
-			// hide tooltip
+         // hide tooltip
 
-			setShellVisible(false);
-		}
-	}
+         setShellVisible(false);
+      }
+   }
 
-	private void animation10_StartKomplex() {
+   private void animation10_StartKomplex() {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tanimation10_StartKomplex"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tanimation10_StartKomplex"));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-//		final long start = System.nanoTime();
+//      final long start = System.nanoTime();
 
-		if (_isShellFadingIn) {
+      if (_isShellFadingIn) {
 
-			// set fading in location
+         // set fading in location
 
-			final Point shellSize = _shell.getSize();
-			Point shellEndLocation = getToolTipLocation(shellSize);
-			shellEndLocation = fixupDisplayBounds(shellSize, shellEndLocation);
+         final Point shellSize = _shell.getSize();
+         Point shellEndLocation = getToolTipLocation(shellSize);
+         shellEndLocation = fixupDisplayBounds(shellSize, shellEndLocation);
 
-			final boolean isShellVisible = _shell.isVisible();
+         final boolean isShellVisible = _shell.isVisible();
 
-			if (shellEndLocation.x == _shellEndLocation.x
-					&& shellEndLocation.y == _shellEndLocation.y
-					&& isShellVisible) {
+         if (shellEndLocation.x == _shellEndLocation.x
+               && shellEndLocation.y == _shellEndLocation.y
+               && isShellVisible) {
 
-				// shell is already fading in with the correct location
+            // shell is already fading in with the correct location
 
-				return;
-			}
+            return;
+         }
 
-			// set new end location
-			_shellEndLocation = shellEndLocation;
+         // set new end location
+         _shellEndLocation = shellEndLocation;
 
-			if (isShellVisible && _isAnimateLocation) {
+         if (isShellVisible && _isAnimateLocation) {
 
-				// shell is already visible, move from the current position to the target position
+            // shell is already visible, move from the current position to the target position
 
-				_shellStartLocation = _shell.getLocation();
+            _shellStartLocation = _shell.getLocation();
 
-				if (_isFixedBottomLocation) {
+            if (_isFixedBottomLocation) {
 
-					// do not animate the vertical position
+               // do not animate the vertical position
 
-					_shellStartLocation.y = shellEndLocation.y;
-				}
+               _shellStartLocation.y = shellEndLocation.y;
+            }
 
-			} else {
+         } else {
 
-				// shell is not visible, set position directly without moving animation, do only fading animation
+            // shell is not visible, set position directly without moving animation, do only fading animation
 
-				_fadeInDelayCounter = 0;
+            _fadeInDelayCounter = 0;
 
-				_shellStartLocation = _shellEndLocation;
+            _shellStartLocation = _shellEndLocation;
 
-				_shell.setLocation(_shellStartLocation.x, _shellStartLocation.y);
+            _shell.setLocation(_shellStartLocation.x, _shellStartLocation.y);
 
-				setShellAlpha(_shell, 0);
-				setShellVisible(true);
-			}
+            setShellAlpha(_shell, 0);
+            setShellVisible(true);
+         }
 
-		} else if (_isShellFadingOut) {
+      } else if (_isShellFadingOut) {
 
-			// fading out has no movement
+         // fading out has no movement
 
-			_fadeOutDelayCounter = 0;
-		}
+         _fadeOutDelayCounter = 0;
+      }
 
-		// start animation now
-		_animationMoveCounter = 0;
-		animation20_Runnable();
+      // start animation now
+      _animationMoveCounter = 0;
+      animation20_Runnable();
 
-//		System.out.println(UI.timeStampNano()
-//				+ " animation10_StartKomplex\t"
-//				+ ((float) (System.nanoTime() - start) / 1000000)
-//				+ " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+//      System.out.println(UI.timeStampNano()
+//            + " animation10_StartKomplex\t"
+//            + ((float) (System.nanoTime() - start) / 1000000)
+//            + " ms");
+//      // TODO remove SYSTEM.OUT.PRINTLN
+   }
 
-	private void animation20_Runnable() {
+   private void animation20_Runnable() {
 
-//		final long start = System.nanoTime();
+//      final long start = System.nanoTime();
 
-		if (isShellHidden()) {
-			return;
-		}
+      if (isShellHidden()) {
+         return;
+      }
 
-		try {
-			/*
-			 * endAlpha will be the final fadeIn/fadeOut value when the animation stops
-			 */
-			int finalFadeAlpha = -1;
+      try {
+         /*
+          * endAlpha will be the final fadeIn/fadeOut value when the animation stops
+          */
+         int finalFadeAlpha = -1;
 
-			int currentAlpha = _shell.getAlpha();
-			boolean isLoopBreak = false;
+         int currentAlpha = _shell.getAlpha();
+         boolean isLoopBreak = false;
 
-			_animationMoveCounter++;
+         _animationMoveCounter++;
 
-			while (true) {
+         while (true) {
 
-				int newAlpha = -1;
+            int newAlpha = -1;
 
-				if (_isShellFadingIn) {
+            if (_isShellFadingIn) {
 
-					if (_fadeInDelayCounter++ < _fadeInDelaySteps) {
+               if (_fadeInDelayCounter++ < _fadeInDelaySteps) {
 
-						// delay fade in
+                  // delay fade in
 
-						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+                  _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
-						return;
-					}
+                  return;
+               }
 
-					final int shellStartX = _shellStartLocation.x;
-					final int shellStartY = _shellStartLocation.y;
-					final int shellEndX = _shellEndLocation.x;
-					final int shellEndY = _shellEndLocation.y;
+               final int shellStartX = _shellStartLocation.x;
+               final int shellStartY = _shellStartLocation.y;
+               final int shellEndX = _shellEndLocation.x;
+               final int shellEndY = _shellEndLocation.y;
 
-					final Point shellCurrentLocation = _shell.getLocation();
+               final Point shellCurrentLocation = _shell.getLocation();
 
-					final boolean isInTarget = shellCurrentLocation.x == shellEndX
-							&& shellCurrentLocation.y == shellEndY;
+               final boolean isInTarget = shellCurrentLocation.x == shellEndX
+                     && shellCurrentLocation.y == shellEndY;
 
-					if (_fadeInSteps <= 0) {
+               if (_fadeInSteps <= 0) {
 
-						newAlpha = ALPHA_OPAQUE;
+                  newAlpha = ALPHA_OPAQUE;
 
-					} else {
+               } else {
 
-						final int diffAlpha = ALPHA_OPAQUE / _fadeInSteps;
+                  final int diffAlpha = ALPHA_OPAQUE / _fadeInSteps;
 
-						newAlpha = currentAlpha + diffAlpha;
+                  newAlpha = currentAlpha + diffAlpha;
 
-						if (newAlpha > ALPHA_OPAQUE) {
-							newAlpha = ALPHA_OPAQUE;
-						}
-					}
+                  if (newAlpha > ALPHA_OPAQUE) {
+                     newAlpha = ALPHA_OPAQUE;
+                  }
+               }
 
-					finalFadeAlpha = ALPHA_OPAQUE;
+               finalFadeAlpha = ALPHA_OPAQUE;
 
-					if (isInTarget && currentAlpha == ALPHA_OPAQUE) {
+               if (isInTarget && currentAlpha == ALPHA_OPAQUE) {
 
-						// target is reached and fully visible, stop animation
+                  // target is reached and fully visible, stop animation
 
-						_isShellFadingIn = false;
+                  _isShellFadingIn = false;
 
-						return;
+                  return;
 
-					} else {
+               } else {
 
-						if (isInTarget == false) {
+                  if (isInTarget == false) {
 
-							// move to target
+                     // move to target
 
-							final int diffX = shellStartX - shellEndX;
-							final int diffY = shellStartY - shellEndY;
+                     final int diffX = shellStartX - shellEndX;
+                     final int diffY = shellStartY - shellEndY;
 
-							final int moveX = (int) ((double) diffX / MOVE_STEPS * _animationMoveCounter);
-							final int moveY = (int) ((double) diffY / MOVE_STEPS * _animationMoveCounter);
+                     final int moveX = (int) ((double) diffX / MOVE_STEPS * _animationMoveCounter);
+                     final int moveY = (int) ((double) diffY / MOVE_STEPS * _animationMoveCounter);
 
-							int shellCurrentX = shellStartX - moveX;
-							int shellCurrentY = shellStartY - moveY;
+                     int shellCurrentX = shellStartX - moveX;
+                     int shellCurrentY = shellStartY - moveY;
 
-							/**
-							 * This wrong behaviour occured (not very often but it occured) that the
-							 * tooltip was moving to the invinity of the right or the left.
-							 * <p>
-							 * This check will prevent this bug.
-							 */
-							if ((shellStartX - shellEndX < 0 && shellCurrentX > shellEndX)
-									|| (shellStartX - shellEndX > 0 && shellCurrentX < shellEndX)) {
+                     /**
+                      * This wrong behaviour occured (not very often but it occured) that the
+                      * tooltip was moving to the invinity of the right or the left.
+                      * <p>
+                      * This check will prevent this bug.
+                      */
+                     if ((shellStartX - shellEndX < 0 && shellCurrentX > shellEndX)
+                           || (shellStartX - shellEndX > 0 && shellCurrentX < shellEndX)) {
 
-								shellCurrentX = shellEndX;
-							}
+                        shellCurrentX = shellEndX;
+                     }
 
-							if ((shellStartY - shellEndY < 0 && shellCurrentY > shellEndY)
-									|| (shellStartY - shellEndY > 0 && shellCurrentY < shellEndY)) {
+                     if ((shellStartY - shellEndY < 0 && shellCurrentY > shellEndY)
+                           || (shellStartY - shellEndY > 0 && shellCurrentY < shellEndY)) {
 
-								shellCurrentY = shellEndY;
-							}
+                        shellCurrentY = shellEndY;
+                     }
 
-							_shell.setLocation(shellCurrentX, shellCurrentY);
-						}
-					}
+                     _shell.setLocation(shellCurrentX, shellCurrentY);
+                  }
+               }
 
-				} else if (_isShellFadingOut) {
+            } else if (_isShellFadingOut) {
 
-					if (_fadeOutDelayCounter++ < _fadeOutDelaySteps) {
+               if (_fadeOutDelayCounter++ < _fadeOutDelaySteps) {
 
-						// delay fade out
+                  // delay fade out
 
-						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+                  _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
-						return;
-					}
+                  return;
+               }
 
-					if (_fadeInSteps <= 0) {
+               if (_fadeInSteps <= 0) {
 
-						newAlpha = 0;
+                  newAlpha = 0;
 
-					} else {
+               } else {
 
-						final int alphaDiff = ALPHA_OPAQUE / _fadeOutSteps;
+                  final int alphaDiff = ALPHA_OPAQUE / _fadeOutSteps;
 
-						newAlpha = currentAlpha - alphaDiff;
-						finalFadeAlpha = 0;
-					}
+                  newAlpha = currentAlpha - alphaDiff;
+                  finalFadeAlpha = 0;
+               }
 
-					if (newAlpha <= 0) {
+               if (newAlpha <= 0) {
 
-						// shell is not visible any more, hide it now
+                  // shell is not visible any more, hide it now
 
-						// hide shell
-						setShellVisible(false);
+                  // hide shell
+                  setShellVisible(false);
 
-						_isShellFadingOut = false;
+                  _isShellFadingOut = false;
 
-						return;
-					}
-				}
+                  return;
+               }
+            }
 
-				if (newAlpha == -1) {
+            if (newAlpha == -1) {
 
-					return;
+               return;
 
-				} else {
+            } else {
 
-					if (newAlpha != currentAlpha) {
-						setShellAlpha(_shell, newAlpha);
-					}
+               if (newAlpha != currentAlpha) {
+                  setShellAlpha(_shell, newAlpha);
+               }
 
-					if (_shell.getAlpha() != newAlpha) {
+               if (_shell.getAlpha() != newAlpha) {
 
-						// platform do not support shell alpha, this occured on Ubuntu 12.04
+                  // platform do not support shell alpha, this occured on Ubuntu 12.04
 
-						if (isLoopBreak) {
-							break;
-						}
+                  if (isLoopBreak) {
+                     break;
+                  }
 
-						// loop only once
-						isLoopBreak = true;
+                  // loop only once
+                  isLoopBreak = true;
 
-						currentAlpha = finalFadeAlpha;
+                  currentAlpha = finalFadeAlpha;
 
-						continue;
+                  continue;
 
-					} else {
+               } else {
 
-						_display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
+                  _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);
 
-						break;
-					}
-				}
-			}
+                  break;
+               }
+            }
+         }
 
-		} catch (final Exception err) {
-			StatusUtil.log(err);
-		} finally {
+      } catch (final Exception err) {
+         StatusUtil.log(err);
+      } finally {
 
-//			final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//			System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
-//			// TODO remove SYSTEM.OUT.PRINTLN
-		}
-	}
+//         final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//         System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
+//         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+   }
 
-	/**
-	 * Is called before the tooltip shell is set hidden.
-	 */
-	protected void beforeHideToolTip() {
-		// do nothing
-	}
+   /**
+    * Is called before the tooltip shell is set hidden, the default is doing nothing.
+    */
+   protected void beforeHideToolTip() {
 
-	/**
-	 * Is called before the tooltip is displayed.
-	 * 
-	 * @return Returns <code>true</code> when the tooltip should be opened, otherwise
-	 *         <code>false</code>.
-	 */
-	protected abstract boolean canShowToolTip();
+      // do nothing
+   }
 
-	/**
-	 * Close tooltip immediatedly without animation.
-	 */
-	public void close() {
+   /**
+    * Is called before the tooltip is displayed.
+    *
+    * @return Returns <code>true</code> when the tooltip should be opened, otherwise
+    *         <code>false</code>.
+    */
+   protected abstract boolean canShowToolTip();
 
-		if (_shell != null && _shell.isDisposed() == false) {
+   /**
+    * Close tooltip immediatedly without animation.
+    */
+   public void close() {
 
-			_shell.close();
-			_shell = null;
-		}
-	}
+      if (_shell != null && _shell.isDisposed() == false) {
 
-	/**
-	 * @return Returns <code>true</code> to close the shell after it is completely hidden.
-	 */
-	protected boolean closeShellAfterHidden() {
+         _shell.close();
+         _shell = null;
+      }
+   }
 
-		return false;
-	}
+   /**
+    * @return Returns <code>true</code> to close the shell after it is completely hidden.
+    */
+   protected boolean closeShellAfterHidden() {
 
-	/**
-	 * Creates the content area of the the tooltip.
-	 * 
-	 * @param shell
-	 *            the parent of the content area
-	 * @return the content area created
-	 */
-	protected abstract Composite createToolTipContentArea(Composite shell);
+      return false;
+   }
 
-	/**
-	 * Create a shell but do not display it
-	 * 
-	 * @return Returns <code>true</code> when shell is created.
-	 */
-	private void createUI() {
+   /**
+    * Creates the content area of the the tooltip.
+    *
+    * @param shell
+    *           the parent of the content area
+    * @return the content area created
+    */
+   protected abstract Composite createToolTipContentArea(Composite shell);
 
-		final boolean isRecreateContent = _toolTipStyle == TOOLTIP_STYLE_RECREATE_CONTENT;
-		boolean isShellCreated = false;
-		boolean isCreateContent = false;
+   /**
+    * Create a shell but do not display it
+    *
+    * @return Returns <code>true</code> when shell is created.
+    */
+   private void createUI() {
 
-		final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
+      final boolean isRecreateContent = _toolTipStyle == TOOLTIP_STYLE_RECREATE_CONTENT;
+      boolean isShellCreated = false;
+      boolean isCreateContent = false;
 
-		if (_shell == null || _shell.isDisposed()) {
+      final int trimStyle = _isShowShellTrimStyle ? 0 : SWT.NO_TRIM;
 
-			/*
-			 * create shell
-			 */
-			final int shellStyle = SWT.ON_TOP //
-					/*
-					 * SWT.TOOL must be disabled that NO_FOCUS is working !!!
-					 */
-//					| SWT.TOOL
-//					| SWT.RESIZE
-					| SWT.NO_FOCUS //
-					| trimStyle;
+      if (_shell == null || _shell.isDisposed()) {
 
-			_shell = new Shell(_ownerControl.getShell(), shellStyle);
+         /*
+          * create shell
+          */
+         final int shellStyle = SWT.ON_TOP //
+         /*
+          * SWT.TOOL must be disabled that NO_FOCUS is working !!!
+          */
+//               | SWT.TOOL
+//               | SWT.RESIZE
+               | SWT.NO_FOCUS //
+               | trimStyle;
 
-			_shell.setLayout(new FillLayout());
+         _shell = new Shell(_ownerControl.getShell(), shellStyle);
 
-			addTTShellListener(_shell);
+         _shell.setLayout(new FillLayout());
 
-			isShellCreated = true;
+         addTTShellListener(_shell);
 
-		} else {
+         isShellCreated = true;
 
-			if (isRecreateContent) {
+      } else {
 
-				// hide previous tooltip content
+         if (isRecreateContent) {
 
-				_shell.setRedraw(false);
+            // hide previous tooltip content
 
-				final Control[] shellChildren = _shell.getChildren();
-				for (final Control control : shellChildren) {
-					control.dispose();
-				}
+            _shell.setRedraw(false);
 
-				isCreateContent = true;
-			}
-		}
+            final Control[] shellChildren = _shell.getChildren();
+            for (final Control control : shellChildren) {
+               control.dispose();
+            }
 
-		final boolean isNewContent = isShellCreated || isCreateContent;
+            isCreateContent = true;
+         }
+      }
 
-		if (isNewContent) {
+      final boolean isNewContent = isShellCreated || isCreateContent;
 
-			// create content
-			createToolTipContentArea(_shell);
-		}
+      if (isNewContent) {
 
-		onAfterCreateUI();
+         // create content
+         createToolTipContentArea(_shell);
+      }
 
-		_shell.layout();
-		_shell.pack(true);
+      onAfterCreateUI();
 
-		_shell.setRedraw(true);
+      _shell.layout();
+      _shell.pack(true);
 
-		if (isNewContent) {
-			addTTAllControlsListener(_shell);
-		}
-	}
+      _shell.setRedraw(true);
 
-	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
+      if (isNewContent) {
+         addTTAllControlsListener(_shell);
+      }
+   }
 
-		final Rectangle displayBounds = getDisplayBounds(location);
-		final Point rightBottomBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
+   private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
-		if (!(displayBounds.contains(location) && displayBounds.contains(rightBottomBounds))) {
+      final Rectangle displayBounds = getDisplayBounds(location);
+      final Point rightBottomBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
 
-			if (rightBottomBounds.x > displayBounds.x + displayBounds.width) {
-				location.x -= rightBottomBounds.x - (displayBounds.x + displayBounds.width);
-			}
+      if (!(displayBounds.contains(location) && displayBounds.contains(rightBottomBounds))) {
 
-			if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
-				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
-			}
+         if (rightBottomBounds.x > displayBounds.x + displayBounds.width) {
+            location.x -= rightBottomBounds.x - (displayBounds.x + displayBounds.width);
+         }
 
-			if (location.x < displayBounds.x) {
-				location.x = displayBounds.x;
-			}
+         if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
+            location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
+         }
 
-			if (location.y < displayBounds.y) {
-				location.y = displayBounds.y;
-			}
-		}
+         if (location.x < displayBounds.x) {
+            location.x = displayBounds.x;
+         }
 
-		return location;
-	}
+         if (location.y < displayBounds.y) {
+            location.y = displayBounds.y;
+         }
+      }
 
-	private Rectangle getDisplayBounds(final Point location) {
+      return location;
+   }
 
-		Rectangle displayBounds;
-		final Monitor[] allMonitors = _ownerControl.getDisplay().getMonitors();
+   private Rectangle getDisplayBounds(final Point location) {
 
-		if (allMonitors.length > 1) {
-			// By default present in the monitor of the control
-			displayBounds = _ownerControl.getMonitor().getBounds();
-			final Point p = new Point(location.x, location.y);
+      Rectangle displayBounds;
+      final Monitor[] allMonitors = _ownerControl.getDisplay().getMonitors();
 
-			// Search on which monitor the event occurred
-			Rectangle tmp;
-			for (final Monitor element : allMonitors) {
-				tmp = element.getBounds();
-				if (tmp.contains(p)) {
-					displayBounds = tmp;
-					break;
-				}
-			}
+      if (allMonitors.length > 1) {
+         // By default present in the monitor of the control
+         displayBounds = _ownerControl.getMonitor().getBounds();
+         final Point p = new Point(location.x, location.y);
 
-		} else {
-			displayBounds = _ownerControl.getDisplay().getBounds();
-		}
+         // Search on which monitor the event occurred
+         Rectangle tmp;
+         for (final Monitor element : allMonitors) {
+            tmp = element.getBounds();
+            if (tmp.contains(p)) {
+               displayBounds = tmp;
+               break;
+            }
+         }
 
-		return displayBounds;
-	}
+      } else {
+         displayBounds = _ownerControl.getDisplay().getBounds();
+      }
 
-	/**
-	 * Get tooltip location.
-	 * 
-	 * @param size
-	 *            Tooltip size
-	 * @return Returns location relative to the device.
-	 */
-	protected abstract Point getToolTipLocation(Point size);
+      return displayBounds;
+   }
 
-	/**
-	 * Hide tool tip with animation.
-	 */
-	public void hide() {
-		ttHide();
-	}
+   /**
+    * Get tooltip location.
+    *
+    * @param size
+    *           Tooltip size
+    * @return Returns location relative to the device.
+    */
+   protected abstract Point getToolTipLocation(Point size);
 
-	/**
-	 * Hide tool tip without delay.
-	 */
-	public void hideNow() {
+   /**
+    * Hide tool tip with animation.
+    */
+   public void hide() {
+      ttHide();
+   }
 
-		if (isShellHidden()) {
-			return;
-		}
+   /**
+    * Hide tool tip without delay.
+    */
+   public void hideNow() {
 
-		setShellAlpha(_shell, 0);
+      if (isShellHidden()) {
+         return;
+      }
 
-		// hide shell
-		setShellVisible(false);
-	}
+      setShellAlpha(_shell, 0);
 
-	/**
-	 * @return When <code>true</code> then the tooltip is <b>not</b> closed. This can be used when
-	 *         the tooltip opens another dialog which prevents to close this tooltip, default is
-	 *         <code>false</code>.
-	 */
-	public boolean isAnotherDialogOpened() {
-		return _isAnotherDialogOpened;
-	}
+      // hide shell
+      setShellVisible(false);
+   }
 
-	/**
-	 * @param displayCursorLocation
-	 * @return Returns <code>true</code> when the tooltip should not be closed.
-	 */
-	protected boolean isInNoHideArea(final Point displayCursorLocation) {
-		return false;
-	}
+   /**
+    * @return When <code>true</code> then the tooltip is <b>not</b> closed. This can be used when
+    *         the tooltip opens another dialog which prevents to close this tooltip, default is
+    *         <code>false</code>.
+    */
+   public boolean isAnotherDialogOpened() {
+      return _isAnotherDialogOpened;
+   }
 
-	/**
-	 * @return Return <code>true</code> when the tooltip shell is <code>null</code>, disposed or not
-	 *         visible.
-	 */
-	private boolean isShellHidden() {
+   /**
+    * @param displayCursorLocation
+    * @return Returns <code>true</code> when the tooltip should not be closed.
+    */
+   protected boolean isInNoHideArea(final Point displayCursorLocation) {
+      return false;
+   }
 
-		return _shell == null || _shell.isDisposed() || _shell.isVisible() == false;
-	}
+   /**
+    * @return Return <code>true</code> when the tooltip shell is <code>null</code>, disposed or not
+    *         visible.
+    */
+   private boolean isShellHidden() {
 
-	/**
-	 * @return Returns <code>true</code> when the tooltip is opened but is started to close it.
-	 */
-	public boolean isTooltipClosing() {
+      return _shell == null || _shell.isDisposed() || _shell.isVisible() == false;
+   }
 
-		return _isShellFadingOut && isToolTipVisible();
-	}
+   /**
+    * @return Returns <code>true</code> when the tooltip is opened but is started to close it.
+    */
+   public boolean isTooltipClosing() {
 
-	public boolean isToolTipVisible() {
+      return _isShellFadingOut && isToolTipVisible();
+   }
 
-		if (_shell == null || _shell.isDisposed()) {
-			return false;
-		}
+   public boolean isToolTipVisible() {
 
-		final boolean isShellVisible = _shell.isVisible();
+      if (_shell == null || _shell.isDisposed()) {
+         return false;
+      }
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tisShellVisible: " + isShellVisible));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+      final boolean isShellVisible = _shell.isVisible();
 
-		return isShellVisible;
-	}
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tisShellVisible: " + isShellVisible));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-	/**
-	 * @return When the returned rectangle (which has display locations) is hit by the mouse, the
-	 *         tooltip should not be hidden. When <code>null</code> this check is ignored.
-	 */
-	protected Rectangle noHideOnMouseMove() {
-		return null;
-	}
+      return isShellVisible;
+   }
 
-	/**
-	 * Is called after the UI is created but before it is packed.
-	 */
-	protected void onAfterCreateUI() {
-		// default do nothing
-	}
+   /**
+    * @return When the returned rectangle (which has display locations) is hit by the mouse, the
+    *         tooltip should not be hidden. When <code>null</code> this check is ignored.
+    */
+   protected Rectangle noHideOnMouseMove() {
+      return null;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when the tooltip should be kept opened.
-	 */
-	private boolean onDisplayMouseMove() {
+   /**
+    * Is called after the UI is created but before it is packed.
+    */
+   protected void onAfterCreateUI() {
+      // default do nothing
+   }
 
-//		final long start = System.nanoTime();
+   /**
+    * @return Returns <code>true</code> when the tooltip should be kept opened.
+    */
+   private boolean onDisplayMouseMove() {
 
-		if (isShellHidden()) {
-			return false;
-		}
+//      final long start = System.nanoTime();
 
-		if (isAnotherDialogOpened()) {
+      if (isShellHidden()) {
+         return false;
+      }
 
-//			System.out.println(UI.timeStampNano()
-//					+ " ["
-//					+ getClass().getSimpleName()
-//					+ "] onDisplayMouseMove::canCloseToolTip\t");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+      if (isAnotherDialogOpened()) {
 
-			return true;
-		}
+//         System.out.println(UI.timeStampNano()
+//               + " ["
+//               + getClass().getSimpleName()
+//               + "] onDisplayMouseMove::canCloseToolTip\t");
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
-		boolean isHide = false;
-		boolean isKeepVisible = false;
+         return true;
+      }
 
-		// get control which is hovered with the mouse after the exit, can be null
-		final Control hoveredControl = _display.getCursorControl();
+      boolean isHide = false;
+      boolean isKeepVisible = false;
 
-//		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove - hoveredControl " + hoveredControl);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+      // get control which is hovered with the mouse after the exit, can be null
+      final Control hoveredControl = _display.getCursorControl();
 
-		if (hoveredControl == null) {
+//      System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove - hoveredControl " + hoveredControl);
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-//			System.out.println(UI.timeStampNano() + " exit 0 hide");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+      if (hoveredControl == null) {
 
-			isHide = true;
+//         System.out.println(UI.timeStampNano() + " exit 0 hide");
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
-		} else {
+         isHide = true;
 
-			/*
-			 * check if the hovered control is the owner control, if not, hide the tooltip
-			 */
-			Control hoveredParent = hoveredControl;
+      } else {
 
-			// move up child-parent hierarchy until shell is reached
-			while (true) {
+         /*
+          * check if the hovered control is the owner control, if not, hide the tooltip
+          */
+         Control hoveredParent = hoveredControl;
 
-				if (hoveredParent == _shell) {
+         // move up child-parent hierarchy until shell is reached
+         while (true) {
 
-					// mouse is hovering in this tooltip
+            if (hoveredParent == _shell) {
 
-					isKeepVisible = true;
+               // mouse is hovering in this tooltip
 
-//					System.out.println(UI.timeStampNano() + " exit 1 no hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+               isKeepVisible = true;
 
-					break;
-				}
+//               System.out.println(UI.timeStampNano() + " exit 1 no hide");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-				if (hoveredParent == _ownerControl) {
+               break;
+            }
 
-					// mouse is hovering the owner control
+            if (hoveredParent == _ownerControl) {
 
-					if (_mouseOverBehaviour == MOUSE_OVER_BEHAVIOUR_NO_IGNORE) {
+               // mouse is hovering the owner control
 
-						/*
-						 * owner is not ignored, which means when the mouse is hovered the owner,
-						 * the tooltip keeps opened, this is the default
-						 */
+               if (_mouseOverBehaviour == MOUSE_OVER_BEHAVIOUR_NO_IGNORE) {
 
-						isKeepVisible = true;
-					}
+                  /*
+                   * owner is not ignored, which means when the mouse is hovered the owner,
+                   * the tooltip keeps opened, this is the default
+                   */
 
-//					System.out.println(UI.timeStampNano() + " exit 2 no hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+                  isKeepVisible = true;
+               }
 
-					break;
-				}
+//               System.out.println(UI.timeStampNano() + " exit 2 no hide");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-				hoveredParent = hoveredParent.getParent();
+               break;
+            }
 
-				if (hoveredParent == null) {
+            hoveredParent = hoveredParent.getParent();
 
-					// mouse has left the tooltip and the owner control
+            if (hoveredParent == null) {
 
-//					System.out.println(UI.timeStampNano() + " exit 3 hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+               // mouse has left the tooltip and the owner control
 
-					isHide = true;
+//               System.out.println(UI.timeStampNano() + " exit 3 hide");
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-					break;
-				}
-			}
-		}
+               isHide = true;
 
-		/**
-		 * !!! this adjustment do not work on Linux because the tooltip gets hidden when the mouse
-		 * tries to mover over the tooltip <br>
-		 * <br>
-		 * it seems to work on windows and linux with margin 1, when set to 0 the tooltip do
-		 * sometime not be poped up again and the i-icons is not deaktivated<br>
-		 * wolfgang 2010-07-23
-		 */
+               break;
+            }
+         }
+      }
 
-		final Rectangle ttShellRect = _shell.getBounds();
-		final int margin = 10;
+      /**
+       * !!! This adjustment do not work on Linux because the tooltip gets hidden when the mouse
+       * tries to mover over the tooltip <br>
+       * <br>
+       * It seems to work on windows and linux with margin 1, when set to 0 the tooltip do
+       * sometime not be poped up again and the i-icons is not deaktivated<br>
+       * wolfgang 2010-07-23
+       */
 
-		ttShellRect.x -= margin;
-		ttShellRect.y -= margin;
-		ttShellRect.width += 2 * margin;
-		ttShellRect.height += 2 * margin;
+      final Rectangle ttShellRect = _shell.getBounds();
 
-		final Point displayCursorLocation = _display.getCursorLocation();
+      final int margin = 20;
 
-		final boolean isInTooltip = ttShellRect.contains(displayCursorLocation);
+      ttShellRect.x -= margin;
+      ttShellRect.width += 2 * margin;
+      ttShellRect.height += margin;
 
-		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
-			isHide = true;
-		}
+      final Point displayCursorLocation = _display.getCursorLocation();
 
-		boolean isKeepOpened = true;
+      final boolean isInTooltip = ttShellRect.contains(displayCursorLocation);
 
-		if (isInTooltip && _isShellFadingOut) {
+      if (isKeepVisible == false && isHide == false && isInTooltip == false) {
+         isHide = true;
+      }
 
-			// don't hide when mouse is hovering hiding tooltip
+      boolean isKeepOpened = true;
 
-			ttShow();
+      if (isInTooltip && _isShellFadingOut) {
 
-		} else if (isHide) {
+         // don't hide when mouse is hovering hiding tooltip
 
-			final boolean isInNoHideArea = isInNoHideArea(displayCursorLocation);
+         ttShow();
 
-			if (isInNoHideArea) {
+      } else if (isHide) {
 
-				// keep open
+         final boolean isInNoHideArea = isInNoHideArea(displayCursorLocation);
 
-			} else {
+         if (isInNoHideArea) {
 
-				final Rectangle noHideArea = noHideOnMouseMove();
+            // keep open
 
-				if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
+         } else {
 
-					// hide definitively
+            final Rectangle noHideArea = noHideOnMouseMove();
 
-					ttHide();
+            if (noHideArea == null || noHideArea.contains(displayCursorLocation) == false) {
 
-					isKeepOpened = false;
-				}
-			}
-		}
+               // hide definitively
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tdisplayCursorLocation:" + displayCursorLocation));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+               if (_isShellFadingOut) {
 
-		return isKeepOpened;
+                  // do nothing, wait until it is finally hidden
 
-	}
+                  hideNow();
 
-	/**
-	 * Is called when the shell is disposed.
-	 */
-	protected void onDispose() {}
+               } else {
 
-	private void onDispose(final Event event) {
+                  ttHide();
+               }
 
-		if (_shell == null || _shell.isDisposed()) {
-			return;
-		}
+               isKeepOpened = false;
+            }
+         }
+      }
 
-		// hide tooltip definitively
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tdisplayCursorLocation:" + displayCursorLocation));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-		removeOwnerShellListener();
-		removeDisplayFilterListener();
+      return isKeepOpened;
 
-		// deactivate auto close timer
-		_display.timerExec(-1, _ttAutoCloseTimer);
+   }
 
-		_shell.dispose();
-	}
+   /**
+    * Is called when the shell is disposed.
+    */
+   protected void onDispose() {}
 
-	protected void onMouseExitToolTip(final MouseEvent mouseEvent) {}
+   private void onDispose(final Event event) {
 
-	protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
+      if (_shell == null || _shell.isDisposed()) {
+         return;
+      }
 
-	private void onOwnerControlEvent(final Event event) {
+      // hide tooltip definitively
 
-		if (_ownerControl == null || _ownerControl.isDisposed()) {
-			return;
-		}
+      removeOwnerShellListener();
+      removeDisplayFilterListener();
 
-		switch (event.type) {
-		case SWT.Dispose:
+      // deactivate auto close timer
+      _display.timerExec(-1, _ttAutoCloseTimer);
 
-			onDispose(event);
+      _shell.dispose();
+   }
 
-			removeOwnerControlsListener();
+   protected void onMouseExitToolTip(final MouseEvent mouseEvent) {}
 
-			break;
+   protected void onMouseMoveInToolTip(final MouseEvent mouseEvent) {}
 
-		case SWT.Resize:
+   private void onOwnerControlEvent(final Event event) {
 
-			showShellWhenVisible();
+      if (_ownerControl == null || _ownerControl.isDisposed()) {
+         return;
+      }
 
-			break;
-		}
-	}
+      switch (event.type) {
+      case SWT.Dispose:
 
-	private void onOwnerShellEvent(final Event event) {
+         onDispose(event);
 
-		if (_shell == null || _shell.isDisposed()) {
-			return;
-		}
+         removeOwnerControlsListener();
 
-		switch (event.type) {
-		case SWT.Deactivate:
+         break;
 
-			_display.asyncExec(new Runnable() {
+      case SWT.Resize:
 
-				@Override
-				public void run() {
+         showShellWhenVisible();
 
-					// hide tooltip when another shell is activated
+         break;
+      }
+   }
 
-					if (_display.getActiveShell() != _shell) {
-						ttHide();
-					}
-				}
-			});
-			break;
+   private void onOwnerShellEvent(final Event event) {
 
-		case SWT.Move:
+      if (_shell == null || _shell.isDisposed()) {
+         return;
+      }
 
-			showShellWhenVisible();
+      switch (event.type) {
+      case SWT.Deactivate:
 
-			break;
-		}
-	}
+         _display.asyncExec(() -> {
 
-	public void onReparentShell(final Shell reparentedShell) {
+            // hide tooltip when another shell is activated
 
-		/*
-		 * reparenting a shells parent which is a shell do NOT work
-		 */
+            if (_display.getActiveShell() != _shell) {
+               ttHide();
+            }
+         });
 
-		if (_shell != null && _shell.isDisposed() == false && _shell.isVisible()) {
-			_shell.setVisible(false);
-		}
+         break;
 
-		// stop animation
-		_isShellFadingIn = _isShellFadingOut = false;
-	}
+      case SWT.Move:
 
-	private void onTTAllControlsEvent(final Event event) {
+         showShellWhenVisible();
 
-		if (_shell == null || _shell.isDisposed()) {
-			return;
-		}
+         break;
+      }
+   }
 
-		switch (event.type) {
-		case SWT.KeyDown:
+   public void onReparentShell(final Shell reparentedShell) {
 
-			if (event.keyCode == SWT.ESC) {
-				hide();
-			}
+      /*
+       * reparenting a shells parent which is a shell do NOT work
+       */
 
-			break;
+      if (_shell != null && _shell.isDisposed() == false && _shell.isVisible()) {
+         _shell.setVisible(false);
+      }
 
-		case SWT.MouseEnter:
+      // stop animation
+      _isShellFadingIn = _isShellFadingOut = false;
+   }
 
-			if (_isShellFadingIn || _isShellFadingOut) {
+   private void onTTAllControlsEvent(final Event event) {
 
-				// stop animation
-//				_isShellFadingIn = _isShellFadingOut = false;
-			}
+      if (_shell == null || _shell.isDisposed()) {
+         return;
+      }
 
-			break;
+      switch (event.type) {
+      case SWT.KeyDown:
 
-		case SWT.MouseExit:
+         if (event.keyCode == SWT.ESC) {
+            hide();
+         }
 
-			if (_isReceiveOnMouseExit) {
+         break;
 
-				final Widget widget = event.widget;
+      case SWT.MouseEnter:
 
-				if (widget instanceof Control) {
+         if (_isShellFadingIn || _isShellFadingOut) {
 
-					final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
-					final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
+            // stop animation
+//            _isShellFadingIn = _isShellFadingOut = false;
+         }
 
-					_display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
+         break;
 
-							final MouseEvent mouseEvent = new MouseEvent(event);
-							mouseEvent.x = ownerLocation.x;
-							mouseEvent.y = ownerLocation.y;
+      case SWT.MouseExit:
 
-							onMouseExitToolTip(mouseEvent);
-						}
-					});
-				}
-			}
-			break;
+         if (_isReceiveOnMouseExit) {
 
-		case SWT.MouseMove:
+            final Widget widget = event.widget;
 
-			if (_isReceiveOnMouseMove) {
+            if (widget instanceof Control) {
 
-				final Widget widget = event.widget;
+               final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
+               final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
 
-				if (widget instanceof Control) {
+               _display.asyncExec(() -> {
 
-					final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
-					final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
+                  final MouseEvent mouseEvent = new MouseEvent(event);
+                  mouseEvent.x = ownerLocation.x;
+                  mouseEvent.y = ownerLocation.y;
 
-					_display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
+                  onMouseExitToolTip(mouseEvent);
+               });
+            }
+         }
+         break;
 
-							final MouseEvent mouseEvent = new MouseEvent(event);
-							mouseEvent.x = ownerLocation.x;
-							mouseEvent.y = ownerLocation.y;
+      case SWT.MouseMove:
 
-							onMouseMoveInToolTip(mouseEvent);
-						}
-					});
-				}
-			}
+         if (_isReceiveOnMouseMove) {
 
-			break;
-		}
-	}
+            final Widget widget = event.widget;
 
-	private void onTTAutoCloseTimer() {
+            if (widget instanceof Control) {
 
-//		System.out.println(UI.timeStampNano() + " onTTAutoCloseTimer\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+               final Point ttDisplayLocation = ((Control) widget).toDisplay(event.x, event.y);
+               final Point ownerLocation = _ownerControl.toControl(ttDisplayLocation);
 
-		final boolean isKeepOpened = onDisplayMouseMove();
+               _display.asyncExec(() -> {
 
-		if (isKeepOpened) {
+                  final MouseEvent mouseEvent = new MouseEvent(event);
+                  mouseEvent.x = ownerLocation.x;
+                  mouseEvent.y = ownerLocation.y;
 
-			// start again to check again
-			_display.timerExec(AUTO_CLOSE_INTERVAL, _ttAutoCloseTimer);
-		}
-	}
+                  onMouseMoveInToolTip(mouseEvent);
+               });
+            }
+         }
 
-	private void onTTShellEvent(final Event event) {
+         break;
+      }
+   }
 
-		switch (event.type) {
-		case SWT.Deactivate:
+   private void onTTAutoCloseTimer() {
 
-			if (_shell != null && !_shell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
+//      System.out.println(UI.timeStampNano() + " onTTAutoCloseTimer\t");
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-				_display.asyncExec(new Runnable() {
+      final boolean isKeepOpened = onDisplayMouseMove();
 
-					@Override
-					public void run() {
+      if (isKeepOpened) {
 
-						// hide tooltip when another shell is activated
+         // start again to check again
+         _display.timerExec(AUTO_CLOSE_INTERVAL, _ttAutoCloseTimer);
+      }
+   }
 
-						// check again
-						if (_shell == null
-								|| _shell.isDisposed()
-								|| _ownerControl == null
-								|| _ownerControl.isDisposed()) {
-							return;
-						}
+   private void onTTShellEvent(final Event event) {
 
-						if (// don't hide when ...
+      switch (event.type) {
+      case SWT.Deactivate:
 
-						// ... main window is active
-						_ownerControl.getShell() == _shell.getDisplay().getActiveShell()
+         if (_shell != null && !_shell.isDisposed() && _ownerControl != null && !_ownerControl.isDisposed()) {
 
-								// ... a sub shell is opened
-								|| isAnotherDialogOpened()) {
+            _display.asyncExec(() -> {
 
-							return;
-						}
+               // hide tooltip when another shell is activated
 
-						ttHide();
-					}
-				});
-			}
+               // check again
+               if (_shell == null
+                     || _shell.isDisposed()
+                     || _ownerControl == null
+                     || _ownerControl.isDisposed()) {
+                  return;
+               }
 
-			break;
+               if (// don't hide when ...
 
-		case SWT.Dispose:
+               // ... main window is active
+               _ownerControl.getShell() == _shell.getDisplay().getActiveShell()
 
-			onDispose();
+                     // ... a sub shell is opened
+                     || isAnotherDialogOpened()) {
 
-			break;
-		}
-	}
+                  return;
+               }
 
-	private void removeDisplayFilterListener() {
+               ttHide();
+            });
+         }
 
-		if (_isDisplayListenerSet == false) {
-			return;
-		}
+         break;
 
-		_display.removeFilter(SWT.MouseMove, _ttDisplayListener);
+      case SWT.Dispose:
 
-		_isDisplayListenerSet = false;
-	}
+         onDispose();
 
-	/**
-	 * Deactivate tooltip support for the underlying control
-	 */
-	private void removeOwnerControlsListener() {
+         break;
+      }
+   }
 
-		_ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
-		_ownerControl.removeListener(SWT.Resize, _ownerControlListener);
-	}
+   private void removeDisplayFilterListener() {
 
-	private void removeOwnerShellListener() {
+      if (_isDisplayListenerSet == false) {
+         return;
+      }
 
-		final Shell ownerShell = _ownerControl.getShell();
+      _display.removeFilter(SWT.MouseMove, _ttDisplayListener);
 
-		ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
-		ownerShell.removeListener(SWT.Move, _ownerShellListener);
-	}
+      _isDisplayListenerSet = false;
+   }
 
-	protected void setBehaviourOnMouseOver(final int mouseOverBehaviour) {
-		_mouseOverBehaviour = mouseOverBehaviour;
-	}
+   /**
+    * Deactivate tooltip support for the underlying control
+    */
+   private void removeOwnerControlsListener() {
 
-	public void setFadeInDelayTime(final int delayTimeInMS) {
-		_fadeInDelaySteps = delayTimeInMS / FADE_TIME_INTERVAL;
-	}
+      _ownerControl.removeListener(SWT.Dispose, _ownerControlListener);
+      _ownerControl.removeListener(SWT.Resize, _ownerControlListener);
+   }
 
-	public void setFadeInSteps(final int fadeInSteps) {
-		_fadeInSteps = fadeInSteps;
-	}
+   private void removeOwnerShellListener() {
 
-	public void setFadeOutDelaySteps(final int fadeOutDelaySteps) {
-		_fadeOutDelaySteps = fadeOutDelaySteps;
-	}
+      final Shell ownerShell = _ownerControl.getShell();
 
-	public void setFadeOutSteps(final int fadeOutSteps) {
-		_fadeOutSteps = fadeOutSteps;
-	}
+      ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
+      ownerShell.removeListener(SWT.Move, _ownerShellListener);
+   }
 
-	/**
-	 * When <code>true</code> (default) the tooltip will be moved from the previous location to the
-	 * current location.
-	 */
-	public void setIsAnimateLocation(final boolean isAnimateLocation) {
-		_isAnimateLocation = isAnimateLocation;
-	}
+   protected void setBehaviourOnMouseOver(final int mouseOverBehaviour) {
+      _mouseOverBehaviour = mouseOverBehaviour;
+   }
 
-	/**
-	 * @param isAnotherDialogOpened
-	 *            When <code>true</code> then this tooltip will not be closed until
-	 *            <code>false</code> is set.
-	 *            <p>
-	 *            This is used to keep the tooltip opened until a subshell is closed which were
-	 *            opened in the tooltip.
-	 */
-	public void setIsAnotherDialogOpened(final boolean isAnotherDialogOpened) {
-		_isAnotherDialogOpened = isAnotherDialogOpened;
-	}
+   public void setFadeInDelayTime(final int delayTimeInMS) {
+      _fadeInDelaySteps = delayTimeInMS / FADE_TIME_INTERVAL;
+   }
 
-	public void setIsFixedBottomLocation(final boolean isFixedBottomLocation) {
-		_isFixedBottomLocation = isFixedBottomLocation;
-	}
+   public void setFadeInSteps(final int fadeInSteps) {
+      _fadeInSteps = fadeInSteps;
+   }
 
-	public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
-		_isKeepToolTipOpenWhenResizedOrMoved = isKeepShellOpenWhenMoved;
-	}
+   public void setFadeOutDelaySteps(final int fadeOutDelaySteps) {
+      _fadeOutDelaySteps = fadeOutDelaySteps;
+   }
 
-	/**
-	 * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
-	 * which creates a border. Set <code>false</code> to hide the border.
-	 */
-	public void setIsShowShellTrimStyle(final boolean isShowShellTrimStyle) {
-		_isShowShellTrimStyle = isShowShellTrimStyle;
-	}
+   public void setFadeOutSteps(final int fadeOutSteps) {
+      _fadeOutSteps = fadeOutSteps;
+   }
 
-	public void setReceiveMouseExitEvent(final boolean isReceive) {
-		_isReceiveOnMouseExit = isReceive;
-	}
+   /**
+    * When <code>true</code> (default) the tooltip will be moved from the previous location to the
+    * current location.
+    */
+   public void setIsAnimateLocation(final boolean isAnimateLocation) {
+      _isAnimateLocation = isAnimateLocation;
+   }
 
-	public void setReceiveMouseMoveEvent(final boolean isReceive) {
-		_isReceiveOnMouseMove = isReceive;
-	}
+   /**
+    * @param isAnotherDialogOpened
+    *           When <code>true</code> then this tooltip will not be closed until
+    *           <code>false</code> is set.
+    *           <p>
+    *           This is used to keep the tooltip opened until a subshell is closed which were
+    *           opened in the tooltip.
+    */
+   public void setIsAnotherDialogOpened(final boolean isAnotherDialogOpened) {
+      _isAnotherDialogOpened = isAnotherDialogOpened;
+   }
 
-	private void setShellAlpha(final Shell shell, final int alpha) {
+   public void setIsFixedBottomLocation(final boolean isFixedBottomLocation) {
+      _isFixedBottomLocation = isFixedBottomLocation;
+   }
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tshell: " + _shell.hashCode())
-//				+ ("\tsetShellAlpha: " + alpha));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+   public void setIsKeepShellOpenWhenMoved(final boolean isKeepShellOpenWhenMoved) {
+      _isKeepToolTipOpenWhenResizedOrMoved = isKeepShellOpenWhenMoved;
+   }
 
-		shell.setAlpha(alpha);
-	}
+   /**
+    * When <code>true</code> (default) the shell trim style is used to create the tooltip shell
+    * which creates a border. Set <code>false</code> to hide the border.
+    */
+   public void setIsShowShellTrimStyle(final boolean isShowShellTrimStyle) {
+      _isShowShellTrimStyle = isShowShellTrimStyle;
+   }
 
-	private void setShellVisible(final boolean isVisible) {
+   public void setReceiveMouseExitEvent(final boolean isReceive) {
+      _isReceiveOnMouseExit = isReceive;
+   }
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tshell: " + _shell.hashCode())
-//				+ ("\tsetShellVisible: " + isVisible));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+   public void setReceiveMouseMoveEvent(final boolean isReceive) {
+      _isReceiveOnMouseMove = isReceive;
+   }
 
-		if (isVisible) {
+   private void setShellAlpha(final Shell shell, final int alpha) {
 
-			// show tooltip
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tshell: " + _shell.hashCode())
+//            + ("\tsetShellAlpha: " + alpha));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-			_shell.setVisible(true);
+      shell.setAlpha(alpha);
+   }
 
-			addDisplayFilterListener();
+   private void setShellVisible(final boolean isVisible) {
 
-		} else {
+//      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tshell: " + _shell.hashCode())
+//            + ("\tsetShellVisible: " + isVisible));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-			// hide tooltip
+      if (isVisible) {
 
-			beforeHideToolTip();
+         // show tooltip
 
-			_shell.setVisible(false);
+         _shell.setVisible(true);
 
-			removeDisplayFilterListener();
+         addDisplayFilterListener();
 
-			if (closeShellAfterHidden()) {
-				close();
-			}
-		}
-	}
+      } else {
 
-	/**
-	 * Set's the tooltip style, default is
-	 * {@link AnimatedToolTipShell#TOOLTIP_STYLE_RECREATE_CONTENT}.
-	 * 
-	 * @param toolTipStyle
-	 *            This is the style how the tooltip content is created.
-	 *            <p>
-	 *            Possible values:<br>
-	 *            {@link AnimatedToolTipShell#TOOLTIP_STYLE_RECREATE_CONTENT}
-	 *            {@link AnimatedToolTipShell#TOOLTIP_STYLE_KEEP_CONTENT}
-	 */
-	protected void setToolTipCreateStyle(final int toolTipStyle) {
-		_toolTipStyle = toolTipStyle;
-	}
+         // hide tooltip
 
-	private void showShellWhenVisible() {
+         beforeHideToolTip();
 
-		if (_isKeepToolTipOpenWhenResizedOrMoved == false) {
-			return;
-		}
+         _shell.setVisible(false);
 
-		if (isShellHidden()) {
-			return;
-		}
+         removeDisplayFilterListener();
 
-		ttShow();
-	}
+         if (closeShellAfterHidden()) {
+            close();
+         }
+      }
+   }
 
-	protected void showToolTip() {
+   /**
+    * Set's the tooltip style, default is
+    * {@link AnimatedToolTipShell#TOOLTIP_STYLE_RECREATE_CONTENT}.
+    *
+    * @param toolTipStyle
+    *           This is the style how the tooltip content is created.
+    *           <p>
+    *           Possible values:<br>
+    *           {@link AnimatedToolTipShell#TOOLTIP_STYLE_RECREATE_CONTENT}
+    *           {@link AnimatedToolTipShell#TOOLTIP_STYLE_KEEP_CONTENT}
+    */
+   protected void setToolTipCreateStyle(final int toolTipStyle) {
+      _toolTipStyle = toolTipStyle;
+   }
 
-		/*
-		 * show tooltip only when this is the active shell, this check is necessary that when a tour
-		 * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
-		 * the tour chart view is also displayed
-		 */
-//		if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
-//			return false;
-//		}
+   private void showShellWhenVisible() {
 
-		createUI();
+      if (_isKeepToolTipOpenWhenResizedOrMoved == false) {
+         return;
+      }
 
-		ttShow();
-	}
+      if (isShellHidden()) {
+         return;
+      }
 
-	private void ttHide() {
+      ttShow();
+   }
 
-		if (isShellHidden()) {
-			return;
-		}
+   protected void showToolTip() {
 
-		// prevent closing when a sub shell is opened
-		if (isAnotherDialogOpened()) {
-			return;
-		}
+      /*
+       * show tooltip only when this is the active shell, this check is necessary that when a tour
+       * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in
+       * the tour chart view is also displayed
+       */
+//      if (_display.getActiveShell() != _ownerControl.getShell() || _ownerControl.isVisible() == false) {
+//         return false;
+//      }
 
-		if (_fadeInDelayCounter < _fadeInDelaySteps) {
+      createUI();
 
-			// fading in have not yet started -> hide shell
-			setShellVisible(false);
+      ttShow();
+   }
 
-			return;
-		}
+   private void ttHide() {
 
-		if (_isShellFadingOut) {
+      if (isShellHidden()) {
+         return;
+      }
 
-			// shell is already fading out
-			return;
-		}
+      // prevent closing when a sub shell is opened
+      if (isAnotherDialogOpened()) {
+         return;
+      }
 
-		// shell is not yet fading out
+      if (_fadeInDelayCounter < _fadeInDelaySteps) {
 
-		_isShellFadingIn = false;
-		_isShellFadingOut = true;
+         // fading in have not yet started -> hide shell
+         setShellVisible(false);
 
-		animation10_Start();
-	}
+         return;
+      }
 
-	private void ttShow() {
+      if (_isShellFadingOut) {
 
-		// shell is not yet fading in
+         // shell is already fading out
+         return;
+      }
 
-		if (canShowToolTip() == false) {
+      // shell is not yet fading out
 
-			return;
-		}
+      _isShellFadingIn = false;
+      _isShellFadingOut = true;
 
-		// ensure tooltip is closed when mouse is not hovering the tooltip or application
-		_display.timerExec(AUTO_CLOSE_INTERVAL, _ttAutoCloseTimer);
+      animation10_Start();
+   }
 
-		_isShellFadingIn = true;
-		_isShellFadingOut = false;
+   private void ttShow() {
 
-		animation10_Start();
-	}
+      // shell is not yet fading in
+
+      if (canShowToolTip() == false) {
+
+         return;
+      }
+
+      // ensure tooltip is closed when mouse is not hovering the tooltip or application
+      _display.timerExec(AUTO_CLOSE_INTERVAL, _ttAutoCloseTimer);
+
+      _isShellFadingIn = true;
+      _isShellFadingOut = false;
+
+      animation10_Start();
+   }
 
 }

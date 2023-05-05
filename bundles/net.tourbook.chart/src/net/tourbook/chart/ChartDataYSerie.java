@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class ChartDataYSerie extends ChartDataSerie {
 
-   static final double            FLOAT_ZERO                        = 0.0001;
+   static final double            FLOAT_ALMOST_ZERO                 = 0.0001;
 
    /**
     * the bars has only a low and high value
@@ -39,26 +39,26 @@ public class ChartDataYSerie extends ChartDataSerie {
     */
    public static final int        BAR_LAYOUT_BESIDE                 = 3;
 
-   public static final String     YDATA_INFO                        = "yDataInfo";                 //$NON-NLS-1$
+   public static final String     YDATA_INFO                        = "yDataInfo";                //$NON-NLS-1$
 
    public static final int        FILL_METHOD_NO                    = 0;
-
    public static final int        FILL_METHOD_FILL_BOTTOM           = 1;
-
    public static final int        FILL_METHOD_FILL_ZERO             = 2;
-
    public static final int        FILL_METHOD_FILL_BOTTOM_NO_BORDER = 3;
    public static final int        FILL_METHOD_CUSTOM                = 100;
+
    public static final int        BAR_DRAW_METHOD_BOTTOM            = 200;
+
    /**
     * Slider label format: n.1
     */
    public static final int        SLIDER_LABEL_FORMAT_DEFAULT       = 0;
+
    /**
     * Slider label format: mm:ss
     */
    public static final int        SLIDER_LABEL_FORMAT_MM_SS         = 1;
-   
+
    /**
     * Contains the values for the chart, highValues contains the upper value, lowValues the lower
     * value. When lowValues is null then the low values is set to 0
@@ -79,7 +79,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    private int                    _graphFillMethod                  = FILL_METHOD_FILL_BOTTOM;
 
-   private boolean                _isShowYSlider                    = false;
+   private boolean                _isShowYSlider;
 
    /**
     * This value is set when a y-slider is dragged
@@ -88,8 +88,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    /**
     * <p>
-    * true: the direction is from bottom to top by increasing number <br>
-    * false: the direction is from top to bottom by increasing number
+    * <code>true</code>: The direction is from bottom to top by increasing number <br>
+    * <code>false</code>: The direction is from top to bottom by increasing number
     */
    private boolean                _yAxisDirection                   = true;
 
@@ -124,6 +124,17 @@ public class ChartDataYSerie extends ChartDataSerie {
    private boolean                _isIgnoreMinMaxZero;
 
    /**
+    * When <code>false</code> which is the default and the historic behavior, then 0 values are
+    * ignored when visible min/max values are set
+    */
+   protected boolean              isSetVisibleMinMax_0_Values;
+
+   /**
+    * When <code>true</code> then a bar with 1x1 pixel is displayed with 3x3 pixel
+    */
+   private boolean                _isShowBarsMoreVisible;
+
+   /**
     * When this value is > 0 a line chart will not draw a line to the next value point when the
     * difference in the x-data values is greater than this value.
     * <p>
@@ -150,6 +161,14 @@ public class ChartDataYSerie extends ChartDataSerie {
    public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
 
       _chartType = chartType;
+
+      setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
+   }
+
+   public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie, final boolean isIgnoreZero) {
+
+      _chartType = chartType;
+      _isIgnoreMinMaxZero = isIgnoreZero;
 
       setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
    }
@@ -222,9 +241,11 @@ public class ChartDataYSerie extends ChartDataSerie {
     * @return Returns the valueColors.
     */
    public int[][] getColorsIndex() {
+
       if (_colorIndex == null || _colorIndex.length == 0 || _colorIndex[0] == null || _colorIndex[0].length == 0) {
          setAllValueColors(0);
       }
+
       return _colorIndex;
    }
 
@@ -268,7 +289,7 @@ public class ChartDataYSerie extends ChartDataSerie {
                   continue;
                }
 
-               if (value < -FLOAT_ZERO || value > FLOAT_ZERO) {
+               if (value < -FLOAT_ALMOST_ZERO || value > FLOAT_ALMOST_ZERO) {
                   return value;
                }
             }
@@ -408,6 +429,10 @@ public class ChartDataYSerie extends ChartDataSerie {
       return _isIgnoreMinMaxZero;
    }
 
+   public boolean isShowBarsMoreVisible() {
+      return _isShowBarsMoreVisible;
+   }
+
    /**
     * @return Returns the showYSlider.
     */
@@ -417,8 +442,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    /**
     * <p>
-    * true: the direction is from bottom to top by increasing number <br>
-    * false: the direction is from top to bottom by increasing number
+    * <code>true</code>: the direction is from bottom to top by increasing number <br>
+    * <code>false</code>: the direction is from top to bottom by increasing number
     */
    public boolean isYAxisDirection() {
       return _yAxisDirection;
@@ -502,12 +527,13 @@ public class ChartDataYSerie extends ChartDataSerie {
          _highValuesFloat = valueSeries;
 
          if (_chartType == ChartType.LINE
+               || _chartType == ChartType.DOT
                || _chartType == ChartType.LINE_WITH_BARS
                || _chartType == ChartType.HORIZONTAL_BAR
                || _chartType == ChartType.XY_SCATTER
                || _chartType == ChartType.HISTORY) {
 
-            setMinMaxValuesLine(valueSeries);
+            setMinMaxValues_Line(valueSeries);
 
          } else {
 
@@ -518,54 +544,7 @@ public class ChartDataYSerie extends ChartDataSerie {
             _visibleMaxValue = _visibleMinValue = firstValue;
 
             if (_chartType == ChartType.BAR) {
-
-               switch (_chartLayout) {
-               case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
-               case ChartDataYSerie.BAR_LAYOUT_BESIDE:
-
-                  // get the min/max highValues for all data
-                  for (final float[] valuesOuter : valueSeries) {
-                     for (final float value : valuesOuter) {
-
-                        if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
-                           continue;
-                        }
-
-                        _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
-                        _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
-                     }
-                  }
-
-                  break;
-
-               case ChartDataYSerie.BAR_LAYOUT_STACKED:
-
-                  final float serieMax[] = new float[valueSeries[0].length];
-
-                  // get the max value for the data which are stacked on each
-                  // other
-                  for (final float[] valuesOuter : valueSeries) {
-                     for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
-
-                        final float outerValue = valuesOuter[valueIndex];
-                        final float outerValueWithMax = serieMax[valueIndex] + outerValue;
-
-                        serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
-                              ? _visibleMaxValue
-                              : outerValueWithMax);
-
-                        _visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
-                     }
-                  }
-
-                  // get max for all series
-                  _visibleMaxValue = 0;
-                  for (final float serieValue : serieMax) {
-                     _visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
-                  }
-
-                  break;
-               }
+               setMinMaxValues_Bar(valueSeries);
             }
 
             _originalMinValue = _visibleMinValue;
@@ -597,6 +576,8 @@ public class ChartDataYSerie extends ChartDataSerie {
          _visibleMinValue = lowValues[0][0];
          _visibleMaxValue = highValues[0][0];
 
+         boolean isMinValueSet = false;
+
          if (_chartType == ChartType.LINE
                || (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
                || (_chartType == ChartType.BAR && _chartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
@@ -604,13 +585,37 @@ public class ChartDataYSerie extends ChartDataSerie {
             // get the min/max values for all data
             for (final float[] valueSerie : highValues) {
                for (final float value : valueSerie) {
+
+                  if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+                     continue;
+                  }
+
                   _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
                }
             }
 
             for (final float[] valueSerie : lowValues) {
                for (final float value : valueSerie) {
-                  _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+
+                  if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+
+                     // value is 0
+
+                     continue;
+                  }
+
+                  if (isMinValueSet == false) {
+
+                     // overwrite initial value which could be 0 but 0 values could be ignored
+
+                     isMinValueSet = true;
+
+                     _visibleMinValue = value;
+
+                  } else {
+
+                     _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+                  }
                }
             }
 
@@ -648,7 +653,59 @@ public class ChartDataYSerie extends ChartDataSerie {
       }
    }
 
-   private void setMinMaxValuesLine(final float[][] valueSeries) {
+   private void setMinMaxValues_Bar(final float[][] valueSeries) {
+
+      switch (_chartLayout) {
+
+      case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
+      case ChartDataYSerie.BAR_LAYOUT_BESIDE:
+
+         // get the min/max highValues for all data
+         for (final float[] valuesOuter : valueSeries) {
+            for (final float value : valuesOuter) {
+
+               if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
+                  continue;
+               }
+
+               _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+               _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
+            }
+         }
+
+         break;
+
+      case ChartDataYSerie.BAR_LAYOUT_STACKED:
+
+         final float[] serieMax = new float[valueSeries[0].length];
+
+         // get the max value for the data which are stacked on each
+         // other
+         for (final float[] valuesOuter : valueSeries) {
+            for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
+
+               final float outerValue = valuesOuter[valueIndex];
+               final float outerValueWithMax = serieMax[valueIndex] + outerValue;
+
+               serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
+                     ? _visibleMaxValue
+                     : outerValueWithMax);
+
+               _visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
+            }
+         }
+
+         // get max for all series
+         _visibleMaxValue = 0;
+         for (final float serieValue : serieMax) {
+            _visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
+         }
+
+         break;
+      }
+   }
+
+   private void setMinMaxValues_Line(final float[][] valueSeries) {
 
       if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
@@ -682,7 +739,7 @@ public class ChartDataYSerie extends ChartDataSerie {
             for (final float value : valueSerie) {
 
                if (value != value) {
-                  // ignore Nan
+                  // ignore NaN
                   continue;
                }
 
@@ -691,7 +748,7 @@ public class ChartDataYSerie extends ChartDataSerie {
                   continue;
                }
 
-               if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
+               if (_isIgnoreMinMaxZero && (value > -FLOAT_ALMOST_ZERO && value < FLOAT_ALMOST_ZERO)) {
                   // ignore zero
                   continue;
                }
@@ -726,6 +783,19 @@ public class ChartDataYSerie extends ChartDataSerie {
       }
    }
 
+   public void setSetMinMax_0Values(final boolean isSetMinMax_0Values) {
+      this.isSetVisibleMinMax_0_Values = isSetMinMax_0Values;
+   }
+
+   /**
+    * Show bar charts more visible, a bar with 1x1 pixel is displayed with 3x3 pixel
+    *
+    * @param isShowBarsMoreVisible
+    */
+   public void setShowBarsMoreVisible(final boolean isShowBarsMoreVisible) {
+      _isShowBarsMoreVisible = isShowBarsMoreVisible;
+   }
+
    /**
     * show the y-sliders for the chart
     *
@@ -752,10 +822,10 @@ public class ChartDataYSerie extends ChartDataSerie {
    }
 
    /**
-    * set the direction for the y axis <code>
-    * true: the direction is from bottom to top by increasing number
-    * false: the direction is from top to bottom by increasing number
-    * </code>
+    * Set the direction for the y axis
+    * <p>
+    * <code>true</code>: The direction is from bottom to top by increasing number<br>
+    * <code>false</code>: The direction is from top to bottom by increasing number
     *
     * @param axisDirection
     */
@@ -773,7 +843,23 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    @Override
    public String toString() {
-      return "[ChartDataYSerie]";//$NON-NLS-1$
+
+      return "ChartDataYSerie\n" //$NON-NLS-1$
+
+            + "[\n" //$NON-NLS-1$
+
+            + "_originalMinValue =" + _originalMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_originalMaxValue =" + _originalMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "_visibleMinValue  =" + _visibleMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_visibleMaxValue  =" + _visibleMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "_isForceMinValue  =" + _isForceMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_isForceMaxValue  =" + _isForceMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_visibleMinValueForced=" + _visibleMinValueForced + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_visibleMaxValueForced=" + _visibleMaxValueForced //$NON-NLS-1$
+
+            + "\n]"; //$NON-NLS-1$
    }
 
 }

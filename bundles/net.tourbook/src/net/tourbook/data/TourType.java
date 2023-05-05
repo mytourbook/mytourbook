@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,13 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,239 +29,277 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import org.eclipse.swt.graphics.RGB;
-
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.database.TourDatabase;
 
+import org.eclipse.swt.graphics.RGB;
+
 @Entity
-public class TourType implements Comparable<Object> {
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "typeId")
+public class TourType implements Comparable<Object>, Serializable {
 
-	public static final int		DB_LENGTH_NAME									= 100;
+   private static final long          serialVersionUID                      = 1L;
 
-	/** Width/height of the tour type image. */
-	public static final int		TOUR_TYPE_IMAGE_SIZE							= 16;
+   private static final char          NL                                    = UI.NEW_LINE;
 
-	/** Color which is transparent in the tour type image. */
-	public static final RGB		TRANSPARENT_COLOR								= new RGB(0x01, 0xfe, 0x00);
+   public static final int            DB_LENGTH_NAME                        = 100;
 
-	public static final long	IMAGE_KEY_DIALOG_SELECTION					= -2;
+   /** Width/height of the tour type image. */
+   public static final int            TOUR_TYPE_IMAGE_SIZE                  = 16;
 
-	/**
-	 * Must be below 0 because a tour type can have a 0 id.
-	 */
-	public static final long	TOUR_TYPE_IS_NOT_USED						= -10;
+   public static final long           IMAGE_KEY_DIALOG_SELECTION            = -2;
 
-	/**
-	 * Must be below 0 because a tour type can have a 0 id.
-	 */
-	public static final long	TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA	= -20;
+   /**
+    * Must be below 0 because a tour type can have a 0 id.
+    */
+   public static final long           TOUR_TYPE_IS_NOT_USED                 = -10;
 
-	/**
-	 * manually created marker or imported marker create a unique id to identify them, saved marker
-	 * are compared with the marker id
-	 */
-	private static int			_createCounter									= 0;
+   /**
+    * Must be below 0 because a tour type can have a 0 id.
+    */
+   public static final long           TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA = -20;
 
-	/**
-	 * contains the entity id
-	 */
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					typeId											= TourDatabase.ENTITY_IS_NOT_SAVED;
+   /**
+    * Manually created marker or imported marker create a unique id to identify them, saved marker
+    * are compared with the marker id
+    */
+   private static final AtomicInteger _createCounter                        = new AtomicInteger();
 
-	@Basic(optional = false)
-	private String					name;
-	private short					colorBrightRed;
-	private short					colorBrightGreen;
+   /**
+    * Contains the entity id
+    */
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
+   private long                       typeId                                = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	private short					colorBrightBlue;
-	private short					colorDarkRed;
-	private short					colorDarkGreen;
+   @Basic(optional = false)
+   @JsonProperty
+   private String                     name;
 
-	private short					colorDarkBlue;
-	private short					colorLineRed;
-	private short					colorLineGreen;
+   private int                        color_Gradient_Bright;
+   private int                        color_Gradient_Dark;
 
-	private short					colorLineBlue;
-	private short					colorTextRed;
-	private short					colorTextGreen;
+   private int                        color_Line_LightTheme;
+   private int                        color_Line_DarkTheme;
 
-	private short					colorTextBlue;
+   private int                        color_Text_LightTheme;
+   private int                        color_Text_DarkTheme;
 
-	/**
-	 * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
-	 * persisted
-	 */
-	@Transient
-	private long					_createId										= 0;
+   /**
+    * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
+    * persisted
+    */
+   @Transient
+   private long                       _createId                             = 0;
 
-	/**
-	 * default constructor used in ejb
-	 */
-	public TourType() {}
+   /**
+    * Default constructor used in ejb
+    */
+   public TourType() {}
 
-	public TourType(final String name) {
+   public TourType(final String name) {
 
-		this.name = name;
+      this.name = name;
 
-		_createId = ++_createCounter;
-	}
+      _createId = _createCounter.incrementAndGet();
+   }
 
-	@Override
-	public int compareTo(final Object other) {
+   @Override
+   public int compareTo(final Object other) {
 
-		// default sorting for tour types is by name
+      // default sorting for tour types is by name
 
-		if (other instanceof TourType) {
-			final TourType otherTourType = (TourType) other;
-			return name.compareTo(otherTourType.getName());
-		}
+      if (other instanceof TourType) {
+         final TourType otherTourType = (TourType) other;
+         return name.compareTo(otherTourType.getName());
+      }
 
-		return 0;
-	}
+      return 0;
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
-		final TourType other = (TourType) obj;
+      final TourType other = (TourType) obj;
 
-		if (_createId == 0) {
+      if (_createId == 0) {
 
-			// tour type is from the database
-			if (typeId != other.typeId) {
-				return false;
-			}
-		} else {
+         // tour type is from the database
+         if (typeId != other.typeId) {
+            return false;
+         }
+      } else {
 
-			// tour type was create or imported
-			if (_createId != other._createId) {
-				return false;
-			}
-		}
+         // tour type was create or imported
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	public long getCreateId() {
-		return _createId;
-	}
+   public int getColorLine_Dark() {
+      return color_Line_DarkTheme;
+   }
 
-	/**
-	 * @return Returns the name for the tour type
-	 */
-	public String getName() {
-		return name;
-	}
+   public int getColorText_Dark() {
+      return color_Text_DarkTheme;
+   }
 
-	public RGB getRGBBright() {
+   public long getCreateId() {
+      return _createId;
+   }
 
-//		final int red = (colorBrightRed + colorDarkRed) / 2;
-//		final int green = (colorBrightGreen + colorDarkGreen) / 2;
-//		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
-//
-//		return new RGB(red, green, blue);
+   /**
+    * @return Returns the name for the tour type
+    */
+   public String getName() {
+      return name;
+   }
 
-		return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
-	}
+   public RGB getRGB_Gradient_Bright() {
+      return ColorUtil.createRGB(color_Gradient_Bright);
+   }
 
-	public RGB getRGBDark() {
+   public RGB getRGB_Gradient_Dark() {
+      return ColorUtil.createRGB(color_Gradient_Dark);
+   }
 
-//		final int red = (colorBrightRed + colorDarkRed) / 2;
-//		final int green = (colorBrightGreen + colorDarkGreen) / 2;
-//		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
-//
-//		return new RGB(red, green, blue);
+   public RGB getRGB_Line_DarkTheme() {
+      return ColorUtil.createRGB(color_Line_DarkTheme);
+   }
 
-		return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
-	}
+   public RGB getRGB_Line_LightTheme() {
+      return ColorUtil.createRGB(color_Line_LightTheme);
+   }
 
-	public RGB getRGBLine() {
-		return new RGB(colorLineRed, colorLineGreen, colorLineBlue);
-	}
+   public RGB getRGB_Line_Themed() {
 
-	public RGB getRGBText() {
-		return new RGB(colorTextRed, colorTextGreen, colorTextBlue);
-	}
+      return UI.IS_DARK_THEME
+            ? getRGB_Line_DarkTheme()
+            : getRGB_Line_LightTheme();
+   }
 
-	/**
-	 * @return Returns the type id, this can be the saved type id or
-	 *         {@link TourDatabase#ENTITY_IS_NOT_SAVED}
-	 */
-	public long getTypeId() {
-		return typeId;
-	}
+   public RGB getRGB_Text_DarkTheme() {
+      return ColorUtil.createRGB(color_Text_DarkTheme);
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		result = prime * result + (int) (typeId ^ (typeId >>> 32));
-		return result;
-	}
+   public RGB getRGB_Text_LightTheme() {
+      return ColorUtil.createRGB(color_Text_LightTheme);
+   }
 
-	public void setColorBright(final RGB rgbBright) {
-		colorBrightRed = (short) rgbBright.red;
-		colorBrightGreen = (short) rgbBright.green;
-		colorBrightBlue = (short) rgbBright.blue;
-	}
+   public RGB getRGB_Text_Themed() {
 
-	public void setColorDark(final RGB rgbDark) {
-		colorDarkRed = (short) rgbDark.red;
-		colorDarkGreen = (short) rgbDark.green;
-		colorDarkBlue = (short) rgbDark.blue;
-	}
+      return UI.IS_DARK_THEME
+            ? getRGB_Text_DarkTheme()
+            : getRGB_Text_LightTheme();
+   }
 
-	public void setColorLine(final RGB rgbLine) {
-		colorLineRed = (short) rgbLine.red;
-		colorLineGreen = (short) rgbLine.green;
-		colorLineBlue = (short) rgbLine.blue;
-	}
+   /**
+    * @return Returns the type id, this can be the saved type id or
+    *         {@link TourDatabase#ENTITY_IS_NOT_SAVED}
+    */
+   public long getTypeId() {
+      return typeId;
+   }
 
-	/**
-	 * @param bright
-	 * @param dark
-	 * @param line
-	 * @param text
-	 */
-	public void setColors(final RGB bright, final RGB dark, final RGB line, final RGB text) {
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_createId ^ (_createId >>> 32));
+      result = prime * result + (int) (typeId ^ (typeId >>> 32));
+      return result;
+   }
 
-		setColorBright(bright);
-		setColorDark(dark);
-		setColorLine(line);
-		setColorText(text);
-	}
+   /**
+    * Set bright gradient background color
+    *
+    * @param rgbBright
+    */
+   public void setColor_Gradient_Bright(final RGB rgbBright) {
 
-	public void setColorText(final RGB rgbText) {
-		colorTextRed = (short) rgbText.red;
-		colorTextGreen = (short) rgbText.green;
-		colorTextBlue = (short) rgbText.blue;
-	}
+      color_Gradient_Bright = ColorUtil.getColorValue(rgbBright);
+   }
 
-	public void setName(final String name) {
-		this.name = name;
-	}
+   /**
+    * Set dark gradient background color
+    *
+    * @param rgbDark
+    */
+   public void setColor_Gradient_Dark(final RGB rgbDark) {
 
-	/**
-	 * This is a very special case for a not saved tour type
-	 */
-	public void setTourId_NotDefinedInTourData() {
+      color_Gradient_Dark = ColorUtil.getColorValue(rgbDark);
+   }
 
-		typeId = TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA;
-	}
+   public void setColor_Line(final RGB rgbLine_Light, final RGB rgbLine_Dark) {
 
-	@Override
-	public String toString() {
-		return "TourType [typeId=" + typeId + ", name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
+      color_Line_LightTheme = ColorUtil.getColorValue(rgbLine_Light);
+      color_Line_DarkTheme = ColorUtil.getColorValue(rgbLine_Dark);
+   }
+
+   public void setColor_Text(final RGB rgbText_Light, final RGB rgbText_Dark) {
+
+      color_Text_LightTheme = ColorUtil.getColorValue(rgbText_Light);
+      color_Text_DarkTheme = ColorUtil.getColorValue(rgbText_Dark);
+   }
+
+   /**
+    * @param gradient_Bright
+    *           Gradient bright color
+    * @param gradient_Dark
+    *           Gradient dark color
+    * @param line_LightTheme
+    * @param line_DarkTheme
+    * @param text_LightTheme
+    * @param text_DarkTheme
+    */
+   public void setColors(final RGB gradient_Bright,
+                         final RGB gradient_Dark,
+
+                         final RGB line_LightTheme,
+                         final RGB line_DarkTheme,
+
+                         final RGB text_LightTheme,
+                         final RGB text_DarkTheme) {
+
+      setColor_Gradient_Bright(gradient_Bright);
+      setColor_Gradient_Dark(gradient_Dark);
+
+      setColor_Line(line_LightTheme, line_DarkTheme);
+      setColor_Text(text_LightTheme, text_DarkTheme);
+   }
+
+   public void setName(final String name) {
+      this.name = name;
+   }
+
+   /**
+    * This is a very special case for a not saved tour type
+    */
+   public void setTourId_NotDefinedInTourData() {
+
+      typeId = TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TourType [typeId=" + typeId + ", name=" + name + "]" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      ;
+   }
 
 }

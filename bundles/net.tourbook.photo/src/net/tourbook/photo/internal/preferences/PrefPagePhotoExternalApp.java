@@ -16,8 +16,8 @@
 package net.tourbook.photo.internal.preferences;
 
 import net.tourbook.common.UI;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -40,7 +40,7 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
 
 	public static final String			ID			= "net.tourbook.preferences.PrefPagePhotoExternalAppID";	//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore	= Activator.getDefault().getPreferenceStore();
+	private final IPreferenceStore		_prefStore	= PhotoActivator.getPrefStore();
 
 	/*
 	 * UI controls

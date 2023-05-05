@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="reset-workspace" default="reset-workspace" basedir=".">
+
+	<!-- Source: https://tonyyan.wordpress.com/2017/03/10/integrate-git-into-ant-targets/ -->
+	
+   <target name="reset-workspace">
+
+      <echo message="GIT_EXE_PATH: ${GIT_EXE_PATH}"  />
+      <echo message="LOCAL_PATH:   ${LOCAL_PATH}"    />
+
+      <delete>
+         <fileset dir="workspace" includes="**/*"    />
+      </delete>
+
+      <!--
+         
+         git restore -source=HEAD -staged -worktree - workspace
+
+      -->
+      <git command = "restore">
+         <args>
+            <arg value = "--source=HEAD"  />
+            <arg value = "--staged"       />
+            <arg value = "--worktree"     />
+            <arg value = "workspace"      />    <!-- pathspec -->
+         </args>
+      </git> 
+   </target>
+
+   <!-- 
+         Define a macro to run a git command
+   -->
+   <macrodef name = "git">
+
+      <attribute name = "command"                  />
+      <attribute name = "dir"  default  = ""       />
+
+      <element   name = "args" optional = "true"   />
+
+      <sequential>
+         <echo message    = "git @{command}"       />
+         <exec executable = "${GIT_EXE_PATH}" 
+               dir        = "${LOCAL_PATH}"        >
+            <arg value    = "@{command}"           />
+            <args/>
+         </exec>
+      </sequential>
+   </macrodef>   
+
+</project>

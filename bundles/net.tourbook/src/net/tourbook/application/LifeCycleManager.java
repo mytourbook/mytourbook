@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ public class LifeCycleManager {
 
    @PostContextCreate
    void postContextCreate3(final IEventBroker eventBroker,
-                           final IApplicationContext context,
+                           final IApplicationContext appContext,
                            final IEclipseContext workbenchContext) {
 
       /*
@@ -57,7 +57,7 @@ public class LifeCycleManager {
       });
 
       // close static splash screen
-      context.applicationRunning();
+      appContext.applicationRunning();
    }
 
 }

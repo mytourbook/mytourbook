@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.application.TourbookPlugin;
@@ -32,6 +35,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -40,15 +45,18 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DaumErgoBikeDataReader extends TourbookDevice {
 
-   private static final String DAUM_ERGO_BIKE_CSV_ID =
+   private static final String            DAUM_ERGO_BIKE_CSV_ID =
          "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;Training Type;Training Value;Pulse Time 1;2;3;4;5;6"; //$NON-NLS-1$
 
-   private static final String CSV_STRING_TOKEN      = ";";                                                                                                                        //$NON-NLS-1$
+   private static final String            CSV_STRING_TOKEN      = ";";                                                                                                             //$NON-NLS-1$
 
-   private DecimalFormat       _decimalFormat        = (DecimalFormat) DecimalFormat.getInstance();
+   private static final DateTimeFormatter _dateParser           = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);                                                       //$NON-NLS-1$
 
-   // plugin constructor
-   public DaumErgoBikeDataReader() {}
+   private static final IPreferenceStore  _prefStore            = TourbookPlugin.getPrefStore();
+
+   public DaumErgoBikeDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -80,10 +88,10 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
       return -1;
    }
 
-   private float parseFloat(final String stringValue) {
+   private float parseFloat(final String stringValue, final DecimalFormat decimalFormat) {
 
       try {
-         return _decimalFormat.parse(stringValue).floatValue();
+         return decimalFormat.parse(stringValue).floatValue();
       } catch (final ParseException e) {
          StatusUtil.log(e);
       }
@@ -92,88 +100,145 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//	public boolean processDeviceData(	final String importFilePath,
-//										final DeviceData deviceData,
-//										final HashMap<Long, TourData> tourDataMap) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
-      final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+      // must be local because of concurrency
+      DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
 
-      if (prefStore.getBoolean(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT)) {
+      if (_prefStore.getBoolean(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT)) {
 
          /*
-          * use customized number format
+          * Use customized number format
           */
          try {
 
-            final DecimalFormatSymbols dfs = _decimalFormat.getDecimalFormatSymbols();
+            final DecimalFormatSymbols dfs = decimalFormat.getDecimalFormatSymbols();
 
-            final String groupSep = prefStore.getString(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR);
-            final String decimalSep = prefStore.getString(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR);
+            final String groupSep = _prefStore.getString(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR);
+            final String decimalSep = _prefStore.getString(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR);
 
             dfs.setGroupingSeparator(groupSep.charAt(0));
             dfs.setDecimalSeparator(decimalSep.charAt(0));
 
-            _decimalFormat.setDecimalFormatSymbols(dfs);
+            decimalFormat.setDecimalFormatSymbols(dfs);
 
          } catch (final Exception e) {
             e.printStackTrace();
          }
+
       } else {
 
-         // use default number format
+         // Use default number format
 
-         _decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
+         decimalFormat = (DecimalFormat) DecimalFormat.getInstance();
       }
-
-      boolean returnValue = false;
 
       try (FileReader fileReader = new FileReader(importFilePath);
             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
          /*
-          * check if the file is from a Daum Ergometer
+          * Check if the file is from a Daum Ergometer
           */
          final String fileHeader = bufferedReader.readLine();
          if (fileHeader.startsWith(DAUM_ERGO_BIKE_CSV_ID) == false) {
-            return false;
+            return;
          }
 
          StringTokenizer tokenizer;
 
          /*
-          * extract data from the file name
+          * Extract data from the file name
           */
          final String fileName = new File(importFilePath).getName();
 
          //           1         2         3         4         5         6         7
          // 01234567890123456789012345678901234567890123456789012345678901234567890
-         //
-         // 0026  12_12_2007 20_35_02    1min    0_3km  Manuelles Training (Watt).csv
-         // 0031  19_12_2007 19_11_37   35min   13_5km  Coaching - 003 - 2_5.csv
-         // 0032  19_12_2007 19_46_44    1min    0_3km  Manuelles Training (Watt).csv
+         //       x  x  x    x  x  x                    x
+         // 0379  01_02_2021 19_04_08   42min   18_9km  Manuelles Training (Watt).csv
+         // 0380  03_02_2021 19_30_08   41min   18_6km  Manuelles Training (Watt).csv
+         // 0381  09_02_2021 19_12_08   42min   19_1km  Manuelles Training (Watt).csv
+         // 0382  12_02_2021 19_45_08   32min   13_9km  Manuelles Training (Watt).csv
 
-         // start date
-         final int tourDay = Integer.parseInt(fileName.substring(6, 8));
-         final int tourMonth = Integer.parseInt(fileName.substring(9, 11));
-         final int tourYear = Integer.parseInt(fileName.substring(12, 16));
+         // 0382  12 Feb 2021 19_45_08   32min   13_9km  Manuelles Training (Watt).csv
+         // 0383  16 Feb 2021 19_40_25   32min   14_4km  Manuelles Training (Watt).csv
+         // 0384  5 Mar 2021 19_20_07   42min   18_9km  Manuelles Training (Watt).csv
+         // 0385  15 Mar 2021 19_17_08   42min   18_8km  Manuelles Training (Watt).csv
+         // 0386  17 Mar 2021 19_29_08   42min   19_2km  Manuelles Training (Watt).csv
+         // 0387  17 May 2021 18_10_08    5min    2_2km  Manuelles Training (Watt).csv
 
-         // start time
-         final int tourHour = Integer.parseInt(fileName.substring(17, 19));
-         final int tourMin = Integer.parseInt(fileName.substring(20, 22));
-         final int tourSec = Integer.parseInt(fileName.substring(23, 25));
+         StringTokenizer fileNameToken = new StringTokenizer(fileName);
+         fileNameToken.nextToken();
+         fileNameToken.nextToken();
+         fileNameToken.nextToken();
+         final String token4 = fileNameToken.nextToken();
+         final boolean is_D_M_Y_Format = token4.contains("min"); //$NON-NLS-1$
 
-         String title = fileName.substring(44);
-         title = title.substring(0, title.length() - 4);
+         // tokenize again
+         fileNameToken = new StringTokenizer(fileName);
+
+         int tourDay = 0;
+         int tourMonth = 0;
+         int tourYear = 0;
+         int tourHour = 0;
+         int tourMin = 0;
+         int tourSec = 0;
+
+         String title = UI.EMPTY_STRING;
+
+         if (is_D_M_Y_Format) {
+
+            // import date format: 01_02_2021"
+            //
+            // 0379  01_02_2021 19_04_08   42min   18_9km  Manuelles Training (Watt).csv
+
+            // start date
+            tourDay = Integer.parseInt(fileName.substring(6, 8));
+            tourMonth = Integer.parseInt(fileName.substring(9, 11));
+            tourYear = Integer.parseInt(fileName.substring(12, 16));
+
+            // start time
+            tourHour = Integer.parseInt(fileName.substring(17, 19));
+            tourMin = Integer.parseInt(fileName.substring(20, 22));
+            tourSec = Integer.parseInt(fileName.substring(23, 25));
+
+         } else {
+
+            // import date format: "5 Mar 2021"
+            //
+            // 0384  5 Mar 2021 19_20_07   42min   18_9km  Manuelles Training (Watt).csv
+
+            // skip file numer, eg 0384
+            fileNameToken.nextToken();
+
+            // start date
+            final String dayToken = fileNameToken.nextToken();
+            final String monthToken = fileNameToken.nextToken();
+            final String yearToken = fileNameToken.nextToken();
+            final String dateToken = dayToken + UI.SPACE + monthToken + UI.SPACE + yearToken;
+
+            tourDay = Integer.parseInt(dayToken);
+            tourMonth = LocalDate.parse(dateToken, _dateParser).getMonthValue();
+            tourYear = Integer.parseInt(yearToken);
+
+            final String timeToken = fileNameToken.nextToken();
+
+            // start time
+            tourHour = Integer.parseInt(timeToken.substring(0, 2));
+            tourMin = Integer.parseInt(timeToken.substring(3, 5));
+            tourSec = Integer.parseInt(timeToken.substring(6, 8));
+
+         }
+
+         title = fileName.substring(44);
+         title = title.substring(0, title.length() - 4).trim();
 
          /*
-          * set tour data
+          * Set tour data
           */
          final TourData tourData = new TourData();
 
@@ -212,26 +277,26 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
             tokenizer = new StringTokenizer(tokenLine, CSV_STRING_TOKEN);
 
-            time = (short) Integer.parseInt(tokenizer.nextToken()); // 				1  Elapsed Time (s)
-            distance = (int) (parseFloat(tokenizer.nextToken()) * 1000); // 		2  Distance (m)
-            kJoule = parseFloat(tokenizer.nextToken()); // 							3  Phys. kJoule
-            tokenizer.nextToken(); // 												4  Slope (%)
-            tokenizer.nextToken(); // 												5  NM
-            final float cadence = parseFloat(tokenizer.nextToken()); // 			6  RPM
-            final float speed = parseFloat(tokenizer.nextToken()); // 				7  Speed (km/h)
-            final int power = Integer.parseInt(tokenizer.nextToken()); //			8  Watt
-            tokenizer.nextToken(); // 												9  Gear
-            tokenizer.nextToken(); // 												10 Device Active
-            final int pulse = Integer.parseInt(tokenizer.nextToken()); // 			11 Pulse;
-            tokenizer.nextToken(); // 												12 Pulse Type;
-            tokenizer.nextToken(); // 												13 Training Type;
-            tokenizer.nextToken(); // 												14 Training Value;
-            final int pulseTime1 = Integer.parseInt(tokenizer.nextToken()); // 		15 Pulse Time 1;
-            final int pulseTime2 = Integer.parseInt(tokenizer.nextToken()); // 		16 2;
-            final int pulseTime3 = Integer.parseInt(tokenizer.nextToken()); // 		17 3;
-            final int pulseTime4 = Integer.parseInt(tokenizer.nextToken()); // 		18 4;
-            final int pulseTime5 = Integer.parseInt(tokenizer.nextToken()); // 		19 5;
-            final int pulseTime6 = Integer.parseInt(tokenizer.nextToken()); // 		20 6
+            time = (short) Integer.parseInt(tokenizer.nextToken()); //                       1  Elapsed Time (s)
+            distance = (int) (parseFloat(tokenizer.nextToken(), decimalFormat) * 1000); //   2  Distance (m)
+            kJoule = parseFloat(tokenizer.nextToken(), decimalFormat); //                    3  Phys. kJoule
+            tokenizer.nextToken(); //                                                        4  Slope (%)
+            tokenizer.nextToken(); //                                                        5  NM
+            final float cadence = parseFloat(tokenizer.nextToken(), decimalFormat); //       6  RPM
+            final float speed = parseFloat(tokenizer.nextToken(), decimalFormat); //         7  Speed (km/h)
+            final int power = Integer.parseInt(tokenizer.nextToken()); //                    8  Watt
+            tokenizer.nextToken(); //                                                        9  Gear
+            tokenizer.nextToken(); //                                                        10 Device Active
+            final int pulse = Integer.parseInt(tokenizer.nextToken()); //                    11 Pulse;
+            tokenizer.nextToken(); //                                                        12 Pulse Type;
+            tokenizer.nextToken(); //                                                        13 Training Type;
+            tokenizer.nextToken(); //                                                        14 Training Value;
+            final int pulseTime1 = Integer.parseInt(tokenizer.nextToken()); //               15 Pulse Time 1;
+            final int pulseTime2 = Integer.parseInt(tokenizer.nextToken()); //               16 2;
+            final int pulseTime3 = Integer.parseInt(tokenizer.nextToken()); //               17 3;
+            final int pulseTime4 = Integer.parseInt(tokenizer.nextToken()); //               18 4;
+            final int pulseTime5 = Integer.parseInt(tokenizer.nextToken()); //               19 5;
+            final int pulseTime6 = Integer.parseInt(tokenizer.nextToken()); //               20 6
 
             timeDataList.add(timeData = new TimeData());
 
@@ -263,10 +328,12 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          }
 
          if (timeDataList.isEmpty()) {
-            /*
-             * data are valid but have no data points
-             */
-            return true;
+
+            // data are valid but have no data points
+
+            importState_File.isFileImportedWithValidData = true;
+
+            return;
          }
 
          final float joule = kJoule * 1000;
@@ -304,16 +371,12 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             tourData.computeComputedValues();
          }
 
-         returnValue = true;
+         importState_File.isFileImportedWithValidData = true;
 
       } catch (final Exception e) {
 
-         StatusUtil.log(e);
-         return false;
-
+         StatusUtil.log(importFilePath, e);
       }
-
-      return returnValue;
    }
 
    /**

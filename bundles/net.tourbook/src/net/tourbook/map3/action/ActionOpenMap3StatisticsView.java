@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
@@ -27,7 +28,8 @@ public class ActionOpenMap3StatisticsView extends Action {
 	public ActionOpenMap3StatisticsView() {
 
 		setText(Messages.Map3_Action_OpenMap3StatisticsView);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_StatisticsView));
+
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Map3_StatisticsView));
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,13 +18,12 @@ package net.tourbook.tour.filter;
 public enum TourFilterFieldType {
 
 	/**
-	 * This is a dummy field type it is used to identify a field category.
-	 */
+    * This is a dummy field type, it is used to identify a field category.
+    */
 	CATEGORY, //
 
 	TEXT, //
 
-//	NUMBER_FLOAT, //
 	NUMBER_INTEGER, //
 	NUMBER_FLOAT, //
 

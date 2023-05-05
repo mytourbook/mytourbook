@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.view.Map2View;
@@ -33,8 +34,8 @@ public class ActionShowTourPauses extends Action {
 
       setText(Messages.Tour_Action_ShowTourPauses);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses_Disabled));
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,10 +34,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,7 +46,6 @@ import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -57,6 +55,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -72,51 +71,61 @@ import org.eclipse.ui.XMLMemento;
 
 public class EasyImportManager {
 
-   private static final String      ID                                                 = "net.tourbook.importdata.EasyImportManager";        //$NON-NLS-1$
+   private static final String      ID                                                 = "net.tourbook.importdata.EasyImportManager";         //$NON-NLS-1$
    //
-   private static final String      XML_STATE_EASY_IMPORT                              = "XML_STATE_EASY_IMPORT";                            //$NON-NLS-1$
+   private static final char        NL                                                 = UI.NEW_LINE;                                         //
    //
-   private static final String      TAG_ROOT                                           = "EasyImportConfig";                                 //$NON-NLS-1$
-   private static final String      TAG_CONFIG                                         = "Config";                                           //$NON-NLS-1$
-   private static final String      TAG_DASH_CONFIG                                    = "DashConfig";                                       //$NON-NLS-1$
-   private static final String      TAG_IMPORT_CONFIG                                  = "ImportConfig";                                     //$NON-NLS-1$
-   private static final String      TAG_LAUNCHER_CONFIG                                = "LauncherConfig";                                   //$NON-NLS-1$
-   private static final String      TAG_TOUR_TYPE_BY_SPEED                             = "Speed";                                            //$NON-NLS-1$
+   private static final String      XML_STATE_EASY_IMPORT                              = "XML_STATE_EASY_IMPORT";                             //$NON-NLS-1$
    //
-   private static final String      ATTR_AVG_SPEED                                     = "avgSpeed";                                         //$NON-NLS-1$
-   private static final String      ATTR_BACKUP_FOLDER                                 = "backupFolder";                                     //$NON-NLS-1$
-   private static final String      ATTR_DEVICE_FILES                                  = "deviceFiles";                                      //$NON-NLS-1$
-   private static final String      ATTR_DEVICE_FOLDER                                 = "deviceFolder";                                     //$NON-NLS-1$
-   private static final String      ATTR_DEVICE_TYPE                                   = "deviceType";                                       //$NON-NLS-1$
-   private static final String      ATTR_IS_ACTIVE_CONFIG                              = "isActiveConfig";                                   //$NON-NLS-1$
-   private static final String      ATTR_IS_CREATE_BACKUP                              = "isCreateBackup";                                   //$NON-NLS-1$
-   private static final String      ATTR_IS_DELETE_DEVICE_FILES                        = "isDeleteDeviceFiles";                              //$NON-NLS-1$
-   private static final String      ATTR_IS_TURN_OFF_WATCHING                          = "isTurnOffWatching";                                //$NON-NLS-1$
-   private static final String      ATTR_NAME                                          = "name";                                             //$NON-NLS-1$
-   private static final String      ATTR_TOUR_TYPE_CONFIG                              = "tourTypeConfig";                                   //$NON-NLS-1$
-   private static final String      ATTR_TOUR_TYPE_ID                                  = "tourTypeId";                                       //$NON-NLS-1$
+   private static final String      TAG_ROOT                                           = "EasyImportConfig";                                  //$NON-NLS-1$
+   private static final String      TAG_CONFIG                                         = "Config";                                            //$NON-NLS-1$
+   private static final String      TAG_DASH_CONFIG                                    = "DashConfig";                                        //$NON-NLS-1$
+   private static final String      TAG_IMPORT_CONFIG                                  = "ImportConfig";                                      //$NON-NLS-1$
+   private static final String      TAG_LAUNCHER_CONFIG                                = "LauncherConfig";                                    //$NON-NLS-1$
+   private static final String      TAG_TOUR_TYPE_BY_SPEED                             = "Speed";                                             //$NON-NLS-1$
    //
-   private static final String      ATTR_DASH_BACKGROUND_OPACITY                       = "backgroundOpacity";                                //$NON-NLS-1$
-   private static final String      ATTR_DASH_ANIMATION_CRAZY_FACTOR                   = "animationCrazyFactor";                             //$NON-NLS-1$
-   private static final String      ATTR_DASH_ANIMATION_DURATION                       = "animationDuration";                                //$NON-NLS-1$
-   private static final String      ATTR_DASH_IS_LIVE_UPDATE                           = "isLiveUpdate";                                     //$NON-NLS-1$
-   private static final String      ATTR_DASH_NUM_UI_COLUMNS                           = "uiColumns";                                        //$NON-NLS-1$
-   private static final String      ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH = "stateTooltipDisplayAbsoluteFilePath";              //$NON-NLS-1$
-   private static final String      ATTR_DASH_STATE_TOOLTIP_WIDTH                      = "stateTooltipWidth";                                //$NON-NLS-1$
-   private static final String      ATTR_DASH_TILE_SIZE                                = "tileSize";                                         //$NON-NLS-1$
+   private static final String      ATTR_AVG_SPEED                                     = "avgSpeed";                                          //$NON-NLS-1$
+   private static final String      ATTR_BACKUP_FOLDER                                 = "backupFolder";                                      //$NON-NLS-1$
+   private static final String      ATTR_DEVICE_FILES                                  = "deviceFiles";                                       //$NON-NLS-1$
+   private static final String      ATTR_DEVICE_FOLDER                                 = "deviceFolder";                                      //$NON-NLS-1$
+   private static final String      ATTR_DEVICE_TYPE                                   = "deviceType";                                        //$NON-NLS-1$
+   private static final String      ATTR_IS_ACTIVE_CONFIG                              = "isActiveConfig";                                    //$NON-NLS-1$
+   private static final String      ATTR_IS_CREATE_BACKUP                              = "isCreateBackup";                                    //$NON-NLS-1$
+   private static final String      ATTR_IS_DELETE_DEVICE_FILES                        = "isDeleteDeviceFiles";                               //$NON-NLS-1$
+   private static final String      ATTR_IS_TURN_OFF_WATCHING                          = "isTurnOffWatching";                                 //$NON-NLS-1$
+   private static final String      ATTR_NAME                                          = "name";                                              //$NON-NLS-1$
+   private static final String      ATTR_TOUR_TYPE_CONFIG                              = "tourTypeConfig";                                    //$NON-NLS-1$
+   private static final String      ATTR_TOUR_TYPE_ID                                  = "tourTypeId";                                        //$NON-NLS-1$
    //
-   private static final String      ATTR_IL_DESCRIPTION                                = "description";                                      //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_ADJUST_TEMPERATURE                      = "isAdjustTemperature";                              //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_RETRIEVE_WEATHER_DATA                   = "isRetrieveWeatherData";                            //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_SAVE_TOUR                               = "isSaveTour";                                       //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD                       = "isShowInDashBoard";                                //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_SET_LAST_MARKER                         = "isSetLastMarker";                                  //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_SET_TOUR_TYPE                           = "isSetTourType";                                    //$NON-NLS-1$
-   private static final String      ATTR_IL_LAST_MARKER_TEXT                           = "lastMarkerText";                                   //$NON-NLS-1$
-   private static final String      ATTR_IL_LAST_MARKER_DISTANCE                       = "lastMarkerDistance";                               //$NON-NLS-1$
-   private static final String      ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION            = "temperatureAdjustmentDuration";                    //$NON-NLS-1$
-   private static final String      ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE           = "tourAverageTemperature";                           //$NON-NLS-1$
-   private static final String      ATTR_IL_TOUR_TYPE_CADENCE                          = "tourTypeCadence";                                  //$NON-NLS-1$
+   private static final String      ATTR_DASH_BACKGROUND_OPACITY                       = "backgroundOpacity";                                 //$NON-NLS-1$
+   private static final String      ATTR_DASH_ANIMATION_CRAZY_FACTOR                   = "animationCrazyFactor";                              //$NON-NLS-1$
+   private static final String      ATTR_DASH_ANIMATION_DURATION                       = "animationDuration";                                 //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_LIVE_UPDATE                           = "isLiveUpdate";                                      //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_LOG_DETAILS                           = "isLogDetails";                                      //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_CLOUD_APPS                  = "isShowTile_CloudApps";                              //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_FILES                       = "isShowTile_Files";                                  //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_FOSSIL_UI                   = "isShowTile_FossilUI";                               //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT                 = "isShowTile_SerialPort";                             //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG     = "isShowTile_SerialPortWithConfig";                   //$NON-NLS-1$
+   private static final String      ATTR_DASH_NUM_UI_COLUMNS                           = "uiColumns";                                         //$NON-NLS-1$
+   private static final String      ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH = "stateTooltipDisplayAbsoluteFilePath";               //$NON-NLS-1$
+   private static final String      ATTR_DASH_STATE_TOOLTIP_WIDTH                      = "stateTooltipWidth";                                 //$NON-NLS-1$
+   private static final String      ATTR_DASH_TILE_SIZE                                = "tileSize";                                          //$NON-NLS-1$
+   //
+   private static final String      ATTR_IL_DESCRIPTION                                = "description";                                       //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_ADJUST_TEMPERATURE                      = "isAdjustTemperature";                               //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_REPLACE_ELEVATION_FROM_SRTM             = "isReplaceElevationFromSRTM";                        //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION      = "isReplaceFirstTimeSliceElevation";                  //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_RETRIEVE_WEATHER_DATA                   = "isRetrieveWeatherData";                             //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_SAVE_TOUR                               = "isSaveTour";                                        //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD                       = "isShowInDashBoard";                                 //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_SET_LAST_MARKER                         = "isSetLastMarker";                                   //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_SET_TOUR_TYPE                           = "isSetTourType";                                     //$NON-NLS-1$
+   private static final String      ATTR_IL_LAST_MARKER_TEXT                           = "lastMarkerText";                                    //$NON-NLS-1$
+   private static final String      ATTR_IL_LAST_MARKER_DISTANCE                       = "lastMarkerDistance";                                //$NON-NLS-1$
+   private static final String      ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION            = "temperatureAdjustmentDuration";                     //$NON-NLS-1$
+   private static final String      ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE           = "tourAverageTemperature";                            //$NON-NLS-1$
+   private static final String      ATTR_IL_TOUR_TYPE_CADENCE                          = "tourTypeCadence";                                   //$NON-NLS-1$
    //
    public static final String       LOG_EASY_IMPORT_000_IMPORT_START                   = Messages.Log_EasyImport_000_ImportStart;
    public static final String       LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES              = Messages.Log_EasyImport_001_BackupTourFiles;
@@ -127,7 +136,9 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM                 = Messages.Log_EasyImport_003_TourType_Item;
    public static final String       LOG_EASY_IMPORT_004_SET_LAST_MARKER                = Messages.Log_EasyImport_004_SetLastMarker;
    public static final String       LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE             = Messages.Log_EasyImport_005_AdjustTemperatureValues;
-   public static final String       LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_006_RetrieveWeatherData;
+   public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION               = Messages.Log_EasyImport_006_AdjustElevation;
+   public static final String       LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM    = Messages.Log_EasyImport_006_ReplaceElevationFromSRTM;
+   public static final String       LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_050_RetrieveWeatherData;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR                      = Messages.Log_EasyImport_099_SaveTour;
    public static final String       LOG_EASY_IMPORT_100_DELETE_TOUR_FILES              = Messages.Log_EasyImport_100_DeleteTourFiles;
    public static final String       LOG_EASY_IMPORT_101_TURN_WATCHING_OFF              = Messages.Log_EasyImport_101_TurnWatchingOff;
@@ -211,7 +222,7 @@ public class EasyImportManager {
                return returnState;
             }
 
-            getImportFiles(fileStores);
+            getImportFiles();
 
          } finally {
             STORE_LOCK.unlock();
@@ -223,11 +234,11 @@ public class EasyImportManager {
       return returnState;
    }
 
-   private HashSet<String> getBackupFiles(final String folder, final Iterable<FileStore> fileStores) {
+   private HashSet<String> getBackupFiles(final String folder) {
 
       final HashSet<String> backupFiles = new HashSet<>();
 
-      final Path validPath = getValidPath(folder, fileStores);
+      final Path validPath = getValidPath(folder);
       if (validPath == null) {
          return backupFiles;
       }
@@ -252,13 +263,13 @@ public class EasyImportManager {
 
             } catch (final Exception e) {
 // this can occur too often
-//					TourLogManager.logEx(e);
+//               TourLogManager.logEx(e);
             }
 
          }
 
       } catch (final IOException ex) {
-         TourLogManager.logEx(ex);
+         TourLogManager.log_EXCEPTION_WithStacktrace(ex);
       }
 
       return backupFiles;
@@ -284,25 +295,29 @@ public class EasyImportManager {
 
          sb.append('\'');
 
-         // escape single quotes
-         sb.append(fileName.replace("\'", "\\\'")); //$NON-NLS-1$ //$NON-NLS-2$
+         // escape single quotes by doubling them
+         sb.append(fileName.replace("\'", "\'\'")); //$NON-NLS-1$ //$NON-NLS-2$
 
          sb.append('\'');
       }
 
-      final String deviceFileNameINList = sb.toString();
+      final String deviceFileName_INList = sb.toString();
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                                         //$NON-NLS-1$
+
+            + "TourImportFileName" + NL //                                             //$NON-NLS-1$
+
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+            + "WHERE TourImportFileName IN (" + deviceFileName_INList + ")" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + "ORDER BY TourImportFileName" + NL //                                    //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final String sqlQuery = UI.EMPTY_STRING//
-               + "SELECT" //															//$NON-NLS-1$
-               + " TourImportFileName" //												//$NON-NLS-1$
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$
-               + (" WHERE TourImportFileName IN (" + deviceFileNameINList + UI.SYMBOL_BRACKET_RIGHT) //	//$NON-NLS-1$
-               + " ORDER BY TourImportFileName"; //									//$NON-NLS-1$
-
-         final ResultSet result = stmt.executeQuery(sqlQuery);
+         final ResultSet result = stmt.executeQuery(sql);
 
          while (result.next()) {
 
@@ -312,7 +327,8 @@ public class EasyImportManager {
          }
 
       } catch (final SQLException e) {
-         SQL.showException(e);
+
+         SQL.showException(e, sql);
       }
 
       return dbFileNames;
@@ -329,7 +345,7 @@ public class EasyImportManager {
 
    /**
     */
-   private void getImportFiles(final Iterable<FileStore> fileStores) throws InterruptedException {
+   private void getImportFiles() throws InterruptedException {
 
       final ArrayList<OSFile> movedFiles = new ArrayList<>();
       final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
@@ -348,7 +364,7 @@ public class EasyImportManager {
       HashSet<String> availableBackupFiles = null;
       if (importConfig.isCreateBackup) {
 
-         availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder(), fileStores);
+         availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder());
       }
 
       /*
@@ -356,8 +372,7 @@ public class EasyImportManager {
        */
       final List<OSFile> existingDeviceFiles = getOSFiles(
             importConfig.getDeviceOSFolder(),
-            importConfig.fileGlobPattern,
-            fileStores);
+            importConfig.fileGlobPattern);
 
       easyConfig.numDeviceFiles = existingDeviceFiles.size();
 
@@ -372,8 +387,7 @@ public class EasyImportManager {
 
          final List<OSFile> existingBackupFiles = getOSFiles(
                importConfig.getBackupOSFolder(),
-               importConfig.fileGlobPattern,
-               fileStores);
+               importConfig.fileGlobPattern);
 
          for (final OSFile backupFile : existingBackupFiles) {
 
@@ -431,10 +445,15 @@ public class EasyImportManager {
       RawDataView.THREAD_WATCHER_LOCK.unlock();
 
       for (final OSFile deviceFile : availableFiles) {
+
          if (dbFileNames.contains(deviceFile.getFileName()) == false) {
+
             if (!RawDataManager.isIgnoreInvalidFile()) {
+
                notImportedFiles.add(deviceFile);
+
             } else {// RawDataManager.isIgnoreInvalidFile() == true
+
                if (!RawDataManager.doesInvalidFileExist(deviceFile.getFileName())) {
                   notImportedFiles.add(deviceFile);
                }
@@ -443,21 +462,15 @@ public class EasyImportManager {
       }
 
       // sort by filename
-      Collections.sort(notImportedFiles, new Comparator<OSFile>() {
-         @Override
-         public int compare(final OSFile file1, final OSFile file2) {
-            return file1.getFileName().compareTo(file2.getFileName());
-         }
-      });
+      Collections.sort(notImportedFiles, (file1, file2) -> file1.getFileName().compareTo(file2.getFileName()));
    }
 
    private List<OSFile> getOSFiles(final String folder,
-                                   final String globFilePattern,
-                                   final Iterable<FileStore> fileStores) throws InterruptedException {
+                                   final String globFilePattern) throws InterruptedException {
 
       final List<OSFile> osFiles = new ArrayList<>();
 
-      final Path validPath = getValidPath(folder, fileStores);
+      final Path validPath = getValidPath(folder);
       if (validPath == null) {
          return osFiles;
       }
@@ -517,7 +530,7 @@ public class EasyImportManager {
          }
 
       } catch (final IOException ex) {
-         TourLogManager.logEx(ex);
+         TourLogManager.log_EXCEPTION_WithStacktrace(ex);
       }
 
       return osFiles;
@@ -527,7 +540,7 @@ public class EasyImportManager {
     * @param osFolder
     * @return Returns the device OS path or <code>null</code> when this folder is not valid.
     */
-   private Path getValidPath(final String osFolder, final Iterable<FileStore> fileStores) {
+   private Path getValidPath(final String osFolder) {
 
       if (osFolder != null && osFolder.trim().length() > 0) {
 
@@ -603,7 +616,7 @@ public class EasyImportManager {
 
                case TAG_CONFIG:
 
-                  loadEasyConfig_10_Common(xmlConfig, easyConfig);
+                  // loadEasyConfig_10_Common(xmlConfig, easyConfig);
                   break;
 
                case TAG_DASH_CONFIG:
@@ -667,55 +680,79 @@ public class EasyImportManager {
       return easyConfig;
    }
 
-   private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
-
-   }
+//   private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
+//
+//   }
 
    private void loadEasyConfig_20_Dash(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
-      dashConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento, //
+      dashConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_ANIMATION_CRAZY_FACTOR,
             EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT,
             EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN,
             EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
 
-      dashConfig.animationDuration = Util.getXmlInteger(xmlMemento, //
+      dashConfig.animationDuration = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_ANIMATION_DURATION,
             EasyConfig.ANIMATION_DURATION_DEFAULT,
             EasyConfig.ANIMATION_DURATION_MIN,
             EasyConfig.ANIMATION_DURATION_MAX);
 
-      dashConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, //
+      dashConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_BACKGROUND_OPACITY,
             EasyConfig.BACKGROUND_OPACITY_DEFAULT,
             EasyConfig.BACKGROUND_OPACITY_MIN,
             EasyConfig.BACKGROUND_OPACITY_MAX);
 
-      dashConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento, //
+      dashConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_NUM_UI_COLUMNS,
             EasyConfig.HORIZONTAL_TILES_DEFAULT,
             EasyConfig.HORIZONTAL_TILES_MIN,
             EasyConfig.HORIZONTAL_TILES_MAX);
 
-      dashConfig.stateToolTipDisplayAbsoluteFilePath = Util.getXmlBoolean(xmlMemento, //
+      dashConfig.stateToolTipDisplayAbsoluteFilePath = Util.getXmlBoolean(xmlMemento,
             ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH,
-            EasyConfig.STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH);
+            EasyConfig.STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH);
 
-      dashConfig.stateToolTipWidth = Util.getXmlInteger(xmlMemento, //
+      dashConfig.stateToolTipWidth = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_STATE_TOOLTIP_WIDTH,
             EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT,
             EasyConfig.STATE_TOOLTIP_WIDTH_MIN,
             EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
 
-      dashConfig.tileSize = Util.getXmlInteger(xmlMemento, //
+      dashConfig.tileSize = Util.getXmlInteger(xmlMemento,
             ATTR_DASH_TILE_SIZE,
             EasyConfig.TILE_SIZE_DEFAULT,
             EasyConfig.TILE_SIZE_MIN,
             EasyConfig.TILE_SIZE_MAX);
 
-      dashConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, //
+      dashConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento,
             ATTR_DASH_IS_LIVE_UPDATE,
-            EasyConfig.LIVE_UPDATE_DEFAULT);
+            EasyConfig.IS_LIVE_UPDATE_DEFAULT);
+
+      dashConfig.isLogDetails = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_LOG_DETAILS,
+            EasyConfig.IS_LOG_DETAILS_DEFAULT);
+
+      dashConfig.isShowTile_CloudApps = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_CLOUD_APPS,
+            EasyConfig.IS_SHOW_TILE_CLOUD_APPS_DEFAULT);
+
+      dashConfig.isShowTile_Files = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_FILES,
+            EasyConfig.IS_SHOW_TILE_FILES_DEFAULT);
+
+      dashConfig.isShowTile_FossilUI = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_FOSSIL_UI,
+            EasyConfig.IS_SHOW_TILE_FOSSIL_UI_DEFAULT);
+
+      dashConfig.isShowTile_SerialPort = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT,
+            EasyConfig.IS_SHOW_TILE_SERIAL_PORT_DEFAULT);
+
+      dashConfig.isShowTile_SerialPortWithConfig = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG,
+            EasyConfig.IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG_DEFAULT);
    }
 
    private void loadEasyConfig_30_Config(final XMLMemento xmlConfig, final EasyConfig dashConfig) {
@@ -784,6 +821,12 @@ public class EasyImportManager {
 
       // retrieve weather data
       importLauncher.isRetrieveWeatherData = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_WEATHER_DATA, false);
+
+      // adjust elevation
+      importLauncher.isReplaceFirstTimeSliceElevation = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, false);
+
+      // replace elevation from SRTM
+      importLauncher.isReplaceElevationFromSRTM = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_REPLACE_ELEVATION_FROM_SRTM, false);
 
       // set your type, default is true to preserve previous saved tour types before this field was introduced
       importLauncher.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_TYPE, true);
@@ -857,9 +900,14 @@ public class EasyImportManager {
       _fileStoresHash = null;
    }
 
-   public ImportDeviceState runImport(final ImportLauncher importLauncher) {
+   /**
+    * @param importLauncher
+    * @param importState_Process
+    * @return Returns a state about the import
+    */
+   public ImportState_Easy runImport(final ImportLauncher importLauncher, final ImportState_Process importState_Process) {
 
-      final ImportDeviceState importState = new ImportDeviceState();
+      final ImportState_Easy easyImportState = new ImportState_Easy();
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -874,9 +922,9 @@ public class EasyImportManager {
             Messages.Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message,
             importConfig.getDeviceFolder())) {
 
-         importState.isOpenSetup = true;
+         easyImportState.isOpenSetup = true;
 
-         return importState;
+         return easyImportState;
       }
 
       /*
@@ -893,15 +941,15 @@ public class EasyImportManager {
                Messages.Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message,
                importConfig.getBackupFolder())) {
 
-            importState.isOpenSetup = true;
+            easyImportState.isOpenSetup = true;
 
-            return importState;
+            return easyImportState;
          }
 
          // folder is valid, run the backup
-         final boolean isCanceled = runImport_01_Backup();
+         final boolean isCanceled = runImport_10_Backup();
          if (isCanceled) {
-            return importState;
+            return easyImportState;
          }
       }
 
@@ -916,7 +964,6 @@ public class EasyImportManager {
             final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(deviceOSFolder);
 
             deviceOSFolder = deviceOSFolder.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
-
          }
 
          MessageDialog.openInformation(
@@ -925,34 +972,38 @@ public class EasyImportManager {
                NLS.bind(Messages.Import_Data_Dialog_EasyImport_NoImportFiles_Message, deviceOSFolder));
 
          // there is nothing more to do
-         importState.isImportCanceled = true;
+         easyImportState.isImportCanceled = true;
 
-         return importState;
+         return easyImportState;
       }
+
+      final RawDataManager rawDataManager = RawDataManager.getInstance();
 
       /*
        * 02. Import files
        */
-      final ImportRunState importRunState = RawDataManager.getInstance()
-            .runImport(
-                  notImportedFiles,
-                  true,
-                  importConfig.fileGlobPattern);
 
-      importState.isImportCanceled = importRunState.isImportCanceled;
+      rawDataManager.importTours_FromMultipleFiles(
+            notImportedFiles,
+            importConfig.fileGlobPattern,
+            importState_Process);
+
+      easyImportState.isImportCanceled = importState_Process.isImportCanceled_ByMonitor().get();
 
       /*
-       * Update tour data.
+       * Update tour data
        */
-      runImport_UpdateTourData(importLauncher, importState);
+      final Map<Long, TourData> importedTours = rawDataManager.getImportedTours();
 
-      return importState;
+      runImport_20_UpdateTourData(importLauncher, easyImportState, importedTours);
+
+      return easyImportState;
    }
 
    /**
     * @return Returns <code>true</code> when the backup is canceled.
     */
-   private boolean runImport_01_Backup() {
+   private boolean runImport_10_Backup() {
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -969,9 +1020,9 @@ public class EasyImportManager {
          return false;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES);
+      TourLogManager.log_DEFAULT(LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES);
 
-      final boolean isCanceled[] = { false };
+      final boolean[] isCanceled = { false };
 
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
@@ -991,10 +1042,11 @@ public class EasyImportManager {
                }
 
                // for debugging
-//					Thread.sleep(800);
+//               Thread.sleep(800);
 
                monitor.worked(1);
-               monitor.subTask(NLS.bind(Messages.Import_Data_Monitor_Backup_SubTask, //
+               monitor.subTask(NLS.bind(
+                     Messages.Import_Data_Monitor_Backup_SubTask,
                      new Object[] { ++copied, numBackupFiles, backupFileName }));
 
                try {
@@ -1009,7 +1061,7 @@ public class EasyImportManager {
                         String.format(LOG_EASY_IMPORT_001_COPY, devicePath, targetPath));
 
                } catch (final IOException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                }
             }
          }
@@ -1018,23 +1070,24 @@ public class EasyImportManager {
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
       } catch (final Exception e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       return isCanceled[0];
    }
 
-   private void runImport_UpdateTourData(final ImportLauncher importLauncher, final ImportDeviceState importState) {
-
-      final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
+   private void runImport_20_UpdateTourData(final ImportLauncher importLauncher,
+                                            final ImportState_Easy importState,
+                                            final Map<Long, TourData> importedTours) {
 
       if (importedTours.isEmpty()) {
+
          // nothing is imported
          return;
       }
 
       if (importLauncher.isSetTourType) {
-         TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
+         TourLogManager.log_DEFAULT(LOG_EASY_IMPORT_003_TOUR_TYPE);
       }
 
       final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
@@ -1088,11 +1141,13 @@ public class EasyImportManager {
 
       } catch (final IOException e) {
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
    private void saveEasyConfig_Data(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
+
+// SET_FORMATTING_OFF
 
       /*
        * Common config
@@ -1107,14 +1162,20 @@ public class EasyImportManager {
       {
          final IMemento xmlConfig = xmlMemento.createChild(TAG_DASH_CONFIG);
 
-         xmlConfig.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR, dashConfig.animationCrazinessFactor);
-         xmlConfig.putInteger(ATTR_DASH_ANIMATION_DURATION, dashConfig.animationDuration);
-         xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY, dashConfig.backgroundOpacity);
-         xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, dashConfig.isLiveUpdate);
-         xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS, dashConfig.numHorizontalTiles);
-         xmlConfig.putBoolean(ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH, dashConfig.stateToolTipDisplayAbsoluteFilePath);
-         xmlConfig.putInteger(ATTR_DASH_STATE_TOOLTIP_WIDTH, dashConfig.stateToolTipWidth);
-         xmlConfig.putInteger(ATTR_DASH_TILE_SIZE, dashConfig.tileSize);
+         xmlConfig.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR,                     dashConfig.animationCrazinessFactor);
+         xmlConfig.putInteger(ATTR_DASH_ANIMATION_DURATION,                         dashConfig.animationDuration);
+         xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY,                         dashConfig.backgroundOpacity);
+         xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE,                             dashConfig.isLiveUpdate);
+         xmlConfig.putBoolean(ATTR_DASH_IS_LOG_DETAILS,                             dashConfig.isLogDetails);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_CLOUD_APPS,                    dashConfig.isShowTile_CloudApps);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_FILES,                         dashConfig.isShowTile_Files);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_FOSSIL_UI,                     dashConfig.isShowTile_FossilUI);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT,                   dashConfig.isShowTile_SerialPort);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG,       dashConfig.isShowTile_SerialPortWithConfig);
+         xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS,                             dashConfig.numHorizontalTiles);
+         xmlConfig.putBoolean(ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH,   dashConfig.stateToolTipDisplayAbsoluteFilePath);
+         xmlConfig.putInteger(ATTR_DASH_STATE_TOOLTIP_WIDTH,                        dashConfig.stateToolTipWidth);
+         xmlConfig.putInteger(ATTR_DASH_TILE_SIZE,                                  dashConfig.tileSize);
       }
 
       /*
@@ -1130,16 +1191,16 @@ public class EasyImportManager {
 
          xmlConfig.putString(ATTR_NAME, importConfig.name);
 
-         xmlConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG, isActiveConfig);
-         xmlConfig.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
-         xmlConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES, importConfig.isDeleteDeviceFiles);
-         xmlConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING, importConfig.isTurnOffWatching);
+         xmlConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG,        isActiveConfig);
+         xmlConfig.putBoolean(ATTR_IS_CREATE_BACKUP,        importConfig.isCreateBackup);
+         xmlConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES,  importConfig.isDeleteDeviceFiles);
+         xmlConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING,    importConfig.isTurnOffWatching);
 
-         xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
-         xmlConfig.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
-         xmlConfig.putInteger(ATTR_DEVICE_TYPE, importConfig.getDeviceType());
+         xmlConfig.putString(ATTR_BACKUP_FOLDER,            importConfig.getBackupFolder());
+         xmlConfig.putString(ATTR_DEVICE_FOLDER,            importConfig.getDeviceFolder());
+         xmlConfig.putInteger(ATTR_DEVICE_TYPE,             importConfig.getDeviceType());
 
-         xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.fileGlobPattern);
+         xmlConfig.putString(ATTR_DEVICE_FILES,             importConfig.fileGlobPattern);
       }
 
       /*
@@ -1149,23 +1210,29 @@ public class EasyImportManager {
 
          final IMemento xmlConfig = xmlMemento.createChild(TAG_LAUNCHER_CONFIG);
 
-         xmlConfig.putString(ATTR_NAME, importLauncher.name);
-         xmlConfig.putString(ATTR_IL_DESCRIPTION, importLauncher.description);
-         xmlConfig.putBoolean(ATTR_IL_IS_SAVE_TOUR, importLauncher.isSaveTour);
-         xmlConfig.putBoolean(ATTR_IL_IS_SHOW_IN_DASHBOARD, importLauncher.isShowInDashboard);
+         xmlConfig.putString(ATTR_NAME,                                 importLauncher.name);
+         xmlConfig.putString(ATTR_IL_DESCRIPTION,                       importLauncher.description);
+         xmlConfig.putBoolean(ATTR_IL_IS_SAVE_TOUR,                     importLauncher.isSaveTour);
+         xmlConfig.putBoolean(ATTR_IL_IS_SHOW_IN_DASHBOARD,             importLauncher.isShowInDashboard);
 
          // last marker
-         xmlConfig.putBoolean(ATTR_IL_IS_SET_LAST_MARKER, importLauncher.isSetLastMarker);
-         xmlConfig.putString(ATTR_IL_LAST_MARKER_TEXT, importLauncher.lastMarkerText);
-         xmlConfig.putInteger(ATTR_IL_LAST_MARKER_DISTANCE, importLauncher.lastMarkerDistance);
+         xmlConfig.putBoolean(ATTR_IL_IS_SET_LAST_MARKER,               importLauncher.isSetLastMarker);
+         xmlConfig.putString(ATTR_IL_LAST_MARKER_TEXT,                  importLauncher.lastMarkerText);
+         xmlConfig.putInteger(ATTR_IL_LAST_MARKER_DISTANCE,             importLauncher.lastMarkerDistance);
 
          // adjust temperature
-         xmlConfig.putBoolean(ATTR_IL_IS_ADJUST_TEMPERATURE, importLauncher.isAdjustTemperature);
-         xmlConfig.putInteger(ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION, importLauncher.temperatureAdjustmentDuration);
-         xmlConfig.putFloat(ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE, importLauncher.tourAvgTemperature);
+         xmlConfig.putBoolean(ATTR_IL_IS_ADJUST_TEMPERATURE,            importLauncher.isAdjustTemperature);
+         xmlConfig.putInteger(ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION,  importLauncher.temperatureAdjustmentDuration);
+         xmlConfig.putFloat(ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE,   importLauncher.tourAvgTemperature);
 
          // Retrieve weather data
-         xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA, importLauncher.isRetrieveWeatherData);
+         xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA,         importLauncher.isRetrieveWeatherData);
+
+         // adjust elevation
+         xmlConfig.putBoolean(ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, importLauncher.isReplaceFirstTimeSliceElevation);
+
+         // replace elevation from SRTM
+         xmlConfig.putBoolean(ATTR_IL_IS_REPLACE_ELEVATION_FROM_SRTM, importLauncher.isReplaceElevationFromSRTM);
 
          // Set tour type
          xmlConfig.putBoolean(ATTR_IL_IS_SET_TOUR_TYPE, importLauncher.isSetTourType);
@@ -1194,8 +1261,8 @@ public class EasyImportManager {
             final TourType oneTourType = importLauncher.oneTourType;
 
             if (oneTourType != null) {
-               Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());
-               Util.setXmlEnum(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE, importLauncher.oneTourTypeCadence);
+               Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID,            oneTourType.getTypeId());
+               Util.setXmlEnum(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE,    importLauncher.oneTourTypeCadence);
             }
 
          } else {
@@ -1203,6 +1270,7 @@ public class EasyImportManager {
             // this is the default, a tour type is not set
          }
       }
+// SET_FORMATTING_ON
    }
 
    /**
@@ -1274,11 +1342,9 @@ public class EasyImportManager {
          // tour type is not set
       }
 
-      TourLogManager.addSubLog(
-            TourLogState.DEFAULT,
-            String.format(
-                  LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
-                  tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                  String.format("%s (%s)", tourTypeName, tourTypeCadence.getNlsLabel())));//$NON-NLS-1$
+      TourLogManager.subLog_DEFAULT(String.format(
+            LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
+            TourManager.getTourDateTimeShort(tourData),
+            String.format("%s (%s)", tourTypeName, tourTypeCadence.getNlsLabel())));//$NON-NLS-1$
    }
 }

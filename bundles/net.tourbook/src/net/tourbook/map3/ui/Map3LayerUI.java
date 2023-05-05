@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.ui;
+
+import static org.eclipse.swt.events.MouseListener.mouseDownAdapter;
 
 import gov.nasa.worldwind.layers.Layer;
 
@@ -35,13 +37,9 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ICellEditorListener;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -52,10 +50,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
@@ -72,7 +66,7 @@ public class Map3LayerUI {
 
    private static final String        OPACITY_CAN_NOT_BE_SET = "....";                               //$NON-NLS-1$
 
-   public static final Double         DEFAULT_OPACITY        = new Double(1.0);
+   private static final Double        DEFAULT_OPACITY        = Double.valueOf(1.0);
 
    private ContainerCheckedTreeViewer _layerViewer;
    private SlideoutMap3LayerTooltip   _propToolTip;
@@ -248,13 +242,7 @@ public class Map3LayerUI {
 
       createUI_10_LayerViewer(parent);
 
-      parent.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDispose());
    }
 
    private Control createUI_10_LayerViewer(final Composite parent) {
@@ -291,12 +279,7 @@ public class Map3LayerUI {
           * selected and the selected tree item layer visibility is toggled !!!
           */
 
-         tree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDown(final MouseEvent e) {
-               onSelectTreeItem();
-            }
-         });
+         tree.addMouseListener(mouseDownAdapter(mouseEvent -> onSelectTreeItem()));
 
          /*
           * tree viewer
@@ -306,17 +289,14 @@ public class Map3LayerUI {
          _layerViewer.setContentProvider(new LayerContentProvider());
          _layerViewer.setUseHashlookup(true);
 
-         _layerViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(final DoubleClickEvent event) {
+         _layerViewer.addDoubleClickListener(doubleClickEvent -> {
 
-               final IStructuredSelection selection = (IStructuredSelection) _layerViewer.getSelection();
+            final IStructuredSelection selection = (IStructuredSelection) _layerViewer.getSelection();
 
-               final Object firstItem = selection.getFirstElement();
-               if (firstItem instanceof TVIMap3Layer) {
+            final Object firstItem = selection.getFirstElement();
+            if (firstItem instanceof TVIMap3Layer) {
 
-                  toggleLayerVisibility((TVIMap3Layer) firstItem, true, false);
-               }
+               toggleLayerVisibility((TVIMap3Layer) firstItem, true, false);
             }
          });
 
@@ -331,12 +311,7 @@ public class Map3LayerUI {
             }
          });
 
-         _layerViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(final CheckStateChangedEvent event) {
-               onChangeCheckState(event);
-            }
-         });
+         _layerViewer.addCheckStateListener(this::onChangeCheckState);
       }
 
       defineAllColumn(treeLayout);
@@ -439,7 +414,7 @@ public class Map3LayerUI {
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8), false));
+      treeLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 8));
    }
 
    private void initUI(final Composite parent) {
@@ -598,13 +573,13 @@ public class Map3LayerUI {
       Map3Manager.saveUIState(_layerViewer.getCheckedElements(), _layerViewer.getExpandedElements());
    }
 
-   public void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
+   void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
 
       // update viewer
       _layerViewer.setChecked(tviLayer, isVisible);
    }
 
-   public void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
+   void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
 
       setLayerVisible_TourTrack(tviLayer, isTrackVisible, true, false);
    }
@@ -663,7 +638,7 @@ public class Map3LayerUI {
       _layerViewer.update(tviLayer, null);
    }
 
-   public void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
+   void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
 
       // get a set of unique parents
       final HashSet<TreeViewerItem> parentItems = new HashSet<>();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,7 @@ package net.tourbook.commands;
 
 import java.util.Map;
 
-import net.tourbook.Messages;
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.views.tagging.TourTags_View;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -37,10 +37,10 @@ import org.eclipse.ui.menus.UIElement;
 
 public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
 
-   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour);
-   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled);
-   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags);
-   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags_Disabled);
+   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getThemedImageDescriptor(Images.SaveTour);
+   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getThemedImageDescriptor(Images.SaveTour_Disabled);
+   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getThemedImageDescriptor(Images.SaveTags);
+   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getThemedImageDescriptor(Images.SaveTags_Disabled);
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {

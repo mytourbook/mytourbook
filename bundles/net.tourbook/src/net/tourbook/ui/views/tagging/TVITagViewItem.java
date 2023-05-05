@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "AVG( CASE WHEN AVGPULSE = 0         THEN NULL ELSE AVGPULSE END)," //                                    8   //$NON-NLS-1$
             + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," //                                 9   //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //  10   //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," //  10   //$NON-NLS-1$
 
             + "SUM(TourDeviceTime_Recorded)," //    11   //$NON-NLS-1$
 
@@ -72,7 +72,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "avgPulse," //                 8   //$NON-NLS-1$
             + "avgCadence," //               9   //$NON-NLS-1$
-            + "(DOUBLE(AvgTemperature) / TemperatureScale)," //         10   //$NON-NLS-1$
+            + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," //         10   //$NON-NLS-1$
             + "TourDeviceTime_Recorded" //   11   //$NON-NLS-1$
       ;
    }
@@ -103,7 +103,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
    float                            colAvgPulse;
    float                            colAvgCadence;
-   float                            colAvgTemperature;
+   float                            colAvgTemperature_Device;
 
    long                             colTourCounter;
 
@@ -150,7 +150,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
              * to hide the '+' for an item which has no children, an empty list of children will be
              * created
              */
-            tagItem.setChildren(new ArrayList<TreeViewerItem>());
+            tagItem.setChildren(new ArrayList<>());
          }
 
       } catch (final SQLException e) {
@@ -175,7 +175,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
       colAvgPulse = result.getFloat(startIndex + 8);
       colAvgCadence = result.getFloat(startIndex + 9);
-      colAvgTemperature = result.getFloat(startIndex + 10);
+      colAvgTemperature_Device = result.getFloat(startIndex + 10);
 
       colRecordedTime = result.getLong(startIndex + 11);
 
@@ -203,7 +203,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
          colAvgPulse = UI.scrambleNumbers(colAvgPulse);
          colAvgCadence = UI.scrambleNumbers(colAvgCadence);
-         colAvgTemperature = UI.scrambleNumbers(colAvgTemperature);
+         colAvgTemperature_Device = UI.scrambleNumbers(colAvgTemperature_Device);
 
          colAvgSpeed = UI.scrambleNumbers(colAvgSpeed);
          colAvgPace = UI.scrambleNumbers(colAvgPace);

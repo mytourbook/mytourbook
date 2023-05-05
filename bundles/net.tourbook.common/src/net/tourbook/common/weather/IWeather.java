@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,16 +20,21 @@ import net.tourbook.common.UI;
 
 public interface IWeather {
 
-   public static final String   WEATHER_ID_CLEAR                = "weather-sunny";            //$NON-NLS-1$
-   public static final String   WEATHER_ID_PART_CLOUDS          = "weather-cloudy";           //$NON-NLS-1$
-   public static final String   WEATHER_ID_OVERCAST             = "weather-clouds";           //$NON-NLS-1$
-   public static final String   WEATHER_ID_LIGHTNING            = "weather-lightning";        //$NON-NLS-1$
-   public static final String   WEATHER_ID_RAIN                 = "weather-rain";             //$NON-NLS-1$
-   public static final String   WEATHER_ID_SNOW                 = "weather-snow";             //$NON-NLS-1$
-   public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";           //$NON-NLS-1$
-   public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scatterd"; //$NON-NLS-1$
+   public static final String   WEATHER_ID_CLEAR                = "weather-sunny";             //$NON-NLS-1$
+   public static final String   WEATHER_ID_PART_CLOUDS          = "weather-cloudy";            //$NON-NLS-1$
+   public static final String   WEATHER_ID_OVERCAST             = "weather-clouds";            //$NON-NLS-1$
+   public static final String   WEATHER_ID_LIGHTNING            = "weather-lightning";         //$NON-NLS-1$
+   public static final String   WEATHER_ID_RAIN                 = "weather-rain";              //$NON-NLS-1$
+   public static final String   WEATHER_ID_DRIZZLE              = "weather-drizzle";           //$NON-NLS-1$
+   public static final String   WEATHER_ID_SNOW                 = "weather-snow";              //$NON-NLS-1$
+   public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";            //$NON-NLS-1$
+   public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scattered"; //$NON-NLS-1$
+
+   public static final String   windDirectionIsNotDefined       = UI.EMPTY_STRING;
 
    public static final String[] windDirectionText               = new String[] {
+
+         windDirectionIsNotDefined,
 
          Messages.Weather_WindDirection_N,
          Messages.Weather_WindDirection_NNE,
@@ -165,7 +170,7 @@ public interface IWeather {
 
 // SET_FORMATTING_ON
 
-   public static final String cloudIsNotDefined = Messages.Weather_Clounds_IsNotDefined;
+   public static final String cloudIsNotDefined = Messages.Weather_Clouds_IsNotDefined;
 
    /*
     * cloudText and cloudDbValue must be in synch
@@ -174,31 +179,50 @@ public interface IWeather {
    /**
     * Text for the weather
     */
-   public static final String[] cloudText = new String[] {
+   public static final String[] cloudText              = new String[] {
 
          cloudIsNotDefined,
 
-         Messages.Weather_Clounds_Sunny,
-         Messages.Weather_Clounds_Clouny,
-         Messages.Weather_Clounds_Clouds,
-         Messages.Weather_Clounds_ScatteredShowers,
-         Messages.Weather_Clounds_Rain,
-         Messages.Weather_Clounds_Lightning,
-         Messages.Weather_Clounds_Snow,
-         Messages.Weather_Clounds_SevereWeatherAlert
+         Messages.Weather_Clouds_Sunny,
+         Messages.Weather_Clouds_Cloudy,
+         Messages.Weather_Clouds_Clouds,
+         Messages.Weather_Clouds_Drizzle,
+         Messages.Weather_Clouds_ScatteredShowers,
+         Messages.Weather_Clouds_Rain,
+         Messages.Weather_Clouds_Lightning,
+         Messages.Weather_Clouds_Snow,
+         Messages.Weather_Clouds_SevereWeatherAlert
+
+   };
+
+   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_IsNotDefined;
+
+   /**
+    * Text for the weather's air quality
+    */
+   public static final String[] airQualityTexts        = new String[] {
+
+         airQualityIsNotDefined,
+
+         Messages.Weather_AirQuality_Good,
+         Messages.Weather_AirQuality_Fair,
+         Messages.Weather_AirQuality_Moderate,
+         Messages.Weather_AirQuality_Poor,
+         Messages.Weather_AirQuality_VeryPoor
 
    };
 
    /**
     * Icons for the weather
     */
-   public static final String[] cloudIcon = new String[] {
+   public static final String[] cloudIcon              = new String[] {
 
          UI.IMAGE_EMPTY_16,
 
          WEATHER_ID_CLEAR,
          WEATHER_ID_PART_CLOUDS,
          WEATHER_ID_OVERCAST,
+         WEATHER_ID_DRIZZLE,
          WEATHER_ID_SCATTERED_SHOWERS,
          WEATHER_ID_RAIN,
          WEATHER_ID_LIGHTNING,

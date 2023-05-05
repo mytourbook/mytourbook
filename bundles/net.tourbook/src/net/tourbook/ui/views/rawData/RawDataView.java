@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,11 +18,11 @@ package net.tourbook.ui.views.rawData;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static net.tourbook.ui.UI.getIconUrl;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -39,12 +39,23 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
@@ -52,19 +63,28 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
+import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.ICloseOpenedDialogs;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -72,14 +92,20 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.download.CloudDownloaderManager;
+import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
+import net.tourbook.importdata.EasyLauncherUtils;
 import net.tourbook.importdata.ImportConfig;
-import net.tourbook.importdata.ImportDeviceState;
 import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.ImportState_Easy;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
@@ -111,7 +137,6 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TableViewerTourInfoToolTip;
@@ -120,8 +145,8 @@ import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -136,21 +161,17 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -164,27 +185,33 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -192,22 +219,23 @@ import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
 /**
- *
+ * Tour import view
  */
-public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3, ITourProviderByID {
+public class RawDataView extends ViewPart implements
 
-// SET_FORMATTING_OFF
-
-   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
-
-// SET_FORMATTING_ON
+      ITourProviderAll,
+      ITourViewer3,
+      ITourProviderByID,
+      ICloseOpenedDialogs {
 
    public static final String ID = "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+
+   private static final char  NL = UI.NEW_LINE;
 
    // db state
    private static final String           IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";               //$NON-NLS-1$
    private static final String           IMAGE_DATABASE                             = "IMAGE_DATABASE";                         //$NON-NLS-1$
-
+   //
    private static final String           IMAGE_DATABASE_OTHER_PERSON                = "IMAGE_DATABASE_OTHER_PERSON";            //$NON-NLS-1$
    private static final String           IMAGE_DELETE                               = "IMAGE_DELETE";                           //$NON-NLS-1$
    private static final String           IMAGE_ICON_PLACEHOLDER                     = "IMAGE_ICON_PLACEHOLDER";                 //$NON-NLS-1$
@@ -219,6 +247,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";             //$NON-NLS-1$
    private static final String           IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                //$NON-NLS-1$
    private static final String           IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                           //$NON-NLS-1$
+   // simple easy import
+   private static final String           IMAGE_DEVICE_FOLDER_ERROR                  = "IMAGE_DEVICE_FOLDER_ERROR";              //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_IS_CHECKING            = "IMAGE_DEVICE_FOLDER_IS_CHECKING";        //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_NOT_SETUP              = "IMAGE_DEVICE_FOLDER_NOT_SETUP";          //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_OFF                    = "IMAGE_DEVICE_FOLDER_OFF";                //$NON-NLS-1$
+   private static final String           IMAGE_DEVICE_FOLDER_OK                     = "IMAGE_DEVICE_FOLDER_OK";                 //$NON-NLS-1$
+   static final String                   IMAGE_DEVICE_TURN_ON                       = "IMAGE_DEVICE_TURN_ON";                   //$NON-NLS-1$
+   static final String                   IMAGE_DEVICE_TURN_OFF                      = "IMAGE_DEVICE_TURN_OFF";                  //$NON-NLS-1$
+   static final String                   IMAGE_STATE_OK                             = "IMAGE_STATE_OK";                         //$NON-NLS-1$
+   static final String                   IMAGE_STATE_ERROR                          = "IMAGE_STATE_ERROR";                      //$NON-NLS-1$
    //
    private static final String           HTML_TD                                    = "<td>";                                   //$NON-NLS-1$
    private static final String           HTML_TD_SPACE                              = "<td ";                                   //$NON-NLS-1$
@@ -229,7 +267,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                   //$NON-NLS-1$
    //
    private static final String           WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                        //$NON-NLS-1$
-   //   private static final String   WEB_RESOURCE_TITLE_FONT                        = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                    //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                        //$NON-NLS-1$
    private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                   //$NON-NLS-1$
@@ -237,26 +274,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String           CSS_IMPORT_BACKGROUND                      = "div.import-background";                  //$NON-NLS-1$
    private static final String           CSS_IMPORT_TILE                            = "a.import-tile";                          //$NON-NLS-1$
    //
+   public static final String            STATE_DEFAULT_CADENCE_MULTIPLIER           = "STATE_DEFAULT_CADENCE_MULTIPLIER";       //$NON-NLS-1$
+   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT   = CadenceMultiplier.RPM;
+   public static final String            STATE_IMPORT_UI                            = "importUI";                               //$NON-NLS-1$
+   public static final ImportUI          STATE_IMPORT_UI_DEFAULT                    = ImportUI.EASY_IMPORT_FANCY;
    private static final String           STATE_IMPORTED_FILENAMES                   = "importedFilenames";                      //$NON-NLS-1$
    private static final String           STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                    //$NON-NLS-1$
    //
+   public static final String            STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";     //$NON-NLS-1$
+   public static final boolean           STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
    public static final String            STATE_IS_CHECKSUM_VALIDATION               = "isChecksumValidation";                   //$NON-NLS-1$
    public static final boolean           STATE_IS_CHECKSUM_VALIDATION_DEFAULT       = true;
    public static final String            STATE_IS_CONVERT_WAYPOINTS                 = "STATE_IS_CONVERT_WAYPOINTS";             //$NON-NLS-1$
    public static final boolean           STATE_IS_CONVERT_WAYPOINTS_DEFAULT         = true;
    public static final String            STATE_IS_CREATE_TOUR_ID_WITH_TIME          = "isCreateTourIdWithTime";                 //$NON-NLS-1$
    public static final boolean           STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT  = false;
-   public static final String            STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";     //$NON-NLS-1$
-   public static final boolean           STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
-   private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
-   public static final String            STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                          //$NON-NLS-1$
-   public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT              = false;
    public static final String            STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                    //$NON-NLS-1$
    public static final boolean           STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
+   public static final String            STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                          //$NON-NLS-1$
+   public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT              = false;
+   private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
    public static final String            STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                        //$NON-NLS-1$
    public static final boolean           STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
-   public static final String            STATE_DEFAULT_CADENCE_MULTIPLIER           = "STATE_DEFAULT_CADENCE_MULTIPLIER";       //$NON-NLS-1$
-   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT   = CadenceMultiplier.RPM;
    //
    private static final String           HREF_TOKEN                                 = "#";                                      //$NON-NLS-1$
    private static final String           PAGE_ABOUT_BLANK                           = "about:blank";                            //$NON-NLS-1$
@@ -289,84 +328,115 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static String                 HREF_ACTION_OLD_UI;
    private static String                 HREF_ACTION_SERIAL_PORT_CONFIGURED;
    private static String                 HREF_ACTION_SERIAL_PORT_DIRECTLY;
-
    private static String                 HREF_ACTION_SETUP_EASY_IMPORT;
+   //
+   private static final String           LOG_TOUR_DETAILS                           = "%s · %.0f s · %5.1f Δ %s";               //$NON-NLS-1$
+   //
+   static {
+      //
+// SET_FORMATTING_OFF
+
+      HREF_ACTION_DEVICE_IMPORT           = HREF_TOKEN + ACTION_DEVICE_IMPORT;
+      HREF_ACTION_DEVICE_WATCHING_ON_OFF  = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
+      HREF_ACTION_IMPORT_FROM_FILES       = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
+      HREF_ACTION_OLD_UI                  = HREF_TOKEN + ACTION_OLD_UI;
+      HREF_ACTION_SERIAL_PORT_CONFIGURED  = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
+      HREF_ACTION_SERIAL_PORT_DIRECTLY    = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
+      HREF_ACTION_SETUP_EASY_IMPORT       = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
+
+// SET_FORMATTING_ON
+   }
+   //
+   private static boolean                      _isStopWatchingStoresThread;
+   public static volatile ReentrantLock        THREAD_WATCHER_LOCK = new ReentrantLock();
+   //
+   private static ThreadPoolExecutor           _saveTour_Executor;
+   private static ArrayBlockingQueue<TourData> _saveTour_Queue     = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch               _saveTour_CountDownLatch;
+
    static {
 
-      HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
-      HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
-      HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
-      HREF_ACTION_OLD_UI = HREF_TOKEN + ACTION_OLD_UI;
-      HREF_ACTION_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
-      HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
-      HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
-   }
-   private static boolean               _isStopWatchingStoresThread;
-   public static volatile ReentrantLock THREAD_WATCHER_LOCK = new ReentrantLock();
-   //
-   //
-   private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore         _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
-   //
-   private RawDataManager                 _rawDataMgr                     = RawDataManager.getInstance();
+      final ThreadFactory threadFactory = runnable -> {
 
-   private TableViewer                    _tourViewer;
-   private TableViewerTourInfoToolTip     _tourInfoToolTip;
-   private ColumnManager                  _columnManager;
-   private SelectionAdapter               _columnSortListener;
-   private TableColumnDefinition          _timeZoneOffsetColDef;
-   private ImportComparator               _importComparator;
+         final Thread thread = new Thread(runnable, "Saving imported tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _saveTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+   }
    //
-   private String                         _columnId_DeviceName;
-   private String                         _columnId_ImportFileName;
-   private String                         _columnId_TimeZone;
-   private String                         _columnId_Title;
-   private String                         _columnId_TourStartDate;
+   private final IPreferenceStore           _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore           _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings            _state                          = TourbookPlugin.getState(ID);
+   private final IDialogSettings            _stateSimpleUI                  = TourbookPlugin.getState(ID + "_SimpleUI"); //$NON-NLS-1$
    //
-   private PostSelectionProvider          _postSelectionProvider;
-   private IPartListener2                 _partListener;
-   private ISelectionListener             _postSelectionListener;
-   private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListener_Common;
-   private ITourEventListener             _tourEventListener;
+   private RawDataManager                   _rawDataMgr                     = RawDataManager.getInstance();
+
+   private TableViewer                      _tourViewer;
+   private TableViewerTourInfoToolTip       _tourInfoToolTip;
+   private ColumnManager                    _tourViewer_ColumnManager;
+   private SelectionListener                _columnSortListener;
+   private TableColumnDefinition            _timeZoneOffsetColDef;
+   private TourViewer_Comparator            _tourViewer_Comparator;
    //
-   private TagMenuManager                 _tagMenuManager;
-   private MenuManager                    _viewerMenuManager;
-   private IContextMenuProvider           _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private String                           _columnId_DeviceName;
+   private String                           _columnId_ImportFileName;
+   private String                           _columnId_Marker;
+   private String                           _columnId_TimeZone;
+   private String                           _columnId_Title;
+   private String                           _columnId_TourStartDate;
    //
-   private ActionClearView                _actionClearView;
-   private ActionOpenTourLogView          _actionOpenTourLogView;
-   private ActionDeleteTourFiles          _actionDeleteTourFile;
-   private ActionExport                   _actionExportTour;
-   private ActionEditQuick                _actionEditQuick;
-   private ActionEditTour                 _actionEditTour;
-   private ActionJoinTours                _actionJoinTours;
-   private ActionMergeIntoMenu            _actionMergeIntoTour;
-   private ActionMergeTour                _actionMergeTour;
-   private ActionModifyColumns            _actionModifyColumns;
-   private ActionOpenTour                 _actionOpenTour;
-   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
-   private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
-   private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private ActionReimportTours            _actionReimport_Tours;
-   private ActionRemoveTour               _actionRemoveTour;
-   private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
-   private ActionSaveTourInDatabase       _actionSaveTour;
-   private ActionSaveTourInDatabase       _actionSaveTourWithPerson;
-   private ActionSetupImport              _actionSetupImport;
-   private ActionSetTourTypeMenu          _actionSetTourType;
+   private PostSelectionProvider            _postSelectionProvider;
+   private IPartListener2                   _partListener;
+   private ISelectionListener               _postSelectionListener;
+   private IPropertyChangeListener          _prefChangeListener;
+   private IPropertyChangeListener          _prefChangeListener_Common;
+   private ITourEventListener               _tourEventListener;
    //
-   protected TourPerson                   _activePerson;
-   protected TourPerson                   _newActivePerson;
+   private TagMenuManager                   _tagMenuManager;
+   private MenuManager                      _tourViewer_MenuManager;
+   private IContextMenuProvider             _tourViewer_ContextMenuProvider = new TourViewer_ContextMenuProvider();
    //
-   protected boolean                      _isPartVisible                  = false;
-   protected boolean                      _isViewerPersonDataDirty        = false;
+   private ActionClearView                  _actionClearView;
+   private ActionOpenTourLogView            _actionOpenTourLogView;
+   private ActionDeleteTourFiles            _actionDeleteTourFile;
+   private ActionExport                     _actionExportTour;
+   private ActionEditQuick                  _actionEditQuick;
+   private ActionEditTour                   _actionEditTour;
+   private ActionJoinTours                  _actionJoinTours;
+   private ActionMergeIntoMenu              _actionMergeIntoTour;
+   private ActionMergeTour                  _actionMergeTour;
+   private ActionOpenTour                   _actionOpenTour;
+   private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
+   private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
+   private ActionOpenPrefDialog             _actionEditImportPreferences;
+   private ActionReimportTours              _actionReimportTours;
+   private ActionRemoveTour                 _actionRemoveTour;
+   private ActionRemoveToursWhenClosed      _actionRemoveToursWhenClosed;
+   private ActionSaveTourInDatabase         _actionSaveTour;
+   private ActionSaveTourInDatabase         _actionSaveTourWithPerson;
+   private ActionSetupImport                _actionSetupImport;
+   private ActionSetTourTypeMenu            _actionSetTourType;
+   private ActionSimpleUI_DeviceState       _actionSimpleUI_DeviceState;
+   private ActionSimpleUI_StartEasyImport   _actionSimpleUI_StartEasyImport;
+   private ActionSimpleUI_StartStopWatching _actionSimpleUI_StartStopWatching;
+   private ActionToggleFossilOrEasyImport   _actionToggleImportUI;
+   private ActionUpload                     _actionUploadTour;
    //
-   private final NumberFormat             _nf1;
-   private final NumberFormat             _nf3;
+   private TourPerson                       _activePerson;
+   private TourPerson                       _newActivePerson;
    //
-   private final PeriodType               _durationTemplate;
+   private boolean                          _isPartVisible                  = false;
+   private boolean                          _isViewerPersonDataDirty        = false;
+   //
+   private final NumberFormat               _nf1;
+   private final NumberFormat               _nf3;
+   //
+   private final PeriodType                 _durationTemplate;
    {
       _nf1 = NumberFormat.getNumberInstance();
       _nf3 = NumberFormat.getNumberInstance();
@@ -382,92 +452,348 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             .withMillisRemoved();
    }
    //
-   private boolean                _isToolTipInDate;
-   private boolean                _isToolTipInTime;
-   private boolean                _isToolTipInTitle;
-   private boolean                _isToolTipInTags;
+   private boolean                       _isToolTipInDate;
+   private boolean                       _isToolTipInTime;
+   private boolean                       _isToolTipInTitle;
+   private boolean                       _isToolTipInTags;
    //
-   private TourDoubleClickState   _tourDoubleClickState       = new TourDoubleClickState();
+   private TourDoubleClickState          _tourDoubleClickState       = new TourDoubleClickState();
    //
-   private Thread                 _watchingStoresThread;
-   private Thread                 _watchingFolderThread;
-   private WatchService           _folderWatcher;
-   private AtomicBoolean          _isWatchingStores           = new AtomicBoolean();
-   private AtomicBoolean          _isDeviceStateUpdateDelayed = new AtomicBoolean();
-   private ReentrantLock          WATCH_LOCK                  = new ReentrantLock();
+   private Thread                        _watchingStoresThread;
+   private Thread                        _watchingFolderThread;
+   private WatchService                  _folderWatcher;
+   private AtomicBoolean                 _isWatchingStores           = new AtomicBoolean();
+   private AtomicBoolean                 _isDeviceStateUpdateDelayed = new AtomicBoolean();
+   private ReentrantLock                 WATCH_LOCK                  = new ReentrantLock();
    //
-   private HashMap<Long, Image>   _configImages               = new HashMap<>();
-   private HashMap<Long, Integer> _configImageHash            = new HashMap<>();
+   private HashMap<String, Image>        _configImages               = new HashMap<>();
+   private HashMap<String, Integer>      _configImageHash            = new HashMap<>();
    //
-   private boolean                _isBrowserCompleted;
-   private boolean                _isInUIStartup;
-   private boolean                _isInUpdate;
-   private boolean                _isNewUI;
+   private boolean                       _isBrowserCompleted;
+   private boolean                       _isInFancyUIStartup;
+   private boolean                       _isInUpdate;
+   //
+   private ImportUI                      _importUI;
 
    /**
     * When <code>false</code> then the background WatchStores task must set it valid. Only when it
     * is valid then the device state icon displays the state, otherwise it shows a waiting icon.
     */
-   private boolean                _isDeviceStateValid;
-   private boolean                _isRunDashboardAnimation    = true;
-   private boolean                _isShowWatcherAnimation;
-   private boolean                _isUpdateDeviceState        = true;
+   private boolean                       _isDeviceStateValid;
+   private boolean                       _isRunDashboardAnimation    = true;
+   private boolean                       _isShowWatcherAnimation;
+   private boolean                       _isUpdateDeviceState        = true;
    //
-   private String                 _cssFonts;
-   private String                 _cssFromFile;
+   private String                        _cssFonts;
+   private String                        _cssFromFile;
    //
-   private String                 _imageUrl_Device_TurnOff;
-   private String                 _imageUrl_Device_TurnOn;
-   private String                 _imageUrl_DeviceFolder_OK;
-   private String                 _imageUrl_DeviceFolder_Disabled;
-   private String                 _imageUrl_DeviceFolder_NotAvailable;
-   private String                 _imageUrl_DeviceFolder_NotChecked;
-   private String                 _imageUrl_DeviceFolder_NotSetup;
-   private String                 _imageUrl_ImportFromFile;
-   private String                 _imageUrl_SerialPort_Configured;
-   private String                 _imageUrl_SerialPort_Directly;
-   private String                 _imageUrl_State_AdjustTemperature;
-   private String                 _imageUrl_State_RetrieveWeatherData;
-   private String                 _imageUrl_State_Error;
-   private String                 _imageUrl_State_OK;
-   private String                 _imageUrl_State_MovedFiles;
-   private String                 _imageUrl_State_SaveTour;
-   private String                 _imageUrl_State_TourMarker;
+   private String                        _imageUrl_Device_TurnOff;
+   private String                        _imageUrl_Device_TurnOn;
+   private String                        _imageUrl_DeviceFolder_OK;
+   private String                        _imageUrl_DeviceFolder_Off;
+   private String                        _imageUrl_DeviceFolder_Error;
+   private String                        _imageUrl_DeviceFolder_IsChecking;
+   private String                        _imageUrl_DeviceFolder_NotSetup;
+   private String                        _imageUrl_ImportFromFile;
+   private String                        _imageUrl_SerialPort_Configured;
+   private String                        _imageUrl_SerialPort_Directly;
+   private String                        _imageUrl_State_AdjustTemperature;
+   private String                        _imageUrl_State_RetrieveWeatherData;
+   private String                        _imageUrl_State_Error;
+   private String                        _imageUrl_State_OK;
+   private String                        _imageUrl_State_MovedFiles;
+   private String                        _imageUrl_State_SaveTour;
+   private String                        _imageUrl_State_TourMarker;
    //
-   private PixelConverter         _pc;
+   private PixelConverter                _pc;
+   private List<TourbookCloudDownloader> _cloudDownloadersList       = CloudDownloaderManager.getCloudDownloaderList();
+   //
+   private DialogEasyImportConfig        _dialogImportConfig;
 
    /*
-    * resources
+    * Simple easy import
     */
-   private ImageRegistry          _images;
+   private TableViewer                    _simpleUI_ImportLauncher_Viewer;
+   private SimpleUI_ImportLauncher_Viewer _simpleUI_ImportLauncher_ColumnViewer        = new SimpleUI_ImportLauncher_Viewer();
+   private ColumnManager                  _simpleUI_ImportLauncher_ColumnManager;
+   private IContextMenuProvider           _simpleUI_ImportLauncher_ContextMenuProvider = new SimpleUI_ImportLauncher_ContextMenuProvider();
+   private MenuManager                    _simpleUI_ImportLauncher_MenuManager;
+   private EasyLauncherUtils              _simpleUI_ImportLauncher_Utils               = new EasyLauncherUtils();
+   //
+   private int                            _simpleUI_ColumnIndexConfigImage;
+   private long                           _lastSimpleUIConfigSelection;
+   //
+   private OpenDialogManager              _openDialogManager                           = new OpenDialogManager();
 
-   private DialogEasyImportConfig _dialogImportConfig;
+   /*
+    * Resources
+    */
+   private ImageRegistry _images;
 
    /*
     * UI controls
     */
-   private PageBook  _topPageBook;
-   private Composite _topPage_Dashboard;
+   private Browser   _browser;
+
+   private PageBook  _topPage_PageBook;
    private Composite _topPage_ImportViewer;
-   private Composite _topPage_OldUI;
    private Composite _topPage_Startup;
 
-   private PageBook  _dashboard_PageBook;
-   private Composite _dashboardPage_NoBrowser;
-   private Composite _dashboardPage_WithBrowser;
+   private Composite _topPage_ImportUI_EasyImport_Fancy;
+   private Composite _topPage_ImportUI_EasyImport_Simple;
+   private Composite _topPage_ImportUI_FossilUI;
+
+   private PageBook  _easyImportFancy_PageBook;
+   private Composite _easyImportFancy_Page_NoBrowser;
+   private Composite _easyImportFancy_Page_WithBrowser;
 
    private Composite _parent;
-   private Composite _viewerContainer;
+   private Composite _tourViewer_Container;
+   private Composite _simpleUI_ViewerContainer;
 
-   private Text      _txtNoBrowser;
+   private Combo     _comboSimpleUI_Config;
+
+   private Label     _lblSimpleUI_EasyImportTitle;
+   private Label     _lblSimpleUI_NumNotImportedFiles;
 
    private Link      _linkImport;
 
-   private Browser   _browser;
+   private Text      _txtNoBrowser;
 
-   private Menu      _tableContextMenu;
+   private Menu      _tourViewer_ContextMenu;
+   private Menu      _simpleUI_ImportLauncher_ContextMenu;
 
-   private class ImportComparator extends ViewerComparator {
+   private class ActionSimpleUI_DeviceState extends ActionToolbarSlideoutAdv {
+
+      private SlideoutDeviceState __slideoutDeviceState;
+
+      public ActionSimpleUI_DeviceState() {
+
+         super(_images.get(IMAGE_DEVICE_FOLDER_OK),
+               _images.get(IMAGE_DEVICE_FOLDER_OFF));
+      }
+
+      @Override
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+
+         __slideoutDeviceState = new SlideoutDeviceState(toolItem, _state, RawDataView.this);
+
+         return __slideoutDeviceState;
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect(final SelectionEvent selectionEvent) {
+
+         /*
+          * Must be closed and not only hidden otherwise it can be blocking the opened dialog when
+          * the slideout is set to keep opened
+          */
+         __slideoutDeviceState.close();
+
+         onSelect_SetupEasyImport(-1);
+      }
+   }
+
+   private class ActionSimpleUI_StartEasyImport extends Action {
+
+      public ActionSimpleUI_StartEasyImport() {
+
+         setText(Messages.Import_Data_Action_StartEasyImport);
+      }
+
+      @Override
+      public void run() {
+
+         runEasyImport();
+      }
+   }
+
+   private class ActionSimpleUI_StartStopWatching extends Action {
+
+      public ActionSimpleUI_StartStopWatching() {
+
+         setToolTipText(Messages.Import_Data_HTML_DeviceOn_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RawData_Device_TurnOn));
+      }
+
+      @Override
+      public void run() {
+
+         onSelect_DeviceWatching_OnOff();
+      }
+   }
+
+   private class ActionToggleFossilOrEasyImport extends Action {
+
+      public ActionToggleFossilOrEasyImport() {
+
+         setToolTipText(Messages.Import_Data_Action_ImportUI_Tooltip);
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         actionToggle_ImportUI(event);
+      }
+   }
+
+   private enum ImportUI {
+
+      /**
+       * Dashboard with the browser
+       */
+      EASY_IMPORT_FANCY,
+
+      /**
+       * Dashboard with SWT widget, to fix issues when the browser is sometimes not working
+       * correctly
+       */
+      EASY_IMPORT_SIMPLE,
+
+      /**
+       * Just a simple import of files without easy import features
+       */
+      FOSSIL
+   }
+
+   private class JS_OnSelectImportConfig extends BrowserFunction {
+
+      JS_OnSelectImportConfig(final Browser browser, final String name) {
+         super(browser, name);
+      }
+
+      @Override
+      public Object function(final Object[] arguments) {
+
+         final int selectedIndex = ((Number) arguments[0]).intValue();
+
+         _parent.getDisplay().asyncExec(() -> onSelect_ImportConfig_Fancy(selectedIndex));
+
+//// this can be used to show created JS in the debugger
+//         if (true) {
+//            throw new RuntimeException();
+//         }
+
+         return null;
+      }
+   }
+
+   private class SimpleUI_ImportLauncher_ContentProvider implements IStructuredContentProvider {
+
+      public SimpleUI_ImportLauncher_ContentProvider() {}
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object parent) {
+
+         final ArrayList<ImportLauncher> configItems = getEasyConfig().importLaunchers;
+
+         return configItems.toArray(new ImportLauncher[configItems.size()]);
+      }
+
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   private class SimpleUI_ImportLauncher_ContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_simpleUI_ImportLauncher_ContextMenu != null) {
+            _simpleUI_ImportLauncher_ContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _simpleUI_ImportLauncher_ContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _simpleUI_ImportLauncher_ContextMenu = createUI_62_SimpleUI_CreateContextMenu();
+
+         return _simpleUI_ImportLauncher_ContextMenu;
+      }
+
+   }
+
+   public class SimpleUI_ImportLauncher_Viewer implements ITourViewer {
+
+      @Override
+      public ColumnManager getColumnManager() {
+         return _simpleUI_ImportLauncher_ColumnManager;
+      }
+
+      @Override
+      public ColumnViewer getViewer() {
+         return _simpleUI_ImportLauncher_Viewer;
+      }
+
+      @Override
+      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+         _simpleUI_ViewerContainer.setRedraw(false);
+         {
+            final ISelection selection = _simpleUI_ImportLauncher_Viewer.getSelection();
+
+            _simpleUI_ImportLauncher_Viewer.getTable().dispose();
+
+            createUI_57_SimpleUI_ViewerTable(_simpleUI_ViewerContainer);
+            _simpleUI_ViewerContainer.layout();
+
+            // update viewer
+            reloadViewer();
+
+            _simpleUI_ImportLauncher_Viewer.setSelection(selection);
+         }
+         _simpleUI_ViewerContainer.setRedraw(true);
+
+         return _simpleUI_ImportLauncher_Viewer;
+      }
+
+      @Override
+      public void reloadViewer() {
+
+         _simpleUI_ImportLauncher_Viewer.setInput(this);
+      }
+
+      @Override
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
+   }
+
+   private class SimpleUI_ImportLauncher_ViewerFilter extends ViewerFilter {
+
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+
+         if (element instanceof ImportLauncher) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) element;
+
+            if (importLauncher.isShowInDashboard) {
+               return true;
+            }
+         }
+
+         return false;
+      }
+   }
+
+   private class TourViewer_Comparator extends ViewerComparator {
 
       static final int         ASCENDING  = 0;
       private static final int DESCENDING = 1;
@@ -494,6 +820,36 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // title
 
             result = tourData1.getTourTitle().compareTo(tourData2.getTourTitle());
+
+         } else if (__sortColumnId.equals(_columnId_Marker)) {
+
+            // marker
+
+            final int numMarker1 = tourData1.getTourMarkers().size();
+            final int numMarker2 = tourData2.getTourMarkers().size();
+            final int numWayPoints1 = tourData1.getTourWayPoints().size();
+            final int numWayPoints2 = tourData2.getTourWayPoints().size();
+
+            final int num1 = numMarker1 + numWayPoints1;
+            final int num2 = numMarker2 + numWayPoints2;
+
+            if (num1 > 0 && num2 > 0) {
+
+               result = num1 > num2 ? 1 : -1;
+
+            } else {
+
+               // prevent java.lang.IllegalArgumentException: Comparison method violates its general contract!
+
+               if (num1 > 0) {
+
+                  result = 1;
+
+               } else if (num2 > 0) {
+
+                  result = -1;
+               }
+            }
 
          } else if (__sortColumnId.equals(_columnId_ImportFileName)) {
 
@@ -538,7 +894,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // do a 2nd sorting by date/time
          if (result == 0) {
-            result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+
+            result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS()
+                  ? 1
+                  : -1;
          }
 
          // if descending order, flip the direction
@@ -580,64 +939,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    }
 
-   private class JS_OnSelectImportConfig extends BrowserFunction {
+   private class TourViewer_ContentProvider implements IStructuredContentProvider {
 
-      JS_OnSelectImportConfig(final Browser browser, final String name) {
-         super(browser, name);
-      }
-
-      @Override
-      public Object function(final Object[] arguments) {
-
-         final int selectedIndex = ((Number) arguments[0]).intValue();
-
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-
-               onSelectImportConfig(selectedIndex);
-            }
-         });
-
-//// this can be used to show created JS in the debugger
-//         if (true) {
-//            throw new RuntimeException();
-//         }
-
-         return null;
-      }
-   }
-
-   public class TableContextMenuProvider implements IContextMenuProvider {
-
-      @Override
-      public void disposeContextMenu() {
-
-         if (_tableContextMenu != null) {
-            _tableContextMenu.dispose();
-         }
-      }
-
-      @Override
-      public Menu getContextMenu() {
-         return _tableContextMenu;
-      }
-
-      @Override
-      public Menu recreateContextMenu() {
-
-         disposeContextMenu();
-
-         _tableContextMenu = createUI_96_CreateViewerContextMenu();
-
-         return _tableContextMenu;
-      }
-
-   }
-
-   private class TourDataContentProvider implements IStructuredContentProvider {
-
-      public TourDataContentProvider() {}
+      public TourViewer_ContentProvider() {}
 
       @Override
       public void dispose() {}
@@ -651,75 +955,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
 
+   private class TourViewer_ContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tourViewer_ContextMenu != null) {
+            _tourViewer_ContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _tourViewer_ContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tourViewer_ContextMenu = createUI_96_CreateViewerContextMenu();
+
+         return _tourViewer_ContextMenu;
+      }
+
+   }
+
    public static boolean isStopWatchingStoresThread() {
       return _isStopWatchingStoresThread;
-   }
-
-   private void action_Easy_SetDeviceWatching_OnOff() {
-
-      _isShowWatcherAnimation = true;
-
-      if (isWatchingOn()) {
-
-         // stop watching
-
-         setWatcher_Off();
-
-      } else {
-
-         // start watching
-
-         setWatcher_On();
-      }
-
-      updateUI_DeviceState();
-   }
-
-   /**
-    * @param selectedTab
-    *           Tab which should be selected when config dialog is opened, -1 will select the
-    *           restored tab index.
-    */
-   void action_Easy_SetupImport(final int selectedTab) {
-
-      // prevent that the dialog is opened multiple times, this occurred when testing
-      if (_dialogImportConfig != null) {
-         return;
-      }
-
-      final Shell shell = Display.getDefault().getActiveShell();
-
-      final EasyConfig easyConfig = getEasyConfig();
-
-      _dialogImportConfig = new DialogEasyImportConfig(shell, easyConfig, this, selectedTab);
-
-      boolean isOK = false;
-
-      if (_dialogImportConfig.open() == Window.OK) {
-         isOK = true;
-      }
-
-      if (isOK) {
-
-         // keep none live update values
-
-         final EasyConfig modifiedEasyConfig = _dialogImportConfig.getModifiedConfig();
-
-         easyConfig.setActiveImportConfig(modifiedEasyConfig.getActiveImportConfig());
-
-         easyConfig.importConfigs.clear();
-         easyConfig.importConfigs.addAll(modifiedEasyConfig.importConfigs);
-
-         easyConfig.importLaunchers.clear();
-         easyConfig.importLaunchers.addAll(modifiedEasyConfig.importLaunchers);
-
-         updateModel_EasyConfig_Dashboard(_dialogImportConfig.getModifiedConfig());
-
-         _isDeviceStateValid = false;
-         updateUI_2_Dashboard();
-      }
-
-      _dialogImportConfig = null;
    }
 
    void actionClearView() {
@@ -810,7 +1074,71 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    void actionSaveTour(final TourPerson person) {
 
-      doSaveTour(person);
+      TourLogManager.addLog(
+
+            TourLogState.DEFAULT,
+
+            Messages.Log_Tour_SaveTours,
+
+            TourLogView.CSS_LOG_TITLE);
+
+      saveImportedTours(getAnySelectedTours(), person);
+   }
+
+   /**
+    * Toggle between different UI's
+    *
+    * @param event
+    */
+   private void actionToggle_ImportUI(final Event event) {
+
+      final boolean isForward = UI.isCtrlKey(event) == false;
+
+// SET_FORMATTING_OFF
+
+      boolean isFancy  = false;
+      boolean isSimple = false;
+      boolean isFossil = false;
+
+      switch (_importUI) {
+
+      case EASY_IMPORT_FANCY:
+
+         if (isForward) {     isSimple = true;  }
+         else {               isFossil = true;  }
+
+         break;
+
+      case EASY_IMPORT_SIMPLE:
+
+         if (isForward) {     isFossil = true;  }
+         else {               isFancy  = true;  }
+
+         break;
+
+      case FOSSIL:
+      default:
+
+         if (isForward) {     isFancy  = true;  }
+         else {               isSimple = true;  }
+
+         break;
+      }
+
+      if (isFancy) {
+
+         onSelect_ImportUI(ImportUI.EASY_IMPORT_FANCY);
+
+      } else if (isSimple) {
+
+         onSelect_ImportUI(ImportUI.EASY_IMPORT_SIMPLE);
+
+      } else if (isFossil) {
+
+         onSelect_ImportUI(ImportUI.FOSSIL);
+      }
+
+// SET_FORMATTING_ON
    }
 
    private void addPartListener() {
@@ -873,49 +1201,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-               if (_isPartVisible) {
-                  updateViewerPersonData();
-               } else {
-                  // keep new active person until the view is visible
-                  _newActivePerson = TourbookPlugin.getActivePerson();
-               }
-
-            } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
-
-               _actionSaveTour.resetPeopleList();
-
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-               // tour type images can have been changed
-               disposeConfigImages();
-
-               // update tour type in the raw data
-               _rawDataMgr.updateTourData_InImportView_FromDb(null);
-
-               _tourViewer.refresh();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
-
-               updateToolTipState();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-               _tourViewer.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tourViewer.getTable().redraw();
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            if (_isPartVisible) {
+               updateViewerPersonData();
+            } else {
+               // keep new active person until the view is visible
+               _newActivePerson = TourbookPlugin.getActivePerson();
             }
+
+         } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+            _actionSaveTour.resetPeopleList();
+
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+            // tour type images can have been changed
+            disposeConfigImages();
+
+            // update tour type in the raw data
+            _rawDataMgr.updateTourData_InImportView_FromDb(null);
+
+            _tourViewer.refresh();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+            updateToolTipState();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+            _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+            _tourViewer.refresh();
+
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _tourViewer.getTable().redraw();
          }
       };
 
@@ -924,23 +1249,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Common preferences
        */
-      _prefChangeListener_Common = new IPropertyChangeListener() {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+            recreateViewer();
 
-               recreateViewer();
+         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            // measurement system has changed
 
-               // measurement system has changed
-
-               recreateViewer();
-            }
+            recreateViewer();
          }
       };
 
@@ -950,99 +1271,114 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-            if (part == RawDataView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (workbenchPart == RawDataView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-            if (part == RawDataView.this) {
-               return;
+         if (part == RawDataView.this) {
+            return;
+         }
+         if (_isInUpdate) {
+            return;
+         }
+
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            // update modified tours
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
+
+               // update model
+               _rawDataMgr.updateTourDataModel(modifiedTours);
+
+               // update viewer
+               _tourViewer.update(modifiedTours.toArray(), null);
+
+               // remove old selection, old selection can have the same tour but with old data
+               _postSelectionProvider.clearSelection();
             }
-            if (_isInUpdate) {
-               return;
+
+         } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
+            // save imported file names
+            final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+
+            _state.put(STATE_IMPORTED_FILENAMES, importedFiles.keySet().toArray(String[]::new));
+
+            if (!RawDataManager.isReimportingActive() &&
+                  !RawDataManager.isDeleteValuesActive()) {
+
+               /*
+                * Re-import files because computed values could be changed, e.g. elevation gain
+                */
+
+               reimportAllImportFiles(false);
             }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-               // update modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            _rawDataMgr.updateTourData_InImportView_FromDb(null);
 
-                  // update model
-                  _rawDataMgr.updateTourDataModel(modifiedTours);
-
-                  // update viewer
-                  _tourViewer.update(modifiedTours.toArray(), null);
-
-                  // remove old selection, old selection can have the same tour but with old data
-                  _postSelectionProvider.clearSelection();
-               }
-
-            } else if (eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
-               // save imported file names
-               final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-               _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
-
-               if (RawDataManager.isReimportingActive() == false) {
-
-                  /*
-                   * Re-import files because computed values could be changed, e.g. elevation gain
-                   */
-
-                  reimportAllImportFiles(false);
-               }
-
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
-
-               _rawDataMgr.updateTourData_InImportView_FromDb(null);
-
-               reloadViewer();
-            }
+            reloadViewer();
          }
       };
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   /**
+    * Close all opened dialogs except the opening dialog.
+    *
+    * @param openingDialog
+    */
+   @Override
+   public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+
+      _openDialogManager.closeOpenedDialogs(openingDialog);
+   }
+
    private void createActions() {
 
-      _actionEditImportPreferences = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+// SET_FORMATTING_OFF
 
-      _actionClearView = new ActionClearView(this);
-      _actionDeleteTourFile = new ActionDeleteTourFiles(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionExportTour = new ActionExport(this);
-      _actionJoinTours = new ActionJoinTours(this);
-      _actionMergeIntoTour = new ActionMergeIntoMenu(this);
-      _actionMergeTour = new ActionMergeTour(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-      _actionOpenTourLogView = new ActionOpenTourLogView();
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-      _actionOpenTour = new ActionOpenTour(this);
-      _actionReimport_Tours = new ActionReimportTours(this);
-      _actionRemoveTour = new ActionRemoveTour(this);
-      _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
-      _actionSaveTour = new ActionSaveTourInDatabase(this, false);
-      _actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
-      _actionSetupImport = new ActionSetupImport(this);
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
+      _actionEditImportPreferences        = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
+
+      _actionClearView                    = new ActionClearView(this);
+      _actionDeleteTourFile               = new ActionDeleteTourFiles(this);
+      _actionEditTour                     = new ActionEditTour(this);
+      _actionEditQuick                    = new ActionEditQuick(this);
+      _actionExportTour                   = new ActionExport(this);
+      _actionJoinTours                    = new ActionJoinTours(this);
+      _actionMergeIntoTour                = new ActionMergeIntoMenu(this);
+      _actionMergeTour                    = new ActionMergeTour(this);
+      _actionOpenAdjustAltitudeDialog     = new ActionOpenAdjustAltitudeDialog(this);
+      _actionOpenTourLogView              = new ActionOpenTourLogView();
+      _actionOpenMarkerDialog             = new ActionOpenMarkerDialog(this, true);
+      _actionOpenTour                     = new ActionOpenTour(this);
+      _actionReimportTours                = new ActionReimportTours(this);
+      _actionRemoveTour                   = new ActionRemoveTour(this);
+      _actionRemoveToursWhenClosed        = new ActionRemoveToursWhenClosed();
+      _actionSaveTour                     = new ActionSaveTourInDatabase(this, false);
+      _actionSaveTourWithPerson           = new ActionSaveTourInDatabase(this, true);
+      _actionSetupImport                  = new ActionSetupImport(this);
+      _actionSetTourType                  = new ActionSetTourTypeMenu(this);
+      _actionToggleImportUI               = new ActionToggleFossilOrEasyImport();
+      _actionUploadTour                   = new ActionUpload(this);
+      _actionSimpleUI_DeviceState         = new ActionSimpleUI_DeviceState();
+      _actionSimpleUI_StartEasyImport     = new ActionSimpleUI_StartEasyImport();
+      _actionSimpleUI_StartStopWatching   = new ActionSimpleUI_StartStopWatching();
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -1069,25 +1405,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * Show image only when it is visible, opacity > 0
           */
 
-         File webFile;
-         try {
+         final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE);
+         final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+         final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
 
-            webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE);
-            final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
-            final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
+         bgImage = CSS_IMPORT_BACKGROUND + NL
 
-            bgImage = (CSS_IMPORT_BACKGROUND + "\n")// //$NON-NLS-1$
-                  + "{\n" //$NON-NLS-1$
-                  + ("   background:            url('data:image/svg+xml;base64," + base64Encoded + "');\n") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ("   background-repeat:      no-repeat;\n") //$NON-NLS-1$
-                  + ("   background-size:       contain;\n") //$NON-NLS-1$
-                  + ("   background-position:    center center;\n") //$NON-NLS-1$
-                  + ("   opacity:            " + (float) opacity / 100 + ";\n") //$NON-NLS-1$ //$NON-NLS-2$
-                  + "}\n"; //$NON-NLS-1$
-
-         } catch (IOException | URISyntaxException e) {
-            TourLogManager.logEx(e);
-         }
+               + "{" + NL //                                                           //$NON-NLS-1$
+               + "   background:             url('data:image/svg+xml;base64," + base64Encoded + "');" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "   background-repeat:      no-repeat;" + NL //                       //$NON-NLS-1$
+               + "   background-size:        contain;" + NL //                         //$NON-NLS-1$
+               + "   background-position:    center center;" + NL //                   //$NON-NLS-1$
+               + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "}" + NL; //                                                          //$NON-NLS-1$
       }
 
       String animation = UI.EMPTY_STRING;
@@ -1101,30 +1431,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          animation = UI.EMPTY_STRING//
 
-               + ("body\n") //$NON-NLS-1$
-               + ("{\n") //$NON-NLS-1$
-               + ("   animation:               fadeinBody;\n") //$NON-NLS-1$
-               + ("   animation-duration:         " + _nf1.format(animationDuration / 10.0) + "s;\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   animation-timing-function:   ease;\n") //$NON-NLS-1$
-               + ("}\n") //$NON-NLS-1$
+               + "body" + NL //                                         //$NON-NLS-1$
+               + "{" + NL //                                            //$NON-NLS-1$
+               + "   animation:                    fadeinBody;" + NL // //$NON-NLS-1$
+               + "   animation-duration:           " + _nf1.format(animationDuration / 10.0) + "s;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+               + "   animation-timing-function:    ease;" + NL //       //$NON-NLS-1$
+               + "}" + NL //                                            //$NON-NLS-1$
 
-               + ("@keyframes fadeinBody                                    \n") //$NON-NLS-1$
-               + ("{                                                   \n") //$NON-NLS-1$
+               + "@keyframes fadeinBody" + NL //                        //$NON-NLS-1$
+               + "{" + NL //                                            //$NON-NLS-1$
 
-               + ("   from                                             \n") //$NON-NLS-1$
-               + ("   {                                                \n") //$NON-NLS-1$
-               + ("      opacity:            0;                           \n") //$NON-NLS-1$
-               + ("      background-color:      ButtonFace;                     \n") //$NON-NLS-1$
-               + ("      transform:            rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);   \n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               + ("   }                                                \n") //$NON-NLS-1$
-//                        transform:            rotateX(-80deg) rotateY(-80deg);
-//                        transform-origin:       50% 200%;
+               + "   from" + NL //                                      //$NON-NLS-1$
+               + "   {" + NL //                                         //$NON-NLS-1$
+               + "      opacity:             0;" + NL //                //$NON-NLS-1$
+               + "      background-color:    ButtonFace;" + NL //       //$NON-NLS-1$
+               + "      transform:           rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);   " + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "   }" + NL //                                         //$NON-NLS-1$
 
-               + ("   to                                                \n") //$NON-NLS-1$
-               + ("   {                                                \n") //$NON-NLS-1$
-               + ("      opacity:            1;                           \n") //$NON-NLS-1$
-               + ("   }                                                \n") //$NON-NLS-1$
-               + ("}                                                   \n"); //$NON-NLS-1$
+               + "   to" + NL //                                        //$NON-NLS-1$
+               + "   {" + NL //                                         //$NON-NLS-1$
+               + "      opacity:             1;" + NL //                //$NON-NLS-1$
+               + "   }" + NL //                                         //$NON-NLS-1$
+               + "}" + NL; //                                           //$NON-NLS-1$
       }
 
       /*
@@ -1132,35 +1460,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        */
       final String tileSize = UI.EMPTY_STRING
             //
-            + (CSS_IMPORT_TILE + "\n") //$NON-NLS-1$
-            + ("{\n") //$NON-NLS-1$
-            + ("   min-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   max-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   min-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   max-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("}\n"); //$NON-NLS-1$
+            + CSS_IMPORT_TILE + NL
+
+            + "{" + NL //                                      //$NON-NLS-1$
+            + "   min-height: " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   max-height: " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   min-width:  " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   max-width:  " + itemSize + "px;" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "}" + NL; //                                     //$NON-NLS-1$
 
       /*
        * State tooltip
        */
       final String stateTooltip = UI.EMPTY_STRING
-            //
-            + (".stateTooltip\n") //$NON-NLS-1$
-            + ("{\n") //$NON-NLS-1$
-            + ("   width:" + easyConfig.stateToolTipWidth + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("}\n"); //$NON-NLS-1$
+
+            + ".stateTooltip" + NL //                          //$NON-NLS-1$
+            + "{" + NL //                                      //$NON-NLS-1$
+            + "   width:" + easyConfig.stateToolTipWidth + "px;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+            + "}" + NL; //                                     //$NON-NLS-1$
 
       /*
        * CSS
        */
-      final String customCSS = UI.EMPTY_STRING //
+      final String customCSS = UI.EMPTY_STRING
 
-            + "<style>\n" // //$NON-NLS-1$
+            + "<style>" + NL //     //$NON-NLS-1$
+            + WEB.createCSS_Scrollbar()
             + animation
             + bgImage
             + tileSize
             + stateTooltip
-            + "</style>\n"; //$NON-NLS-1$
+            + "</style>" + NL; //   //$NON-NLS-1$
 
       return customCSS;
    }
@@ -1176,62 +1506,75 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //      prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
 //      the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
 
-      final String html = UI.EMPTY_STRING //
-            + "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
-            + ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + "</html>"; //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING
+
+            + "<!DOCTYPE html>" + NL //   // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>" + NL //    //$NON-NLS-1$
+            + "<head>" + NL + createHTML_10_Head() + NL + "</head>" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "<body>" + NL + createHTML_20_Body() + NL + "</body>" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "</html>"; //                                                                     //$NON-NLS-1$
 
       return html;
    }
 
    private String createHTML_10_Head() {
 
-      final String html = UI.EMPTY_STRING//
-            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
-            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING
+
+            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //   //$NON-NLS-1$
+            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //                 //$NON-NLS-1$
             + _cssFonts
             + _cssFromFile
             + createCSS_Custom()
-            + "\n"; //$NON-NLS-1$
+            + "" + NL; // //$NON-NLS-1$
 
       return html;
    }
 
    private String createHTML_20_Body() {
 
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final boolean isShowSimpleImport = easyConfig.isShowTile_CloudApps
+            || easyConfig.isShowTile_Files
+            || easyConfig.isShowTile_FossilUI
+            || easyConfig.isShowTile_SerialPort
+            || easyConfig.isShowTile_SerialPortWithConfig;
+
       final StringBuilder sb = new StringBuilder();
 
-      sb.append("<div class='import-container'>\n"); //$NON-NLS-1$
+      sb.append("<div class='import-container'>" + NL); //$NON-NLS-1$
       {
          /*
           * Very tricky: When a parent has an opacity, a child cannot modify it. Therefore the
           * different divs with position relative/absolute. It took me some time to find/implement
           * this tricky but simple solution.
           */
-         sb.append("<div class='import-background'></div>\n"); //$NON-NLS-1$
+         sb.append("<div class='import-background'></div>" + NL); //$NON-NLS-1$
 
-         sb.append("<div class='import-content'>\n"); //$NON-NLS-1$
+         sb.append("<div class='import-content'>" + NL); //$NON-NLS-1$
          {
             /*
-             * Device Import
+             * Easy Import
              */
             createHTML_50_Easy_Header(sb);
             createHTML_80_Easy_Tiles(sb);
 
             /*
-             * Get Tours
+             * Simple Import
              */
-            sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$
-            sb.append("</div>\n"); //$NON-NLS-1$
+            if (isShowSimpleImport) {
 
-            createHTML_90_SimpleImport(sb);
+               sb.append("<div class='get-tours-title title'>" + NL); //$NON-NLS-1$
+               sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + NL);
+               sb.append("</div>" + NL); //$NON-NLS-1$
+
+               createHTML_90_SimpleImport(sb, easyConfig);
+            }
          }
-         sb.append("</div>\n"); //$NON-NLS-1$
+         sb.append("</div>" + NL); //$NON-NLS-1$
       }
-      sb.append("</div>\n"); //$NON-NLS-1$
+      sb.append("</div>" + NL); //$NON-NLS-1$
 
       return sb.toString();
    }
@@ -1240,40 +1583,40 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
 
-      final String html = UI.EMPTY_STRING //
+      final String html = UI.EMPTY_STRING
 
-            + "<div class='auto-import-header'>\n" //$NON-NLS-1$
-            + ("   <table border=0><tbody><tr>\n") //$NON-NLS-1$
+            + "<div class='auto-import-header'>" + NL //          //$NON-NLS-1$
+            + "   <table border=0><tbody><tr>" + NL //            //$NON-NLS-1$
 
-            // device state on/off
-            + ("      <td>\n") //$NON-NLS-1$
-            + ("         <div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_DeviceState_OnOff() + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ("      </td>\n") //$NON-NLS-1$
+            // device on/off
+            + "      <td>" + NL //                                //$NON-NLS-1$
+            + "         <div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_Device_OnOff() + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "      </td>" + NL //                               //$NON-NLS-1$
 
             // title
-            + ("      <td><span class='title'>" + Messages.Import_Data_HTML_EasyImport + "</span></td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + "      <td><span class='title'>" + Messages.Import_Data_HTML_EasyImport + "</span></td>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-            // state icon
-            + ("      <td>\n") //$NON-NLS-1$
-            + ("         <div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:25px;' class='" + watchClass + "'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + (createHTML_54_DeviceState())
-            + ("         </div>\n") //$NON-NLS-1$
-            + ("      </td>\n") //$NON-NLS-1$
+            // device folder
+            + "      <td>" + NL //                                //$NON-NLS-1$
+            + "         <div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:25px;' class='" + watchClass + "'>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + createHTML_54_DeviceFolder()
+            + "         </div>" + NL //                           //$NON-NLS-1$
+            + "      </td>" + NL //                               //$NON-NLS-1$
 
             // selected config
-            + ("      <td>") //$NON-NLS-1$
-            + ("         <div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + (createHTML_60_SelectImportConfig())
-            + ("         </div>") //$NON-NLS-1$
-            + ("      </td>") //$NON-NLS-1$
+            + "      <td>" //$NON-NLS-1$
+            + "         <div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + createHTML_60_SelectImportConfig()
+            + "         </div>" //                                //$NON-NLS-1$
+            + "      </td>" //                                    //$NON-NLS-1$
 
-            + "   </tr></tbody></table>\n" // //$NON-NLS-1$
-            + "</div>\n"; //$NON-NLS-1$
+            + "   </tr></tbody></table>" + NL //                  //$NON-NLS-1$
+            + "</div>" + NL; //                                   //$NON-NLS-1$
 
       sb.append(html);
    }
 
-   private String createHTML_52_DeviceState_OnOff() {
+   private String createHTML_52_Device_OnOff() {
 
       final boolean isWatchingOn = isWatchingOn();
 
@@ -1284,28 +1627,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tooltip = UI.replaceHTML_NewLine(tooltip);
 
       // show red image when off
-      final String imageUrl = isWatchingOn //
+      final String imageUrl = isWatchingOn
             ? _imageUrl_Device_TurnOn
             : _imageUrl_Device_TurnOff;
 
       final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
       final String onOffImage = createHTML_BgImageStyle(imageUrl);
 
-      final String html = UI.EMPTY_STRING//
+      final String html = UI.EMPTY_STRING
 
-            + "<a class='onOffIcon dash-action'" // //$NON-NLS-1$
-            + ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + ">" //$NON-NLS-1$
+            + "<a class='onOffIcon dash-action'" //                  //$NON-NLS-1$
+            + "title='" + tooltip + "'" //                           //$NON-NLS-1$ //$NON-NLS-2$
+            + " href='" + hrefAction + "'" //                        //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" //                                                 //$NON-NLS-1$
 
-            + ("<div class='stateIcon' " + onOffImage + "></div>") //$NON-NLS-1$ //$NON-NLS-2$
+            + "<div class='stateIcon' " + onOffImage + "></div>" //  //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "</a>"; //$NON-NLS-1$
+            + "</a>"; //                                             //$NON-NLS-1$
 
       return html;
    }
 
-   private String createHTML_54_DeviceState() {
+   private String createHTML_54_DeviceFolder() {
 
       final String hrefSetupAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
@@ -1316,29 +1659,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final boolean isWatchAnything = importConfig.isWatchAnything();
 
-      if (!isWatchingOn()) {
+      if (isWatchingOn() == false) {
 
          // watching is off
 
-         final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Disabled);
+         final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Off);
          final String htmlTooltip = Messages.Import_Data_HTML_WatchingIsOff;
 
-         html = "\n"// //$NON-NLS-1$
+         html = "" + NL //                                                 //$NON-NLS-1$
 
-               + "<a class='importState dash-action'" // //$NON-NLS-1$
-               + (" href='" + HTTP_DUMMY + "'") //$NON-NLS-1$ //$NON-NLS-2$
-               + ">" //$NON-NLS-1$
+               + "<a class='importState dash-action'" //                   //$NON-NLS-1$
+               + " href='" + HTTP_DUMMY + "'" //                           //$NON-NLS-1$ //$NON-NLS-2$
+               + ">" //                                                    //$NON-NLS-1$
 
-               + ("<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   <div class='stateIconValue'></div>\n") //$NON-NLS-1$
-               + ("</div>\n") //$NON-NLS-1$
-               + ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+               + "<div class='stateIcon' " + stateImage + ">" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + "   <div class='stateIconValue'></div>" + NL //           //$NON-NLS-1$
+               + "</div>" + NL //                                          //$NON-NLS-1$
+               + "<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "</a>\n"; //$NON-NLS-1$
+               + "</a>" + NL; //                                           //$NON-NLS-1$
 
       } else if (isWatchAnything && _isDeviceStateValid) {
 
-         html = createHTML_55_DeviceState_IsValid(easyConfig, hrefSetupAction);
+         html = createHTML_55_DeviceFolder_IsValid(easyConfig, hrefSetupAction);
 
       } else {
 
@@ -1348,31 +1691,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
 
          final String stateImage = createHTML_BgImageStyle(isWatchAnything
-               ? _imageUrl_DeviceFolder_NotChecked
+               ? _imageUrl_DeviceFolder_IsChecking
                : _imageUrl_DeviceFolder_NotSetup);
 
          final String htmlTooltip = isWatchAnything
                ? Messages.Import_Data_HTML_AcquireDeviceInfo
                : Messages.Import_Data_HTML_NothingIsWatched;
 
-         html = "\n"// //$NON-NLS-1$
+         html = "" + NL //                                                 //$NON-NLS-1$
 
-               + "<a class='importState dash-action'" // //$NON-NLS-1$
-               + (" href='" + hrefSetupAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-               + ">\n" //$NON-NLS-1$
+               + "<a class='importState dash-action'" //                   //$NON-NLS-1$
+               + " href='" + hrefSetupAction + "'" //                      //$NON-NLS-1$ //$NON-NLS-2$
+               + ">" + NL //                                               //$NON-NLS-1$
 
-               + ("<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   <div class='stateIconValue'></div>\n") //$NON-NLS-1$
-               + ("</div>\n") //$NON-NLS-1$
-               + ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+               + "<div class='stateIcon' " + stateImage + ">" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + "   <div class='stateIconValue'></div>" + NL //           //$NON-NLS-1$
+               + "</div>" + NL //                                          //$NON-NLS-1$
+               + "<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "</a>\n"; //$NON-NLS-1$
+               + "</a>" + NL; //                                           //$NON-NLS-1$
       }
 
       return html;
    }
 
-   private String createHTML_55_DeviceState_IsValid(final EasyConfig easyConfig, final String hrefAction) {
+   private String createHTML_55_DeviceFolder_IsValid(final EasyConfig easyConfig, final String hrefAction) {
 
       final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
@@ -1420,13 +1763,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final int numNotBackedUpFiles = easyConfig.notBackedUpFiles.size();
 
-            folderInfo = numNotBackedUpFiles == 0 //
+            folderInfo = numNotBackedUpFiles == 0
                   ? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
                   : NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
 
          }
 
-         createHTML_56_FolderState(//
+         createHTML_56_FolderState(
                sb,
                htmlBackupFolder,
                isBackupFolderOK,
@@ -1444,11 +1787,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final boolean isTopMargin = importConfig.isCreateBackup;
 
          final String folderTitle = Messages.Import_Data_HTML_Title_Device;
-         final String folderInfo = numNotImportedFiles == 0 //
+         final String folderInfo = numNotImportedFiles == 0
                ? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numAllFiles)
                : NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numAllFiles);
 
-         createHTML_56_FolderState(//
+         createHTML_56_FolderState(
                sb,
                htmlDeviceFolder,
                isDeviceFolderOK,
@@ -1532,7 +1875,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                : Messages.Import_Data_HTML_WatchingOn;
 
          // show red image when off
-         final String imageUrl = isWatchingOff //
+         final String imageUrl = isWatchingOff
                ? _imageUrl_Device_TurnOff
                : _imageUrl_Device_TurnOn;
 
@@ -1560,9 +1903,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final String htmlTooltip = sb.toString();
 
       /*
-       * All states
+       * State values
        */
-      final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
+      final String imageUrl = isFolderOK
+            ? _imageUrl_DeviceFolder_OK
+            : _imageUrl_DeviceFolder_Error;
+
       final String stateImage = createHTML_BgImageStyle(imageUrl);
       final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImportedFiles) : UI.EMPTY_STRING;
 
@@ -1573,18 +1919,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             ? "style='overflow-y: scroll;'" //$NON-NLS-1$
             : UI.EMPTY_STRING;
 
-      final String html = "\n"// //$NON-NLS-1$
+      final String html = "" + NL //                                       //$NON-NLS-1$
 
-            + "<a class='importState dash-action'" // //$NON-NLS-1$
-            + (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + ">" //$NON-NLS-1$
+            + "<a class='importState dash-action'" //                      //$NON-NLS-1$
+            + " href='" + hrefAction + "'" //                              //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" //                                                       //$NON-NLS-1$
 
-            + ("   <div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("      <div class='stateIconValue'>" + stateIconValue + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   </div>\n") //$NON-NLS-1$
-            + ("   <div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='stateIcon' " + stateImage + ">" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+            + "      <div class='stateIconValue'>" + stateIconValue + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+            + "   </div>" + NL //                                          //$NON-NLS-1$
+            + "   <div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>" + NL // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-            + "</a>\n"; //$NON-NLS-1$
+            + "</a>" + NL; //                                              //$NON-NLS-1$
 
       return html;
    }
@@ -1610,7 +1956,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isOSFolderValid) {
 
          htmlErrorState = UI.EMPTY_STRING;
-         htmlFolderInfo = folderInfo == null //
+         htmlFolderInfo = folderInfo == null
                ? UI.EMPTY_STRING
                : "<span class='folderInfo'>" + folderInfo + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1620,11 +1966,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          htmlFolderInfo = UI.EMPTY_STRING;
       }
 
-      final String paddingTop = isTopMargin //
+      final String paddingTop = isTopMargin
             ? HTML_STYLE_TITLE_VERTICAL_PADDING
             : UI.EMPTY_STRING;
 
-      final String imageUrl = isOSFolderValid //
+      final String imageUrl = isOSFolderValid
             ? _imageUrl_State_OK
             : _imageUrl_State_Error;
 
@@ -1661,6 +2007,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
          final ZonedDateTime modifiedTime = TimeTools.getZonedDateTime(deviceFile.modifiedTime);
 
+         // am/pm contains a space which can break the line
+         final String nbspTime = modifiedTime.format(TimeTools.Formatter_Time_S).replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+         final String nbspFileName = deviceFile.getFileName().replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+
          sb.append(HTML_TR);
 
          sb.append("<td width=1 class='column'>"); //$NON-NLS-1$
@@ -1668,7 +2018,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column content'>"); //$NON-NLS-1$
-         sb.append(deviceFile.getFileName());
+         sb.append(nbspFileName);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
@@ -1676,14 +2026,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
-         sb.append(modifiedTime.format(TimeTools.Formatter_Time_S));
+         sb.append(nbspTime);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='right'>"); //$NON-NLS-1$
          sb.append(deviceFile.size);
          sb.append(HTML_TD_END);
 
-         // this is for debugging
+         // this is useful for debugging
          if (easyConfig.stateToolTipDisplayAbsoluteFilePath) {
 
             if (NIO.isTourBookFileSystem(filePathName)) {
@@ -1693,8 +2043,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                filePathName = filePathName.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
             }
 
+            final String nbspFilePathName = UI.EMPTY_STRING
+
+                  // add additonal space before the text otherwise it is too narrow to the previous column
+                  + WEB.NONE_BREAKING_SPACE
+                  + WEB.NONE_BREAKING_SPACE
+
+                  + filePathName.replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+
             sb.append("<td class='column content'>"); //$NON-NLS-1$
-            sb.append(filePathName);
+            sb.append(nbspFilePathName);
             sb.append(HTML_TD_END);
          }
 
@@ -1718,7 +2076,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       for (final ImportConfig importConfig : easyConfig.importConfigs) {
 
-         final String isSelected = importConfig.equals(selectedConfig)//
+         final String isSelected = importConfig.equals(selectedConfig)
                ? "selected" //$NON-NLS-1$
                : UI.EMPTY_STRING;
 
@@ -1740,7 +2098,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (allImportLauncher.isEmpty() || allImportConfigs.isEmpty()) {
 
          // this case should not happen
-         TourLogManager.logEx(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+         TourLogManager.log_EXCEPTION_WithStacktrace(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
 
          return;
       }
@@ -1762,32 +2120,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          numHorizontalTiles = availableLauncher;
       }
 
-      final String watchClass = isWatchingOn() //
+      final String watchClass = isWatchingOn()
             ? DOM_CLASS_DEVICE_ON
             : DOM_CLASS_DEVICE_OFF;
 
       sb.append("<table border=0" //$NON-NLS-1$
-            + (" id='" + DOM_ID_IMPORT_TILES + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" style='margin-top:5px;'") //$NON-NLS-1$
-            + (" class='" + watchClass + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + "><tbody>\n"); //$NON-NLS-1$
+            + " id='" + DOM_ID_IMPORT_TILES + "'" //$NON-NLS-1$ //$NON-NLS-2$
+            + " style='margin-top:5px;'" //$NON-NLS-1$
+            + " class='" + watchClass + "'" //$NON-NLS-1$ //$NON-NLS-2$
+            + "><tbody>" + NL); //$NON-NLS-1$
 
       for (final ImportLauncher importLauncher : allImportLauncher) {
 
          if (importLauncher.isShowInDashboard) {
 
             if (tileIndex % numHorizontalTiles == 0) {
-               sb.append("<tr>\n"); //$NON-NLS-1$
+               sb.append("<tr>" + NL); //$NON-NLS-1$
                isTrOpen = true;
             }
 
             // enforce equal column width
-            sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
             sb.append(createHTML_82_Easy_Tile(importLauncher));
-            sb.append("</td>\n"); //$NON-NLS-1$
+            sb.append("</td>" + NL); //$NON-NLS-1$
 
             if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
-               sb.append("</tr>\n"); //$NON-NLS-1$
+               sb.append("</tr>" + NL); //$NON-NLS-1$
                isTrOpen = false;
             }
 
@@ -1796,10 +2154,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       if (isTrOpen) {
-         sb.append("</tr>\n"); //$NON-NLS-1$
+         sb.append("</tr>" + NL); //$NON-NLS-1$
       }
 
-      sb.append("</tbody></table>\n"); //$NON-NLS-1$
+      sb.append("</tbody></table>" + NL); //$NON-NLS-1$
    }
 
    private String createHTML_82_Easy_Tile(final ImportLauncher importTile) {
@@ -1812,7 +2170,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Tile image
        */
-      final Image tileImage = getImportConfigImage(importTile);
+      final Image tileImage = getImportConfigImage(importTile, true);
       String htmlImage = UI.EMPTY_STRING;
       if (tileImage != null) {
 
@@ -1831,10 +2189,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String html = UI.EMPTY_STRING
 
-            + ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ("   <div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   <div class='import-tile-config'>" + htmlConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("</a>\n") //$NON-NLS-1$
+            + "<a href='" + href + "' title='" + tooltip + "' class='import-tile'>" + NL //  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='import-tile-image'>" + htmlImage + "</div>" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+            + "   <div class='import-tile-config'>" + htmlConfig + "</div>" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
+            + "</a>" + NL //                                                                 //$NON-NLS-1$
       ;
 
       return html;
@@ -1860,7 +2218,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          for (final SpeedTourType speedTT : speedTourTypes) {
 
             if (isSpeedAdded) {
-               ttText.append(UI.NEW_LINE);
+               ttText.append(NL);
             }
 
             final long tourTypeId = speedTT.tourTypeId;
@@ -1934,7 +2292,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // adjust temperature
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          if (importLauncher.isAdjustTemperature) {
 
@@ -1954,9 +2312,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
+      // adjust elevation
+      {
+         sb.append(NL);
+
+         sb.append(importLauncher.isReplaceFirstTimeSliceElevation
+               ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
+               : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+      }
+
+      // set elevation from SRTM
+      {
+         sb.append(NL);
+
+         sb.append(importLauncher.isReplaceElevationFromSRTM
+               ? Messages.Import_Data_HTML_ReplaceElevationFromSRTM_Yes
+               : Messages.Import_Data_HTML_ReplaceElevationFromSRTM_No);
+      }
+
       // retrieve weather data
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          sb.append(importLauncher.isRetrieveWeatherData
                ? Messages.Import_Data_HTML_RetrieveWeatherData_Yes
@@ -1965,7 +2341,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // save tour
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          sb.append(importLauncher.isSaveTour
                ? Messages.Import_Data_HTML_SaveTour_Yes
@@ -1974,7 +2350,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // delete device files
       {
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
          sb.append(getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles
                ? Messages.Import_Data_HTML_DeleteDeviceFiles_Yes
@@ -2055,41 +2431,66 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return sb.toString();
    }
 
-   private void createHTML_90_SimpleImport(final StringBuilder sb) {
+   private void createHTML_90_SimpleImport(final StringBuilder sb, final EasyConfig easyConfig) {
 
-      sb.append("<div class='get-tours-items'>\n"); //$NON-NLS-1$
-      sb.append("   <table><tbody><tr>\n"); //$NON-NLS-1$
+      sb.append("<div class='get-tours-items'>" + NL); //$NON-NLS-1$
+      sb.append("   <table><tbody><tr>" + NL); //$NON-NLS-1$
       {
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_ImportFromFiles_Action,
-               Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
-               (HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES),
-               _imageUrl_ImportFromFile);
+         if (easyConfig.isShowTile_Files) {
 
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
-               (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
-               _imageUrl_SerialPort_Configured);
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_ImportFromFiles_Action,
+                  Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
+                  HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES,
+                  _imageUrl_ImportFromFile);
+         }
 
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
-               Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
-               (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
-               _imageUrl_SerialPort_Directly);
+         if (easyConfig.isShowTile_CloudApps) {
 
-         createHTML_92_TileAction(
-               sb,
-               Messages.Import_Data_HTML_Action_OldUI,
-               Messages.Import_Data_HTML_Action_OldUI_Tooltip,
-               (HTTP_DUMMY + HREF_ACTION_OLD_UI),
-               null);
+            for (final TourbookCloudDownloader cloudDownloader : _cloudDownloadersList) {
+
+               createHTML_92_TileAction(
+                     sb,
+                     cloudDownloader.getName(),
+                     cloudDownloader.getTooltip(),
+                     HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId(),
+                     cloudDownloader.getIconUrl());
+            }
+         }
+
+         if (easyConfig.isShowTile_SerialPort) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
+                  HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED,
+                  _imageUrl_SerialPort_Configured);
+         }
+
+         if (easyConfig.isShowTile_SerialPortWithConfig) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
+                  Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
+                  HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY,
+                  _imageUrl_SerialPort_Directly);
+         }
+
+         if (easyConfig.isShowTile_FossilUI) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  Messages.Import_Data_HTML_Action_OldUI,
+                  Messages.Import_Data_HTML_Action_OldUI_Tooltip,
+                  HTTP_DUMMY + HREF_ACTION_OLD_UI,
+                  null);
+         }
       }
-      sb.append("   </tr></tbody></table>\n"); // //$NON-NLS-1$
-      sb.append("</div>\n"); //$NON-NLS-1$
+      sb.append("   </tr></tbody></table>" + NL); // //$NON-NLS-1$
+      sb.append("</div>" + NL); //$NON-NLS-1$
 
    }
 
@@ -2105,8 +2506,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          htmlImage = "style='" // //$NON-NLS-1$
 
-               + ("background-image:   url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
-               //
+               + "background-image:   url(" + imageUrl + ");" + NL //$NON-NLS-1$ //$NON-NLS-2$
+
                + "'"; //$NON-NLS-1$
       }
 
@@ -2115,10 +2516,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final String html = UI.EMPTY_STRING
 
             + HTML_TD
-            + ("<a href='" + href + "' title='" + validTooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ("   <div class='import-tile-image action-button' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("   <div class='import-tile-config'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("</a>\n") //$NON-NLS-1$
+            + "<a href='" + href + "' title='" + validTooltip + "' class='import-tile'>" + NL //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='import-tile-image action-button' " + htmlImage + "></div>" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "   <div class='import-tile-config'>" + name + "</div>" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + "</a>" + NL //                                                                       //$NON-NLS-1$
             + HTML_TD_END;
 
       sb.append(html);
@@ -2147,15 +2548,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _tagMenuManager = new TagMenuManager(this, true);
 
-      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
+      _tourViewer_MenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _tourViewer_MenuManager.setRemoveAllWhenShown(true);
+      _tourViewer_MenuManager.addMenuListener(menuManager -> fillTourViewer_ContextMenu(menuManager));
 
-            fillContextMenu(manager);
-         }
-      });
+      _simpleUI_ImportLauncher_MenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _simpleUI_ImportLauncher_MenuManager.setRemoveAllWhenShown(true);
+      _simpleUI_ImportLauncher_MenuManager.addMenuListener(menuManager -> fillSimpleUI_ContextMenu(menuManager));
    }
 
    @Override
@@ -2165,13 +2564,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       createMenuManager();
 
       // define all columns
-      _columnManager = new ColumnManager(this, _state);
-      _columnManager.setIsCategoryAvailable(true);
+      _tourViewer_ColumnManager = new ColumnManager(this, _state);
+      _tourViewer_ColumnManager.setIsCategoryAvailable(true);
       defineAllColumns();
 
-      createUI(parent);
       createActions();
+      createUI(parent);
 
+      fillUI();
       fillToolbar();
 
       addPartListener();
@@ -2198,40 +2598,45 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _images = new ImageRegistry();
 
+// SET_FORMATTING_OFF
+
       /*
        * Database
        */
-      _images.put(IMAGE_DATABASE, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__database));
-      _images.put(IMAGE_DATABASE_OTHER_PERSON, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
-      _images.put(IMAGE_ASSIGN_MERGED_TOUR, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour));
-      _images.put(IMAGE_ICON_PLACEHOLDER, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder));
-      _images.put(IMAGE_DELETE, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+      _images.put(IMAGE_DATABASE,                  TourbookPlugin.getImageDescriptor      (Images.Saved_Tour));
+      _images.put(IMAGE_DATABASE_OTHER_PERSON,     TourbookPlugin.getThemedImageDescriptor(Images.Saved_Tour_OtherPerson));
+      _images.put(IMAGE_ASSIGN_MERGED_TOUR,        TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour));
+      _images.put(IMAGE_ICON_PLACEHOLDER,          TourbookPlugin.getImageDescriptor      (Images.App_EmptyIcon_Placeholder));
+      _images.put(IMAGE_DELETE,                    TourbookPlugin.getImageDescriptor      (Images.App_Delete));
 
       /*
        * Import state
        */
-      _images.put(IMAGE_STATE_DELETE, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__State_DeletedTour_View));
-      _images.put(IMAGE_STATE_MOVED, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__State_MovedTour_View));
+      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor(Images.State_DeletedTour_View));
+      _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor(Images.State_MovedTour_View));
 
       /*
        * Data transfer
        */
-      _images.put(IMAGE_DATA_TRANSFER, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
-      _images.put(IMAGE_DATA_TRANSFER_DIRECT, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
-      _images.put(IMAGE_IMPORT_FROM_FILES, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
-      _images.put(IMAGE_NEW_UI, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_DashboardUI));
+      _images.put(IMAGE_DATA_TRANSFER,             TourbookPlugin.getImageDescriptor(Images.RawData_Transfer));
+      _images.put(IMAGE_DATA_TRANSFER_DIRECT,      TourbookPlugin.getImageDescriptor(Images.RawData_TransferDirect));
+      _images.put(IMAGE_IMPORT_FROM_FILES,         TourbookPlugin.getImageDescriptor(Images.Import_Files));
+      _images.put(IMAGE_NEW_UI,                    TourbookPlugin.getImageDescriptor(Images.Import_DashboardUI));
 
+      /*
+       * Simple easy UI
+       */
+      _images.put(IMAGE_DEVICE_FOLDER_ERROR,       TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_Error));
+      _images.put(IMAGE_DEVICE_FOLDER_IS_CHECKING, TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_IsChecking));
+      _images.put(IMAGE_DEVICE_FOLDER_NOT_SETUP,   TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_NotSetup));
+      _images.put(IMAGE_DEVICE_FOLDER_OFF,         TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_Off));
+      _images.put(IMAGE_DEVICE_FOLDER_OK,          TourbookPlugin.getImageDescriptor      (Images.RawData_DeviceFolder_OK));
+      _images.put(IMAGE_DEVICE_TURN_ON,            TourbookPlugin.getImageDescriptor      (Images.RawData_Device_TurnOn));
+      _images.put(IMAGE_DEVICE_TURN_OFF,           TourbookPlugin.getImageDescriptor      (Images.RawData_Device_TurnOff));
+      _images.put(IMAGE_STATE_OK,                  TourbookPlugin.getThemedImageDescriptor(Images.State_OK));
+      _images.put(IMAGE_STATE_ERROR,               TourbookPlugin.getThemedImageDescriptor(Images.State_Error));
+
+// SET_FORMATTING_ON
    }
 
    private void createResources_Web() {
@@ -2247,18 +2652,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final byte[] data = Files.readAllBytes(path);
          final String base64Encoded = Base64.getEncoder().encodeToString(data);
 
-         _cssFonts = "<style>\n" // //$NON-NLS-1$
+         _cssFonts = "<style>" + NL //                               //$NON-NLS-1$
 
-               + ("@font-face\n") //$NON-NLS-1$
-               + ("{\n") //$NON-NLS-1$
-//               + ("   font-family:   'NothingYouCouldDo';\n") //$NON-NLS-1$
-               + ("   font-family:   'Nunito-Bold';\n") //$NON-NLS-1$
-               + ("   font-weight:   700;\n") //$NON-NLS-1$
-               + ("   font-style:      bold;\n") //$NON-NLS-1$
-               + ("   src:         url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("}\n") //$NON-NLS-1$
+               + "@font-face" + NL //                                //$NON-NLS-1$
+               + "{" + NL //                                         //$NON-NLS-1$
+               + "   font-family:   'Nunito-Bold';" + NL //          //$NON-NLS-1$
+               + "   font-weight:   700;" + NL //                    //$NON-NLS-1$
+               + "   font-style:      bold;" + NL //                 //$NON-NLS-1$
+               + "   src:         url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');" //$NON-NLS-1$ //$NON-NLS-2$
+               + "}" + NL //                                         //$NON-NLS-1$
 
-               + "</style>\n"; //$NON-NLS-1$
+               + "</style>" + NL //                                  //$NON-NLS-1$
+         ;
 
          /*
           * Webpage css
@@ -2276,206 +2681,62 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             css3 = Util.readContentFromFile(webFile.getAbsolutePath());
          }
 
-         _cssFromFile = UI.EMPTY_STRING//
-               + "<style>\n" //$NON-NLS-1$
+         _cssFromFile = UI.EMPTY_STRING
+
+               + "<style>" + NL //        //$NON-NLS-1$
                + css
                + css3
-               + "</style>\n"; //$NON-NLS-1$
+               + "</style>" + NL //      //$NON-NLS-1$
+         ;
+
+// SET_FORMATTING_OFF
 
          /*
           * Image urls
           */
-         _imageUrl_ImportFromFile = getIconUrl(Messages.Image__RawData_Import);
-         _imageUrl_SerialPort_Configured = getIconUrl(Messages.Image__RawData_Transfer);
-         _imageUrl_SerialPort_Directly = getIconUrl(Messages.Image__RawData_TransferDirect);
+         _imageUrl_ImportFromFile            = getIconUrl(Images.Import_Files);
+         _imageUrl_SerialPort_Configured     = getIconUrl(Images.RawData_Transfer);
+         _imageUrl_SerialPort_Directly       = getIconUrl(Images.RawData_TransferDirect);
 
-         _imageUrl_State_AdjustTemperature = getIconUrl(Messages.Image__State_AdjustTemperature);
-         _imageUrl_State_RetrieveWeatherData = getIconUrl(Messages.Image__State_RetrieveWeatherData);
-         _imageUrl_State_Error = getIconUrl(Messages.Image__State_Error);
-         _imageUrl_State_OK = getIconUrl(Messages.Image__State_OK);
-         _imageUrl_State_MovedFiles = getIconUrl(Messages.Image__State_MovedTour);
-         _imageUrl_State_SaveTour = getIconUrl(Messages.Image__State_SaveTour);
-         _imageUrl_State_TourMarker = getIconUrl(Messages.Image__State_TourMarker);
+         _imageUrl_State_AdjustTemperature   = getIconUrl(Images.State_AdjustTemperature);
+         _imageUrl_State_RetrieveWeatherData = getIconUrl(Images.State_RetrieveWeatherData);
+         _imageUrl_State_Error               = getIconUrl(Images.State_Error);
+         _imageUrl_State_OK                  = getIconUrl(Images.State_OK);
+         _imageUrl_State_MovedFiles          = getIconUrl(Images.State_MovedTour);
+         _imageUrl_State_SaveTour            = getIconUrl(Images.State_SaveTour);
+         _imageUrl_State_TourMarker          = getIconUrl(Images.State_TourMarker);
 
-         _imageUrl_Device_TurnOff = getIconUrl(Messages.Image__RawData_Device_TurnOff);
-         _imageUrl_Device_TurnOn = getIconUrl(Messages.Image__RawData_Device_TurnOn);
+         _imageUrl_Device_TurnOff            = getIconUrl(Images.RawData_Device_TurnOff);
+         _imageUrl_Device_TurnOn             = getIconUrl(Images.RawData_Device_TurnOn);
 
-         _imageUrl_DeviceFolder_OK = getIconUrl(Messages.Image__RawData_DeviceFolder);
-         _imageUrl_DeviceFolder_Disabled = getIconUrl(Messages.Image__RawData_DeviceFolderDisabled);
-         _imageUrl_DeviceFolder_NotAvailable = getIconUrl(Messages.Image__RawData_DeviceFolder_NotDefined);
-         _imageUrl_DeviceFolder_NotChecked = getIconUrl(Messages.Image__RawData_DeviceFolder_NotChecked);
-         _imageUrl_DeviceFolder_NotSetup = getIconUrl(Messages.Image__RawData_DeviceFolder_NotSetup);
+         _imageUrl_DeviceFolder_OK           = getIconUrl(Images.RawData_DeviceFolder_OK);
+         _imageUrl_DeviceFolder_Off          = getIconUrl(Images.RawData_DeviceFolder_Off);
+         _imageUrl_DeviceFolder_Error        = getIconUrl(Images.RawData_DeviceFolder_Error);
+         _imageUrl_DeviceFolder_IsChecking   = getIconUrl(Images.RawData_DeviceFolder_IsChecking);
+         _imageUrl_DeviceFolder_NotSetup     = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
-      } catch (final IOException | URISyntaxException e) {
-         TourLogManager.logEx(e);
+// SET_FORMATTING_ON
+
+      } catch (final IOException e) {
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
    private void createUI(final Composite parent) {
 
-      _topPageBook = new PageBook(parent, SWT.NONE);
+      _topPage_PageBook = new PageBook(parent, SWT.NONE);
 
-      _topPage_OldUI = createUI_05_Page_OldUI(_topPageBook);
-      _topPage_Startup = createUI_10_Page_Startup(_topPageBook);
-      _topPage_ImportViewer = createUI_90_Page_TourViewer(_topPageBook);
+// SET_FORMATTING_OFF
 
-      _topPageBook.showPage(_topPage_Startup);
-   }
+      _topPage_Startup                    = createUI_00_Page_Startup    (_topPage_PageBook);
+      _topPage_ImportUI_FossilUI          = createUI_10_Page_FossilUI   (_topPage_PageBook);
+      _topPage_ImportUI_EasyImport_Simple = createUI_50_Page_SimpleUI   (_topPage_PageBook);
 
-   private Composite createUI_05_Page_OldUI(final Composite parent) {
+      _topPage_ImportViewer               = createUI_90_Page_TourViewer (_topPage_PageBook);
 
-      final int defaultWidth = 300;
+// SET_FORMATTING_ON
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
-         {
-            /*
-             * Import info
-             */
-            final Label label = new Label(container, SWT.WRAP);
-            label.setText(Messages.Import_Data_OldUI_Label_Info);
-            GridDataFactory.fillDefaults()//
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .grab(true, false)
-                  .span(2, 1)
-                  .applyTo(label);
-         }
-
-         {
-            /*
-             * Import
-             */
-            // icon
-            final CLabel iconImport = new CLabel(container, SWT.NONE);
-            iconImport.setImage(_images.get(IMAGE_IMPORT_FROM_FILES));
-            GridDataFactory.fillDefaults()//
-                  .indent(0, 10)
-                  .align(SWT.CENTER, SWT.BEGINNING)
-//                  .grab(true, false)
-                  .applyTo(iconImport);
-
-            // link
-            _linkImport = new Link(container, SWT.NONE);
-            _linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
-            _linkImport.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _rawDataMgr.actionImportFromFile();
-               }
-            });
-            GridDataFactory.fillDefaults()//
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(_linkImport);
-         }
-
-         {
-            /*
-             * Data transfer
-             */
-            // icon
-            final CLabel iconTransfer = new CLabel(container, SWT.NONE);
-            iconTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER));
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.CENTER, SWT.BEGINNING)
-//                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(iconTransfer);
-
-            // link
-            final Link linkTransfer = new Link(container, SWT.NONE);
-            linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
-            linkTransfer.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _rawDataMgr.actionImportFromDevice();
-               }
-            });
-            GridDataFactory.fillDefaults()//
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-//                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(linkTransfer);
-         }
-
-         {
-            /*
-             * Direct data transfer
-             */
-            // icon
-            final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
-            iconDirectTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER_DIRECT));
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.CENTER, SWT.BEGINNING)
-//                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(iconDirectTransfer);
-
-            // link
-            final Link linkTransferDirect = new Link(container, SWT.NONE);
-            linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
-            linkTransferDirect.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _rawDataMgr.actionImportFromDeviceDirect();
-               }
-            });
-            GridDataFactory.fillDefaults() //
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(linkTransferDirect);
-         }
-
-         {
-            /*
-             * New UI
-             */
-            // icon
-            final CLabel icon = new CLabel(container, SWT.NONE);
-            icon.setImage(_images.get(IMAGE_NEW_UI));
-            GridDataFactory.fillDefaults().indent(0, 10).applyTo(icon);
-
-            // link
-            final Link link = new Link(container, SWT.NONE);
-            link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
-            link.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectUI_New();
-               }
-            });
-            GridDataFactory.fillDefaults()//
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .indent(0, 10)
-                  .applyTo(link);
-         }
-
-         {
-            /*
-             * Hint
-             */
-            final Label label = new Label(container, SWT.WRAP);
-            label.setText(Messages.Import_Data_OldUI_Label_Hint);
-            GridDataFactory.fillDefaults()//
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .grab(true, false)
-                  .indent(0, 20)
-                  .span(2, 1)
-                  .applyTo(label);
-         }
-      }
-
-      return container;
+      _topPage_PageBook.showPage(_topPage_Startup);
    }
 
    /**
@@ -2484,7 +2745,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     * @param parent
     * @return
     */
-   private Composite createUI_10_Page_Startup(final Composite parent) {
+   private Composite createUI_00_Page_Startup(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -2498,34 +2759,158 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return container;
    }
 
-   private Composite createUI_20_Page_Dashboard(final Composite parent) {
+   private Composite createUI_10_Page_FossilUI(final Composite parent) {
+
+      final int defaultWidth = 300;
+
+      final GridDataFactory linkGridData = GridDataFactory.fillDefaults()
+            .hint(defaultWidth, SWT.DEFAULT)
+            .align(SWT.FILL, SWT.CENTER)
+            .grab(true, false)
+            .indent(0, 10);
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         {
+            /*
+             * Import info
+             */
+            final Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.Import_Data_OldUI_Label_Info);
+            GridDataFactory.fillDefaults()
+                  .hint(defaultWidth, SWT.DEFAULT)
+                  .grab(true, false)
+                  .span(2, 1)
+                  .applyTo(label);
+         }
+         {
+            /*
+             * Import
+             */
+            // icon
+            final CLabel iconImport = new CLabel(container, SWT.NONE);
+            iconImport.setImage(_images.get(IMAGE_IMPORT_FROM_FILES));
+            GridDataFactory.fillDefaults()
+                  .indent(0, 10)
+                  .align(SWT.CENTER, SWT.BEGINNING)
+                  .applyTo(iconImport);
+
+            // link
+            _linkImport = new Link(container, SWT.NONE);
+            _linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
+            _linkImport.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _rawDataMgr.actionImportFromFile()));
+            linkGridData.applyTo(_linkImport);
+         }
+         {
+            /*
+             * Data transfer
+             */
+            // icon
+            final CLabel iconTransfer = new CLabel(container, SWT.NONE);
+            iconTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.CENTER, SWT.BEGINNING)
+                  .indent(0, 10)
+                  .applyTo(iconTransfer);
+
+            // link
+            final Link linkTransfer = new Link(container, SWT.NONE);
+            linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
+            linkTransfer.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _rawDataMgr.actionImportFromDevice()));
+            linkGridData.applyTo(linkTransfer);
+         }
+         {
+            /*
+             * Direct data transfer
+             */
+            // icon
+            final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
+            iconDirectTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER_DIRECT));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.CENTER, SWT.BEGINNING)
+                  .indent(0, 10)
+                  .applyTo(iconDirectTransfer);
+
+            // link
+            final Link linkTransferDirect = new Link(container, SWT.NONE);
+            linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
+            linkTransferDirect.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> _rawDataMgr.actionImportFromDeviceDirect()));
+            linkGridData.applyTo(linkTransferDirect);
+         }
+         {
+            /*
+             * New UI
+             */
+            // icon
+            final CLabel icon = new CLabel(container, SWT.NONE);
+            icon.setImage(_images.get(IMAGE_NEW_UI));
+            GridDataFactory.fillDefaults().indent(0, 10).applyTo(icon);
+
+            // link
+            final Link link = new Link(container, SWT.NONE);
+            link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
+            link.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onSelect_ImportUI(ImportUI.EASY_IMPORT_FANCY)));
+            linkGridData.applyTo(link);
+         }
+         {
+            /*
+             * Hint
+             */
+            final Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.Import_Data_OldUI_Label_Hint);
+            GridDataFactory.fillDefaults()
+                  .hint(defaultWidth, SWT.DEFAULT)
+                  .grab(true, false)
+                  .indent(0, 20)
+                  .span(2, 1)
+                  .applyTo(label);
+         }
+      }
+
+      return container;
+   }
+
+   private Composite createUI_20_Page_EasyImporFancy(final Composite parent) {
 
       final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 
-      _dashboard_PageBook = new PageBook(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboard_PageBook);
+      _easyImportFancy_PageBook = new PageBook(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_easyImportFancy_PageBook);
 
-      _dashboardPage_NoBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
-      _dashboardPage_NoBrowser.setBackground(bgColor);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboardPage_NoBrowser);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_dashboardPage_NoBrowser);
+      /*
+       * Page: Browser error
+       */
+      _easyImportFancy_Page_NoBrowser = new Composite(_easyImportFancy_PageBook, SWT.NONE);
+      _easyImportFancy_Page_NoBrowser.setBackground(bgColor);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_easyImportFancy_Page_NoBrowser);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_easyImportFancy_Page_NoBrowser);
       {
-         _txtNoBrowser = new Text(_dashboardPage_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
+         _txtNoBrowser = new Text(_easyImportFancy_Page_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
          _txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
          _txtNoBrowser.setBackground(bgColor);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.BEGINNING)
                .applyTo(_txtNoBrowser);
       }
 
-      _dashboardPage_WithBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(_dashboardPage_WithBrowser);
+      /*
+       * Page: Browser for fancy UI
+       */
+      _easyImportFancy_Page_WithBrowser = new Composite(_easyImportFancy_PageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_easyImportFancy_Page_WithBrowser);
       {
-         createUI_22_Browser(_dashboardPage_WithBrowser);
+         createUI_22_Browser(_easyImportFancy_Page_WithBrowser);
       }
 
-      return _dashboard_PageBook;
+      return _easyImportFancy_PageBook;
    }
 
    private void createUI_22_Browser(final Composite parent) {
@@ -2574,7 +2959,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                @Override
                public void completed(final ProgressEvent event) {
 
-                  onBrowser_Completed(event);
+                  onBrowser_Completed();
 
                }
             });
@@ -2590,15 +2975,174 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private Composite createUI_90_Page_TourViewer(final Composite parent) {
+   private Composite createUI_50_Page_SimpleUI(final Composite parent) {
 
-      _viewerContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
       {
-         createUI_92_TourViewer(_viewerContainer);
+         createUI_51_SimpleUI_Header(container);
+         createUI_56_SimpleUI_Viewer(container);
       }
 
-      return _viewerContainer;
+      return container;
+   }
+
+   private void createUI_51_SimpleUI_Header(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(5)
+            .spacing(15, 5)
+            .applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_CYAN);
+      {
+         {
+            /*
+             * Action: Start/stop watching import folder
+             */
+            UI.createToolbarAction(container, _actionSimpleUI_StartStopWatching);
+         }
+         {
+            /*
+             * Title: Easy Import
+             */
+            _lblSimpleUI_EasyImportTitle = new Label(container, SWT.NONE);
+            _lblSimpleUI_EasyImportTitle.setText(Messages.Import_Data_HTML_EasyImport);
+            _lblSimpleUI_EasyImportTitle.setForeground(UI.SYS_COLOR_WIDGET_DARK_SHADOW);
+            MTFont.setBannerFont(_lblSimpleUI_EasyImportTitle);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblSimpleUI_EasyImportTitle);
+         }
+         {
+            /*
+             * Action: Device state
+             */
+            UI.createToolbarAction(container, _actionSimpleUI_DeviceState);
+         }
+         {
+            /*
+             * Label: Number of not imported files
+             */
+            _lblSimpleUI_NumNotImportedFiles = new Label(container, SWT.CENTER);
+            _lblSimpleUI_NumNotImportedFiles.setText(UI.EMPTY_STRING);
+            _lblSimpleUI_NumNotImportedFiles.setToolTipText(Messages.Import_Data_Label_NumNotImportedFiles);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.CENTER, SWT.CENTER)
+                  .hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
+
+                  // adjust position otherwise it is not exactly centered
+                  .indent(-4, 0)
+
+                  .applyTo(_lblSimpleUI_NumNotImportedFiles);
+
+//            _lblSimpleUI_NumNotImportedFiles.setBackground(UI.SYS_COLOR_YELLOW);
+         }
+         {
+            /*
+             * Combo: Configuration
+             */
+            _comboSimpleUI_Config = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboSimpleUI_Config.setToolTipText(Messages.Import_Data_Combo_SimpleUIConfig_Tooltip);
+            _comboSimpleUI_Config.setVisibleItemCount(20);
+            _comboSimpleUI_Config.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ImportConfig_SimpleUI()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_comboSimpleUI_Config);
+         }
+      }
+   }
+
+   private void createUI_56_SimpleUI_Viewer(final Composite parent) {
+
+      // define all columns for this viewer
+      _simpleUI_ImportLauncher_ColumnManager = new ColumnManager(_simpleUI_ImportLauncher_ColumnViewer, _stateSimpleUI);
+      _simpleUI_ImportLauncher_Utils.defineAllColumns(_simpleUI_ImportLauncher_ColumnManager, _pc);
+
+      _simpleUI_ViewerContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .applyTo(_simpleUI_ViewerContainer);
+      GridLayoutFactory.fillDefaults().applyTo(_simpleUI_ViewerContainer);
+//      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         createUI_57_SimpleUI_ViewerTable(_simpleUI_ViewerContainer);
+      }
+   }
+
+   private void createUI_57_SimpleUI_ViewerTable(final Composite parent) {
+
+      /*
+       * Create table
+       */
+      final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+      table.setHeaderVisible(true);
+
+      /*
+       * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+       * critical for performance that these methods be as efficient as possible.
+       */
+      final Listener paintListener = event -> {
+
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+
+            onPaint_SimpleUIViewer(event);
+         }
+      };
+      table.addListener(SWT.MeasureItem, paintListener);
+      table.addListener(SWT.PaintItem, paintListener);
+
+      /*
+       * Create viewer
+       */
+      _simpleUI_ImportLauncher_Viewer = new TableViewer(table);
+
+      _simpleUI_ImportLauncher_ColumnManager.createColumns(_simpleUI_ImportLauncher_Viewer);
+//    _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
+
+      _simpleUI_ColumnIndexConfigImage = _simpleUI_ImportLauncher_Utils.getColDef_TourTypeImage().getCreateIndex();
+
+      _simpleUI_ImportLauncher_Viewer.setUseHashlookup(true);
+      _simpleUI_ImportLauncher_Viewer.setContentProvider(new SimpleUI_ImportLauncher_ContentProvider());
+      _simpleUI_ImportLauncher_Viewer.addFilter(new SimpleUI_ImportLauncher_ViewerFilter());
+
+      _simpleUI_ImportLauncher_Viewer.addDoubleClickListener(doubleClickEvent -> runEasyImport());
+
+      createUI_60_SimpleUI_ContextMenu();
+   }
+
+   /**
+    * Create the launcher context menu
+    */
+   private void createUI_60_SimpleUI_ContextMenu() {
+
+      _simpleUI_ImportLauncher_ContextMenu = createUI_62_SimpleUI_CreateContextMenu();
+
+      final Table table = (Table) _simpleUI_ImportLauncher_Viewer.getControl();
+
+      _simpleUI_ImportLauncher_ColumnManager.createHeaderContextMenu(table, _simpleUI_ImportLauncher_ContextMenuProvider);
+   }
+
+   private Menu createUI_62_SimpleUI_CreateContextMenu() {
+
+      final Table table = (Table) _simpleUI_ImportLauncher_Viewer.getControl();
+      final Menu tableContextMenu = _simpleUI_ImportLauncher_MenuManager.createContextMenu(table);
+
+      return tableContextMenu;
+   }
+
+   private Composite createUI_90_Page_TourViewer(final Composite parent) {
+
+      _tourViewer_Container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_tourViewer_Container);
+      {
+         createUI_92_TourViewer(_tourViewer_Container);
+      }
+
+      return _tourViewer_Container;
    }
 
    /**
@@ -2614,34 +3158,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
       _tourViewer = new TableViewer(table);
-      _columnManager.createColumns(_tourViewer);
+      _tourViewer_ColumnManager.createColumns(_tourViewer);
 
       // table viewer
-      _tourViewer.setContentProvider(new TourDataContentProvider());
-      _tourViewer.setComparator(_importComparator);
+      _tourViewer.setContentProvider(new TourViewer_ContentProvider());
+      _tourViewer.setComparator(_tourViewer_Comparator);
 
-      _tourViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+      _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 
-            final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+         final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
-            if ((firstElement != null) && (firstElement instanceof TourData)) {
-               TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
-            }
+         if (firstElement instanceof TourData) {
+            TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
          }
       });
 
-      _tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
+      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> {
 
-            if (_isInUpdate) {
-               return;
-            }
-
-            fireSelectedTour();
+         if (_isInUpdate) {
+            return;
          }
+
+         fireSelectedTour();
       });
 
       // set tour info tooltip provider
@@ -2650,13 +3188,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Setup tour comparator
        */
-      _importComparator.__sortColumnId = _columnId_TourStartDate;
-      _importComparator.__sortDirection = ImportComparator.ASCENDING;
+      _tourViewer_Comparator.__sortColumnId = _columnId_TourStartDate;
+      _tourViewer_Comparator.__sortDirection = TourViewer_Comparator.ASCENDING;
 
       // show the sorting indicator in the viewer
-      updateUI_ShowSortDirection(//
-            _importComparator.__sortColumnId,
-            _importComparator.__sortDirection);
+      updateUI_ShowSortDirection(
+            _tourViewer_Comparator.__sortColumnId,
+            _tourViewer_Comparator.__sortDirection);
 
       createUI_94_ContextMenu();
    }
@@ -2666,20 +3204,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void createUI_94_ContextMenu() {
 
-      _tableContextMenu = createUI_96_CreateViewerContextMenu();
+      _tourViewer_ContextMenu = createUI_96_CreateViewerContextMenu();
 
       final Table table = (Table) _tourViewer.getControl();
 
-      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+      _tourViewer_ColumnManager.createHeaderContextMenu(table, _tourViewer_ContextMenuProvider);
 
       // this is from the beginning of the MT development and may not be needed
-      getSite().registerContextMenu(_viewerMenuManager, _tourViewer);
+      getSite().registerContextMenu(_tourViewer_MenuManager, _tourViewer);
    }
 
    private Menu createUI_96_CreateViewerContextMenu() {
 
       final Table table = (Table) _tourViewer.getControl();
-      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+      final Menu tableContextMenu = _tourViewer_MenuManager.createContextMenu(table);
 
       tableContextMenu.addMenuListener(new MenuAdapter() {
          @Override
@@ -2694,18 +3232,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       });
 
       return tableContextMenu;
-   }
-
-   private void createUI_NewUI() {
-
-      /*
-       * Create new UI only when it is used to prevent that the app is crashing when the old UI is
-       * used
-       */
-      if (_topPage_Dashboard == null) {
-
-         _topPage_Dashboard = createUI_20_Page_Dashboard(_topPageBook);
-      }
    }
 
    /**
@@ -2761,7 +3287,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void defineColumn_Altitude_Down() {
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(
-            _columnManager,
+            _tourViewer_ColumnManager,
             _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -2782,7 +3308,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void defineColumn_Altitude_Up() {
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(
-            _columnManager,
+            _tourViewer_ColumnManager,
             _pc);
 
       colDef.setIsDefaultColumn();
@@ -2803,14 +3329,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Body_Calories() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_CALORIES.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final TourData element = (TourData) cell.getElement();
-            final long value = element.getCalories();
+            final long value = element.getCalories() / 1000L;
 
             cell.setText(FormatManager.formatNumber_0(value));
          }
@@ -2822,7 +3348,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Data_ImportFileName() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -2846,7 +3372,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Data_ImportFilePath() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_PATH.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_PATH.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2867,7 +3393,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Date_TimeInterval() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DATA_TIME_INTERVAL.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2882,7 +3408,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Device_Name() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -2910,7 +3436,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Device_Profile() {
 
-      final ColumnDefinition colDef = TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.DEVICE_PROFILE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2925,7 +3451,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Motion_AvgPace() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -2939,7 +3465,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final long time = isPaceAndSpeedFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
-            0
+                  0
                   : time * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
@@ -2956,7 +3482,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Motion_AvgSpeed() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_tourViewer_ColumnManager, _pc);
 
       // show avg speed to verify the tour type by speed
       colDef.setIsDefaultColumn();
@@ -2986,7 +3512,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Motion_Distance() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3006,7 +3532,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_State_Database() {
 
-      final ColumnDefinition colDef = TableColumnFactory.STATE_DB_STATUS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.STATE_DB_STATUS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3028,7 +3554,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_State_Import() {
 
-      final ColumnDefinition colDef = TableColumnFactory.STATE_IMPORT_STATE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.STATE_IMPORT_STATE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3049,7 +3575,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3068,7 +3594,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3086,7 +3612,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_TimeZone() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.TIME_TIME_ZONE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3108,7 +3634,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_TimeZoneDifference() {
 
-      _timeZoneOffsetColDef = TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE.createColumn(_columnManager, _pc);
+      _timeZoneOffsetColDef = TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE.createColumn(_tourViewer_ColumnManager, _pc);
 
       _timeZoneOffsetColDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3127,7 +3653,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_TourDate() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_DATE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_DATE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3149,7 +3675,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = (TourData) cell.getElement();
 
-            cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Date_S));
+            cell.setText(TourManager.getTourDateShort(tourData));
          }
       });
 
@@ -3161,7 +3687,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_TourStartTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -3191,7 +3717,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             } else {
 
-               cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_S));
+               cell.setText(TourManager.getTourTimeShort(tourData));
             }
          }
       });
@@ -3202,9 +3728,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Marker() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3229,6 +3756,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             }
          }
       });
+
+      _columnId_Marker = colDef.getColumnId();
    }
 
    /**
@@ -3236,7 +3765,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Tags() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
@@ -3280,7 +3809,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Title() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3311,7 +3840,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Type() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3343,7 +3872,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_TypeText() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_tourViewer_ColumnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3363,7 +3892,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Weather_Clouds() {
 
-      final ColumnDefinition colDef = TableColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.WEATHER_CLOUDS.createColumn(_tourViewer_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3371,7 +3900,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final String weatherCloudId = ((TourData) cell.getElement()).getWeatherClouds();
+            final String weatherCloudId = ((TourData) cell.getElement()).getWeather_Clouds();
             if (weatherCloudId == null) {
                cell.setText(UI.EMPTY_STRING);
             } else {
@@ -3417,16 +3946,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final String fileNamePath = '"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"';
          notDeletedFiles.add(fileNamePath);
 
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileNamePath);
+         TourLogManager.subLog_ERROR(fileNamePath);
       }
-
-      return;
    }
 
    @Override
    public void dispose() {
 
-      resetEasyImport();
+      resetEasyImport(false);
 
       _images.dispose();
 
@@ -3466,122 +3993,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       updateModel_EasyConfig_Dashboard(dialogImportConfig.getModifiedConfig());
 
       _isDeviceStateValid = false;
-      updateUI_2_Dashboard();
-   }
-
-   private void doSaveTour(final TourPerson person) {
-
-      final ArrayList<TourData> selectedTours = getAnySelectedTours();
-
-      runEasyImport_099_SaveTour(person, selectedTours, false);
-   }
-
-   /**
-    * @param tourData
-    *           {@link TourData} which is not yet saved.
-    * @param person
-    *           Person for which the tour is being saved.
-    * @param savedTours
-    *           The saved tour is added to this list.
-    */
-   private void doSaveTour_OneTour(final TourData tourData,
-                                   final TourPerson person,
-                                   final ArrayList<TourData> savedTours) {
-
-      // workaround for hibernate problems
-      if (tourData.isTourDeleted) {
-         return;
-      }
-
-      if (tourData.getTourPerson() != null) {
-
-         /*
-          * tour is already saved, resaving cannot be done in the import view it can be done in the
-          * tour editor
-          */
-         return;
-      }
-
-      // a saved tour needs a person
-      tourData.setTourPerson(person);
-
-      // set weight from person
-      if (RawDataManager.isSetBodyWeight()) {
-         tourData.setBodyWeight(person.getWeight());
-      }
-
-      tourData.setTourBike(person.getTourBike());
-
-      final TourData savedTour = TourDatabase.saveTour(tourData, true);
-
-      if (savedTour != null) {
-
-         savedTours.add(savedTour);
-
-         // update fields which are not saved but used in the UI and easy setup
-         savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
-         savedTour.isTourFileMoved = tourData.isTourFileMoved;
-         savedTour.isBackupImportFile = tourData.isBackupImportFile;
-         savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
-      }
-   }
-
-   /**
-    * After tours are saved, the internal structures and ui viewers must be updated
-    *
-    * @param savedTours
-    *           contains the saved {@link TourData}
-    */
-   private void doSaveTour_PostActions(final ArrayList<TourData> savedTours) {
-
-      // update viewer, fire selection event
-      if (savedTours.isEmpty()) {
-         return;
-      }
-
-      final ArrayList<Long> savedToursIds = new ArrayList<>();
-
-      // update raw data map with the saved tour data
-      final HashMap<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
-      for (final TourData tourData : savedTours) {
-
-         final Long tourId = tourData.getTourId();
-
-         rawDataMap.put(tourId, tourData);
-         savedToursIds.add(tourId);
-      }
-
-      /*
-       * the selection provider can contain old tour data which conflicts with the tour data in the
-       * tour data editor
-       */
-      _postSelectionProvider.clearSelection();
-
-      // update import viewer
-      reloadViewer();
-
-      enableActions();
-
-      /*
-       * notify all views, it is not checked if the tour data editor is dirty because newly saved
-       * tours can not be modified in the tour data editor
-       */
-      TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
+      updateUI_2_EasyImport_Fancy();
    }
 
    private void enableActions() {
 
-      final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
-      final boolean isTourAvailable = rawData.length > 0;
+      final boolean isTourImported = _rawDataMgr.getImportedTours().values().size() > 0;
 
       final StructuredSelection selection = (StructuredSelection) _tourViewer.getSelection();
 
-      int savedTours = 0;
-      int unsavedTours = 0;
-      int selectedTours = 0;
+      int numSavedTours = 0;
+      int numUnsavedTours = 0;
+      int numSelectedTours = 0;
 
       // contains all tours which are selected and not deleted
-      int selectedNotDeleteTours = 0;
+      int numSelectedNotDeletedTours = 0;
 
       TourData firstSavedTour = null;
       TourData firstValidTour = null;
@@ -3589,7 +4015,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       for (final Object treeItem : selection) {
          if (treeItem instanceof TourData) {
 
-            selectedTours++;
+            numSelectedTours++;
 
             final TourData tourData = (TourData) treeItem;
             if (tourData.getTourPerson() == null) {
@@ -3600,30 +4026,60 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   // tour is not deleted, deleted tours are ignored
 
-                  unsavedTours++;
-                  selectedNotDeleteTours++;
+                  numUnsavedTours++;
+                  numSelectedNotDeletedTours++;
                }
 
             } else {
 
-               if (savedTours == 0) {
+               if (numSavedTours == 0) {
                   firstSavedTour = tourData;
                }
 
-               savedTours++;
-               selectedNotDeleteTours++;
+               numSavedTours++;
+               numSelectedNotDeletedTours++;
             }
 
-            if (selectedNotDeleteTours == 1) {
+            if (numSelectedNotDeletedTours == 1) {
                firstValidTour = tourData;
             }
          }
       }
 
-      final boolean isSavedTourSelected = savedTours > 0;
-      final boolean isOneSavedAndNotDeleteTour = (selectedNotDeleteTours == 1) && (savedTours == 1);
+      final boolean isSavedTourSelected = numSavedTours > 0;
+      final boolean isOneSavedAndNotDeleteTour = numSelectedNotDeletedTours == 1 && numSavedTours == 1;
+      final boolean isOneSelectedNotDeleteTour = numSelectedNotDeletedTours == 1;
 
-      final boolean isOneSelectedNotDeleteTour = selectedNotDeleteTours == 1;
+      final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
+      final ArrayList<Long> allUsedTagIds = new ArrayList<>();
+
+      long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      boolean isOneTourSelected;
+
+      if (firstSavedTour != null && numSavedTours == 1) {
+
+         // one tour is selected
+
+         isOneTourSelected = true;
+
+         final TourType tourType = firstSavedTour.getTourType();
+         existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+
+         final Set<TourTag> allUsedTags = firstSavedTour.getTourTags();
+         if (allUsedTags != null && allUsedTags.size() > 0) {
+
+            // tour contains at least one tag
+            for (final TourTag tourTag : allUsedTags) {
+               allUsedTagIds.add(tourTag.getTagId());
+            }
+         }
+
+      } else {
+
+         // multiple tours are selected
+
+         isOneTourSelected = false;
+      }
 
       // action: save tour with person
       final TourPerson person = TourbookPlugin.getActivePerson();
@@ -3633,7 +4089,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                person.getName()));
          _actionSaveTourWithPerson.setPerson(person);
       }
-      _actionSaveTourWithPerson.setEnabled((person != null) && (unsavedTours > 0));
+      _actionSaveTourWithPerson.setEnabled((person != null) && (numUnsavedTours > 0));
 
       // action: save tour...
       if (selection.size() == 1) {
@@ -3641,12 +4097,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else {
          _actionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
       }
-      _actionSaveTour.setEnabled(unsavedTours > 0);
+      _actionSaveTour.setEnabled(numUnsavedTours > 0);
 
       // action: merge tour ... into ...
       if (isOneSelectedNotDeleteTour) {
 
-         final StringBuilder sb = new StringBuilder().append(UI.EMPTY_STRING)//
+         final StringBuilder sb = new StringBuilder()
+               .append(UI.EMPTY_STRING)
                .append(TourManager.getTourDateShort(firstValidTour))
                .append(UI.DASH_WITH_SPACE)
                .append(TourManager.getTourTimeShort(firstValidTour))
@@ -3662,69 +4119,141 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionMergeIntoTour.setEnabled(isOneSelectedNotDeleteTour);
 
       _actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
-      _actionReimport_Tours.setEnabled(selectedTours > 0);
-      _actionRemoveTour.setEnabled(selectedTours > 0);
-      _actionExportTour.setEnabled(selectedNotDeleteTours > 0);
-      _actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
 
-      _actionEditTour.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionEditQuick.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionOpenTour.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionOpenMarkerDialog.setEnabled(isOneSavedAndNotDeleteTour);
-      _actionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndNotDeleteTour);
+// SET_FORMATTING_OFF
 
-      _actionDeleteTourFile.setEnabled(isTourAvailable);
+      _actionDeleteTourFile               .setEnabled(isTourImported);
+      _actionEditTour                     .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionEditQuick                    .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionExportTour                   .setEnabled(numSelectedNotDeletedTours > 0);
+      _actionJoinTours                    .setEnabled(numSelectedNotDeletedTours > 1);
+      _actionOpenTour                     .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionOpenMarkerDialog             .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionOpenAdjustAltitudeDialog     .setEnabled(isOneSavedAndNotDeleteTour);
+      _actionReimportTours                .setEnabled(numSelectedTours > 0);
+      _actionRemoveTour                   .setEnabled(numSelectedTours > 0);
+      _actionUploadTour                   .setEnabled(numSelectedNotDeletedTours > 0);
 
-      // set double click state
-      _tourDoubleClickState.canEditTour = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canQuickEditTour = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canEditMarker = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canAdjustAltitude = isOneSavedAndNotDeleteTour;
-      _tourDoubleClickState.canOpenTour = isOneSelectedNotDeleteTour;
+      // import setup
+      _actionClearView                    .setEnabled(isTourImported);
+      _actionSetupImport                  .setEnabled(isTourImported == false);
+      _actionToggleImportUI               .setEnabled(isTourImported == false);
 
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
-
-      final ArrayList<Long> existingTagIds = new ArrayList<>();
-      long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-      boolean isOneTour;
-
-      if ((firstSavedTour != null) && (savedTours == 1)) {
-
-         // one tour is selected
-
-         isOneTour = true;
-
-         final TourType tourType = firstSavedTour.getTourType();
-         existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-
-         final Set<TourTag> existingTags = firstSavedTour.getTourTags();
-         if ((existingTags != null) && (existingTags.size() > 0)) {
-
-            // tour contains at least one tag
-            for (final TourTag tourTag : existingTags) {
-               existingTagIds.add(tourTag.getTagId());
-            }
-         }
-      } else {
-
-         // multiple tours are selected
-
-         isOneTour = false;
-      }
-
-      // enable/disable actions for tags/tour types
-      _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTour, existingTagIds);
+      // actions for tags/tour types
+      _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
+      _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTourSelected, allUsedTagIds);
       TourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
 
-      /*
-       * Action: Setup import
-       */
-      _actionSetupImport.setEnabled(!isTourAvailable);
-      _actionClearView.setEnabled(isTourAvailable);
+      // set double click state
+      _tourDoubleClickState.canEditTour         = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canQuickEditTour    = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canEditMarker       = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canAdjustAltitude   = isOneSavedAndNotDeleteTour;
+      _tourDoubleClickState.canOpenTour         = isOneSelectedNotDeleteTour;
+
+// SET_FORMATTING_ON
    }
 
-   private void fillContextMenu(final IMenuManager menuMgr) {
+   private void enableSimpleUI(final boolean isEnabled) {
+
+      if (_parent.isDisposed()) {
+         return;
+      }
+
+      final Table viewerTable = _simpleUI_ImportLauncher_Viewer.getTable();
+
+// SET_FORMATTING_OFF
+
+      _actionSimpleUI_DeviceState      .setEnabled(isEnabled);
+      _comboSimpleUI_Config            .setEnabled(isEnabled);
+      _lblSimpleUI_EasyImportTitle     .setEnabled(isEnabled);
+      _lblSimpleUI_NumNotImportedFiles .setEnabled(isEnabled);
+
+      viewerTable                      .setEnabled(isEnabled);
+
+// SET_FORMATTING_ON
+
+      if (UI.IS_DARK_THEME) {
+
+         viewerTable.setHeaderForeground(isEnabled
+               ? ThemeUtil.getDefaultForegroundColor_TableHeader()
+               : ThemeUtil.getDefaultBackgroundColor_Combo());
+
+         viewerTable.setHeaderBackground(isEnabled
+               ? ThemeUtil.getDefaultBackgroundColor_TableHeader()
+               : ThemeUtil.getDefaultBackgroundColor_Table());
+
+      } else {
+
+         // bright theme
+
+         viewerTable.setHeaderForeground(isEnabled
+               ? UI.SYS_COLOR_WIDGET_FOREGROUND
+               : UI.SYS_COLOR_WIDGET_DARK_SHADOW);
+
+         viewerTable.setHeaderBackground(UI.SYS_COLOR_WIDGET_BACKGROUND);
+
+         _topPage_ImportUI_EasyImport_Simple.setBackground(isEnabled
+               ? UI.SYS_COLOR_LIST_BACKGROUND
+               : UI.SYS_COLOR_WIDGET_BACKGROUND);
+      }
+   }
+
+   private void fillSimpleUI() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      for (final ImportConfig importConfig : easyConfig.importConfigs) {
+         _comboSimpleUI_Config.add(importConfig.name);
+      }
+   }
+
+   private void fillSimpleUI_ContextMenu(final IMenuManager menuManager) {
+
+      // update import action text
+      final Object firstElement = _simpleUI_ImportLauncher_Viewer.getStructuredSelection().getFirstElement();
+      if (firstElement instanceof ImportLauncher) {
+
+         _actionSimpleUI_StartEasyImport.setText(NLS.bind(
+
+               Messages.Import_Data_Action_StartEasyImport,
+               ((ImportLauncher) firstElement).name));
+      }
+
+      menuManager.add(_actionSimpleUI_StartEasyImport);
+   }
+
+   private void fillToolbar() {
+
+      /*
+       * fill view toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_actionSaveTourWithPerson);
+      tbm.add(_actionSaveTour);
+      tbm.add(new Separator());
+
+      // place for import and transfer actions
+      tbm.add(new GroupMarker("import")); //$NON-NLS-1$
+      tbm.add(new Separator());
+
+      tbm.add(_actionToggleImportUI);
+      tbm.add(_actionClearView);
+      tbm.add(_actionOpenTourLogView);
+      tbm.add(_actionSetupImport);
+
+      /*
+       * fill view menu
+       */
+      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+      menuMgr.add(_actionRemoveToursWhenClosed);
+      menuMgr.add(_actionEditImportPreferences);
+
+   }
+
+   private void fillTourViewer_ContextMenu(final IMenuManager menuMgr) {
 
       // hide tour info tooltip, this is displayed when the mouse context menu should be created
       _tourInfoToolTip.hide();
@@ -3737,8 +4266,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       menuMgr.add(_actionJoinTours);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionUploadTour);
       menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimport_Tours);
+      menuMgr.add(_actionReimportTours);
       menuMgr.add(_actionEditImportPreferences);
       menuMgr.add(_actionRemoveTour);
       menuMgr.add(_actionDeleteTourFile);
@@ -3765,38 +4295,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       enableActions();
    }
 
-   private void fillToolbar() {
+   private void fillUI() {
 
-      /*
-       * fill view toolbar
-       */
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(_actionSaveTourWithPerson);
-      tbm.add(_actionSaveTour);
-      tbm.add(new Separator());
-
-      // place for import and transfer actions
-      tbm.add(new GroupMarker("import")); //$NON-NLS-1$
-      tbm.add(new Separator());
-
-      tbm.add(_actionClearView);
-      tbm.add(_actionOpenTourLogView);
-      tbm.add(_actionSetupImport);
-
-      /*
-       * fill view menu
-       */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(_actionRemoveToursWhenClosed);
-      menuMgr.add(_actionEditImportPreferences);
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+      fillSimpleUI();
    }
 
    private void fireSelectedTour() {
+
+      if (_parent != null && _parent.isDisposed()) {
+
+         // this happens when import view is closed from setFocus() method
+
+         return;
+      }
 
       final IStructuredSelection selection = (IStructuredSelection) _tourViewer.getSelection();
       final TourData tourData = (TourData) selection.getFirstElement();
@@ -3806,6 +4317,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (tourData != null) {
          _postSelectionProvider.setSelection(new SelectionTourData(null, tourData));
       }
+   }
+
+   private int getActiveEasyConfigSelectionIndex() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final ImportConfig activeEasyConfig = easyConfig.getActiveImportConfig();
+      final ArrayList<ImportConfig> allConfigs = easyConfig.importConfigs;
+
+      for (int configIndex = 0; configIndex < allConfigs.size(); configIndex++) {
+
+         if (allConfigs.get(configIndex) == activeEasyConfig) {
+
+            return configIndex;
+         }
+      }
+
+      return 0;
    }
 
    @Override
@@ -3854,6 +4383,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return selectedTourData;
    }
 
+   private ArrayList<Long> getAllTourIds(final ArrayList<TourData> allTourData) {
+
+      final ArrayList<Long> allTourIds = new ArrayList<>(allTourData.size());
+
+      for (final TourData tourData : allTourData) {
+         allTourIds.add(tourData.getTourId());
+      }
+
+      return allTourIds;
+   }
+
+   /**
+    * @return Returns all tours which are selected in the import view
+    */
    private ArrayList<TourData> getAnySelectedTours() {
 
       final ArrayList<TourData> selectedTours = new ArrayList<>();
@@ -3870,23 +4413,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    @Override
    public ColumnManager getColumnManager() {
-      return _columnManager;
+      return _tourViewer_ColumnManager;
    }
 
    private String getDurationText(final ImportLauncher importLauncher) {
 
       final int duration = importLauncher.temperatureAdjustmentDuration;
-      final Period durationPeriod = new Period(0, duration * 1000, _durationTemplate);
+      final Period durationPeriod = new Period(0, duration * 1000L, _durationTemplate);
 
       return durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER);
    }
 
-   private EasyConfig getEasyConfig() {
+   EasyConfig getEasyConfig() {
 
       return EasyImportManager.getInstance().getEasyConfig();
    }
 
-   public Image getImportConfigImage(final ImportLauncher importConfig) {
+   public ImageRegistry getImages() {
+
+      return _images;
+   }
+
+   public Image getImportConfigImage(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
 
       final int imageWidth = importConfig.imageWidth;
 
@@ -3894,11 +4442,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return null;
       }
 
-      final long configId = importConfig.getId();
-      Image image = _configImages.get(configId);
+      /**
+       * Color which is transparent in the combined tour type images
+       */
+      final RGB TRANSPARENT_COLOR = isDarkTransparentColor
 
-      if (isConfigImageValid(image, importConfig)) {
-         return image;
+            ? new RGB(67, 67, 67)
+            : new RGB(0xff, 0xfe, 0xff);
+
+      final long configId = importConfig.getId();
+      final String configImageId = Long.toString(configId) + UI.SPACE + Boolean.toString(isDarkTransparentColor);
+
+      Image configImage = _configImages.get(configImageId);
+
+      if (isConfigImageValid(configImage, importConfig, configImageId)) {
+         return configImage;
       }
 
       final Display display = _parent.getDisplay();
@@ -3913,7 +4471,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final Image tempImage = new Image(display, imageWidth, imageSize);
          {
             final GC gcImage = new GC(tempImage);
-            final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+            final Color colorTransparent = new Color(display, TRANSPARENT_COLOR);
             {
                // fill with transparent color
                gcImage.setBackground(colorTransparent);
@@ -3925,7 +4483,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   final Image ttImage = TourTypeImage.getTourTypeImage(vertex.tourTypeId);
 
-                  gcImage.drawImage(ttImage, //
+                  gcImage.drawImage(ttImage,
                         0,
                         0,
                         imageSize,
@@ -3944,9 +4502,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * set transparency
              */
             final ImageData imageData = tempImage.getImageData();
-            imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
+            imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR);
 
-            image = new Image(display, imageData);
+            configImage = new Image(display, imageData);
          }
          tempImage.dispose();
 
@@ -3961,7 +4519,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             {
 
                final GC gcImage = new GC(tempImage);
-               final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+               final Color colorTransparent = new Color(display, TRANSPARENT_COLOR);
                {
                   // fill with transparent color
                   gcImage.setBackground(colorTransparent);
@@ -3977,9 +4535,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                 * set transparency
                 */
                final ImageData imageData = tempImage.getImageData();
-               imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
+               imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR);
 
-               image = new Image(display, imageData);
+               configImage = new Image(display, imageData);
 
             }
             tempImage.dispose();
@@ -3992,13 +4550,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       // keep image in the cache
-      final Image oldImage = _configImages.put(configId, image);
+      final Image oldImage = _configImages.put(configImageId, configImage);
 
-      Util.disposeResource(oldImage);
+      UI.disposeResource(oldImage);
 
-      _configImageHash.put(configId, importConfig.imageHash);
+      _configImageHash.put(configImageId, importConfig.imageHash);
 
-      return image;
+      return configImage;
    }
 
    @Override
@@ -4008,7 +4566,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    @Override
    public Set<Long> getSelectedTourIDs() {
-      final Set<Long> tourIds = new HashSet<>();
+
+      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
       for (final Object viewItem : selectedTours) {
@@ -4133,29 +4692,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       createResources_Image();
       createResources_Web();
 
-      _importComparator = new ImportComparator();
-      _columnSortListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelect_SortColumn(e);
-         }
-      };
+      _tourViewer_Comparator = new TourViewer_Comparator();
+      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
    /**
     * @param image
     * @param importConfig
+    * @param configImageId
     * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when the
     *         profile image must be created,
     */
-   private boolean isConfigImageValid(final Image image, final ImportLauncher importConfig) {
+   private boolean isConfigImageValid(final Image image,
+                                      final ImportLauncher importConfig,
+                                      final String configImageId) {
 
       if (image == null || image.isDisposed()) {
 
          return false;
       }
 
-      final Integer imageHash = _configImageHash.get(importConfig.getId());
+      final Integer imageHash = _configImageHash.get(configImageId);
 
       if (imageHash == null || imageHash != importConfig.imageHash) {
 
@@ -4167,7 +4724,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return true;
    }
 
-   private boolean isOSFolderValid(final String osFolder) {
+   boolean isOSFolderValid(final String osFolder) {
 
       try {
 
@@ -4192,13 +4749,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return _watchingStoresThread != null;
    }
 
-   private void onBrowser_Completed(final ProgressEvent event) {
+   private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
 
-      if (_isInUIStartup) {
+      if (_isInFancyUIStartup) {
 
-         _isInUIStartup = false;
+         _isInFancyUIStartup = false;
 
          // a redraw MUST be done otherwise nothing is displayed
          _browser.setRedraw(true);
@@ -4207,11 +4764,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _browser.setFocus();
 
          // dashboard is visible, activate background task
-         setWatcher_On();
+         setWatcher_1_On();
 
          // make the import tiles visible otherwise they are 'hidden' after the startup
          _isShowWatcherAnimation = true;
-         updateUI_WatcherAnimation(isWatchingOn() //
+         updateUI_WatcherAnimation(isWatchingOn()
                ? DOM_CLASS_DEVICE_ON_ANIMATED
                : DOM_CLASS_DEVICE_OFF_ANIMATED);
       }
@@ -4230,12 +4787,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (locationParts.length > 1) {
 
          // finalize loading of the browser page and then start the action
-         _browser.getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               onBrowser_LocationChanging_Runnable(locationParts);
-            }
-         });
+         _browser.getDisplay().asyncExec(() -> onBrowser_LocationChanging_Runnable(locationParts));
       }
 
       // prevent to load a new url
@@ -4259,11 +4811,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
 
-         action_Easy_SetupImport(-1);
+         onSelect_SetupEasyImport(-1);
 
       } else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
 
-         action_Easy_SetDeviceWatching_OnOff();
+         onSelect_DeviceWatching_OnOff();
 
       } else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
@@ -4279,19 +4831,238 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
-         onSelectUI_Old();
+         onSelect_ImportUI(ImportUI.FOSSIL);
+
+      } else {
+
+         //We look for the cloud downloader that matches
+         //the action in {@link hrefAction} and execute its
+         //{@link TourbookCloudDownloader#downloadTours} method.
+         _cloudDownloadersList.stream()
+               .filter(cd -> cd.getId().equals(hrefAction))
+               .forEach(TourbookCloudDownloader::downloadTours);
       }
+   }
+
+   private void onPaint_SimpleUIViewer(final Event event) {
+
+      if (event.index != _simpleUI_ColumnIndexConfigImage) {
+         return;
+      }
+
+      final TableItem item = (TableItem) event.item;
+      final ImportLauncher importLauncher = (ImportLauncher) item.getData();
+
+      switch (event.type) {
+      case SWT.MeasureItem:
+
+         /*
+          * Set height also for color def, when not set and all is collapsed, the color def size
+          * will be adjusted when an item is expanded.
+          */
+
+         event.width += importLauncher.imageWidth;
+//         event.height = PROFILE_IMAGE_HEIGHT;
+
+         break;
+
+      case SWT.PaintItem:
+
+         final Image image = getImportConfigImage(importLauncher, UI.IS_DARK_THEME);
+
+         if (image != null && !image.isDisposed()) {
+
+            final Rectangle rect = image.getBounds();
+
+            final int x = event.x + event.width;
+            final int yOffset = Math.max(0, (event.height - rect.height) / 2);
+
+            event.gc.drawImage(image, x, event.y + yOffset);
+         }
+
+         break;
+      }
+   }
+
+   private void onSelect_DeviceWatching_OnOff() {
+
+      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         _isShowWatcherAnimation = true;
+      }
+
+      if (isWatchingOn()) {
+
+         // stop watching
+
+         setWatcher_2_Off();
+
+      } else {
+
+         // start watching
+
+         setWatcher_1_On();
+      }
+
+      updateUI_DeviceState();
+   }
+
+   /**
+    * Import config is selected in the dashboard.
+    *
+    * @param selectedIndex
+    */
+   private void onSelect_ImportConfig_Fancy(final int selectedIndex) {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
+
+      setWatcher_2_Off();
+      {
+         easyConfig.setActiveImportConfig(selectedConfig);
+
+         _isDeviceStateValid = false;
+
+         updateUI_2_EasyImport_Fancy();
+      }
+      setWatcher_1_On();
+
+      updateUI_2_EasyImport_Fancy();
+
+      // update also the simple UI to be in sync with the fancy UI
+      updateUI_2_EasyImport_Simple();
+   }
+
+   /**
+    * Import config is selected in the simple UI.
+    */
+   private void onSelect_ImportConfig_SimpleUI() {
+
+      /**
+       * When the import config selection is done too frequently, it can block the UI because of the
+       * different threads/watcher
+       * <p>
+       * -> delay UI
+       */
+      final long now = TimeTools.nowInMilliseconds();
+
+      // check if selection is delayed
+      if (now < _lastSimpleUIConfigSelection + 1000) {
+
+         // reselect last config
+
+         _comboSimpleUI_Config.getDisplay().asyncExec(() -> {
+
+            final int activeEasyConfigSelectionIndex = getActiveEasyConfigSelectionIndex();
+
+            _comboSimpleUI_Config.select(activeEasyConfigSelectionIndex);
+         });
+
+         return;
+      }
+
+      _lastSimpleUIConfigSelection = now;
+
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig activeEasyConfig = easyConfig.getActiveImportConfig();
+
+      final int selectionIndex = Math.max(0, _comboSimpleUI_Config.getSelectionIndex()); // get valid index
+      final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectionIndex);
+
+      if (selectedConfig == activeEasyConfig) {
+
+         // ignore the same config
+
+         return;
+      }
+
+      setWatcher_2_Off();
+      {
+         easyConfig.setActiveImportConfig(selectedConfig);
+
+         _isDeviceStateValid = false;
+
+         // close slideout to remove old content
+         _actionSimpleUI_DeviceState.__slideoutDeviceState.close();
+      }
+      setWatcher_1_On();
+   }
+
+   private void onSelect_ImportUI(final ImportUI importUI) {
+
+      _importUI = importUI;
+
+      if (importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         updateUI_1_TopPage(true);
+
+         showFailbackUI();
+
+      } else {
+
+         resetEasyImport(true);
+
+         updateUI_1_TopPage(true);
+      }
+
+      updateUI_ImportUI_Action();
+   }
+
+   /**
+    * @param selectedTab
+    *           Tab which should be selected when config dialog is opened, -1 will select the
+    *           restored tab index.
+    */
+   void onSelect_SetupEasyImport(final int selectedTab) {
+
+      // prevent that the dialog is opened multiple times, this occurred when testing
+      if (_dialogImportConfig != null) {
+         return;
+      }
+
+      final Shell shell = Display.getDefault().getActiveShell();
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      _dialogImportConfig = new DialogEasyImportConfig(shell, easyConfig, this, selectedTab);
+
+      if (_dialogImportConfig.open() == Window.OK) {
+
+         // keep none live update values
+
+         final EasyConfig modifiedEasyConfig = _dialogImportConfig.getModifiedConfig();
+
+         easyConfig.setActiveImportConfig(modifiedEasyConfig.getActiveImportConfig());
+
+         easyConfig.importConfigs.clear();
+         easyConfig.importConfigs.addAll(modifiedEasyConfig.importConfigs);
+
+         easyConfig.importLaunchers.clear();
+         easyConfig.importLaunchers.addAll(modifiedEasyConfig.importLaunchers);
+
+         updateModel_EasyConfig_Dashboard(modifiedEasyConfig);
+
+         _isDeviceStateValid = false;
+
+         updateUI_2_EasyImport_Fancy();
+         updateUI_2_EasyImport_Simple();
+
+         _simpleUI_ImportLauncher_Viewer.refresh();
+      }
+
+      _dialogImportConfig = null;
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
 
-      _viewerContainer.setRedraw(false);
+      _tourViewer_Container.setRedraw(false);
       {
          // keep selection
          final ISelection selectionBackup = _tourViewer.getSelection();
 
          // update viewer with new sorting
-         _importComparator.setSortColumn(e.widget);
+         _tourViewer_Comparator.setSortColumn(e.widget);
          _tourViewer.refresh();
 
          // reselect
@@ -4302,26 +5073,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
          _isInUpdate = false;
       }
-      _viewerContainer.setRedraw(true);
-   }
-
-   /**
-    * Import config is selected in the dashboard.
-    *
-    * @param selectedIndex
-    */
-   private void onSelectImportConfig(final int selectedIndex) {
-
-      final EasyConfig easyConfig = getEasyConfig();
-
-      final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
-
-      setWatcher_Off();
-      easyConfig.setActiveImportConfig(selectedConfig);
-      _isDeviceStateValid = false;
-      updateUI_2_Dashboard();
-      setWatcher_On();
-      updateUI_2_Dashboard();
+      _tourViewer_Container.setRedraw(true);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -4353,41 +5105,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             reloadViewer();
 
          } else {
+
             _isViewerPersonDataDirty = true;
          }
+
+         // it's important to update this state otherwise deleted tours are not counted !!!
+         updateUI_DeviceState();
       }
-   }
-
-   private void onSelectUI_New() {
-
-      _isNewUI = true;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
-
-      updateUI_1_TopPage(true);
-
-      showFailbackUI();
-   }
-
-   private void onSelectUI_Old() {
-
-      resetEasyImport();
-
-      _isNewUI = false;
-      _prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
-
-      updateUI_1_TopPage(true);
    }
 
    private void recreateViewer() {
 
-      _columnManager.saveState(_state);
-      _columnManager.clearColumns();
+      _tourViewer_ColumnManager.saveState(_state);
+      _tourViewer_ColumnManager.clearColumns();
       defineAllColumns();
 
       _tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
       _isDeviceStateValid = false;
-      updateUI_2_Dashboard();
+      updateUI_2_EasyImport_Fancy();
    }
 
    @Override
@@ -4410,9 +5146,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /**
     * Update {@link TourData} from the database for all imported tours, displays a progress dialog.
     *
-    * @param canCancelable
+    * @param canCancelProcess
     */
-   private void reimportAllImportFiles(final boolean canCancelable) {
+   private void reimportAllImportFiles(final boolean canCancelProcess) {
 
       final String[] prevImportedFiles = _state.getArray(STATE_IMPORTED_FILENAMES);
       if ((prevImportedFiles == null) || (prevImportedFiles.length == 0)) {
@@ -4422,7 +5158,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // Log re-import
       TourLogManager.addLog(
             TourLogState.DEFAULT,
-            RawDataManager.LOG_REIMPORT_PREVIOUS_FILES,
+            Messages.Log_Reimport_PreviousFiles,
             TourLogView.CSS_LOG_TITLE);
 
       final long start = System.currentTimeMillis();
@@ -4433,28 +5169,34 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       try {
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
+
                true,
-               canCancelable,
-               new IRunnableWithProgress() {
+               canCancelProcess,
 
-                  @Override
-                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
+               monitor -> {
 
-                     reimportAllImportFiles_Runnable(monitor, prevImportedFiles, canCancelable);
-                  }
+                  final ImportState_Process importState_Process = new ImportState_Process();
+
+                  reimportAllImportFiles_Runnable(
+                        monitor,
+                        prevImportedFiles,
+                        canCancelProcess,
+                        importState_Process);
+
+                  // fix: org.eclipse.swt.SWTException: Invalid thread access
+                  _parent.getDisplay().syncExec(() -> importState_Process.runPostProcess());
                });
 
       } catch (final Exception e) {
 
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
 
       } finally {
 
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(//
-               TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_REIMPORT_END, time));
+         TourLogManager.log_DEFAULT(String.format(
+               Messages.Log_Reimport_PreviousFiles_End,
+               (System.currentTimeMillis() - start) / 1000.0));
       }
    }
 
@@ -4463,11 +5205,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     *
     * @param monitor
     * @param importedFiles
-    * @param canCancelable
+    * @param canCancelProcess
+    * @param importState_Process
     */
    private void reimportAllImportFiles_Runnable(final IProgressMonitor monitor,
                                                 final String[] importedFiles,
-                                                final boolean canCancelable) {
+                                                final boolean canCancelProcess,
+                                                final ImportState_Process importState_Process) {
 
       int workedDone = 0;
       final int workedAll = importedFiles.length;
@@ -4479,77 +5223,93 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<String> notImportedFiles = new ArrayList<>();
 
       _rawDataMgr.getImportedTours().clear();
-      _rawDataMgr.setImportId();
 
-      int importedFileCounter = 0;
+      int numImportedFiles = 0;
 
       // loop: import all files
       for (final String fileName : importedFiles) {
 
          if (monitor != null) {
             monitor.worked(1);
-            monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
+            monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask,
                   new Object[] { workedDone++, workedAll, fileName }));
          }
 
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true);
+            final ImportState_File importState_File = _rawDataMgr.importTours_FromOneFile(
 
-            if (isImported) {
-               TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
-               importedFileCounter++;
+                  file, //                         importFile
+                  null, //                         destinationPath
+                  null, //                         fileCollision
+                  false, //                        isBuildNewFileNames
+                  true, //                         isTourDisplayedInImportView
+                  new HashMap<>(),
+                  importState_Process //
+            );
+
+            if (importState_File.isFileImportedWithValidData) {
+
+               TourLogManager.subLog_OK(fileName);
+               numImportedFiles++;
+
             } else {
-               TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileName);
+
+               if (importState_File.isImportLogged == false) {
+
+                  // do default logging
+
+                  TourLogManager.subLog_ERROR(fileName);
+               }
+
                notImportedFiles.add(fileName);
             }
          }
 
-         if (canCancelable && monitor.isCanceled()) {
+         if (canCancelProcess && monitor.isCanceled()) {
+
             // stop importing but process imported tours
+
             break;
          }
       }
 
-      if (importedFileCounter > 0) {
+      if (numImportedFiles > 0) {
 
          _rawDataMgr.updateTourData_InImportView_FromDb(monitor);
 
-         Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().asyncExec(() -> {
 
-               reloadViewer();
+            reloadViewer();
 
-               /*
-                * restore selected tour
-                */
-               final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
+            /*
+             * Restore selected tour
+             */
+            final String[] viewerIndices = _state.getArray(STATE_SELECTED_TOUR_INDICES);
 
-               if (viewerIndices != null) {
+            if (viewerIndices != null) {
 
-                  final ArrayList<Object> viewerTourData = new ArrayList<>();
+               final ArrayList<Object> viewerTourData = new ArrayList<>();
 
-                  for (final String viewerIndex : viewerIndices) {
+               for (final String viewerIndex : viewerIndices) {
 
-                     Object tourData = null;
+                  Object tourData = null;
 
-                     try {
-                        final int index = Integer.parseInt(viewerIndex);
-                        tourData = _tourViewer.getElementAt(index);
-                     } catch (final NumberFormatException e) {
-                        // just ignore
-                     }
-
-                     if (tourData != null) {
-                        viewerTourData.add(tourData);
-                     }
+                  try {
+                     final int index = Integer.parseInt(viewerIndex);
+                     tourData = _tourViewer.getElementAt(index);
+                  } catch (final NumberFormatException e) {
+                     // just ignore
                   }
 
-                  if (viewerTourData.size() > 0) {
-                     _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
+                  if (tourData != null) {
+                     viewerTourData.add(tourData);
                   }
+               }
+
+               if (viewerTourData.size() > 0) {
+                  _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
                }
             }
          });
@@ -4571,7 +5331,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       updateUI_1_TopPage(false);
 
-      // update tour data viewer
+      // update tour viewer
       final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
       _tourViewer.setInput(rawData);
 
@@ -4580,7 +5340,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void removeTours(final ArrayList<ITourItem> removedTours) {
 
-      final HashMap<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
+      final Map<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
 
       for (final ITourItem tourItem : removedTours) {
 
@@ -4593,7 +5353,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // remove tour properties
             tourData.setTourType(null);
             tourData.setTourTitle(UI.EMPTY_STRING);
-            tourData.setTourTags(new HashSet<TourTag>());
+            tourData.setTourTags(new HashSet<>());
 
             /**
              * when a remove tour is saved again, this will cause the exception: <br>
@@ -4606,18 +5366,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void resetEasyImport() {
+   private void resetEasyImport(final boolean isUpdateUI) {
 
-      setWatcher_Off();
+      setWatcher_2_Off(isUpdateUI);
+
       EasyImportManager.getInstance().reset();
    }
 
    private void restoreState() {
 
-      _isNewUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
+      _importUI = (ImportUI) Util.getStateEnum(_state, STATE_IMPORT_UI, STATE_IMPORT_UI_DEFAULT);
 
-      _actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
-            _state,
+      _actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(_state,
             STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED,
             true));
 
@@ -4643,28 +5403,52 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
 
       // auto open import log view
-      final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
+      final boolean isAutoOpenLogView = Util.getStateBoolean(_state,
             STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
             RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
       _rawDataMgr.setState_IsOpenImportLogView(isAutoOpenLogView);
 
       // restore: is checksum validation
       final boolean isValidation = _state.getBoolean(STATE_IS_CHECKSUM_VALIDATION);
-      _rawDataMgr.setIsChecksumValidation(isValidation);
+      _rawDataMgr.setIsHAC4_5_ChecksumValidation(isValidation);
 
       updateToolTipState();
+      updateUI_ImportUI_Action();
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            reimportAllImportFiles(true);
-         }
-      });
+      // simple easy import
+      _comboSimpleUI_Config.select(getActiveEasyConfigSelectionIndex());
+      _simpleUI_ImportLauncher_Viewer.setInput(new Object());
+
+      Display.getCurrent().asyncExec(() -> reimportAllImportFiles(true));
    }
 
-   private void runEasyImport(final long tileId) {
+   /**
+    * Launch easy import from the simple UI
+    */
+   private void runEasyImport() {
 
-      final long start = System.currentTimeMillis();
+      // get selected launcher
+      final Object firstElement = _simpleUI_ImportLauncher_Viewer.getStructuredSelection().getFirstElement();
+      if (firstElement instanceof ImportLauncher) {
+
+         /*
+          * Log import start
+          */
+         TourLogManager.addLog(
+               TourLogState.DEFAULT,
+               EasyImportManager.LOG_EASY_IMPORT_000_IMPORT_START,
+               TourLogView.CSS_LOG_TITLE);
+
+         runEasyImport_001_WithLauncher((ImportLauncher) firstElement);
+      }
+   }
+
+   /**
+    * Launch easy import from the fancy UI
+    *
+    * @param launcherId
+    */
+   private void runEasyImport(final long launcherId) {
 
       /*
        * Log import start
@@ -4684,25 +5468,34 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return;
       }
 
-      final EasyConfig easyConfig = getEasyConfig();
-      final ImportConfig importConfig = easyConfig.getActiveImportConfig();
-
       /*
        * Get import launcher
        */
+      final EasyConfig easyConfig = getEasyConfig();
       ImportLauncher importLauncher = null;
 
       for (final ImportLauncher launcher : easyConfig.importLaunchers) {
-         if (launcher.getId() == tileId) {
+         if (launcher.getId() == launcherId) {
             importLauncher = launcher;
             break;
          }
       }
 
       if (importLauncher == null) {
+
          // this should not occur
          return;
       }
+
+      runEasyImport_001_WithLauncher(importLauncher);
+   }
+
+   private void runEasyImport_001_WithLauncher(final ImportLauncher importLauncher) {
+
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+      final long start = System.currentTimeMillis();
 
       /*
        * Check person
@@ -4722,10 +5515,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
+      // clear old tours which can cause problems when they are reimported
+//      TourManager.getInstance().clearTourDataCache();
+
       /*
        * Run easy import
        */
-      ImportDeviceState importState = null;
+      ImportState_Easy importState_Easy = null;
+
+      final ImportState_Process importState_Process = new ImportState_Process()
+
+            .setIsEasyImport(true);
+
+      if (easyConfig.isLogDetails == false) {
+
+         // disable logging, the default is to log details
+
+         importState_Process
+
+               .setIsLog_DEFAULT(false)
+               .setIsLog_INFO(false)
+               .setIsLog_OK(false)
+
+         ;
+      }
 
       if (RawDataManager.isAutoOpenImportLog()) {
          TourLogManager.showLogView();
@@ -4736,7 +5549,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // disable state update during import, this causes lots of problems !!!
          _isUpdateDeviceState = false;
 
-         importState = EasyImportManager.getInstance().runImport(importLauncher);
+         importState_Easy = EasyImportManager.getInstance().runImport(importLauncher, importState_Process);
 
       } finally {
 
@@ -4749,22 +5562,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
       final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
 
+      final boolean isIgnoreInvalidFile = RawDataManager.isIgnoreInvalidFile();
+
       try {
 
          // stop all other actions when canceled
-         if (importState.isImportCanceled) {
+         if (importState_Easy.isImportCanceled) {
             return;
          }
 
          // open import config dialog to solve problems
-         if (importState.isOpenSetup) {
+         if (importState_Easy.isOpenSetup) {
 
-            _parent.getDisplay().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  action_Easy_SetupImport(0);
-               }
-            });
+            _parent.getDisplay().asyncExec(() -> onSelect_SetupEasyImport(0));
 
             return;
          }
@@ -4784,10 +5594,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          /*
-          * 6. Retrieve weather data
+          * 6. Adjust elevation
+          */
+         if (importLauncher.isReplaceFirstTimeSliceElevation) {
+            runEasyImport_006_ReplaceFirstTimeSliceElevation(importLauncher, importedTours);
+         }
+
+         /*
+          * 7. Replace elevation up/down from SRTM values
+          */
+         if (importLauncher.isReplaceElevationFromSRTM) {
+            runEasyImport_007_ReplaceElevationFromSRTM(importLauncher, importedTours);
+         }
+
+         /*
+          * 50. Retrieve weather data
           */
          if (importLauncher.isRetrieveWeatherData) {
-            runEasyImport_006_RetrieveWeatherData(importLauncher, importedTours);
+            runEasyImport_050_RetrieveWeatherData(importLauncher, importedTours);
          }
 
          ArrayList<TourData> importedAndSavedTours;
@@ -4797,11 +5621,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
          if (importLauncher.isSaveTour) {
 
-            importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours, true);
+            importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours);
 
          } else {
 
-            importedAndSavedTours = _rawDataMgr.getImportedTourList();
+            importedAndSavedTours = _rawDataMgr.getImportedTours_AsList();
          }
 
          /*
@@ -4811,7 +5635,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // use newly saved/not saved tours
 
-            final ArrayList<String> invalidFiles = RawDataManager.isIgnoreInvalidFile() ? _rawDataMgr.getInvalidFilesList() : null;
+            final String[] invalidFilesSet = _rawDataMgr.getInvalidFilesList().keySet().toArray(String[]::new);
+
+            final String[] invalidFiles = isIgnoreInvalidFile
+                  ? invalidFilesSet
+                  : null;
 
             runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
          }
@@ -4821,24 +5649,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           */
          if (importConfig.isTurnOffWatching) {
 
-            TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
+            TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
 
-            setWatcher_Off();
+            setWatcher_2_Off();
          }
 
          /*
           * Log import end
           */
-         final double time = (System.currentTimeMillis() - start) / 1000.0;
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               String.format(EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END, time));
+         TourLogManager.log_DEFAULT(String.format(
+               EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END,
+               (System.currentTimeMillis() - start) / 1000.0));
 
       } finally {
 
          // update viewer when required
 
-         if (importState.isUpdateImportViewer) {
+         Display.getDefault().asyncExec(() -> importState_Process.runPostProcess());
+
+         if (importState_Easy.isUpdateImportViewer) {
 
             _tourViewer.update(importedToursCollection.toArray(), null);
 
@@ -4846,7 +5675,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
       }
 
-      if (RawDataManager.isIgnoreInvalidFile()) {
+      if (isIgnoreInvalidFile) {
          _rawDataMgr.clearInvalidFilesList();
       }
    }
@@ -4860,7 +5689,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
 
       final int ilLastMarkerDistance = importLauncher.lastMarkerDistance;
 
@@ -4895,7 +5724,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             lastMarker.setLabel(lastMarkerText);
 
-            TourLogManager.addSubLog(TourLogState.DEFAULT, TourManager.getTourDateTimeShort(tourData));
+            TourLogManager.subLog_DEFAULT(TourManager.getTourDateTimeShort(tourData));
          }
       }
    }
@@ -4907,22 +5736,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final float temperature = UI.convertTemperatureFromMetric(avgMinimumTemperature);
       final int durationTime = importLauncher.temperatureAdjustmentDuration;
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            NLS.bind(EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
-                  new Object[] {
-                        getDurationText(importLauncher),
-                        _nf1.format(temperature),
-                        UI.UNIT_LABEL_TEMPERATURE }));
+      // "5. Adjust tour start temperature values - {0} < {1} {2}"
+      TourLogManager.log_DEFAULT(NLS.bind(
+            EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE,
+            new Object[] {
+                  getDurationText(importLauncher),
+                  _nf1.format(temperature),
+                  UI.UNIT_LABEL_TEMPERATURE }));
 
       for (final TourData tourData : importedTours) {
 
-         final float oldTourAvgTemperature = tourData.getAvgTemperature();
+         final float oldTourAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.subLog_Error(String.format(
+            // "%s . . . %.2f > %.0f °C"
+            TourLogManager.subLog_DEFAULT(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -4935,81 +5765,114 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void runEasyImport_006_RetrieveWeatherData(final ImportLauncher importLauncher,
-                                                      final ArrayList<TourData> importedTours) {
+   private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ImportLauncher importLauncher,
+                                                                 final ArrayList<TourData> importedTours) {
 
-      TourLogManager.addLog(
-            TourLogState.DEFAULT,
-            NLS.bind(EasyImportManager.LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA,
-                  new Object[] {
-                        getDurationText(importLauncher),
-                        UI.UNIT_LABEL_TEMPERATURE }));
+      // "6. Replace first time slice elevation value"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION);
 
       for (final TourData tourData : importedTours) {
-         TourManager.retrieveWeatherData(tourData);
+
+         final float[] altitudeSerie = tourData.altitudeSerie;
+
+         if (altitudeSerie == null || altitudeSerie.length < 2) {
+
+            continue;
+         }
+
+         final float firstElevation = altitudeSerie[0];
+         final float secondElevation = altitudeSerie[1];
+
+         final int[] timeSerie = tourData.timeSerie;
+         final float timeDiff = timeSerie[1];
+
+         final float elevationDiff = Math.abs(firstElevation - secondElevation);
+         final float timeElevationDiff = elevationDiff / timeDiff;
+
+         if (timeElevationDiff > 0.5) {
+
+            // adjust elevation
+
+            altitudeSerie[0] = secondElevation;
+
+            // discard computed elevation values
+            tourData.clearAltitudeSeries();
+
+            tourData.computeAltitudeUpDown();
+            tourData.computeComputedValues();
+
+            // "%s - %.1f Δ %s"
+            TourLogManager.subLog_OK(String.format(
+                  LOG_TOUR_DETAILS,
+                  TourManager.getTourDateTimeShort(tourData),
+                  timeDiff,
+                  elevationDiff,
+                  UI.UNIT_LABEL_ELEVATION));
+         } else {
+
+            // "%s - %.1f Δ %s"
+            TourLogManager.subLog_DEFAULT(String.format(
+                  LOG_TOUR_DETAILS,
+                  TourManager.getTourDateTimeShort(tourData),
+                  timeDiff,
+                  elevationDiff,
+                  UI.UNIT_LABEL_ELEVATION));
+         }
       }
    }
 
-   /**
-    * @param person
-    * @param selectedTours
-    * @param isEasyImport
-    * @return Returns list with saved tours.
-    */
-   private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person,
-                                                          final ArrayList<TourData> selectedTours,
-                                                          final boolean isEasyImport) {
+   private void runEasyImport_007_ReplaceElevationFromSRTM(final ImportLauncher importLauncher,
+                                                           final ArrayList<TourData> importedTours) {
 
-      final String css = isEasyImport //
-            ? UI.EMPTY_STRING
-            : TourLogView.CSS_LOG_TITLE;
-      final String message = isEasyImport //
-            ? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
-            : TourLogManager.LOG_TOUR_SAVE_TOURS;
+      // "7. Replace elevation up/down total values from SRTM data"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM);
 
-      TourLogManager.addLog(TourLogState.DEFAULT, message, css);
+      for (final TourData tourData : importedTours) {
 
-      final ArrayList<TourData> savedTours = new ArrayList<>();
+         final int oldElevationUp = tourData.getTourAltUp();
+         final int oldElevationDown = tourData.getTourAltDown();
 
-      final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-         @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+         final ElevationGainLoss elevationUpDown = tourData.computeAltitudeUpDown_FromSRTM();
 
-            int saveCounter = 0;
-            final int selectionSize = selectedTours.size();
+         if (elevationUpDown == null) {
 
-            monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, selectionSize);
+            TourLogManager.subLog_ERROR(String.format(Messages.Log_ReplaceElevationUpDown_SRTMDataNotAvailable,
+                  TourManager.getTourDateTimeShort(tourData)));
 
-            // loop: all selected tours, selected tours can already be saved
-            for (final TourData tourData : selectedTours) {
+         } else {
 
-               monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
+            TourLogManager.subLog_DEFAULT(String.format(Messages.Log_ReplaceElevationUpDown_ValuesAreReplaced,
 
-               doSaveTour_OneTour(tourData, person, savedTours);
+                  TourManager.getTourDateTimeShort(tourData),
 
-               TourLogManager.addSubLog(
-                     TourLogState.TOUR_SAVED,
-                     String.format(
-                           TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
-                           tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                           tourData.getImportFilePathNameText()));
+                  oldElevationUp,
+                  elevationUpDown.elevationGain,
 
-               monitor.worked(1);
-            }
+                  oldElevationDown,
+                  elevationUpDown.elevationLoss));
          }
-      };
-
-      try {
-
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
-
-      } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
       }
+   }
 
-      doSaveTour_PostActions(savedTours);
+   private void runEasyImport_050_RetrieveWeatherData(final ImportLauncher importLauncher,
+                                                      final List<TourData> importedTours) {
 
-      return savedTours;
+      // "50. Retrieve Weather Data"
+      TourLogManager.log_DEFAULT(NLS.bind(
+            EasyImportManager.LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA,
+            new Object[] {
+                  getDurationText(importLauncher),
+                  UI.UNIT_LABEL_TEMPERATURE }));
+
+      TourManager.retrieveWeatherData(importedTours);
+   }
+
+   private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {
+
+      // "99. Save tours"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR);
+
+      return saveImportedTours(importedTours, person);
    }
 
    /**
@@ -5020,7 +5883,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
                                                   final ArrayList<TourData> allTourData,
-                                                  final ArrayList<String> invalidFiles,
+                                                  final String[] invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always then tour files are deleted
@@ -5032,7 +5895,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String message = isEasyImport
             ? EasyImportManager.LOG_EASY_IMPORT_100_DELETE_TOUR_FILES
-            : RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE;
+            : Messages.Log_Import_DeleteTourFiles;
 
       TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
@@ -5063,7 +5926,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             int saveCounter = 0;
 
             int selectionSize = allTourData.size();
-            selectionSize += invalidFiles != null ? invalidFiles.size() : 0;
+            selectionSize += invalidFiles != null ? invalidFiles.length : 0;
 
             monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
 
@@ -5141,7 +6004,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
       // show delete state in UI
@@ -5150,23 +6013,308 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Log deleted files
        */
-      final String logText = String.format(
-            RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE_END,
+      TourLogManager.log_DEFAULT(String.format(
+            Messages.Log_Import_DeleteTourFiles_End,
             deletedFiles.size(),
-            notDeletedFiles.size());
-      TourLogManager.addLog(TourLogState.DEFAULT, logText);
+            notDeletedFiles.size()));
+   }
+
+   /**
+    * Save imported tours
+    *
+    * @param allTourData
+    * @param person
+    * @return Returns saved {@link TourData}
+    */
+   private ArrayList<TourData> saveImportedTours(final ArrayList<TourData> allTourData, final TourPerson person) {
+
+      final int numTours = allTourData.size();
+      final ArrayList<TourData> allSavedTours = new ArrayList<>();
+
+      if (numTours == 0) {
+
+         // nothing to do
+
+         return allSavedTours;
+      }
+
+      final long start = System.currentTimeMillis();
+
+      /*
+       * Check if new tour tags / types were created, when yes the UI must be updated afterwards
+       * otherwise e.g. new tour types are not available in the tour type filter !!!
+       */
+      boolean isNewTourType = false;
+      boolean isNewTourTags = false;
+      for (final TourData tourData : allTourData) {
+
+         /*
+          * Check tour type
+          */
+         final TourType tourType = tourData.getTourType();
+         if (tourType != null) {
+
+            if (tourType.getTypeId() == -1) {
+               isNewTourType = true;
+            }
+         }
+
+         /*
+          * Check tour tags
+          */
+         for (final TourTag tourTag : tourData.getTourTags()) {
+
+            if (tourTag.getTagId() == -1) {
+               isNewTourTags = true;
+               break;
+            }
+         }
+      }
+
+      /*
+       * Setup concurrency
+       */
+      _saveTour_CountDownLatch = new CountDownLatch(numTours);
+      _saveTour_Queue.clear();
+
+      final ArrayBlockingQueue<TourData> allSavedToursConcurrent = new ArrayBlockingQueue<>(numTours);
+
+      final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            final AtomicInteger numSavedTours = new AtomicInteger();
+
+            final long startTime = System.currentTimeMillis();
+            long lastUpdateTime = startTime;
+
+            monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, numTours);
+
+            // loop: all selected tours, selected tours can already be saved
+            for (final TourData tourData : allTourData) {
+
+               final long currentTime = System.currentTimeMillis();
+               final long timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > 500) {
+
+                  lastUpdateTime = currentTime;
+
+                  monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, numSavedTours.get(), numTours));
+               }
+
+               saveImportedTours_10_Concurrent(
+                     tourData,
+                     person,
+                     allSavedToursConcurrent,
+                     monitor,
+                     numSavedTours);
+            }
+
+            // wait until all re-imports are performed
+            _saveTour_CountDownLatch.await();
+         }
+      };
+
+      try {
+
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+
+      } catch (final Exception e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+
+      } finally {
+
+         // get all saved tour data
+         allSavedToursConcurrent.drainTo(allSavedTours);
+
+         TourLogManager.subLog_DEFAULT(String.format(Messages.Log_Tour_SaveTours_End,
+               allSavedTours.size(),
+               (System.currentTimeMillis() - start) / 1000.0));
+
+         // update e.g. fulltext index
+         TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(getAllTourIds(allSavedTours));
+
+         saveImportedTours_30_PostActions(allSavedTours, isNewTourType, isNewTourTags);
+      }
+
+      return allSavedTours;
+   }
+
+   private void saveImportedTours_10_Concurrent(final TourData tourData,
+                                                final TourPerson person,
+                                                final ArrayBlockingQueue<TourData> allSavedToursConcurrent,
+                                                final IProgressMonitor monitor,
+                                                final AtomicInteger numSavedTours) {
+
+      // workaround for hibernate problems
+      if (tourData.isTourDeleted) {
+         monitor.worked(1);
+         numSavedTours.getAndIncrement();
+         _saveTour_CountDownLatch.countDown();
+
+         return;
+      }
+
+      if (tourData.getTourPerson() != null) {
+
+         /*
+          * Tour is already saved, resaving cannot be done in the import view it can be done in the
+          * tour editor
+          */
+         monitor.worked(1);
+         numSavedTours.getAndIncrement();
+         _saveTour_CountDownLatch.countDown();
+
+         return;
+      }
+
+      try {
+
+         // put tour data into the queue AND wait when it is full
+
+         _saveTour_Queue.put(tourData);
+
+      } catch (final InterruptedException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _saveTour_Executor.submit(() -> {
+
+         try {
+
+            // get last added tour
+            final TourData queueItem_TourData = _saveTour_Queue.poll();
+
+            if (queueItem_TourData != null) {
+
+               saveImportedTours_20_Concurrent_OneTour(tourData, person, allSavedToursConcurrent);
+            }
+
+//            TourLogManager.addSubLog(TourLogState.TOUR_SAVED,
+//                  String.format(TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
+//                        tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+//                        tourData.getImportFilePathNameText()));
+
+         } finally {
+
+            monitor.worked(1);
+            numSavedTours.getAndIncrement();
+
+            _saveTour_CountDownLatch.countDown();
+         }
+      });
+   }
+
+   /**
+    * @param tourData
+    *           {@link TourData} which is not yet saved.
+    * @param person
+    *           Person for which the tour is being saved.
+    * @param allSavedTours
+    *           The saved tour is added to this list.
+    */
+   private void saveImportedTours_20_Concurrent_OneTour(final TourData tourData,
+                                                        final TourPerson person,
+                                                        final ArrayBlockingQueue<TourData> allSavedTours) {
+
+      // a saved tour needs a person
+      tourData.setTourPerson(person);
+
+      // set weight from person
+      if (RawDataManager.isSetBodyWeight()) {
+         tourData.setBodyWeight(person.getWeight());
+      }
+
+      tourData.setTourBike(person.getTourBike());
+
+      final TourData savedTour = TourDatabase.saveTour_Concurrent(tourData, true);
+
+      if (savedTour != null) {
+
+         allSavedTours.add(savedTour);
+
+         // update fields which are not saved but used in the UI and easy setup
+         savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
+         savedTour.isTourFileMoved = tourData.isTourFileMoved;
+         savedTour.isBackupImportFile = tourData.isBackupImportFile;
+         savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
+      }
+   }
+
+   /**
+    * After tours are saved, the internal structures and ui viewers must be updated
+    *
+    * @param savedTours
+    *           contains the saved {@link TourData}
+    * @param isNewTourTags
+    * @param isNewTourType
+    */
+   private void saveImportedTours_30_PostActions(final ArrayList<TourData> savedTours,
+                                                 final boolean isNewTourType,
+                                                 final boolean isNewTourTags) {
+
+      // update viewer, fire selection event
+      if (savedTours.isEmpty()) {
+         return;
+      }
+
+      final ArrayList<Long> savedToursIds = new ArrayList<>();
+
+      // update raw data map with the saved tour data
+      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
+      for (final TourData tourData : savedTours) {
+
+         final Long tourId = tourData.getTourId();
+
+         rawDataMap.put(tourId, tourData);
+         savedToursIds.add(tourId);
+      }
+
+      /*
+       * The selection provider can contain old tour data which conflicts with the tour data in the
+       * tour data editor
+       */
+      _postSelectionProvider.clearSelection();
+
+      // update import viewer
+      reloadViewer();
+
+      enableActions();
+
+      if (isNewTourType) {
+
+         TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+      }
+
+      if (isNewTourTags) {
+
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+      }
+
+      /*
+       * Notify all views, it is not checked if the tour data editor is dirty because newly saved
+       * tours can not be modified in the tour data editor
+       */
+      TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
    }
 
    @PersistState
    private void saveState() {
 
       // check if UI is disposed
-      final Table table = _tourViewer.getTable();
-      if (table.isDisposed()) {
+      if (_parent.isDisposed()) {
          return;
       }
 
       EasyImportManager.getInstance().saveEasyConfig(getEasyConfig());
+
+      Util.setStateEnum(_state, STATE_IMPORT_UI, _importUI);
 
       /*
        * save imported file names
@@ -5176,16 +6324,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (isRemoveToursWhenClosed) {
          stateImportedFiles = new String[] {};
       } else {
-         final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
-         stateImportedFiles = importedFiles.toArray(new String[importedFiles.size()]);
+         final ConcurrentHashMap<String, String> importedFiles = _rawDataMgr.getImportedFiles();
+         stateImportedFiles = importedFiles.keySet().toArray(String[]::new);
+
       }
       _state.put(STATE_IMPORTED_FILENAMES, stateImportedFiles);
       _state.put(STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED, isRemoveToursWhenClosed);
 
       // keep selected tours
-      Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
+      Util.setState(_state, STATE_SELECTED_TOUR_INDICES, _tourViewer.getTable().getSelectionIndices());
 
-      _columnManager.saveState(_state);
+      _tourViewer_ColumnManager.saveState(_state);
+      _simpleUI_ImportLauncher_ColumnManager.saveState(_stateSimpleUI);
    }
 
    /**
@@ -5196,19 +6346,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final TourData firstTourData = (TourData) _tourViewer.getElementAt(0);
       if (firstTourData != null) {
          _tourViewer.setSelection(new StructuredSelection(firstTourData), true);
-      }
-   }
-
-   void selectLastTour() {
-
-      final Collection<TourData> tourDataCollection = _rawDataMgr.getImportedTours().values();
-
-      final TourData[] tourList = tourDataCollection.toArray(new TourData[tourDataCollection.size()]);
-
-      // select the last tour in the viewer
-      if (tourList.length > 0) {
-         final TourData tourData = tourList[0];
-         _tourViewer.setSelection(new StructuredSelection(tourData), true);
       }
    }
 
@@ -5236,61 +6373,107 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } else {
 
-         if (_isNewUI) {
+         switch (_importUI) {
+
+         case EASY_IMPORT_FANCY:
 
             if (_browser != null) {
                _browser.setFocus();
             }
 
-         } else {
+            break;
 
-            _topPageBook.setFocus();
+         case EASY_IMPORT_SIMPLE:
+
+            _simpleUI_ImportLauncher_Viewer.getTable().setFocus();
+
+            break;
+
+         case FOSSIL:
+         default:
+
+            _topPage_PageBook.setFocus();
+
+            break;
          }
       }
 
       if (_postSelectionProvider.getSelection() == null) {
 
          // fire a selected tour when the selection provider was cleared sometime before
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               fireSelectedTour();
-            }
-         });
+         Display.getCurrent().asyncExec(this::fireSelectedTour);
       }
    }
 
-   private void setWatcher_Off() {
+   private void setWatcher_1_On() {
 
       if (isWatchingOn()) {
 
-         // !!! Store watching must be canceled before the watch folder thread because it could launch a new watch folder thread !!!
-         thread_WatchStores_Cancel();
-         // thread_WatchFolders(false);
-
-         updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
-
-         try {
-            if (_watchingStoresThread != null) {
-               _watchingStoresThread.join();
-            }
-         } catch (final InterruptedException e) {
-            TourLogManager.logEx(e);
-         }
-      }
-   }
-
-   private void setWatcher_On() {
-
-      if (isWatchingOn()) {
          // do not start twice
          return;
       }
 
-      updateUI_WatcherAnimation(DOM_CLASS_DEVICE_ON_ANIMATED);
+      if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+         updateUI_WatcherAnimation(DOM_CLASS_DEVICE_ON_ANIMATED);
+
+      } else {
+
+         // simple UI
+
+         enableSimpleUI(true);
+      }
 
       thread_WatchStores_Start();
       thread_FolderWatcher_Activate();
+   }
+
+   private void setWatcher_2_Off() {
+
+      setWatcher_2_Off(true);
+   }
+
+   /**
+    * @param isUpdateUI
+    */
+   private void setWatcher_2_Off(final boolean isUpdateUI) {
+
+      if (isWatchingOn()) {
+
+         /*
+          * !!! Store watching must be canceled before the watch folder thread because it could
+          * launch a new watch folder thread !!!
+          */
+         thread_WatchStores_Cancel();
+
+         // thread_WatchFolders(false);
+
+         try {
+
+            if (_watchingStoresThread != null) {
+               _watchingStoresThread.join();
+            }
+
+            if (isUpdateUI) {
+
+               if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+                  updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+
+               } else {
+
+                  // simple UI
+
+                  updateUI_DeviceState_SimpleUI();
+
+                  enableSimpleUI(false);
+               }
+            }
+
+         } catch (final InterruptedException e) {
+            TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         }
+      }
    }
 
    private void showFailbackUI() {
@@ -5298,18 +6481,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (_browser == null || _browser.isDisposed()) {
 
          // show OLD UI after 5 seconds
-         Display.getDefault().timerExec(5000, new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().timerExec(5000, () -> {
 
-               if (_parent.isDisposed()) {
-                  return;
-               }
+            if (_parent.isDisposed()) {
+               return;
+            }
 
-               // check again because the browser could be set
-               if (_browser == null || _browser.isDisposed()) {
-                  onSelectUI_Old();
-               }
+            // check again because the browser could be set
+            if (_browser == null || _browser.isDisposed()) {
+
+               onSelect_ImportUI(ImportUI.EASY_IMPORT_SIMPLE);
             }
          });
       }
@@ -5397,7 +6578,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   THREAD_WATCHER_LOCK.lock();
                   _folderWatcher.close();
                } catch (final IOException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                } finally {
                   _watchingFolderThread.interrupt(); // (rtdog) CancelWatchfolders
                   THREAD_WATCHER_LOCK.unlock();
@@ -5424,95 +6605,93 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private Runnable thread_WatchFolders_Runnable() {
 
-      return new Runnable() {
-         @Override
-         public void run() {
+      return () -> {
 
-            WatchService folderWatcher = null;
-            WatchKey watchKey = null;
+         WatchService folderWatcher = null;
+         WatchKey watchKey = null;
 
-            try {
+         try {
 
-               final EasyConfig easyConfig = getEasyConfig();
-               final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+            final EasyConfig easyConfig = getEasyConfig();
+            final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
-               /*
-                * Check device folder
-                */
-               boolean isDeviceFolderValid = false;
-               final String deviceFolder = importConfig.getDeviceOSFolder();
+            /*
+             * Check device folder
+             */
+            boolean isDeviceFolderValid = false;
+            final String deviceFolder = importConfig.getDeviceOSFolder();
 
-               final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
-                     deviceFolder)
-                           ? FileSystemManager.getFileSystem(deviceFolder) : null;
+            final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
+                  deviceFolder)
+                        ? FileSystemManager.getFileSystem(deviceFolder) : null;
 
-               // keep watcher local because it could be set to null !!!
-               folderWatcher = _folderWatcher =
-                     tourbookFileSystem != null
-                           ? tourbookFileSystem.newWatchService()
-                           : FileSystems.getDefault().newWatchService();
+            // keep watcher local because it could be set to null !!!
+            folderWatcher = _folderWatcher =
+                  tourbookFileSystem != null
+                        ? tourbookFileSystem.newWatchService()
+                        : FileSystems.getDefault().newWatchService();
 
-               if (deviceFolder != null) {
+            if (deviceFolder != null) {
 
-                  try {
+               try {
 
-                     final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
+                  final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
 
-                     if (Files.exists(deviceFolderPath)) {
+                  if (Files.exists(deviceFolderPath)) {
 
-                        isDeviceFolderValid = true;
+                     isDeviceFolderValid = true;
 
-                        deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
-                     }
-
-                  } catch (final Exception e) {}
-               }
-
-               if (isDeviceFolderValid) {
-
-                  Thread.currentThread().setName("WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
-
-               } else {
-
-                  // the device folder is not available, update the folder state
-
-                  updateUI_DeviceState();
-
-                  return;
-               }
-
-               /*
-                * Check backup folder
-                */
-               final String backupFolder = importConfig.getBackupOSFolder();
-               if (backupFolder != null) {
-
-                  try {
-
-                     final Path watchBackupFolder = Paths.get(backupFolder);
-
-                     if (Files.exists(watchBackupFolder)) {
-                        watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
-                     }
-
-                  } catch (final Exception e) {}
-               }
-
-               do {
-
-                  // wait for the next event
-                  watchKey = folderWatcher.take();
-
-                  if (Thread.currentThread().isInterrupted()) {
-                     Thread.currentThread().interrupt();
-                     throw new InterruptedException(); // Needed because DropboxFileWatcher take() doesn't throw interruptedException when interrupted
+                     deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                   }
 
-                  /*
-                   * Events MUST be polled otherwise this will stay in an endless loop.
-                   */
-                  @SuppressWarnings("unused")
-                  final List<WatchEvent<?>> polledEvents = watchKey.pollEvents();
+               } catch (final Exception e1) {}
+            }
+
+            if (isDeviceFolderValid) {
+
+               Thread.currentThread().setName("WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
+
+            } else {
+
+               // the device folder is not available, update the folder state
+
+               updateUI_DeviceState();
+
+               return;
+            }
+
+            /*
+             * Check backup folder
+             */
+            final String backupFolder = importConfig.getBackupOSFolder();
+            if (backupFolder != null) {
+
+               try {
+
+                  final Path watchBackupFolder = Paths.get(backupFolder);
+
+                  if (Files.exists(watchBackupFolder)) {
+                     watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
+                  }
+
+               } catch (final Exception e2) {}
+            }
+
+            do {
+
+               // wait for the next event
+               watchKey = folderWatcher.take();
+
+               if (Thread.currentThread().isInterrupted()) {
+                  Thread.currentThread().interrupt();
+                  throw new InterruptedException(); // Needed because DropboxFileWatcher take() doesn't throw interruptedException when interrupted
+               }
+
+               /*
+                * Events MUST be polled otherwise this will stay in an endless loop.
+                */
+               @SuppressWarnings("unused")
+               final List<WatchEvent<?>> polledEvents = watchKey.pollEvents();
 
 //// log events, they are not used
 //                  for (final WatchEvent<?> event : polledEvents) {
@@ -5521,34 +6700,34 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //
 //                     System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                           + (String.format("Event: %s\tFile: %s", kind, event.context())));
-//                     // TODO remove SYSTEM.OUT.PRINTLN
+//                     // remove SYSTEM.OUT.PRINTLN
 //                  }
 
-                  // do not update the device state when the import is running otherwise the import file list can be wrong
-                  if (_isUpdateDeviceState) {
-                     thread_UpdateDeviceState();
-                  }
-
+               // do not update the device state when the import is running otherwise the import file list can be wrong
+               if (_isUpdateDeviceState) {
+                  thread_UpdateDeviceState();
                }
-               while (watchKey.reset());
 
-            } catch (final InterruptedException | ClosedWatchServiceException e) {
-               // no-op
-            } catch (final Exception e) {
-               TourLogManager.logEx(e);
-            } finally {
+            }
+            while (watchKey.reset());
 
-               try {
-                  if (watchKey != null) {
-                     watchKey.cancel();
-                  }
+         } catch (final InterruptedException | ClosedWatchServiceException e3) {
+            // no-op
+            Thread.currentThread().interrupt();
+         } catch (final Exception e4) {
+            TourLogManager.log_EXCEPTION_WithStacktrace(e4);
+         } finally {
 
-                  if (folderWatcher != null) {
-                     folderWatcher.close();
-                  }
-               } catch (final Exception e) {
-                  TourLogManager.logEx(e);
+            try {
+               if (watchKey != null) {
+                  watchKey.cancel();
                }
+
+               if (folderWatcher != null) {
+                  folderWatcher.close();
+               }
+            } catch (final Exception e5) {
+               TourLogManager.log_EXCEPTION_WithStacktrace(e5);
             }
          }
       };
@@ -5558,10 +6737,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     * Thread cannot be interrupted, it could cause SQL exceptions, so set flag and wait.
     */
    private void thread_WatchStores_Cancel() {
+
       _isDeviceStateValid = false;
       _isStopWatchingStoresThread = true;
 
-      // run with progress, duration can be 0...5 seconds
+      // run with progress, duration can be 0...10 seconds
       try {
 
          final IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -5570,23 +6750,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                try {
 
-                  monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
+                  // fixed NPE
+                  if (_watchingStoresThread != null) {
 
-                  final int waitingTime = 30000; // in ms
+                     monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-                  THREAD_WATCHER_LOCK.lock();
-                  _watchingStoresThread.interrupt();
-                  THREAD_WATCHER_LOCK.unlock();
-                  _watchingStoresThread.join(waitingTime); // must unlock then join
+                     final int waitingTime = 10000; // in ms
 
-                  if (_watchingStoresThread.isAlive()) {
-                     StatusUtil.logInfo(NLS.bind(
-                           Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
-                           waitingTime / 1000));
+                     THREAD_WATCHER_LOCK.lock();
+                     {
+                        _watchingStoresThread.interrupt();
+                     }
+                     THREAD_WATCHER_LOCK.unlock();
+
+                     _watchingStoresThread.join(waitingTime); // must unlock then join
+
+                     if (_watchingStoresThread.isAlive()) {
+
+                        StatusUtil.logInfo(NLS.bind(
+                              Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
+                              waitingTime / 1000));
+                     }
                   }
 
                } catch (final InterruptedException e) {
-                  TourLogManager.logEx(e);
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
                } finally {
                   _watchingStoresThread = null;
                }
@@ -5596,13 +6784,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
       } catch (InvocationTargetException | InterruptedException e) {
-         TourLogManager.logEx(e);
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
 
    }
 
    private void thread_WatchStores_Start() {
+
       _watchingStoresThread = new Thread("WatchingStores") { //$NON-NLS-1$
+
          @Override
          public void run() {
 
@@ -5642,35 +6832,39 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   }
 
                   Thread.sleep(1000);
+
                } catch (final InterruptedException e) {
 
                   if (_isStopWatchingStoresThread) {
+
+                     // an interrupt request is performed
+
                      _isStopWatchingStoresThread = false;
+
                      break;
                   }
-                  // interrupt();
-               } catch (final Exception e) {
-                  TourLogManager.logEx(e);
-               }
 
+                  // interrupt();
+
+               } catch (final Exception e) {
+                  TourLogManager.log_EXCEPTION_WithStacktrace(e);
+               }
             }
+
             _isStopWatchingStoresThread = false;
 
             // StoreWatcher going down, need to take down DeviceFolderWatcher
             thread_WatchFolders_Cancel();
          }
-
       };
+
       _isDeviceStateValid = false;
       _watchingStoresThread.setDaemon(true);
       _watchingStoresThread.start();
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    /**
     * Keep live update values, other values MUST already have been set.
@@ -5685,15 +6879,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // run animation only when it was modified
          _isRunDashboardAnimation = true;
       }
-      easyConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
-      easyConfig.animationDuration = modifiedConfig.animationDuration;
 
-      easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
-      easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
-      easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
-      easyConfig.stateToolTipDisplayAbsoluteFilePath = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
-      easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;
-      easyConfig.tileSize = modifiedConfig.tileSize;
+// SET_FORMATTING_OFF
+
+      easyConfig.animationCrazinessFactor             = modifiedConfig.animationCrazinessFactor;
+      easyConfig.animationDuration                    = modifiedConfig.animationDuration;
+      easyConfig.backgroundOpacity                    = modifiedConfig.backgroundOpacity;
+      easyConfig.isLiveUpdate                         = modifiedConfig.isLiveUpdate;
+      easyConfig.isLogDetails                         = modifiedConfig.isLogDetails;
+      easyConfig.isShowTile_CloudApps                 = modifiedConfig.isShowTile_CloudApps;
+      easyConfig.isShowTile_Files                     = modifiedConfig.isShowTile_Files;
+      easyConfig.isShowTile_FossilUI                  = modifiedConfig.isShowTile_FossilUI;
+      easyConfig.isShowTile_SerialPort                = modifiedConfig.isShowTile_SerialPort;
+      easyConfig.isShowTile_SerialPortWithConfig      = modifiedConfig.isShowTile_SerialPortWithConfig;
+      easyConfig.numHorizontalTiles                   = modifiedConfig.numHorizontalTiles;
+      easyConfig.stateToolTipDisplayAbsoluteFilePath  = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
+      easyConfig.stateToolTipWidth                    = modifiedConfig.stateToolTipWidth;
+      easyConfig.tileSize                             = modifiedConfig.tileSize;
+
+// SET_FORMATTING_ON
 
       EasyImportManager.getInstance().saveEasyConfig(easyConfig);
    }
@@ -5719,45 +6923,74 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          thread_FolderWatcher_Deactivate();
 
-         _topPageBook.showPage(_topPage_ImportViewer);
+         _topPage_PageBook.showPage(_topPage_ImportViewer);
 
       } else {
 
-         /*
-          * !!! Run async that the first page in the top pagebook is visible and to prevent
-          * flickering when the view toolbar is first drawn on the left side of the view !!!
-          */
+         switch (_importUI) {
 
-         if (_isNewUI) {
+         case EASY_IMPORT_FANCY:
 
-            _parent.getDisplay().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            /*
+             * !!! Run async that the first page in the top pagebook is visible and to prevent
+             * flickering when the view toolbar is first drawn on the left side of the view !!!
+             */
 
-                  _isInUIStartup = isInStartUp;
+            _parent.getDisplay().asyncExec(() -> {
 
-                  createUI_NewUI();
-                  _topPageBook.showPage(_topPage_Dashboard);
+               _isInFancyUIStartup = isInStartUp;
 
-                  // create dashboard UI
-                  updateUI_2_Dashboard();
+               /*
+                * Create new UI only when it is used to prevent that the app is crashing when
+                * another import UI is used
+                */
+               if (_topPage_ImportUI_EasyImport_Fancy == null) {
 
-                  if (_browser == null) {
-
-                     // deactivate background task
-
-                     setWatcher_Off();
-                  }
-
-                  // the watcher is started in onBrowser_Completed
+                  _topPage_ImportUI_EasyImport_Fancy = createUI_20_Page_EasyImporFancy(_topPage_PageBook);
                }
+
+               _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Fancy);
+
+               // create dashboard UI
+               updateUI_2_EasyImport_Fancy();
+
+               if (_browser == null) {
+
+                  // deactivate background task
+
+                  setWatcher_2_Off();
+               }
+
+               // the watcher is started in onBrowser_Completed
             });
+            break;
 
-         } else {
+         case EASY_IMPORT_SIMPLE:
 
-            _topPageBook.showPage(_topPage_OldUI);
+            _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Simple);
+
+            if (isWatchingOn()) {
+
+               _simpleUI_ImportLauncher_Viewer.getTable().setFocus();
+            }
+
+            if (isInStartUp) {
+
+               setWatcher_1_On();
+
+               updateUI_DeviceState_SimpleUI();
+            }
+
+            break;
+
+         case FOSSIL:
+         default:
+
+            _topPage_PageBook.showPage(_topPage_ImportUI_FossilUI);
 
             _linkImport.setFocus();
+
+            break;
          }
       }
    }
@@ -5765,13 +6998,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /**
     * Set/create dashboard page.
     */
-   private void updateUI_2_Dashboard() {
+   private void updateUI_2_EasyImport_Fancy() {
 
-      if (_dashboard_PageBook == null) {
+      if (_easyImportFancy_PageBook == null) {
 
          /*
           * This occurs when the app is started the first time and the measurement selection dialog
-          * which fires an event
+          * fires an event
           */
 
          return;
@@ -5780,28 +7013,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isBrowserAvailable = _browser != null;
 
       // set dashboard page
-      _dashboard_PageBook.showPage(isBrowserAvailable//
-            ? _dashboardPage_WithBrowser
-            : _dashboardPage_NoBrowser);
+      _easyImportFancy_PageBook.showPage(isBrowserAvailable
+            ? _easyImportFancy_Page_WithBrowser
+            : _easyImportFancy_Page_NoBrowser);
 
-      if (!isBrowserAvailable) {
-         return;
+      if (isBrowserAvailable) {
+
+         // the html is created completely for every UI update
+         final String html = createHTML();
+
+         _isBrowserCompleted = false;
+
+         _browser.setText(html);
       }
+   }
 
-      final String html = createHTML();
+   /**
+    * Update simple UI
+    */
+   private void updateUI_2_EasyImport_Simple() {
 
-      _isBrowserCompleted = false;
+      _comboSimpleUI_Config.removeAll();
 
-      _browser.setText(html);
+      fillSimpleUI();
+
+      _comboSimpleUI_Config.select(getActiveEasyConfigSelectionIndex());
    }
 
    private void updateUI_DeviceState() {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      if (_parent.isDisposed()) {
+         return;
+      }
+
+      // must be running in the UI thread, is called from other threads
+      _parent.getDisplay().asyncExec(() -> {
+
+         if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
             if (_browser.isDisposed()) {
+
                // this occurred
                return;
             }
@@ -5812,35 +7063,179 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                _isDeviceStateUpdateDelayed.set(true);
             }
          }
+
+         // update simple UI always to be in sync with the fancy UI
+         updateUI_DeviceState_SimpleUI();
       });
    }
 
    private void updateUI_DeviceState_DOM() {
 
-      final String htmlDeviceOnOff = createHTML_52_DeviceState_OnOff();
-      String jsDeviceOnOff = UI.replaceJS_QuotaMark(htmlDeviceOnOff);
-      jsDeviceOnOff = UI.replaceHTML_NewLine(jsDeviceOnOff);
+// SET_FORMATTING_OFF
 
-      final String htmlDeviceState = createHTML_54_DeviceState();
-      String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
-      jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
+      final String htmlDeviceOnOff  = createHTML_52_Device_OnOff();
+      String jsDeviceOnOff          = UI.replaceJS_QuotaMark(htmlDeviceOnOff);
+      jsDeviceOnOff                 = UI.replaceHTML_NewLine(jsDeviceOnOff);
 
-      final String js = "\n" //$NON-NLS-1$
+      final String htmlDeviceState  = createHTML_54_DeviceFolder();
+      String jsDeviceState          = UI.replaceJS_QuotaMark(htmlDeviceState);
+      jsDeviceState                 = UI.replaceHTML_NewLine(jsDeviceState);
 
-            + ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
+// SET_FORMATTING_ON
 
-            + ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
+      final String js = NL
+
+            + "var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";" + NL //                                         //$NON-NLS-1$ //$NON-NLS-2$
+            + "document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;" + NL // //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "var htmlDeviceState =\"" + jsDeviceState + "\";" + NL //                                        //$NON-NLS-1$ //$NON-NLS-2$
+            + "document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
       ;
 
       final boolean isSuccess = _browser.execute(js);
 
-      if (!isSuccess) {
+      if (isSuccess == false) {
          System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
                + ("\tupdateDOM_DeviceState: " + isSuccess + js)); //$NON-NLS-1$
-         // TODO remove SYSTEM.OUT.PRINTLN
       }
+   }
+
+   private void updateUI_DeviceState_SimpleUI() {
+
+      /*
+       * Device watching On/Off
+       */
+      final boolean isWatchingOn = isWatchingOn();
+
+      String tooltip = isWatchingOn
+            ? Messages.Import_Data_HTML_DeviceOff_Tooltip
+            : Messages.Import_Data_HTML_DeviceOn_Tooltip;
+
+      // show red image when off
+      final String imageDescriptor = isWatchingOn
+            ? Images.RawData_Device_TurnOn
+            : Images.RawData_Device_TurnOff;
+
+      _actionSimpleUI_StartStopWatching.setToolTipText(tooltip);
+      _actionSimpleUI_StartStopWatching.setImageDescriptor(TourbookPlugin.getImageDescriptor(imageDescriptor));
+
+      /*
+       * Device state/folder
+       */
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+      final boolean isWatchAnything = importConfig.isWatchAnything();
+
+      if (isWatchingOn == false) {
+
+         // watching is off
+
+         _actionSimpleUI_DeviceState.notSelectedTooltip = Messages.Import_Data_HTML_WatchingIsOff;
+         _actionSimpleUI_DeviceState.getActionToolItem().setImage(_images.get(IMAGE_DEVICE_FOLDER_OFF));
+
+      } else if (isWatchAnything && _isDeviceStateValid) {
+
+         updateUI_DeviceState_SimpleUI_IsValid();
+
+      } else {
+
+         /*
+          * On startup, set the folder state without device info because this is retrieved in a
+          * background thread, if not, it is blocking the UI !!!
+          */
+
+         final Image stateImage = isWatchAnything
+               ? _images.get(IMAGE_DEVICE_FOLDER_IS_CHECKING)
+               : _images.get(IMAGE_DEVICE_FOLDER_NOT_SETUP);
+
+         tooltip = isWatchAnything
+               ? Messages.Import_Data_HTML_AcquireDeviceInfo
+               : Messages.Import_Data_HTML_NothingIsWatched;
+
+         _actionSimpleUI_DeviceState.notSelectedTooltip = tooltip;
+         _actionSimpleUI_DeviceState.getActionToolItem().setImage(stateImage);
+      }
+   }
+
+   private void updateUI_DeviceState_SimpleUI_IsValid() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+
+      final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+      final String deviceOSFolder = importConfig.getDeviceOSFolder();
+      final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
+
+      final int numNotImportedFiles = notImportedFiles.size();
+
+      final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
+      boolean isFolderOK = true;
+
+      /*
+       * Backup folder
+       */
+      final boolean isCreateBackup = importConfig.isCreateBackup;
+      if (isCreateBackup) {
+
+         // check OS folder
+         final String backupOSFolder = importConfig.getBackupOSFolder();
+         final boolean isBackupFolderOK = isOSFolderValid(backupOSFolder);
+         isFolderOK &= isBackupFolderOK;
+      }
+
+      isFolderOK &= isDeviceFolderOK;
+
+      /*
+       * Update UI
+       */
+      final Image stateImage = isFolderOK
+            ? _images.get(IMAGE_DEVICE_FOLDER_OK)
+            : _images.get(IMAGE_DEVICE_FOLDER_ERROR);
+
+      final String numNotImportedFilesAsText = isDeviceFolderOK
+            ? Integer.toString(numNotImportedFiles)
+            : UI.EMPTY_STRING;
+
+      _actionSimpleUI_DeviceState.notSelectedTooltip = UI.EMPTY_STRING;
+      _actionSimpleUI_DeviceState.getActionToolItem().setImage(stateImage);
+
+      _lblSimpleUI_NumNotImportedFiles.setText(numNotImportedFilesAsText);
+
+      // close state slideout to remove old content
+      _actionSimpleUI_DeviceState.__slideoutDeviceState.close();
+   }
+
+   private void updateUI_ImportUI_Action() {
+
+// SET_FORMATTING_OFF
+
+      switch (_importUI) {
+
+      case EASY_IMPORT_FANCY:
+
+         _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy));
+         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy_Disabled));
+
+         break;
+
+      case EASY_IMPORT_SIMPLE:
+
+         _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Simple));
+         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Simple_Disabled));
+
+         break;
+
+      case FOSSIL:
+      default:
+
+         _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil));
+         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil_Disabled));
+
+         break;
+      }
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -5855,7 +7250,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final TableColumn tc = getSortColumn(sortColumnId);
 
       table.setSortColumn(tc);
-      table.setSortDirection(sortDirection == ImportComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+      table.setSortDirection(sortDirection == TourViewer_Comparator.ASCENDING ? SWT.UP : SWT.DOWN);
    }
 
    private void updateUI_TourViewerColumns() {
@@ -5863,21 +7258,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // set tooltip text
       final String timeZone = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
 
-      final String timeZoneTooltip = NLS.bind(COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
+      final String timeZoneTooltip = NLS.bind(OtherMessages.COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
 
       _timeZoneOffsetColDef.setColumnHeaderToolTipText(timeZoneTooltip);
    }
 
    private void updateUI_WatcherAnimation(final String domClassState) {
 
-      if (_isShowWatcherAnimation && _browser != null && !_browser.isDisposed() && _isBrowserCompleted) {
+      if (_importUI != ImportUI.EASY_IMPORT_FANCY) {
+         return;
+      }
+
+      if (_isShowWatcherAnimation
+            && _browser != null
+            && _browser.isDisposed() == false
+            && _isBrowserCompleted) {
 
          _isShowWatcherAnimation = false;
 
-         final String js = UI.EMPTY_STRING//
-               + ("document.getElementById(\"" + DOM_ID_IMPORT_TILES + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               + ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               + ("document.getElementById(\"" + DOM_ID_IMPORT_CONFIG + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         final String js = UI.EMPTY_STRING
+
+               + "document.getElementById(\"" + DOM_ID_IMPORT_TILES + "\").className ='" + domClassState + "';" + NL //    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").className ='" + domClassState + "';" + NL //    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "document.getElementById(\"" + DOM_ID_IMPORT_CONFIG + "\").className ='" + domClassState + "';" + NL //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          ;
 
          _browser.execute(js);

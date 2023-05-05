@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,10 +17,10 @@ package net.tourbook.ui.views.tourCatalog;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -38,174 +38,184 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionRemoveComparedTours extends Action {
 
-	private TourCatalogView	fTourView;
+   private TourCatalogView _tourView;
 
-	public ActionRemoveComparedTours(final TourCatalogView view) {
+   public ActionRemoveComparedTours(final TourCatalogView view) {
 
-		fTourView = view;
+      _tourView = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
-		setText(Messages.tourCatalog_view_action_delete_tours);
+      setText(Messages.tourCatalog_view_action_delete_tours);
 
-		setEnabled(false);
+      setEnabled(false);
 
-	}
+   }
 
-	/**
-	 * @param selection
-	 * @param removedTours
-	 * @return Returns <code>true</code> when the tours are removed
-	 */
-	private boolean removeComparedTours(final IStructuredSelection selection,
-										final SelectionRemovedComparedTours removedTours) {
+   /**
+    * @param selection
+    * @param selectionRemovedTours
+    * @return Returns <code>true</code> when the tours are removed
+    */
+   private boolean removeComparedTours(final IStructuredSelection selection,
+                                       final SelectionRemovedComparedTours selectionRemovedTours) {
 
-		// confirm removal
-		if (MessageDialog.openConfirm(fTourView.getSite().getShell(),
-				Messages.tourCatalog_view_dlg_delete_comparedTour_title,
-				Messages.tourCatalog_view_dlg_delete_comparedTour_msg) == false) {
+      // confirm removal
+      if (MessageDialog.openConfirm(_tourView.getSite().getShell(),
+            Messages.tourCatalog_view_dlg_delete_comparedTour_title,
+            Messages.tourCatalog_view_dlg_delete_comparedTour_msg) == false) {
 
-			return false;
-		}
+         return false;
+      }
 
-		final TreeViewer tourViewer = fTourView.getTourViewer();
-		final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
+      final TreeViewer tourViewer = _tourView.getTourViewer();
+      final ArrayList<ElevationCompareResult> removedComparedTours = selectionRemovedTours.removedComparedTours;
 
-		// loop: selected items
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-			final Object element = iterator.next();
-			if (element instanceof TVICatalogComparedTour) {
+      // loop: selected items
+      for (final Object element : selection) {
+         if (element instanceof TVICatalogComparedTour) {
 
-				final TVICatalogComparedTour compTourItem = (TVICatalogComparedTour) element;
-				final long compId = compTourItem.getCompId();
+            final TVICatalogComparedTour compTourItem = (TVICatalogComparedTour) element;
+            final long compId = compTourItem.getCompId();
 
-				if (TourCompareManager.removeComparedTourFromDb(compId)) {
+            if (TourCompareManager.removeComparedTourFromDb(compId)) {
 
-					// update model: remove compared tour
-					compTourItem.remove();
+               // update model: remove compared tour
+               compTourItem.remove();
 
-					// update viewer: remove item
-					tourViewer.remove(compTourItem);
+               // update viewer: remove item
+               tourViewer.remove(compTourItem);
 
-					// update selection
-					removedComparedTours.add(compId);
-				}
-			}
-		}
+               // update selection
+               removedComparedTours.add(new ElevationCompareResult(
 
-		return true;
-	}
+                     compId,
+                     compTourItem.getTourId(),
+                     compTourItem.refId));
+            }
+         }
+      }
 
-	/**
-	 * @param selection
-	 * @param removedTours
-	 * @return Returns <code>true</code> when the tours are deleted
-	 */
-	private boolean removeRefTours(	final IStructuredSelection selection,
-									final SelectionRemovedComparedTours removedTours) {
+      return true;
+   }
 
-		// confirm deletion
-		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
-				Messages.tourCatalog_view_dlg_delete_refTour_title,
-				Messages.tourCatalog_view_dlg_delete_refTour_msg) == false) {
-			return false;
-		}
+   /**
+    * @param selection
+    * @param selectionRemovedTours
+    * @return Returns <code>true</code> when the tours are deleted
+    */
+   private boolean removeRefTours(final IStructuredSelection selection,
+                                  final SelectionRemovedComparedTours selectionRemovedTours) {
 
-		final TreeViewer tourViewer = fTourView.getTourViewer();
-		final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
-		final ArrayList<Long> modifiedRefTours = new ArrayList<Long>();
+      // confirm deletion
+      if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+            Messages.tourCatalog_view_dlg_delete_refTour_title,
+            Messages.tourCatalog_view_dlg_delete_refTour_msg) == false) {
 
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+         return false;
+      }
 
-			final Object element = iterator.next();
-			if (element instanceof TVICatalogRefTourItem) {
+      final TreeViewer tourViewer = _tourView.getTourViewer();
 
-				/*
-				 * remove all compared tours from the current reference tour
-				 */
+      final ArrayList<ElevationCompareResult> removedComparedTours = selectionRemovedTours.removedComparedTours;
+      final ArrayList<Long> modifiedRefTours = new ArrayList<>();
 
-				final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) element;
-				final Collection<StoredComparedTour> storedCompTours = TourCompareManager.getComparedToursFromDb(refTourItem.refId)
-						.values();
+      for (final Object element : selection) {
 
-				for (final StoredComparedTour storedComparedTour : storedCompTours) {
+         if (element instanceof TVICatalogRefTourItem) {
 
-					final long compId = (storedComparedTour).comparedId;
+            /*
+             * Remove all compared tours from the current reference tour
+             */
 
-					TourCompareManager.removeComparedTourFromDb(compId);
+            final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) element;
+            final Collection<StoredComparedTour> allComparedToursFromDb = TourCompareManager.getComparedToursFromDb(refTourItem.refId).values();
 
-					// change selection
-					removedComparedTours.add(compId);
-				}
+            for (final StoredComparedTour comparedTour : allComparedToursFromDb) {
 
-				/*
-				 * remove the reference tour from the tour and persist it
-				 */
-				final EntityManager em = TourDatabase.getInstance().getEntityManager();
-				final TourReference refTour = em.find(TourReference.class, refTourItem.refId);
+               final long compId = comparedTour.comparedId;
 
-				if (refTour != null) {
+               TourCompareManager.removeComparedTourFromDb(compId);
 
-					// get the ref tour from the database
-					final TourData tourData = refTour.getTourData();
+               // change selection
+               removedComparedTours.add(new ElevationCompareResult(
 
-					if (tourData.getTourReferences().remove(refTour)) {
-						TourDatabase.saveTour(tourData, false);
+                     compId,
+                     comparedTour.tourId,
+                     comparedTour.refTourId));
+            }
 
-						modifiedRefTours.add(tourData.getTourId());
-					}
+            /*
+             * Remove the reference tour from the tour and save it
+             * -> this will also delete TourReference in the db !
+             */
+            final EntityManager em = TourDatabase.getInstance().getEntityManager();
+            final TourReference refTour = em.find(TourReference.class, refTourItem.refId);
 
-					// remove the ref tour from the fDataModel
-					refTourItem.remove();
+            if (refTour != null) {
 
-					// remove the ref tour from the tree
-					tourViewer.remove(refTourItem);
-				}
+               // get the ref tour from the database
+               final TourData tourData = refTour.getTourData();
 
-				em.close();
-			}
-		}
+               if (tourData.getTourReferences().remove(refTour)) {
 
-		if (modifiedRefTours.size() > 0) {
-			TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(modifiedRefTours), null);
-		}
+                  TourDatabase.saveTour(tourData, false);
 
-		return true;
-	}
+                  modifiedRefTours.add(tourData.getTourId());
+               }
 
-	@Override
-	public void run() {
+               // remove the ref tour from the data model
+               refTourItem.remove();
 
-		if (TourManager.isTourEditorModified()) {
-			return;
-		}
+               // remove the ref tour from the UI
+               tourViewer.remove(refTourItem);
+            }
 
-		final TreeViewer tourViewer = fTourView.getTourViewer();
+            em.close();
+         }
+      }
 
-		final SelectionRemovedComparedTours removedTours = new SelectionRemovedComparedTours();
+      if (modifiedRefTours.size() > 0) {
+         TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(modifiedRefTours), null);
+      }
 
-		// get selected reference tours
-		final IStructuredSelection selection = (IStructuredSelection) tourViewer.getSelection();
+      return true;
+   }
 
-		final Object firstItem = selection.getFirstElement();
+   @Override
+   public void run() {
 
-		boolean isRemoved = false;
-		if (firstItem instanceof TVICatalogRefTourItem) {
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
-			// remove the reference tours and it's children
-			isRemoved = removeRefTours(selection, removedTours);
+      final TreeViewer tourViewer = _tourView.getTourViewer();
 
-		} else if (firstItem instanceof TVICatalogComparedTour) {
+      final SelectionRemovedComparedTours removedTours = new SelectionRemovedComparedTours();
 
-			// remove compared tours
-			isRemoved = removeComparedTours(selection, removedTours);
-		}
+      // get selected tours
+      final IStructuredSelection selection = (IStructuredSelection) tourViewer.getSelection();
 
-		if (isRemoved) {
-			// update the compare result view
-			fTourView.fireSelection(removedTours);
-		}
-	}
+      final Object firstItem = selection.getFirstElement();
+
+      boolean isRemoved = false;
+      if (firstItem instanceof TVICatalogRefTourItem) {
+
+         // remove the reference tours and it's children
+         isRemoved = removeRefTours(selection, removedTours);
+
+      } else if (firstItem instanceof TVICatalogComparedTour) {
+
+         // remove compared tours
+         isRemoved = removeComparedTours(selection, removedTours);
+      }
+
+      if (isRemoved) {
+
+         // update the compare result view
+         _tourView.fireSelection(removedTours);
+      }
+   }
 
 }

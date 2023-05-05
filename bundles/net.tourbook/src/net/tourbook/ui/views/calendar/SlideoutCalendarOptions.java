@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.dialog.MessageDialog_Customized;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.font.IFontEditorListener;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.FormatManager;
@@ -69,6 +69,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
@@ -98,8 +100,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -276,7 +276,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
    private Spinner               _spinnerYear_ColumnSpacing;
    private Spinner               _spinnerYear_DayWidth;
    //
-   private TabFolder             _tabFolder;
+   private CTabFolder            _tabFolder;
    //
    private TableViewer           _profileViewer;
    //
@@ -399,34 +399,34 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
-         _tabFolder = new TabFolder(shellContainer, SWT.TOP);
+         _tabFolder = new CTabFolder(shellContainer, SWT.TOP);
          GridDataFactory
                .fillDefaults()
                .indent(0, 5)
                .applyTo(_tabFolder);
          {
             // profiles
-            final TabItem tabProfile = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabProfile = new CTabItem(_tabFolder, SWT.NONE);
             tabProfile.setControl(createUI_100_Tab_Profile(_tabFolder));
             tabProfile.setText(Messages.Slideout_CalendarOptions_Tab_Profiles);
 
             // calendar layout
-            final TabItem tabLayout = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabLayout = new CTabItem(_tabFolder, SWT.NONE);
             tabLayout.setControl(createUI_200_Tab_Day(_tabFolder));
             tabLayout.setText(Messages.Slideout_CalendarOptions_Tab_CalendarLayout);
 
             // tour layout
-            final TabItem tabDayContent = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabDayContent = new CTabItem(_tabFolder, SWT.NONE);
             tabDayContent.setControl(createUI_400_Tab_TourLayout(_tabFolder));
             tabDayContent.setText(Messages.Slideout_CalendarOptions_Tab_TourLayout);
 
             // tour content
-            final TabItem tabTour = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabTour = new CTabItem(_tabFolder, SWT.NONE);
             tabTour.setControl(createUI_600_Tab_TourContent(_tabFolder));
             tabTour.setText(Messages.Slideout_CalendarOptions_Tab_TourContent);
 
             // week
-            final TabItem tabWeekSummary = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabWeekSummary = new CTabItem(_tabFolder, SWT.NONE);
             tabWeekSummary.setControl(createUI_800_Tab_WeekSummary(_tabFolder));
             tabWeekSummary.setText(Messages.Slideout_CalendarOptions_Tab_WeekSummary);
          }
@@ -3601,7 +3601,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
       setIsKeepOpenInternally(true);
       boolean isDeleteProfile = false;
       {
-         MessageDialog_Customized dialog = new MessageDialog_Customized(
+         MessageDialog_OnTop dialog = new MessageDialog_OnTop(
 
                getToolTipShell(),
 

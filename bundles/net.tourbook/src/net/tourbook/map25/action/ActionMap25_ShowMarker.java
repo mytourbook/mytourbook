@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map25.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -26,10 +27,7 @@ import net.tourbook.map25.ui.SlideoutMap25_MarkerOptions;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -41,12 +39,9 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap25_ShowMarker extends ContributionItem implements IOpeningDialog {
 
-   private static final String         IMAGE_EDIT_TOUR_MARKER          = Messages.Image__edit_tour_marker;
-   private static final String         IMAGE_EDIT_TOUR_MARKER_DISABLED = Messages.Image__edit_tour_marker_disabled;
+   private IDialogSettings             _state    = TourbookPlugin.getState("net.tourbook.map25.action.ActionTourMapMarker"); //$NON-NLS-1$
 
-   private IDialogSettings             _state                          = TourbookPlugin.getState("net.tourbook.map25.action.ActionTourMapMarker"); //$NON-NLS-1$
-
-   private final String                _dialogId                       = getClass().getCanonicalName();
+   private final String                _dialogId = getClass().getCanonicalName();
 
    private Map25View                   _map25View;
 
@@ -68,16 +63,10 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
       _map25View = map25View;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
+      _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker).createImage();
+      _imageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled).createImage();
 
-      parent.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDispose());
    }
 
    @Override
@@ -85,12 +74,9 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
       if (_actionToolItem == null && toolbar != null) {
 
-         toolbar.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               _actionToolItem.dispose();
-               _actionToolItem = null;
-            }
+         toolbar.addDisposeListener(disposeEvent -> {
+            _actionToolItem.dispose();
+            _actionToolItem = null;
          });
 
          _toolBar = toolbar;
@@ -105,15 +91,12 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
             }
          });
 
-         toolbar.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(mouseEvent -> {
 
-               final Point mousePosition = new Point(e.x, e.y);
-               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-               onMouseMove(hoveredItem, e);
-            }
+            onMouseMove(hoveredItem, mouseEvent);
          });
 
          _slideoutMarkerOptions = new SlideoutMap25_MarkerOptions(_parent, _toolBar, _state, _map25View);
@@ -159,8 +142,8 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
    private void onDispose() {
 
-      Util.disposeResource(_imageEnabled);
-      Util.disposeResource(_imageDisabled);
+      UI.disposeResource(_imageEnabled);
+      UI.disposeResource(_imageDisabled);
    }
 
    private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {

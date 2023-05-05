@@ -274,6 +274,7 @@ public class TourInfo_View extends ViewPart {
       _tourInfoUI = new TourInfoUI();
       _tourInfoUI.setIsUIEmbedded(true);
       _tourInfoUI.setNoTourTooltip(Messages.UI_Label_TourIsNotSelected);
+      _tourInfoUI.setPart(this);
    }
 
    private void onResize() {
@@ -324,7 +325,7 @@ public class TourInfo_View extends ViewPart {
          if (firstElement instanceof TVICatalogComparedTour) {
             tourId = ((TVICatalogComparedTour) firstElement).getTourId();
          } else if (firstElement instanceof TVICompareResultComparedTour) {
-            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+            tourId = ((TVICompareResultComparedTour) firstElement).getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

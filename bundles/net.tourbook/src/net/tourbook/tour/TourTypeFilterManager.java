@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,6 +35,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.upload.CloudUploaderManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
@@ -47,7 +49,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
@@ -144,32 +145,28 @@ public class TourTypeFilterManager {
     */
    private static void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
+      _prefChangeListener = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+               || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+            final String newValue = propertyChangeEvent.getNewValue().toString();
+            final double propertyValue = Double.parseDouble(newValue);
 
-               final String newValue = event.getNewValue().toString();
-               final double propertyValue = Double.parseDouble(newValue);
+            // check if the event was originated from this tour type
+            // combobox
+            if (_propertyValue != propertyValue) {
 
-               // check if the event was originated from this tour type
-               // combobox
-               if (_propertyValue != propertyValue) {
+               /*
+                * reselect old tour type filter when it's still available
+                */
+               final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-                  /*
-                   * reselect old tour type filter when it's still available
-                   */
-                  final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+               updateTourTypeFilter();
 
-                  updateTourTypeFilter();
-
-                  selectTourTypeFilter(activeTourTypeFilter, false);
-               }
+               selectTourTypeFilter(activeTourTypeFilter, false);
             }
          }
       };
@@ -260,6 +257,15 @@ public class TourTypeFilterManager {
    public static ArrayList<TourTypeFilter> readTourTypeFilters() {
 
       final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
+
+      final List<TourTypeFilter> cloudTourTypeFilters = CloudUploaderManager.getCloudTourTypeFilters();
+      cloudTourTypeFilters.forEach(tourTypeFilter -> {
+
+         if (filterList.stream().noneMatch(
+               filter -> filter.getFilterName().equals(tourTypeFilter.getFilterName()))) {
+            filterList.add(tourTypeFilter);
+         }
+      });
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       final ArrayList<?> tourTypesNotDisplayed = (ArrayList<?>) tourTypes.clone();
@@ -568,16 +574,13 @@ public class TourTypeFilterManager {
       }
 
       /*
-       * fire as asynch that the combo box drop down is hidden and the combo text ist displayed
+       * fire as async that the combo box drop down is hidden and the combo text ist displayed
        */
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // fire change event
-            _propertyValue = Math.random();
-            _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, _propertyValue);
-         }
+         // fire change event
+         _propertyValue = Math.random();
+         _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, _propertyValue);
       });
    }
 

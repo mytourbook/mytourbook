@@ -1,5 +1,5 @@
 /******************************************************  *************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
@@ -34,6 +36,7 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -51,9 +54,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 public class StatisticTooltipUI_TourFrequency {
-
-   private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-   private static final String IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
 
    private static final String NUMBERS_UNIT             = net.tourbook.statistics.Messages.NUMBERS_UNIT;
 
@@ -77,7 +77,7 @@ public class StatisticTooltipUI_TourFrequency {
    private static IValueFormatter        _valueFormatter_Time_HH           = new ValueFormatter_Time_HH();
    private static IValueFormatter        _valueFormatter_Time_HHMM         = new ValueFormatter_Time_HHMM();
 
-   private final int                     _columnSpacing                    = 10;
+   private static final int              _columnSpacing                    = 10;
 
    /*
     * Tooltip context
@@ -140,10 +140,10 @@ public class StatisticTooltipUI_TourFrequency {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_APP_CLOSE));
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -223,7 +223,7 @@ public class StatisticTooltipUI_TourFrequency {
       _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
       _isTourTypeImageAvailable = _tourTypeId >= 0;
 
-      initUI(parent);
+      initUI();
 
       createActions();
       createUI(parent);
@@ -645,7 +645,7 @@ public class StatisticTooltipUI_TourFrequency {
 
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
    }
 
@@ -831,9 +831,6 @@ public class StatisticTooltipUI_TourFrequency {
 
       final String elevationUp_Percentage_Text        = elevationUp_Percentage   == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(elevationUp_Percentage);
 
-      final float elevationUp_WithMeasurement         = elevationUp / UI.UNIT_VALUE_ELEVATION;
-      final float elevationUp_Summary_WithMeasurement = elevationUp_Summary / UI.UNIT_VALUE_ELEVATION;
-
 // SET_FORMATTING_ON
 
       final int[] allGrouped_ElevationUp = statData.statElevation_GroupValues;
@@ -867,7 +864,7 @@ public class StatisticTooltipUI_TourFrequency {
 
       _lblDataLabel.setText(Messages.Statistic_Tooltip_Label_Elevation);
 
-      _lblDataValue.setText(FormatManager.formatElevation_Summary(elevationUp_WithMeasurement));
+      _lblDataValue.setText(FormatManager.formatElevation_Summary(elevationUp));
       _lblDataValue_Unit.setText(unit);
 
       _lblNumberOfTours.setText(Integer.toString(statData.statElevation_NumTours_High[_serieIndex][_valueIndex]));
@@ -876,9 +873,9 @@ public class StatisticTooltipUI_TourFrequency {
 
          _lblColumnHeader_Summary.setText(title);
 
-         _lblDataValue_Summary.setText(elevationUp_Summary_WithMeasurement == 0
+         _lblDataValue_Summary.setText(elevationUp_Summary == 0
                ? UI.EMPTY_STRING
-               : FormatManager.formatElevation_Summary(elevationUp_Summary_WithMeasurement));
+               : FormatManager.formatElevation_Summary(elevationUp_Summary));
          _lblDataValue_Summary_Unit.setText(unit);
 
          _lblNumberOfTours_Summary.setText(Integer.toString((int) (numTours_Summary + 0.5)));

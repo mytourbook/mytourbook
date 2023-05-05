@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -845,7 +845,7 @@ public abstract class AdvancedSlideoutShell {
 
    private Shell getRootShell(final Shell shell) {
 
-      if (shell == null) {
+      if (shell == null || shell.isDisposed()) {
          return shell;
       }
 
@@ -1303,6 +1303,14 @@ public abstract class AdvancedSlideoutShell {
       }
 
       final Shell resizeShell = _rrShellWithResize.getShell();
+
+      if (resizeShell == null) {
+
+         // fixed NPE which happened during debugging
+         
+         return;
+      }
+
       final Point shellLocation = resizeShell.getLocation();
 
       // ensure tooltip is not too large
@@ -1476,7 +1484,14 @@ public abstract class AdvancedSlideoutShell {
       int vertContentDefaultWidth;
       int vertContentDefaultHeight;
 
-      if (defaultSize != null && defaultSize.length == 4) {
+      if (defaultSize != null && defaultSize.length == 2) {
+
+         horizContentDefaultWidth = defaultSize[0];
+         horizContentDefaultHeight = defaultSize[1];
+         vertContentDefaultWidth = defaultSize[0];
+         vertContentDefaultHeight = defaultSize[1];
+
+      } else if (defaultSize != null && defaultSize.length == 4) {
 
          horizContentDefaultWidth = defaultSize[0];
          horizContentDefaultHeight = defaultSize[1];
@@ -1492,7 +1507,7 @@ public abstract class AdvancedSlideoutShell {
       }
 
       /*
-       * get horizontal gallery values
+       * Get horizontal values
        */
       _horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_WIDTH, horizContentDefaultWidth);
       _horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_HEIGHT, horizContentDefaultHeight);
@@ -1507,7 +1522,7 @@ public abstract class AdvancedSlideoutShell {
       }
 
       /*
-       * get vertical gallery values
+       * Get vertical values
        */
       _vertContentWidth = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_WIDTH, vertContentDefaultWidth);
       _vertContentHeight = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_HEIGHT, vertContentDefaultHeight);

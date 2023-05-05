@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -26,7 +27,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -220,8 +220,7 @@ public class TourTypeMenuManager {
             final TourType recentTourType = _recentTourTypes.get(tourTypeIndex);
 
             actionRecentTourType.setTourType(recentTourType);
-            actionRecentTourType.setText(//
-                  (UI.SPACE4 + UI.MNEMONIC + (tourTypeIndex + 1) + UI.SPACE2 + recentTourType.getName()));
+            actionRecentTourType.setText(UI.SPACE4 + UI.MNEMONIC + (tourTypeIndex + 1) + UI.SPACE2 + recentTourType.getName());
 
             menuMgr.add(actionRecentTourType);
 

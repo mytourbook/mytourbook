@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Default is absolute distance that the defaults for export/import are the same
        */
       store.setDefault(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, false);
+
+      /**
+       * Suunto 9
+       */
+      store.setDefault(IPreferences.SUUNTO9_ALTITUDE_DATA_SOURCE, 1);
+      store.setDefault(IPreferences.SUUNTO9_DISTANCE_DATA_SOURCE, 0);
    }
 
 }

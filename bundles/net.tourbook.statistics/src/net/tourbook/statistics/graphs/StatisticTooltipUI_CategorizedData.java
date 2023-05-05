@@ -1,5 +1,5 @@
-/******************************************************  *************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+/*******************************************************************************
+ * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
@@ -29,6 +31,7 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -46,18 +49,15 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class StatisticTooltipUI_CategorizedData {
 
-   private static final String          APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-   private static final String          IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
+   private static final String          NUMBERS_UNIT        = net.tourbook.statistics.Messages.NUMBERS_UNIT;
 
-   private static final String          NUMBERS_UNIT             = net.tourbook.statistics.Messages.NUMBERS_UNIT;
+   private static final int             VERTICAL_LINE_SPACE = 8;
+   private static final int             SHELL_MARGIN        = 5;
 
-   private static final int             VERTICAL_LINE_SPACE      = 8;
-   private static final int             SHELL_MARGIN             = 5;
+   private static final IValueFormatter VALUE_FORMATTER_1_0 = new ValueFormatter_Number_1_0();
 
-   private static final IValueFormatter VALUE_FORMATTER_1_0      = new ValueFormatter_Number_1_0();
-
-   private static final int             _columnSpacing           = 20;
-   private static final GridDataFactory _columnGridData          = GridDataFactory.fillDefaults().grab(true, false).indent(_columnSpacing, 0);
+   private static final int             _columnSpacing      = 20;
+   private static final GridDataFactory _columnGridData     = GridDataFactory.fillDefaults().grab(true, false).indent(_columnSpacing, 0);
 
    /*
     * Tooltip context
@@ -151,10 +151,10 @@ public class StatisticTooltipUI_CategorizedData {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_APP_CLOSE));
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -242,7 +242,7 @@ public class StatisticTooltipUI_CategorizedData {
       _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
       _isTourTypeImageAvailable = _tourTypeId >= 0;
 
-      initUI(parent);
+      initUI();
 
       createActions();
       createUI(parent);
@@ -706,7 +706,7 @@ public class StatisticTooltipUI_CategorizedData {
 
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
    }
 
@@ -756,14 +756,11 @@ public class StatisticTooltipUI_CategorizedData {
 
       final float distance_Summary                       = computeSummary(_tourData_Common.distance_High_Resorted,      _valueIndex);
       final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
-      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex) ;
+      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex);
 
       final float distance_Percentage                    = distance_Summary    == 0 ? 0 : distance    / distance_Summary      * 100;
       final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
       final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
-
-      final float elevationUp_WithMeasurement            = elevationUp / UI.UNIT_VALUE_ELEVATION;
-      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / UI.UNIT_VALUE_ELEVATION;
 
       final String deviceTime_Elapsed_Percentage_Text    = deviceTime_Elapsed_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Elapsed_Percentage);
       final String deviceTime_Recorded_Percentage_Text   = deviceTime_Recorded_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Recorded_Percentage);
@@ -801,11 +798,11 @@ public class StatisticTooltipUI_CategorizedData {
       _lblComputedTime_Break                 .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
       _lblComputedTime_Break_Unit            .setText(computedTime_Break_UnitText);
 
-      _lblDistance                           .setText(distance                      == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
-      _lblDistance_Unit                      .setText(distance                      == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+      _lblDistance                           .setText(distance       == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary  (distance / 1000.0));
+      _lblDistance_Unit                      .setText(distance       == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-      _lblElevationUp                        .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
-      _lblElevationUp_Unit                   .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+      _lblElevationUp                        .setText(elevationUp    == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp));
+      _lblElevationUp_Unit                   .setText(elevationUp    == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
       _lblNumberOfTours                      .setText(Integer.toString((int) (numTours + 0.5)));
 
@@ -823,11 +820,11 @@ public class StatisticTooltipUI_CategorizedData {
          _lblComputedTime_Break_Summary      .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break_Summary));
          _lblComputedTime_Break_Summary_Unit .setText(computedTime_Break_Summary_UnitText);
 
-         _lblDistance_Summary                .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance_Summary / 1000.0));
-         _lblDistance_Summary_Unit           .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+         _lblDistance_Summary                .setText(distance_Summary     == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary  (distance_Summary / 1000.0));
+         _lblDistance_Summary_Unit           .setText(distance_Summary     == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-         _lblElevationUp_Summary             .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary_WithMeasurement));
-         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+         _lblElevationUp_Summary             .setText(elevationUp_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp_Summary));
+         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
          _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
       }

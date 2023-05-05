@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.text.NumberFormat;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
+import net.tourbook.common.UI;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 
@@ -89,12 +90,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       final boolean isDiffValues = yDiffTo2ndSerie != null;
       final boolean isAdjustedValues = yAdjustedSerie != null;
 
-      final boolean isPointInGraph = _splineData != null && _splineData.splinePoint_DataSerieIndex != null;
+      final boolean isSplinePointInGraph = _splineData != null && _splineData.splinePoint_DataSerieIndex != null;
 
-      if (xValues == null || xValues.length == 0 /*
-                                                  * || yValues2ndSerie == null ||
-                                                  * yValues2ndSerie.length == 0
-                                                  */) {
+      if (xValues == null || xValues.length == 0
+//        || yValues2ndSerie == null || yValues2ndSerie.length == 0
+      ) {
+
          return;
       }
 
@@ -121,9 +122,9 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       _devY0Spline = devYBottom - devGraphHeight / 2;
 
       /*
-       * convert all diff values into positive values
+       * Convert all diff values into positive values
        */
-      float diffValues[] = null;
+      float[] diffValues = null;
       double scaleValueDiff = _scaleY;
       if (isDiffValues) {
 
@@ -131,6 +132,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          float maxValueDiff = 0;
 
          diffValues = new float[yDiffTo2ndSerie.length];
+
          for (float valueDiff : yDiffTo2ndSerie) {
             diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
             maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
@@ -161,7 +163,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       }
 
       /*
-       * create paths
+       * Create paths
        */
       for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
 
@@ -256,16 +258,16 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       gc.setClipping(graphRect);
 
       /*
-       * paint and fill adjusted value graph
+       * Paint and fill adjusted value graph
        */
       if (isAdjustedValues) {
 
-         final Color color1 = new Color(display, new RGB(0xFF, 0x3E, 0x00));
-//         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+         final Color colorAdjustedValue = new Color(UI.IS_DARK_THEME
+               ? new RGB(224, 111, 0)
+               : new RGB(0xFF, 0x3E, 0x00));
 
-         gc.setForeground(color1);
-         gc.setBackground(color1);
+         gc.setForeground(colorAdjustedValue);
+         gc.setBackground(colorAdjustedValue);
          gc.setAlpha(0x80);
 
          // fill background
@@ -277,22 +279,23 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          gc.drawPath(pathAdjustValue);
 
          gc.setAlpha(0xff);
-         color1.dispose();
       }
 
       /*
-       * paint value diff graph
+       * Paint value diff graph
        */
       if (isDiffValues) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+         gc.setForeground(UI.IS_DARK_THEME
+               ? new Color(245, 245, 245, 0xff)
+               : display.getSystemColor(SWT.COLOR_BLACK));
          gc.drawPath(pathValueDiff);
       }
 
       /*
-       * paint splines
+       * Paint spline
        */
-      final Color splineColor = new Color(display, 0x00, 0xb4, 0xff);
+      final Color splineColor = new Color(0x00, 0xb4, 0xff); // bright blue
       final float[] ySplineSerie = _tourData.dataSerieSpline;
       if (ySplineSerie != null) {
 
@@ -309,6 +312,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
             final int devX = (int) (_scaleX * graphX);
             final int devY = (int) (_scaleY * graphY);
 
+            // skip same positions
             if (!(devX == devXPrev && devY == devYPrev)) {
                gc.drawLine(devXPrev, _devY0Spline - devYPrev, devX, _devY0Spline - devY);
             }
@@ -319,28 +323,27 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       }
 
       /*
-       * paint data graph
+       * Paint data graph
        */
       if (is2ndYValues) {
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
          gc.drawPath(path2ndSerie);
       }
 
       /*
-       * paint spline points
+       * Paint spline points in the spline
        */
-      final SplineData splineData = _tourData.splineDataPoints;
-      if (splineData != null) {
+      if (isSplinePointInGraph) {
 
          final int[] graphSerieIndex = _splineData.splinePoint_DataSerieIndex;
 
-         final double[] graphXSplineValues = splineData.posX_GraphValues;
-         final double[] graphYSplineValues = splineData.posY_GraphValues;
-         final boolean[] isPointMovable = splineData.isPointMovable;
+         final double[] graphXSplineValues = _splineData.posX_GraphValues;
+         final double[] graphYSplineValues = _splineData.posY_GraphValues;
+         final boolean[] isPointMovable = _splineData.isPointMovable;
 
-         final int splinePointLength = graphXSplineValues.length;
+         final int numSplinePoints = graphXSplineValues.length;
 
-         _spPointRects = new Rectangle[splinePointLength];
+         _spPointRects = new Rectangle[numSplinePoints];
 
          final int pointSize = 10;
          final int pointSize2 = pointSize / 2;
@@ -348,11 +351,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          final int hitSize2 = hitSize / 2;
 
          /*
-          * paint static points
+          * Paint static points
           */
          gc.setBackground(splineColor);
-         for (int pointIndex = 0; pointIndex < splinePointLength; pointIndex++) {
+         for (int pointIndex = 0; pointIndex < numSplinePoints; pointIndex++) {
 
+            // skip movable points
             if (isPointMovable[pointIndex]) {
                continue;
             }
@@ -364,10 +368,10 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
             final int devPointY = (int) (graphY * scaleValueDiff);
 
             /*
-             * set the last point visible if it's hidden
+             * Set the last point visible when it's hidden
              */
             final boolean isPointHidden = devPointX > devChartWidth;
-            final boolean isLastSPlinePoint = pointIndex == splinePointLength - 1;
+            final boolean isLastSPlinePoint = pointIndex == numSplinePoints - 1;
             final boolean isLastSerieIndex = graphSerieIndex[pointIndex] == xValues.length - 1;
             final boolean isRightBorder = _xxDevViewPortLeftBorder + devChartWidth == drawingData.devVirtualGraphWidth;
             if (isPointHidden && isLastSPlinePoint && isLastSerieIndex && isRightBorder) {
@@ -388,10 +392,10 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          }
 
          /*
-          * paint movable points
+          * Paint movable points
           */
          gc.setBackground(display.getSystemColor(SWT.COLOR_RED));
-         for (int pointIndex = 0; pointIndex < splinePointLength; pointIndex++) {
+         for (int pointIndex = 0; pointIndex < numSplinePoints; pointIndex++) {
 
             if (isPointMovable[pointIndex] == false) {
                continue;
@@ -418,11 +422,14 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       }
 
       /*
-       * paint spline points in the graph
+       * Paint spline points in the graph
        */
-      if (isPointInGraph && isAdjustedValues) {
+      if (isSplinePointInGraph && isAdjustedValues) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+         gc.setForeground(UI.IS_DARK_THEME
+               ? new Color(245, 245, 245, 0xff)
+               : display.getSystemColor(SWT.COLOR_BLACK));
+
          final int[] graphSerieIndex = _splineData.splinePoint_DataSerieIndex;
 
          for (final int serieIndex : graphSerieIndex) {
@@ -436,7 +443,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
             gc.fillOval(devX - 2, devY - 2, 5, 5);
 
             /*
-             * draw altitude
+             * Draw elevation
              */
             final String altiText = _nf3.format(graphY);
             final Point textExtent = gc.textExtent(altiText);
@@ -457,7 +464,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       }
 
       // dispose resources
-      splineColor.dispose();
       path2ndSerie.dispose();
       pathValueDiff.dispose();
       pathAdjustValue.dispose();

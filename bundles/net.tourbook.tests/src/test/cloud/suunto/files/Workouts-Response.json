@@ -1,0 +1,104 @@
+{
+	"error": null,
+	"payload": [
+		{
+			"workoutId": 0,
+			"activityId": 1,
+			"description": "Plan improvise :\n30mns a 70% + 15mn allure course (80%)\n\nEncore des douleurs a lavant de la jambe gauche et au tibia. Xa Pro 3d ? changer chaussures ?\n\nSalomonXAPro 3DGTX",
+			"startTime": 1294887748000,
+			"totalTime": 3178.1,
+			"totalDistance": 8500.0,
+			"totalAscent": 0.0,
+			"totalDescent": 0.0,
+			"startPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"stopPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"centerPosition": {
+				"x": 0.0,
+				"y": 0.0
+			},
+			"maxSpeed": 0.0,
+			"stepCount": 0,
+			"recoveryTime": 0,
+			"cumulativeRecoveryTime": 0,
+			"rankings": {
+				"totalTimeOnRouteRanking": {
+					"originalRanking": 0,
+					"originalNumberOfWorkouts": 0
+				}
+			},
+			"extensions": [
+				{
+					"type": "SummaryExtension",
+					"avgSpeed": 2.675,
+					"avgPower": null,
+					"maxPower": null,
+					"avgCadence": 0.0,
+					"maxCadence": null,
+					"ascent": 9.0,
+					"descent": 9.0,
+					"ascentTime": 368.0,
+					"descentTime": 284.0,
+					"pte": 3.2,
+					"peakEpoc": 73.2,
+					"performanceLevel": null,
+					"recoveryTime": null,
+					"weather": null,
+					"minTemperature": null,
+					"avgTemperature": null,
+					"maxTemperature": null,
+					"workoutType": null,
+					"feeling": null,
+					"tags": null,
+					"gear": null,
+					"exerciseId": null,
+					"apps": []
+				}
+			],
+			"extensionTypes": [
+				"ALTITUDESTREAM", "ENERGYCONSUMPTIONSTREAM", "HEARTRATESTREAM", "IBISTREAM", "INTENSITY", "SUMMARY"
+			],
+			"minAltitude": 130.0,
+			"maxAltitude": 220.0,
+			"externalMoveId": 1085138,
+			"isEdited": false,
+			"isManuallyAdded": false,
+			"tss": {
+				"calculationMethod": "MET",
+				"trainingStressScore": 49.437115,
+				"intensityFactor": null,
+				"normalizedPower": null,
+				"averageGradeAdjustedPace": null
+			},
+			"cadence": {
+				"max": 0,
+				"avg": 0
+			},
+			"timeOffsetInMinutes": -480,
+			"avgSpeed": 2.67,
+			"hrdata": {
+				"workoutMaxHR": 148,
+				"workoutAvgHR": 131,
+				"userMaxHR": 180,
+				"max": 180,
+				"avg": 131,
+				"hrmax": 148
+			},
+			"workoutKey": "601227a563c46e612c20b579",
+			"energyConsumption": 614,
+			"avgPace": 6.23,
+			"commentCount": 0,
+			"pictureCount": 0,
+			"viewCount": 0
+		}
+	],
+	"metadata": {
+		"workoutcount": "4",
+		"until": "1295049600000"
+	}
+}

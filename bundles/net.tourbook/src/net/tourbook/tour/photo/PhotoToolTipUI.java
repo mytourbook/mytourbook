@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,13 @@
 package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 import net.tourbook.common.util.Util;
@@ -27,9 +31,11 @@ import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.ui.tourChart.ChartPhoto;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -75,14 +81,18 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
    private final ArrayList<Photo>         _allPhotos                      = new ArrayList<>();
 
+   private ActionAddPhoto                 _actionAddPhoto;
    private ActionCloseToolTip             _actionCloseToolTip;
    private ActionPinToolTip               _actionPinToolTip;
+   private ActionRemovePhoto              _actionRemovePhoto;
    private ActionToggleGalleryOrientation _actionToggleGalleryOrientation;
    private ActionToolTipLocationUpDown    _actionToolTipLocation;
 
    private ToolBarManager                 _galleryToolbarManager;
    private boolean                        _isVerticalGallery;
    private boolean                        _isShellDragged;
+
+   private boolean                        _isLinkPhotoDisplayed;
 
    /**
     * <pre>
@@ -98,17 +108,17 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    /*
     * UI controls
     */
-   private Composite    _galleryContainer;
+   private Composite        _galleryContainer;
 
-   private PhotoGallery _photoGallery;
+   private TourPhotoGallery _photoGallery;
 
-   private ToolBar      _ttToolbarControlExit;
-   private ToolBar      _galleryToolbarControl;
+   private ToolBar          _ttToolbarControlExit;
+   private ToolBar          _galleryToolbarControl;
 
-   private Label        _labelDragToolTip;
+   private Label            _labelDragToolTip;
 
-   private Cursor       _cursorResize;
-   private Cursor       _cursorHand;
+   private Cursor           _cursorResize;
+   private Cursor           _cursorHand;
 
    private class ActionCloseToolTip extends Action {
 
@@ -117,7 +127,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Close));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -133,7 +143,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Pin_Blue));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Pin));
       }
 
       @Override
@@ -150,7 +160,11 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    private class ActionToggleGalleryOrientation extends Action {
 
       public ActionToggleGalleryOrientation() {
+
          super(null, Action.AS_PUSH_BUTTON);
+
+         // an image must be set otherwise the toolbar icons can be too small, this happens not allways :-(
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
       }
 
       @Override
@@ -166,7 +180,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_ToolTipLocation_AboveTourChart_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown));
       }
 
       @Override
@@ -193,6 +207,18 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       @Override
       public void setSelection(final PhotoSelection photoSelection) {
          onSelectPhoto(photoSelection);
+      }
+   }
+
+   private class TourPhotoGallery extends PhotoGallery {
+
+      public TourPhotoGallery(final IDialogSettings state) {
+         super(state);
+      }
+
+      @Override
+      public void fillContextMenu(final IMenuManager menuMgr) {
+         PhotoToolTipUI.this.fillContextMenu(menuMgr);
       }
    }
 
@@ -327,10 +353,16 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
    private void createActions() {
 
+      _actionCloseToolTip = new ActionCloseToolTip();
       _actionPinToolTip = new ActionPinToolTip();
       _actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
-      _actionCloseToolTip = new ActionCloseToolTip();
       _actionToolTipLocation = new ActionToolTipLocationUpDown();
+   }
+
+   private void createActions_WithUI() {
+
+      _actionAddPhoto = new ActionAddPhoto(_photoGallery);
+      _actionRemovePhoto = new ActionRemovePhoto(_photoGallery);
    }
 
    @Override
@@ -354,6 +386,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
       createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
 
+      createActions_WithUI();
       fillActionBar();
 
       // must be called after the custom action bar is created
@@ -377,7 +410,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
             .applyTo(_galleryContainer);
       _galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         _photoGallery = new PhotoGallery(_state);
+         _photoGallery = new TourPhotoGallery(_state);
 
          _photoGallery.setShowCustomActionBar();
          _photoGallery.setShowThumbnailSize();
@@ -461,6 +494,16 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       }
    }
 
+   private void enableActions() {
+
+      final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
+
+      final boolean isPhotoSelected = selectedPhotos.size() > 0;
+
+      _actionAddPhoto.setEnabled(isPhotoSelected && _isLinkPhotoDisplayed);
+      _actionRemovePhoto.setEnabled(isPhotoSelected);
+   }
+
    protected void enableControls() {
 
       _actionToolTipLocation.setEnabled(isToolTipPinned() == false);
@@ -486,6 +529,21 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
       _galleryToolbarManager.add(_actionToggleGalleryOrientation);
       _galleryToolbarManager.add(new Separator());
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      if (_isLinkPhotoDisplayed) {
+         menuMgr.add(_actionAddPhoto);
+      }
+
+      menuMgr.add(_actionRemovePhoto);
+
+      enableActions();
+   }
+
+   public PhotoGallery getPhotoGallery() {
+      return _photoGallery;
    }
 
    @Override
@@ -605,6 +663,8 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
    protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos, final boolean isLinkPhotoDisplayed) {
 
+      _isLinkPhotoDisplayed = isLinkPhotoDisplayed;
+
       final boolean isPhotoHovered = hoveredPhotos != null && hoveredPhotos.size() > 0;
 
       final int hoveredPhotosHash = isPhotoHovered ? hoveredPhotos.hashCode() : 0;
@@ -660,19 +720,13 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
       if (_isVerticalGallery) {
 
-         _actionToggleGalleryOrientation.setToolTipText(//
-               Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-
-         _actionToggleGalleryOrientation.setImageDescriptor(//
-               TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+         _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
-         _actionToggleGalleryOrientation.setToolTipText(//
-               Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-
-         _actionToggleGalleryOrientation.setImageDescriptor(//
-               TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+         _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 
@@ -683,14 +737,14 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          // above tour chart
 
          _actionToolTipLocation.setToolTipText(Messages.App_Action_ToolTipLocation_BelowTourChart_Tooltip);
-         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown));
 
       } else {
 
          // below tour chart
 
          _actionToolTipLocation.setToolTipText(Messages.App_Action_ToolTipLocation_AboveTourChart_Tooltip);
-         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp));
       }
    }
 }

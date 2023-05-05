@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,16 +21,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -41,201 +43,198 @@ import org.xml.sax.SAXParseException;
 
 public class GPXDeviceDataReader extends TourbookDevice {
 
-	private static final String	XML_GPX_TAG	= "<gpx";	//$NON-NLS-1$
+   private static final char   NL          = UI.NEW_LINE;
 
-	// plugin constructor
-	public GPXDeviceDataReader() {}
+   private static final String XML_GPX_TAG = "<gpx";     //$NON-NLS-1$
 
-	@Override
-	public String buildFileNameFromRawData(final String rawDataFileName) {
-		// NEXT Auto-generated method stub
-		return null;
-	}
+   public GPXDeviceDataReader() {
+      // plugin constructor
+   }
 
-	@Override
-	public boolean checkStartSequence(final int byteIndex, final int newByte) {
-		return true;
-	}
+   @Override
+   public String buildFileNameFromRawData(final String rawDataFileName) {
+      // NEXT Auto-generated method stub
+      return null;
+   }
 
-	private InputStream convertIntoWellFormedXml(final String importFilePath) {
+   @Override
+   public boolean checkStartSequence(final int byteIndex, final int newByte) {
+      return true;
+   }
 
-		StringWriter xmlWriter = null;
+   private InputStream convertIntoWellFormedXml(final String importFilePath) {
 
-		try ( FileInputStream inputStream = new FileInputStream(importFilePath);
-		      BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
+      StringWriter xmlWriter = null;
 
-			xmlWriter = new StringWriter();
+      try (FileInputStream inputStream = new FileInputStream(importFilePath);
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
-			// write "<?xml ..." to be well conformed
-			xmlWriter.write(XML_HEADER);
-			xmlWriter.write(UI.NEW_LINE);
+         xmlWriter = new StringWriter();
 
-			// copy all lines
-			String line;
-			while ((line = fileReader.readLine()) != null) {
-				xmlWriter.write(line);
-				xmlWriter.write(UI.NEW_LINE);
-			}
+         // write "<?xml ..." to be well conformed
+         xmlWriter.write(XML_HEADER);
+         xmlWriter.write(NL);
 
-		} catch (final Exception e1) {
-			StatusUtil.log(e1);
-		} finally {
-			Util.closeWriter(xmlWriter);
-		}
+         // copy all lines
+         String line;
+         while ((line = fileReader.readLine()) != null) {
+            xmlWriter.write(line);
+            xmlWriter.write(NL);
+         }
 
-		final String xml = xmlWriter.toString();
+      } catch (final Exception e1) {
+         StatusUtil.log(e1);
+      } finally {
+         Util.closeWriter(xmlWriter);
+      }
 
-		return new ByteArrayInputStream(xml.getBytes());
-	}
+      final String xml = xmlWriter.toString();
 
-	@Override
-	public String getDeviceModeName(final int profileId) {
-		return UI.EMPTY_STRING;
-	}
+      return new ByteArrayInputStream(xml.getBytes());
+   }
 
-	@Override
-	public SerialParameters getPortParameters(final String portName) {
-		return null;
-	}
+   @Override
+   public String getDeviceModeName(final int profileId) {
+      return UI.EMPTY_STRING;
+   }
 
-	@Override
-	public int getStartSequenceSize() {
-		return 0;
-	}
+   @Override
+   public SerialParameters getPortParameters(final String portName) {
+      return null;
+   }
 
-	@Override
-	public int getTransferDataSize() {
-		return -1;
-	}
+   @Override
+   public int getStartSequenceSize() {
+      return 0;
+   }
 
-	/**
-	 * @param importFilePath
-	 * @return Returns <code>null</code> when file is not a .gpx file.
-	 */
-	private InputStream getWellFormedGPX(final String importFilePath) {
+   @Override
+   public int getTransferDataSize() {
+      return -1;
+   }
 
-		if (isGPXFile(importFilePath) == false) {
-			return null;
-		}
+   /**
+    * @param importFilePath
+    * @return Returns <code>null</code> when file is not a .gpx file.
+    */
+   private InputStream getWellFormedGPX(final String importFilePath) {
 
-		return convertIntoWellFormedXml(importFilePath);
-	}
+      if (isGPXFile(importFilePath) == false) {
+         return null;
+      }
 
-	/**
-	 * Check if the file is a valid gpx file by checking this tag. This file must not be a well
-	 * conformed xml file.
-	 * 
-	 * @param importFilePath
-	 * @return Returns <code>true</code> when the file contains the gpx tag.
-	 */
-	private boolean isGPXFile(final String importFilePath) {
+      return convertIntoWellFormedXml(importFilePath);
+   }
 
-		try (FileInputStream inputStream = new FileInputStream(importFilePath);
-		      BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))){
+   /**
+    * Check if the file is a valid gpx file by checking this tag. This file must not be a well
+    * conformed xml file.
+    *
+    * @param importFilePath
+    * @return Returns <code>true</code> when the file contains the gpx tag.
+    */
+   private boolean isGPXFile(final String importFilePath) {
 
-			String line;
+      try (FileInputStream inputStream = new FileInputStream(importFilePath);
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
-			while ((line = fileReader.readLine()) != null) {
+         String line;
 
-				if (line.toLowerCase().contains(XML_GPX_TAG)) {
-					return true;
-				}
-			}
+         while ((line = fileReader.readLine()) != null) {
 
-		} catch (final Exception e1) {
+            if (line.toLowerCase().contains(XML_GPX_TAG)) {
+               return true;
+            }
+         }
 
-			StatusUtil.log(e1);
+      } catch (final Exception e1) {
 
-		}
+         StatusUtil.log(e1);
 
-		return false;
-	}
+      }
 
-	@Override
-	public boolean processDeviceData(	final String importFilePath,
-										final DeviceData deviceData,
-										final HashMap<Long, TourData> alreadyImportedTours,
-										final HashMap<Long, TourData> newlyImportedTours) {
+      return false;
+   }
 
-		InputStream inputStream = null;
+   @Override
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
-		if (isValidXMLFile(importFilePath, XML_GPX_TAG) == false) {
+      InputStream inputStream = null;
 
-			inputStream = getWellFormedGPX(importFilePath);
+      if (isValidXMLFile(importFilePath, XML_GPX_TAG) == false) {
 
-			if (inputStream == null) {
-				return false;
-			}
-		}
+         inputStream = getWellFormedGPX(importFilePath);
 
-		final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-				this,
-				importFilePath,
-				deviceData,
-				alreadyImportedTours,
-				newlyImportedTours);
+         if (inputStream == null) {
+            return;
+         }
+      }
 
-		try {
+      try {
 
-			final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+         final SAXParser saxParser = XmlUtils.initializeParser();
 
-			if (inputStream == null) {
-				saxParser.parse("file:" + importFilePath, handler);//$NON-NLS-1$
-			} else {
-				saxParser.parse(inputStream, handler);
-			}
+         final GPX_SAX_Handler handler = new GPX_SAX_Handler(
 
-		} catch (final SAXParseException e) {
+               importFilePath,
+               deviceData,
+               alreadyImportedTours,
+               newlyImportedTours,
 
-			final StringBuilder sb = new StringBuilder()//
-					.append("XML error when parsing file:\n") //$NON-NLS-1$
-					.append(UI.NEW_LINE)
-					.append(importFilePath)
-					.append(UI.NEW_LINE)
-					.append(UI.NEW_LINE)
-					.append(e.getLocalizedMessage())
-					.append(UI.NEW_LINE)
-					.append(UI.NEW_LINE)
-					.append("Line: ") //$NON-NLS-1$
-					.append(e.getLineNumber())
-					.append("\tColumn: ") //$NON-NLS-1$
-					.append(e.getColumnNumber())
-			//
-			;
+               importState_File,
+               importState_Process,
 
-			Display.getDefault().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString()); //$NON-NLS-1$
-				}
-			});
+               this);
 
-			TourLogManager.logEx(e);
+         if (inputStream == null) {
+            saxParser.parse("file:" + importFilePath, handler);//$NON-NLS-1$
+         } else {
+            saxParser.parse(inputStream, handler);
+         }
 
-			return false;
+      } catch (final SAXParseException e) {
 
-		} catch (final Exception e) {
+         final String errorText = UI.EMPTY_STRING
 
-			TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+               + "XML error when parsing file:" + NL //        //$NON-NLS-1$
+               + NL
+               + importFilePath
+               + NL
+               + NL
+               + e.getLocalizedMessage()
+               + NL
+               + NL
+               + "Line: " + e.getLineNumber() //               //$NON-NLS-1$
+               + "   Column: " + e.getColumnNumber() //        //$NON-NLS-1$
+         ;
 
-			return false;
-		}
+         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", errorText)); //$NON-NLS-1$
 
-		return handler.isImported();
-	}
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
-	@Override
-	public boolean validateRawData(final String importFilePath) {
+      } catch (final Exception e) {
 
-		if (isValidXMLFile(importFilePath, XML_GPX_TAG)) {
-			return true;
-		}
+         TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
+      }
+   }
 
-		if (isGPXFile(importFilePath)) {
-			return true;
-		}
+   @Override
+   public boolean validateRawData(final String importFilePath) {
 
-		return false;
-	}
+      if (isValidXMLFile(importFilePath, XML_GPX_TAG)) {
+         return true;
+      }
+
+      if (isGPXFile(importFilePath)) {
+         return true;
+      }
+
+      return false;
+   }
 
 }

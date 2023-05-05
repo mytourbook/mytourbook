@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,14 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+import static org.eclipse.ui.forms.events.IExpansionListener.expansionStateChangedAdapter;
+
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
@@ -49,14 +50,10 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -71,10 +68,6 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -92,8 +85,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -293,12 +284,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
       shell.setText(Messages.Dialog_WmsConfig_DialogTitle);
 
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      shell.addDisposeListener(disposeEvent -> onDispose());
    }
 
    @Override
@@ -584,26 +570,18 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
       });
 
-      _layerViewer.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
+      _layerViewer.addCheckStateListener(checkStateChangedEvent -> {
 
-            // select the checked item
-            _layerViewer.setSelection(new StructuredSelection(event.getElement()));
+         // select the checked item
+         _layerViewer.setSelection(new StructuredSelection(checkStateChangedEvent.getElement()));
 
-            // set focus to selected layer
-            table.setSelection(table.getSelectionIndex());
+         // set focus to selected layer
+         table.setSelection(table.getSelectionIndex());
 
-            onCheckLayer(event.getElement());
-         }
+         onCheckLayer(checkStateChangedEvent.getElement());
       });
 
-      _layerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectLayer();
-         }
-      });
+      _layerViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectLayer());
 
       /*
        * set drag adapter
@@ -774,12 +752,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
             // combo: image size
             _comboImageSize = new Combo(leftContainer, SWT.BORDER | SWT.READ_ONLY);
-            _comboImageSize.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectImageSize();
-               }
-            });
+            _comboImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImageSize()));
             // set content
             for (final String imageSize : MapProviderManager.IMAGE_SIZE) {
                _comboImageSize.add(imageSize);
@@ -798,12 +771,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
                   .fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                   .applyTo(_cboImageFormat);
-            _cboImageFormat.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectImageFormat();
-               }
-            });
+            _cboImageFormat.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImageFormat()));
          }
 
          // ############################################################
@@ -816,12 +784,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
             _chkLoadTransparentImages = new Button(rightContainer, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkLoadTransparentImages);
             _chkLoadTransparentImages.setText(Messages.Dialog_WmsConfig_Button_GetTransparentMap);
-            _chkLoadTransparentImages.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectTransparentImage();
-               }
-            });
+            _chkLoadTransparentImages.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTransparentImage()));
 
             // ############################################################
 
@@ -829,13 +792,10 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
             _chkShowTileInfo = new Button(rightContainer, SWT.CHECK);
             GridDataFactory.fillDefaults().applyTo(_chkShowTileInfo);
             _chkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
-            _chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  final boolean isTileInfo = _chkShowTileInfo.getSelection();
-                  _map.setShowDebugInfo(isTileInfo, isTileInfo);
-               }
-            });
+            _chkShowTileInfo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               final boolean isTileInfo = _chkShowTileInfo.getSelection();
+               _map.setShowDebugInfo(isTileInfo, isTileInfo);
+            }));
 
             // ############################################################
 
@@ -846,12 +806,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
                   .applyTo(_chkShowTileImageLog);
             _chkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
             _chkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-            _chkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls();
-               }
-            });
+            _chkShowTileImageLog.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
          }
       }
    }
@@ -869,17 +824,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
       _logContainer.setBackground(parentBackground);
       _logContainer.setText(Messages.Dialog_MapConfig_Label_LoadedImageUrl);
       _logContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-      _logContainer.addExpansionListener(new IExpansionListener() {
-
-         @Override
-         public void expansionStateChanged(final ExpansionEvent e) {
-            _logContainer.getParent().layout(true);
-         }
-
-         @Override
-         public void expansionStateChanging(final ExpansionEvent e) {}
-      });
-
+      _logContainer.addExpansionListener(expansionStateChangedAdapter(expansionEvent -> _logContainer.getParent().layout(true)));
       {
          final Composite clientContainer = _formTk.createComposite(_logContainer);
          _logContainer.setClient(clientContainer);
@@ -888,7 +833,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          GridLayoutFactory.fillDefaults().applyTo(clientContainer);
 
          clientContainer.setBackground(parentBackground);
-
          {
             // combo: url log
             _cboTileImageLog = new Combo(clientContainer, SWT.READ_ONLY);
@@ -897,17 +841,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
             _cboTileImageLog.setVisibleItemCount(40);
             _formTk.adapt(_cboTileImageLog, true, true);
             _cboTileImageLog.setFont(monoFont);
-
-            _cboTileImageLog.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  // display selected item in the text field below
-                  final int selectionIndex = _cboTileImageLog.getSelectionIndex();
-                  if (selectionIndex != -1) {
-                     _txtLogDetail.setText(_cboTileImageLog.getItem(selectionIndex));
-                  }
+            _cboTileImageLog.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               // display selected item in the text field below
+               final int selectionIndex = _cboTileImageLog.getSelectionIndex();
+               if (selectionIndex != -1) {
+                  _txtLogDetail.setText(_cboTileImageLog.getItem(selectionIndex));
                }
-            });
+            }));
 
             // label: selected log entry
             _txtLogDetail = new Text(clientContainer, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.WRAP);
@@ -933,12 +873,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          _btnShowMap = new Button(toolbarContainer, SWT.NONE);
          _btnShowMap.setText(Messages.Dialog_WmsConfig_Button_UpdateMap);
          _btnShowMap.setToolTipText(Messages.Dialog_WmsConfig_Button_UpdateMap_Tooltip);
-         _btnShowMap.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectWmsMap();
-            }
-         });
+         _btnShowMap.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectWmsMap()));
 
          // ############################################################
 
@@ -946,12 +881,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          _btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
          _btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
          _btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
-         _btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectOsmMap();
-            }
-         });
+         _btnShowOsmMap.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectOsmMap()));
 
          // ############################################################
 
@@ -962,34 +892,31 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
                .applyTo(_toolbar);
       }
 
-      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
+      _map = new Map2(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
       GridDataFactory.fillDefaults()//
             .grab(true, true)
             .applyTo(_map);
 
       _map.setShowScale(true);
 
-      _map.addMousePositionListener(new IPositionListener() {
+      _map.addMousePositionListener(mapGeoPositionEvent -> {
 
-         @Override
-         public void setPosition(final MapPositionEvent event) {
+         final GeoPosition mousePosition = mapGeoPositionEvent.mapGeoPosition;
 
-            final GeoPosition mousePosition = event.mapGeoPosition;
+         double lon = mousePosition.longitude % 360;
+         lon = lon > 180
+               ? lon - 360
+               : lon < -180
+                     ? lon + 360
+                     : lon;
 
-            double lon = mousePosition.longitude % 360;
-            lon = lon > 180 ? //
-            lon - 360
-                  : lon < -180 ? //
-            lon + 360
-                        : lon;
-
-            _lblMapInfo.setText(NLS.bind(
-                  Messages.Dialog_MapConfig_Label_MapInfo,
-                  new Object[] {
-                        _nfLatLon.format(mousePosition.latitude),
-                        _nfLatLon.format(lon),
-                        Integer.toString(event.mapZoomLevel + 1) }));
-         }
+         _lblMapInfo.setText(NLS.bind(
+               Messages.Dialog_MapConfig_Label_MapInfo,
+               new Object[] {
+                     _nfLatLon.format(mousePosition.latitude),
+                     _nfLatLon.format(lon),
+                     Integer.toString(mapGeoPositionEvent.mapZoomLevel + 1)
+               }));
       });
 
       /*
@@ -1518,8 +1445,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
          // center position in the map
-         final double centerX = positionRect.x + positionRect.width / 2;
-         final double centerY = positionRect.y + positionRect.height / 2;
+         final double centerX = positionRect.x + positionRect.width / 2.0;
+         final double centerY = positionRect.y + positionRect.height / 2.0;
          final Point center = new Point((int) centerX, (int) centerY);
 
          final GeoPosition devCenter = mp.pixelToGeo(center, zoom);

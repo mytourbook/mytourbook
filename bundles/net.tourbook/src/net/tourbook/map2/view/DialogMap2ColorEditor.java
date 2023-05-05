@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
@@ -23,6 +26,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapColorProfile;
 import net.tourbook.map2.Messages;
+import net.tourbook.preferences.PrefPageAppearanceColors;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -31,20 +35,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.ColorSelector;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -53,7 +46,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
@@ -76,7 +68,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private final IGradientColorProvider _colorProvider;
    private Map2ColorProfile             _mapColorWorkingCopy;
 
-   private final SelectionAdapter       _defaultSelectionAdapter;
+   private SelectionListener            _defaultSelectionAdapter;
 
    private ColorDefinition              _colorDefinition;
 
@@ -116,16 +108,6 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private ColorSelector _colorSelectorLow;
    private ColorSelector _colorSelectorMin;
 
-   {
-      _defaultSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            updateModelFromUI();
-            doLiveUpdate();
-         }
-      };
-   }
-
    public DialogMap2ColorEditor(final Shell parentShell,
                                 final IGradientColorProvider colorProvider,
                                 final IMap2ColorUpdater mapColorUpdater) {
@@ -143,6 +125,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    public boolean close() {
 
       saveState();
+      logColorValues();
 
       return super.close();
    }
@@ -192,15 +175,17 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
+      final Composite uiContainer = (Composite) super.createDialogArea(parent);
 
-      createUI(dlgAreaContainer);
+      initUI();
+
+      createUI(uiContainer);
 
       restoreState();
 
       enableControls();
 
-      return dlgAreaContainer;
+      return uiContainer;
    }
 
    /**
@@ -216,12 +201,13 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
       final int legendWidth = Math.max(140, canvasSize.x);
       final int legendHeight = Math.max(100, canvasSize.y);
 
-      _imageMappingColor = TourMapPainter.createMapLegendImage(
-            Display.getCurrent(),
+      _imageMappingColor = TourMapPainter.createMap2_LegendImage_AWT(
             _colorProvider,
             legendWidth,
             legendHeight,
-            true);
+            UI.IS_DARK_THEME, // is dark background
+            false // no shadow
+      );
    }
 
    private void createUI(final Composite parent) {
@@ -232,7 +218,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
        * dialog container
        */
       final Composite dlgContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults()//
+      GridLayoutFactory.swtDefaults()
             .extendedMargins(10, 10, 5, 5)
             .numColumns(3)
             .applyTo(dlgContainer);
@@ -264,37 +250,34 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
        * legend
        */
       _canvasMappingColor = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-      GridDataFactory.fillDefaults()//
+
+      _canvasMappingColor.addPaintListener(paintEvent -> {
+
+         if (_imageMappingColor == null || _imageMappingColor.isDisposed()) {
+            return;
+         }
+
+         paintEvent.gc.drawImage(_imageMappingColor, 0, 0);
+      });
+
+      _canvasMappingColor.addControlListener(controlResizedAdapter(controlEvent -> {
+
+         // update image when the dialog is created or resized
+         updateUI_LegendImage();
+      }));
+
+      _canvasMappingColor.addDisposeListener(disposeEvent -> {
+
+         if (_imageMappingColor != null) {
+            _imageMappingColor.dispose();
+         }
+
+      });
+
+      GridDataFactory.fillDefaults()
             .grab(false, true)
             .hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
             .applyTo(_canvasMappingColor);
-      _canvasMappingColor.addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent e) {
-            if (_imageMappingColor == null || _imageMappingColor.isDisposed()) {
-               return;
-            }
-
-            e.gc.drawImage(_imageMappingColor, 0, 0);
-         }
-      });
-      _canvasMappingColor.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            // update image when the dialog is created or resized
-            updateUI_LegendImage();
-         }
-      });
-      _canvasMappingColor.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            if (_imageMappingColor != null) {
-               _imageMappingColor.dispose();
-            }
-
-         }
-      });
    }
 
    private void createUI_20_LegendColorSelector(final Composite parent) {
@@ -303,104 +286,82 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
       GridDataFactory.fillDefaults().grab(false, true).applyTo(selectorContainer);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 20, 10, 10).applyTo(selectorContainer);
       {
-         /*
-          * max color
-          */
-         final Composite maxContainer = new Composite(selectorContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, true).applyTo(maxContainer);
-         GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(maxContainer);
+         {
+            /*
+             * max color
+             */
+            final Composite maxContainer = new Composite(selectorContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(false, true).applyTo(maxContainer);
+            GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(maxContainer);
 
-         _colorSelectorMax = new ColorSelector(maxContainer);
-         GridDataFactory
-               .swtDefaults()
-               .grab(false, true)
-               .align(SWT.BEGINNING, SWT.BEGINNING)
-               .applyTo(_colorSelectorMax.getButton());
-         _colorSelectorMax.addListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               onSelectColor(_colorSelectorMax, 0);
-            }
-         });
+            _colorSelectorMax = new ColorSelector(maxContainer);
+            _colorSelectorMax.addListener(propertyChangeEvent -> onSelectColor(_colorSelectorMax, 0));
+            GridDataFactory
+                  .swtDefaults()
+                  .grab(false, true)
+                  .align(SWT.BEGINNING, SWT.BEGINNING)
+                  .applyTo(_colorSelectorMax.getButton());
+         }
+         {
+            /*
+             * high color
+             */
+            final Composite highContainer = new Composite(selectorContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(false, true).applyTo(highContainer);
+            GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(highContainer);
 
-         /*
-          * high color
-          */
-         final Composite highContainer = new Composite(selectorContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, true).applyTo(highContainer);
-         GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(highContainer);
+            _colorSelectorHigh = new ColorSelector(highContainer);
+            _colorSelectorHigh.addListener(propertyChangeEvent -> onSelectColor(_colorSelectorHigh, 1));
+            GridDataFactory
+                  .swtDefaults()
+                  .grab(false, true)
+                  .align(SWT.BEGINNING, SWT.BEGINNING)
+                  .applyTo(_colorSelectorHigh.getButton());
+         }
+         {
+            /*
+             * mid color
+             */
+            final Composite midContainer = new Composite(selectorContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(midContainer);
+            GridLayoutFactory.fillDefaults().margins(0, 5).applyTo(midContainer);
 
-         _colorSelectorHigh = new ColorSelector(highContainer);
-         GridDataFactory
-               .swtDefaults()
-               .grab(false, true)
-               .align(SWT.BEGINNING, SWT.BEGINNING)
-               .applyTo(_colorSelectorHigh.getButton());
+            _colorSelectorMid = new ColorSelector(midContainer);
+            _colorSelectorMid.addListener(propertyChangeEvent -> onSelectColor(_colorSelectorMid, 2));
+            GridDataFactory.swtDefaults().applyTo(_colorSelectorMid.getButton());
+         }
+         {
+            /*
+             * low color
+             */
+            final Composite lowContainer = new Composite(selectorContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(false, true).applyTo(lowContainer);
+            GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(lowContainer);
 
-         _colorSelectorHigh.addListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               onSelectColor(_colorSelectorHigh, 1);
-            }
-         });
+            _colorSelectorLow = new ColorSelector(lowContainer);
+            _colorSelectorLow.addListener(propertyChangeEvent -> onSelectColor(_colorSelectorLow, 3));
+            GridDataFactory
+                  .swtDefaults()
+                  .grab(false, true)
+                  .align(SWT.BEGINNING, SWT.END)
+                  .applyTo(_colorSelectorLow.getButton());
+         }
+         {
+            /*
+             * min color
+             */
+            final Composite minContainer = new Composite(selectorContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(false, true).applyTo(minContainer);
+            GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(minContainer);
 
-         /*
-          * mid color
-          */
-         final Composite midContainer = new Composite(selectorContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(midContainer);
-         GridLayoutFactory.fillDefaults().margins(0, 5).applyTo(midContainer);
-
-         _colorSelectorMid = new ColorSelector(midContainer);
-         GridDataFactory.swtDefaults().applyTo(_colorSelectorMid.getButton());
-         _colorSelectorMid.addListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               onSelectColor(_colorSelectorMid, 2);
-            }
-         });
-
-         /*
-          * low color
-          */
-         final Composite lowContainer = new Composite(selectorContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, true).applyTo(lowContainer);
-         GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(lowContainer);
-
-         _colorSelectorLow = new ColorSelector(lowContainer);
-         GridDataFactory
-               .swtDefaults()
-               .grab(false, true)
-               .align(SWT.BEGINNING, SWT.END)
-               .applyTo(_colorSelectorLow.getButton());
-
-         _colorSelectorLow.addListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               onSelectColor(_colorSelectorLow, 3);
-            }
-         });
-
-         /*
-          * min color
-          */
-         final Composite minContainer = new Composite(selectorContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, true).applyTo(minContainer);
-         GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 0).applyTo(minContainer);
-
-         _colorSelectorMin = new ColorSelector(minContainer);
-         GridDataFactory
-               .swtDefaults()
-               .grab(false, true)
-               .align(SWT.BEGINNING, SWT.END)
-               .applyTo(_colorSelectorMin.getButton());
-
-         _colorSelectorMin.addListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               onSelectColor(_colorSelectorMin, 4);
-            }
-         });
+            _colorSelectorMin = new ColorSelector(minContainer);
+            _colorSelectorMin.addListener(propertyChangeEvent -> onSelectColor(_colorSelectorMin, 4));
+            GridDataFactory
+                  .swtDefaults()
+                  .grab(false, true)
+                  .align(SWT.BEGINNING, SWT.END)
+                  .applyTo(_colorSelectorMin.getButton());
+         }
       }
    }
 
@@ -418,14 +379,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             _chkForceMaxValue = new Button(group, SWT.CHECK);
             _chkForceMaxValue.setText(Messages.legendcolor_dialog_chk_max_value_text);
             _chkForceMaxValue.setToolTipText(Messages.legendcolor_dialog_chk_max_value_tooltip);
+            _chkForceMaxValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               enableControls();
+               validateFields();
+            }));
             GridDataFactory.swtDefaults().applyTo(_chkForceMaxValue);
-            _chkForceMaxValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls();
-                  validateFields();
-               }
-            });
 
             _lblMaxValue = new Label(group, SWT.NONE);
             _lblMaxValue.setText(Messages.legendcolor_dialog_txt_max_value);
@@ -434,18 +392,13 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             _spinMaxValue = new Spinner(group, SWT.BORDER);
             _spinMaxValue.setMinimum(SPINNER_MIN_VALUE);
             _spinMaxValue.setMaximum(SPINNER_MAX_VALUE);
-            _spinMaxValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  validateFields();
-               }
-            });
-            _spinMaxValue.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  UI.adjustSpinnerValueOnMouseScroll(event);
-                  validateFields();
-               }
+            _spinMaxValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               validateFields();
+
+            }));
+            _spinMaxValue.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               validateFields();
             });
          }
 
@@ -456,14 +409,12 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             _chkForceMinValue = new Button(group, SWT.CHECK);
             _chkForceMinValue.setText(Messages.legendcolor_dialog_chk_min_value_text);
             _chkForceMinValue.setToolTipText(Messages.legendcolor_dialog_chk_min_value_tooltip);
+            _chkForceMinValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               enableControls();
+               validateFields();
+
+            }));
             GridDataFactory.swtDefaults().applyTo(_chkForceMinValue);
-            _chkForceMinValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls();
-                  validateFields();
-               }
-            });
 
             _lblMinValue = new Label(group, SWT.NONE);
             _lblMinValue.setText(Messages.legendcolor_dialog_txt_min_value);
@@ -472,18 +423,12 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             _spinMinValue = new Spinner(group, SWT.BORDER);
             _spinMinValue.setMinimum(SPINNER_MIN_VALUE);
             _spinMinValue.setMaximum(SPINNER_MAX_VALUE);
-            _spinMinValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  validateFields();
-               }
-            });
-            _spinMinValue.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  UI.adjustSpinnerValueOnMouseScroll(event);
-                  validateFields();
-               }
+            _spinMinValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               validateFields();
+            }));
+            _spinMinValue.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               validateFields();
             });
          }
       }
@@ -513,11 +458,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             }
 
             _scaleMaxBrightness = new Scale(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
             _scaleMaxBrightness.setMinimum(0);
             _scaleMaxBrightness.setMaximum(100);
             _scaleMaxBrightness.setPageIncrement(10);
             _scaleMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
 
             _lblMaxBrightnessValue = new Label(group, SWT.NONE);
             _lblMaxBrightnessValue.setText(VALUE_SPACER);
@@ -539,11 +484,11 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             }
 
             _scaleMinBrightness = new Scale(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
             _scaleMinBrightness.setMinimum(0);
             _scaleMinBrightness.setMaximum(100);
             _scaleMinBrightness.setPageIncrement(10);
             _scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
 
             _lblMinBrightnessValue = new Label(group, SWT.NONE);
             _lblMinBrightnessValue.setText(VALUE_SPACER);
@@ -555,7 +500,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private void createUI_50_Apply(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .indent(0, 20)
             .align(SWT.FILL, SWT.END)
@@ -567,27 +512,21 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
           * button: live update
           */
          _chkLiveUpdate = new Button(container, SWT.CHECK);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
          _chkLiveUpdate.setText(Messages.LegendColor_Dialog_Check_LiveUpdate);
          _chkLiveUpdate.setToolTipText(Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip);
-         _chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               enableControls();
-            }
-         });
+         _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            enableControls();
+         }));
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
 
          /*
           * button: apply
           */
          _btnApply = new Button(container, SWT.NONE);
          _btnApply.setText(Messages.App_Action_Apply);
-         _btnApply.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               _mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
-            }
-         });
+         _btnApply.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _mapColorUpdater.applyMapColors(_mapColorWorkingCopy);
+         }));
          setButtonLayoutData(_btnApply);
       }
    }
@@ -638,6 +577,28 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
       // keep window size and position
       return _state;
+   }
+
+   private void initUI() {
+
+      _defaultSelectionAdapter = widgetSelectedAdapter(selectionEvent -> {
+         updateModelFromUI();
+         doLiveUpdate();
+      });
+   }
+
+   private void logColorValues() {
+
+      if (PrefPageAppearanceColors.isLogging_ColorValues()) {
+
+         // log changes that it is easier to adjust the default values
+         System.out.println(UI.NEW_LINE + UI.NEW_LINE
+
+               + UI.timeStampNano()
+
+               + " [" + getClass().getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
+               + _mapColorWorkingCopy);
+      }
    }
 
    private void onSelectColor(final ColorSelector colorSelector, final int valueColorIndex) {
@@ -695,21 +656,21 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
       // update color selector
 
-      final ColorValue[] colorValues = _mapColorWorkingCopy.getColorValues();
+      final ColorValue[] allColorValues = _mapColorWorkingCopy.getColorValues();
 
-      ColorValue colorValue = colorValues[4];
+      ColorValue colorValue = allColorValues[4];
       _colorSelectorMax.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[3];
+      colorValue = allColorValues[3];
       _colorSelectorHigh.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[2];
+      colorValue = allColorValues[2];
       _colorSelectorMid.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[1];
+      colorValue = allColorValues[1];
       _colorSelectorLow.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
-      colorValue = colorValues[0];
+      colorValue = allColorValues[0];
       _colorSelectorMin.setColorValue(new RGB(colorValue.red, colorValue.green, colorValue.blue));
 
       _mapColorWorkingCopy.setMinBrightness(_cboMinBrightness.getSelectionIndex());

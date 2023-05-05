@@ -37,6 +37,6 @@ class ActionDeleteDistanceValues extends Action {
 
 	@Override
 	public void run() {
-		_tourDataEditor.actionDeleteDistanceValues();
+		_tourDataEditor.actionDelete_DistanceValues();
 	}
 }

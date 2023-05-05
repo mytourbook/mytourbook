@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -30,89 +31,90 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionOpenAdjustAltitudeDialog extends Action {
 
-	private ITourProvider	_tourProvider;
-	private boolean			_isFromEditor;
+   private ITourProvider _tourProvider;
+   private boolean       _isFromEditor;
 
-	public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider) {
+   public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider) {
 
-		_tourProvider = tourProvider;
+      _tourProvider = tourProvider;
 
-		setText(Messages.app_action_edit_adjust_altitude);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude_disabled));
+      setText(Messages.app_action_edit_adjust_altitude);
 
-		setEnabled(false);
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation_Disabled));
 
-	public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider, final boolean isFromEditor) {
-		this(tourProvider);
-		_isFromEditor = isFromEditor;
-	}
+      setEnabled(false);
+   }
 
-	public static void doAction(final ITourProvider tourProvider, final boolean isFromEditor) {
+   public ActionOpenAdjustAltitudeDialog(final ITourProvider tourProvider, final boolean isFromEditor) {
+      this(tourProvider);
+      _isFromEditor = isFromEditor;
+   }
 
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+   public static void doAction(final ITourProvider tourProvider, final boolean isFromEditor) {
 
-		// check if one tour is selected
-		if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
-			return;
-		}
+      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
-		final TourData tourData = selectedTours.get(0);
+      // check if one tour is selected
+      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
+         return;
+      }
 
-		if (tourData.isManualTour()) {
-			// a manually created tour do not have time slices -> no altitude
-			return;
-		}
+      final TourData tourData = selectedTours.get(0);
 
-		boolean isCreateDummyAltitude = false;
-		final float[] altitudeSerie = tourData.altitudeSerie;
+      if (tourData.isManualTour()) {
+         // a manually created tour do not have time slices -> no altitude
+         return;
+      }
 
-		// check if altitude values are available
-		if (altitudeSerie == null || altitudeSerie.length == 0) {
-			if (MessageDialog.openQuestion(
-					Display.getCurrent().getActiveShell(),
-					Messages.Adjust_Altitude_CreateDummyAltitudeData_Title,
-					Messages.Adjust_Altitude_CreateDummyAltitudeData_Message) == false) {
-				return;
-			}
+      boolean isCreateDummyAltitude = false;
+      final float[] altitudeSerie = tourData.altitudeSerie;
 
-			isCreateDummyAltitude = true;
-		}
+      // check if altitude values are available
+      if (altitudeSerie == null || altitudeSerie.length == 0) {
+         if (MessageDialog.openQuestion(
+               Display.getCurrent().getActiveShell(),
+               Messages.Adjust_Altitude_CreateDummyAltitudeData_Title,
+               Messages.Adjust_Altitude_CreateDummyAltitudeData_Message) == false) {
+            return;
+         }
 
-		/*
-		 * don't save when the tour is opened in the editor, just update the tour, saving must be
-		 * done ALWAYS in the editor
-		 */
-		boolean isSave = true;
-		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-		if (isFromEditor
-				|| (tourDataEditor != null && tourDataEditor.isDirty() && tourDataEditor.getTourData() == tourData)) {
-			isSave = false;
-		}
+         isCreateDummyAltitude = true;
+      }
 
-		if (new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData, isSave, isCreateDummyAltitude)
-				.open() == Window.OK) {
+      /*
+       * don't save when the tour is opened in the editor, just update the tour, saving must be
+       * done ALWAYS in the editor
+       */
+      boolean isSave = true;
+      final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+      if (isFromEditor
+            || (tourDataEditor != null && tourDataEditor.isDirty() && tourDataEditor.getTourData() == tourData)) {
+         isSave = false;
+      }
 
-			if (isSave) {
-				TourManager.saveModifiedTours(selectedTours);
-			} else {
+      if (new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData, isSave, isCreateDummyAltitude)
+            .open() == Window.OK) {
 
-				/*
-				 * don't save the tour, just update the tour data editor
-				 */
-				if (tourDataEditor != null) {
+         if (isSave) {
+            TourManager.saveModifiedTours(selectedTours);
+         } else {
 
-					tourDataEditor.updateUI(tourData, true);
+            /*
+             * don't save the tour, just update the tour data editor
+             */
+            if (tourDataEditor != null) {
 
-					TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
-				}
-			}
-		}
-	}
+               tourDataEditor.updateUI(tourData, true);
 
-	@Override
-	public void run() {
-		doAction(_tourProvider, _isFromEditor);
-	}
+               TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
+            }
+         }
+      }
+   }
+
+   @Override
+   public void run() {
+      doAction(_tourProvider, _isFromEditor);
+   }
 }

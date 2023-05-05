@@ -27,14 +27,12 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -60,7 +58,6 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -84,7 +81,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
    private IContextMenuProvider  _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
    private ActionDeleteBookmark  _actionDeleteBookmark;
-   private ActionModifyColumns   _actionModifyColumns;
    private ActionRenameBookmark  _actionRenameBookmark;
 
    private final NumberFormat    _nf0                            = NumberFormat.getNumberInstance();
@@ -246,7 +242,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
    private void createActions() {
 
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionDeleteBookmark = new ActionDeleteBookmark();
       _actionRenameBookmark = new ActionRenameBookmark();
    }
@@ -398,8 +393,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       defineColumn_50_Tilt();
       defineColumn_60_Latitude();
       defineColumn_70_Longitude();
-      defineColumn_80_PositionMarkerLatitude();
-      defineColumn_90_PositionMarkerLongitude();
    }
 
    /**
@@ -615,60 +608,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       });
    }
 
-   /**
-    * Column: Map Positionmarker Latitude
-    */
-   private void defineColumn_80_PositionMarkerLatitude() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "PositionMarkerLatitude", SWT.TRAIL); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Map_Bookmark_Column_PositionMarkerLatitude_Tooltip);
-      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_PositionMarkerLatitude);
-      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_PositionMarkerLatitude_Tooltip);
-
-      colDef.setIsDefaultColumn();
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//      colDef.setColumnWeightData(new ColumnWeightData(9));
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final MapBookmark bookmark = (MapBookmark) cell.getElement();
-            final String valueText = _nfLatLon.format(bookmark.get_mapPositionMarkerLatitude());
-
-            cell.setText(valueText);
-         }
-      });
-   }
-
-   /**
-    * Column: Positionmarker Longitude
-    */
-   private void defineColumn_90_PositionMarkerLongitude() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "PositionMarkerLongitude", SWT.TRAIL); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Map_Bookmark_Column_PositionMarkerLongitude_Tooltip);
-      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_PositionMarkerLongitude);
-      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_PositionMarkerLongitude_Tooltip);
-
-      colDef.setIsDefaultColumn();
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//      colDef.setColumnWeightData(new ColumnWeightData(9));
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final MapBookmark bookmark = (MapBookmark) cell.getElement();
-            final String valueText = _nfLatLon.format(bookmark.get_mapPositionMarkerLongitude());
-
-            cell.setText(valueText);
-         }
-      });
-   }
-
    @Override
    public void dispose() {
 
@@ -701,15 +640,14 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
    private void fillToolbar() {
 
-      final IActionBars actionBars = getViewSite().getActionBars();
+//      final IActionBars actionBars = getViewSite().getActionBars();
 
       /*
        * Fill view menu
        */
-      final IMenuManager menuMgr = actionBars.getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = actionBars.getMenuManager();
+//
+//      menuMgr.add(new Separator());
 
       /*
        * Fill view toolbar

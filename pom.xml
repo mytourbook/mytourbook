@@ -10,11 +10,23 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>20.12.0-SNAPSHOT</version>
+                                             <version>23.3.2-SNAPSHOT</version>
    <packaging>pom</packaging>
    
+   <dependencies>
+      <dependency>
+         <artifactId>org.eclipse.core.runtime</artifactId>              <groupId>org.eclipse.core</groupId>
+                                                                        <version>3.7.0</version>
+      </dependency>
+      <dependency>
+         <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
+                                                                        <version>5.9.3</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>	
+
    <properties>
-      <tycho.version>1.4.0</tycho.version>
+      <tycho.version>2.7.5</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -58,56 +70,42 @@
 
 
    <repositories>
-   
 
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.16</id>                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2020-06</url>
+         <id>eclipse.platform.4.24</id>                                 <layout>p2</layout>
+         
+         <url>https://download.eclipse.org/releases/2022-06</url>
+         
+<!-- 
+         <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
+         <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
+ -->
       </repository>   
-   
-      <!-- 
-      
-      Eclipse local repositories downloaded from https://download.eclipse.org/eclipse/downloads/
-      do not work anymore
-      
+
       <repository>
-         <id>eclipse.platform.4.10</id>                                  <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.platform-4.10.zip!/</url>
-      </repository>
-   
-      <repository>
-         <id>eclipse.rcp.4.10</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.rcp-4.10.zip!/</url>
-      </repository>
-   
-      <repository>
-         <id>eclipse.jdt.4.10</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.jdt-4.10.zip!/</url>
-      </repository>
-   
-      <repository>
-         <id>eclipse.pde.4.10</id>                                       <layout>p2</layout>
-         <url>jar:file:repositories/org.eclipse.pde-4.10.zip!/</url>
-      </repository>
-      
-      -->
+         <id>eclipse.nattable.2.0</id>                                  <layout>p2</layout>
+         <url>http://download.eclipse.org/nattable/releases/2.0.3/repository</url>
+      </repository> 
       
       <repository>
-         <id>eclipse.4.17.nl</id>                                       <layout>p2</layout>
-         <url>file:build/build.eclipse.4.17.nl.repo</url>
+         <id>eclipse.nebula.3.0</id>                                  <layout>p2</layout>
+         <url>https://download.eclipse.org/nebula/releases/3.0.0</url>
       </repository>
 
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
+      <repository> <id>eclipse.4.17.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.17.nl.repo</url> </repository>
 
    </repositories>
 
    <build>
+   
+      <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
 
 <!-- 
       <defaultGoal>clean verify</defaultGoal>
 -->
-   
       <plugins>
 
          <plugin>
@@ -121,15 +119,14 @@
                                                                      <version>${tycho.version}</version>
             <configuration>
 
-
                <!-- Fix this problem (and propably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
                 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
 
                 -->
-               <compilerArgument>-warn:none</compilerArgument>     
-               <compilerArgument>-err:none</compilerArgument>      
+               <compilerArgument>-warn:none</compilerArgument>
+               <compilerArgument>-err:none</compilerArgument>
             </configuration>
          </plugin>
 
@@ -155,7 +152,7 @@
                <format>yyyyMMdd-HHmm</format>
 
             </configuration>
-         </plugin>         
+         </plugin>
 
          <plugin>
             <artifactId>target-platform-configuration</artifactId>   <groupId>org.eclipse.tycho</groupId>
@@ -172,7 +169,88 @@
             </configuration>
          </plugin>
 
-      </plugins>
-   </build>
+      <plugin>
+         <artifactId>maven-surefire-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
+                                                               <version>3.0.0</version>
+         <configuration>
+            <skipTests>true</skipTests>
+         </configuration>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>test</goal>
+               </goals>
+            </execution>
+         </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
+                                                               <version>3.11.0</version>
+         <executions>
+            <execution>
+               <id>compiletests</id>
+               <phase>test-compile</phase>
+               <goals>
+                  <goal>testCompile</goal>
+               </goals>
+            </execution>
+         </executions>
+         <configuration>
+               <release>11</release>
+         </configuration>
+      </plugin>
+      
+      <plugin>
+         <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
+                                                               <version>0.8.10</version>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>prepare-agent</goal>
+               </goals>
+            </execution>
+            <execution>
+               <id>all-tests-report</id>
+               <phase>verify</phase>
+               <goals>
+                  <goal>report-aggregate</goal>
+               </goals>
+               <configuration>
+                  <skip>true</skip>
+               </configuration>
+            </execution>
+	     <execution>
+               <id>merge-all-jacoco</id>
+               <phase>verify</phase>
+               <goals>
+                  <goal>merge</goal>
+               </goals>
+               <configuration>
+                  <destFile>${session.executionRootDirectory}/mergedJaCoCoReport.exec</destFile> 
+                  <append>true</append> 
+                  <skip>true</skip>
+               <fileSets>
+                  <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>*.exec</include>
+                  </includes>
+                  </fileSet>
+                  <fileSet>
+                  <directory>${session.executionRootDirectory}</directory>
+                  <includes>
+                    <include>mergedJaCoCoReport.exec</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+            </configuration> 
+        </execution>
+         </executions>
+      </plugin>
+
+    </plugins>
+  </build>
 
 </project>
+

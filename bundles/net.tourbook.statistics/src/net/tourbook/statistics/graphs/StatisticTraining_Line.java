@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -23,17 +22,12 @@ import net.tourbook.statistic.ChartOptions_Training;
 import net.tourbook.statistic.SlideoutStatisticOptions;
 import net.tourbook.statistic.TrainingPrefKeys;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticTraining_Line extends StatisticTraining {
 
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
    private IPropertyChangeListener _prefChangeListener;
 
    private boolean                 _isShow_Altitude;
@@ -48,43 +42,40 @@ public class StatisticTraining_Line extends StatisticTraining {
    private void addPrefListener(final Composite container) {
 
       // create pref listener
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            // observe which data are displayed
-            if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)
+         // observe which data are displayed
+         if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)
 
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_ALTITUDE)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_PACE)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_SPEED)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DISTANCE)
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DURATION)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_ALTITUDE)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_PACE)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_AVG_SPEED)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DISTANCE)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DURATION)
 
-                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME)
+               || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME)
 
-            ) {
+         ) {
 
-               if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME)) {
-                  _isDuration_ReloadData = true;
-               }
-
-               // get the changed preferences
-               getPreferences();
-
-               // data needs to be recalculated
-               if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)) {
-                  setIsForceReloadData(true);
-               }
-
-               // update chart
-               preferencesHasChanged();
+            if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME)) {
+               _isDuration_ReloadData = true;
             }
+
+            // get the changed preferences
+            getPreferences();
+
+            // data needs to be recalculated
+            if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE)) {
+               setIsForceReloadData(true);
+            }
+
+            // update chart
+            preferencesHasChanged();
          }
       };
 
@@ -92,12 +83,7 @@ public class StatisticTraining_Line extends StatisticTraining {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
 
       // remove pref listener
-      container.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _prefStore.removePropertyChangeListener(_prefChangeListener);
-         }
-      });
+      container.addDisposeListener(disposeEvent -> _prefStore.removePropertyChangeListener(_prefChangeListener));
    }
 
    @Override

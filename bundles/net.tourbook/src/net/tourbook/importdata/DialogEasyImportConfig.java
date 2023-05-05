@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.text.NumberFormat;
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.FileSystemManager;
@@ -28,6 +32,9 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -41,12 +48,12 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.CadenceMultiplier;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -60,23 +67,19 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -84,22 +87,16 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -109,7 +106,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -118,8 +114,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -132,16 +126,14 @@ import org.joda.time.PeriodType;
 /**
  * Dialog to configure the device import.
  */
-public class DialogEasyImportConfig extends TitleAreaDialog {
+public class DialogEasyImportConfig extends TitleAreaDialog implements IActionResetToDefault {
 
-   private static final String          ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
-   //
-   private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                        //$NON-NLS-1$
+   public static final String           ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
    private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
-   private static final String          STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
+   public static final String           STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_SELECTED_IMPORT_LAUNCHER    = "STATE_SELECTED_IMPORT_LAUNCHER";       //$NON-NLS-1$
    private static final String          STATE_SELECTED_TAB_FOLDER         = "STATE_SELECTED_TAB_FOLDER";            //$NON-NLS-1$
    //
@@ -159,22 +151,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private IPropertyChangeListener      _prefChangeListener;
    //
-   private SelectionAdapter             _defaultModify_Listener;
+   private SelectionListener            _defaultModify_Listener;
    private MouseWheelListener           _defaultModify_MouseWheelListener;
    private MouseWheelListener           _defaultMouseWheelListener;
-   private SelectionAdapter             _icSelectionListener;
+   private SelectionListener            _icSelectionListener;
    private FocusListener                _ic_FolderFocusListener;
-   private KeyAdapter                   _ic_FolderKeyListener;
+   private KeyListener                  _ic_FolderKeyListener;
    private ModifyListener               _ic_FolderModifyListener;
    private ModifyListener               _icModifyListener;
    private ModifyListener               _ilModifyListener;
-   private SelectionAdapter             _ilSelectionListener;
-   private SelectionAdapter             _liveUpdateListener;
+   private SelectionListener            _ilSelectionListener;
+   private SelectionListener            _liveUpdateListener;
    private MouseWheelListener           _liveUpdateMouseWheelListener;
-   private SelectionAdapter             _speedTourTypeListener;
+   private SelectionListener            _speedTourTypeListener;
    //
    private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
-   private Action                       _actionRestoreDefaults;
+   private ActionResetToDefaults        _actionRestoreDefaults;
    private ActionSpeedTourType_Add      _actionTTSpeed_Add;
    private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
    private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
@@ -195,9 +187,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
    private ColumnManager                _icColumnManager;
    private ColumnManager                _ilColumnManager;
+   private EasyLauncherUtils            _ilEasyLauncherUtils              = new EasyLauncherUtils();
    //
-   private TableColumnDefinition        _colDefProfileImage;
-   private int                          _columnIndexConfigImage;
+   private int                          _ilColumnIndexConfigImage;
    //
    private HashMap<Long, Image>         _configImages                     = new HashMap<>();
    private HashMap<Long, Integer>       _configImageHash                  = new HashMap<>();
@@ -212,25 +204,18 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private int                          _initialTab;
 
-   private final NumberFormat           _nf1                              = NumberFormat.getNumberInstance();
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
+   private final PeriodType             _durationTemplate                 = PeriodType
 
-   private final PeriodType         _durationTemplate    = PeriodType
          .yearMonthDayTime()
-         //      // hide these components
-         .withMillisRemoved();
 
-   private Color                    COLOR_RED;
-   private Color                    COLOR_FOREGROUND;
+         // hide these components
+         .withMillisRemoved();
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
-   private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
+   private final ArrayList<Control>     _firstColumnControls              = new ArrayList<>();
 
    /*
     * UI controls
@@ -248,18 +233,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Composite            _pageTourType_OneForAll;
    private Composite            _pageTourType_BySpeed;
    //
-   private Button               _chkDash_DisplayAbsoluteFilePath;
-   private Button               _chkDash_LiveUpdate;
+   private Button               _chkOptions_DisplayAbsoluteFilePath;
+   private Button               _chkOptions_LiveUpdate;
+   private Button               _chkOptions_LogDetails;
+   //
    private Button               _chkIC_CreateBackup;
    private Button               _chkIC_DeleteDeviceFiles;
    private Button               _chkIC_ImportFiles;
    private Button               _chkIC_TurnOffWatching;
+   //
    private Button               _chkIL_AdjustTemperature;
+   private Button               _chkIL_ReplaceElevationFromSRTM;
+   private Button               _chkIL_ReplaceFirstTimeSliceElevation;
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
-   private Button               _chkIL_ShowInDashboard;
    private Button               _chkIL_SetLastMarker;
    private Button               _chkIL_SetTourType;
+   private Button               _chkIL_ShowInDashboard;
+   //
+   private Button               _chkOptions_ShowTile_CloudApps;
+   private Button               _chkOptions_ShowTile_Files;
+   private Button               _chkOptions_ShowTile_FossilUI;
+   private Button               _chkOptions_ShowTile_SerialPort;
+   private Button               _chkOptions_ShowTile_SerialPortWithConfig;
    //
    private Button               _btnIC_Duplicate;
    private Button               _btnIC_New;
@@ -316,7 +312,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
    private Spinner[]            _spinnerTT_Speed_AvgSpeed;
    //
-   private TabFolder            _tabFolderEasy;
+   private CTabFolder           _tabFolderEasy;
    //
    private Text                 _txtIC_DeviceFiles;
    private Text                 _txtIC_ConfigName;
@@ -385,7 +381,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          super(null, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
       }
 
       @Override
@@ -404,8 +400,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Disabled));
       }
 
       @Override
@@ -413,7 +409,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          onSpeed_IL_TT_Remove(_speedTTIndex);
       }
 
-      public void setData(final String key, final int speedTTIndex) {
+      public void setData(final int speedTTIndex) {
 
          _speedTTIndex = speedTTIndex;
       }
@@ -461,8 +457,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort_Disabled));
       }
 
       @Override
@@ -610,26 +606,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__options).createImage());
-
       cloneEasyConfig(easyConfig);
    }
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-               // tour type images can have been changed
+            // tour type images can have been changed
 
-               _ilViewer.refresh(true);
-               update_UI_From_Model_IL();
-            }
+            _ilViewer.refresh(true);
+            update_UI_From_Model_IL();
          }
       };
 
@@ -643,16 +634,26 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
     */
    private void cloneEasyConfig(final EasyConfig easyConfig) {
 
+// SET_FORMATTING_OFF
+
       _dialogEasyConfig = new EasyConfig();
 
-      _dialogEasyConfig.animationCrazinessFactor = easyConfig.animationCrazinessFactor;
-      _dialogEasyConfig.animationDuration = easyConfig.animationDuration;
-      _dialogEasyConfig.backgroundOpacity = easyConfig.backgroundOpacity;
-      _dialogEasyConfig.isLiveUpdate = easyConfig.isLiveUpdate;
-      _dialogEasyConfig.numHorizontalTiles = easyConfig.numHorizontalTiles;
-      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = easyConfig.stateToolTipDisplayAbsoluteFilePath;
-      _dialogEasyConfig.stateToolTipWidth = easyConfig.stateToolTipWidth;
-      _dialogEasyConfig.tileSize = easyConfig.tileSize;
+      _dialogEasyConfig.animationCrazinessFactor               = easyConfig.animationCrazinessFactor;
+      _dialogEasyConfig.animationDuration                      = easyConfig.animationDuration;
+      _dialogEasyConfig.backgroundOpacity                      = easyConfig.backgroundOpacity;
+      _dialogEasyConfig.isLiveUpdate                           = easyConfig.isLiveUpdate;
+      _dialogEasyConfig.isLogDetails                           = easyConfig.isLogDetails;
+      _dialogEasyConfig.isShowTile_CloudApps                   = easyConfig.isShowTile_CloudApps;
+      _dialogEasyConfig.isShowTile_Files                       = easyConfig.isShowTile_Files;
+      _dialogEasyConfig.isShowTile_FossilUI                    = easyConfig.isShowTile_FossilUI;
+      _dialogEasyConfig.isShowTile_SerialPort                  = easyConfig.isShowTile_SerialPort;
+      _dialogEasyConfig.isShowTile_SerialPortWithConfig        = easyConfig.isShowTile_SerialPortWithConfig;
+      _dialogEasyConfig.numHorizontalTiles                     = easyConfig.numHorizontalTiles;
+      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath    = easyConfig.stateToolTipDisplayAbsoluteFilePath;
+      _dialogEasyConfig.stateToolTipWidth                      = easyConfig.stateToolTipWidth;
+      _dialogEasyConfig.tileSize                               = easyConfig.tileSize;
+
+// SET_FORMATTING_ON
 
       final ImportConfig activeImportConfig = easyConfig.getActiveImportConfig();
 
@@ -742,19 +743,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             Messages.action_tourType_modify_tourTypes,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetDashboardToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -785,12 +774,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
        */
       final MenuManager menuMgr = new MenuManager();
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-            fillTourTypeMenu(menuMgr);
-         }
-      });
+      menuMgr.addMenuListener(this::fillTourTypeMenu);
       final Menu ttContextMenu = menuMgr.createContextMenu(_linkTT_One_TourType);
       _linkTT_One_TourType.setMenu(ttContextMenu);
    }
@@ -801,31 +785,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      TabItem tabDashboard;
-
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
-         _tabFolderEasy = new TabFolder(container, SWT.NONE);
+         _tabFolderEasy = new CTabFolder(container, SWT.NONE);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolderEasy);
          {
             // tab: config
-            final TabItem tabConfig = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabConfig = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabConfig.setText(Messages.Dialog_ImportConfig_Tab_Configuration);
-            tabConfig.setControl(createUI_200_ImportActions(_tabFolderEasy));
+            tabConfig.setControl(createUI_200_Tab_ImportActions(_tabFolderEasy));
 
             // tab: launcher
-            final TabItem tabLauncher = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabLauncher = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabLauncher.setText(Messages.Dialog_ImportConfig_Tab_Launcher);
-            tabLauncher.setControl(createUI_500_IL_ImportLauncher(_tabFolderEasy));
+            tabLauncher.setControl(createUI_500_Tab_IL_ImportLauncher(_tabFolderEasy));
 
-            // tab: dashboard
-            tabDashboard = new TabItem(_tabFolderEasy, SWT.NONE);
-            tabDashboard.setText(Messages.Dialog_ImportConfig_Tab_Dashboard);
-            tabDashboard.setControl(createUI_900_Dashboard(_tabFolderEasy));
+            // tab: options
+            final CTabItem tabOptions = new CTabItem(_tabFolderEasy, SWT.NONE);
+            tabOptions.setText(Messages.Dialog_ImportConfig_Tab_Options);
+            tabOptions.setControl(createUI_900_Tab_Options(_tabFolderEasy));
          }
       }
 
@@ -844,7 +826,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       });
    }
 
-   private Composite createUI_200_ImportActions(final Composite parent) {
+   private Composite createUI_200_Tab_ImportActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -871,10 +853,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private void createUI_202_Title(final Composite parent) {
 
       final Label label = new Label(parent, SWT.WRAP);
+      label.setText(Messages.Dialog_ImportConfig_Info_ImportActions);
       GridDataFactory.fillDefaults()
             .hint(convertWidthInCharsToPixels(30), SWT.DEFAULT)
             .applyTo(label);
-      label.setText(Messages.Dialog_ImportConfig_Info_ImportActions);
 
    }
 
@@ -887,7 +869,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _icViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            //            .hint(SWT.DEFAULT, convertHeightInCharsToPixels(7))
             .applyTo(_icViewerContainer);
       GridLayoutFactory.fillDefaults().applyTo(_icViewerContainer);
 //      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -901,15 +882,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /*
        * Create tree
        */
-      final Table table = new Table(
-            parent, //
-            SWT.H_SCROLL //
+      final Table table = new Table(parent,
+            SWT.H_SCROLL
                   | SWT.V_SCROLL
                   | SWT.BORDER
                   | SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
       table.setHeaderVisible(true);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
       /*
        * Create tree viewer
@@ -921,19 +900,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _icViewer.setUseHashlookup(true);
       _icViewer.setContentProvider(new ICContentProvider());
 
-      _icViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onIC_SelectIC(event.getSelection());
-         }
-      });
+      _icViewer.addSelectionChangedListener(selectionChangedEvent -> onIC_SelectIC(selectionChangedEvent.getSelection()));
 
-      _icViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onIC_DblClick();
-         }
-      });
+      _icViewer.addDoubleClickListener(doubleClickEvent -> onIC_DblClick());
 
       createUI_213_IC_ContextMenu();
       createUI_214_IC_DragDrop();
@@ -1102,12 +1071,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              */
             _btnIC_New = new Button(container, SWT.NONE);
             _btnIC_New.setText(Messages.App_Action_New);
-            _btnIC_New.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onIC_Add(false);
-               }
-            });
+            _btnIC_New.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Add(false)));
             setButtonLayoutData(_btnIC_New);
          }
 
@@ -1117,12 +1081,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              */
             _btnIC_Duplicate = new Button(container, SWT.NONE);
             _btnIC_Duplicate.setText(Messages.App_Action_Duplicate);
-            _btnIC_Duplicate.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onIC_Add(true);
-               }
-            });
+            _btnIC_Duplicate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Add(true)));
             setButtonLayoutData(_btnIC_Duplicate);
          }
 
@@ -1132,12 +1091,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              */
             _btnIC_Remove = new Button(container, SWT.NONE);
             _btnIC_Remove.setText(Messages.App_Action_Remove_Immediate);
-            _btnIC_Remove.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onIC_Remove();
-               }
-            });
+            _btnIC_Remove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Remove()));
             setButtonLayoutData(_btnIC_Remove);
          }
 
@@ -1173,8 +1127,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          createUI_250_IC_Name(group);
-         createUI_252_IC_BackupFolder(group);
-         createUI_254_IC_DeviceFileFolder(group);
+         createUI_252_IC_1_BackupFolder(group);
+         createUI_254_IC_2_DeviceFileFolder(group);
          createUI_270_IC_3_99_Actions(group);
          createUI_280_IC_100(group);
       }
@@ -1205,7 +1159,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
    }
 
-   private void createUI_252_IC_BackupFolder(final Composite parent) {
+   private void createUI_252_IC_1_BackupFolder(final Composite parent) {
 
       {
          /*
@@ -1215,14 +1169,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _chkIC_CreateBackup.setText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup);
          _chkIC_CreateBackup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip);
          _chkIC_CreateBackup.addSelectionListener(_icSelectionListener);
-         _chkIC_CreateBackup.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_chkIC_CreateBackup.getSelection()) {
-                  _comboIC_BackupFolder.setFocus();
-               }
+         _chkIC_CreateBackup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_chkIC_CreateBackup.getSelection()) {
+               _comboIC_BackupFolder.setFocus();
             }
-         });
+         }));
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(0, 10)
@@ -1267,16 +1218,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           * Button: browse...
           */
          _btnIC_SelectBackupFolder = new Button(container, SWT.PUSH);
+         _btnIC_SelectBackupFolder.setText(Messages.app_btn_browse);
+         _btnIC_SelectBackupFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Backup()));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_btnIC_SelectBackupFolder);
-         _btnIC_SelectBackupFolder.setText(Messages.app_btn_browse);
-         _btnIC_SelectBackupFolder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_IC_Folder_Backup();
-            }
-         });
          setButtonLayoutData(_btnIC_SelectBackupFolder);
       }
 
@@ -1300,14 +1246,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
    }
 
-   private void createUI_254_IC_DeviceFileFolder(final Composite parent) {
+   private void createUI_254_IC_2_DeviceFileFolder(final Composite parent) {
 
-      final ModifyListener deviceTypeListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onSelectDevice();
-         }
-      };
+      final ModifyListener deviceTypeListener = modifyEvent -> onSelectDevice();
 
       final Composite importContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(importContainer);
@@ -1335,7 +1276,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              * File System image
              */
             _lblIC_FileSystemImage = new Label(importContainer, SWT.NONE);
-            _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+            _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
             _lblIC_FileSystemImage.setImage(_imageFileSystem);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
@@ -1349,17 +1290,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
          _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
+         _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
+         _comboIC_DeviceType.addModifyListener(deviceTypeListener);
+
          GridDataFactory.fillDefaults()
                .indent(CONTROL_DECORATION_WIDTH, 0)
                .align(SWT.LEFT, SWT.CENTER)
                .applyTo(_comboIC_DeviceType);
 
-         _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
-         final List<String> fileSystemsIds = FileSystemManager.getFileSystemsIds();
-         for (final String fileSystemsId : fileSystemsIds) {
-            _comboIC_DeviceType.add(fileSystemsId);
-         }
-         _comboIC_DeviceType.addModifyListener(deviceTypeListener);
+         FileSystemManager.getFileSystemsIds().forEach(_comboIC_DeviceType::add);
       }
 
       {
@@ -1377,9 +1316,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults()
-            .numColumns(2)
-            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
 
          /*
@@ -1405,12 +1342,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _btnIC_SelectDeviceFolder = new Button(container, SWT.PUSH);
          _btnIC_SelectDeviceFolder.setText(Messages.app_btn_browse);
          _btnIC_SelectDeviceFolder.setData(_comboIC_DeviceFolder);
-         _btnIC_SelectDeviceFolder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_IC_Folder_Device();
-            }
-         });
+         _btnIC_SelectDeviceFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Device()));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_btnIC_SelectDeviceFolder);
@@ -1469,12 +1401,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       {
          _linkIC_ILActions = new Link(parent, SWT.NONE);
          _linkIC_ILActions.setText(Messages.Dialog_ImportConfig_Link_OtherActions);
-         _linkIC_ILActions.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_IC_LauncherActions();
-            }
-         });
+         _linkIC_ILActions.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_LauncherActions()));
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .span(2, 1)
@@ -1502,16 +1429,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              */
             _chkIC_DeleteDeviceFiles = new Button(container, SWT.CHECK);
             _chkIC_DeleteDeviceFiles.setText(Messages.Dialog_ImportConfig_Checkbox_DeleteDeviceFiles);
-            _chkIC_DeleteDeviceFiles
-                  .setToolTipText(Messages.Dialog_ImportConfig_Checkbox_DeleteDeviceFiles_Tooltip);
+            _chkIC_DeleteDeviceFiles.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_DeleteDeviceFiles_Tooltip);
             _chkIC_DeleteDeviceFiles.addSelectionListener(_icSelectionListener);
          }
          {
             /*
-             * Label: Delete INFo
+             * Label: Delete Info
              */
             _lblIC_DeleteFilesInfo = new Label(container, SWT.NONE);
-            _lblIC_DeleteFilesInfo.setForeground(COLOR_RED);
+            _lblIC_DeleteFilesInfo.setForeground(ThemeUtil.getErrorColor());
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(convertWidthInCharsToPixels(1), 0)
@@ -1533,7 +1459,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
    }
 
-   private Composite createUI_500_IL_ImportLauncher(final Composite parent) {
+   private Composite createUI_500_Tab_IL_ImportLauncher(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1545,11 +1471,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          final Label label = new Label(container, SWT.WRAP);
+         label.setText(Messages.Dialog_ImportConfig_Label_ImportLauncher);
          GridDataFactory.fillDefaults()
                .span(3, 1)
                .hint(convertWidthInCharsToPixels(30), SWT.DEFAULT)
                .applyTo(label);
-         label.setText(Messages.Dialog_ImportConfig_Label_ImportLauncher);
 
          createUI_510_IL_Viewer(container);
          createUI_530_IL_Actions(container);
@@ -1565,7 +1491,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       // define all columns for the viewer
       _ilColumnManager = new ColumnManager(_ilColumnViewer, _stateIL);
-      defineAll_ILColumns();
+      _ilEasyLauncherUtils.defineAllColumns(_ilColumnManager, _pc);
 
       _ilViewerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1582,11 +1508,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private void createUI_512_IL_ViewerTable(final Composite parent) {
 
       /*
-       * Create tree
+       * Create table
        */
-      final Table table = new Table(
-            parent, //
-            SWT.H_SCROLL //
+      final Table table = new Table(parent,
+            SWT.H_SCROLL
                   | SWT.V_SCROLL
                   | SWT.BORDER
                   | SWT.FULL_SELECTION);
@@ -1598,43 +1523,31 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
        * critical for performance that these methods be as efficient as possible.
        */
-      final Listener paintListener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      final Listener paintListener = event -> {
 
-            if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-               onPaintViewer(event);
-            }
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+
+            onPaintViewer(event);
          }
       };
       table.addListener(SWT.MeasureItem, paintListener);
       table.addListener(SWT.PaintItem, paintListener);
 
       /*
-       * Create tree viewer
+       * Create viewer
        */
       _ilViewer = new TableViewer(table);
 
       _ilColumnManager.createColumns(_ilViewer);
 
-      _columnIndexConfigImage = _colDefProfileImage.getCreateIndex();
+      _ilColumnIndexConfigImage = _ilEasyLauncherUtils.getColDef_TourTypeImage().getCreateIndex();
 
       _ilViewer.setUseHashlookup(true);
       _ilViewer.setContentProvider(new ILContentProvider());
 
-      _ilViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_IL(event.getSelection());
-         }
-      });
+      _ilViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_IL(selectionChangedEvent.getSelection()));
 
-      _ilViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onIL_DblClick();
-         }
-      });
+      _ilViewer.addDoubleClickListener(doubleClickEvent -> onIL_DblClick());
 
       createUI_513_IL_ContextMenu();
       createUI_514_IL_DragDrop();
@@ -1804,16 +1717,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           * Button: New one tour type
           */
          _btnIL_NewOne = new Button(container, SWT.NONE);
-         _btnIL_NewOne.setImage(//
-               TourTypeImage.getTourTypeImage(TourType.IMAGE_KEY_DIALOG_SELECTION));
+         _btnIL_NewOne.setImage(TourTypeImage.getTourTypeImage(TourType.IMAGE_KEY_DIALOG_SELECTION));
          _btnIL_NewOne.setText(Messages.Dialog_ImportConfig_Action_NewOneTourType);
          _btnIL_NewOne.setToolTipText(Messages.Dialog_ImportConfig_Action_NewOneTourType_Tooltip);
-         _btnIL_NewOne.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               UI.openControlMenu(_btnIL_NewOne);
-            }
-         });
+         _btnIL_NewOne.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_btnIL_NewOne)));
          setButtonLayoutData(_btnIL_NewOne);
 
          /*
@@ -1821,12 +1728,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
          final MenuManager menuMgr = new MenuManager();
          menuMgr.setRemoveAllWhenShown(true);
-         menuMgr.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(final IMenuManager menuMgr) {
-               fillTourTypeOneMenu(menuMgr);
-            }
-         });
+         menuMgr.addMenuListener(this::fillTourTypeOneMenu);
          final Menu ttContextMenu = menuMgr.createContextMenu(_btnIL_NewOne);
          _btnIL_NewOne.setMenu(ttContextMenu);
 
@@ -1835,12 +1737,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
          _btnIL_New = new Button(container, SWT.NONE);
          _btnIL_New.setText(Messages.App_Action_New);
-         _btnIL_New.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onIL_Add(false);
-            }
-         });
+         _btnIL_New.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Add(false)));
          setButtonLayoutData(_btnIL_New);
 
          /*
@@ -1848,12 +1745,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
          _btnIL_Duplicate = new Button(container, SWT.NONE);
          _btnIL_Duplicate.setText(Messages.App_Action_Duplicate);
-         _btnIL_Duplicate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onIL_Add(true);
-            }
-         });
+         _btnIL_Duplicate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Add(true)));
          setButtonLayoutData(_btnIL_Duplicate);
 
          /*
@@ -1861,12 +1753,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
          _btnIL_Remove = new Button(container, SWT.NONE);
          _btnIL_Remove.setText(Messages.App_Action_Remove_Immediate);
-         _btnIL_Remove.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onIL_Remove();
-            }
-         });
+         _btnIL_Remove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Remove()));
          setButtonLayoutData(_btnIL_Remove);
 
          // align to the end
@@ -1891,7 +1778,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          createUI_550_IL_TourType(group);
          createUI_580_IL_LastMarker(group);
          createUI_590_IL_AdjustTemperature(group);
-         createUI_591_IL_RetrieveWeatherData(group);
+         createUI_591_IL_AdjustElevation(group);
+         createUI_592_IL_SetElevationFromSRTM(group);
+         createUI_595_IL_RetrieveWeatherData(group);
          createUI_599_IL_Save(group);
       }
    }
@@ -1931,9 +1820,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                .applyTo(_lblIL_ConfigDescription);
 
          // text
-         _txtIL_ConfigDescription = new Text(
-               parent, //
-               SWT.BORDER | //
+         _txtIL_ConfigDescription = new Text(parent,
+               SWT.BORDER |
                      SWT.WRAP
                      | SWT.MULTI
                      | SWT.V_SCROLL
@@ -2021,34 +1909,35 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          _lblIL_One_TourTypeIcon = new Label(container, SWT.NONE);
+         _lblIL_One_TourTypeIcon.setText(UI.EMPTY_STRING);
          GridDataFactory.fillDefaults()
                .hint(16, 16)
                .applyTo(_lblIL_One_TourTypeIcon);
-         _lblIL_One_TourTypeIcon.setText(UI.EMPTY_STRING);
 
          /*
-          * tour type
+          * Tour type
           */
          _linkTT_One_TourType = new Link(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTT_One_TourType);
          _linkTT_One_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
-         _linkTT_One_TourType.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType);
-            }
-         });
+         _linkTT_One_TourType.addSelectionListener(widgetSelectedAdapter(
+               selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType)));
+
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTT_One_TourType);
 
          _lblIL_One_TourTypeCadenceLabel = new Label(container, SWT.NONE);
          _lblIL_One_TourTypeCadenceLabel.setText(Messages.Tour_Editor_Label_Cadence);
 
-         _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-
+         /*
+          * Cadence
+          */
          final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
                RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
                RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
+         _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          _comboIL_One_TourType_Cadence.setSelection(cadence);
       }
 
@@ -2174,12 +2063,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              * Link: Tour type
              */
             final Link linkTourType = new Link(_speedTourType_Container, SWT.NONE);
+            linkTourType.setText(Messages.tour_editor_label_tour_type);
+            linkTourType.addSelectionListener(_speedTourTypeListener);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(linkTourType);
-            linkTourType.setText(Messages.tour_editor_label_tour_type);
-            linkTourType.addSelectionListener(_speedTourTypeListener);
 
             /*
              * Combo: Cadence
@@ -2187,11 +2076,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             final Label lblCadence = new Label(_speedTourType_Container, SWT.NONE);
             lblCadence.setText(Messages.Tour_Editor_Label_Cadence);
 
-            final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
-
             final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
                   RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
                   RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
+            final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
             comboCadence.setSelection(cadence);
 
             /*
@@ -2199,12 +2088,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              */
             final MenuManager menuMgr = new MenuManager();
             menuMgr.setRemoveAllWhenShown(true);
-            menuMgr.addMenuListener(new IMenuListener() {
-               @Override
-               public void menuAboutToShow(final IMenuManager menuMgr) {
-                  fillSpeedTourTypeMenu(menuMgr, linkTourType);
-               }
-            });
+            menuMgr.addMenuListener(menuManager -> fillSpeedTourTypeMenu(menuManager, linkTourType));
+
             final Menu ttContextMenu = menuMgr.createContextMenu(linkTourType);
             linkTourType.setMenu(ttContextMenu);
 
@@ -2239,9 +2124,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       // scrolled container
       _speedTourType_ScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_speedTourType_ScrolledContainer);
       _speedTourType_ScrolledContainer.setExpandVertical(true);
       _speedTourType_ScrolledContainer.setExpandHorizontal(true);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_speedTourType_ScrolledContainer);
 
       // container
       final Composite speedTTContainer = new Composite(_speedTourType_ScrolledContainer, SWT.NONE);
@@ -2251,12 +2136,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             .applyTo(speedTTContainer);
 
       _speedTourType_ScrolledContainer.setContent(speedTTContainer);
-      _speedTourType_ScrolledContainer.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            _speedTourType_ScrolledContainer.setMinSize(speedTTContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-         }
-      });
+      _speedTourType_ScrolledContainer.addControlListener(controlResizedAdapter(
+            ControlEvent -> _speedTourType_ScrolledContainer.setMinSize(
+                  speedTTContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT))));
 
       return speedTTContainer;
    }
@@ -2370,8 +2252,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              * Label: Adjustment duration
              */
             _lblIL_TemperatureAdjustmentDuration = new Label(container, SWT.NONE);
-            _lblIL_TemperatureAdjustmentDuration
-                  .setText(Messages.Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration);
+            _lblIL_TemperatureAdjustmentDuration.setText(Messages.Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .indent(_leftPadding, 0)
@@ -2384,21 +2265,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             _spinnerIL_TemperatureAdjustmentDuration.setMinimum(0);
             _spinnerIL_TemperatureAdjustmentDuration.setMaximum(60 * 60 * 24); // 1 day
             _spinnerIL_TemperatureAdjustmentDuration.setPageIncrement(60); // 1 minute
-            _spinnerIL_TemperatureAdjustmentDuration.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  updateUI_TemperatureAdjustmentDuration();
-                  onIL_Modified();
-               }
+            _spinnerIL_TemperatureAdjustmentDuration.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               updateUI_TemperatureAdjustmentDuration();
+               onIL_Modified();
             });
-            _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  updateUI_TemperatureAdjustmentDuration();
-                  onIL_Modified();
-               }
-            });
+            _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> {
+                     updateUI_TemperatureAdjustmentDuration();
+                     onIL_Modified();
+                  }));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_spinnerIL_TemperatureAdjustmentDuration);
@@ -2411,7 +2287,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   .grab(true, false)
                   .applyTo(_lblIL_TemperatureAdjustmentDuration_Unit);
          }
-
          {
             /*
              * Avg temperature
@@ -2445,7 +2320,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
    }
 
-   private void createUI_591_IL_RetrieveWeatherData(final Composite parent) {
+   private void createUI_591_IL_AdjustElevation(final Composite parent) {
+
+      /*
+       * Checkbox: Adjust Elevation
+       */
+      _chkIL_ReplaceFirstTimeSliceElevation = new Button(parent, SWT.CHECK);
+      _chkIL_ReplaceFirstTimeSliceElevation.setText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation);
+      _chkIL_ReplaceFirstTimeSliceElevation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip);
+      _chkIL_ReplaceFirstTimeSliceElevation.addSelectionListener(_ilSelectionListener);
+      GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .indent(0, 5)
+            .applyTo(_chkIL_ReplaceFirstTimeSliceElevation);
+   }
+
+   private void createUI_592_IL_SetElevationFromSRTM(final Composite parent) {
+
+      /*
+       * Checkbox: Set elevation up/down values from SRTM data
+       */
+      _chkIL_ReplaceElevationFromSRTM = new Button(parent, SWT.CHECK);
+      _chkIL_ReplaceElevationFromSRTM.setText(Messages.Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM);
+      _chkIL_ReplaceElevationFromSRTM.addSelectionListener(_ilSelectionListener);
+      GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .indent(0, 5)
+            .applyTo(_chkIL_ReplaceElevationFromSRTM);
+   }
+
+   private void createUI_595_IL_RetrieveWeatherData(final Composite parent) {
 
       /*
        * Checkbox: Retrieve Weather Data
@@ -2491,7 +2395,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
    }
 
-   private Composite createUI_900_Dashboard(final Composite parent) {
+   private Composite createUI_900_Tab_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -2503,7 +2407,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          createUI_902_Dashboard(container);
-         createUI_904_Actions(container);
+         createUI_990_Actions(container);
       }
 
       return container;
@@ -2518,213 +2422,294 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             .applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
+         createUI_910_Option_Tiles(container);
+         createUI_920_Option_StateTooltip(container);
+         createUI_930_Option_Dashboard(container);
+         createUI_940_Option_SimpleImport(container);
+
+         createUI_980_TourLog(container);
+      }
+   }
+
+   private void createUI_910_Option_Tiles(final Composite parent) {
+
+      /*
+       * Group: Tiles
+       */
+      final Group groupTiles = new Group(parent, SWT.NONE);
+      groupTiles.setText(Messages.Dialog_ImportConfig_Group_Tiles);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupTiles);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(groupTiles);
+      {
+         /*
+          * Tile size
+          */
+         // label
+         Label label = new Label(groupTiles, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_ConfigTileSize);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_ConfigTileSize_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_TileSize = new Spinner(groupTiles, SWT.BORDER);
+         _spinnerDash_TileSize.setMaximum(EasyConfig.TILE_SIZE_MAX);
+         _spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
+         _spinnerDash_TileSize.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_TileSize);
+
+         // label: px
+         label = new Label(groupTiles, SWT.NONE);
+         label.setText(CSS_PX);
+      }
+      {
+         /*
+          * Number of columns
+          */
+         // label
+         final Label label = new Label(groupTiles, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_ImportColumns);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportColumns_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_NumHTiles = new Spinner(groupTiles, SWT.BORDER);
+         _spinnerDash_NumHTiles.setMaximum(EasyConfig.HORIZONTAL_TILES_MAX);
+         _spinnerDash_NumHTiles.setMinimum(EasyConfig.HORIZONTAL_TILES_MIN);
+         _spinnerDash_NumHTiles.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_NumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_NumHTiles);
+
+         // fill 3rd column
+         new Label(groupTiles, SWT.NONE);
+      }
+   }
+
+   private void createUI_920_Option_StateTooltip(final Composite parent) {
+
+      /*
+       * Group: State Tooltip
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ImportConfig_Group_StateTooltip);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
          {
             /*
-             * Group: Tiles
+             * Width
              */
-            final Group groupTiles = new Group(container, SWT.NONE);
-            groupTiles.setText(Messages.Dialog_ImportConfig_Group_Tiles);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupTiles);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(groupTiles);
-            {
-               /*
-                * Tile size
-                */
-               // label
-               Label label = new Label(groupTiles, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_ConfigTileSize);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_ConfigTileSize_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               _firstColumnControls.add(label);
+            // label
+            Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
+            GridDataFactory.fillDefaults().applyTo(label);
+            _firstColumnControls.add(label);
 
-               // spinner
-               _spinnerDash_TileSize = new Spinner(groupTiles, SWT.BORDER);
-               _spinnerDash_TileSize.setMaximum(EasyConfig.TILE_SIZE_MAX);
-               _spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
-               _spinnerDash_TileSize.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_TileSize);
+            // spinner
+            _spinnerDash_StateTooltipWidth = new Spinner(group, SWT.BORDER);
+            _spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
+            _spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
+            _spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
+            _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerDash_StateTooltipWidth);
 
-               // label: px
-               label = new Label(groupTiles, SWT.NONE);
-               label.setText(CSS_PX);
-            }
-            {
-               /*
-                * Number of columns
-                */
-               // label
-               final Label label = new Label(groupTiles, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_ImportColumns);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportColumns_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_NumHTiles = new Spinner(groupTiles, SWT.BORDER);
-               _spinnerDash_NumHTiles.setMaximum(EasyConfig.HORIZONTAL_TILES_MAX);
-               _spinnerDash_NumHTiles.setMinimum(EasyConfig.HORIZONTAL_TILES_MIN);
-               _spinnerDash_NumHTiles.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_NumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_NumHTiles);
-
-               // fill 3rd column
-               new Label(groupTiles, SWT.NONE);
-            }
+            // label: px
+            label = new Label(group, SWT.NONE);
+            label.setText(CSS_PX);
          }
          {
             /*
-             * Group: State Tooltip
+             * Display absolute file path
              */
-            final Group groupStateTooltip = new Group(container, SWT.NONE);
-            groupStateTooltip.setText(Messages.Dialog_ImportConfig_Group_StateTooltip);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupStateTooltip);
+            // Checkbox
+            _chkOptions_DisplayAbsoluteFilePath = new Button(group, SWT.CHECK);
+            _chkOptions_DisplayAbsoluteFilePath.setText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath);
+            _chkOptions_DisplayAbsoluteFilePath.setToolTipText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip);
+            _chkOptions_DisplayAbsoluteFilePath.addSelectionListener(_liveUpdateListener);
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(groupStateTooltip);
-            {
-               {
-                  /*
-                   * Width
-                   */
-                  // label
-                  Label label = new Label(groupStateTooltip, SWT.NONE);
-                  label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
-                  GridDataFactory.fillDefaults().applyTo(label);
-                  _firstColumnControls.add(label);
-
-                  // spinner
-                  _spinnerDash_StateTooltipWidth = new Spinner(groupStateTooltip, SWT.BORDER);
-                  _spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
-                  _spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
-                  _spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
-                  _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
-                  GridDataFactory.fillDefaults().applyTo(_spinnerDash_StateTooltipWidth);
-
-                  // label: px
-                  label = new Label(groupStateTooltip, SWT.NONE);
-                  label.setText(CSS_PX);
-               }
-               {
-                  /*
-                   * Display absolute file path
-                   */
-                  // Checkbox
-                  _chkDash_DisplayAbsoluteFilePath = new Button(groupStateTooltip, SWT.CHECK);
-                  _chkDash_DisplayAbsoluteFilePath.setText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath);
-                  _chkDash_DisplayAbsoluteFilePath.setToolTipText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip);
-                  _chkDash_DisplayAbsoluteFilePath.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        doLiveUpdate();
-                     }
-                  });
-                  GridDataFactory.fillDefaults()
-                        .span(3, 1)
-                        .applyTo(_chkDash_DisplayAbsoluteFilePath);
-               }
-            }
-         }
-         {
-            /*
-             * Group: State Tooltip
-             */
-            final Group groupDashboard = new Group(container, SWT.NONE);
-            groupDashboard.setText(Messages.Dialog_ImportConfig_Group_Dashboard);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupDashboard);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(groupDashboard);
-            {
-               /*
-                * Animation duration
-                */
-               // label
-               Label label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               _firstColumnControls.add(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_AnimationDuration = new Spinner(groupDashboard, SWT.BORDER);
-               _spinnerDash_AnimationDuration.setMaximum(EasyConfig.ANIMATION_DURATION_MAX);
-               _spinnerDash_AnimationDuration.setMinimum(EasyConfig.ANIMATION_DURATION_MIN);
-               _spinnerDash_AnimationDuration.setDigits(1);
-               _spinnerDash_AnimationDuration.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_AnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_AnimationDuration);
-
-               // label
-               label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.App_Unit_Seconds_Small);
-            }
-            {
-               /*
-                * Animation crazy factor
-                */
-               // label
-               final Label label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_AnimationCrazinessFactor = new Spinner(groupDashboard, SWT.BORDER);
-               _spinnerDash_AnimationCrazinessFactor.setMaximum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
-               _spinnerDash_AnimationCrazinessFactor.setMinimum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
-               _spinnerDash_AnimationCrazinessFactor.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_AnimationCrazinessFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_AnimationCrazinessFactor);
-
-               // fill 3rd column
-               new Label(groupDashboard, SWT.NONE);
-            }
-            {
-               /*
-                * Background opacity
-                */
-               // label
-               final Label label = new Label(groupDashboard, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
-               label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(label);
-               _firstColumnControls.add(label);
-
-               // spinner
-               _spinnerDash_BgOpacity = new Spinner(groupDashboard, SWT.BORDER);
-               _spinnerDash_BgOpacity.setMaximum(EasyConfig.BACKGROUND_OPACITY_MAX);
-               _spinnerDash_BgOpacity.setMinimum(EasyConfig.BACKGROUND_OPACITY_MIN);
-               _spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_spinnerDash_BgOpacity);
-
-               // fill 3rd column
-               new Label(groupDashboard, SWT.NONE);
-            }
+                  .span(3, 1)
+                  .applyTo(_chkOptions_DisplayAbsoluteFilePath);
          }
       }
    }
 
-   private void createUI_904_Actions(final Composite parent) {
+   private void createUI_930_Option_Dashboard(final Composite parent) {
+
+      /*
+       * Group: State Tooltip
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ImportConfig_Group_Dashboard);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
+         /*
+          * Animation duration
+          */
+         // label
+         Label label = new Label(group, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_AnimationDuration = new Spinner(group, SWT.BORDER);
+         _spinnerDash_AnimationDuration.setMaximum(EasyConfig.ANIMATION_DURATION_MAX);
+         _spinnerDash_AnimationDuration.setMinimum(EasyConfig.ANIMATION_DURATION_MIN);
+         _spinnerDash_AnimationDuration.setDigits(1);
+         _spinnerDash_AnimationDuration.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_AnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_AnimationDuration);
+
+         // label
+         label = new Label(group, SWT.NONE);
+         label.setText(Messages.App_Unit_Seconds_Small);
+      }
+      {
+         /*
+          * Animation crazy factor
+          */
+         // label
+         final Label label = new Label(group, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_AnimationCrazinessFactor = new Spinner(group, SWT.BORDER);
+         _spinnerDash_AnimationCrazinessFactor.setMaximum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
+         _spinnerDash_AnimationCrazinessFactor.setMinimum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
+         _spinnerDash_AnimationCrazinessFactor.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_AnimationCrazinessFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_AnimationCrazinessFactor);
+
+         // fill 3rd column
+         new Label(group, SWT.NONE);
+      }
+      {
+         /*
+          * Background opacity
+          */
+         // label
+         final Label label = new Label(group, SWT.NONE);
+         label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(label);
+         _firstColumnControls.add(label);
+
+         // spinner
+         _spinnerDash_BgOpacity = new Spinner(group, SWT.BORDER);
+         _spinnerDash_BgOpacity.setMaximum(EasyConfig.BACKGROUND_OPACITY_MAX);
+         _spinnerDash_BgOpacity.setMinimum(EasyConfig.BACKGROUND_OPACITY_MIN);
+         _spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
+         _spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_spinnerDash_BgOpacity);
+
+         // fill 3rd column
+         new Label(group, SWT.NONE);
+      }
+   }
+
+   private void createUI_940_Option_SimpleImport(final Composite parent) {
+
+      /*
+       * Group: Simple Import
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ImportConfig_Group_SimpleImport);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
+         {
+            /*
+             * Label: Show these tiles
+             */
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Dialog_ImportConfig_Label_ShowTheseTiles);
+         }
+         {
+            /*
+             * Checkbox: Files
+             */
+            _chkOptions_ShowTile_Files = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_Files.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_Files);
+            _chkOptions_ShowTile_Files.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Cloud apps
+             */
+            _chkOptions_ShowTile_CloudApps = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_CloudApps.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_CloudApps);
+            _chkOptions_ShowTile_CloudApps.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Serial port
+             */
+            _chkOptions_ShowTile_SerialPort = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_SerialPort.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_SerialPort);
+            _chkOptions_ShowTile_SerialPort.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Serial port with configuration
+             */
+            _chkOptions_ShowTile_SerialPortWithConfig = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_SerialPortWithConfig.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_SerialPortWithConfig);
+            _chkOptions_ShowTile_SerialPortWithConfig.addSelectionListener(_liveUpdateListener);
+         }
+         {
+            /*
+             * Checkbox: Fossil UI
+             */
+            _chkOptions_ShowTile_FossilUI = new Button(group, SWT.CHECK);
+            _chkOptions_ShowTile_FossilUI.setText(Messages.Dialog_ImportConfig_Checkbox_ShowTile_FossilUI);
+            _chkOptions_ShowTile_FossilUI.addSelectionListener(_liveUpdateListener);
+         }
+      }
+   }
+
+   private void createUI_980_TourLog(final Composite parent) {
+
+      {
+         /*
+          * Checkbox: Log Details
+          */
+         _chkOptions_LogDetails = new Button(parent, SWT.CHECK);
+         _chkOptions_LogDetails.setText(Messages.Tour_Log_Checkbox_LogDetails);
+         _chkOptions_LogDetails.addSelectionListener(_liveUpdateListener);
+         GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkOptions_LogDetails);
+      }
+   }
+
+   private void createUI_990_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -2735,15 +2720,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             /*
              * Checkbox: live update
              */
-            _chkDash_LiveUpdate = new Button(container, SWT.CHECK);
-            _chkDash_LiveUpdate.setText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate);
-            _chkDash_LiveUpdate.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip);
-            _chkDash_LiveUpdate.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  doLiveUpdate();
-               }
-            });
+            _chkOptions_LiveUpdate = new Button(container, SWT.CHECK);
+            _chkOptions_LiveUpdate.setText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate);
+            _chkOptions_LiveUpdate.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip);
+            _chkOptions_LiveUpdate.addSelectionListener(_liveUpdateListener);
          }
          {
             /*
@@ -2789,20 +2769,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       defineColumnIC_20_Backup();
       defineColumnIC_30_DeviceFolder();
       defineColumnIC_32_DeviceFiles();
-      defineColumnIC_90_DeleteDeviceFiles();
+      defineColumnIC_90_DeviceFiles_Delete();
       defineColumnIC_99_TurnOFF();
-   }
-
-   private void defineAll_ILColumns() {
-
-      defineColumnIL_10_LauncherName();
-      defineColumnIL_20_ColorImage();
-      defineColumnIL_30_LastMarkerDistance();
-      defineColumnIL_40_AdjustTemperature();
-      defineColumnIL_50_RetrieveWeatherData();
-      defineColumnIL_88_IsSaveTour();
-      defineColumnIL_90_ShowInDashboard();
-      defineColumnIL_99_Description();
    }
 
    /**
@@ -2913,7 +2881,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    /**
     * Column: Delete device files
     */
-   private void defineColumnIC_90_DeleteDeviceFiles() {
+   private void defineColumnIC_90_DeviceFiles_Delete() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "deleteFiles", SWT.CENTER); //$NON-NLS-1$
 
@@ -2935,15 +2903,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
             if (importConfig.isCreateBackup) {
 
-               cell.setText(
-                     isDeleteDeviceFiles //
-                           ? Messages.App_Label_BooleanYes
-                           : Messages.App_Label_BooleanNo);
+               cell.setText(isDeleteDeviceFiles
+                     ? Messages.App_Label_BooleanYes
+                     : Messages.App_Label_BooleanNo);
 
-               cell.setForeground(
-                     isDeleteDeviceFiles //
-                           ? COLOR_RED
-                           : COLOR_FOREGROUND);
+               cell.setForeground(isDeleteDeviceFiles
+                     ? ThemeUtil.getErrorColor()
+                     : ThemeUtil.getDefaultForegroundColor_Table());
             } else {
 
                cell.setText(UI.EMPTY_STRING);
@@ -2953,7 +2919,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    }
 
    /**
-    * Column: Turn OFF watching
+    * Column: Turn watching OFF
     */
    private void defineColumnIC_99_TurnOFF() {
 
@@ -2982,243 +2948,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       });
    }
 
-   /**
-    * Column: Item name
-    */
-   private void defineColumnIL_10_LauncherName() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "launcherName", SWT.LEAD); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(17));
-      colDef.setColumnWeightData(new ColumnWeightData(17));
-
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-            cell.setText(((ImportLauncher) cell.getElement()).name);
-         }
-      });
-   }
-
-   /**
-    * Column: Tour type
-    */
-   private void defineColumnIL_20_ColorImage() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
-      _colDefProfileImage = colDef;
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourType);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_TourType);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
-      colDef.setColumnWeightData(new ColumnWeightData(12));
-
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         // !!! set dummy label provider, otherwise an error occurs !!!
-         @Override
-         public void update(final ViewerCell cell) {}
-      });
-   }
-
-   /**
-    * Column: Set last marker
-    */
-   private void defineColumnIL_30_LastMarkerDistance() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_LastMarker_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_LastMarker_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_LastMarker_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-
-            if (importLauncher.isSetLastMarker) {
-
-               final double distance = getMarkerDistanceValue(importLauncher);
-
-               cell.setText(_nf1.format(distance));
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Adjust temperature
-    */
-   private void defineColumnIL_40_AdjustTemperature() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(
-            _ilColumnManager, //
-            "isAdjustTemperature", //$NON-NLS-1$
-            SWT.CENTER);
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-
-            if (importLauncher.isAdjustTemperature) {
-
-               final float temperature = importLauncher.tourAvgTemperature;
-
-               final String logText = NLS.bind(
-                     COLUMN_ADJUST_TEMPERATURE,
-                     new Object[] {
-                           importLauncher.temperatureAdjustmentDuration,
-                           (int) (UI.convertTemperatureFromMetric(temperature) + 0.5),
-                           UI.UNIT_LABEL_TEMPERATURE });
-
-               cell.setText(logText);
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Retrieve weather data
-    */
-   private void defineColumnIL_50_RetrieveWeatherData() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isRetrieveWeatherData", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_RetrieveWeatherData_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_RetrieveWeatherData_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-            cell.setText(
-                  importLauncher.isRetrieveWeatherData
-                        ? Messages.App_Label_BooleanYes
-                        : Messages.App_Label_BooleanNo);
-         }
-      });
-   }
-
-   /**
-    * Column: Is save tour
-    */
-   private void defineColumnIL_88_IsSaveTour() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-            cell.setText(
-                  importLauncher.isSaveTour //
-                        ? Messages.App_Label_BooleanYes
-                        : UI.EMPTY_STRING);
-         }
-      });
-   }
-
-   /**
-    * Column: Show in dashboard
-    */
-   private void defineColumnIL_90_ShowInDashboard() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_ShowInDash_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_ShowInDash_Header);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-      colDef.setColumnWeightData(new ColumnWeightData(8));
-
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(
-                  ((ImportLauncher) cell.getElement()).isShowInDashboard
-                        ? Messages.App_Label_BooleanYes
-                        : Messages.App_Label_BooleanNo);
-         }
-      });
-   }
-
-   /**
-    * Column: Item description
-    */
-   private void defineColumnIL_99_Description() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Description);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Description);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
-      colDef.setColumnWeightData(new ColumnWeightData(25));
-
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-            cell.setText(((ImportLauncher) cell.getElement()).description);
-         }
-      });
-   }
-
    private void disposeConfigImages() {
 
       for (final Image configImage : _configImages.values()) {
@@ -3231,15 +2960,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _configImages.clear();
       _configImageHash.clear();
 
-      Util.disposeResource(_imageFileSystem);
+      UI.disposeResource(_imageFileSystem);
    }
 
    /**
-    * Do live update for this feature.
+    * Do live update for this feature
     */
    private void doLiveUpdate() {
 
-      final boolean isLiveUpdate = _chkDash_LiveUpdate.getSelection();
+      final boolean isLiveUpdate = _chkOptions_LiveUpdate.getSelection();
       if (isLiveUpdate) {
 
          update_Model_From_UI_LiveUpdateValues();
@@ -3282,8 +3011,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final boolean isILSelected = _selectedIL != null;
       final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
       final boolean isAdjustTemperature = isILSelected && _chkIL_AdjustTemperature.getSelection();
-      final boolean isRetrieveWeatherData = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            !StringUtils.isNullOrEmpty(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
 
       boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
@@ -3321,20 +3049,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                   for (final Label label : _lblTT_Speed_TourTypeIcon) {
 
-                     if (isILSelected) {
+                     final Integer speedTTIndex = (Integer) label.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
 
-                        final Integer speedTTIndex = (Integer) label.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
+                     final SpeedTourType speedTT = _selectedIL.speedTourTypes.get(speedTTIndex);
+                     final long tourTypeId = speedTT.tourTypeId;
 
-                        final SpeedTourType speedTT = _selectedIL.speedTourTypes.get(speedTTIndex);
-                        final long tourTypeId = speedTT.tourTypeId;
-
-                        label.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
-
-                     } else {
-
-                        // the disabled image looks very ugly
-                        label.setImage(null);
-                     }
+                     label.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
                   }
                }
 
@@ -3356,50 +3076,52 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          showTourTypePage(null);
       }
 
-      _btnIL_Duplicate.setEnabled(isILSelected);
-      _btnIL_Remove.setEnabled(isILSelected && numLaunchers > 1);
+// SET_FORMATTING_OFF
 
-      _chkIL_SetLastMarker.setEnabled(isILSelected);
-      _chkIL_SaveTour.setEnabled(isILSelected);
-      _chkIL_ShowInDashboard.setEnabled(isILSelected);
-      _chkIL_SetTourType.setEnabled(isILSelected);
+      _btnIL_Duplicate              .setEnabled(isILSelected);
+      _btnIL_Remove                 .setEnabled(isILSelected && numLaunchers > 1);
 
-      _comboIL_TourType.setEnabled(isILSelected && isSetTourType);
+      _chkIL_SetLastMarker          .setEnabled(isILSelected);
+      _chkIL_SaveTour               .setEnabled(isILSelected);
+      _chkIL_ShowInDashboard        .setEnabled(isILSelected);
+      _chkIL_SetTourType            .setEnabled(isILSelected);
 
-      _lblIL_ConfigName.setEnabled(isILSelected);
-      _lblIL_ConfigDescription.setEnabled(isILSelected);
+      _comboIL_TourType             .setEnabled(isILSelected && isSetTourType);
 
-      _txtIL_ConfigName.setEnabled(isILSelected);
-      _txtIL_ConfigDescription.setEnabled(isILSelected);
+      _lblIL_ConfigName             .setEnabled(isILSelected);
+      _lblIL_ConfigDescription      .setEnabled(isILSelected);
+
+      _txtIL_ConfigName             .setEnabled(isILSelected);
+      _txtIL_ConfigDescription      .setEnabled(isILSelected);
 
       // last marker
-      _lblIL_LastMarker.setEnabled(isLastMarkerSelected);
-      _lblIL_LastMarkerDistanceUnit.setEnabled(isLastMarkerSelected);
-      _lblIL_LastMarkerText.setEnabled(isLastMarkerSelected);
-      _spinnerIL_LastMarkerDistance.setEnabled(isLastMarkerSelected);
-      _txtIL_LastMarker.setEnabled(isLastMarkerSelected);
+      _lblIL_LastMarker             .setEnabled(isLastMarkerSelected);
+      _lblIL_LastMarkerDistanceUnit .setEnabled(isLastMarkerSelected);
+      _lblIL_LastMarkerText         .setEnabled(isLastMarkerSelected);
+      _spinnerIL_LastMarkerDistance .setEnabled(isLastMarkerSelected);
+      _txtIL_LastMarker             .setEnabled(isLastMarkerSelected);
 
       // adjust temperature
-      _lblIL_AvgTemperature.setEnabled(isAdjustTemperature);
-      _lblIL_AvgTemperature_Unit.setEnabled(isAdjustTemperature);
-      _lblIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
-      _lblIL_TemperatureAdjustmentDuration_Unit.setEnabled(isAdjustTemperature);
-      _spinnerIL_AvgTemperature.setEnabled(isAdjustTemperature);
-      _spinnerIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+      _lblIL_AvgTemperature                     .setEnabled(isAdjustTemperature);
+      _lblIL_AvgTemperature_Unit                .setEnabled(isAdjustTemperature);
+      _lblIL_TemperatureAdjustmentDuration      .setEnabled(isAdjustTemperature);
+      _lblIL_TemperatureAdjustmentDuration_Unit .setEnabled(isAdjustTemperature);
+      _spinnerIL_AvgTemperature                 .setEnabled(isAdjustTemperature);
+      _spinnerIL_TemperatureAdjustmentDuration  .setEnabled(isAdjustTemperature);
 
       // Retrieve weather data
-      _chkIL_RetrieveWeatherData.setEnabled(isRetrieveWeatherData);
+      _chkIL_RetrieveWeatherData    .setEnabled(isWeatherRetrievalActivated);
 
-      _ilViewer.getTable().setEnabled(isLauncherAvailable);
+      _ilViewer.getTable()          .setEnabled(isLauncherAvailable);
 
+// SET_FORMATTING_ON
    }
 
    private void fillSpeedTourTypeMenu(final IMenuManager menuMgr, final Link linkTourType) {
 
-      // get tour type which will be checked in the menu
-      final TourType checkedTourType = null;
-
       final int speedTTIndex = (int) linkTourType.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
+      final SpeedTourType speedTT = _selectedIL.speedTourTypes.get(speedTTIndex);
+      final long speedTourTypeId = speedTT.tourTypeId;
 
       // add all tour types to the menu
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -3407,7 +3129,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       for (final TourType tourType : tourTypes) {
 
          boolean isChecked = false;
-         if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
+         if (speedTourTypeId == tourType.getTypeId()) {
             isChecked = true;
          }
 
@@ -3550,133 +3272,67 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _leftPadding = convertHorizontalDLUsToPixels(11);
       _defaultPaneWidth = convertWidthInCharsToPixels(50);
 
-      COLOR_FOREGROUND = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
-      COLOR_RED = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+//    FONT_BOLD = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-//      FONT_BOLD = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
-      parent.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDispose());
 
       /*
        * IC listener
        */
-      _icSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onIC_Modified();
-            enable_IC_Controls();
-         }
-      };
+      _icSelectionListener = widgetSelectedAdapter(selectionEvent -> {
+         onIC_Modified();
+         enable_IC_Controls();
+      });
 
-      _icModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onIC_Modified();
-         }
-      };
+      _icModifyListener = modifyEvent -> onIC_Modified();
 
       /*
        * Path listener
        */
-      _ic_FolderFocusListener = new FocusAdapter() {
-         @Override
-         public void focusLost(final FocusEvent e) {
-            onIC_Folder_FocusLost(e);
-         }
+      _ic_FolderFocusListener = focusLostAdapter(this::onIC_Folder_FocusLost);
+      _ic_FolderModifyListener = modifyEvent -> {
+         onIC_Folder_Modified(modifyEvent);
+         onIC_Modified();
       };
-      _ic_FolderModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onIC_Folder_Modified(e);
-            onIC_Modified();
-         }
-      };
-      _ic_FolderKeyListener = new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
-            onIC_Folder_KeyPressed(e);
-         }
-      };
+      _ic_FolderKeyListener = keyPressedAdapter(this::onIC_Folder_KeyPressed);
 
       /*
        * IL listener
        */
-      _ilModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onIL_Modified();
-         }
-      };
+      _ilModifyListener = modifyEvent -> onIL_Modified();
 
-      _ilSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onIL_Modified();
-         }
-      };
+      _ilSelectionListener = widgetSelectedAdapter(selectionEvent -> onIL_Modified());
 
       /*
        * Field listener
        */
-      _liveUpdateListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            doLiveUpdate();
-         }
-      };
-      _liveUpdateMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            doLiveUpdate();
-         }
+      _liveUpdateListener = widgetSelectedAdapter(selectionEvent -> doLiveUpdate());
+      _liveUpdateMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         doLiveUpdate();
       };
 
       /*
        * Default mouse listener
        */
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-         }
-      };
+      _defaultMouseWheelListener = UI::adjustSpinnerValueOnMouseScroll;
 
-      _speedTourTypeListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            UI.openControlMenu((Link) event.widget);
-         }
-      };
+      _speedTourTypeListener = widgetSelectedAdapter(selectionEvent -> UI.openControlMenu((Link) selectionEvent.widget));
 
       /*
        * Default modify listener
        */
-      _defaultModify_Listener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      _defaultModify_Listener = widgetSelectedAdapter(selectionEvent -> {
+         onIL_Modified();
+         enable_IL_Controls();
+      });
 
-            onIL_Modified();
-            enable_IL_Controls();
-         }
-      };
+      _defaultModify_MouseWheelListener = mouseEvent -> {
 
-      _defaultModify_MouseWheelListener = new MouseWheelListener() {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-         @Override
-         public void mouseScrolled(final MouseEvent e) {
-
-            UI.adjustSpinnerValueOnMouseScroll(e);
-
-            onIL_Modified();
-            enable_IL_Controls();
-         }
+         onIL_Modified();
+         enable_IL_Controls();
       };
 
    }
@@ -3705,7 +3361,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       update_Model_From_UI_IC();
 
       // update model
-      final ArrayList<ImportConfig> icItems = _dialogEasyConfig.importConfigs;
+      final ArrayList<ImportConfig> allConfigItems = _dialogEasyConfig.importConfigs;
       ImportConfig newIC;
 
       if (isCopy) {
@@ -3720,7 +3376,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          newIC = new ImportConfig();
       }
 
-      icItems.add(newIC);
+      allConfigItems.add(newIC);
 
       // update UI
       _icViewer.refresh();
@@ -3824,12 +3480,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final ImportConfig selectedConfig = (ImportConfig) selection.getFirstElement();
 
       int selectedIndex = -1;
-      final ArrayList<ImportConfig> configItems = _dialogEasyConfig.importConfigs;
+      final ArrayList<ImportConfig> allConfigItems = _dialogEasyConfig.importConfigs;
 
       // get index of the selected config
-      for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
+      for (int configIndex = 0; configIndex < allConfigItems.size(); configIndex++) {
 
-         final ImportConfig config = configItems.get(configIndex);
+         final ImportConfig config = allConfigItems.get(configIndex);
 
          if (config.equals(selectedConfig)) {
             selectedIndex = configIndex;
@@ -3844,19 +3500,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
 
       // update model
-      configItems.remove(selectedIndex);
+      allConfigItems.remove(selectedIndex);
 
       // update UI
       _icViewer.refresh();
 
       // select config at the same position
-      if (configItems.size() > 0) {
+      if (allConfigItems.size() > 0) {
 
-         if (selectedIndex >= configItems.size()) {
+         if (selectedIndex >= allConfigItems.size()) {
             selectedIndex--;
          }
 
-         final ImportConfig nextConfig = configItems.get(selectedIndex);
+         final ImportConfig nextConfig = allConfigItems.get(selectedIndex);
 
          _icViewer.setSelection(new StructuredSelection(nextConfig), true);
       }
@@ -3968,23 +3624,27 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          return;
       }
 
+// SET_FORMATTING_OFF
+
       // update model which is displayed in the IL viewer
-      _selectedIL.name = _txtIL_ConfigName.getText();
-      _selectedIL.description = _txtIL_ConfigDescription.getText();
+      _selectedIL.name                                = _txtIL_ConfigName.getText();
+      _selectedIL.description                         = _txtIL_ConfigDescription.getText();
 
-      _selectedIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
-      _selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
+      _selectedIL.isSetLastMarker                     = _chkIL_SetLastMarker.getSelection();
+      _selectedIL.lastMarkerDistance                  = getSelectedLastMarkerDistance();
 
-      _selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
-      _selectedIL.temperatureAdjustmentDuration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
-      _selectedIL.tourAvgTemperature = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
+      _selectedIL.isAdjustTemperature                 = _chkIL_AdjustTemperature.getSelection();
+      _selectedIL.temperatureAdjustmentDuration       = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
+      _selectedIL.tourAvgTemperature                  = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
-      _selectedIL.isRetrieveWeatherData = _chkIL_RetrieveWeatherData.getSelection();
+      _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
+      _selectedIL.isRetrieveWeatherData               = _chkIL_RetrieveWeatherData.getSelection();
+      _selectedIL.isSaveTour                          = _chkIL_SaveTour.getSelection();
+      _selectedIL.isReplaceElevationFromSRTM          = _chkIL_ReplaceElevationFromSRTM.getSelection();
+      _selectedIL.isSetTourType                       = _chkIL_SetTourType.getSelection();
+      _selectedIL.isShowInDashboard                   = _chkIL_ShowInDashboard.getSelection();
 
-      _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
-      _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
-
-      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
+// SET_FORMATTING_ON
 
       // update UI
       _ilViewer.update(_selectedIL, null);
@@ -4039,7 +3699,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void onPaintViewer(final Event event) {
 
-      if (event.index != _columnIndexConfigImage) {
+      if (event.index != _ilColumnIndexConfigImage) {
          return;
       }
 
@@ -4055,13 +3715,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
           */
 
          event.width += importLauncher.imageWidth;
-//         event.height = PROFILE_IMAGE_HEIGHT;
+//       event.height = PROFILE_IMAGE_HEIGHT;
 
          break;
 
       case SWT.PaintItem:
 
-         final Image image = _rawDataView.getImportConfigImage(importLauncher);
+         final Image image = _rawDataView.getImportConfigImage(importLauncher, UI.IS_DARK_THEME);
 
          if (image != null && !image.isDisposed()) {
 
@@ -4079,7 +3739,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void onSelect_IC_Folder_Backup() {
 
-      final String filterOSPath = _backupHistoryItems.getOSPath(//
+      final String filterOSPath = _backupHistoryItems.getOSPath(
             _comboIC_BackupFolder.getText(),
             _selectedIC.getBackupFolder());
 
@@ -4115,7 +3775,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
             selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell(),
                   filterOSPath.replace(fileSystem.getId(), UI.EMPTY_STRING));
-            if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+            if (StringUtils.hasContent(selectedFolder)) {
                _comboIC_DeviceFolder.setText(selectedFolder);
             }
          } catch (final Exception e) {
@@ -4185,55 +3845,69 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       if (_comboIC_DeviceType == null) {
          return;
       }
-      final int deviceIndex = _comboIC_DeviceType.getSelectionIndex();
 
       if (_lblIC_DeviceFolder == null) {
          return;
       }
 
+      final int deviceIndex = _comboIC_DeviceType.getSelectionIndex();
       final boolean isDeviceLocal = deviceIndex == 0; //Local device
+
       _lblIC_DeviceFolder.setEnabled(isDeviceLocal);
       _comboIC_DeviceFolder.setEnabled(isDeviceLocal);
 
       String deviceFolder = _selectedIC.getDeviceFolder();
 
       //We update the file system icon
-      Util.disposeResource(_imageFileSystem);
+      UI.disposeResource(_imageFileSystem);
       if (isDeviceLocal) {
-         _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+
+         _imageFileSystem = TourbookPlugin.getThemedImageDescriptor(Images.EasyImport_Harddrive).createImage();
+
       } else if (NIO.isTourBookFileSystem(_comboIC_DeviceType.getText())) {
-         final ImageDescriptor fileSystemImageDescriptor = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText())
-               .getFileSystemImageDescriptor();
-         _imageFileSystem = fileSystemImageDescriptor.createImage();
+
+         _imageFileSystem = FileSystemManager
+               .getTourbookFileSystem(_comboIC_DeviceType.getText())
+               .getFileSystemImageDescriptor()
+               .createImage();
       }
 
       if (_imageFileSystem != null && !_imageFileSystem.isDisposed()) {
+
          _lblIC_FileSystemImage.setImage(_imageFileSystem);
       }
 
       if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
+
          deviceFolder = UI.EMPTY_STRING;
-      } else if (!isDeviceLocal &&
-            !NIO.isTourBookFileSystem(deviceFolder)) {
+
+      } else if (isDeviceLocal == false && NIO.isTourBookFileSystem(deviceFolder) == false) {
+
          deviceFolder = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText()).getDisplayId();
       }
+
       _comboIC_DeviceFolder.setText(deviceFolder);
 
       _chkIC_CreateBackup.setEnabled(isDeviceLocal);
       _chkIC_DeleteDeviceFiles.setEnabled(isDeviceLocal);
 
-      if (!isDeviceLocal) {
+      if (isDeviceLocal) {
+
+         enable_IC_Controls();
+
+      } else {
+
          _comboIC_BackupFolder.setText(UI.EMPTY_STRING);
          _comboIC_BackupFolder.setEnabled(false);
+
          _chkIC_CreateBackup.setSelection(false);
          _chkIC_DeleteDeviceFiles.setSelection(false);
          _lblIC_DeleteFilesInfo.setText(UI.EMPTY_STRING);
          _lblIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
+
          _backupHistoryItems.setIsValidateFolder(false);
          _backupHistoryItems.validateModifiedPath();
-      } else {
-         enable_IC_Controls();
       }
    }
 
@@ -4316,16 +3990,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _ilViewer.getTable().redraw();
    }
 
-   private void resetDashboardToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
-      _chkDash_LiveUpdate.setSelection(EasyConfig.LIVE_UPDATE_DEFAULT);
+// SET_FORMATTING_OFF
 
-      _spinnerDash_AnimationCrazinessFactor.setSelection(EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT);
-      _spinnerDash_AnimationDuration.setSelection(EasyConfig.ANIMATION_DURATION_DEFAULT);
-      _spinnerDash_BgOpacity.setSelection(EasyConfig.BACKGROUND_OPACITY_DEFAULT);
-      _spinnerDash_NumHTiles.setSelection(EasyConfig.HORIZONTAL_TILES_DEFAULT);
-      _spinnerDash_StateTooltipWidth.setSelection(EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT);
-      _spinnerDash_TileSize.setSelection(EasyConfig.TILE_SIZE_DEFAULT);
+      _chkOptions_LiveUpdate                    .setSelection(EasyConfig.IS_LIVE_UPDATE_DEFAULT);
+      _chkOptions_LogDetails                    .setSelection(EasyConfig.IS_LOG_DETAILS_DEFAULT);
+
+      _chkOptions_ShowTile_CloudApps            .setSelection(EasyConfig.IS_SHOW_TILE_CLOUD_APPS_DEFAULT);
+      _chkOptions_ShowTile_Files                .setSelection(EasyConfig.IS_SHOW_TILE_FILES_DEFAULT);
+      _chkOptions_ShowTile_FossilUI             .setSelection(EasyConfig.IS_SHOW_TILE_FOSSIL_UI_DEFAULT);
+      _chkOptions_ShowTile_SerialPort           .setSelection(EasyConfig.IS_SHOW_TILE_SERIAL_PORT_DEFAULT);
+      _chkOptions_ShowTile_SerialPortWithConfig .setSelection(EasyConfig.IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG_DEFAULT);
+
+      _spinnerDash_AnimationCrazinessFactor     .setSelection(EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT);
+      _spinnerDash_AnimationDuration            .setSelection(EasyConfig.ANIMATION_DURATION_DEFAULT);
+      _spinnerDash_BgOpacity                    .setSelection(EasyConfig.BACKGROUND_OPACITY_DEFAULT);
+      _spinnerDash_NumHTiles                    .setSelection(EasyConfig.HORIZONTAL_TILES_DEFAULT);
+      _spinnerDash_StateTooltipWidth            .setSelection(EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT);
+      _spinnerDash_TileSize                     .setSelection(EasyConfig.TILE_SIZE_DEFAULT);
+
+// SET_FORMATTING_ON
 
       doLiveUpdate();
    }
@@ -4335,7 +4021,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /*
        * Tab folder
        */
-      final int selectedTab = _initialTab == -1 //
+      final int selectedTab = _initialTab == -1
             ? Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0)
             : _initialTab;
 
@@ -4405,17 +4091,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // ensure that the selected also has the focus, these are 2 different things
       ilTable.setSelection(ilTable.getSelectionIndex());
 
+// SET_FORMATTING_OFF
+
       /*
        * Dashboard
        */
-      _chkDash_LiveUpdate.setSelection(_dialogEasyConfig.isLiveUpdate);
-      _spinnerDash_AnimationCrazinessFactor.setSelection(_dialogEasyConfig.animationCrazinessFactor);
-      _spinnerDash_AnimationDuration.setSelection(_dialogEasyConfig.animationDuration);
-      _spinnerDash_BgOpacity.setSelection(_dialogEasyConfig.backgroundOpacity);
-      _spinnerDash_NumHTiles.setSelection(_dialogEasyConfig.numHorizontalTiles);
-      _chkDash_DisplayAbsoluteFilePath.setSelection(_dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath);
-      _spinnerDash_StateTooltipWidth.setSelection(_dialogEasyConfig.stateToolTipWidth);
-      _spinnerDash_TileSize.setSelection(_dialogEasyConfig.tileSize);
+      _chkOptions_DisplayAbsoluteFilePath       .setSelection(_dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath);
+      _chkOptions_LiveUpdate                    .setSelection(_dialogEasyConfig.isLiveUpdate);
+      _chkOptions_LogDetails                    .setSelection(_dialogEasyConfig.isLogDetails);
+
+      _chkOptions_ShowTile_CloudApps            .setSelection(_dialogEasyConfig.isShowTile_CloudApps);
+      _chkOptions_ShowTile_Files                .setSelection(_dialogEasyConfig.isShowTile_Files);
+      _chkOptions_ShowTile_FossilUI             .setSelection(_dialogEasyConfig.isShowTile_FossilUI);
+      _chkOptions_ShowTile_SerialPort           .setSelection(_dialogEasyConfig.isShowTile_SerialPort);
+      _chkOptions_ShowTile_SerialPortWithConfig .setSelection(_dialogEasyConfig.isShowTile_SerialPortWithConfig);
+
+      _spinnerDash_AnimationCrazinessFactor     .setSelection(_dialogEasyConfig.animationCrazinessFactor);
+      _spinnerDash_AnimationDuration            .setSelection(_dialogEasyConfig.animationDuration);
+      _spinnerDash_BgOpacity                    .setSelection(_dialogEasyConfig.backgroundOpacity);
+      _spinnerDash_NumHTiles                    .setSelection(_dialogEasyConfig.numHorizontalTiles);
+      _spinnerDash_StateTooltipWidth            .setSelection(_dialogEasyConfig.stateToolTipWidth);
+      _spinnerDash_TileSize                     .setSelection(_dialogEasyConfig.tileSize);
+
+// SET_FORMATTING_ON
    }
 
    private void saveState() {
@@ -4455,17 +4153,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          return;
       }
 
-      _selectedIC.name = _txtIC_ConfigName.getText();
+// SET_FORMATTING_OFF
 
-      _selectedIC.isCreateBackup = _chkIC_CreateBackup.getSelection();
-      _selectedIC.isDeleteDeviceFiles = _chkIC_DeleteDeviceFiles.getSelection();
-      _selectedIC.isTurnOffWatching = _chkIC_TurnOffWatching.getSelection();
+      _selectedIC.name                 = _txtIC_ConfigName.getText();
 
-      _selectedIC.setBackupFolder(_comboIC_BackupFolder.getText());
-      _selectedIC.setDeviceType(_comboIC_DeviceType.getSelectionIndex());
-      _selectedIC.setDeviceFolder(_comboIC_DeviceFolder.getText());
+      _selectedIC.isCreateBackup       = _chkIC_CreateBackup.getSelection();
+      _selectedIC.isDeleteDeviceFiles  = _chkIC_DeleteDeviceFiles.getSelection();
+      _selectedIC.isTurnOffWatching    = _chkIC_TurnOffWatching.getSelection();
 
-      _selectedIC.fileGlobPattern = _txtIC_DeviceFiles.getText();
+      _selectedIC.setBackupFolder(     _comboIC_BackupFolder.getText());
+      _selectedIC.setDeviceType(       _comboIC_DeviceType.getSelectionIndex());
+      _selectedIC.setDeviceFolder(     _comboIC_DeviceFolder.getText());
+
+      _selectedIC.fileGlobPattern      = _txtIC_DeviceFiles.getText();
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -4477,20 +4179,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          return;
       }
 
-      _selectedIL.name = _txtIL_ConfigName.getText();
-      _selectedIL.description = _txtIL_ConfigDescription.getText();
-      _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
-      _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+// SET_FORMATTING_OFF
+
+      _selectedIL.name                 = _txtIL_ConfigName.getText();
+      _selectedIL.description          = _txtIL_ConfigDescription.getText();
+      _selectedIL.isSaveTour           = _chkIL_SaveTour.getSelection();
+      _selectedIL.isShowInDashboard    = _chkIL_ShowInDashboard.getSelection();
 
       // last marker
-      _selectedIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
-      _selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
-      _selectedIL.lastMarkerText = _txtIL_LastMarker.getText();
+      _selectedIL.isSetLastMarker      = _chkIL_SetLastMarker.getSelection();
+      _selectedIL.lastMarkerDistance   = getSelectedLastMarkerDistance();
+      _selectedIL.lastMarkerText       = _txtIL_LastMarker.getText();
 
       // tour type
       final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
-      _selectedIL.tourTypeConfig = selectedTourTypeConfig;
-      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
+      _selectedIL.tourTypeConfig       = selectedTourTypeConfig;
+      _selectedIL.isSetTourType        = _chkIL_SetTourType.getSelection();
+
+// SET_FORMATTING_ON
 
       /*
        * Set tour type data
@@ -4548,15 +4254,26 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void update_Model_From_UI_LiveUpdateValues() {
 
-      _dialogEasyConfig.isLiveUpdate = _chkDash_LiveUpdate.getSelection();
+// SET_FORMATTING_OFF
 
-      _dialogEasyConfig.animationCrazinessFactor = _spinnerDash_AnimationCrazinessFactor.getSelection();
-      _dialogEasyConfig.animationDuration = _spinnerDash_AnimationDuration.getSelection();
-      _dialogEasyConfig.backgroundOpacity = _spinnerDash_BgOpacity.getSelection();
-      _dialogEasyConfig.numHorizontalTiles = _spinnerDash_NumHTiles.getSelection();
-      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath = _chkDash_DisplayAbsoluteFilePath.getSelection();
-      _dialogEasyConfig.stateToolTipWidth = _spinnerDash_StateTooltipWidth.getSelection();
-      _dialogEasyConfig.tileSize = _spinnerDash_TileSize.getSelection();
+      _dialogEasyConfig.isLiveUpdate                           = _chkOptions_LiveUpdate.getSelection();
+      _dialogEasyConfig.isLogDetails                           = _chkOptions_LogDetails.getSelection();
+
+      _dialogEasyConfig.isShowTile_CloudApps                   = _chkOptions_ShowTile_CloudApps.getSelection();
+      _dialogEasyConfig.isShowTile_Files                       = _chkOptions_ShowTile_Files.getSelection();
+      _dialogEasyConfig.isShowTile_FossilUI                    = _chkOptions_ShowTile_FossilUI.getSelection();
+      _dialogEasyConfig.isShowTile_SerialPort                  = _chkOptions_ShowTile_SerialPort.getSelection();
+      _dialogEasyConfig.isShowTile_SerialPortWithConfig        = _chkOptions_ShowTile_SerialPortWithConfig.getSelection();
+
+      _dialogEasyConfig.animationCrazinessFactor               = _spinnerDash_AnimationCrazinessFactor.getSelection();
+      _dialogEasyConfig.animationDuration                      = _spinnerDash_AnimationDuration.getSelection();
+      _dialogEasyConfig.backgroundOpacity                      = _spinnerDash_BgOpacity.getSelection();
+      _dialogEasyConfig.numHorizontalTiles                     = _spinnerDash_NumHTiles.getSelection();
+      _dialogEasyConfig.stateToolTipDisplayAbsoluteFilePath    = _chkOptions_DisplayAbsoluteFilePath.getSelection();
+      _dialogEasyConfig.stateToolTipWidth                      = _spinnerDash_StateTooltipWidth.getSelection();
+      _dialogEasyConfig.tileSize                               = _spinnerDash_TileSize.getSelection();
+
+// SET_FORMATTING_ON
    }
 
    private void update_Model_From_UI_OneTourType() {
@@ -4667,6 +4384,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          // Retrieve Weather Data
          _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
 
+         // adjust elevation
+         _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
+
+         // set elevation from SRTM data
+         _chkIL_ReplaceElevationFromSRTM.setSelection(_selectedIL.isReplaceElevationFromSRTM);
+
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;
 
@@ -4732,7 +4455,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   linkTourType.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   spinnerAvgSpeed.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   comboCadence.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
-                  _actionTTSpeed_Delete[speedTTIndex].setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+                  _actionTTSpeed_Delete[speedTTIndex].setData(speedTTIndex);
 
                }
             }

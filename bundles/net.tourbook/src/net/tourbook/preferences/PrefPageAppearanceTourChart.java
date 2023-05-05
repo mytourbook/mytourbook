@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,31 +19,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -55,8 +50,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
@@ -64,68 +57,35 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String  ID                                        = "net.tourbook.preferences.PrefPageChartGraphs";                     //$NON-NLS-1$
+   public static final String      ID                                        = "net.tourbook.preferences.PrefPageChartGraphs"; //$NON-NLS-1$
 
-   private static final String STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB = "PrefPage.ChartGraphs.SelectedTab";                                 //$NON-NLS-1$
+   private static final String     STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB = "PrefPage.ChartGraphs.SelectedTab";             //$NON-NLS-1$
 
-   private static final String GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS       = net.tourbook.common.Messages.Graph_Label_Prefix_RunningDynamics;
-   private static final String GRAPH_LABEL_PREFIX_SWIMMING               = net.tourbook.common.Messages.Graph_Label_Prefix_Swimming;
-   private static final String GRAPH_LABEL_PREFIX_TRAINING               = net.tourbook.common.Messages.Graph_Label_Prefix_Training;
-
-   private static final String GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String GRAPH_LABEL_GRADIENT                      = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String GRAPH_LABEL_HEARTBEAT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_PACE                          = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String GRAPH_LABEL_POWER                         = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String GRAPH_LABEL_SPEED                         = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String GRAPH_LABEL_TEMPERATURE                   = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String GRAPH_LABEL_TOUR_COMPARE_RESULT           = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME           = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED  = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH           = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION  = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-
-   private static final String GRAPH_LABEL_SWIM_STROKES                  = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String GRAPH_LABEL_SWIM_SWOLF                    = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
-
-   private static final String GRAPH_LABEL_TRAINING_EFFECT_AEROB         = net.tourbook.common.Messages.Graph_Label_Training_Effect_Aerob;
-   private static final String GRAPH_LABEL_TRAINING_EFFECT_ANAEROB       = net.tourbook.common.Messages.Graph_Label_Training_Effect_Anaerob;
-   private static final String GRAPH_LABEL_TRAINING_PERFORMANCE          = net.tourbook.common.Messages.Graph_Label_Training_Performance;
-   //
-   //
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore                                = TourbookPlugin.getPrefStore();
 
    private HashMap<Integer, Graph> _graphMap;
    private ArrayList<Graph>        _graphList;
    private ArrayList<Graph>        _viewerGraphs;
 
-   private IPropertyChangeListener _defaultChangePropertyListener;
    private MouseWheelListener      _defaultMouseWheelListener;
    private SelectionAdapter        _defaultSelectionListener;
 
    /*
     * UI controls
     */
-   private TabFolder           _tabFolder;
-   private TabItem             _tab1_Graphs;
-   private TabItem             _tab2_Grid;
-   private TabItem             _tab3_Options;
+   private CTabFolder          _tabFolder;
+   private CTabItem            _tab1_Graphs;
+   private CTabItem            _tab2_Grid;
+   private CTabItem            _tab3_Options;
 
    private CheckboxTableViewer _graphCheckboxList;
 
    private Button              _btnDown;
    private Button              _btnUp;
 
-   private Button              _chkGraphAntialiasing;
    private Button              _chkLiveUpdate;
 
    private Button              _chkMoveSlidersWhenZoomed;
-   private Button              _chkSegmentAlternateColor;
    private Button              _chkShowGrid_HorizontalLines;
    private Button              _chkShowStartTime;
    private Button              _chkShowGrid_VerticalLines;
@@ -141,12 +101,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private Button              _rdoShowDistance;
    private Button              _rdoShowTime;
 
-   private Spinner             _spinnerGraphTransparencyLine;
-   private Spinner             _spinnerGraphTransparencyFilling;
    private Spinner             _spinnerGridHorizontalDistance;
    private Spinner             _spinnerGridVerticalDistance;
-
-   private ColorSelector       _colorSegmentAlternateColor;
 
    private static class Graph {
 
@@ -174,7 +130,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    @Override
    protected Control createContents(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       final Control ui = createUI(parent);
 
@@ -194,18 +150,18 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         _tabFolder = new TabFolder(container, SWT.NONE);
+         _tabFolder = new CTabFolder(container, SWT.NONE);
          _tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
          {
-            _tab1_Graphs = new TabItem(_tabFolder, SWT.NONE);
+            _tab1_Graphs = new CTabItem(_tabFolder, SWT.NONE);
             _tab1_Graphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
             _tab1_Graphs.setControl(createUI_10_Tab_1_Graphs(_tabFolder));
 
-            _tab2_Grid = new TabItem(_tabFolder, SWT.NONE);
+            _tab2_Grid = new CTabItem(_tabFolder, SWT.NONE);
             _tab2_Grid.setText(Messages.Pref_Graphs_Tab_Grid);
             _tab2_Grid.setControl(createUI_70_Tab_2_Grid(_tabFolder));
 
-            _tab3_Options = new TabItem(_tabFolder, SWT.NONE);
+            _tab3_Options = new CTabItem(_tabFolder, SWT.NONE);
             _tab3_Options.setText(Messages.Pref_Graphs_Tab_zoom_options);
             _tab3_Options.setControl(createUI_80_Tab_3_Options(_tabFolder));
          }
@@ -293,27 +249,21 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          }
       });
 
-      _graphCheckboxList.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
+      _graphCheckboxList.addCheckStateListener(checkStateChangedEvent -> {
 
-            // keep the checked status
-            final Graph item = (Graph) event.getElement();
-            item.__isChecked = event.getChecked();
+         // keep the checked status
+         final Graph item = (Graph) checkStateChangedEvent.getElement();
+         item.__isChecked = checkStateChangedEvent.getChecked();
 
-            // select the checked item
-            _graphCheckboxList.setSelection(new StructuredSelection(item));
+         // select the checked item
+         _graphCheckboxList.setSelection(new StructuredSelection(item));
 
-            validateInput();
-         }
+         validateInput();
       });
 
-      _graphCheckboxList.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            enableUpDownActions();
-            doLiveUpdate();
-         }
+      _graphCheckboxList.addSelectionChangedListener(selectionChangedEvent -> {
+         enableUpDownActions();
+         doLiveUpdate();
       });
 
 //      final Table table = _graphCheckboxList.getTable();
@@ -372,70 +322,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         /*
-          * label: graph filling transparency
-          */
-         Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(label);
-         label.setText(Messages.Pref_Graphs_Label_GraphTransparencyLine);
-         label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparencyLine_Tooltip);
 
-         /*
-          * spinner: graph filling transparence
-          */
-         _spinnerGraphTransparencyLine = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_spinnerGraphTransparencyLine);
-         _spinnerGraphTransparencyLine.setMinimum(0x10);
-         _spinnerGraphTransparencyLine.setMaximum(0xff);
-         _spinnerGraphTransparencyLine.addMouseWheelListener(_defaultMouseWheelListener);
-         _spinnerGraphTransparencyLine.addSelectionListener(_defaultSelectionListener);
-
-         /*
-          * label: graph filling transparency
-          */
-         label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(label);
-         label.setText(Messages.Pref_Graphs_Label_GraphTransparency);
-         label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
-
-         /*
-          * spinner: graph filling transparence
-          */
-         _spinnerGraphTransparencyFilling = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_spinnerGraphTransparencyFilling);
-         _spinnerGraphTransparencyFilling.setMinimum(0x00);
-         _spinnerGraphTransparencyFilling.setMaximum(0xff);
-         _spinnerGraphTransparencyFilling.addMouseWheelListener(_defaultMouseWheelListener);
-         _spinnerGraphTransparencyFilling.addSelectionListener(_defaultSelectionListener);
-
-         /*
-          * checkbox: graph antialiasing
-          */
-         _chkGraphAntialiasing = new Button(container, SWT.CHECK);
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkGraphAntialiasing);
-         _chkGraphAntialiasing.setText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing);
-         _chkGraphAntialiasing.setToolTipText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip);
-         _chkGraphAntialiasing.addSelectionListener(_defaultSelectionListener);
-
-         /*
-          * Checkbox: Segments with alternate colors
-          */
-         _chkSegmentAlternateColor = new Button(container, SWT.CHECK);
-         _chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
-         _chkSegmentAlternateColor.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
-         _chkSegmentAlternateColor.addSelectionListener(_defaultSelectionListener);
-
-         // Color: Segment alternate color
-         _colorSegmentAlternateColor = new ColorSelector(container);
-         _colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
       }
    }
 
@@ -689,7 +576,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
    private void enableControls() {
 
-      _colorSegmentAlternateColor.setEnabled(_chkSegmentAlternateColor.getSelection());
    }
 
    /**
@@ -706,7 +592,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       boolean enableDown = validSelection;
 
       if (validSelection) {
-         final int indices[] = table.getSelectionIndices();
+         final int[] indices = table.getSelectionIndices();
          final int max = table.getItemCount();
          enableUp = indices[0] != 0;
          enableDown = indices[indices.length - 1] < max - 1;
@@ -724,14 +610,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       setPreferenceStore(_prefStore);
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onSelection();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onSelection();
       };
 
       _defaultSelectionListener = new SelectionAdapter() {
@@ -741,41 +624,34 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          }
       };
 
-      _defaultChangePropertyListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onSelection();
-         }
-      };
-
 // SET_FORMATTING_OFF
 
       // create a map and list with all available graphs
-      final Graph graph_Altitude                      = new Graph(TourManager.GRAPH_ALTITUDE,                  GRAPH_LABEL_ALTITUDE);
-      final Graph graph_Speed                         = new Graph(TourManager.GRAPH_SPEED,                     GRAPH_LABEL_SPEED);
-      final Graph graph_Pace                          = new Graph(TourManager.GRAPH_PACE,                      GRAPH_LABEL_PACE);
-      final Graph graph_Power                         = new Graph(TourManager.GRAPH_POWER,                     GRAPH_LABEL_POWER);
-      final Graph graph_Pulse                         = new Graph(TourManager.GRAPH_PULSE,                     GRAPH_LABEL_HEARTBEAT);
-      final Graph graph_Temperature                   = new Graph(TourManager.GRAPH_TEMPERATURE,               GRAPH_LABEL_TEMPERATURE);
-      final Graph graph_Cadence                       = new Graph(TourManager.GRAPH_CADENCE,                   GRAPH_LABEL_CADENCE);
-      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                     GRAPH_LABEL_GEARS);
-      final Graph graph_Altimeter                     = new Graph(TourManager.GRAPH_ALTIMETER,                 GRAPH_LABEL_ALTIMETER);
-      final Graph graph_Gradient                      = new Graph(TourManager.GRAPH_GRADIENT,                  GRAPH_LABEL_GRADIENT);
+      final Graph graph_Altitude                      = new Graph(TourManager.GRAPH_ALTITUDE,                     OtherMessages.GRAPH_LABEL_ALTITUDE);
+      final Graph graph_Speed                         = new Graph(TourManager.GRAPH_SPEED,                        OtherMessages.GRAPH_LABEL_SPEED);
+      final Graph graph_Pace                          = new Graph(TourManager.GRAPH_PACE,                         OtherMessages.GRAPH_LABEL_PACE);
+      final Graph graph_Power                         = new Graph(TourManager.GRAPH_POWER,                        OtherMessages.GRAPH_LABEL_POWER);
+      final Graph graph_Pulse                         = new Graph(TourManager.GRAPH_PULSE,                        OtherMessages.GRAPH_LABEL_HEARTBEAT);
+      final Graph graph_Temperature                   = new Graph(TourManager.GRAPH_TEMPERATURE,                  OtherMessages.GRAPH_LABEL_TEMPERATURE);
+      final Graph graph_Cadence                       = new Graph(TourManager.GRAPH_CADENCE,                      OtherMessages.GRAPH_LABEL_CADENCE);
+      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                        OtherMessages.GRAPH_LABEL_GEARS);
+      final Graph graph_Altimeter                     = new Graph(TourManager.GRAPH_ALTIMETER,                    OtherMessages.GRAPH_LABEL_ALTIMETER);
+      final Graph graph_Gradient                      = new Graph(TourManager.GRAPH_GRADIENT,                     OtherMessages.GRAPH_LABEL_GRADIENT);
 
-      final Graph graph_RunDyn_StanceTime             = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME,          GRAPH_LABEL_RUN_DYN_STANCE_TIME,             GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_StanceTimeBalance      = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,    GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_StepLength             = new Graph(TourManager.GRAPH_RUN_DYN_STEP_LENGTH,          GRAPH_LABEL_RUN_DYN_STEP_LENGTH,             GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_VerticalOscillation    = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,    GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_VerticalRatio          = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,       GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,          GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_StanceTime             = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME,          OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,              OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_StanceTimeBalance      = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,      OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_StepLength             = new Graph(TourManager.GRAPH_RUN_DYN_STEP_LENGTH,          OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH,              OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_VerticalOscillation    = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,     OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_VerticalRatio          = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,       OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,           OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
 
-      final Graph graph_Swim_Strokes                  = new Graph(TourManager.GRAPH_SWIM_STROKES,              GRAPH_LABEL_SWIM_STROKES,              GRAPH_LABEL_PREFIX_SWIMMING);
-      final Graph graph_Swim_Swolf                    = new Graph(TourManager.GRAPH_SWIM_SWOLF,                GRAPH_LABEL_SWIM_SWOLF,                GRAPH_LABEL_PREFIX_SWIMMING);
+      final Graph graph_Swim_Strokes                  = new Graph(TourManager.GRAPH_SWIM_STROKES,                 OtherMessages.GRAPH_LABEL_SWIM_STROKES,                     OtherMessages.GRAPH_LABEL_PREFIX_SWIMMING);
+      final Graph graph_Swim_Swolf                    = new Graph(TourManager.GRAPH_SWIM_SWOLF,                   OtherMessages.GRAPH_LABEL_SWIM_SWOLF,                       OtherMessages.GRAPH_LABEL_PREFIX_SWIMMING);
 
-      final Graph graph_Training_Effect_Aerob         = new Graph(TourManager.GRAPH_TRAINING_EFFECT_AEROB,     GRAPH_LABEL_TRAINING_EFFECT_AEROB,     GRAPH_LABEL_PREFIX_TRAINING);
-      final Graph graph_Training_Effect_Anaerob       = new Graph(TourManager.GRAPH_TRAINING_EFFECT_ANAEROB,   GRAPH_LABEL_TRAINING_EFFECT_ANAEROB,   GRAPH_LABEL_PREFIX_TRAINING);
-      final Graph graph_Training_Performance          = new Graph(TourManager.GRAPH_TRAINING_PERFORMANCE,      GRAPH_LABEL_TRAINING_PERFORMANCE,      GRAPH_LABEL_PREFIX_TRAINING);
+      final Graph graph_Training_Effect_Aerob         = new Graph(TourManager.GRAPH_TRAINING_EFFECT_AEROB,        OtherMessages.GRAPH_LABEL_TRAINING_EFFECT_AEROB,            OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
+      final Graph graph_Training_Effect_Anaerob       = new Graph(TourManager.GRAPH_TRAINING_EFFECT_ANAEROB,      OtherMessages.GRAPH_LABEL_TRAINING_EFFECT_ANAEROB,          OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
+      final Graph graph_Training_Performance          = new Graph(TourManager.GRAPH_TRAINING_PERFORMANCE,         OtherMessages.GRAPH_LABEL_TRAINING_PERFORMANCE,             OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
 
-      final Graph graph_TourCompareResult             = new Graph(TourManager.GRAPH_TOUR_COMPARE,              GRAPH_LABEL_TOUR_COMPARE_RESULT);
+      final Graph graph_TourCompareResult             = new Graph(TourManager.GRAPH_TOUR_COMPARE,                 OtherMessages.GRAPH_LABEL_TOUR_COMPARE);
 
       _graphMap = new HashMap<>();
 
@@ -855,12 +731,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private void moveSelectionDown() {
 
       final Table table = _graphCheckboxList.getTable();
-      final int indices[] = table.getSelectionIndices();
+      final int[] indices = table.getSelectionIndices();
       if (indices.length < 1) {
          return;
       }
 
-      final int newSelection[] = new int[indices.length];
+      final int[] newSelection = new int[indices.length];
       final int max = table.getItemCount() - 1;
 
       for (int i = indices.length - 1; i >= 0; i--) {
@@ -879,8 +755,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private void moveSelectionUp() {
 
       final Table table = _graphCheckboxList.getTable();
-      final int indices[] = table.getSelectionIndices();
-      final int newSelection[] = new int[indices.length];
+      final int[] indices = table.getSelectionIndices();
+      final int[] newSelection = new int[indices.length];
 
       for (int i = 0; i < indices.length; i++) {
          final int index = indices[i];
@@ -905,7 +781,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       /*
        * perform defaults for the currently selected tab
        */
-      final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
+      final CTabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
       if (selectedTab == _tab1_Graphs) {
 
@@ -935,21 +811,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       /*
        * perform defaults for the currently selected tab
        */
-      final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
+      final CTabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
-      if (selectedTab == _tab1_Graphs) {
-
-         _chkGraphAntialiasing.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
-
-         _spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
-         _spinnerGraphTransparencyLine.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-
-         // segment alternate color
-         _chkSegmentAlternateColor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-         _colorSegmentAlternateColor.setColorValue(//
-               PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
-
-      } else if (selectedTab == _tab2_Grid) {
+      if (selectedTab == _tab2_Grid) {
 
          _spinnerGridHorizontalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
          _spinnerGridVerticalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
@@ -991,15 +855,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
    private void restoreState_Tab_1_Graphs() {
 
-      _chkGraphAntialiasing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
-
-      _spinnerGraphTransparencyFilling.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
-      _spinnerGraphTransparencyLine.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-
-      // segment alternate color
-      _chkSegmentAlternateColor.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-      _colorSegmentAlternateColor.setColorValue(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
-
       restoreState_Tab_1_Graphs_Graphs();
    }
 
@@ -1008,7 +863,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       /*
        * create a list with all available graphs
        */
-      final String[] prefAllGraphIds = StringToArrayConverter.convertStringToArray(//
+      final String[] prefAllGraphIds = StringToArrayConverter.convertStringToArray(
             _prefStore.getString(ITourbookPreferences.GRAPH_ALL));
 
       _viewerGraphs = new ArrayList<>();
@@ -1032,7 +887,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
       _graphCheckboxList.setInput(this);
 
-      final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(//
+      final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(
             _prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
 
       // check all graphs which are defined in the prefs
@@ -1080,7 +935,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       _chkMoveSlidersWhenZoomed.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
 
       // zoom options
-      if (_prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
+      final String prefMouseWheelMode = _prefStore.getString(ITourbookPreferences.GRAPH_MOUSE_MODE);
+      final Enum<MouseWheelMode> mouseWheelMode = Util.getEnumValue(prefMouseWheelMode, MouseWheelMode.Zoom);
+
+      if (mouseWheelMode.equals(MouseWheelMode.Selection)) {
          _rdoMouseModeSlider.setSelection(true);
       } else {
          _rdoMouseModeZoom.setSelection(true);
@@ -1098,17 +956,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    }
 
    private void saveState_Tab_1_Graphs() {
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING, _chkGraphAntialiasing.getSelection());
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, _spinnerGraphTransparencyFilling.getSelection());
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, _spinnerGraphTransparencyLine.getSelection());
-
-      // segment alternate color
-      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, _chkSegmentAlternateColor.getSelection());
-      PreferenceConverter.setValue(_prefStore,
-            ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
-            _colorSegmentAlternateColor.getColorValue());
 
       saveState_Tab_1_Graphs_Graphs();
    }
@@ -1162,9 +1009,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
       // mouse wheel mode
       if (_rdoMouseModeSlider.getSelection()) {
-         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
+         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, MouseWheelMode.Selection.name());
       } else {
-         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
+         _prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, MouseWheelMode.Zoom.name());
       }
 
       // zoom options

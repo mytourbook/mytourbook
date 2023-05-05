@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,6 +46,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
 
@@ -155,6 +155,7 @@ public class MapProviderManager {
    private static final String ATTR_MP_TYPE                        = "Type";                  //$NON-NLS-1$
    private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";             //$NON-NLS-1$
    private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";           //$NON-NLS-1$
+   private static final String ATTR_MP_USER_AGENT                  = "UserAgent";             //$NON-NLS-1$
    private static final String ATTR_MP_ZOOM_LEVEL_MIN              = "ZoomMin";               //$NON-NLS-1$
    private static final String ATTR_MP_ZOOM_LEVEL_MAX              = "ZoomMax";               //$NON-NLS-1$
    private static final String ATTR_MP_LAST_USED_ZOOM_LEVEL        = "LastUsedZoomLevel";     //$NON-NLS-1$
@@ -181,9 +182,9 @@ public class MapProviderManager {
    private static final String PART_TYPE_HTML                                = "HTML";               //$NON-NLS-1$
    private static final String PART_TYPE_RANDOM_INTEGER                      = "RANDOM_INTEGER";     //$NON-NLS-1$
    private static final String PART_TYPE_RANDOM_ALPHA                        = "RANDOM_ALPHA";       //$NON-NLS-1$
-   private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$;
-   private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$;
-   private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$;
+   private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$
+   private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$
+   private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$
 
    /*
     * WMS map provider
@@ -299,7 +300,7 @@ public class MapProviderManager {
          WMS_LOCK.lock();
          try {
 
-            // recheck again, it's possible tha another thread could have loaded the caps
+            // recheck again, it's possible that another thread could have loaded the caps
             if (mpWms == null || mpWms.getWmsCaps() == null) {
                checkWmsRunnable(mpWms, capsUrl, returnMpWms);
             }
@@ -326,7 +327,7 @@ public class MapProviderManager {
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
             final String capsUrlFinal = mpWms == null ? //
-            capsUrl
+                  capsUrl
                   : mpWms.getCapabilitiesUrl();
 
             monitor.beginTask(Messages.MP_Manager_Task_GetWms, 1);
@@ -377,14 +378,11 @@ public class MapProviderManager {
 
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
-            } catch (final InvocationTargetException | InterruptedException e1) {
-               StatusUtil.showStatus(e1.getMessage(), e1);
-            }
+      display.syncExec(() -> {
+         try {
+            new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
+         } catch (final InvocationTargetException | InterruptedException e1) {
+            StatusUtil.showStatus(e1.getMessage(), e1);
          }
       });
    }
@@ -452,7 +450,7 @@ public class MapProviderManager {
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                final String taskName = isDeletePartImages ? //
-               Messages.MP_Manager_DeletedOfflineImagesParts_TaskNameParts
+                     Messages.MP_Manager_DeletedOfflineImagesParts_TaskNameParts
                      : Messages.MP_Manager_DeletedOfflineImagesParts_TaskName;
 
                monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
@@ -1016,7 +1014,7 @@ public class MapProviderManager {
          updatedWmsMapProvider = oldWmsMapProvider;
       }
 
-      // inizialize map provider by setting none UI data
+      // initialize map provider by setting none UI data
       updatedWmsMapProvider.initializeWms(wmsServer, wmsCaps, loadedMtLayers);
 
       /*
@@ -1295,7 +1293,7 @@ public class MapProviderManager {
       for (final MP mp : importedMapProviders) {
 
          /*
-          * ignore plugin map providers, they should be already in the list but can occure in the
+          * ignore plugin map providers, they should be already in the list but can occur in the
           * import file as a map profile wrapper
           */
          if ((mp instanceof MPPlugin) == false) {
@@ -1533,7 +1531,7 @@ public class MapProviderManager {
    /**
     * @param importFilePath
     * @return Returns the imported map providers or <code>null</code> when an import error
-    *         occured<br>
+    *         occurred<br>
     *         <br>
     *         Multiple map providers are returned when a map profile contains map providers which
     *         do not yet exists
@@ -1614,13 +1612,7 @@ public class MapProviderManager {
          logError(e.getMessage(), e);
       } finally {
 
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
+         Util.close(reader);
 
          displayError(filename);
       }
@@ -1694,6 +1686,9 @@ public class MapProviderManager {
 
             xmlModified = Util.getXmlDateTime(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, null);
          }
+
+         // User Agent
+         final String userAgent = tagMapProvider.getString(ATTR_MP_USER_AGENT);
 
          // zoom level
          final Integer xmlZoomMin = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MIN);
@@ -1813,6 +1808,9 @@ public class MapProviderManager {
             mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
             mapProvider.setImageFormat(xmlImageFormat == null ? DEFAULT_IMAGE_FORMAT : xmlImageFormat);
 
+            // User Agent
+            mapProvider.setUserAgent(StringUtils.hasContent(userAgent) ? userAgent : UI.EMPTY_STRING);
+
             // zoom level
             final int minZoom = xmlZoomMin == null ? 0 : xmlZoomMin;
             final int maxZoom = xmlZoomMax == null ? 17 : xmlZoomMax;
@@ -1914,12 +1912,7 @@ public class MapProviderManager {
       }
 
       // sort parts by position
-      Collections.sort(urlParts, new Comparator<UrlPart>() {
-         @Override
-         public int compare(final UrlPart p1, final UrlPart p2) {
-            return p1.getPosition() - p2.getPosition();
-         }
-      });
+      Collections.sort(urlParts, (urlPart1, urlPart2) -> urlPart1.getPosition() - urlPart2.getPosition());
 
       /*
        * update model
@@ -2033,8 +2026,6 @@ public class MapProviderManager {
              * read wms layer state
              */
 
-            @SuppressWarnings("unused")
-            int displayedLayers = 0;
             final ArrayList<LayerOfflineData> wmsOfflineLayers = new ArrayList<>();
 
             for (final IMemento tagLayer : tagProfileMapProvider.getChildren(TAG_LAYER)) {
@@ -2089,10 +2080,6 @@ public class MapProviderManager {
                offlineLayer.position = layerPosition == null ? -1 : layerPosition;
 
                wmsOfflineLayers.add(offlineLayer);
-
-               if (layerIsDisplayed) {
-                  displayedLayers++;
-               }
             }
 
             mpWrapper.setWmsOfflineLayerList(wmsOfflineLayers);
@@ -2562,9 +2549,12 @@ public class MapProviderManager {
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
       tagMapProvider.putString(ATTR_MP_IMAGE_FORMAT, mp.getImageFormat());
 
+      // User Agent
+      tagMapProvider.putString(ATTR_MP_USER_AGENT, mp.getUserAgent());
+
       // zoom level
-      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MIN, mp.getMinZoomLevel());
-      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MAX, mp.getMaxZoomLevel());
+      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MIN, mp.getMinimumZoomLevel());
+      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MAX, mp.getMaximumZoomLevel());
 
       // favorite position
       tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mp.getFavoriteZoom());

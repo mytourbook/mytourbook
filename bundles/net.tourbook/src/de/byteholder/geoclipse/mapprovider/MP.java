@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package de.byteholder.geoclipse.mapprovider;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.ITilePainter;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Mercator;
 import de.byteholder.geoclipse.map.OverlayTourState;
 import de.byteholder.geoclipse.map.Projection;
@@ -49,6 +49,7 @@ import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -127,14 +128,17 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    /**
     * Listener which throws {@link ITileListener} events
     */
-   private final static ListenerList<ITileListener>        _tileListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITileListener>        _tileListeners               = new ListenerList<>(ListenerList.IDENTITY);
 
    private static final ListenerList<IOfflineInfoListener> _offlineReloadEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
-   private int                                             _dimmingAlphaValue           = 0xFF;
+   private boolean                                         _isDimMap;
+   private int                                             _dimmingAlphaValue           = 0xff;
    private RGB                                             _dimmingColor;
 
    private final Projection                                _projection;
+
+   private String                                          _userAgent                   = UI.EMPTY_STRING;
 
    /**
     * image size in pixel for a square image
@@ -143,7 +147,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    // map min/max zoom level
    private int         _minZoomLevel       = 0;
-   private int         _maxZoomLevel       = Map.UI_MAX_ZOOM_LEVEL - Map.UI_MIN_ZOOM_LEVEL;
+   private int         _maxZoomLevel       = Map2.UI_MAX_ZOOM_LEVEL - Map2.UI_MIN_ZOOM_LEVEL;
 
    private int         _defaultZoomLevel   = 0;
 
@@ -283,7 +287,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     */
-   public MP() {
+   protected MP() {
 
       _projection = new Mercator();
 
@@ -348,7 +352,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       } else {
 
-         mapProvider._imageFormat = new String(_imageFormat);
+         mapProvider._imageFormat = _imageFormat;
 
          mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
                ? new GeoPosition(0.0, 0.0)
@@ -417,26 +421,23 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.syncExec(() -> {
 
-            final int tileSize = getTileSize();
+         final int tileSize = getTileSize();
 
-            _errorImage = new Image(display, tileSize, tileSize);
+         _errorImage = new Image(display, tileSize, tileSize);
 
-            final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
-            final GC gc = new GC(getErrorImage());
-            {
-               gc.setBackground(bgColor);
-               gc.fillRectangle(0, 0, tileSize, tileSize);
+         final Color bgColor = new Color(display, Map2.OSM_BACKGROUND_RGB);
+         final GC gc = new GC(getErrorImage());
+         {
+            gc.setBackground(bgColor);
+            gc.fillRectangle(0, 0, tileSize, tileSize);
 
-               gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-               gc.drawString(Messages.geoclipse_extensions_loading_failed, 5, 5);
-            }
-            gc.dispose();
-            bgColor.dispose();
+            gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            gc.drawString(Messages.geoclipse_extensions_loading_failed, 5, 5);
          }
+         gc.dispose();
+         bgColor.dispose();
       });
    }
 
@@ -444,26 +445,23 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.syncExec(() -> {
 
-            final int tileSize = getTileSize();
+         final int tileSize = getTileSize();
 
-            _loadingImage = new Image(display, tileSize, tileSize);
+         _loadingImage = new Image(display, tileSize, tileSize);
 
-            final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
-            final GC gc = new GC(getLoadingImage());
-            {
-               gc.setBackground(bgColor);
-               gc.fillRectangle(0, 0, tileSize, tileSize);
+         final Color bgColor = new Color(display, Map2.OSM_BACKGROUND_RGB);
+         final GC gc = new GC(getLoadingImage());
+         {
+            gc.setBackground(bgColor);
+            gc.fillRectangle(0, 0, tileSize, tileSize);
 
-               gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-               gc.drawString(Messages.geoclipse_extensions_loading, 5, 5);
-            }
-            gc.dispose();
-            bgColor.dispose();
+            gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            gc.drawString(Messages.geoclipse_extensions_loading, 5, 5);
          }
+         gc.dispose();
+         bgColor.dispose();
       });
    }
 
@@ -472,9 +470,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    public void disposeAllImages() {
 
-      if (_tileImageCache != null) {
-         _tileImageCache.dispose();
-      }
+      _tileImageCache.dispose();
 
       if (_loadingImage != null) {
          _loadingImage.dispose();
@@ -770,18 +766,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _maxZoomLevel;
    }
 
-   public int getMaxZoomLevel() {
-      return _maxZoomLevel;
-   }
-
    /**
     * @return
     */
    public int getMinimumZoomLevel() {
-      return _minZoomLevel;
-   }
-
-   public int getMinZoomLevel() {
       return _minZoomLevel;
    }
 
@@ -900,7 +888,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          // check if the old implementation was not correctly transfered to the cache with error tiles
          if (tile.isLoadingError()) {
-            StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
+            StatusUtil.logError("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
                   + tile.getTileKey());
 
             // ensure the error do not occur again for this tile
@@ -923,7 +911,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
          // check if the old implementation was not correctly transfered to the cache with error tiles
          if (tile != null) {
-            StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
+            StatusUtil.logError("Internal error: Tile with loading error should not be in the tile cache 2: " //$NON-NLS-1$
                   + tile.getTileKey());
          }
 
@@ -1093,7 +1081,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *         This was necessary to conform to OpenStreetMap policy.
     */
    public String getUserAgent() {
-      return null;
+      return _userAgent;
    }
 
    @Override
@@ -1147,6 +1135,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _maxZoomLevel = maxZoom;
 
       initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
+   }
+
+   public boolean isDimMap() {
+      return _isDimMap;
    }
 
    /**
@@ -1235,7 +1227,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * @param isFiFo
     * @throws InterruptedException
     */
-   private void putOneTileInWaitingQueue(final Tile tile, final boolean isFiFo) throws InterruptedException {
+   private void putOneTileInWaitingQueue(final Tile tile, final boolean isFiFo) {
 
       tile.setLoading(true);
 
@@ -1387,16 +1379,21 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       this._description = fDescription;
    }
 
-   public void setDimLevel(final int dimLevel, final RGB dimColor) {
+   public void setDimLevel(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
 
-      // check if dimming value is modified
-      if (_dimmingAlphaValue == dimLevel && _dimmingColor == dimColor) {
+      // convert dimLevel 0...10 into alpha value 0...255
+      final int dimAlphaValue = 255 - dimLevel * 255 / Map2View.MAX_DIM_STEPS;
+
+      // check if the dimming value is modified
+      if (_isDimMap == isDimMap && _dimmingAlphaValue == dimAlphaValue && dimColor.equals(_dimmingColor)) {
+
          // dimming value is not modified
          return;
       }
 
-      // set new dim level/color
-      _dimmingAlphaValue = dimLevel;
+      // keep dim fields
+      _isDimMap = isDimMap;
+      _dimmingAlphaValue = dimAlphaValue;
       _dimmingColor = dimColor;
 
       // dispose all cached images
@@ -1523,6 +1520,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public void setUseOfflineImage(final boolean useOfflineImage) {
       _isOfflineImageUsed = useOfflineImage;
+   }
+
+   public void setUserAgent(final String userAgent) {
+      _userAgent = userAgent;
    }
 
    /**

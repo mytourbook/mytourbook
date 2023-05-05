@@ -1,0 +1,75 @@
+22.8.0                                                   17. August 2022
+
+
+New
+===
+
+* 2.5D Map
+  - Draw tour track with a gradient color, the color depends on a track value, e.g. elevation
+    Hint: The color must be set to black for a gradient color with opacity
+                                                            https://github.com/mytourbook/mytourbook/issues/893
+  - Show track legend                                       https://github.com/mytourbook/mytourbook/issues/893
+  - Set map luminance                                       https://github.com/mytourbook/mytourbook/issues/893
+      
+  - Show compassrose (Thomas + Wolfgang)                    https://github.com/mytourbook/mytourbook/issues/896
+  
+
+Improvements
+============
+
+* 2D Map
+  - Goto latitude/longitude location                        https://github.com/mytourbook/mytourbook/issues/884
+  - Copy geo location to clipboard
+  
+* 2.5D Map
+  - Paint tour track with a vertical offset                 https://github.com/mytourbook/mytourbook/issues/889
+  - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
+
+* Weather (Frederic)
+  - Added a drizzle weather icon                            https://github.com/mytourbook/mytourbook/issues/874
+
+* Tour Editor (Frederic)
+  - Added the ability to change the weather description's number of lines 
+                                                            https://github.com/mytourbook/mytourbook/issues/897
+
+* Tour printing (Frederic)
+  - Added the ability to enable/disable the opening of the printed tour in the default PDF viewer
+
+
+Changes
+=======
+
+* Fitlog/FitlogEx Import (Frederic)
+  - Compute the average power when power data is provided but average power value is not
+
+* 2.5D Map
+  - Track (line) colors in the color profiles are reset to defaults
+  
+  
+Bugfix
+======
+
+* 2.5D Map
+  - Track width jumped when the zoom-level changed, now it's width is always the same
+
+* TCX Export (Frederic)
+  - Fixed an issue where the exported speed was in km/h instead of m/s 
+                                                            https://github.com/mytourbook/mytourbook/issues/903
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone     https://github.com/mytourbook/mytourbook/milestone/5?closed=1
+* Eclipse 2022-06
+* FIT SDK 21.84
+* WorldWind 2.2.1          https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

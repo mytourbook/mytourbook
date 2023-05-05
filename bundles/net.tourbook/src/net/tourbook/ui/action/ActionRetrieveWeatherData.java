@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui.action;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
@@ -24,11 +25,11 @@ import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class ActionRetrieveWeatherData extends Action {
+
    private final ITourProvider2 _tourProvider;
 
    public ActionRetrieveWeatherData(final ITourProvider2 tourProvider) {
@@ -48,9 +49,8 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
-      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-
       final Shell shell = Display.getCurrent().getActiveShell();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
       if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
@@ -62,29 +62,10 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            final ArrayList<TourData> modifiedTours = new ArrayList<>();
+      final List<TourData> modifiedTours = TourManager.retrieveWeatherData(selectedTours);
 
-            for (final TourData tour : selectedTours) {
-
-               final boolean isDataRetrieved = TourManager.retrieveWeatherData(tour);
-
-               if (isDataRetrieved) {
-                  modifiedTours.add(tour);
-               }
-            }
-
-            if (modifiedTours.size() > 0) {
-               TourManager.saveModifiedTours(modifiedTours);
-            } else {
-               MessageDialog.openInformation(
-                     shell,
-                     Messages.Dialog_RetrieveWeather_Dialog_Title,
-                     Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
-            }
-         }
-      });
+      if (modifiedTours.size() > 0) {
+         TourManager.saveModifiedTours(modifiedTours);
+      }
    }
 }

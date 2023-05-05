@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.tour.filter;
 
 import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.common.UI;
 
@@ -24,10 +25,12 @@ import net.tourbook.common.UI;
  */
 public class TourFilterFieldConfig {
 
+   private static final char       NL                    = UI.NEW_LINE;
+
    /**
     * Visible field name
     */
-   final String                    name;
+   private final String            name;
 
    /**
     * Every field must have a unique id, it is <code>null</code> when it's a category. config.
@@ -67,6 +70,7 @@ public class TourFilterFieldConfig {
    String                          unitLabel             = UI.EMPTY_STRING;
 
    private TourFilterFieldConfig(final String name) {
+
       this.name = name;
    }
 
@@ -91,28 +95,10 @@ public class TourFilterFieldConfig {
 
    private static String createLabel_Category(final String category) {
 
-      final String label = UI.EMPTY_STRING
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + category.toUpperCase()
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
-            + UI.SPACE
-            + UI.SPACE
-            + UI.SYMBOL_DOT
+      // put spaces between characters that it looks more as a title
+      final String categoryNameWithSpaces = category.replaceAll(".", "$0  "); //$NON-NLS-1$ //$NON-NLS-2$
 
-      ;
+      final String label = UI.SPACE3 + UI.SPACE3 + categoryNameWithSpaces.toUpperCase();
 
       return label;
    }
@@ -204,6 +190,10 @@ public class TourFilterFieldConfig {
       return fieldOperators[0];
    }
 
+   public String getName() {
+      return name;
+   }
+
    /**
     * Set maximum integer value, default is {@link Integer#MAX_VALUE}.
     *
@@ -238,12 +228,26 @@ public class TourFilterFieldConfig {
 
    @Override
    public String toString() {
-      return "TourFilterFieldConfig [\n" //$NON-NLS-1$
-            + ("name=" + name + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("fieldId=" + fieldId + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("fieldType=" + fieldType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("fieldOperators=" + Arrays.toString(fieldOperators)) //$NON-NLS-1$
-            + "\n]\n"; //$NON-NLS-1$
+
+      final int maxLen = 5;
+
+      final List<TourFilterFieldOperator> fieldOperatorsAsText = fieldOperators != null
+            ? Arrays.asList(fieldOperators).subList(0, Math.min(fieldOperators.length, maxLen))
+            : null;
+
+      return UI.EMPTY_STRING
+
+            + "TourFilterFieldConfig" + NL //                     //$NON-NLS-1$
+
+            + "[" + NL //                                         //$NON-NLS-1$
+
+            + "name           =" + name + NL //                   //$NON-NLS-1$
+            + "fieldId        =" + fieldId + NL //                //$NON-NLS-1$
+            + "fieldType      =" + fieldType + NL //              //$NON-NLS-1$
+            + "fieldOperators =" + fieldOperatorsAsText + NL //   //$NON-NLS-1$
+
+            + "]" + NL //                                         //$NON-NLS-1$
+      ;
    }
 
    /**

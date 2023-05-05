@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.common.UI;
@@ -561,7 +562,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
       ttPosY = -tipHeight + 1;
 
-      // ckeck if tooltip is left to the chart border
+      // check if tooltip is left to the chart border
       if (ttPosX /* + tipWidth */ < 0) {
 
          // set tooltip to the graph left border
@@ -717,7 +718,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 
    private void updateUI() {
 
-      final ArrayList<TourSegment> tourSegments = _tourChart.getTourSegments();
+      final List<TourSegment> tourSegments = _tourChart.getTourSegments();
       if (tourSegments == null || tourSegments.isEmpty()) {
          return;
       }

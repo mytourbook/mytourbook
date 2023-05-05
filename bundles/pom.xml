@@ -8,12 +8,12 @@
    <modelVersion>4.0.0</modelVersion>
 
    <artifactId>mytourbook-bundles</artifactId>     <groupId>net.tourbook</groupId>
-                                                   <version>20.12.0-SNAPSHOT</version>
+                                                   <version>23.3.2-SNAPSHOT</version>
    <packaging>pom</packaging>
 
    <parent>
       <artifactId>mytourbook-app</artifactId>      <groupId>net.tourbook</groupId>
-                                                   <version>20.12.0-SNAPSHOT</version>
+                                                   <version>23.3.2-SNAPSHOT</version>
 
       <relativePath>../../MT/mytourbook/pom.xml</relativePath>
    </parent>
@@ -30,10 +30,13 @@
       <module>net.tourbook.device.garmin.fit</module>
       <module>net.tourbook.device.nmea</module>
       <module>net.tourbook.export</module>
+      <module>net.tourbook.model</module>
       <module>net.tourbook.p2</module>
       <module>net.tourbook.photo</module>
       <module>net.tourbook.printing</module>
       <module>net.tourbook.statistics</module>
+      <module>net.tourbook.tests</module>
+      <module>net.tourbook.ui.tests</module>
       <module>net.tourbook.web</module>
 
       <module>net.tourbook.ext.apache</module>

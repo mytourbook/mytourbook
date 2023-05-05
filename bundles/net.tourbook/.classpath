@@ -11,8 +11,12 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins">
 		<accessrules>
 			<accessrule kind="accessible" pattern="org/eclipse/core/internal/databinding/conversion/**"/>
+			<accessrule kind="accessible" pattern="org/eclipse/e4/ui/css/swt/theme/**"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/internal/DPIUtil"/>
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 </classpath>

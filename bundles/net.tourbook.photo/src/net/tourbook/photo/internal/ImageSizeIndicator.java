@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.photo.internal;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -25,47 +24,42 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ImageSizeIndicator extends Canvas {
 
-	private boolean	_isHqImage;
+   private boolean _isHqImage;
 
-	public ImageSizeIndicator(final Composite parent, final int style) {
+   public ImageSizeIndicator(final Composite parent, final int style) {
 
-		super(parent, style);
+      super(parent, style);
 
-		addPaintListener(new PaintListener() {
+      addPaintListener(paintEvent -> onPaint(paintEvent));
+   }
 
-			@Override
-			public void paintControl(final PaintEvent e) {
-				onPaint(e);
-			}
-		});
-	}
+   private void onPaint(final PaintEvent paintEvent) {
 
-	private void onPaint(final PaintEvent paintEvent) {
+      final GC gc = paintEvent.gc;
 
-		final GC gc = paintEvent.gc;
+      final Rectangle bounds = getBounds();
 
-		final Rectangle bounds = getBounds();
+      final int vMargin = 1;
+      final int vMargin2 = 2 * vMargin;
+      final int width = bounds.width;
+      final int height = bounds.height;
 
-		final int vMargin = 1;
-		final int vMargin2 = 2 * vMargin;
-		final int width = bounds.width;
-		final int height = bounds.height;
-
-		// debug box
+      // debug box
 //		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 //		gc.fillRectangle(0, 0, bounds.width, bounds.height);
 
-		if (_isHqImage) {
-			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
-		} else {
-			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
-		}
-		gc.fillRectangle(0, vMargin, width, height - vMargin2);
-	}
+      if (_isHqImage) {
+         gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
+      } else {
+         gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
+      }
 
-	public void setIndicator(final boolean isHqImage) {
-		_isHqImage = isHqImage;
-		redraw();
-	}
+      gc.fillRectangle(0, vMargin, width, height - vMargin2);
+   }
+
+   public void setIndicator(final boolean isHqImage) {
+      _isHqImage = isHqImage;
+      redraw();
+   }
 
 }

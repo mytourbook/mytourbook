@@ -1,3 +1,18 @@
+#####################################
+Version update - simplified
+#####################################
+
+Replace by using <Ctrl-H-> the old version with the new version, e.g. from "21.9.0" -> "21.12.0" in the workspaces
+
+   ws-MT-422
+   ws-mt-NL-projects
+
+AND REVIEW IT MANUALLY IN ALL MODIFIED FILES, subversions must not be modified everywhere, take care with
+
+   "feature.xml" in "feature.net.tourbook.app"
+   "feature.xml" in "feature.net.tourbook.app.nl" 
+
+
 
 #####################################
  One Click build process (since 18.1)
@@ -8,33 +23,66 @@
 * Run "gradlew" in "C:\DAT\MT\mytourbook\build\build.net.tourbook" this will run the default task
 
 
+Setup to run gradle:
+
+   JAVA_HOME   =C:\Program Files\AdoptOpenJDK\jdk-11.0.11.9-hotspot\
+   Path        =C:\Program Files\AdoptOpenJDK\jdk-11.0.11.9-hotspot\bin;
+                C:\BIN\gradle\gradle-6.9\bin;
+                C:\BIN\maven\bin\;
+
+Setup the graddle wrapper in the build folder:
+
+   gradle wrapper --gradle-version 6.9
+
+
 #################
  Build VTM Plugin
 #################
 
    Setup Gradle environment
-   - Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\WolfgangSchramm\.gradle\gradle.properties
+   - Set "org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-11.0.17.8-hotspot"
+     in C:\Users\Wolfgang\.gradle\gradle.properties
    
 
-   Build plugin
+   Build VTM plugin for MT
+   
    - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
-   - Update VTM files, run task assemble:    C:\DAT\MT\vtm-parent>gradlew ass
-   - Update VTM plugin, run task assemble:   C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm>gradle ass
-
-   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
-    
-      Update manifest.MF
-      - Select 'EGradle virtual root project' in 'Package Explorer'
-      - Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
-      
-      Build plugin
-      - Open 'Gradle Tasks' view
-      - Select 'net.tourbook.ext.vtm'
-      - Double click 'assemble'
    
-   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD 
+   - Update VTM files, run task assemble:   
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew clean ass
+      
+      
+   - Update VTM plugin, run task assemble:   
+     
+     cd C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm
+     gradle clean ass
 
 
+   TEST VTM
+   
+   - Run playground
+   
+      cd C:\DAT\MT\vtm-parent
+      run-playground.cmd
+
+
+   - Copy debug files
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew copyDebugFiles   
+
+
+   - Fat jar
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew :vtm-playground:fatJar
+
+
+   - Other VTM Tests
+   
+     https://github.com/mapsforge/vtm/blob/master/docs/desktop.md   
 
 ###########################
  Update Eclipse NL repo
@@ -133,18 +181,26 @@ Build Product
       - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
 
 
-Build Update site
+Build Update Site
 ------------------
-   Open cmd
-      - Select folder "C:\DAT\MT\mytourbook"
-      - Run "mvn verify -P build-update-site"
+
+   !!! BEFORE !!!
+   
+   1. Set version numbers like in this commit https://github.com/mytourbook/mytourbook/commit/4ad360673bea889647dfb54f7c754c8bb41984b0
+   2. Run "CREATE_MT_BuildFiles.xml" BEFORE the following commands
+
+   * WITH NL
+   
+      Open cmd
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site"
 
 
-   * without NL
+   * WITHOUT NL
 
-   Open cmd
-      - Select folder "C:\DAT\MT\mytourbook"
-      - Run "mvn verify -P build-update-site-no-nl"
+      Open cmd
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site-no-nl"
 
 
 
@@ -289,81 +345,6 @@ Create Update Site
 
 
 
-
-------------------------------------------------------------------------------------
-
-All MT app + build files
-
-
-/build.eclipse.3.8.2.nl.update-site
-/build.net.tourbook
-/build.net.tourbook.ant
-/build.net.tourbook.feature
-/build.net.tourbook.product
-/build.parent.pom
-/de.byteholder.geoclipse.ext.geotools
-/feature.net.tourbook.app
-/feature.net.tourbook.app.nl
-/feature.net.tourbook.ext.derby
-/feature.net.tourbook.ext.eclipse
-/feature.net.tourbook.ext.eclipse.nl
-/feature.net.tourbook.ext.jpa
-/feature.net.tourbook.ext.jars
-/feature.net.tourbook.ext.rxtx
-/feature.net.tourbook.ext.worldwind
-/feature.z-Dummy-Host
-/net.tourbook
-/net.tourbook.branding
-/net.tourbook.chart
-/net.tourbook.chart.nl
-/net.tourbook.common
-/net.tourbook.common.nl
-/net.tourbook.device
-/net.tourbook.device.garmin
-/net.tourbook.device.garmin.fit
-/net.tourbook.device.garmin.fit.nl
-/net.tourbook.device.garmin.nl
-/net.tourbook.device.nl
-/net.tourbook.device.nmea
-/net.tourbook.device.nmea.nl
-/net.tourbook.export
-/net.tourbook.ext.jpa
-/net.tourbook.ext.jars
-/net.tourbook.ext.jars.printing
-/net.tourbook.ext.rxtx_2.2
-/net.tourbook.ext.rxtx.linux32_2.2
-/net.tourbook.ext.rxtx.linux64_2.2
-/net.tourbook.ext.rxtx.macosx_2.2
-/net.tourbook.ext.rxtx.win32_2.2
-/net.tourbook.ext.rxtx.win64_2.2
-/net.tourbook.ext.velocity
-/net.tourbook.ext.worldwind
-/net.tourbook.ext.worldwind.linux32
-/net.tourbook.ext.worldwind.linux64
-/net.tourbook.ext.worldwind.macosx
-/net.tourbook.ext.worldwind.win32
-/net.tourbook.ext.worldwind.win64
-/net.tourbook.nl
-/net.tourbook.photo
-/net.tourbook.photo.nl
-/net.tourbook.printing
-/net.tourbook.printing.nl
-/net.tourbook.statistics
-/net.tourbook.statistics.nl
-/net.tourbook.web
-/net.tourbook.web.nl
-/org.apache.derby_10.11.1.1
-/z-DUMMY-HOST.net.tourbook
-/z-DUMMY-HOST.net.tourbook.chart
-/z-DUMMY-HOST.net.tourbook.common
-/z-DUMMY-HOST.net.tourbook.device
-/z-DUMMY-HOST.net.tourbook.device.garmin
-/z-DUMMY-HOST.net.tourbook.device.garmin.fit
-/z-DUMMY-HOST.net.tourbook.device.nmea
-/z-DUMMY-HOST.net.tourbook.photo
-/z-DUMMY-HOST.net.tourbook.printing
-/z-DUMMY-HOST.net.tourbook.statistics
-/z-DUMMY-HOST.net.tourbook.web
 
 
 

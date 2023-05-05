@@ -1,0 +1,110 @@
+23.next.0                                                 ?. March 2023
+
+
+TODO's
+======               
+
+* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
+                    Released: 23.3
+
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+
+
+Issues
+======
+
+*
+
+
+Experimental
+============
+
+* 
+
+
+New
+===
+
+* Easy Import
+  - Simple UI to start an easy import launcher
+    https://github.com/mytourbook/mytourbook/issues/1065
+
+* Tour Weather (Frederic)
+  - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
+
+* Tour Export (Frederic)
+  - Added the ability to export tours in FIT format
+  
+* Suunto App Integration (Frederic)
+  - Added the ability to upload tours as workouts
+
+Improvements
+============
+
+* Tour Reimport (Frederic)
+  - Added the ability to reimport weather information (clouds and description)
+
+* Tour Book View
+  - Filter tours which are collected or not collected
+    https://github.com/mytourbook/mytourbook/issues/1050
+  - Delete tours with the keyboard <Ctrl><Shift><Delete>
+
+* 2D Map (Meinhard)
+  - Make power a selectable option for coloring the tour graph 
+    https://github.com/mytourbook/mytourbook/issues/1071
+
+* Tour Info Tooltip
+  - Adjust width of the tour info tooltip
+    https://github.com/mytourbook/mytourbook/issues/1077
+  - Added, when available, the time and percentage of time spent in each HR zone (Frederic)
+  
+* Tour Chart
+  - Show "Recorded Time" in the value point tooltip 
+    https://github.com/mytourbook/mytourbook/issues/502
+  
+* Tour Pauses View (Frederic)
+  - Added a Pause Type column
+
+* Tour Geo Filter
+  - Toggle name in the filter history viewer between read and edit mode
+
+* Weather (Frederic)
+  - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
+
+Changes
+=======
+
+* 
+
+
+Bugfix
+======
+
+* Tour Import
+  - "distanceSerie" is null                  https://github.com/mytourbook/mytourbook/issues/1044
+
+* Tour Info Tooltip (Frederic)
+  - Fixed a bug where the time formats were not correctly applied
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.3   https://github.com/mytourbook/mytourbook/milestone/6?closed=1
+* Eclipse 2022-06
+* NatTable 2.03               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.105
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

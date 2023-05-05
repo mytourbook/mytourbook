@@ -59,476 +59,477 @@ import org.osgi.framework.ServiceReference;
 @SuppressWarnings("restriction")
 public class P2_Activator extends AbstractUIPlugin {
 
-	public static final String					PLUGIN_ID				= "org.eclipse.equinox.p2.ui.sdk";				//$NON-NLS-1$
+   public static final String  PLUGIN_ID              = "org.eclipse.equinox.p2.ui.sdk";             //$NON-NLS-1$
 
-	private static final String					UPDATE_SITE_NAME		= "MyTourbook Update Site";					//$NON-NLS-1$
+   private static final String UPDATE_SITE_NAME       = "MyTourbook Update Site";                    //$NON-NLS-1$
 
-	private static final String					TAG_REPOSITORIES		= "Repositories"; //$NON-NLS-1$
-	private static final String					TAG_REPOSITORY			= "Repository"; //$NON-NLS-1$
+   private static final String TAG_REPOSITORIES       = "Repositories";                              //$NON-NLS-1$
+   private static final String TAG_REPOSITORY         = "Repository";                                //$NON-NLS-1$
 
-	private static final String					ATTR_IS_ENABLED			= "isEnabled"; //$NON-NLS-1$
-	private static final String					ATTR_NICK_NAME			= "nickName"; //$NON-NLS-1$
-	private static final String					ATTR_URI				= "uri"; //$NON-NLS-1$
+   private static final String ATTR_IS_ENABLED        = "isEnabled";                                 //$NON-NLS-1$
+   private static final String ATTR_NICK_NAME         = "nickName";                                  //$NON-NLS-1$
+   private static final String ATTR_URI               = "uri";                                       //$NON-NLS-1$
 
-	private static String						UPDATE_SITE_PRODUCTION	= "http://mytourbook.sourceforge.net/updates";	//$NON-NLS-1$
-//	private static String						UPDATE_SITE_TEST		= "http://mytourbook.sourceforge.net/TEST-updates";						//$NON-NLS-1$
-//	private static String						UPDATE_SITE_TEST_LOCAL	= "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";	//$NON-NLS-1$
+   private static String       UPDATE_SITE_PRODUCTION = "https://github.com/mytourbook/mytourbook.github.io"; //$NON-NLS-1$
+//   private static String     UPDATE_SITE_TEST      = "http://mytourbook.sourceforge.net/TEST-updates";                  //$NON-NLS-1$
+//   private static String     UPDATE_SITE_TEST_LOCAL   = "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";   //$NON-NLS-1$
 
-	private static MetadataRepositoryElement[]	DEFAULT_UPDATE_SITES;													;
+   private static MetadataRepositoryElement[] DEFAULT_UPDATE_SITES;
 
-	static {
+   static {
 
-		try {
+      try {
 
-			/*
-			 * http://mytourbook.sourceforge.net/updates
-			 */
-			final MetadataRepositoryElement repo_PRODUCTION = new MetadataRepositoryElement(null, //
-					new URI(UPDATE_SITE_PRODUCTION),
-					true);
+         /*
+          * https://github.com/mytourbook/mytourbook.github.io
+          */
+         final MetadataRepositoryElement repo_PRODUCTION = new MetadataRepositoryElement(null, //
+               new URI(UPDATE_SITE_PRODUCTION),
+               true);
 
-			repo_PRODUCTION.setNickname(UPDATE_SITE_NAME);
+         repo_PRODUCTION.setNickname(UPDATE_SITE_NAME);
 
-//			/*
-//			 * http://mytourbook.sourceforge.net/TEST-updates
-//			 */
-//			final MetadataRepositoryElement repo_TEST_Web = new MetadataRepositoryElement(null,//
-//					new URI(UPDATE_SITE_TEST),
-//					true);
+//         /*
+//          * http://mytourbook.sourceforge.net/TEST-updates
+//          */
+//         final MetadataRepositoryElement repo_TEST_Web = new MetadataRepositoryElement(null,//
+//               new URI(UPDATE_SITE_TEST),
+//               true);
 //
-//			repo_TEST_Web.setNickname(UPDATE_SITE_TEST);
+//         repo_TEST_Web.setNickname(UPDATE_SITE_TEST);
 //
-//			/*
-//			 * file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository
-//			 */
-//			final MetadataRepositoryElement repo_TEST_Local = new MetadataRepositoryElement(null, //
-//					new URI(UPDATE_SITE_TEST_LOCAL),
-//					true);
+//         /*
+//          * file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository
+//          */
+//         final MetadataRepositoryElement repo_TEST_Local = new MetadataRepositoryElement(null, //
+//               new URI(UPDATE_SITE_TEST_LOCAL),
+//               true);
 //
-//			repo_TEST_Local.setNickname(UPDATE_SITE_TEST_LOCAL);
+//         repo_TEST_Local.setNickname(UPDATE_SITE_TEST_LOCAL);
 
-			DEFAULT_UPDATE_SITES = new MetadataRepositoryElement[] {
+         DEFAULT_UPDATE_SITES = new MetadataRepositoryElement[] {
 
-			//	PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION
+               //   PRODUCTION   PRODUCTION   PRODUCTION   PRODUCTION
 
-			repo_PRODUCTION,
+               repo_PRODUCTION,
 
-			//
-			// DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG
-			//
+               //
+               // DEBUG   DEBUG   DEBUG   DEBUG   DEBUG   DEBUG
+               //
 
-//			repo_TEST_Web,
-//			repo_TEST_Local
+//         repo_TEST_Web,
+//         repo_TEST_Local
 
-			//
-			};
+               //
+         };
 
-		} catch (final URISyntaxException e) {
-			StatusUtil.handleStatus(e, 0);
-		}
-	}
+      } catch (final URISyntaxException e) {
+         StatusUtil.handleStatus(e, 0);
+      }
+   }
 
-	private static P2_Activator					plugin;
-	private static BundleContext				context;
+   private static P2_Activator     plugin;
+   private static BundleContext    context;
 
-	private ScopedPreferenceStore				preferenceStore;
-	private IPropertyChangeListener				preferenceListener;
+   private ScopedPreferenceStore   preferenceStore;
+   private IPropertyChangeListener preferenceListener;
 
-	public P2_Activator() {
-		// constructor
-	}
+   public P2_Activator() {
+      // constructor
+   }
 
-	static boolean containsURI(final URI[] locations, final URI url) {
-		for (final URI location : locations) {
-			if (location.equals(url)) {
-				return true;
-			}
-		}
-		return false;
-	}
+   static boolean containsURI(final URI[] locations, final URI url) {
+      for (final URI location : locations) {
+         if (location.equals(url)) {
+            return true;
+         }
+      }
+      return false;
+   }
 
-	public static BundleContext getContext() {
-		return context;
-	}
+   public static BundleContext getContext() {
+      return context;
+   }
 
-	/**
-	 * Returns the singleton plugin instance
-	 * 
-	 * @return the instance
-	 */
-	public static P2_Activator getDefault() {
-		return plugin;
-	}
+   /**
+    * Returns the singleton plugin instance
+    *
+    * @return the instance
+    */
+   public static P2_Activator getDefault() {
+      return plugin;
+   }
 
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(final String path) {
+   /**
+    * Returns an image descriptor for the image file at the given plug-in relative path
+    *
+    * @param path
+    *           the path
+    * @return the image descriptor
+    */
+   public static ImageDescriptor getImageDescriptor(final String path) {
       final Optional<ImageDescriptor> imageDescriptor = ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path);
 
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
-	}
+   }
 
-	static IStatus getNoSelfProfileStatus() {
-		return new Status(IStatus.WARNING, PLUGIN_ID, ProvSDKMessages.ProvSDKUIActivator_NoSelfProfile);
-	}
+   static IStatus getNoSelfProfileStatus() {
+      return new Status(IStatus.WARNING, PLUGIN_ID, ProvSDKMessages.ProvSDKUIActivator_NoSelfProfile);
+   }
 
-	private static ArrayList<MetadataRepositoryElement> getOldRepos(final IMemento memento) {
+   private static ArrayList<MetadataRepositoryElement> getOldRepos(final IMemento memento) {
 
-		final ArrayList<MetadataRepositoryElement> oldRepos = new ArrayList<MetadataRepositoryElement>();
+      final ArrayList<MetadataRepositoryElement> oldRepos = new ArrayList<>();
 
-		try {
+      try {
 
-			final IMemento xmlRepos = memento.getChild(TAG_REPOSITORIES);
-			for (final IMemento xmlRepo : xmlRepos.getChildren(TAG_REPOSITORY)) {
+         final IMemento xmlRepos = memento.getChild(TAG_REPOSITORIES);
+         for (final IMemento xmlRepo : xmlRepos.getChildren(TAG_REPOSITORY)) {
 
-				final String uriName = xmlRepo.getString(ATTR_URI);
-				final String nickName = xmlRepo.getString(ATTR_NICK_NAME);
-				final Boolean isEnabled = xmlRepo.getBoolean(ATTR_IS_ENABLED);
+            final String uriName = xmlRepo.getString(ATTR_URI);
+            final String nickName = xmlRepo.getString(ATTR_NICK_NAME);
+            final Boolean isEnabled = xmlRepo.getBoolean(ATTR_IS_ENABLED);
 
-				if (uriName != null && isEnabled != null) {
+            if (uriName != null && isEnabled != null) {
 
-					final MetadataRepositoryElement oldRepo = new MetadataRepositoryElement(null, //
-							new URI(uriName),
-							isEnabled);
+               final MetadataRepositoryElement oldRepo = new MetadataRepositoryElement(null, //
+                     new URI(uriName),
+                     isEnabled);
 
-					if (nickName != null) {
-						oldRepo.setNickname(nickName);
-					}
+               if (nickName != null) {
+                  oldRepo.setNickname(nickName);
+               }
 
-					oldRepos.add(oldRepo);
+               oldRepos.add(oldRepo);
 
-				} else {
-					StatusUtil.handleStatus(String.format(
-							"Repository data is invalid - Nickname:%s - URI:%s - Enabled:%s", //$NON-NLS-1$
-							nickName,
-							uriName,
-							isEnabled), 0);
-				}
-			}
-		} catch (final Exception e) {
-			StatusUtil.handleStatus(e, 0);
-		}
+            } else {
+               StatusUtil.handleStatus(String.format(
+                     "Repository data is invalid - Nickname:%s - URI:%s - Enabled:%s", //$NON-NLS-1$
+                     nickName,
+                     uriName,
+                     isEnabled), 0);
+            }
+         }
+      } catch (final Exception e) {
+         StatusUtil.handleStatus(e, 0);
+      }
 
-		return oldRepos;
-	}
+      return oldRepos;
+   }
 
-	private static MetadataRepositoryElement[] mergeRepositories(final IMemento memento) {
+   private static MetadataRepositoryElement[] mergeRepositories(final IMemento memento) {
 
-		final ArrayList<MetadataRepositoryElement> oldRepos = getOldRepos(memento);
-		final Collection<MetadataRepositoryElement> newRepos = new ArrayList<MetadataRepositoryElement>();
+      final ArrayList<MetadataRepositoryElement> oldRepos = getOldRepos(memento);
+      final Collection<MetadataRepositoryElement> newRepos = new ArrayList<>();
 
-		// add default repos when they are not contained in the old repos
-		for (final MetadataRepositoryElement defaultRepo : DEFAULT_UPDATE_SITES) {
+      // add default repos when they are not contained in the old repos
+      for (final MetadataRepositoryElement defaultRepo : DEFAULT_UPDATE_SITES) {
 
-			final String defaultRepoLocation = defaultRepo.getLocation().toASCIIString();
-			boolean isInOldRepo = false;
+         final String defaultRepoLocation = defaultRepo.getLocation().toASCIIString();
+         boolean isInOldRepo = false;
 
-			for (final MetadataRepositoryElement oldRepo : oldRepos) {
+         for (final MetadataRepositoryElement oldRepo : oldRepos) {
 
-				if (oldRepo.getLocation().toASCIIString().equals(defaultRepoLocation)) {
-					isInOldRepo = true;
-					break;
-				}
-			}
+            if (oldRepo.getLocation().toASCIIString().equals(defaultRepoLocation)) {
+               isInOldRepo = true;
+               break;
+            }
+         }
 
-			if (isInOldRepo == false) {
+         if (isInOldRepo == false) {
 
-				// add default repo before the old repos
-				newRepos.add(defaultRepo);
-			}
-		}
+            // add default repo before the old repos
+            newRepos.add(defaultRepo);
+         }
+      }
 
-		newRepos.addAll(oldRepos);
+      newRepos.addAll(oldRepos);
 
-		return newRepos.toArray(new MetadataRepositoryElement[newRepos.size()]);
-	}
+      return newRepos.toArray(new MetadataRepositoryElement[newRepos.size()]);
+   }
 
-	/**
-	 * Save update sites in a memento because when a new app is installed then the configuration is
-	 * cleaned up.
-	 */
-	public static void saveState(final IMemento memento) {
+   /**
+    * Save update sites in a memento because when a new app is installed then the configuration is
+    * cleaned up.
+    */
+   public static void saveState(final IMemento memento) {
 
-		try {
+      try {
 
-			final ProvisioningUI ui = ProvisioningUI.getDefaultUI();
+         final ProvisioningUI ui = ProvisioningUI.getDefaultUI();
 
-			ui.signalRepositoryOperationStart();
+         ui.signalRepositoryOperationStart();
 
-			final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
+         final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
 
-			try {
+         try {
 
-				final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
+            final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
 
-				final URI[] currentlyEnabledURIs = metaManager.getKnownRepositories(//
-						IRepositoryManager.REPOSITORIES_ALL);
+            final URI[] currentlyEnabledURIs = metaManager.getKnownRepositories(//
+                  IRepositoryManager.REPOSITORIES_ALL);
 
-				final URI[] currentlyDisabledURIs = metaManager.getKnownRepositories(//
-						IRepositoryManager.REPOSITORIES_DISABLED | visibilityFlags);
+            final URI[] currentlyDisabledURIs = metaManager.getKnownRepositories(//
+                  IRepositoryManager.REPOSITORIES_DISABLED | visibilityFlags);
 
-				final IMemento xmlRepositories = memento.createChild(TAG_REPOSITORIES);
+            final IMemento xmlRepositories = memento.createChild(TAG_REPOSITORIES);
 
-				saveState_URI(currentlyEnabledURIs, metaManager, xmlRepositories, true);
-				saveState_URI(currentlyDisabledURIs, metaManager, xmlRepositories, false);
+            saveState_URI(currentlyEnabledURIs, metaManager, xmlRepositories, true);
+            saveState_URI(currentlyDisabledURIs, metaManager, xmlRepositories, false);
 
-			} finally {
-				ui.signalRepositoryOperationComplete(null, true);
-			}
+         } finally {
+            ui.signalRepositoryOperationComplete(null, true);
+         }
 
-		} catch (final Exception e) {
+      } catch (final Exception e) {
 
-			// this can occure when running in the IDE
-			StatusUtil.handleStatus(e, 0);
-		}
-	}
+         // this can occure when running in the IDE
+         StatusUtil.handleStatus(e, 0);
+      }
+   }
 
-	private static void saveState_URI(	final URI[] location,
-										final IMetadataRepositoryManager metaManager,
-										final IMemento xmlRepositories,
-										final boolean isEnabled) {
+   private static void saveState_URI(final URI[] location,
+                                     final IMetadataRepositoryManager metaManager,
+                                     final IMemento xmlRepositories,
+                                     final boolean isEnabled) {
 
-		for (final URI uri : location) {
+      for (final URI uri : location) {
 
-			final IMemento xmlRepo = xmlRepositories.createChild(TAG_REPOSITORY);
+         final IMemento xmlRepo = xmlRepositories.createChild(TAG_REPOSITORY);
 
-			final String nickName = metaManager.getRepositoryProperty(uri, IRepository.PROP_NICKNAME);
+         final String nickName = metaManager.getRepositoryProperty(uri, IRepository.PROP_NICKNAME);
 
-			xmlRepo.putString(ATTR_URI, uri.toASCIIString());
-			xmlRepo.putString(ATTR_NICK_NAME, nickName);
-			xmlRepo.putBoolean(ATTR_IS_ENABLED, isEnabled);
-		}
-	}
+         xmlRepo.putString(ATTR_URI, uri.toASCIIString());
+         xmlRepo.putString(ATTR_NICK_NAME, nickName);
+         xmlRepo.putBoolean(ATTR_IS_ENABLED, isEnabled);
+      }
+   }
 
-	private static void setColocatedRepositoryEnablement(	final ProvisioningUI ui,
-															final URI location,
-															final boolean enable) {
-		ProvUI.getArtifactRepositoryManager(ui.getSession()).setEnabled(location, enable);
-		ProvUI.getMetadataRepositoryManager(ui.getSession()).setEnabled(location, enable);
-	}
+   private static void setColocatedRepositoryEnablement(final ProvisioningUI ui,
+                                                        final URI location,
+                                                        final boolean enable) {
+      ProvUI.getArtifactRepositoryManager(ui.getSession()).setEnabled(location, enable);
+      ProvUI.getMetadataRepositoryManager(ui.getSession()).setEnabled(location, enable);
+   }
 
-	/**
-	 * After trying to set addRepository with p2.inf for 2 full days, I ended up to set it
-	 * programmatically like others also did, found a solution here: <a href=
-	 * "http://coopology.com/2012/08/eclipse-rcp-setting-p2-repositories-update-sites-programmatically-for-when-p2-inf-fails/"
-	 * >http://coopology.com/2012/08/eclipse-rcp-setting-p2-repositories-update-sites-
-	 * programmatically-for-when-p2-inf-fails/</a>
-	 * 
-	 * @param memento
-	 * @throws InvocationTargetException
-	 */
-	public static void setUpdateSites(final IMemento memento) {
+   /**
+    * After trying to set addRepository with p2.inf for 2 full days, I ended up to set it
+    * programmatically like others also did, found a solution here: <a href=
+    * "http://coopology.com/2012/08/eclipse-rcp-setting-p2-repositories-update-sites-programmatically-for-when-p2-inf-fails/"
+    * >http://coopology.com/2012/08/eclipse-rcp-setting-p2-repositories-update-sites-
+    * programmatically-for-when-p2-inf-fails/</a>
+    *
+    * @param memento
+    * @throws InvocationTargetException
+    */
+   public static void setUpdateSites(final IMemento memento) {
 
 //
 // Original
 //
-//		ElementUtils.updateRepositoryUsingElements(ui, DEFAULT_UPDATE_SITES, null);
+//      ElementUtils.updateRepositoryUsingElements(ui, DEFAULT_UPDATE_SITES, null);
 //
 
-		final MetadataRepositoryElement[] mergedRepos = mergeRepositories(memento);
+      final MetadataRepositoryElement[] mergedRepos = mergeRepositories(memento);
 
-		try {
+      try {
 
-			updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), mergedRepos, null);
+         updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), mergedRepos, null);
 
-		} catch (final Exception e) {
+      } catch (final Exception e) {
 
-			// this can occure when running in the IDE
-			StatusUtil.handleStatus(e, 0);
-		}
-	}
+         // this can occure when running in the IDE
+         StatusUtil.handleStatus(e, 0);
+      }
+   }
 
-	/**
-	 * Copied from {@link ElementUtils} and disabled the part which removes previous repositories.
-	 * 
-	 * @param ui
-	 * @param newRepos
-	 * @param shell
-	 */
-	private static void updateRepositoryUsingElements(	final ProvisioningUI ui,
-														final MetadataRepositoryElement[] newRepos,
-														final Shell shell) {
-		ui.signalRepositoryOperationStart();
+   /**
+    * Copied from {@link ElementUtils} and disabled the part which removes previous repositories.
+    *
+    * @param ui
+    * @param newRepos
+    * @param shell
+    */
+   private static void updateRepositoryUsingElements(final ProvisioningUI ui,
+                                                     final MetadataRepositoryElement[] newRepos,
+                                                     final Shell shell) {
+      ui.signalRepositoryOperationStart();
 
-		final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
-		final IArtifactRepositoryManager artManager = ProvUI.getArtifactRepositoryManager(ui.getSession());
+      final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
+      final IArtifactRepositoryManager artManager = ProvUI.getArtifactRepositoryManager(ui.getSession());
 
-		try {
+      try {
 
-			final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
+         final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
 
-			final URI[] currentlyEnabled = metaManager.getKnownRepositories(visibilityFlags);
-			final URI[] currentlyDisabled = metaManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_DISABLED
-					| visibilityFlags);
+         final URI[] currentlyEnabled = metaManager.getKnownRepositories(visibilityFlags);
+         final URI[] currentlyDisabled = metaManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_DISABLED
+               | visibilityFlags);
 
-			for (final MetadataRepositoryElement newRepo : newRepos) {
+         for (final MetadataRepositoryElement newRepo : newRepos) {
 
-				final URI location = newRepo.getLocation();
+            final URI location = newRepo.getLocation();
 
-				if (newRepo.isEnabled()) {
+            if (newRepo.isEnabled()) {
 
-					if (containsURI(currentlyDisabled, location)) {
+               if (containsURI(currentlyDisabled, location)) {
 
-						// It should be enabled and is not currently
+                  // It should be enabled and is not currently
 
 // disabled this code, that existing disabled repos are not enabled if the user do not want it
 //
-//						setColocatedRepositoryEnablement(ui, location, true);
+//                  setColocatedRepositoryEnablement(ui, location, true);
 
-					} else if (!containsURI(currentlyEnabled, location)) {
+               } else if (!containsURI(currentlyEnabled, location)) {
 
-						// It is not known as enabled or disabled.  Add it.
-						metaManager.addRepository(location);
-						artManager.addRepository(location);
-					}
+                  // It is not known as enabled or disabled.  Add it.
+                  metaManager.addRepository(location);
+                  artManager.addRepository(location);
+               }
 
-				} else {
+            } else {
 
-					if (containsURI(currentlyEnabled, location)) {
+               if (containsURI(currentlyEnabled, location)) {
 
-						// It should be disabled, and is currently enabled
-						setColocatedRepositoryEnablement(ui, location, false);
+                  // It should be disabled, and is currently enabled
+                  setColocatedRepositoryEnablement(ui, location, false);
 
-					} else if (!containsURI(currentlyDisabled, location)) {
+               } else if (!containsURI(currentlyDisabled, location)) {
 
-						// It is not known as enabled or disabled.  Add it and then disable it.
-						metaManager.addRepository(location);
-						artManager.addRepository(location);
-						setColocatedRepositoryEnablement(ui, location, false);
-					}
-				}
+                  // It is not known as enabled or disabled.  Add it and then disable it.
+                  metaManager.addRepository(location);
+                  artManager.addRepository(location);
+                  setColocatedRepositoryEnablement(ui, location, false);
+               }
+            }
 
-				// set repo name
+            // set repo name
 
-				final String name = newRepo.getName();
-				if (name != null && name.length() > 0) {
-					metaManager.setRepositoryProperty(location, IRepository.PROP_NICKNAME, name);
-					artManager.setRepositoryProperty(location, IRepository.PROP_NICKNAME, name);
-				}
-			}
+            final String name = newRepo.getName();
+            if (name != null && name.length() > 0) {
+               metaManager.setRepositoryProperty(location, IRepository.PROP_NICKNAME, name);
+               artManager.setRepositoryProperty(location, IRepository.PROP_NICKNAME, name);
+            }
+         }
 
-//			// Are there any elements that need to be deleted?  Go over the original state
-//			// and remove any elements that weren't in the elements we were given
-//			final Set<String> nowKnown = new HashSet<String>();
-//			for (final MetadataRepositoryElement element : elements) {
-//				nowKnown.add(URIUtil.toUnencodedString(element.getLocation()));
-//			}
-//			for (int i = 0; i < currentlyEnabled.length; i++) {
-//				if (!nowKnown.contains(URIUtil.toUnencodedString(currentlyEnabled[i]))) {
-//					metaManager.removeRepository(currentlyEnabled[i]);
-//					artManager.removeRepository(currentlyEnabled[i]);
-//				}
-//			}
-//			for (int i = 0; i < currentlyDisabled.length; i++) {
-//				if (!nowKnown.contains(URIUtil.toUnencodedString(currentlyDisabled[i]))) {
-//					metaManager.removeRepository(currentlyDisabled[i]);
-//					artManager.removeRepository(currentlyDisabled[i]);
-//				}
-//			}
+//         // Are there any elements that need to be deleted?  Go over the original state
+//         // and remove any elements that weren't in the elements we were given
+//         final Set<String> nowKnown = new HashSet<String>();
+//         for (final MetadataRepositoryElement element : elements) {
+//            nowKnown.add(URIUtil.toUnencodedString(element.getLocation()));
+//         }
+//         for (int i = 0; i < currentlyEnabled.length; i++) {
+//            if (!nowKnown.contains(URIUtil.toUnencodedString(currentlyEnabled[i]))) {
+//               metaManager.removeRepository(currentlyEnabled[i]);
+//               artManager.removeRepository(currentlyEnabled[i]);
+//            }
+//         }
+//         for (int i = 0; i < currentlyDisabled.length; i++) {
+//            if (!nowKnown.contains(URIUtil.toUnencodedString(currentlyDisabled[i]))) {
+//               metaManager.removeRepository(currentlyDisabled[i]);
+//               artManager.removeRepository(currentlyDisabled[i]);
+//            }
+//         }
 
-		} finally {
-			ui.signalRepositoryOperationComplete(null, true);
-		}
-	}
+      } finally {
+         ui.signalRepositoryOperationComplete(null, true);
+      }
+   }
 
-	private IAgentLocation getAgentLocation() {
-		final ServiceReference<?> ref = getContext().getServiceReference(IAgentLocation.SERVICE_NAME);
-		if (ref == null) {
-			return null;
-		}
-		final IAgentLocation location = (IAgentLocation) getContext().getService(ref);
-		getContext().ungetService(ref);
-		return location;
-	}
+   private IAgentLocation getAgentLocation() {
+      final ServiceReference<?> ref = getContext().getServiceReference(IAgentLocation.SERVICE_NAME);
+      if (ref == null) {
+         return null;
+      }
+      final IAgentLocation location = (IAgentLocation) getContext().getService(ref);
+      getContext().ungetService(ref);
+      return location;
+   }
 
-	Policy getPolicy() {
-		return getProvisioningUI().getPolicy();
-	}
+   Policy getPolicy() {
+      return getProvisioningUI().getPolicy();
+   }
 
-	private IPropertyChangeListener getPreferenceListener() {
-		if (preferenceListener == null) {
-			preferenceListener = new IPropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent event) {
-					updateWithPreferences(getPolicy());
-				}
-			};
-		}
-		return preferenceListener;
-	}
+   private IPropertyChangeListener getPreferenceListener() {
+      if (preferenceListener == null) {
+         preferenceListener = new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(final PropertyChangeEvent event) {
+               updateWithPreferences(getPolicy());
+            }
+         };
+      }
+      return preferenceListener;
+   }
 
-	/*
-	 * Overridden to use a profile scoped preference store. (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#getPreferenceStore()
-	 */
-	@Override
-	public IPreferenceStore getPreferenceStore() {
-		// Create the preference store lazily.
-		if (preferenceStore == null) {
-			final IAgentLocation agentLocation = getAgentLocation();
-			if (agentLocation == null) {
-				return super.getPreferenceStore();
-			}
-			preferenceStore = new ScopedPreferenceStore(
-					new ProfileScope(agentLocation, IProfileRegistry.SELF),
-					PLUGIN_ID);
-		}
-		return preferenceStore;
-	}
+   /*
+    * Overridden to use a profile scoped preference store. (non-Javadoc)
+    * @see org.eclipse.ui.plugin.AbstractUIPlugin#getPreferenceStore()
+    */
+   @Override
+   public IPreferenceStore getPreferenceStore() {
+      // Create the preference store lazily.
+      if (preferenceStore == null) {
+         final IAgentLocation agentLocation = getAgentLocation();
+         if (agentLocation == null) {
+            return super.getPreferenceStore();
+         }
+         preferenceStore = new ScopedPreferenceStore(
+               new ProfileScope(agentLocation, IProfileRegistry.SELF),
+               PLUGIN_ID);
+      }
+      return preferenceStore;
+   }
 
-	public IProvisioningAgent getProvisioningAgent() {
-		return getProvisioningUI().getSession().getProvisioningAgent();
-	}
+   public IProvisioningAgent getProvisioningAgent() {
+      return getProvisioningUI().getSession().getProvisioningAgent();
+   }
 
-	public ProvisioningUI getProvisioningUI() {
-		return ProvisioningUI.getDefaultUI();
-	}
+   public ProvisioningUI getProvisioningUI() {
+      return ProvisioningUI.getDefaultUI();
+   }
 
-	public void savePreferences() {
+   public void savePreferences() {
 
-		if (preferenceStore != null) {
+      if (preferenceStore != null) {
 
-			try {
-				preferenceStore.save();
-			} catch (final IOException e) {
+         try {
+            preferenceStore.save();
+         } catch (final IOException e) {
 
-				final Status status = new Status(
-						IStatus.ERROR,
-						PLUGIN_ID,
-						0,
-						ProvSDKMessages.ProvSDKUIActivator_ErrorSavingPrefs,
-						e);
+            final Status status = new Status(
+                  IStatus.ERROR,
+                  PLUGIN_ID,
+                  0,
+                  ProvSDKMessages.ProvSDKUIActivator_ErrorSavingPrefs,
+                  e);
 
-				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.SHOW);
-			}
-		}
-	}
+            StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.SHOW);
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(final BundleContext bundleContext) throws Exception {
-		super.start(bundleContext);
-		plugin = this;
-		P2_Activator.context = bundleContext;
-		PreferenceInitializer.migratePreferences();
-		getPreferenceStore().addPropertyChangeListener(getPreferenceListener());
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+    */
+   @Override
+   public void start(final BundleContext bundleContext) throws Exception {
+      super.start(bundleContext);
+      plugin = this;
+      P2_Activator.context = bundleContext;
+      PreferenceInitializer.migratePreferences();
+      getPreferenceStore().addPropertyChangeListener(getPreferenceListener());
+   }
 
-	@Override
-	public void stop(final BundleContext bundleContext) throws Exception {
-		plugin = null;
-		getPreferenceStore().removePropertyChangeListener(preferenceListener);
-		super.stop(bundleContext);
-	}
+   @Override
+   public void stop(final BundleContext bundleContext) throws Exception {
+      plugin = null;
+      getPreferenceStore().removePropertyChangeListener(preferenceListener);
+      super.stop(bundleContext);
+   }
 
-	void updateWithPreferences(final Policy policy) {
-		policy.setShowLatestVersionsOnly(getPreferenceStore().getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION));
-	}
+   void updateWithPreferences(final Policy policy) {
+      policy.setShowLatestVersionsOnly(getPreferenceStore().getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION));
+   }
 }

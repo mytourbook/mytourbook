@@ -11,14 +11,14 @@
 	<classpathentry exported="true" kind="lib" path="derbynet-10.14.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="derbyoptionaltools-10.14.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="derbytools-10.14.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-analyzers-common-7.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-core-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lucene-highlighter-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lucene-join-7.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-memory-7.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-misc-7.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-queries-7.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-queryparser-7.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lucene-suggest-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lucene-analyzers-common-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common -->
+	<classpathentry exported="true" kind="lib" path="lucene-core-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
+	<classpathentry exported="true" kind="lib" path="lucene-highlighter-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-highlighter -->
+	<classpathentry exported="true" kind="lib" path="lucene-join-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-join -->
+	<classpathentry exported="true" kind="lib" path="lucene-memory-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-memory -->
+	<classpathentry exported="true" kind="lib" path="lucene-misc-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-misc -->
+	<classpathentry exported="true" kind="lib" path="lucene-queries-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queries -->
+	<classpathentry exported="true" kind="lib" path="lucene-queryparser-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->
+	<classpathentry exported="true" kind="lib" path="lucene-suggest-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-suggest -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

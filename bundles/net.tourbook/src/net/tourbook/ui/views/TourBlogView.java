@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,21 +15,25 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.browser.LocationListener.changingAdapter;
+import static org.eclipse.swt.browser.ProgressListener.completedAdapter;
+
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -49,12 +53,12 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionTourBlogMarker;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.weather.WeatherUtils;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.IToolBarManager;
@@ -64,7 +68,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -72,43 +75,44 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.ProgressAdapter;
-import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourBlogView extends ViewPart {
 
-   public static final String  ID                                      = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
+   public static final String  ID                                              = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
 
-   private static final String TOUR_BLOG_CSS                           = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
+   private static final String NL                                              = UI.NEW_LINE1;
 
-   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
-   static final String         STATE_IS_SHOW_HIDDEN_MARKER             = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
+   private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
 
-   private static final String EXTERNAL_LINK_URL                       = "http";                                    //$NON-NLS-1$
-   private static final String HREF_TOKEN                              = "#";                                       //$NON-NLS-1$
-   private static final String PAGE_ABOUT_BLANK                        = "about:blank";                             //$NON-NLS-1$
+   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
+   static final boolean        STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT = false;
+   static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
+   static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
+
+   private static final String EXTERNAL_LINK_URL                               = "http";                                    //$NON-NLS-1$
+   private static final String HREF_TOKEN                                      = "#";                                       //$NON-NLS-1$
+   private static final String PAGE_ABOUT_BLANK                                = "about:blank";                             //$NON-NLS-1$
 
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
     */
-   private static final String HTTP_DUMMY                              = "http://dummy";                            //$NON-NLS-1$
+   private static final String HTTP_DUMMY                                      = "http://dummy";                            //$NON-NLS-1$
 
-   private static final String ACTION_EDIT_TOUR                        = "EditTour";                                //$NON-NLS-1$
-   private static final String ACTION_EDIT_MARKER                      = "EditMarker";                              //$NON-NLS-1$
-   private static final String ACTION_HIDE_MARKER                      = "HideMarker";                              //$NON-NLS-1$
-   private static final String ACTION_OPEN_MARKER                      = "OpenMarker";                              //$NON-NLS-1$
-   private static final String ACTION_SHOW_MARKER                      = "ShowMarker";                              //$NON-NLS-1$
+   private static final String ACTION_EDIT_TOUR                                = "EditTour";                                //$NON-NLS-1$
+   private static final String ACTION_EDIT_MARKER                              = "EditMarker";                              //$NON-NLS-1$
+   private static final String ACTION_HIDE_MARKER                              = "HideMarker";                              //$NON-NLS-1$
+   private static final String ACTION_OPEN_MARKER                              = "OpenMarker";                              //$NON-NLS-1$
+   private static final String ACTION_SHOW_MARKER                              = "ShowMarker";                              //$NON-NLS-1$
 
    private static String       HREF_EDIT_TOUR;
    private static String       HREF_EDIT_MARKER;
@@ -126,37 +130,36 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String     HREF_MARKER_ITEM  = "#MarkerItem";                 //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM = "#MarkerItem";                //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore       = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state           = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_WEB       = WEB.getState();
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
+   private PostSelectionProvider         _postSelectionProvider;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private ITourEventListener            _tourEventListener;
+   private IPartListener2                _partListener;
 
-   private TourData                _tourData;
+   private TourData                      _tourData;
 
-   private String                  _htmlCss;
+   private String                        _htmlCss;
 
-   private String                  _actionEditImageUrl;
-   private String                  _actionHideMarkerUrl;
-   private String                  _actionShowMarkerUrl;
+   private String                        _imageUrl_ActionEdit;
+   private String                        _imageUrl_ActionHideMarker;
+   private String                        _imageUrl_ActionShowMarker;
 
-   private String                  _cssMarkerDefaultColor;
-   private String                  _cssMarkerDeviceColor;
-   private String                  _cssMarkerHiddenColor;
+   private String                        _cssMarker_DefaultColor;
+   private String                        _cssMarker_DeviceColor;
+   private String                        _cssMarker_HiddenColor;
 
-   private boolean                 _isDrawWithDefaultColor;
-   private boolean                 _isShowHiddenMarker;
+   private boolean                       _isDrawWithDefaultColor;
+   private boolean                       _isShowHiddenMarker;
 
-   private Long                    _reloadedTourMarkerId;
+   private Long                          _reloadedTourMarkerId;
 
-   private ActionTourBlogMarker    _actionTourBlogMarker;
+   private ActionTourBlogOptions         _actionTourBlogOptions;
 
    /*
     * UI controls
@@ -166,11 +169,20 @@ public class TourBlogView extends ViewPart {
    private Composite _pageNoBrowser;
    private Composite _pageNoData;
    private Composite _pageContent;
-   private Composite _uiParent;
+   private Composite _parent;
 
    private Browser   _browser;
    private TourChart _tourChart;
    private Text      _txtNoBrowser;
+
+   private class ActionTourBlogOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTourBlogOptions(_parent, toolbar, TourBlogView.this, _state);
+      }
+   }
 
    private void addPartListener() {
 
@@ -205,34 +217,17 @@ public class TourBlogView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
-               updateUI();
-            }
-         }
-      };
-
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-
-            final String property = event.getProperty();
-
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-            }
+            updateUI();
          }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -240,74 +235,72 @@ public class TourBlogView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourBlogView.this) {
-               return;
-            }
-            onSelectionChanged(selection);
+      _postSelectionListener = (workbenchPart, selection) -> {
+         if (workbenchPart == TourBlogView.this) {
+            return;
          }
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, eventId, eventData) -> {
 
-            if (part == TourBlogView.this) {
-               return;
-            }
+         if (workbenchPart == TourBlogView.this) {
+            return;
+         }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
 
-                  // update modified tour
+               // update modified tour
 
-                  final long viewTourId = _tourData.getTourId();
-
-                  for (final TourData tourData : modifiedTours) {
-                     if (tourData.getTourId() == viewTourId) {
-
-                        // get modified tour
-                        _tourData = tourData;
-
-                        // removed old tour data from the selection provider
-                        _postSelectionProvider.clearSelection();
-
-                        updateUI();
-
-                        // nothing more to do, the view contains only one tour
-                        return;
-                     }
-                  }
+               if (_tourData == null) {
+                  return;
                }
 
-            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+               final long viewTourId = _tourData.getTourId();
 
-               clearView();
+               for (final TourData tourData : modifiedTours) {
+                  if (tourData.getTourId() == viewTourId) {
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-               if (eventData instanceof SelectionTourMarker) {
-
-                  final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
-
-                  if (tourData != _tourData) {
-
+                     // get modified tour
                      _tourData = tourData;
 
+                     // removed old tour data from the selection provider
+                     _postSelectionProvider.clearSelection();
+
                      updateUI();
+
+                     // nothing more to do, the view contains only one tour
+                     return;
                   }
+               }
+            }
+
+         } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if (eventId == TourEventId.MARKER_SELECTION) {
+
+            if (eventData instanceof SelectionTourMarker) {
+
+               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+
+               if (tourData != _tourData) {
+
+                  _tourData = tourData;
+
+                  updateUI();
                }
             }
          }
@@ -328,11 +321,38 @@ public class TourBlogView extends ViewPart {
 
    private String create_10_Head() {
 
-      final String html = UI.EMPTY_STRING//
-            + "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
-            + "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
-            + _htmlCss
-            + "\n"; //$NON-NLS-1$
+      // set body size
+      final int bodyFontSize = Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT);
+      String htmlCss = _htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG, Integer.toString(bodyFontSize));
+
+      /*
+       * Replace theme tags
+       */
+
+// SET_FORMATTING_OFF
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__COLOR,                        UI.IS_DARK_THEME ? "ddd" : "333");        //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__BACKGROUND_COLOR,             UI.IS_DARK_THEME ? "333" : "fff");        //$NON-NLS-1$ //$NON-NLS-2$
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__A_LINK__COLOR,                      UI.IS_DARK_THEME ? "D6FF6F" : "3B9529");  //$NON-NLS-1$ //$NON-NLS-2$
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__A_VISITED__COLOR,                   UI.IS_DARK_THEME ? "7E9543" : "DE559D");  //$NON-NLS-1$ //$NON-NLS-2$
+
+      htmlCss = htmlCss.replace(WEB.CSS_TAG__ACTION_CONTAINER__BACKGROUND_COLOR, UI.IS_DARK_THEME ? "444" : "f8f8f8");     //$NON-NLS-1$ //$NON-NLS-2$
+
+// SET_FORMATTING_ON
+
+      if (UI.IS_DARK_THEME) {
+
+         // show dark scrollbar
+         htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY_SCROLLBAR, WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK);
+      }
+
+      final String html = UI.EMPTY_STRING
+
+            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //$NON-NLS-1$
+            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //$NON-NLS-1$
+            + htmlCss
+            + NL;
 
       return html;
    }
@@ -342,7 +362,7 @@ public class TourBlogView extends ViewPart {
       final StringBuilder sb = new StringBuilder();
 
       final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
-      final ArrayList<TourMarker> allMarker = new ArrayList<>(tourMarkers);
+      final List<TourMarker> allMarker = new ArrayList<>(tourMarkers);
       Collections.sort(allMarker);
 
       create_22_BlogHeader(sb);
@@ -356,13 +376,13 @@ public class TourBlogView extends ViewPart {
          }
 
          sb.append("<div class='blog-item'>"); //$NON-NLS-1$
-         sb.append("<div class='action-hover-container'>\n"); //$NON-NLS-1$
+         sb.append("<div class='action-hover-container'>" + NL); //$NON-NLS-1$
          {
             create_30_Marker(sb, tourMarker);
             create_32_MarkerUrl(sb, tourMarker);
          }
-         sb.append("</div>\n"); //$NON-NLS-1$
-         sb.append("</div>\n"); //$NON-NLS-1$
+         sb.append("</div>" + NL); //$NON-NLS-1$
+         sb.append("</div>" + NL); //$NON-NLS-1$
       }
 
       return sb.toString();
@@ -380,21 +400,26 @@ public class TourBlogView extends ViewPart {
 
       final String date = dtTourStart.format(TimeTools.Formatter_Date_F);
 
-      final String time = String.format(//
-            "%s - %s", //$NON-NLS-1$
+      final String time = String.format("%s - %s", //$NON-NLS-1$
             dtTourStart.format(TimeTools.Formatter_Time_M),
             dtTourEnd.format(TimeTools.Formatter_Time_M));
 
-      sb.append("<div class='date'>" + date + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<div class='time'>" + time + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<div style='clear: both;'></div>\n"); //$NON-NLS-1$
+      sb.append("<div class='date'>" + date + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<div class='time'>" + time + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<div style='clear: both;'></div>" + NL); //$NON-NLS-1$
    }
 
    private void create_24_Tour(final StringBuilder sb) {
 
+      final boolean isSaveWeatherLogInWeatherDescription = _prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION);
+
       String tourTitle = _tourData.getTourTitle();
-      final String tourDescription = _tourData.getTourDescription();
-      final String tourWeather = _tourData.getWeather();
+      String tourDescription = _tourData.getTourDescription();
+      String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
+            true, // isdisplayMaximumMinimumTemperature
+            true, // isDisplayPressure
+            isSaveWeatherLogInWeatherDescription // isWeatherDataSeparatorNewLine
+      );
 
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
@@ -402,7 +427,7 @@ public class TourBlogView extends ViewPart {
 
       if (isDescription || isTitle || isWeather) {
 
-         sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>\n"); //$NON-NLS-1$
+         sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
 
             sb.append("<div class='blog-item'>"); //$NON-NLS-1$
@@ -411,30 +436,43 @@ public class TourBlogView extends ViewPart {
                 * Tour title
                 */
                if (isTitle == false) {
+
                   tourTitle = "&nbsp;"; //$NON-NLS-1$
+
+               } else {
+
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourTitle = UI.scrambleText(tourTitle);
+                  }
                }
 
-               final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
+               final String hoverEdit = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle));
 
                final String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
 
-               sb.append(UI.EMPTY_STRING + //
-                     ("<div class='action-container'>" //$NON-NLS-1$
-                           + ("<a class='action' style='background: url(" //$NON-NLS-1$
-                                 + _actionEditImageUrl
-                                 + ") no-repeat;'" //$NON-NLS-1$
-                                 + (" href='" + hrefEditTour + "'") //$NON-NLS-1$ //$NON-NLS-2$
-                                 + (" title='" + hoverEdit + "'") //$NON-NLS-1$ //$NON-NLS-2$
-                                 + ">" // //$NON-NLS-1$
-                                 + "</a>") // //$NON-NLS-1$
-                           + "	</div>\n") //$NON-NLS-1$
-                     + ("<span class='blog-title'>" + tourTitle + "</span>\n")); //$NON-NLS-1$ //$NON-NLS-2$
+               sb.append(UI.EMPTY_STRING +
+
+                     ("<div class='action-container'>" //                           //$NON-NLS-1$
+                           + ("<a class='action' style='background: url(" //        //$NON-NLS-1$
+                                 + _imageUrl_ActionEdit
+                                 + ") no-repeat;'" //                               //$NON-NLS-1$
+                                 + " href='" + hrefEditTour + "'" //                //$NON-NLS-1$ //$NON-NLS-2$
+                                 + " title='" + hoverEdit + "'" //                  //$NON-NLS-1$ //$NON-NLS-2$
+                                 + ">" //                                           //$NON-NLS-1$
+                                 + "</a>") //                                       //$NON-NLS-1$
+                           + "   </div>" + NL) //                                   //$NON-NLS-1$
+                     + ("<span class='blog-title'>" + tourTitle + "</span>" + NL)); //$NON-NLS-1$ //$NON-NLS-2$
 
                /*
                 * Description
                 */
                if (isDescription) {
-                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourDescription = UI.scrambleText(tourDescription);
+                  }
+
+                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }
 
                /*
@@ -442,24 +480,28 @@ public class TourBlogView extends ViewPart {
                 */
                if (isWeather) {
 
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourWeather = UI.scrambleText(tourWeather);
+                  }
+
                   if (isDescription) {
                      // write spacer
                      sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
                   }
 
-                  sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+                  sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }
             }
-            sb.append("</div>\n"); //$NON-NLS-1$
+            sb.append("</div>" + NL); //$NON-NLS-1$
          }
-         sb.append("</div>\n"); //$NON-NLS-1$
+         sb.append("</div>" + NL); //$NON-NLS-1$
 
       } else {
 
          // there is no tour header, set some spacing
 
-         sb.append("<div style='margin-top:20px;'></div>\n"); //$NON-NLS-1$
+         sb.append("<div style='margin-top:20px;'></div>" + NL); //$NON-NLS-1$
       }
    }
 
@@ -469,17 +511,21 @@ public class TourBlogView extends ViewPart {
    private void create_30_Marker(final StringBuilder sb, final TourMarker tourMarker) {
 
       final long markerId = tourMarker.getMarkerId();
-      final String markerLabel = tourMarker.getLabel();
+      String markerLabel = tourMarker.getLabel();
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         markerLabel = UI.scrambleText(markerLabel);
+      }
 
       final String hrefOpenMarker = HTTP_DUMMY + HREF_OPEN_MARKER + markerId;
       final String hrefEditMarker = HTTP_DUMMY + HREF_EDIT_MARKER + markerId;
       final String hrefHideMarker = HTTP_DUMMY + HREF_HIDE_MARKER + markerId;
       final String hrefShowMarker = HTTP_DUMMY + HREF_SHOW_MARKER + markerId;
 
-      final String hoverEditMarker = NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel);
-      final String hoverHideMarker = NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel);
-      final String hoverOpenMarker = NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel);
-      final String hoverShowMarker = NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel);
+      final String hoverEditMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel));
+      final String hoverHideMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel));
+      final String hoverOpenMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel));
+      final String hoverShowMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel));
 
       /*
        * get color by priority
@@ -489,38 +535,38 @@ public class TourBlogView extends ViewPart {
       if (_isDrawWithDefaultColor) {
 
          // force default color
-         cssMarkerColor = _cssMarkerDefaultColor;
+         cssMarkerColor = _cssMarker_DefaultColor;
 
       } else if (tourMarker.isMarkerVisible() == false) {
 
          // show hidden color
-         cssMarkerColor = _cssMarkerHiddenColor;
+         cssMarkerColor = _cssMarker_HiddenColor;
 
       } else if (tourMarker.isDeviceMarker()) {
 
          // show with device color
-         cssMarkerColor = _cssMarkerDeviceColor;
+         cssMarkerColor = _cssMarker_DeviceColor;
 
       } else {
 
-         cssMarkerColor = _cssMarkerDefaultColor;
+         cssMarkerColor = _cssMarker_DefaultColor;
       }
 
       final String htmlMarkerStyle = " style='color:" + cssMarkerColor + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
       final String htmlActionShowHideMarker = tourMarker.isMarkerVisible() //
-            ? createHtml_Action(hrefHideMarker, hoverHideMarker, _actionHideMarkerUrl)
-            : createHtml_Action(hrefShowMarker, hoverShowMarker, _actionShowMarkerUrl);
+            ? createHtml_Action(hrefHideMarker, hoverHideMarker, _imageUrl_ActionHideMarker)
+            : createHtml_Action(hrefShowMarker, hoverShowMarker, _imageUrl_ActionShowMarker);
 
       final String htmlActionContainer = UI.EMPTY_STRING //
             + "<div class='action-container'>" //$NON-NLS-1$
             + ("<table><tbody><tr>") //$NON-NLS-1$
             + ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _actionEditImageUrl) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
             + "</tr></tbody></table>" // //$NON-NLS-1$
-            + "</div>\n"; //$NON-NLS-1$
+            + "</div>" + NL; //$NON-NLS-1$
 
-      sb.append("<div class='title'>\n" //$NON-NLS-1$
+      sb.append("<div class='title'>" + NL //$NON-NLS-1$
 
             + htmlActionContainer
 
@@ -529,18 +575,22 @@ public class TourBlogView extends ViewPart {
                   + (" href='" + hrefOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
                   + (" name='" + createHtml_MarkerName(markerId) + "'") //$NON-NLS-1$ //$NON-NLS-2$
                   + (" title='" + hoverOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ">" + markerLabel + "</a>\n") //$NON-NLS-1$ //$NON-NLS-2$
+                  + ">" + markerLabel + "</a>" + NL) //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "</div>\n"); //$NON-NLS-1$
+            + "</div>" + NL); //$NON-NLS-1$
       /*
        * Description
        */
       final String description = tourMarker.getDescription();
-      final String descriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
+      String descriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
 
-      sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      sb.append("	<p class='description'" + htmlMarkerStyle + ">" + descriptionWithLineBreaks + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      sb.append("</a>\n"); //$NON-NLS-1$
+      if (UI.IS_SCRAMBLE_DATA) {
+         descriptionWithLineBreaks = UI.scrambleText(descriptionWithLineBreaks);
+      }
+
+      sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      sb.append("   <p class='description'" + htmlMarkerStyle + ">" + descriptionWithLineBreaks + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      sb.append("</a>" + NL); //$NON-NLS-1$
    }
 
    /**
@@ -561,15 +611,15 @@ public class TourBlogView extends ViewPart {
 
             // only text is in the link -> this is not a internet address but create a link of it
 
-            linkText = "<a href='" + urlText + "' title='" + urlText + "'>" + urlText + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            linkText = "<a href='" + urlText + "' title='" + urlText + "'>" + urlText + "</a>" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
          } else if (isText == false) {
 
-            linkText = "<a href='" + urlAddress + "' title='" + urlAddress + "'>" + urlAddress + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            linkText = "<a href='" + urlAddress + "' title='" + urlAddress + "'>" + urlAddress + "</a>" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
          } else {
 
-            linkText = "<a href='" + urlAddress + "' title='" + urlAddress + "'>" + urlText + "</a>\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            linkText = "<a href='" + urlAddress + "' title='" + urlAddress + "'>" + urlText + "</a>" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
          }
 
          sb.append(linkText);
@@ -578,7 +628,7 @@ public class TourBlogView extends ViewPart {
 
    private void createActions() {
 
-      _actionTourBlogMarker = new ActionTourBlogMarker(this, _uiParent);
+      _actionTourBlogOptions = new ActionTourBlogOptions();
 
       fillActionBars();
    }
@@ -586,10 +636,10 @@ public class TourBlogView extends ViewPart {
    private String createHtml_Action(final String hrefMarker, final String hoverMarker, final String backgroundImage) {
 
       return "<a class='action'" // //$NON-NLS-1$
-            + (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" href='" + hrefMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" title='" + hoverMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-            + ">" // //$NON-NLS-1$
+            + " style='background-image: url(" + backgroundImage + ");'" //$NON-NLS-1$ //$NON-NLS-2$
+            + " href='" + hrefMarker + "'" //$NON-NLS-1$ //$NON-NLS-2$
+            + " title='" + hoverMarker + "'" //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" //$NON-NLS-1$
             + "</a>"; //$NON-NLS-1$
    }
 
@@ -601,7 +651,7 @@ public class TourBlogView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
-      _uiParent = parent;
+      _parent = parent;
 
       initUI();
 
@@ -663,28 +713,15 @@ public class TourBlogView extends ViewPart {
 
          } catch (final Exception e) {
 
-            /*
-             * Use WebKit browser, this is necessary for Linux when default browser fails however
-             * the XULrunner needs to be installed.
-             */
+            // use WebKit browser for Linux when default browser fails
             _browser = new Browser(parent, SWT.WEBKIT);
          }
 
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-         _browser.addLocationListener(new LocationAdapter() {
-            @Override
-            public void changing(final LocationEvent event) {
-               onBrowserLocationChanging(event);
-            }
-         });
+         _browser.addLocationListener(changingAdapter(this::onBrowserLocationChanging));
 
-         _browser.addProgressListener(new ProgressAdapter() {
-            @Override
-            public void completed(final ProgressEvent event) {
-               onBrowserCompleted(event);
-            }
-         });
+         _browser.addProgressListener(completedAdapter(progressEvent -> onBrowserCompleted()));
 
       } catch (final SWTError e) {
 
@@ -701,7 +738,6 @@ public class TourBlogView extends ViewPart {
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -709,11 +745,11 @@ public class TourBlogView extends ViewPart {
    private void fillActionBars() {
 
       /*
-       * fill view toolbar
+       * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionTourBlogMarker);
+      tbm.add(_actionTourBlogOptions);
    }
 
    private void fireMarkerPosition(final StructuredSelection selection) {
@@ -835,17 +871,17 @@ public class TourBlogView extends ViewPart {
          /*
           * set image urls
           */
-         _actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
-         _actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Remove);
-         _actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Eye);
+         _imageUrl_ActionEdit = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Edit));
+         _imageUrl_ActionHideMarker = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Hide));
+         _imageUrl_ActionShowMarker = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Show));
 
-      } catch (final IOException | URISyntaxException e) {
+      } catch (final Exception e) {
          StatusUtil.showStatus(e);
       }
 
    }
 
-   private void onBrowserCompleted(final ProgressEvent event) {
+   private void onBrowserCompleted() {
 
       if (_reloadedTourMarkerId == null) {
          return;
@@ -857,14 +893,11 @@ public class TourBlogView extends ViewPart {
       /*
        * This must be run async otherwise an endless loop will happen
        */
-      _browser.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _browser.getDisplay().asyncExec(() -> {
 
-            final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+         final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
-            _browser.execute(href);
-         }
+         _browser.execute(href);
       });
 
       _reloadedTourMarkerId = null;
@@ -990,7 +1023,7 @@ public class TourBlogView extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
@@ -1013,7 +1046,7 @@ public class TourBlogView extends ViewPart {
          if (firstElement instanceof TVICatalogComparedTour) {
             tourId = ((TVICatalogComparedTour) firstElement).getTourId();
          } else if (firstElement instanceof TVICompareResultComparedTour) {
-            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+            tourId = ((TVICompareResultComparedTour) firstElement).getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -1052,12 +1085,7 @@ public class TourBlogView extends ViewPart {
       /*
        * Run async because a tour save will fire a tour change event.
        */
-      _uiParent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            TourManager.saveModifiedTour(_tourData);
-         }
-      });
+      _parent.getDisplay().asyncExec(() -> TourManager.saveModifiedTour(_tourData));
    }
 
    @Override
@@ -1075,27 +1103,24 @@ public class TourBlogView extends ViewPart {
       showInvalidPage();
 
       // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_pageBook.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_pageBook.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_tourData != null) {
-               return;
-            }
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_tourData != null) {
+            return;
+         }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         final List<TourData> selectedTours = TourManager.getSelectedTours();
 
-            if ((selectedTours != null) && (selectedTours.size() > 0)) {
-               onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
-            }
+         if ((selectedTours != null) && (selectedTours.size() > 0)) {
+            onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
          }
       });
    }
@@ -1114,32 +1139,36 @@ public class TourBlogView extends ViewPart {
       _isDrawWithDefaultColor = _state.getBoolean(STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR);
       _isShowHiddenMarker = _state.getBoolean(STATE_IS_SHOW_HIDDEN_MARKER);
 
-      _cssMarkerDefaultColor = CSS.color(PreferenceConverter.getColor(
-            _prefStore,
-            ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
+      final String graphMarker_ColorDefault = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT;
 
-      _cssMarkerHiddenColor = CSS.color(PreferenceConverter.getColor(
-            _prefStore,
-            ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+      final String graphMarker_ColorHidden = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN;
 
-      _cssMarkerDeviceColor = CSS.color(PreferenceConverter.getColor(
-            _prefStore,
-            ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
+      final String graphMarker_ColorDevice = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE;
 
-//		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
-//		several domains (including "ibm.com") require compatibility mode. You may see your web application run
-//		normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
-//		Setting "IE=Edge" will force the latest standards mode for the version of Internet Explorer being used.
-//		This is supported for Internet Explorer 8 and later. You can also ease your testing efforts by forcing
-//		specific versions of Internet Explorer to render using the standards mode of previous versions. This
-//		prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
-//		the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
+      _cssMarker_DefaultColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDefault));
+      _cssMarker_HiddenColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorHidden));
+      _cssMarker_DeviceColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDevice));
 
-      final String html = UI.EMPTY_STRING //
-            + "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
-            + ("<head>\n" + create_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<body>\n" + create_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+//      Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
+//      several domains (including "ibm.com") require compatibility mode. You may see your web application run
+//      normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
+//      Setting "IE=Edge" will force the latest standards mode for the version of Internet Explorer being used.
+//      This is supported for Internet Explorer 8 and later. You can also ease your testing efforts by forcing
+//      specific versions of Internet Explorer to render using the standards mode of previous versions. This
+//      prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
+//      the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
+
+      final String html = UI.EMPTY_STRING
+            + "<!DOCTYPE html>" + NL // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>" + NL //$NON-NLS-1$
+            + "<head>" + NL + create_10_Head() + NL + "</head>" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "<body>" + NL + create_20_Body() + NL + "</body>" + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "</html>"; //$NON-NLS-1$
 
       _browser.setRedraw(true);

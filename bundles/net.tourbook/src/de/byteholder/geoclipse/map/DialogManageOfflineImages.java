@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 
@@ -46,9 +47,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -58,8 +57,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -215,12 +212,9 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
       // disable all controls
       enableControls(false);
 
-      _display.asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            initOfflineManager();
-            _comboTargetZoom.setFocus();
-         }
+      _display.asyncExec(() -> {
+         initOfflineManager();
+         _comboTargetZoom.setFocus();
       });
    }
 
@@ -236,19 +230,14 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       final Composite container = (Composite) super.createDialogArea(parent);
 
-      _imageRefresh = TourbookPlugin.getImageDescriptor(Messages.Image__Refresh).createImage();
+      _imageRefresh = TourbookPlugin.getImageDescriptor(Images.App_Refresh).createImage();
 
       // create ui
       createUI(container);
 
       initUI();
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _imageRefresh.dispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> _imageRefresh.dispose());
 
       return container;
    }
@@ -380,7 +369,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
-      table.setLinesVisible(true);
 
       _partViewer = new TableViewer(table);
 
@@ -437,13 +425,10 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       _partViewer.setContentProvider(new PartViewerContentProvider());
 
-      _partViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            final StructuredSelection selection = (StructuredSelection) event.getSelection();
-            if (selection != null) {
-               enableControls(true);
-            }
+      _partViewer.addSelectionChangedListener(event -> {
+         final StructuredSelection selection = (StructuredSelection) event.getSelection();
+         if (selection != null) {
+            enableControls(true);
          }
       });
    }
@@ -686,7 +671,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
       for (final String storeMpId : storedProviderIds) {
 
          /*
-          * ensure that a map provider is unique and not duplicated, this happend during
+          * ensure that a map provider is unique and not duplicated, this happened during
           * debugging
           */
          boolean ignoreMP = false;
@@ -751,75 +736,72 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       getOfflineMapProviders();
 
-      BusyIndicator.showWhile(_display, new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(_display, () -> {
 
-            final int selectedZoomLevel = _targetZoomLevels[_comboTargetZoom.getSelectionIndex()];
+         final int selectedZoomLevel = _targetZoomLevels[_comboTargetZoom.getSelectionIndex()];
 
-            final int tileSize = _selectedMp.getTileSize();
+         final int tileSize = _selectedMp.getTileSize();
 
-            final int worldStartX = _offlineWorldStart.x;
-            final int worldStartY = _offlineWorldStart.y;
-            final int worldEndX = _offlineWorldEnd.x;
-            final int worldEndY = _offlineWorldEnd.y;
+         final int worldStartX = _offlineWorldStart.x;
+         final int worldStartY = _offlineWorldStart.y;
+         final int worldEndX = _offlineWorldEnd.x;
+         final int worldEndY = _offlineWorldEnd.y;
 
-            for (final PartMP partMp : _partMapProvider) {
+         for (final PartMP partMp : _partMapProvider) {
 
-               final MP offlineMp = partMp.partMp;
+            final MP offlineMp = partMp.partMp;
 
-               double worldX1 = Math.min(worldStartX, worldEndX);
-               double worldX2 = Math.max(worldStartX, worldEndX);
-               double worldY1 = Math.min(worldStartY, worldEndY);
-               double worldY2 = Math.max(worldStartY, worldEndY);
+            double worldX1 = Math.min(worldStartX, worldEndX);
+            double worldX2 = Math.max(worldStartX, worldEndX);
+            double worldY1 = Math.min(worldStartY, worldEndY);
+            double worldY2 = Math.max(worldStartY, worldEndY);
 
-               for (int zoomLevel = _validMapZoomLevel; zoomLevel <= selectedZoomLevel; zoomLevel++) {
+            for (int zoomLevel = _validMapZoomLevel; zoomLevel <= selectedZoomLevel; zoomLevel++) {
 
-                  final int maxMapTileSize = offlineMp.getMapTileSize(zoomLevel).width;
+               final int maxMapTileSize = offlineMp.getMapTileSize(zoomLevel).width;
 
-                  final int areaPixelWidth = (int) (worldX2 - worldX1);
-                  final int areaPixelHeight = (int) (worldY2 - worldY1);
+               final int areaPixelWidth = (int) (worldX2 - worldX1);
+               final int areaPixelHeight = (int) (worldY2 - worldY1);
 
-                  final int numTileWidth = (int) Math.ceil((double) areaPixelWidth / (double) tileSize);
-                  final int numTileHeight = (int) Math.ceil((double) areaPixelHeight / (double) tileSize);
+               final int numTileWidth = (int) Math.ceil((double) areaPixelWidth / (double) tileSize);
+               final int numTileHeight = (int) Math.ceil((double) areaPixelHeight / (double) tileSize);
 
-                  int tilePosMinX = (int) Math.floor(worldX1 / tileSize);
-                  int tilePosMinY = (int) Math.floor(worldY1 / tileSize);
-                  int tilePosMaxX = tilePosMinX + numTileWidth;
-                  int tilePosMaxY = tilePosMinY + numTileHeight;
+               int tilePosMinX = (int) Math.floor(worldX1 / tileSize);
+               int tilePosMinY = (int) Math.floor(worldY1 / tileSize);
+               int tilePosMaxX = tilePosMinX + numTileWidth;
+               int tilePosMaxY = tilePosMinY + numTileHeight;
 
-                  // ensure tiles are within the map
-                  tilePosMinX = Math.max(0, tilePosMinX);
-                  tilePosMinY = Math.max(0, tilePosMinY);
-                  tilePosMaxX = Math.min(tilePosMaxX, maxMapTileSize);
-                  tilePosMaxY = Math.min(tilePosMaxY, maxMapTileSize);
+               // ensure tiles are within the map
+               tilePosMinX = Math.max(0, tilePosMinX);
+               tilePosMinY = Math.max(0, tilePosMinY);
+               tilePosMaxX = Math.min(tilePosMaxX, maxMapTileSize);
+               tilePosMaxY = Math.min(tilePosMaxY, maxMapTileSize);
 
-                  for (int tilePosX = tilePosMinX; tilePosX <= tilePosMaxX; tilePosX++) {
-                     for (int tilePosY = tilePosMinY; tilePosY <= tilePosMaxY; tilePosY++) {
+               for (int tilePosX = tilePosMinX; tilePosX <= tilePosMaxX; tilePosX++) {
+                  for (int tilePosY = tilePosMinY; tilePosY <= tilePosMaxY; tilePosY++) {
 
-                        // create offline tile
-                        final Tile offlineTile = new Tile(offlineMp, zoomLevel, tilePosX, tilePosY, null);
-                        offlineTile.setBoundingBoxEPSG4326();
-                        offlineMp.doPostCreation(offlineTile);
+                     // create offline tile
+                     final Tile offlineTile = new Tile(offlineMp, zoomLevel, tilePosX, tilePosY, null);
+                     offlineTile.setBoundingBoxEPSG4326();
+                     offlineMp.doPostCreation(offlineTile);
 
-                        final boolean isAvailable = _offlineManager.isOfflineImageAvailable(
-                              offlineMp,
-                              offlineTile);
+                     final boolean isAvailable = _offlineManager.isOfflineImageAvailable(
+                           offlineMp,
+                           offlineTile);
 
-                        if (isAvailable) {
-                           partMp.existingImages++;
-                        } else {
-                           partMp.missingImages++;
-                        }
+                     if (isAvailable) {
+                        partMp.existingImages++;
+                     } else {
+                        partMp.missingImages++;
                      }
                   }
-
-                  // zoom into the map
-                  worldX1 *= 2;
-                  worldX2 *= 2;
-                  worldY1 *= 2;
-                  worldY2 *= 2;
                }
+
+               // zoom into the map
+               worldX1 *= 2;
+               worldX2 *= 2;
+               worldY1 *= 2;
+               worldY2 *= 2;
             }
          }
       });
@@ -966,12 +948,6 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
       _progbarQueue.setMaximum(_maxQueue);
    }
 
-   @Override
-   protected void okPressed() {
-
-      super.okPressed();
-   }
-
    private void onSelectDelete(final Object selectedPart) {
 
       if (selectedPart instanceof PartMP) {
@@ -1102,7 +1078,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
        * get valid zoom levels
        */
       _validMapZoomLevel = _mapZoomLevel;
-      final int mapMaxZoom = _selectedMp.getMaxZoomLevel();
+      final int mapMaxZoom = _selectedMp.getMaximumZoomLevel();
 
       // check if the map zoom level is higher than the available mp zoom levels
       if (_mapZoomLevel > mapMaxZoom) {

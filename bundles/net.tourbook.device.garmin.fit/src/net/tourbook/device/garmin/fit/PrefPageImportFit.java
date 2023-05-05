@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
@@ -24,18 +26,15 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.joda.time.Period;
@@ -47,7 +46,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private static final String   STATE_FIT_IMPORT_SELECTED_TAB = "STATE_FIT_IMPORT_SELECTED_TAB";            //$NON-NLS-1$
 
-   private static final String   DEGREE_CELCIUS                = "\u0394 \u00b0C";                           //$NON-NLS-1$
+   private static final String   DEGREE_CELSIUS                = "\u0394 \u00b0C";                           //$NON-NLS-1$
 
    private static final float    TEMPERATURE_DIGITS            = 10.0f;
 
@@ -63,7 +62,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 //       // hide these components
          .withMillisRemoved();
 
-   private final static String[] PowerDataSources              = new String[] {
+   private static final String[] PowerDataSources              = new String[] {
          Messages.PrefPage_Fit_Combo_Power_Data_Source_Stryd,
          Messages.PrefPage_Fit_Combo_Power_Data_Source_Garmin_RD_Pod
    };
@@ -72,36 +71,36 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private PixelConverter        _pc;
 
-   private SelectionAdapter      _defaultSelectionListener;
+   private SelectionListener     _defaultSelectionListener;
 
    /*
     * UI controls
     */
-   private Button    _chkIgnoreLastMarker;
-   private Button    _chkIgnoreSpeedValues;
-   private Button    _chkRemoveExceededDuration;
-   private Button    _chkFitImportTourType;
+   private Button     _chkIgnoreLastMarker;
+   private Button     _chkIgnoreSpeedValues;
+   private Button     _chkRemoveExceededDuration;
+   private Button     _chkFitImportTourType;
 
-   private Combo     _comboPowerDataSource;
+   private Combo      _comboPowerDataSource;
 
-   private Label     _lblIgnorLastMarker_Info;
-   private Label     _lblIgnorLastMarker_TimeSlices;
-   private Label     _lblIgnorSpeedValues_Info;
-   private Label     _lblSplitTour_Duration;
-   private Label     _lblSplitTour_DurationUnit;
-   private Label     _lblSplitTour_Info;
-   private Label     _lblPowerDataSource;
+   private Label      _lblIgnorLastMarker_Info;
+   private Label      _lblIgnorLastMarker_TimeSlices;
+   private Label      _lblIgnorSpeedValues_Info;
+   private Label      _lblSplitTour_Duration;
+   private Label      _lblSplitTour_DurationUnit;
+   private Label      _lblSplitTour_Info;
+   private Label      _lblPowerDataSource;
 
-   private Button    _rdoTourTypeFromSport;
-   private Button    _rdoTourTypeFromProfile;
-   private Button    _rdoTourTypeFromProfileElseSport;
-   private Button    _rdoTourTypeFromSportAndProfile;
+   private Button     _rdoTourTypeFromSport;
+   private Button     _rdoTourTypeFromProfile;
+   private Button     _rdoTourTypeFromProfileElseSport;
+   private Button     _rdoTourTypeFromSportAndProfile;
 
-   private Spinner   _spinnerIgnorLastMarker_TimeSlices;
-   private Spinner   _spinnerExceededDuration;
-   private Spinner   _spinnerTemperatureAdjustment;
+   private Spinner    _spinnerIgnorLastMarker_TimeSlices;
+   private Spinner    _spinnerExceededDuration;
+   private Spinner    _spinnerTemperatureAdjustment;
 
-   private TabFolder _tabFolder;
+   private CTabFolder _tabFolder;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -121,34 +120,34 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       GridLayoutFactory.fillDefaults().applyTo(parent);
       {
 
-         _tabFolder = new TabFolder(parent, SWT.TOP);
+         _tabFolder = new CTabFolder(parent, SWT.TOP);
          GridDataFactory
                .fillDefaults()//
                .grab(true, true)
                .applyTo(_tabFolder);
          {
 
-            final TabItem tabMeasurementSystem = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabMeasurementSystem = new CTabItem(_tabFolder, SWT.NONE);
             tabMeasurementSystem.setControl(createUI_20_Speed(_tabFolder));
             tabMeasurementSystem.setText(Messages.PrefPage_Fit_Group_Speed);
 
-            final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
             tabBreakTime.setControl(createUI_30_Temperature(_tabFolder));
             tabBreakTime.setText(Messages.PrefPage_Fit_Group_AdjustTemperature);
 
-            final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
             tabElevation.setControl(createUI_50_IgnoreLastMarker(_tabFolder));
             tabElevation.setText(Messages.PrefPage_Fit_Group_IgnoreLastMarker);
 
-            final TabItem tabNotes = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabNotes = new CTabItem(_tabFolder, SWT.NONE);
             tabNotes.setControl(createUI_70_SplitTour(_tabFolder));
             tabNotes.setText(Messages.PrefPage_Fit_Group_ReplaceTimeSlice);
 
-            final TabItem tabPower = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabPower = new CTabItem(_tabFolder, SWT.NONE);
             tabPower.setControl(createUI_80_Power(_tabFolder));
             tabPower.setText(Messages.PrefPage_Fit_Group_Power);
 
-            final TabItem tabTourType = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabTourType = new CTabItem(_tabFolder, SWT.NONE);
             tabTourType.setControl(createUI_90_TourType(_tabFolder));
             tabTourType.setText(Messages.PrefPage_Fit_Group_TourType);
          }
@@ -220,19 +219,14 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _spinnerTemperatureAdjustment.setPageIncrement(10);
             _spinnerTemperatureAdjustment.setMinimum(-100); // - 10.0 �C
             _spinnerTemperatureAdjustment.setMaximum(100); // +10.0 �C
-            _spinnerTemperatureAdjustment.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-               }
-            });
+            _spinnerTemperatureAdjustment.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
          }
 
          // label: �C
          {
             final Label label = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-            label.setText(DEGREE_CELCIUS);
+            label.setText(DEGREE_CELSIUS);
          }
 
          // label: info
@@ -290,12 +284,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _spinnerIgnorLastMarker_TimeSlices.setMinimum(0);
             _spinnerIgnorLastMarker_TimeSlices.setMaximum(1000);
             _spinnerIgnorLastMarker_TimeSlices.setPageIncrement(10);
-            _spinnerIgnorLastMarker_TimeSlices.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-               }
-            });
+            _spinnerIgnorLastMarker_TimeSlices.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
          }
       }
 
@@ -343,19 +332,11 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _spinnerExceededDuration.setMinimum(0);
             _spinnerExceededDuration.setMaximum(Integer.MAX_VALUE);
             _spinnerExceededDuration.setPageIncrement(3600); // 60*60 = 1 hour
-            _spinnerExceededDuration.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  updateUI_SplitTour();
-               }
+            _spinnerExceededDuration.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               updateUI_SplitTour();
             });
-            _spinnerExceededDuration.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  updateUI_SplitTour();
-               }
-            });
+            _spinnerExceededDuration.addSelectionListener(widgetSelectedAdapter(selectionEvent -> updateUI_SplitTour()));
          }
 
          // label: duration in year/months/days/...
@@ -408,15 +389,15 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory
-                .fillDefaults()//
-                .numColumns(1)
-                .extendedMargins(5, 5, 15, 5)
-                .spacing(20, 5)
-                .applyTo(container);
+            .fillDefaults()//
+            .numColumns(1)
+            .extendedMargins(5, 5, 15, 5)
+            .spacing(20, 5)
+            .applyTo(container);
       {
          /*
-         * Set Tour Type using FIT file fields
-         */
+          * Set Tour Type using FIT file fields
+          */
 
          // label: info
          {
@@ -428,12 +409,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             // checkbox: enable/disable setting Tour Type
             _chkFitImportTourType = new Button(container, SWT.CHECK);
             _chkFitImportTourType.setText(Messages.PrefPage_Fit_Checkbox_FitImportTourType);
-            _chkFitImportTourType.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls();
-               }
-            });
+            _chkFitImportTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
          }
 
          // container: Tour Type import options
@@ -517,12 +493,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       _pc = new PixelConverter(parent);
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableControls();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
    }
 
    @Override
@@ -557,17 +528,13 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       } else if (selectedTab == TAB_FOLDER_MARKER_FILTER) {
 
-         _chkIgnoreLastMarker.setSelection(//
-               _prefStore.getDefaultBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
-         _spinnerIgnorLastMarker_TimeSlices.setSelection(//
-               _prefStore.getDefaultInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
+         _chkIgnoreLastMarker.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
+         _spinnerIgnorLastMarker_TimeSlices.setSelection(_prefStore.getDefaultInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
 
       } else if (selectedTab == TAB_FOLDER_TIME_SLIZE) {
 
-         _chkRemoveExceededDuration.setSelection(//
-               _prefStore.getDefaultBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
-         _spinnerExceededDuration.setSelection(//
-               _prefStore.getDefaultInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
+         _chkRemoveExceededDuration.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
+         _spinnerExceededDuration.setSelection(_prefStore.getDefaultInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
 
       } else if (selectedTab == TAB_FOLDER_POWER) {
 
@@ -611,20 +578,15 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       // temperature
       final float temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
-      _spinnerTemperatureAdjustment.setSelection(//
-            (int) (temperatureAdjustment * TEMPERATURE_DIGITS));
+      _spinnerTemperatureAdjustment.setSelection((int) (temperatureAdjustment * TEMPERATURE_DIGITS));
 
       // last marker
-      _chkIgnoreLastMarker.setSelection(//
-            _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
-      _spinnerIgnorLastMarker_TimeSlices.setSelection(//
-            _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
+      _chkIgnoreLastMarker.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER));
+      _spinnerIgnorLastMarker_TimeSlices.setSelection(_prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES));
 
       // exceeded time slice
-      _chkRemoveExceededDuration.setSelection(//
-            _prefStore.getBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
-      _spinnerExceededDuration.setSelection(//
-            _prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
+      _chkRemoveExceededDuration.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE));
+      _spinnerExceededDuration.setSelection(_prefStore.getInt(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION));
 
       // folder
       _tabFolder.setSelection(_prefStore.getInt(STATE_FIT_IMPORT_SELECTED_TAB));
@@ -652,35 +614,21 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       // temperature
       final float temperatureAdjustment = _spinnerTemperatureAdjustment.getSelection() / TEMPERATURE_DIGITS;
-      _prefStore.setValue(//
-            IPreferences.FIT_TEMPERATURE_ADJUSTMENT,
-            temperatureAdjustment);
+      _prefStore.setValue(IPreferences.FIT_TEMPERATURE_ADJUSTMENT, temperatureAdjustment);
 
       // last marker
-      _prefStore.setValue(//
-            IPreferences.FIT_IS_IGNORE_LAST_MARKER,
-            _chkIgnoreLastMarker.getSelection());
-      _prefStore.setValue(
-            IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES,
-            _spinnerIgnorLastMarker_TimeSlices.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_IGNORE_LAST_MARKER, _chkIgnoreLastMarker.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES, _spinnerIgnorLastMarker_TimeSlices.getSelection());
 
       // exceeded time slice
-      _prefStore.setValue(//
-            IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE,
-            _chkRemoveExceededDuration.getSelection());
-      _prefStore.setValue(//
-            IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION,
-            _spinnerExceededDuration.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE, _chkRemoveExceededDuration.getSelection());
+      _prefStore.setValue(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION, _spinnerExceededDuration.getSelection());
 
       // Preferred power data source
-      _prefStore.setValue(
-            IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE,
-            _comboPowerDataSource.getSelectionIndex());
+      _prefStore.setValue(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, _comboPowerDataSource.getSelectionIndex());
 
       // Set Tour Type during FIT import
-      _prefStore.setValue(
-            IPreferences.FIT_IS_IMPORT_TOURTYPE,
-            _chkFitImportTourType.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_IMPORT_TOURTYPE, _chkFitImportTourType.getSelection());
 
       // Mode for Tour Type during FIT import
       String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
@@ -698,9 +646,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
       }
 
-      _prefStore.setValue(
-            IPreferences.FIT_IMPORT_TOURTYPE_MODE,
-            tourTypeMode);
+      _prefStore.setValue(IPreferences.FIT_IMPORT_TOURTYPE_MODE, tourTypeMode);
    }
 
    private void saveUIState() {

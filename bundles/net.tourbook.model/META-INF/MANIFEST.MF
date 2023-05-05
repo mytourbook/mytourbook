@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: 3D Animated Models
+Bundle-SymbolicName: net.tourbook.model;singleton:=true
+Bundle-Version: 23.3.2.qualifier
+Bundle-Activator: net.tourbook.model.ModelActivator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: net.tourbook.model
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: MyTourbook
+Export-Package: net.tourbook.model
+Eclipse-BundleShape: dir

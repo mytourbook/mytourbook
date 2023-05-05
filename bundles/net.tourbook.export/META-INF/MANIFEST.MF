@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GPX/TCX Export
 Bundle-SymbolicName: net.tourbook.export;singleton:=true
-Bundle-Version: 20.12.0.qualifier
+Bundle-Version: 23.3.2.qualifier
 Bundle-Activator: net.tourbook.export.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.core.runtime,
@@ -20,6 +20,7 @@ Import-Package: net.tourbook,
  net.tourbook.common.util,
  net.tourbook.data,
  net.tourbook.database,
+ net.tourbook.device.garmin.fit,
  net.tourbook.ext.velocity,
  net.tourbook.extension.export,
  net.tourbook.tour,
@@ -31,3 +32,4 @@ Import-Package: net.tourbook,
  org.dinopolis.gpstool.gpsinput.garmin,
  org.dinopolis.util.text
 Automatic-Module-Name: net.tourbook.export
+Export-Package: net.tourbook.export

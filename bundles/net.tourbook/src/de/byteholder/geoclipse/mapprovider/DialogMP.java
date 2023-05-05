@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 
@@ -46,8 +47,6 @@ public class DialogMP extends TitleAreaDialog {
 
    private static final String            TIME_SPACER             = "       ";                    //$NON-NLS-1$
 
-   private static final String            DEFAULT_MONO_FONT       = "Courier";                    //$NON-NLS-1$
-
    private static final DateTimeFormatter _timeFormatter          = new DateTimeFormatterBuilder()
          .append(DateTimeFormatter.ISO_TIME)
          .appendInstant(3)
@@ -59,7 +58,7 @@ public class DialogMP extends TitleAreaDialog {
    private MP _mp;
 
    // map is shared
-   protected Map _map;
+   protected Map2 _map;
 
    private Font  _fontMono;
 
@@ -119,7 +118,7 @@ public class DialogMP extends TitleAreaDialog {
       }
 
       if (_fontMono == null) {
-         _fontMono = new Font(display, DEFAULT_MONO_FONT, 9, SWT.NORMAL);
+         _fontMono = new Font(display, MTFont.DEFAULT_MONO_FONT, 9, SWT.NORMAL);
       }
    }
 

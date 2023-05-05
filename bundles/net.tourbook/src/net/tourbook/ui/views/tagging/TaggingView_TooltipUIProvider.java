@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,12 @@ package net.tourbook.ui.views.tagging;
 
 import java.util.HashMap;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
@@ -44,21 +47,18 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
-   private static final String IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
-   private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
+   private static final int   SHELL_MARGIN   = 5;
+   private static final int   MAX_DATA_WIDTH = 300;
 
-   private static final int    SHELL_MARGIN             = 5;
-   private static final int    MAX_DATA_WIDTH           = 300;
+   private Object             _viewerCellData;
 
-   private Object              _viewerCellData;
+   private IToolTipProvider   _toolTipProvider;
 
-   private IToolTipProvider    _toolTipProvider;
+   private ActionCloseTooltip _actionCloseTooltip;
+   private ActionEditTag      _actionEditTag;
 
-   private ActionCloseTooltip  _actionCloseTooltip;
-   private ActionEditTag       _actionEditTag;
-
-   private boolean             _hasNotes;
-   private String              _content_Notes;
+   private boolean            _hasNotes;
+   private String             _content_Notes;
 
    /*
     * UI resources
@@ -81,8 +81,8 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          super(null, Action.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_APP_CLOSE));
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -99,8 +99,8 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          setToolTipText(Messages.Action_Tag_Edit_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Edit));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
       }
 
       @Override

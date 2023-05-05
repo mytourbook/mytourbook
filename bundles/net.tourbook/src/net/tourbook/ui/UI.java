@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,8 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -35,7 +35,6 @@ import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
@@ -62,8 +61,6 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -81,116 +78,104 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.menus.UIElement;
 
 public class UI {
 
-//	long startTime = System.currentTimeMillis();
+   private static final String           ICONS_PATH                    = "/icons/";                    //$NON-NLS-1$
 
-//	long endTime = System.currentTimeMillis();
-//	System.out.println("Execution time : " + (endTime - startTime) + " ms");
-
-   public static final boolean       IS_LINUX                      = "gtk".equals(SWT.getPlatform());                                         //$NON-NLS-1$
-   public static final boolean       IS_OSX                        = "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform()); //$NON-NLS-1$ //$NON-NLS-2$
-   public static final boolean       IS_WIN                        = "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());    //$NON-NLS-1$ //$NON-NLS-2$
-
-   private static final String       ICONS_PATH                    = "/icons/";                                                               //$NON-NLS-1$
-
-   public static final String        EMPTY_STRING                  = "";                                                                      //$NON-NLS-1$
-   public static final String        SPACE                         = " ";                                                                     //$NON-NLS-1$
-   public static final String        SPACE2                        = "  ";                                                                    //$NON-NLS-1$
-   public static final String        SPACE4                        = "    ";                                                                  //$NON-NLS-1$
-   public static final String        COLON_SPACE                   = ": ";                                                                    //$NON-NLS-1$
-   public static final String        COMMA_SPACE                   = ", ";                                                                    //$NON-NLS-1$
-   public static final String        UNDERSCORE                    = "_";                                                                     //$NON-NLS-1$
-   public static final String        DASH                          = "-";                                                                     //$NON-NLS-1$
-   public static final String        DASH_WITH_SPACE               = " - ";                                                                   //$NON-NLS-1$
-   public static final String        DASH_WITH_DOUBLE_SPACE        = "   -   ";                                                               //$NON-NLS-1$
-   public static final String        SLASH_WITH_SPACE              = " / ";                                                                   //$NON-NLS-1$
-   public static final String        EMPTY_STRING_FORMAT           = "%s";                                                                    //$NON-NLS-1$
-   public static final String        MNEMONIC                      = "&";                                                                     //$NON-NLS-1$
-   public static final String        BREAK_TIME_MARKER             = "x";                                                                     //$NON-NLS-1$
+   public static final String            EMPTY_STRING                  = "";                           //$NON-NLS-1$
+   public static final String            SPACE                         = " ";                          //$NON-NLS-1$
+   public static final String            SPACE2                        = "  ";                         //$NON-NLS-1$
+   public static final String            SPACE4                        = "    ";                       //$NON-NLS-1$
+   public static final String            COLON_SPACE                   = ": ";                         //$NON-NLS-1$
+   public static final String            COMMA_SPACE                   = ", ";                         //$NON-NLS-1$
+   public static final String            UNDERSCORE                    = "_";                          //$NON-NLS-1$
+   public static final String            DASH                          = "-";                          //$NON-NLS-1$
+   public static final String            DASH_WITH_SPACE               = " - ";                        //$NON-NLS-1$
+   public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                    //$NON-NLS-1$
+   public static final String            SLASH_WITH_SPACE              = " / ";                        //$NON-NLS-1$
+   public static final String            EMPTY_STRING_FORMAT           = "%s";                         //$NON-NLS-1$
 
    /**
     * contains a new line
     */
-   public static final String        NEW_LINE                      = "\n";                                                                    //$NON-NLS-1$
+   public static final String            NEW_LINE                      = "\n";                         //$NON-NLS-1$
 
    /**
     * contains 2 new lines
     */
-   public static final String        NEW_LINE2                     = "\n\n";                                                                  //$NON-NLS-1$
+   public static final String            NEW_LINE2                     = "\n\n";                       //$NON-NLS-1$
 
-   public static final String        SYSTEM_NEW_LINE               = System.getProperty("line.separator");                                    //$NON-NLS-1$
+   public static final String            IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";         //$NON-NLS-1$
 
-   public static final String        IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";                                                    //$NON-NLS-1$
+   public static final String            GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";            //$NON-NLS-1$
+   public static final String            GRAPH_ALTITUDE                = "GRAPH_ALTITUDE";             //$NON-NLS-1$
+   public static final String            GRAPH_CADENCE                 = "GRAPH_CADENCE";              //$NON-NLS-1$
+   public static final String            GRAPH_GRADIENT                = "GRAPH_GRADIENT";             //$NON-NLS-1$
+   public static final String            GRAPH_PACE                    = "GRAPH_PACE";                 //$NON-NLS-1$
+   public static final String            GRAPH_POWER                   = "GRAPH_POWER";                //$NON-NLS-1$
+   public static final String            GRAPH_PULSE                   = "GRAPH_PULSE";                //$NON-NLS-1$
+   public static final String            GRAPH_SPEED                   = "GRAPH_SPEED";                //$NON-NLS-1$
+   public static final String            GRAPH_TEMPERATURE             = "GRAPH_TEMPERATURE";          //$NON-NLS-1$
 
-   public static final String        GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";                                                       //$NON-NLS-1$
-   public static final String        GRAPH_ALTITUDE                = "GRAPH_ALTITUDE";                                                        //$NON-NLS-1$
-   public static final String        GRAPH_CADENCE                 = "GRAPH_CADENCE";                                                         //$NON-NLS-1$
-   public static final String        GRAPH_GRADIENT                = "GRAPH_GRADIENT";                                                        //$NON-NLS-1$
-   public static final String        GRAPH_PACE                    = "GRAPH_PACE";                                                            //$NON-NLS-1$
-   public static final String        GRAPH_POWER                   = "GRAPH_POWER";                                                           //$NON-NLS-1$
-   public static final String        GRAPH_PULSE                   = "GRAPH_PULSE";                                                           //$NON-NLS-1$
-   public static final String        GRAPH_SPEED                   = "GRAPH_SPEED";                                                           //$NON-NLS-1$
-   public static final String        GRAPH_TEMPERATURE             = "GRAPH_TEMPERATURE";                                                     //$NON-NLS-1$
+   public static final String            VIEW_COLOR_CATEGORY           = "view.color.category";        //$NON-NLS-1$
+   public static final String            VIEW_COLOR_TITLE              = "view.color.title";           //$NON-NLS-1$
+   public static final String            VIEW_COLOR_SUB                = "view.color.sub";             //$NON-NLS-1$
+   public static final String            VIEW_COLOR_SUB_SUB            = "view.color.sub-sub";         //$NON-NLS-1$
+   public static final String            VIEW_COLOR_TOUR               = "view.color.tour";            //$NON-NLS-1$
+   public static final String            VIEW_COLOR_BG_HISTORY_TOUR    = "VIEW_COLOR_BG_HISTORY_TOUR"; //$NON-NLS-1$
 
-   public static final String        VIEW_COLOR_CATEGORY           = "view.color.category";                                                   //$NON-NLS-1$
-   public static final String        VIEW_COLOR_TITLE              = "view.color.title";                                                      //$NON-NLS-1$
-   public static final String        VIEW_COLOR_SUB                = "view.color.sub";                                                        //$NON-NLS-1$
-   public static final String        VIEW_COLOR_SUB_SUB            = "view.color.sub-sub";                                                    //$NON-NLS-1$
-   public static final String        VIEW_COLOR_TOUR               = "view.color.tour";                                                       //$NON-NLS-1$
-   public static final String        VIEW_COLOR_BG_HISTORY_TOUR    = "VIEW_COLOR_BG_HISTORY_TOUR";                                            //$NON-NLS-1$
+   public static final String            SYMBOL_AVERAGE                = "\u00f8";                     //$NON-NLS-1$
+   public static final String            SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";                    //$NON-NLS-1$
+   public static final String            SYMBOL_DASH                   = "-";                          //$NON-NLS-1$
+   public static final String            SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";                     //$NON-NLS-1$
+   public static final String            SYMBOL_DOUBLE_VERTICAL        = "\u2551";                     //$NON-NLS-1$
+   public static final String            SYMBOL_DEGREE                 = "\u00B0";                     //$NON-NLS-1$
+   public static final String            SYMBOL_INFINITY               = "\u221E";                     //$NON-NLS-1$
+   public static final String            SYMBOL_SUM_WITH_SPACE         = "\u2211 ";                    //$NON-NLS-1$
+   public static final String            SYMBOL_TAU                    = "\u03c4";                     //$NON-NLS-1$
 
-   public static final String        SYMBOL_AVERAGE                = "\u00f8";                                                                //$NON-NLS-1$
-   public static final String        SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";                                                               //$NON-NLS-1$
-   public static final String        SYMBOL_DASH                   = "-";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";                                                                //$NON-NLS-1$
-   public static final String        SYMBOL_DOUBLE_VERTICAL        = "\u2551";                                                                //$NON-NLS-1$
-   public static final String        SYMBOL_DEGREE                 = "\u00B0";                                                                //$NON-NLS-1$
-   public static final String        SYMBOL_INFINITY               = "\u221E";                                                                //$NON-NLS-1$
-   public static final String        SYMBOL_SUM_WITH_SPACE         = "\u2211 ";                                                               //$NON-NLS-1$
-   public static final String        SYMBOL_TAU                    = "\u03c4";                                                                //$NON-NLS-1$
+   public static final String            SYMBOL_BRACKET_LEFT           = "(";                          //$NON-NLS-1$
+   public static final String            SYMBOL_BRACKET_RIGHT          = ")";                          //$NON-NLS-1$
+   public static final String            SYMBOL_COLON                  = ":";                          //$NON-NLS-1$
+   public static final String            SYMBOL_DOT                    = ".";                          //$NON-NLS-1$
+   public static final String            SYMBOL_EQUAL                  = "=";                          //$NON-NLS-1$
+   public static final String            SYMBOL_GREATER_THAN           = ">";                          //$NON-NLS-1$
+   public static final String            SYMBOL_LESS_THAN              = "<";                          //$NON-NLS-1$
+   public static final String            SYMBOL_PERCENTAGE             = "%";                          //$NON-NLS-1$
+   public static final String            SYMBOL_WIND_WITH_SPACE        = "W ";                         //$NON-NLS-1$
+   public static final String            SYMBOL_EXCLAMATION_POINT      = "!";                          //$NON-NLS-1$
 
-   public static final String        SYMBOL_BRACKET_LEFT           = "(";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_BRACKET_RIGHT          = ")";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_COLON                  = ":";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_DOT                    = ".";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_EQUAL                  = "=";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_GREATER_THAN           = ">";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_LESS_THAN              = "<";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_PERCENTAGE             = "%";                                                                     //$NON-NLS-1$
-   public static final String        SYMBOL_WIND_WITH_SPACE        = "W ";                                                                    //$NON-NLS-1$
-   public static final String        SYMBOL_EXCLAMATION_POINT      = "!";                                                                     //$NON-NLS-1$
+   public static final ImageRegistry     IMAGE_REGISTRY;
 
-   public final static ImageRegistry IMAGE_REGISTRY;
+   private static final String           PART_NAME_GRAPH_ID            = "graphId-";                   //$NON-NLS-1$
+   private static final String           PART_NAME_DISABLED            = "-disabled";                  //$NON-NLS-1$
 
-   private static final String       PART_NAME_GRAPH_ID            = "graphId-";                                                              //$NON-NLS-1$
-   private static final String       PART_NAME_DISABLED            = "-disabled";                                                             //$NON-NLS-1$
+   public static final String            IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";            //$NON-NLS-1$
+   public static final String            IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";     //$NON-NLS-1$
 
-   public static final String        IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";                                                       //$NON-NLS-1$
-   public static final String        IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";                                                //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
 
-   private static StringBuilder      _formatterSB                  = new StringBuilder();
-   private static Formatter          _formatter                    = new Formatter(_formatterSB);
+   private static StringBuilder          _formatterSB                  = new StringBuilder();
+   private static Formatter              _formatter                    = new Formatter(_formatterSB);
 
-   private static DateFormat         _dateFormatterShort;
-   private static DateFormat         _timeFormatterShort;
+   private static DateFormat             _dateFormatterShort;
+   private static DateFormat             _timeFormatterShort;
 
-   public static Styler              TAG_STYLER;
-   public static Styler              TAG_CATEGORY_STYLER;
-   public static Styler              TAG_SUB_STYLER;
+   public static Styler                  TAG_STYLER;
+   public static Styler                  TAG_CATEGORY_STYLER;
+   public static Styler                  TAG_SUB_STYLER;
 
-   private static final String       DEFAULT_MONO_FONT             = "Courier";                                                               //$NON-NLS-1$
-   private static Font               _fontForLogging;
+   private static final String           DEFAULT_MONO_FONT             = "Courier";                    //$NON-NLS-1$
+   private static Font                   _fontForLogging;
 
    static {
 
@@ -202,85 +187,39 @@ public class UI {
        */
       IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
+// SET_FORMATTING_OFF
+
       /*
        * Chart and map graphs.
        */
-      createGraphImageInRegistry(
-            MapGraphId.Altimeter,
-            Messages.Image__graph_altimeter,
-            Messages.Image__graph_altimeter_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Altitude,
-            Messages.Image__graph_altitude,
-            Messages.Image__graph_altitude_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Cadence,
-            Messages.Image__graph_cadence,
-            Messages.Image__graph_cadence_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Gradient,
-            Messages.Image__graph_gradient,
-            Messages.Image__graph_gradient_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.HrZone,
-            Messages.Image__PulseZones,
-            Messages.Image__PulseZones_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Pace,
-            Messages.Image__graph_pace,
-            Messages.Image__graph_pace_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Power,
-            Messages.Image__graph_power,
-            Messages.Image__graph_power_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Pulse,
-            Messages.Image__graph_heartbeat,
-            Messages.Image__graph_heartbeat_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Speed,
-            Messages.Image__graph_speed,
-            Messages.Image__graph_speed_disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Temperature,
-            Messages.Image__graph_temperature,
-            Messages.Image__graph_temperature_disabled);
+      createGraphImageInRegistry(MapGraphId.Altimeter,   Images.Graph_Altimeter,    Images.Graph_Altimeter_Disabled);
+      createGraphImageInRegistry(MapGraphId.Altitude,    Images.Graph_Elevation,    Images.Graph_Elevation_Disabled);
+      createGraphImageInRegistry(MapGraphId.Cadence,     Images.Graph_Cadence,      Images.Graph_Cadence_Disabled);
+      createGraphImageInRegistry(MapGraphId.Gradient,    Images.Graph_Gradient,     Images.Graph_Gradient_Disabled);
+      createGraphImageInRegistry(MapGraphId.HrZone,      Images.PulseZones,         Images.PulseZones_Disabled);
+      createGraphImageInRegistry(MapGraphId.Pace,        Images.Graph_Pace,         Images.Graph_Pace_Disabled);
+      createGraphImageInRegistry(MapGraphId.Power,       Images.Graph_Power,        Images.Graph_Power_Disabled);
+      createGraphImageInRegistry(MapGraphId.Pulse,       Images.Graph_Heartbeat,    Images.Graph_Heartbeat_Disabled);
+      createGraphImageInRegistry(MapGraphId.Speed,       Images.Graph_Speed,        Images.Graph_Speed_Disabled);
+      createGraphImageInRegistry(MapGraphId.Temperature, Images.Graph_Temperature,  Images.Graph_Temperature_Disabled);
 
       // tour type images
-      IMAGE_REGISTRY.put(
-            IMAGE_TOUR_TYPE_FILTER,
-            TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
-      IMAGE_REGISTRY.put(
-            IMAGE_TOUR_TYPE_FILTER_SYSTEM,
-            TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,               TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,        TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter_System));
 
       // photo
-      IMAGE_REGISTRY.put(
-            TourPhotoLinkView.IMAGE_PIC_DIR_VIEW,
-            TourbookPlugin.getImageDescriptor(Messages.Image__PhotoDirectoryView));
-      IMAGE_REGISTRY.put(
-            TourPhotoLinkView.IMAGE_PHOTO_PHOTO,
-            TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos));
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, TourbookPlugin.getImageDescriptor(Images.PhotoDirectoryView));
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,  TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       /*
        * set tag styler
        */
-      TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
-      TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
-      TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
-   }
+      TAG_CATEGORY_STYLER  = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
+      TAG_STYLER           = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
+      TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 
-   // pref store var cannot be set from a static field because it can be null !!!
-//	private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+// SET_FORMATTING_ON
+   }
 
    private UI() {}
 
@@ -297,7 +236,7 @@ public class UI {
       if (display != null) {
 
          // Look at all the shells and pick the first one that is a workbench window.
-         final Shell shells[] = display.getShells();
+         final Shell[] shells = display.getShells();
          for (final Shell shell : shells) {
 
             final Object data = shell.getData();
@@ -328,7 +267,7 @@ public class UI {
 
       final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-      final MessageDialog dialog = new MessageDialog(//
+      final MessageDialog dialog = new MessageDialog(
             shell,
             Messages.app_dlg_confirmFileOverwrite_title,
             null,
@@ -357,55 +296,52 @@ public class UI {
             || fileCollisionValue == FileCollisionBehavior.REPLACE
             || fileCollisionValue == FileCollisionBehavior.KEEP) {
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().syncExec(() -> {
 
-               final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-               final MessageDialog dialog = new MessageDialog(//
-                     shell,
-                     Messages.app_dlg_confirmFileOverwrite_title,
-                     null,
-                     NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
-                     MessageDialog.QUESTION,
-                     new String[] {
-                           IDialogConstants.YES_LABEL,
-                           IDialogConstants.YES_TO_ALL_LABEL,
-                           IDialogConstants.NO_LABEL,
-                           IDialogConstants.NO_TO_ALL_LABEL,
-                           IDialogConstants.CANCEL_LABEL },
-                     0);
-               dialog.open();
+            final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            final MessageDialog dialog = new MessageDialog(
+                  shell,
+                  Messages.app_dlg_confirmFileOverwrite_title,
+                  null,
+                  NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
+                  MessageDialog.QUESTION,
+                  new String[] {
+                        IDialogConstants.YES_LABEL,
+                        IDialogConstants.YES_TO_ALL_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.NO_TO_ALL_LABEL,
+                        IDialogConstants.CANCEL_LABEL },
+                  0);
+            dialog.open();
 
-               final int returnCode = dialog.getReturnCode();
-               switch (returnCode) {
+            final int returnCode = dialog.getReturnCode();
+            switch (returnCode) {
 
-               case -1: // dialog was canceled
-               case 4:
-                  fileCollision.value = FileCollisionBehavior.DIALOG_IS_CANCELED;
-                  break;
+            case -1: // dialog was canceled
+            case 4:
+               fileCollision.value = FileCollisionBehavior.DIALOG_IS_CANCELED;
+               break;
 
-               case 0: // YES
-                  fileCollision.value = FileCollisionBehavior.REPLACE;
-                  isOverwrite[0] = true;
-                  break;
+            case 0: // YES
+               fileCollision.value = FileCollisionBehavior.REPLACE;
+               isOverwrite[0] = true;
+               break;
 
-               case 1: // YES_TO_ALL
-                  fileCollision.value = FileCollisionBehavior.REPLACE_ALL;
-                  isOverwrite[0] = true;
-                  break;
+            case 1: // YES_TO_ALL
+               fileCollision.value = FileCollisionBehavior.REPLACE_ALL;
+               isOverwrite[0] = true;
+               break;
 
-               case 2: // NO
-                  fileCollision.value = FileCollisionBehavior.KEEP;
-                  break;
+            case 2: // NO
+               fileCollision.value = FileCollisionBehavior.KEEP;
+               break;
 
-               case 3: // NO_TO_ALL
-                  fileCollision.value = FileCollisionBehavior.KEEP_ALL;
-                  break;
+            case 3: // NO_TO_ALL
+               fileCollision.value = FileCollisionBehavior.KEEP_ALL;
+               break;
 
-               default:
-                  break;
-               }
+            default:
+               break;
             }
          });
 
@@ -474,7 +410,7 @@ public class UI {
       if ((tourDataEditor != null) && tourDataEditor.isDirty() && (tourDataEditor.getTourData() == tourData)) {
          okText = Messages.app_action_update;
       } else {
-         okText = Messages.app_action_save;
+         okText = Messages.App_Action_Save;
       }
 
       return okText;
@@ -490,21 +426,41 @@ public class UI {
 
    private static void createGraphImageInRegistry(final MapGraphId graphId,
                                                   final String graphImageName,
-                                                  final String graphImageNameDisabled) {
+                                                  final String graphImageName_Disabled) {
 
       // create enabled image
-      IMAGE_REGISTRY.put(
-            createGraphImage_Name(graphId), //
-            TourbookPlugin.getImageDescriptor(graphImageName));
+      IMAGE_REGISTRY.put(createGraphImage_Name(graphId),
+            TourbookPlugin.getThemedImageDescriptor(graphImageName));
 
       // create disabled image
-      IMAGE_REGISTRY.put(
-            createGraphImage_NameDisabled(graphId),
-            TourbookPlugin.getImageDescriptor(graphImageNameDisabled));
+      IMAGE_REGISTRY.put(createGraphImage_NameDisabled(graphId),
+            TourbookPlugin.getThemedImageDescriptor(graphImageName_Disabled));
    }
 
    /**
     * Creates a page with a static text.
+    *
+    * @param formToolkit
+    * @param parent
+    * @param labelText
+    * @return
+    */
+   public static Composite createPage(final Composite parent, final String labelText) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.WRAP);
+         label.setText(labelText);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      }
+
+      return container;
+   }
+
+   /**
+    * Creates a page with a static text by using a {@link FormToolkit}
     *
     * @param formToolkit
     * @param parent
@@ -560,15 +516,16 @@ public class UI {
 
       final ZonedDateTime dt = tourData.getTourStartTime();
 
-      return _formatter
-            .format(//
-                  Messages.Format_yyyymmdd_hhmmss,
-                  dt.getYear(),
-                  dt.getMonthValue(),
-                  dt.getDayOfMonth(),
-                  dt.getHour(),
-                  dt.getMinute(),
-                  dt.getSecond())//
+      return _formatter.format(
+
+            Messages.Format_yyyymmdd_hhmmss,
+            dt.getYear(),
+            dt.getMonthValue(),
+            dt.getDayOfMonth(),
+            dt.getHour(),
+            dt.getMinute(),
+            dt.getSecond())
+
             .toString();
    }
 
@@ -609,7 +566,7 @@ public class UI {
 
             String oldPattern = sdf.toPattern();
 
-            //	some short formats have only one M and d (e.g. ths US)
+            // some short formats have only one M and d (e.g. ths US)
             if (oldPattern.indexOf("MM") == -1 && oldPattern.indexOf("dd") == -1) {//$NON-NLS-1$ //$NON-NLS-2$
                String newPattern = UI.EMPTY_STRING;
                for (int i = 0; i < oldPattern.length(); i++) {
@@ -624,12 +581,12 @@ public class UI {
                sdf.applyPattern(newPattern);
             }
 
-            //	Unknown short format => use JDBC
+            // Unknown short format => use JDBC
             if (sdf.toPattern().length() != 8) {
                sdf.applyPattern("yyyy-MM-dd"); //$NON-NLS-1$
             }
 
-            //	4 digit year
+            // 4 digit year
             if (sdf.toPattern().indexOf("yyyy") == -1) { //$NON-NLS-1$
                oldPattern = sdf.toPattern();
                String newPattern = UI.EMPTY_STRING;
@@ -683,7 +640,7 @@ public class UI {
 
             final String oldPattern = sdf.toPattern();
 
-            //	some short formats have only one h (e.g. ths US)
+            // some short formats have only one h (e.g. ths US)
             if (oldPattern.indexOf("hh") == -1) {//$NON-NLS-1$
 
                String newPattern = UI.EMPTY_STRING;
@@ -715,65 +672,65 @@ public class UI {
       return IMAGE_REGISTRY.get(createGraphImage_Name(graphId));
    }
 
-   public static ImageDescriptor getGraphImageDescriptor(final MapGraphId graphId) {
-
-      switch (graphId) {
-      case Altitude:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude);
-
-      case Gradient:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient);
-
-      case Pace:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace);
-
-      case Pulse:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat);
-
-      case Speed:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed);
-
-      case HrZone:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones);
-
-      default:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude);
-      }
-   }
-
-   public static ImageDescriptor getGraphImageDescriptorDisabled(final MapGraphId graphId) {
-
-      switch (graphId) {
-      case Altitude:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled);
-
-      case Gradient:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled);
-
-      case Pace:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled);
-
-      case Pulse:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled);
-
-      case Speed:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled);
-
-      case HrZone:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones_Disabled);
-
-      default:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled);
-      }
-   }
-
    /**
     * @param graphId
     * @return Returns a graph image, this image <b>MUST</b> not be disposed.
     */
-   public static Image getGraphImageDisabled(final MapGraphId graphId) {
+   public static Image getGraphImage_Disabled(final MapGraphId graphId) {
 
       return IMAGE_REGISTRY.get(createGraphImage_NameDisabled(graphId));
+   }
+
+   public static ImageDescriptor getGraphImageDescriptor(final MapGraphId graphId) {
+
+      switch (graphId) {
+      case Altitude:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation);
+
+      case Gradient:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient);
+
+      case Pace:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Pace);
+
+      case Pulse:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat);
+
+      case Speed:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed);
+
+      case HrZone:
+         return TourbookPlugin.getThemedImageDescriptor(Images.PulseZones);
+
+      default:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation);
+      }
+   }
+
+   public static ImageDescriptor getGraphImageDescriptor_Disabled(final MapGraphId graphId) {
+
+      switch (graphId) {
+      case Altitude:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled);
+
+      case Gradient:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient_Disabled);
+
+      case Pace:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Pace_Disabled);
+
+      case Pulse:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat_Disabled);
+
+      case Speed:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed_Disabled);
+
+      case HrZone:
+         return TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled);
+
+      default:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled);
+      }
    }
 
    /**
@@ -801,34 +758,6 @@ public class UI {
 
    public static Font getLogFont() {
       return _fontForLogging;
-   }
-
-   /**
-    * Checks if propertyData has the same tour as the oldTourData
-    *
-    * @param propertyData
-    * @param oldTourData
-    * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
-    *         tour
-    */
-   public static TourData getTourPropertyTourData(final TourEvent propertyData, final TourData oldTourData) {
-
-      final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
-      if (modifiedTours == null) {
-         return null;
-      }
-
-      final long oldTourId = oldTourData.getTourId();
-
-      for (final TourData tourData : modifiedTours) {
-         if (tourData.getTourId() == oldTourId) {
-
-            // nothing more to do, only one tour is supported
-            return tourData;
-         }
-      }
-
-      return null;
    }
 
    /**
@@ -948,32 +877,41 @@ public class UI {
        * NOTE: EraseItem is called repeatedly. Therefore it is critical
        * for performance that this method be as efficient as possible.
        */
-      table.addListener(SWT.EraseItem, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      table.addListener(SWT.EraseItem, event -> {
 
-            event.detail &= ~SWT.HOT;
+         event.detail &= ~SWT.HOT;
 
-            if ((event.detail & SWT.SELECTED) == 0) {
-               // item is not selected
-               return;
-            }
-
-            final int clientWidth = table.getClientArea().width;
-            final GC gc = event.gc;
-
-            final Color oldForeground = gc.getForeground();
-            final Color oldBackground = gc.getBackground();
-            {
-               gc.setBackground(bgSelectedColor);
-               gc.fillRectangle(0, event.y, clientWidth, event.height);
-            }
-            gc.setForeground(oldForeground);
-            gc.setBackground(oldBackground);
-
-            event.detail &= ~SWT.SELECTED;
+         if ((event.detail & SWT.SELECTED) == 0) {
+            // item is not selected
+            return;
          }
+
+         final int clientWidth = table.getClientArea().width;
+         final GC gc = event.gc;
+
+         final Color oldForeground = gc.getForeground();
+         final Color oldBackground = gc.getBackground();
+         {
+            gc.setBackground(bgSelectedColor);
+            gc.fillRectangle(0, event.y, clientWidth, event.height);
+         }
+         gc.setForeground(oldForeground);
+         gc.setBackground(oldBackground);
+
+         event.detail &= ~SWT.SELECTED;
       });
+   }
+
+   /**
+    * Set the themed image descriptor for a {@link UIElement} with images from the
+    * {@link TourbookPlugin} plugin
+    *
+    * @param uiElement
+    * @param icon
+    */
+   public static void setThemedIcon(final UIElement uiElement, final String icon) {
+
+      uiElement.setIcon(TourbookPlugin.getThemedImageDescriptor(icon));
    }
 
    private static void setupFonts() {
@@ -982,49 +920,39 @@ public class UI {
       Assert.isNotNull(display);
 
       // hookup dispose
-      display.disposeExec(new Runnable() {
-         @Override
-         public void run() {
-            if (_fontForLogging != null) {
-               _fontForLogging.dispose();
-            }
+      display.disposeExec(() -> {
+         if (_fontForLogging != null) {
+            _fontForLogging.dispose();
          }
       });
 
       setupFonts_Logging(display);
 
       // update font after it changed
-      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
-      prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+      _prefStore.addPropertyChangeListener(propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(IMappingPreferences.THEME_FONT_LOGGING)) {
 
-            if (property.equals(IMappingPreferences.THEME_FONT_LOGGING)) {
+            if (_fontForLogging != null) {
 
-               if (_fontForLogging != null) {
+               /**
+                * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
+                * using the old font in setFont(...) before the new font is initialized
+                * -> really bad behavior !!!
+                */
+               final Font oldFont = _fontForLogging;
 
-                  /**
-                   * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
-                   * using the old font in setFont(...) before the new font is initialized
-                   * -> realy bad behavior !!!
-                   */
-                  final Font oldFont = _fontForLogging;
+               display.timerExec(10_000, oldFont::dispose);
 
-                  display.timerExec(10_000, () -> {
-                     oldFont.dispose();
-                  });
-
-                  _fontForLogging = null;
-               }
-
-               setupFonts_Logging(display);
-
-               // fire event after the font is recreated to update the UI
-               prefStore.setValue(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED, Math.random());
+               _fontForLogging = null;
             }
+
+            setupFonts_Logging(display);
+
+            // fire event after the font is recreated to update the UI
+            _prefStore.setValue(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED, Math.random());
          }
       });
 
@@ -1032,9 +960,7 @@ public class UI {
 
    private static void setupFonts_Logging(final Display display) {
 
-      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
-
-      final String prefFontData = prefStore.getString(IMappingPreferences.THEME_FONT_LOGGING);
+      final String prefFontData = _prefStore.getString(IMappingPreferences.THEME_FONT_LOGGING);
       if (prefFontData.length() > 0) {
          try {
 
@@ -1067,31 +993,27 @@ public class UI {
    public static void setViewColorsFromPrefStore() {
 
       // pref store var cannot be set from a static field because it can be null !!!
-      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-      colorRegistry.put(
-            VIEW_COLOR_CATEGORY, //
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
-      colorRegistry.put(
-            VIEW_COLOR_TITLE, //
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
+      colorRegistry.put(VIEW_COLOR_CATEGORY,
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
+      colorRegistry.put(VIEW_COLOR_TITLE,
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
 
-      colorRegistry.put(
-            VIEW_COLOR_SUB, // year
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
-      colorRegistry.put(
-            VIEW_COLOR_SUB_SUB, // month
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
+      // year
+      colorRegistry.put(VIEW_COLOR_SUB,
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
 
-      colorRegistry.put(
-            VIEW_COLOR_TOUR, //
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
+      // month
+      colorRegistry.put(VIEW_COLOR_SUB_SUB,
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
 
-      colorRegistry.put(
-            VIEW_COLOR_BG_HISTORY_TOUR, //
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR));
+      colorRegistry.put(VIEW_COLOR_TOUR,
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
+
+      colorRegistry.put(VIEW_COLOR_BG_HISTORY_TOUR,
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR));
    }
 
    public static GridData setWidth(final Control control, final int width) {
@@ -1103,36 +1025,28 @@ public class UI {
 
    public static void showMessageInfo(final String title, final String message) {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message);
-         }
-      });
+      Display.getDefault().asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message));
    }
 
    public static void showSQLException(final SQLException ex) {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            SQLException e = ex;
+         SQLException e = ex;
 
-            while (e != null) {
+         while (e != null) {
 
-               final String sqlExceptionText = Util.getSQLExceptionText(e);
+            final String sqlExceptionText = Util.getSQLExceptionText(e);
 
-               // log also the stacktrace
-               StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+            // log also the stacktrace
+            StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
 
-               MessageDialog.openError(
-                     Display.getDefault().getActiveShell(), //
-                     "SQL Error", //$NON-NLS-1$
-                     sqlExceptionText);
+            MessageDialog.openError(
+                  Display.getDefault().getActiveShell(),
+                  "SQL Error", //$NON-NLS-1$
+                  sqlExceptionText);
 
-               e = e.getNextException();
-            }
+            e = e.getNextException();
          }
       });
    }
@@ -1150,47 +1064,19 @@ public class UI {
          return;
       }
 
-      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
-
       chart.updateProperties(
 
-            Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
-            Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
+            Util.getPrefixPrefInt(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
+            Util.getPrefixPrefInt(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
 
-            Util.getPrefixPrefBoolean(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-            Util.getPrefixPrefBoolean(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+            Util.getPrefixPrefBoolean(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+            Util.getPrefixPrefBoolean(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
 
-            prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR),
-            PreferenceConverter.getColor(prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
-   }
+            _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR),
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR),
+            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
 
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
-
-      updateUI_Tags(tourData, tourTagLabel, false);
-   }
-
-   /**
-    * @param tourData
-    * @param tourTagLabel
-    * @param isVertical
-    *           When <code>true</code> the tags are displayed as a list, otherwise horizontally
-    */
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel, final boolean isVertical) {
-
-      // tour tags
-      final Set<TourTag> tourTags = tourData.getTourTags();
-
-      if (tourTags == null || tourTags.isEmpty()) {
-
-         tourTagLabel.setText(UI.EMPTY_STRING);
-
-      } else {
-
-         final String tagLabels = TourDatabase.getTagNames(tourTags, isVertical);
-
-         tourTagLabel.setText(tagLabels);
-         tourTagLabel.setToolTipText(tagLabels);
-      }
+      );
    }
 
    /**

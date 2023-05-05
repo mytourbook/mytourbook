@@ -120,22 +120,34 @@
    </extension>
 
 
+   <!-- MT -->
+   <extension	point="net.tourbook.deviceDataReader">
+      <device
+         name           ="MyTourbook (.mt)"
+         fileextension  ="mt"
+         class          ="net.tourbook.device.mt.MTDeviceDataReader"
+         id             ="net.tourbook.device.mt.MTDeviceDataReader"
+      />
+   </extension>
+
+
    <!-- HAC 4 -->
    <extension	point="net.tourbook.deviceDataReader">
       <device
-            class="net.tourbook.device.hac4.HAC4DeviceReader"
-            fileextension="dat"
-            id="net.tourbook.device.HAC4DeviceReader"
-            name="HAC4"/>
+         name           ="HAC4"
+         fileextension  ="dat"
+         class          ="net.tourbook.device.hac4.HAC4DeviceReader"
+         id             ="net.tourbook.device.HAC4DeviceReader"
+      />
    </extension>
    
    <extension	point="net.tourbook.externalDeviceDataReader">
       <device
-            class="net.tourbook.device.hac4.HAC4ExternalDevice"
-            id="net.tourbook.device.HAC4ExternalDeviceReader"
-            name="HAC4"
-            type="serial">
-      </device>
+         name           ="HAC4"
+         class          ="net.tourbook.device.hac4.HAC4ExternalDevice"
+         id             ="net.tourbook.device.HAC4ExternalDeviceReader"
+         type           ="serial"
+      />
    </extension>
 
 
@@ -182,8 +194,8 @@
             class="net.tourbook.device.hac5.HAC5ExternalDevice"
             id="net.tourbook.device.HAC5ExternalDeviceReader"
             name="HAC5"
-            type="serial">
-      </device>
+            type="serial"
+      />
    </extension>
 
 
@@ -262,7 +274,7 @@
 
 		<!-- Suunto 2 -->
 		<device
-			class="net.tourbook.device.suunto.Suunto2DeviceDataReader"
+			class="net.tourbook.device.suunto.Suunto2_DeviceDataReader"
 			fileextension="xml"
 			id="net.tourbook.device.Suunto"
 			name="Suunto 2">
@@ -278,7 +290,7 @@
 		
 		<!-- Suunto Spartan/9 -->
 		<device
-			class="net.tourbook.device.suunto.Suunto9DeviceDataReader"
+			class="net.tourbook.device.suunto.Suunto9_DeviceDataReader"
 			fileextension="gz"
 			id="net.tourbook.device.Suunto9"
 			name="Suunto Spartan/9">

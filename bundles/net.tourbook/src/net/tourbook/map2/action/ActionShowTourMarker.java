@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
@@ -33,8 +34,8 @@ public class ActionShowTourMarker extends Action {
 
       setText(Messages.map_action_show_tour_marker);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled));
    }
 
    @Override

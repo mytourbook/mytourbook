@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,13 @@ public class StatisticValue {
 
    private boolean             _isUsePadding    = true;
 
+   /**
+    * @param head1
+    * @param head2
+    * @param unitLabel
+    * @param valueFormatting
+    * @param valueLength
+    */
    public StatisticValue(final String head1, final String head2, final String unitLabel, final String valueFormatting, final int valueLength) {
 
       _head1_Raw = head1;

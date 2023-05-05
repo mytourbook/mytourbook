@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,8 +25,12 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourPauseUI;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
@@ -41,34 +45,34 @@ public class TourChartConfiguration {
     */
    public static final GraphBgSourceType[]   GRAPH_BACKGROUND_SOURCE_TYPE;
 
-   public final static GraphBackgroundSource GRAPH_BACKGROUND_SOURCE_DEFAULT = GraphBackgroundSource.DEFAULT;
+   public static final GraphBackgroundSource GRAPH_BACKGROUND_SOURCE_DEFAULT = GraphBackgroundSource.DEFAULT;
 
    /**
     * Graph background style, they must correspond to the position id GRAPH_BACKGROUND_SOURCE_*.
     */
    public static final GraphBgStyleType[]    GRAPH_BACKGROUND_STYLE_TYPE;
 
-   public final static GraphBackgroundStyle  GRAPH_BACKGROUND_STYLE_DEFAULT  = GraphBackgroundStyle.NO_GRADIENT;
+   public static final GraphBackgroundStyle  GRAPH_BACKGROUND_STYLE_DEFAULT  = GraphBackgroundStyle.NO_GRADIENT;
 
 // SET_FORMATTING_OFF
 
-	static {
+   static {
 
-		GRAPH_BACKGROUND_SOURCE_TYPE = new GraphBgSourceType[] { //
-				//
-				new GraphBgSourceType(GraphBackgroundSource.DEFAULT, 					Messages.TourChart_GraphBackgroundSource_Default),
-				new GraphBgSourceType(GraphBackgroundSource.HR_ZONE, 					Messages.TourChart_GraphBackgroundSource_HrZone),
-				new GraphBgSourceType(GraphBackgroundSource.SWIMMING_STYLE,			Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
-		};
+      GRAPH_BACKGROUND_SOURCE_TYPE = new GraphBgSourceType[] {
 
-		GRAPH_BACKGROUND_STYLE_TYPE = new GraphBgStyleType[] { //
-				//
-				new GraphBgStyleType(GraphBackgroundStyle.NO_GRADIENT, 		Messages.TourChart_GraphBackgroundStyle_NoGradient),
-				new GraphBgStyleType(GraphBackgroundStyle.GRAPH_COLOR_TOP, 	Messages.TourChart_GraphBackgroundStyle_GraphColor_Top),
-				new GraphBgStyleType(GraphBackgroundStyle.WHITE_BOTTOM, 		Messages.TourChart_GraphBackgroundStyle_White_Bottom),
-				new GraphBgStyleType(GraphBackgroundStyle.WHITE_TOP, 			Messages.TourChart_GraphBackgroundStyle_White_Top),
-		};
-	}
+            new GraphBgSourceType(GraphBackgroundSource.DEFAULT,           Messages.TourChart_GraphBackgroundSource_Default),
+            new GraphBgSourceType(GraphBackgroundSource.HR_ZONE,           Messages.TourChart_GraphBackgroundSource_HrZone),
+            new GraphBgSourceType(GraphBackgroundSource.SWIMMING_STYLE,    Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
+      };
+
+      GRAPH_BACKGROUND_STYLE_TYPE = new GraphBgStyleType[] {
+
+            new GraphBgStyleType(GraphBackgroundStyle.NO_GRADIENT,         Messages.TourChart_GraphBackgroundStyle_NoGradient),
+            new GraphBgStyleType(GraphBackgroundStyle.GRAPH_COLOR_TOP,     Messages.TourChart_GraphBackgroundStyle_GraphColor_Top),
+            new GraphBgStyleType(GraphBackgroundStyle.WHITE_BOTTOM,        Messages.TourChart_GraphBackgroundStyle_White_Bottom),
+            new GraphBgStyleType(GraphBackgroundStyle.WHITE_TOP,           Messages.TourChart_GraphBackgroundStyle_White_Top),
+      };
+   }
 
 // SET_FORMATTING_ON
 
@@ -134,6 +138,12 @@ public class TourChartConfiguration {
    public boolean                 isSRTMDataVisible       = false;
 
    /**
+    * When <code>true</code> then SRTM 1 values are displayed, when they are available, otherwise
+    * SRTM 3 values are displayed
+    */
+   public boolean                 isShowSrtm1Values;
+
+   /**
     * when <code>true</code> the SRTM data are visible in the altitude graph
     */
    public boolean                 canShowSRTMData;
@@ -141,12 +151,7 @@ public class TourChartConfiguration {
    /**
     * Is <code>true</code> when tour markers are displayed.
     */
-   public Boolean                 isShowTourMarker        = true;
-
-   /**
-    * Is <code>true</code> when tour pauses are displayed.
-    */
-   public Boolean                 isShowTourPauses        = true;
+   public boolean                 isShowTourMarker        = true;
 
    /**
     * When <code>true</code>, hidden markers are also visible.
@@ -169,19 +174,37 @@ public class TourChartConfiguration {
     * When <code>true</code> tour marker labels are displayed.
     */
    public boolean                 isShowMarkerLabel;
-
    public boolean                 isShowMarkerTooltip;
+   public boolean                 isShowTooltipData_Elevation;
+   public boolean                 isShowTooltipData_Distance;
+   public boolean                 isShowTooltipData_Duration;
+   public boolean                 isShowTooltipData_ElevationGainDifference;
+   public boolean                 isShowTooltipData_DistanceDifference;
+   public boolean                 isShowTooltipData_DurationDifference;
+
+   /**
+    * Is <code>true</code> when tour pauses are displayed.
+    */
+   public boolean                 isShowTourPauses        = true;
+   public boolean                 isShowPauseTooltip;
+   public boolean                 isFilterTourPauses;
+   public boolean                 isFilterPauseDuration;
+   public boolean                 isShowAutoPauses;
+   public boolean                 isShowUserPauses;
+   public long                    pauseDuration;
+   public TourFilterFieldOperator pauseDurationOperator;
 
    public boolean                 isShowAbsoluteValues;
 
    public int                     markerTooltipPosition   = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
+
+   public int                     pauseTooltipPosition    = ChartPauseToolTip.DEFAULT_TOOLTIP_POSITION;
+
    public boolean                 isShowMarkerPoint;
-
    public boolean                 isShowSignImage;
-
    public boolean                 isGraphOverlapped;
-   public int                     markerHoverSize;
 
+   public int                     markerHoverSize;
    public int                     markerLabelOffset;
 
    public boolean                 isShowLabelTempPos;
@@ -191,6 +214,7 @@ public class TourChartConfiguration {
     * Size of the marker point in DLU (Dialog Units).
     */
    public int                     markerPointSize;
+
    /**
     * Size of the sign image in DLU (Dialog Units).
     */
@@ -199,17 +223,20 @@ public class TourChartConfiguration {
    /**
     * Color for the tour marker point and label.
     */
-   public RGB                     markerColorDefault;
+   public RGB                     markerColorDefault_Light;
+   public RGB                     markerColorDefault_Dark;
 
    /**
     * Color for the tour marker point which is created by the device and not with the marker editor.
     */
-   public RGB                     markerColorDevice;
+   public RGB                     markerColorDevice_Light;
+   public RGB                     markerColorDevice_Dark;
 
    /**
     * Color for tour markers which are hidden, visibility is false.
     */
-   public RGB                     markerColorHidden;
+   public RGB                     markerColorHidden_Light;
+   public RGB                     markerColorHidden_Dark;
 
    /**
     * Is <code>true</code> when graph values are displayed when they are recorded when a break time
@@ -243,11 +270,16 @@ public class TourChartConfiguration {
     */
    public boolean               canShowBackground_SwimStyle = false;
 
+   /**
+    * When <code>true</code> then night sections are displayed when tour time is between sunset and
+    * sunrise
+    */
+   public boolean               isShowNightSections;
+
    /*
     * Tour photos
     */
    public boolean isShowTourPhotos       = true;
-
    public boolean isShowTourPhotoTooltip = true;
 
    /*
@@ -255,18 +287,32 @@ public class TourChartConfiguration {
     */
    public boolean isTourInfoVisible;
    public boolean isShowInfoTitle;
-
    public boolean isShowInfoTooltip;
    public boolean isShowInfoTourSeparator;
+
    public int     tourInfoTooltipDelay;
+
+   /*
+    * Pulse graphs
+    */
+   public PulseGraph pulseGraph;
+   public boolean    canShowPulseSerie;
+   public boolean    canShowPulseTimeSerie;
+
    /**
     * Is <code>true</code> when the geo compare action is visible and can be used
     */
-   public boolean canUseGeoCompareTool;
+   public boolean    canUseGeoCompareTool;
+
    /**
     * Is <code>true</code> to show geo diff unit in compared tour chart
     */
-   public boolean isGeoCompareDiff;
+   public boolean    isGeoCompareDiff;
+
+   /**
+    * Show/hide value point value label when mouse is hovering a graph
+    */
+   public boolean    isShowValuePointValue;
 
    @SuppressWarnings("unused")
    private TourChartConfiguration() {}
@@ -275,7 +321,7 @@ public class TourChartConfiguration {
     * @param keepMinMaxValues
     *           set <code>true</code> to keep min/max values when tour data will change
     */
-   public TourChartConfiguration(final boolean keepMinMaxValues) {
+   public TourChartConfiguration(final boolean keepMinMaxValues, final IDialogSettings state) {
 
       if (keepMinMaxValues) {
          setMinMaxKeeper(true);
@@ -283,47 +329,80 @@ public class TourChartConfiguration {
 
 // SET_FORMATTING_OFF
 
-		/*
-		 * Initialize tour marker settings from the pref store
-		 */
-		isShowTourMarker 					= _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+      isSRTMDataVisible             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
+      isShowSrtm1Values             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_SRTM_1_VALUES);
 
-		markerHoverSize 					= _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE);
-		markerLabelOffset 				= _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET);
-		markerLabelTempPos 				= _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
-		markerPointSize 					= _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
-		markerSignImageSize 				= _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE);
-		markerTooltipPosition 			= _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION);
+      isGraphOverlapped             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED);
 
-		isDrawMarkerWithDefaultColor 	= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
-		isShowAbsoluteValues 			= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES);
-		isShowHiddenMarker				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
-		isShowLabelTempPos 				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
-		isShowMarkerLabel 				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
-		isShowMarkerPoint 				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
-		isShowMarkerTooltip				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
-		isShowOnlyWithDescription 		= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
-		isShowSignImage 					= _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
+      isShowTourPhotos              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
+      isShowTourPhotoTooltip        = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
 
-		markerColorDefault 				= PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
-		markerColorDevice 				= PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
-		markerColorHidden 				= PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
+      isShowBreaktimeValues         = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+      isShowValuePointValue         = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
 
-		/*
+      isShowNightSections           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS);
+
+      /*
+       * Initialize tour marker settings from the pref store
+       */
+      isShowTourMarker              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE);
+
+      markerHoverSize               = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE);
+      markerLabelOffset             = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET);
+      markerLabelTempPos            = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION);
+      markerPointSize               = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE);
+      markerSignImageSize           = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE);
+      markerTooltipPosition         = _prefStore.getInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION);
+
+      isDrawMarkerWithDefaultColor  = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR);
+      isShowAbsoluteValues          = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES);
+      isShowHiddenMarker            = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER);
+      isShowLabelTempPos            = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION);
+      isShowMarkerLabel             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
+      isShowMarkerPoint             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
+      isShowMarkerTooltip           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
+      isShowOnlyWithDescription     = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
+      isShowSignImage               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
+
+      isShowTooltipData_Elevation               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION);
+      isShowTooltipData_Distance                = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE);
+      isShowTooltipData_Duration                = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION);
+      isShowTooltipData_ElevationGainDifference = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE);
+      isShowTooltipData_DistanceDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE);
+      isShowTooltipData_DurationDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE);
+
+      markerColorDefault_Light      = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
+      markerColorDefault_Dark       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK);
+      markerColorDevice_Light       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
+      markerColorDevice_Dark        = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK);
+      markerColorHidden_Light       = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN);
+      markerColorHidden_Dark        = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK);
+
+      /*
        * Tour pauses
        */
-		isShowTourPauses 					= _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
+      isShowTourPauses              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
+      isShowPauseTooltip            = _prefStore.getBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP);
+      pauseTooltipPosition          = _prefStore.getInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION);
 
-		/*
-		 * Tour info
-		 */
-		isTourInfoVisible 				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE);
-		isShowInfoTitle 					= _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE);
-		isShowInfoTooltip 				= _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE);
-		isShowInfoTourSeparator 		= _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE);
-		tourInfoTooltipDelay 			= _prefStore.getInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
+      /*
+       * Tour info
+       */
+      isTourInfoVisible             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE);
+      isShowInfoTitle               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TITLE_VISIBLE);
+      isShowInfoTooltip             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOOLTIP_VISIBLE);
+      isShowInfoTourSeparator       = _prefStore.getBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE);
+      tourInfoTooltipDelay          = _prefStore.getInt(    ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY);
+
+      /*
+       * Pulse values
+       */
+      pulseGraph                    = (PulseGraph) Util.getEnumValue(_prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES), TourChart.PULSE_GRAPH_DEFAULT);
+
 
 // SET_FORMATTING_ON
+
+      updateStateValues(state);
    }
 
    public void addVisibleGraph(final int visibleGraph) {
@@ -390,6 +469,20 @@ public class TourChartConfiguration {
       } else {
          _minMaxKeeper = null;
       }
+   }
+
+   public void updateStateValues(final IDialogSettings state) {
+
+// SET_FORMATTING_OFF
+
+      isFilterTourPauses    = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES,       TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
+      isFilterPauseDuration = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION,    TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
+      isShowAutoPauses      = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES,         TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
+      isShowUserPauses      = Util.getStateBoolean(   state, TourPauseUI.STATE_IS_SHOW_USER_PAUSES,         TourPauseUI.STATE_IS_SHOW_USER_PAUSES_DEFAULT);
+      pauseDuration         = Util.getStateLong(      state, TourPauseUI.STATE_DURATION_FILTER_SUMMARIZED,  0);
+      pauseDurationOperator = (TourFilterFieldOperator) Util.getStateEnum(state, TourPauseUI.STATE_DURATION_OPERATOR, TourPauseUI.STATE_DURATION_OPERATOR_DEFAULT);
+
+// SET_FORMATTING_ON
    }
 
    /**

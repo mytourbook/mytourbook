@@ -9,45 +9,99 @@
 plugins {
 
    // osgi bundle support
-   id 'com.diffplug.gradle.osgi.bndmanifest' version '3.17.6'
+   id 'com.diffplug.osgi.bndmanifest' version '3.40.0'
 }
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 
 repositories {
+   google()
+   jcenter {
+        content {
+          // https://youtrack.jetbrains.com/issue/IDEA-261387
+              includeModule("org.jetbrains.trove4j", "trove4j")
+        }
+   }
    mavenCentral()
    maven { url 'https://jitpack.io' }
 }
 
+allprojects {
+
+   /*
+    I've struggled with the gdx version 1.11.0, 
+    when not setting also in the gdx project build.gradle files,
+    then the old 1.9.10 version was used -> compile errors
+   */
+   
+// vtm-desktop-lwjgl/build.gradle
+//    
+//    dependencies {
+//        api project(':vtm-desktop')
+//   -    api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+//   +    api "com.badlogicgames.gdx:gdx-backend-lwjgl:1.11.0"
+//   +//  api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+//    }
+//    
+// vtm-gdx/build.gradle
+//   
+//    dependencies {
+//        api project(':vtm')
+//        api project(':vtm-themes')
+//   -    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+//   +    api "com.badlogicgames.gdx:gdx:1.11.0"
+//   +//  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+   ext.gdxVersion    = "1.11.0"
+   ext.gltfVersion   = '-SNAPSHOT'     // use newest version
+}
+
+// start with: gradlew logAllDeps
+task logAllDeps(type: DependencyReportTask) {}
+
+
 dependencies {
 
-   compile project(':net.tourbook.ext.vtm.linux')
-   compile project(':net.tourbook.ext.vtm.macosx')
-   compile project(':net.tourbook.ext.vtm.windows')
+   println ''
+   println "   gdxVersion: $gdxVersion"
+   println ''
    
-   compile project(':vtm')
-   compile project(':vtm-desktop')
-   compile project(':vtm-desktop-lwjgl')
-   compile project(':vtm-gdx')
-   compile project(':vtm-http')
-   compile project(':vtm-mvt')
-   compile project(':vtm-themes')
+   api project(':vtm')
+   api project(':vtm-desktop')
+   api project(':vtm-desktop-lwjgl')
+   api project(':vtm-gdx')
+   api project(':vtm-gdx-poi3d')
+   api project(':vtm-http')
+   api project(':vtm-models')
+   api project(':vtm-mvt')
+   api project(':vtm-themes')
+   
+   api project(':net.tourbook.ext.vtm.linux')
+   api project(':net.tourbook.ext.vtm.macosx')
+   api project(':net.tourbook.ext.vtm.windows')
    
    // !!! STRING MUST BE CREATED WITH " OTHERWISE IT IS NOT WORKING !!!
-   compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+//   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
        
    /*
-      This error is fixed with slf4j-simple
+      !!! VERY IMPORTANT !!!
+      
+      When slf4j-simple is not added, then errors are not logged !!!
+      
+      This will also fix
    
       SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
       SLF4J: Defaulting to no-operation (NOP) logger implementation
       SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
    */
-    compile 'org.slf4j:slf4j-simple:1.7.25'
+   api 'org.slf4j:slf4j-simple:2.0.5'
     
     // http logging
-    compile 'com.squareup.okhttp3:logging-interceptor:3.14.1'
+   api 'com.squareup.okhttp3:logging-interceptor:3.14.1'
+   
+   // glTF loader
+   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"
 }
 
 // -----------------------------------
@@ -66,15 +120,24 @@ eclipse {
     }
 }
 
-task logCompileConfig {
+task logCompileClasspath {
 
    doLast {
        
-      println 'configurations.compile'
+      /* 
+       * Log sorted dependencies
+       */
+       
+      println ''
       
-       configurations.compile.each {
-          println '\t' + it.name
+      def allUnsortedDependencies = configurations.compileClasspath.incoming.resolutionResult.allDependencies.collect { 
+      
+         dep -> sprintf('   %-50s   %s', ["${dep.selected}", "${dep.from}"])
        }         
+      
+      allUnsortedDependencies
+//       .unique()
+         .sort().each { println it}
    }
 }
 
@@ -88,13 +151,19 @@ task extractNatives {
 
    doLast {
 
+      println ''
       println 'extractNatives'
+      println ''
    
-      configurations.compile.files.each { file ->
+      configurations.runtimeClasspath.files.each { file ->
+      
+         def filePathName = sprintf('   %-40s   %s', ["$file.name", "$file.path"])
+   
+//         println filePathName
       
          if (file.name.contains('gdx-platform')) {
    
-            println "\t$file.name - $file.path"
+//            println filePathName
    
             // copy gdx linux natives          
             copy {
@@ -119,7 +188,7 @@ task extractNatives {
             
          } else if (file.name.contains('natives-linux')) {
    
-            println "\t$file.name - $file.path"
+//            println filePathName
    
             // copy linux natives          
             copy {
@@ -130,7 +199,7 @@ task extractNatives {
             
          } else if (file.name.contains('natives-osx')) {
    
-            println "\t$file.name - $file.path"
+//            println filePathName
    
             // copy macos natives          
             copy {
@@ -141,7 +210,7 @@ task extractNatives {
             
          } else if (file.name.contains('natives-windows')) {
    
-            println "\t$file.name - $file.path"
+//            println filePathName
    
             // copy windows natives          
             copy {
@@ -157,11 +226,15 @@ task extractNatives {
 // copy vtm natives into plugin fragment
 task copyVtmNatives_Linux(type: Copy) {
 
+   println '   copyVtmNatives_Linux'
+
    from nativesDir_Vtm + '/linux'
    into nativesDir_Linux
     include '**/*'
 }
 task copyVtmNatives_MacOS(type: Copy) {
+
+   println '   copyVtmNatives_MacOS'
 
    from nativesDir_Vtm + '/osx'
    into nativesDir_MacOS
@@ -169,26 +242,31 @@ task copyVtmNatives_MacOS(type: Copy) {
 }
 task copyVtmNatives_Windows(type: Copy) {
 
+   println '   copyVtmNatives_Windows'
+
    from nativesDir_Vtm + '/windows'
    into nativesDir_Windows
     include '**/*'
 }
 
-// sync will remove old jar's !!!
+// "Sync" will also delete old files !!!
 task copyDependenciesIntoLibFolder(type: Sync) {
 
-   // sync compile jar's (dependencies) into the lib folder
+   // sync compiled jar's and dependencies into the lib folder
+   
+   from     configurations.runtimeClasspath
    into 'libs'
-   from configurations.compile
+    
+   include  '*.jar'
     
    exclude '*natives*.jar'
    exclude   'net.tourbook.*.jar' 
 }
 
-// MUST be set AFTER task declaration !!!
+// MUST be set AFTER task declarations !!!
 tasks.classes.dependsOn(
 
-   logCompileConfig,
+// logCompileClasspath,
 
    // copy natives into platform plugin fragments
    extractNatives,
@@ -213,7 +291,9 @@ tasks.classes.dependsOn(
    // eclipse, 
 )
 
-// Convert created .classpath entries from
+// Convert created .classpath entries 
+//
+// from
 //
 //   <classpathentry 
 //      kind      ="lib" 
@@ -234,7 +314,7 @@ eclipse.classpath.file {
    // cleanup classpath
    whenMerged { classpath ->
 
-      // remove natives classpath entries, they causes errors
+      // remove natives classpath entries, they are causing errors
       classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
 
       // remove natives which are put into platform features
@@ -250,11 +330,18 @@ eclipse.classpath.file {
       def node = xml.asNode()
 
       // log all classpath items
+      println ''
       println 'All classpathentry items'
+      println ''
       node.classpathentry.each {
-         println '\t' + it
+      
+         println '   item ' + it
       }
    
+      println ''
+      println 'Add "libs/" folder'
+      println ''
+      
       // add 'libs/' folder for jar files
       node.classpathentry.findAll { it.@kind == 'lib'}.each {
       
@@ -263,22 +350,26 @@ eclipse.classpath.file {
       
          it.@exported   = 'true'
          it.@path      = 'libs/' + jarFileName
+         
+         println '   ' + jarFileName
       }
+      
+      println ''
       
       // src from a project dependency is not working, convert it into a jar, jar's are already created :-)
       node.findAll { it.@kind == 'src'}.each {
       
          println 'converted'
-         println '\tfrom:\t' + it
+         println '   from:   ' + it
       
          def srcPath = it.@path
          
          it.@kind      = 'lib'
          it.@exported   = 'true'
          it.@path      = 'libs' + srcPath + '.jar'
-         it.@sourcepath   = srcPath
+         it.@sourcepath = '/vtm-parent' + srcPath
    
-         println '\tinto:\t' + it
+         println '   into:   ' + it
       }
       
       // add libs/ which contains the vtm natives
@@ -300,14 +391,18 @@ osgiBndManifest {
 
 def createBundleClassPath() {
 
+   println ''
+   println 'createBundleClassPath'
+   println ''
+   
     def list = []
 
    // use only compile time resources and not runtime resources, this trick excludes :sources 
-    configurations.compile.each {
+   configurations.runtimeClasspath.each {
     
        def name = it.name
        
-//      println '\t' + name
+      println '   ' + it
        
        if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
           
@@ -325,18 +420,18 @@ def createBundleClassPath() {
        }
     }
 
-   // add libs/ which contains the vtm natives
-    list += 'libs/'
-
-   // add log4j.properties
-    list += 'resources/'
+//   // add libs/ which contains the vtm natives
+//   list += 'libs/'
+//
+//   // add log4j.properties
+//   list += 'resources/'
 
     return list.join(',')
 }
 
 // get MT version and remove quotes
-def _mtVersionRaw   = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
-def _mtVersion      = _mtVersionRaw.replaceAll('\'', '')            // 18.2.0
+def _mtVersionRaw   = project(':mytourbook').ext.myTourbookVersion   // '18.2.0'
+def _mtVersion      = _mtVersionRaw.replaceAll('\'', '')             //  18.2.0
 
 
 // set MANIFEST.MF properties to configure OSGi bundle
@@ -352,7 +447,7 @@ jar.manifest.attributes(
    'Bundle-License':                         'http://www.apache.org/licenses/LICENSE-2.0',
    
    // eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
-   'Bundle-RequiredExecutionEnvironment':    'JavaSE-1.8',
+   'Bundle-RequiredExecutionEnvironment':    'JavaSE-11',
 
    // export all packages from all included jar's
    'Export-Package':                         '*',

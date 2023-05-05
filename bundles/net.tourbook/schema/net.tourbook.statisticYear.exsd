@@ -89,22 +89,16 @@
             </annotation>
             <simpleType>
                <restriction base="string">
-                  <enumeration value="Other">
-                  </enumeration>
-                  <enumeration value="Summary">
-                  </enumeration>
-                  <enumeration value="Altitude">
-                  </enumeration>
-                  <enumeration value="Distance">
-                  </enumeration>
-                  <enumeration value="Time">
-                  </enumeration>
-                  <enumeration value="HR">
-                  </enumeration>
-                  <enumeration value="Training">
-                  </enumeration>
-                  <enumeration value="AthleteData">
-                  </enumeration>
+                  <enumeration value="Other"/>
+                  <enumeration value="Altitude"/>
+                  <enumeration value="AthleteData"/>
+                  <enumeration value="Battery"/>
+                  <enumeration value="Distance"/>
+                  <enumeration value="HR"/>
+                  <enumeration value="Sensor"/>
+                  <enumeration value="Summary"/>
+                  <enumeration value="Time"/>
+                  <enumeration value="Training"/>
                </restriction>
             </simpleType>
          </attribute>
@@ -116,15 +110,11 @@
             </annotation>
             <simpleType>
                <restriction base="string">
-                  <enumeration value="Other">
-                  </enumeration>
-                  <enumeration value="Day">
-                  </enumeration>
-                  <enumeration value="Week">
-                  </enumeration>
-                  <enumeration value="Month">
-                  </enumeration>
-                  <enumeration value="Year">
+                  <enumeration value="Other"/>
+                  <enumeration value="Day"/>
+                  <enumeration value="Week"/>
+                  <enumeration value="Month"/>
+                  <enumeration value="Year"/>
                   </enumeration>
                </restriction>
             </simpleType>

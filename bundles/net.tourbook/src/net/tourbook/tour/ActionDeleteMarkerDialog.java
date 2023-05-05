@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -47,8 +48,8 @@ public class ActionDeleteMarkerDialog extends Action {
       _tourProvider = tourProvider;
 
       setText(Messages.App_Action_DeleteTourMarker);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       setEnabled(false);
    }
@@ -80,7 +81,7 @@ public class ActionDeleteMarkerDialog extends Action {
          final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
          for (final TourMarker tourMarker : selectedTourMarkers) {
             if (markersNames.toString().isEmpty() == false) {
-               markersNames.append(UI.NEW_LINE);
+               markersNames.append(UI.COMMA_SPACE);
             }
             markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
          }
@@ -114,12 +115,7 @@ public class ActionDeleteMarkerDialog extends Action {
 
    @Override
    public void run() {
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            doAction(_tourProvider, _tourMarkers);
-         }
-      });
+      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider, _tourMarkers));
 
    }
 

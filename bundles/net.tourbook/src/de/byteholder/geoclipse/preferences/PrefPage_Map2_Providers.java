@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.UI;
@@ -82,10 +83,7 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -103,17 +101,11 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.dnd.URLTransfer;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
@@ -143,10 +135,10 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private static final String           APP_TRUE   = net.tourbook.Messages.App__True;
 
-   public static final String            ID         = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers";                          //$NON-NLS-1$
+   public static final String            ID         = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state     = TourbookPlugin.getState("de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"); //$NON-NLS-1$
+   private static final IDialogSettings  _state     = TourbookPlugin.getState(ID);
 
    //
 
@@ -158,7 +150,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       XML_EXTENSION                  = ".xml";                          //$NON-NLS-1$
 
    /**
-    * max lenghth for map provider id and offline folder
+    * max length for map provider id and offline folder
     */
    private static final int          MAX_ID_LENGTH                  = 24;
 
@@ -180,7 +172,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       COLUMN_ONLINE_MAP_URL          = "OnlineMapUrl";                  //$NON-NLS-1$
    private static final String       COLUMN_TILE_URL                = "TileUrl";                       //$NON-NLS-1$
 
-   private final static NumberFormat _nf                            = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf                            = NumberFormat.getNumberInstance();
    static {
       _nf.setMinimumFractionDigits(2);
       _nf.setMaximumFractionDigits(2);
@@ -496,12 +488,9 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       noDefaultAndApplyButton();
 
-      _modifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            if (_isInUIUpdate == false) {
-               setMapProviderModified();
-            }
+      _modifyListener = modifyEvent -> {
+         if (_isInUIUpdate == false) {
+            setMapProviderModified();
          }
       };
    }
@@ -544,26 +533,16 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void addListener() {
 
-      _offlineJobInfoListener = new IOfflineInfoListener() {
+      _offlineJobInfoListener = mapProvider -> Display.getDefault().asyncExec(() -> {
 
-         @Override
-         public void offlineInfoIsDirty(final MP mapProvider) {
-
-            Display.getDefault().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-
-                  if ((_mpViewer == null) || _mpViewer.getTable().isDisposed()) {
-                     return;
-                  }
-
-                  _mpViewer.update(mapProvider, null);
-
-                  updateUI_OfflineInfo_Total();
-               }
-            });
+         if ((_mpViewer == null) || _mpViewer.getTable().isDisposed()) {
+            return;
          }
-      };
+
+         _mpViewer.update(mapProvider, null);
+
+         updateUI_OfflineInfo_Total();
+      });
 
       MP.addOfflineInfoListener(_offlineJobInfoListener);
    }
@@ -848,27 +827,20 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       table.setHeaderBackground(bgColor);
       table.setHeaderForeground(fgColor);
 
-      table.addKeyListener(new KeyListener() {
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
-         @Override
-         public void keyPressed(final KeyEvent e) {
+         if (keyEvent.keyCode == SWT.DEL) {
 
-            if (e.keyCode == SWT.DEL) {
+            /*
+             * Delete map provider only when the delete button is enabled, otherwise internal map
+             * providers can be deleted which is not good
+             */
+            if (_btnDeleteMapProvider.isEnabled()) {
 
-               /*
-                * Delete map provider only when the delete button is enabled, otherwise internal map
-                * providers can be deleted which is not good
-                */
-               if (_btnDeleteMapProvider.isEnabled()) {
-
-                  onAction_MapProvider_Delete();
-               }
+               onAction_MapProvider_Delete();
             }
          }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+      }));
 
       net.tourbook.ui.UI.setTableSelectionColor(table);
 
@@ -884,35 +856,27 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _columnManager.createColumns(_mpViewer);
       _columnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
 
-      _mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_MapProvider(event);
-         }
-      });
+      _mpViewer.addSelectionChangedListener(this::onSelect_MapProvider);
 
-      _mpViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+      _mpViewer.addDoubleClickListener(doubleClickEvent -> {
 
-            if (_selectedMapProvider instanceof MPWms) {
+         if (_selectedMapProvider instanceof MPWms) {
 
-               openConfigDialog_Wms();
+            openConfigDialog_Wms();
 
-            } else if (_selectedMapProvider instanceof MPCustom) {
+         } else if (_selectedMapProvider instanceof MPCustom) {
 
-               openConfigDialog_Custom();
+            openConfigDialog_Custom();
 
-            } else if (_selectedMapProvider instanceof MPProfile) {
+         } else if (_selectedMapProvider instanceof MPProfile) {
 
-               openConfigDialog_MapProfile();
+            openConfigDialog_MapProfile();
 
-            } else {
+         } else {
 
-               // select name
-               _txtMapProviderName.setFocus();
-               _txtMapProviderName.selectAll();
-            }
+            // select name
+            _txtMapProviderName.setFocus();
+            _txtMapProviderName.selectAll();
          }
       });
 
@@ -934,12 +898,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
             _btnEdit = new Button(btnContainer, SWT.NONE);
             _btnEdit.setText(Messages.Pref_Map_Button_Edit);
-            _btnEdit.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  openConfigDialog();
-               }
-            });
+            _btnEdit.addSelectionListener(widgetSelectedAdapter(selectionEvent -> openConfigDialog()));
             GridDataFactory.fillDefaults()//
                   .grab(true, false)
                   .align(SWT.END, SWT.FILL)
@@ -953,12 +912,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _btnAddMapProviderCustom = new Button(btnContainer, SWT.NONE);
             _btnAddMapProviderCustom.setText(Messages.Pref_Map_Button_AddMapProviderCustom);
             _btnAddMapProviderCustom.setToolTipText(Messages.Pref_Map_Button_AddMapProviderCustom_Tooltip);
-            _btnAddMapProviderCustom.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  setEmptyMapProviderUI(new MPCustom());
-               }
-            });
+            _btnAddMapProviderCustom.addSelectionListener(widgetSelectedAdapter(selectionEvent -> setEmptyMapProviderUI(new MPCustom())));
             setButtonLayoutData(_btnAddMapProviderCustom);
          }
          {
@@ -968,12 +922,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _btnAddMapProviderWms = new Button(btnContainer, SWT.NONE);
             _btnAddMapProviderWms.setText(Messages.Pref_Map_Button_AddMapProviderWms);
             _btnAddMapProviderWms.setToolTipText(Messages.Pref_Map_Button_AddMapProviderWms_Tooltip);
-            _btnAddMapProviderWms.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_MapProvider_AddWms();
-               }
-            });
+            _btnAddMapProviderWms.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_MapProvider_AddWms()));
             setButtonLayoutData(_btnAddMapProviderWms);
          }
          {
@@ -983,16 +932,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _btnAddMapProviderMapProfile = new Button(btnContainer, SWT.NONE);
             _btnAddMapProviderMapProfile.setText(Messages.Pref_Map_Button_AddMapProfile);
             _btnAddMapProviderMapProfile.setToolTipText(Messages.Pref_Map_Button_AddMapProfile_Tooltip);
-            _btnAddMapProviderMapProfile.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _btnAddMapProviderMapProfile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  final MPProfile mapProfile = new MPProfile();
-                  mapProfile.synchronizeMPWrapper();
+               final MPProfile mapProfile = new MPProfile();
+               mapProfile.synchronizeMPWrapper();
 
-                  setEmptyMapProviderUI(mapProfile);
-               }
-            });
+               setEmptyMapProviderUI(mapProfile);
+            }));
             setButtonLayoutData(_btnAddMapProviderMapProfile);
          }
          {
@@ -1011,12 +957,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
             _btnDeleteOfflineMap = new Button(btnContainer, SWT.NONE);
             _btnDeleteOfflineMap.setText(Messages.Pref_Map_Button_DeleteOfflineMap);
-            _btnDeleteOfflineMap.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  deleteOfflineMap(_selectedMapProvider);
-               }
-            });
+            _btnDeleteOfflineMap.addSelectionListener(widgetSelectedAdapter(selectionEvent -> deleteOfflineMap(_selectedMapProvider)));
             setButtonLayoutData(_btnDeleteOfflineMap);
          }
          {
@@ -1025,12 +966,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
             _btnImport = new Button(btnContainer, SWT.NONE);
             _btnImport.setText(Messages.Pref_Map_Button_ImportMP);
-            _btnImport.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_MapProvider_Import();
-               }
-            });
+            _btnImport.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_MapProvider_Import()));
             setButtonLayoutData(_btnImport);
             final GridData gd = setButtonLayoutData(_btnImport);
             gd.verticalIndent = 20;
@@ -1041,12 +977,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
             _btnExport = new Button(btnContainer, SWT.NONE);
             _btnExport.setText(Messages.Pref_Map_Button_ExportMP);
-            _btnExport.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_MapProvider_Export();
-               }
-            });
+            _btnExport.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_MapProvider_Export()));
             setButtonLayoutData(_btnExport);
          }
          {
@@ -1060,7 +991,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             _mpDropTarget = new DropTarget(_lblMpDropTarget, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
 
-            _mpDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), FileTransfer.getInstance() });
+            _mpDropTarget.setTransfer(URLTransfer.getInstance(), FileTransfer.getInstance());
 
             _mpDropTarget.addDropListener(new DropTargetAdapter() {
 
@@ -1075,12 +1006,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
                   /*
                    * run async to free the mouse cursor from the drop operation
                    */
-                  Display.getDefault().asyncExec(new Runnable() {
-                     @Override
-                     public void run() {
-                        runnableDropMapProvider(event);
-                     }
-                  });
+                  Display.getDefault().asyncExec(() -> runnableDropMapProvider(event));
                }
             });
          }
@@ -1092,12 +1018,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             link.setText(Messages.Pref_Map_Link_MapProvider);
             link.setToolTipText(Messages.Pref_Map_Link_MapProvider_Tooltip);
             link.setEnabled(true);
-            link.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(Messages.External_Link_MapProviders);
-               }
-            });
+            link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+                  "https://mytourbook.sourceforge.io/mytourbook/index.php/map-provider")));//$NON-NLS-1$
             GridDataFactory.fillDefaults()//
                   .align(SWT.END, SWT.FILL)
                   .grab(true, false)
@@ -1109,12 +1031,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
             _btnDeleteMapProvider = new Button(btnContainer, SWT.NONE);
             _btnDeleteMapProvider.setText(Messages.Pref_Map_Button_DeleteMapProvider);
-            _btnDeleteMapProvider.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_MapProvider_Delete();
-               }
-            });
+            _btnDeleteMapProvider.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_MapProvider_Delete()));
             final GridData gd = setButtonLayoutData(_btnDeleteMapProvider);
             gd.grabExcessVerticalSpace = true;
             gd.verticalAlignment = SWT.END;
@@ -1148,19 +1065,9 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void createUI_52_Details_Details(final Group parent) {
 
-      final VerifyListener verifyListener = new VerifyListener() {
-         @Override
-         public void verifyText(final VerifyEvent e) {
-            e.text = UI.createIdFromName(e.text, MAX_ID_LENGTH);
-         }
-      };
+      final VerifyListener verifyListener = verifyEvent -> verifyEvent.text = UI.createIdFromName(verifyEvent.text, MAX_ID_LENGTH);
 
-      final SelectionListener selectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            setMapProviderModified();
-         }
-      };
+      final SelectionListener selectionListener = widgetSelectedAdapter(selectionEvent -> setMapProviderModified());
 
       final int secondColumnIndent = 20;
 
@@ -1178,15 +1085,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // text: map provider
             _txtMapProviderName = new Text(container, SWT.BORDER);
-            _txtMapProviderName.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isInUIUpdate) {
-                     return;
-                  }
-                  createAutoText();
-                  setMapProviderModified();
+            _txtMapProviderName.addModifyListener(modifyEvent -> {
+               if (_isInUIUpdate) {
+                  return;
                }
+               createAutoText();
+               setMapProviderModified();
             });
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_txtMapProviderName);
          }
@@ -1214,21 +1118,18 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // text
             _txtOnlineMapUrl = new Text(container, SWT.BORDER);
-            _txtOnlineMapUrl.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
+            _txtOnlineMapUrl.addModifyListener(modifyEvent -> {
 
-                  if (_isInUIUpdate) {
-                     return;
-                  }
-
-                  // update link text
-                  _linkOnlineMap.setText(net.tourbook.common.UI.getLinkFromText(_txtOnlineMapUrl.getText()));
-                  _linkOnlineMap.setToolTipText(_txtMapProviderName.getText());
-
-                  _isModifiedOfflineFolder = true;
-                  setMapProviderModified();
+               if (_isInUIUpdate) {
+                  return;
                }
+
+               // update link text
+               _linkOnlineMap.setText(net.tourbook.common.UI.getLinkFromText(_txtOnlineMapUrl.getText()));
+               _linkOnlineMap.setToolTipText(_txtMapProviderName.getText());
+
+               _isModifiedOfflineFolder = true;
+               setMapProviderModified();
             });
             GridDataFactory.fillDefaults()
                   .span(3, 1)
@@ -1240,12 +1141,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // link
             _linkOnlineMap = new Link(container, SWT.NONE);
-            _linkOnlineMap.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(_txtOnlineMapUrl.getText());
-               }
-            });
+            _linkOnlineMap.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(_txtOnlineMapUrl.getText())));
             GridDataFactory.fillDefaults()
                   .span(3, 1)
                   .grab(true, false)
@@ -1305,20 +1201,17 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
                   .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
                   .applyTo(_txtOfflineFolder);
 
-            _txtOfflineFolder.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
+            _txtOfflineFolder.addModifyListener(modifyEvent -> {
 
-                  if (_isInUIUpdate) {
-                     return;
-                  }
-
-                  _isModifiedOfflineFolder = true;
-                  setMapProviderModified();
-
-                  // force offline folder to be reloaded
-                  _selectedMapProvider.setStateToReloadOfflineCounter();
+               if (_isInUIUpdate) {
+                  return;
                }
+
+               _isModifiedOfflineFolder = true;
+               setMapProviderModified();
+
+               // force offline folder to be reloaded
+               _selectedMapProvider.setStateToReloadOfflineCounter();
             });
 
             // label: offline info
@@ -1343,16 +1236,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _txtMapProviderId.addVerifyListener(verifyListener);
             GridDataFactory.fillDefaults().applyTo(_txtMapProviderId);
 
-            _txtMapProviderId.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isInUIUpdate) {
-                     return;
-                  }
-
-                  _isModifiedMapProviderId = true;
-                  setMapProviderModified();
+            _txtMapProviderId.addModifyListener(modifyEvent -> {
+               if (_isInUIUpdate) {
+                  return;
                }
+
+               _isModifiedMapProviderId = true;
+               setMapProviderModified();
             });
          }
          {
@@ -1409,23 +1299,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          // button: update
          _btnUpdate = new Button(btnContainer, SWT.NONE);
          _btnUpdate.setText(Messages.Pref_Map_Button_UpdateMapProvider);
-         _btnUpdate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction_MapProvider_Update();
-            }
-         });
+         _btnUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_MapProvider_Update()));
          setButtonLayoutData(_btnUpdate);
 
          // button: cancel
          _btnCancel = new Button(btnContainer, SWT.NONE);
          _btnCancel.setText(Messages.Pref_Map_Button_CancelMapProvider);
-         _btnCancel.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction_MapProvider_Cancel();
-            }
-         });
+         _btnCancel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_MapProvider_Cancel()));
          setButtonLayoutData(_btnCancel);
       }
    }
@@ -1436,7 +1316,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
     * @param capsUrl
     * @throws Exception
     */
-   private void createWmsMapProvider(final String capsUrl) throws Exception {
+   private void createWmsMapProvider(final String capsUrl) {
 
       // show loading... message
       setMessage(NLS.bind(Messages.pref_map_message_loadingWmsCapabilities, capsUrl), INFORMATION);
@@ -1449,7 +1329,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final MPWms wmsMapProvider = MapProviderManager.checkWms(null, capsUrl);
       if (wmsMapProvider == null) {
 
-         // an error occured, exception is already displayed
+         // an error occurred, exception is already displayed
 
          // hide loading message
          setMessage(null);
@@ -2180,7 +2060,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    }
 
    /**
-    * !!!!! Recursive funktion to count files/size !!!!!
+    * !!!!! Recursive function to count files/size !!!!!
     *
     * @param listOfFiles
     */
@@ -2353,7 +2233,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       _pc = new PixelConverter(parent);
 
-      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
+      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
    @Override
@@ -2377,14 +2257,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private boolean loadFile(final String address, final String localFilePathName) {
 
-      OutputStream outputStream = null;
       InputStream inputStream = null;
 
-      try {
+      try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePathName))) {
 
          final URL url = new URL(address);
-         outputStream = new BufferedOutputStream(new FileOutputStream(localFilePathName));
-
          final URLConnection urlConnection = url.openConnection();
          inputStream = urlConnection.getInputStream();
 
@@ -2401,16 +2278,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          StatusUtil.showStatus(e.getMessage(), e);
       } finally {
 
-         try {
-            if (inputStream != null) {
-               inputStream.close();
-            }
-            if (outputStream != null) {
-               outputStream.close();
-            }
-         } catch (final IOException e) {
-            StatusUtil.log(e);
-         }
+         Util.close(inputStream);
       }
 
       return false;
@@ -2427,18 +2295,15 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void onAction_MapProvider_AddWms() {
 
-      final IInputValidator inputValidator = new IInputValidator() {
-         @Override
-         public String isValid(final String newText) {
-            try {
-               // check url
-               new URL(newText);
-            } catch (final MalformedURLException e) {
-               return Messages.Wms_Error_InvalidUrl;
-            }
-
-            return null;
+      final IInputValidator inputValidator = newText -> {
+         try {
+            // check url
+            new URL(newText);
+         } catch (final MalformedURLException e) {
+            return Messages.Wms_Error_InvalidUrl;
          }
+
+         return null;
       };
 
       // get the reference tour name
@@ -3072,6 +2937,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void saveState() {
 
+      if (_columnManager == null) {
+
+         // this happened when another pref page had an error and this pref page was selected
+
+         return;
+      }
+
       _state.put(STATE_SORT_COLUMN_ID, _mpComparator.__sortColumnId);
       _state.put(STATE_SORT_COLUMN_DIRECTION, _mpComparator.__sortDirection);
 
@@ -3134,7 +3006,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private void setWmsDropTarget(final Label label) {
 
       _wmsDropTarget = new DropTarget(label, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
-      _wmsDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), TextTransfer.getInstance() });
+      _wmsDropTarget.setTransfer(URLTransfer.getInstance(), TextTransfer.getInstance());
 
       _wmsDropTarget.addDropListener(new DropTargetAdapter() {
          @Override
@@ -3284,16 +3156,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             _isOfflineJobRunning = false;
 
-            Display.getDefault().syncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getDefault().syncExec(() -> {
 
-                  // enable offline delete button
-                  enableControls();
+               // enable offline delete button
+               enableControls();
 
-                  updateUI_OfflineInfo_Total();
-               }
-
+               updateUI_OfflineInfo_Total();
             });
 
             return Status.OK_STATUS;
@@ -3494,26 +3362,23 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void updateUI_OfflineInfo() {
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> {
 
-            // check if UI is available
-            if (_mpViewer.getTable().isDisposed() || (_offlineJobMp == null)) {
-               return;
-            }
+         // check if UI is available
+         if (_mpViewer.getTable().isDisposed() || (_offlineJobMp == null)) {
+            return;
+         }
 
-            // update model
-            _offlineJobMp.setOfflineFileCounter(_offlineJobFileCounter);
-            _offlineJobMp.setOfflineFileSize(_offlineJobFileSize);
+         // update model
+         _offlineJobMp.setOfflineFileCounter(_offlineJobFileCounter);
+         _offlineJobMp.setOfflineFileSize(_offlineJobFileSize);
 
-            // update viewer
-            _mpViewer.update(_offlineJobMp, null);
+         // update viewer
+         _mpViewer.update(_offlineJobMp, null);
 
-            // update info detail when the selected map provider is currently in the job
-            if ((_selectedMapProvider != null) && _selectedMapProvider.equals(_offlineJobMp)) {
-               updateUI_OfflineInfo_Detail(_selectedMapProvider);
-            }
+         // update info detail when the selected map provider is currently in the job
+         if ((_selectedMapProvider != null) && _selectedMapProvider.equals(_offlineJobMp)) {
+            updateUI_OfflineInfo_Detail(_selectedMapProvider);
          }
       });
    }

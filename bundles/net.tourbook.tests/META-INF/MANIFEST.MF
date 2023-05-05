@@ -1,20 +1,52 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Unit tests suite for MyTourbook
+Bundle-Name: Integration tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.tests;singleton:=true
-Bundle-Version: 20.12.0.qualifier
-Require-Bundle: org.junit.jupiter.api;resolution:=optional,
- net.tourbook
+Bundle-Version: 23.3.2.qualifier
+Require-Bundle: org.junit.jupiter.api,
+ net.tourbook,
+ net.tourbook.ext.jars,
+ net.tourbook.ext.ejb3,
+ net.tourbook.cloud,
+ org.eclipse.ui,
+ net.tourbook.common,
+ org.opentest4j
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+ hibernate-entitymanager.jar,
+ jsonassert-1.5.1.jar,
+ xmlunit-core-2.9.1.jar,
+ HttpClientMock-1.0.0.jar,
+ hamcrest-all-1.3.jar
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Import-Package: net.tourbook.common,
+Import-Package: com.fasterxml.jackson.core.type,
+ com.fasterxml.jackson.databind,
+ net.tourbook.cloud.oauth2,
+ net.tourbook.cloud.strava,
+ net.tourbook.cloud.suunto,
+ net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,
+ net.tourbook.device.cm4xxm,
+ net.tourbook.device.crp,
+ net.tourbook.device.daum.ergobike,
  net.tourbook.device.garmin,
  net.tourbook.device.garmin.fit,
  net.tourbook.device.gpx,
+ net.tourbook.device.hac4,
+ net.tourbook.device.hac4linux.tour,
+ net.tourbook.device.mt,
+ net.tourbook.device.nmea,
+ net.tourbook.device.polar.hrm,
+ net.tourbook.device.polartrainer,
  net.tourbook.device.sporttracks,
  net.tourbook.device.suunto,
+ net.tourbook.device.tur,
+ net.tourbook.export,
+ org.apache.commons.io,
+ org.eclipse.jface.preference,
+ org.eclipse.swt,
+ org.eclipse.swt.widgets,
  org.json
 Automatic-Module-Name: net.tourbook.tests

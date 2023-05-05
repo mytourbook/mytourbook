@@ -2,50 +2,46 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Velocity 1.5
 Bundle-SymbolicName: net.tourbook.ext.velocity;singleton:=true
-Bundle-Version: 15.6.0.qualifier
+Bundle-Version: 23.3.2.qualifier
 Bundle-Activator: net.tourbook.ext.velocity.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common,
+ net.tourbook.ext.jars,
  net.tourbook.ext.rxtx_2.2
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Eclipse-BuddyPolicy: registered
 Bundle-ActivationPolicy: lazy
+Eclipse-RegisterBuddy: net.tourbook.ext.jars
 Bundle-ClassPath: .,
- commons-collections-3.2.jar,
- commons-lang-2.4.jar,
- log4j-1.2.14.jar,
- velocity-1.5.jar,
- velocity-tools-1.3.jar,
+ commons-collections4-4.4.jar,
+ slf4j-api-1.7.30.jar,
+ log4j-1.2.17.jar,
+ slf4j-simple-1.7.30.jar,
+ velocity-engine-core-2.3.jar,
+ velocity-tools-generic-3.1.jar,
  dinopolis-util-0.5.4mt.jar,
  gpsinput-0.5.4mt.jar
 Export-Package: net.tourbook.ext.velocity,
+ org.apache.commons.collections4,
+ org.apache.commons.collections4.collection,
  org.apache.velocity,
- org.apache.velocity.anakia,
  org.apache.velocity.app,
  org.apache.velocity.app.event,
  org.apache.velocity.app.event.implement,
- org.apache.velocity.app.tools,
  org.apache.velocity.context,
- org.apache.velocity.convert,
  org.apache.velocity.exception,
  org.apache.velocity.io,
  org.apache.velocity.runtime,
  org.apache.velocity.runtime.directive,
- org.apache.velocity.runtime.log,
  org.apache.velocity.runtime.parser,
  org.apache.velocity.runtime.parser.node,
  org.apache.velocity.runtime.resource,
  org.apache.velocity.runtime.resource.loader,
  org.apache.velocity.runtime.resource.util,
  org.apache.velocity.runtime.visitor,
- org.apache.velocity.servlet,
- org.apache.velocity.texen,
- org.apache.velocity.texen.ant,
- org.apache.velocity.texen.util,
  org.apache.velocity.tools.generic,
- org.apache.velocity.tools.generic.log,
  org.apache.velocity.util,
  org.apache.velocity.util.introspection,
  org.dinopolis.gpstool.gpsinput,
@@ -60,6 +56,10 @@ Export-Package: net.tourbook.ext.velocity,
  org.dinopolis.util.io,
  org.dinopolis.util.resource,
  org.dinopolis.util.servicediscovery,
- org.dinopolis.util.text
-Import-Package: net.tourbook.common.util
+ org.dinopolis.util.text,
+ org.slf4j
+Import-Package: net.tourbook.common.util,
+ org.apache.commons.lang3,
+ org.apache.commons.lang3.reflect,
+ org.apache.commons.lang3.tuple
 Automatic-Module-Name: net.tourbook.ext.velocity

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.util;
+
+import net.tourbook.common.UI;
 
 /**
  * String utilities.
@@ -60,5 +62,33 @@ public final class StringUtils {
       }
 
       return sb.toString();
+   }
+
+   /**
+    * Sanitizes a file name string by replacing any illegal characters
+    * with a '-'.
+    *
+    * @param fileName
+    *           The string of a given file name
+    * @return
+    *         The sanitized file name
+    */
+   public static String sanitizeFileName(final String fileName) {
+
+      if (StringUtils.isNullOrEmpty(fileName)) {
+         return fileName;
+      }
+
+      String regEx;
+
+      if (UI.IS_WIN) {
+
+         regEx = "[\\\\/:*?\"<>|]"; //$NON-NLS-1$
+      } else //UI.IS_OSX or UI.IS_LINUX
+      {
+         regEx = "[\\/]";//$NON-NLS-1$
+      }
+
+      return fileName.replaceAll(regEx, UI.DASH);
    }
 }

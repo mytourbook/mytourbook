@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,17 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import static org.eclipse.swt.events.FocusListener.focusGainedAdapter;
+import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
+
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -36,7 +42,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
@@ -44,26 +49,25 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class StatisticValuesView extends ViewPart {
 
-   private static final String                IMAGE_TOUR_OPTIONS             = net.tourbook.common.Messages.Image__TourOptions;
-   private static final String                IMAGE_TOUR_OPTIONS_DISABLED    = net.tourbook.common.Messages.Image__TourOptions_Disabled;
+   public static final String                 ID                             = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
 
-   public static final String                 ID                             = "net.tourbook.statistic.StatisticValuesView";            //$NON-NLS-1$
-
-   private static final String                STATE_IS_GROUP_VALUES          = "STATE_IS_GROUP_VALUES";                                 //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_CSV_FORMAT       = "STATE_IS_SHOW_CSV_FORMAT";                              //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_ZERO_VALUES      = "STATE_IS_SHOW_ZERO_VALUES";                             //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_SEQUENCE_NUMBERS = "STATE_IS_SHOW_SEQUENCE_NUMBERS";                        //$NON-NLS-1$
+   private static final String                STATE_IS_GROUP_VALUES          = "STATE_IS_GROUP_VALUES";                      //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_CSV_FORMAT       = "STATE_IS_SHOW_CSV_FORMAT";                   //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_ZERO_VALUES      = "STATE_IS_SHOW_ZERO_VALUES";                  //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_SEQUENCE_NUMBERS = "STATE_IS_SHOW_SEQUENCE_NUMBERS";             //$NON-NLS-1$
 
    private static final IPreferenceStore      _prefStore                     = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore      _prefStore_Common              = CommonActivator.getPrefStore();
    private static final IDialogSettings       _state                         = TourbookPlugin.getState(ID);
 
+   private IPartListener2                     _partListener;
    private IPropertyChangeListener            _prefChangeListener;
    private IPropertyChangeListener            _prefChangeListener_Common;
 
@@ -87,7 +91,7 @@ public class StatisticValuesView extends ViewPart {
    private Composite  _pageContent;
 
    /**
-    * Usinge {@link Text} or {@link StyledText}
+    * Using {@link Text} or {@link StyledText}
     * <p>
     * {@link Text}
     * <p>
@@ -110,8 +114,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override
@@ -128,8 +132,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_GroupValues_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GroupValues));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GroupValues_Disabled));
       }
 
       @Override
@@ -147,8 +151,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CSVFormat_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.CSVFormat_Disabled));
       }
 
       @Override
@@ -172,8 +176,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowSequenceNumbers_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_SequenceNumber));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_SequenceNumber_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_SequenceNumber));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_SequenceNumber_Disabled));
       }
 
       @Override
@@ -191,8 +195,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowZeroValued_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZeroValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZeroValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZeroValues));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ZeroValues_Disabled));
       }
 
       @Override
@@ -202,42 +206,77 @@ public class StatisticValuesView extends ViewPart {
       }
    }
 
+   private void addPartListener() {
+
+      _partListener = new IPartListener2() {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == StatisticValuesView.this) {
+               fixThemedColors();
+            }
+         }
+
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == StatisticValuesView.this) {
+               fixThemedColors();
+            }
+         }
+
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+      getViewSite().getPage().addPartListener(_partListener);
+   }
+
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
 
-               // update font
+            // update font
 
-               final Font logFont = net.tourbook.ui.UI.getLogFont();
+            final Font logFont = net.tourbook.ui.UI.getLogFont();
 
-               // ensure the font is valid, this case occurred in Ubuntu
-               if (logFont != null) {
-                  _txtStatValues.setFont(logFont);
-               }
+            // ensure the font is valid, this case occurred in Ubuntu
+            if (logFont != null) {
 
-            } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
-
-               updateUI();
+               _txtStatValues.setFont(logFont);
             }
+
+         } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+
+            updateUI();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
-            }
+            // measurement system has changed
          }
       };
 
@@ -247,25 +286,22 @@ public class StatisticValuesView extends ViewPart {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == StatisticValuesView.this) {
-               return;
-            }
+         if (workbenchPart == StatisticValuesView.this) {
+            return;
+         }
 
-            if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+         if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-               clearView();
+            clearView();
 
-            } else if ((eventId == TourEventId.STATISTIC_VALUES)) {
+         } else if ((tourEventId == TourEventId.STATISTIC_VALUES)) {
 
-               // new statistic values are retrieved from the StatisticManager
+            // new statistic values are retrieved from the StatisticManager
 
-               updateUI();
-               enableActions();
-            }
+            updateUI();
+            enableActions();
          }
       };
 
@@ -280,8 +316,8 @@ public class StatisticValuesView extends ViewPart {
    private void createActions() {
 
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.Tour_StatisticValues_Action_OpenPreferences_Tooltip, PrefPageAppearance.ID, ID);
-      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_TOUR_OPTIONS));
-      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_TOUR_OPTIONS_DISABLED));
+      _action_PrefDialog.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
+      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
 
       _action_CopyIntoClipboard = new Action_CopyStatValuesIntoClipboard();
       _action_ShowCSVFormat = new Action_ShowCSVFormat();
@@ -300,6 +336,7 @@ public class StatisticValuesView extends ViewPart {
       createUI(parent);
       createActions();
 
+      addPartListener();
       addTourEventListener();
       addPrefListener();
 
@@ -323,6 +360,8 @@ public class StatisticValuesView extends ViewPart {
       {
          createUI_10_Container(_pageContent);
       }
+
+      fixThemedColors();
    }
 
    private void createUI_10_Container(final Composite parent) {
@@ -335,12 +374,16 @@ public class StatisticValuesView extends ViewPart {
          _txtStatValues = new StyledText(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
          _txtStatValues.setFont(net.tourbook.ui.UI.getLogFont());
          _txtStatValues.setTabs(1);
+         _txtStatValues.addFocusListener(focusLostAdapter(focusEvent -> fixThemedColors()));
+         _txtStatValues.addFocusListener(focusGainedAdapter(focusEvent -> fixThemedColors()));
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_txtStatValues);
       }
    }
 
    @Override
    public void dispose() {
+
+      getViewSite().getPage().removePartListener(_partListener);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -390,6 +433,18 @@ public class StatisticValuesView extends ViewPart {
 
       // setup actions
       tbm.update(true);
+   }
+
+   private void fixThemedColors() {
+
+      _pageBook.getDisplay().asyncExec(() -> {
+
+         if (_pageBook.isDisposed()) {
+            return;
+         }
+
+         _txtStatValues.setBackground(ThemeUtil.getDarkestBackgroundColor());
+      });
    }
 
    private void initUI() {
@@ -485,6 +540,8 @@ public class StatisticValuesView extends ViewPart {
          _txtStatValues.setHorizontalIndex(hIndex);
       }
       _txtStatValues.setRedraw(true);
+
+      fixThemedColors();
    }
 
 }

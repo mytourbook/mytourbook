@@ -1,52 +1,103 @@
-/******************************************************************************
- *  Copyright (c) 2011 GitHub Inc.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
+/*******************************************************************************
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
- *  Contributors:
- *    Kevin Sawicki (GitHub Inc.) - initial API and implementation
- *    https://github.com/kevinsawicki/eclipse-oauth2
- *****************************************************************************/
-/*
- * Modified for MyTourbook by Frédéric Bard
- */
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.cloud.oauth2;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
+import net.tourbook.weather.WeatherUtils;
 
-/**
- * OAuth2 utilities.
- */
+import org.json.JSONObject;
+
 public class OAuth2Utils {
 
+   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+
+   private OAuth2Utils() {}
+
+   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime,
+                                                         final long accessTokenExpiresIn) {
+
+      final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
+
+      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
+   }
+
+   public static URI createOAuthPasseurUri(final String uriSuffix) {
+
+      return URI.create(WeatherUtils.OAUTH_PASSEUR_APP_URL + uriSuffix);
+   }
+
+   public static String getTokens(final String authorizationCode,
+                                  final boolean isRefreshToken,
+                                  final String refreshToken,
+                                  final URI uri) {
+
+      final JSONObject body = new JSONObject();
+      String grantType;
+      if (isRefreshToken) {
+         body.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
+         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
+      } else {
+         body.put(OAuth2Constants.PARAM_CODE, authorizationCode);
+         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
+      }
+
+      body.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
+
+      final HttpRequest request = HttpRequest.newBuilder()
+            .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
+            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+            .uri(uri)
+            .build();
+
+      try {
+         final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+         final String responseBody = response.body();
+         if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(responseBody)) {
+            return responseBody;
+         } else {
+            StatusUtil.logError(responseBody);
+         }
+      } catch (IOException | InterruptedException e) {
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      return null;
+   }
+
    /**
-    * Generate authorize url for given client
-    * See {#link
-    * https://www.dropbox.com/developers/documentation/http/documentation#oauth2-authorize}
+    * We consider that an access token is valid (non expired) if there are more
+    * than 5 mins remaining until the actual expiration
     *
-    * @param client
-    * @return authorize url
+    * @return
     */
-   public static String getAuthorizeUrl(final OAuth2Client client) {
+   public static boolean isAccessTokenValid(final long tokenExpirationDate) {
 
-      final List<NameValuePair> params = new ArrayList<>();
-      params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_REDIRECT_URI,
-            client.getRedirectUri()));
-      params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_CLIENT_ID,
-            client.getId().toString()));
-      params.add(new BasicNameValuePair(
-            IOAuth2Constants.RESPONSE_TYPE,
-            IOAuth2Constants.PARAM_TOKEN));
-
-      final String query = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
-      return client.getAuthorizeUrl() + '?' + query;
+      return tokenExpirationDate - System.currentTimeMillis() - 300000 > 0;
    }
 }

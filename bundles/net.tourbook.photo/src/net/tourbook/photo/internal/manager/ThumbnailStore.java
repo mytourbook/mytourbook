@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.core.runtime.IPath;
@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ThumbnailStore {
 
-   private static final long   MBYTE                         = 1024 * 1024;
+   private static final long   MBYTE                         = 1024 * 1024L;
 
    static final String         THUMBNAIL_IMAGE_EXTENSION_JPG = "jpg";             //$NON-NLS-1$
    private static final String THUMBNAIL_STORE_OS_PATH       = "thumbnail-store"; //$NON-NLS-1$
@@ -59,13 +59,12 @@ public class ThumbnailStore {
    /*
     * photo image properties saved in a properties file
     */
-   private static final String        PROPERTIES_FILE_EXTENSION = "properties";           //$NON-NLS-1$
+   private static final String        PROPERTIES_FILE_EXTENSION = "properties";                 //$NON-NLS-1$
 //	private static final String			PROPERTIES_FILE_HEADER			= "Image properties ";		//$NON-NLS-1$
-   public static final String         ORIGINAL_IMAGE_WIDTH      = "OriginalImageWidth";   //$NON-NLS-1$
-   public static final String         ORIGINAL_IMAGE_HEIGHT     = "OriginalImageHeight";  //$NON-NLS-1$
+   public static final String         ORIGINAL_IMAGE_WIDTH      = "OriginalImageWidth";         //$NON-NLS-1$
+   public static final String         ORIGINAL_IMAGE_HEIGHT     = "OriginalImageHeight";        //$NON-NLS-1$
 
-   private static IPreferenceStore    _prefStore                = Activator.getDefault()  //
-         .getPreferenceStore();
+   private static IPreferenceStore    _prefStore                = PhotoActivator.getPrefStore();
 
    private static IPath               _storePath                = getThumbnailStorePath();
 
@@ -139,7 +138,7 @@ public class ThumbnailStore {
       final int daysToKeepImages = _prefStore.getInt(//
             IPhotoPreferences.PHOTO_THUMBNAIL_STORE_NUMBER_OF_DAYS_TO_KEEP_IMAGES);
 
-      // ckeck if cleanup is done always
+      // check if cleanup is done always
       if (daysToKeepImages == 0) {
 
          doCleanup(Integer.MIN_VALUE, Long.MIN_VALUE, true);
@@ -190,7 +189,7 @@ public class ThumbnailStore {
 
    /**
     * Cleanup store files for a specific folder.
-    * 
+    *
     * @param folderPath
     */
    public static void cleanupStoreFiles(final File[] imageFiles) {
@@ -239,7 +238,7 @@ public class ThumbnailStore {
          final boolean isDeleted = storeFile.delete();
 
          if (isDeleted == false) {
-            StatusUtil.log(NLS.bind("cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
+            StatusUtil.logError(NLS.bind("Cannot delete file: {0}", storeFilePath)); //$NON-NLS-1$
          }
       }
    }
@@ -306,7 +305,7 @@ public class ThumbnailStore {
 
    /**
     * recursively delete directory
-    * 
+    *
     * @param directory
     * @param monitor
     */
@@ -346,7 +345,7 @@ public class ThumbnailStore {
     * <br>
     * <br>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-    * 
+    *
     * @param fileOrFolder
     * @param monitor
     * @return Returns number of deleted files

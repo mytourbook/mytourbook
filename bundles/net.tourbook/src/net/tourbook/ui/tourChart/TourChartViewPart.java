@@ -15,8 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import java.util.ArrayList;
+
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -24,13 +28,13 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoPartItem;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -47,21 +51,22 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TourChartViewPart extends ViewPart implements IGeoCompareListener {
 
-   private static final String      ID         = "net.tourbook.ui.tourChart.TourChartViewPart";   //$NON-NLS-1$
+   private static final String           ID         = "net.tourbook.ui.tourChart.TourChartViewPart";   //$NON-NLS-1$
 
-   private final IPreferenceStore   _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IDialogSettings  _state     = TourbookPlugin.getState(ID);
 
-   public TourData                  _tourData;
+   public TourData                       _tourData;
 
-   protected TourChart              _tourChart;
-   protected TourChartConfiguration _tourChartConfig;
+   protected TourChart                   _tourChart;
+   protected TourChartConfiguration      _tourChartConfig;
 
-   public PostSelectionProvider     _postSelectionProvider;
+   public PostSelectionProvider          _postSelectionProvider;
 
-   private IPropertyChangeListener  _prefChangeListener;
-   private ITourEventListener       _tourEventListener;
-   private ISelectionListener       _postSelectionListener;
-   private IPartListener2           _partListener;
+   private ITourEventListener            _abstractTourEventListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPartListener2                _partListener;
 
    /**
     * set the part listener to save the view settings, the listeners are called before the controls
@@ -122,7 +127,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
                   || property.equals(ITourbookPreferences.GRAPH_X_AXIS)
                   || property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-               _tourChartConfig = TourManager.createDefaultTourChartConfig();
+               _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
 
                if (_tourChart != null) {
                   _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
@@ -130,7 +135,10 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
             } else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
 
-               _tourChart.setMouseMode(event.getNewValue());
+               final Object newValue = event.getNewValue();
+               final Enum<MouseWheelMode> enumValue = Util.getEnumValue((String) newValue, MouseWheelMode.Zoom);
+
+               _tourChart.setMouseWheelMode((MouseWheelMode) enumValue);
             }
          }
       };
@@ -154,7 +162,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
+      _abstractTourEventListener = new ITourEventListener() {
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
@@ -180,20 +188,32 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
             } else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-               final TourData tourData = UI.getTourPropertyTourData((TourEvent) eventData, _tourData);
+               final TourEvent tourEvent = (TourEvent) eventData;
+               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-               // check if the current tour is modified
-               if (tourData != null && tourData.getTourId() == _tourData.getTourId()) {
+               if (modifiedTours != null) {
 
-                  _tourData = tourData;
+                  final long oldTourId = _tourData.getTourId();
 
-                  updateChart();
+                  for (final TourData tourData : modifiedTours) {
+
+                     // check if the current tour is modified
+                     if (tourData.getTourId() == oldTourId) {
+
+                        _tourData = tourData;
+
+                        updateChart();
+
+                        // current tour is updated -> nothing more to do
+                        break;
+                     }
+                  }
                }
             }
          }
       };
 
-      TourManager.getInstance().addTourEventListener(_tourEventListener);
+      TourManager.getInstance().addTourEventListener(_abstractTourEventListener);
    }
 
    @Override
@@ -215,7 +235,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getSite().getPage().removePartListener(_partListener);
 
-      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      TourManager.getInstance().removeTourEventListener(_abstractTourEventListener);
       GeoCompareManager.removeGeoCompareListener(this);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -244,7 +264,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
             _tourData = TourManager.getInstance().getTourData(tourId);
 
             if (_tourChartConfig == null) {
-               _tourChartConfig = TourManager.createDefaultTourChartConfig();
+               _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
             }
 
 //            TourManager.fireEventWithCustomData(

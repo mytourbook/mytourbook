@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,8 +17,11 @@ package net.tourbook.ui.views.heartRateVariability;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -83,17 +86,14 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class HeartRateVariabilityView extends ViewPart {
 
-   public static final String  ID                                      = "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"; //$NON-NLS-1$
+   public static final String  ID                          = "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"; //$NON-NLS-1$
 
-   private static final String GRAPH_LABEL_HEART_RATE_VARIABILITY      = net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
-   private static final String GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT = net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
+   private static final String STATE_HRV_MIN_TIME          = "STATE_HRV_MIN_TIME";                                                  //$NON-NLS-1$
+   private static final String STATE_HRV_MAX_TIME          = "STATE_HRV_MAX_TIME";                                                  //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ALL_VALUES    = "STATE_IS_SHOW_ALL_VALUES";                                            //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_CHART_SCALING = "STATE_IS_SYNC_CHART_SCALING";                                         //$NON-NLS-1$
 
-   private static final String STATE_HRV_MIN_TIME                      = "STATE_HRV_MIN_TIME";                                                  //$NON-NLS-1$
-   private static final String STATE_HRV_MAX_TIME                      = "STATE_HRV_MAX_TIME";                                                  //$NON-NLS-1$
-   private static final String STATE_IS_SHOW_ALL_VALUES                = "STATE_IS_SHOW_ALL_VALUES";                                            //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_CHART_SCALING             = "STATE_IS_SYNC_CHART_SCALING";                                         //$NON-NLS-1$
-
-   private static final String GRID_PREF_PREFIX                        = "GRID_HEART_RATE_VARIABILITY__";                                       //$NON-NLS-1$
+   private static final String GRID_PREF_PREFIX            = "GRID_HEART_RATE_VARIABILITY__";                                       //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -110,7 +110,7 @@ public class HeartRateVariabilityView extends ViewPart {
    private static final int         HRV_TIME_MAX_BORDER = 9999;                                      //ms
 
    private final IPreferenceStore   _prefStore          = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore   _commonPrefStore    = CommonActivator.getPrefStore();
+   private final IPreferenceStore   _prefStore_Common   = CommonActivator.getPrefStore();
    private final IDialogSettings    _state              = TourbookPlugin.getState(ID);
 
    private ModifyListener           _defaultSpinnerModifyListener;
@@ -121,7 +121,7 @@ public class HeartRateVariabilityView extends ViewPart {
    private IPropertyChangeListener  _prefChangeListener;
    private ITourEventListener       _tourEventListener;
 
-   private ArrayList<TourData>      _hrvTours;
+   private List<TourData>           _hrvTours;
 
    private ActionToolbarSlideout    _actionHrvOptions;
    private ActionSynchChartScale    _actionSynchChartScaling;
@@ -180,7 +180,7 @@ public class HeartRateVariabilityView extends ViewPart {
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setToolTipText(Messages.HRV_View_Action_ShowAllValues);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_FitGraph));
       }
 
       @Override
@@ -197,8 +197,8 @@ public class HeartRateVariabilityView extends ViewPart {
 
          setToolTipText(Messages.HRV_View_Action_SynchChartScale);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
       }
 
       @Override
@@ -368,7 +368,7 @@ public class HeartRateVariabilityView extends ViewPart {
     *           contains all tours which are displayed in the chart, they can be valid or invalid
     * @return
     */
-   private ChartDataModel createChartDataModel(final ArrayList<TourData> hrvTours) {
+   private ChartDataModel createChartDataModel(final List<TourData> hrvTours) {
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.XY_SCATTER);
 
@@ -388,7 +388,7 @@ public class HeartRateVariabilityView extends ViewPart {
             continue;
          }
 
-         final int[] tdPulseTimeSerie = tourData.pulseTimeSerie;
+         final int[] tdPulseTimeSerie = tourData.pulseTime_Milliseconds;
 
          // check if required data series are available
          if (tdPulseTimeSerie != null && tdPulseTimeSerie.length > 1) {
@@ -408,24 +408,26 @@ public class HeartRateVariabilityView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final String prefColorLine = net.tourbook.common.UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_LINE_DARK
+            : GraphColorManager.PREF_COLOR_LINE_LIGHT;
 
-      final RGB rgbPrefDark = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      final String prefColorText = net.tourbook.common.UI.IS_DARK_THEME
+            ? GraphColorManager.PREF_COLOR_TEXT_DARK
+            : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
 
-      final RGB rgbPrefBright = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      // get colors from common pref store
+      final RGB rgbGradient_Bright = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT);
+      final RGB rgbGradient_Dark = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + GraphColorManager.PREF_COLOR_GRADIENT_DARK);
+      final RGB rgbLineColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorLine);
+      final RGB rgbTextColor = PreferenceConverter.getColor(_prefStore_Common, prefGraphName + prefColorText);
 
       final double[][] rr0Series = new double[validDataLength][];
       final float[][] rr1Series = new float[validDataLength][];
 
-      final RGB[] rgbLine = new RGB[validDataLength];
-      final RGB[] rgbDark = new RGB[validDataLength];
-      final RGB[] rgbBright = new RGB[validDataLength];
+      final RGB[] allRgbGradient_Bright = new RGB[validDataLength];
+      final RGB[] allRgbLine = new RGB[validDataLength];
+      final RGB[] allRgbDark = new RGB[validDataLength];
 
       final TourData[] validTours = validTourList.toArray(new TourData[validTourList.size()]);
 
@@ -440,7 +442,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
          final TourData tourData = validTours[tourIndex];
 
-         final int[] pulseTimeSerie = tourData.pulseTimeSerie;
+         final int[] pulseTimeSerie = tourData.pulseTime_Milliseconds;
          final int numPulseTimes = pulseTimeSerie.length - 1;
 
          final double[] rr0Values = new double[numPulseTimes];
@@ -475,9 +477,9 @@ public class HeartRateVariabilityView extends ViewPart {
          rr0Series[tourIndex] = rr0Values;
          rr1Series[tourIndex] = rr1Values;
 
-         rgbLine[tourIndex] = rgbPrefLine;
-         rgbDark[tourIndex] = rgbPrefDark;
-         rgbBright[tourIndex] = rgbPrefBright;
+         allRgbLine[tourIndex] = rgbLineColor;
+         allRgbDark[tourIndex] = rgbGradient_Dark;
+         allRgbGradient_Bright[tourIndex] = rgbGradient_Bright;
       }
 
       if (validDataLength == 1) {
@@ -488,8 +490,8 @@ public class HeartRateVariabilityView extends ViewPart {
        * X axis: RR
        */
       final ChartDataXSerie xDataRR0 = new ChartDataXSerie(rr0Series);
-      xDataRR0.setLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY);
-      xDataRR0.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
+      xDataRR0.setLabel(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY);
+      xDataRR0.setUnitLabel(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
 
       xDataRR0.forceXAxisMinValue(xDataRR0.getOriginalMinValue() - ADJUST_PULSE_VALUE);
       xDataRR0.forceXAxisMaxValue(xDataRR0.getOriginalMaxValue() + ADJUST_PULSE_VALUE);
@@ -500,12 +502,13 @@ public class HeartRateVariabilityView extends ViewPart {
        * Y axis: RR +1
        */
       final ChartDataYSerie yDataRR1 = new ChartDataYSerie(ChartType.XY_SCATTER, rr1Series);
-      yDataRR1.setYTitle(GRAPH_LABEL_HEART_RATE_VARIABILITY);
-      yDataRR1.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
-      yDataRR1.setDefaultRGB(rgbPrefLine);
-      yDataRR1.setRgbLine(rgbLine);
-      yDataRR1.setRgbDark(rgbDark);
-      yDataRR1.setRgbBright(rgbBright);
+      yDataRR1.setYTitle(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY);
+      yDataRR1.setUnitLabel(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
+      yDataRR1.setRgbBar_Gradient_Dark(allRgbDark);
+      yDataRR1.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
+      yDataRR1.setRgbBar_Line(allRgbLine);
+
+      yDataRR1.setRgbGraph_Text(rgbTextColor);
 
       yDataRR1.forceYAxisMinValue(yDataRR1.getOriginalMinValue() - ADJUST_PULSE_VALUE);
       yDataRR1.forceYAxisMaxValue(yDataRR1.getOriginalMaxValue() + ADJUST_PULSE_VALUE);
@@ -935,7 +938,7 @@ public class HeartRateVariabilityView extends ViewPart {
       updateChart_22(tourDataList);
    }
 
-   private void updateChart_22(final ArrayList<TourData> tourDataList) {
+   private void updateChart_22(final List<TourData> tourDataList) {
 
       /*
        * tour editor is not opened because it can cause a recursive attempt to active a part in the
@@ -955,8 +958,6 @@ public class HeartRateVariabilityView extends ViewPart {
       _hrvTours = tourDataList;
 
       updateChart_50_CurrentTours(true);
-
-      return;
    }
 
    /**

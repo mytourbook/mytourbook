@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.util;
-
-import gnu.trove.list.array.TIntArrayList;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -42,6 +40,7 @@ import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.formatter.ValueFormatter_Time_SSS;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.AbstractColumnLayout;
@@ -222,7 +221,7 @@ public class ColumnManager {
          }
       };
 
-      _profileSorter = new Comparator<ColumnProfile>() {
+      _profileSorter = new Comparator<>() {
          @Override
          public int compare(final ColumnProfile colProfile1, final ColumnProfile colProfile2) {
             return colProfile1.name.compareTo(colProfile2.name);
@@ -833,7 +832,7 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logError("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
                } else if (defaultContextMenuProvider != null
                      && contextMenu == defaultContextMenuProvider.getContextMenu()
@@ -841,7 +840,7 @@ public class ColumnManager {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.log("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logError("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -897,7 +896,8 @@ public class ColumnManager {
     *           Can be <code>null</code> when a default context menu is not available
     */
    public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider) {
-      this.createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
+
+      createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
    }
 
    /**
@@ -960,7 +960,7 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logError("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
                } else if (defaultContextMenuProvider != null
                      && contextMenu == defaultContextMenuProvider.getContextMenu()
@@ -968,7 +968,7 @@ public class ColumnManager {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.log("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logError("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -1087,7 +1087,7 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.log("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logError("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
                } else if (defaultContextMenuProvider != null
                      && contextMenu == defaultContextMenuProvider.getContextMenu()
@@ -1095,7 +1095,7 @@ public class ColumnManager {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.log("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logError("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -1675,6 +1675,10 @@ public class ColumnManager {
       return orderedColumnIds.toArray(new String[orderedColumnIds.size()]);
    }
 
+   ColumnViewer getColumnViewer() {
+      return _columnViewer;
+   }
+
    private int getColumnWidth(final String columnWidthId) {
 
       final String[] values = _activeProfile.visibleColumnIdsAndWidth;
@@ -1875,7 +1879,7 @@ public class ColumnManager {
 
          final int numColumns = dataLayer.getColumnCount();
 
-         final TIntArrayList allOrderedColumns = new TIntArrayList();
+         final IntArrayList allOrderedColumns = new IntArrayList();
 
          for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
 

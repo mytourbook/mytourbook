@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,25 +23,92 @@ import java.util.regex.Pattern;
 
 import net.tourbook.common.UI;
 
+/***********************************************************************************
+ * <pre>
+ *
+ * Zur Erkennung von Strings: zunächst werden Ersetzungen vorgenommen:
+ *
+ * blank       -> (nichts)
+ * "           -> (nichts)
+ * [SW] vorne  -> - vorne
+ * [SW] hinten -> - vorne
+ * [NEO]       -> (nichts)
+ * ,           -> .
+ * °           -> :
+ * '           -> :
+ * : hinten    -> (nichts)
+ *
+ * danach bleiben folgende Fälle übrig:
+ *
+ * Symbolisch RegEx
+ *
+ * -ggg:mm           ([-+]?)([0-9]{1,3}):([0-9]{1,2})
+ * -gggMM            ([-+]?)([0-9]{1,3})([0-9]{2})
+ * -ggg:mm:ss        ([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2})
+ * -gggMMSS          ([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2})
+ * -ggg:mm:ss:tt     ([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})
+ * -ggg.ggggg        ([-+]?)([0-9]{1,3}\\.[0-9]+)
+ * -ggg:mm.mmmmm     ([-+]?)([0-9]{1,3}):([0-9]{1,2}\\.[0-9]+)
+ * -gggMM.mmmmm      ([-+]?)([0-9]{1,3})([0-9]{2}\\.[0-9]+)
+ * -ggg:mm:ss.sssss  ([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+)
+ * -gggMMSS.sssss    ([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+)
+ *
+ * dabei bedeutet:
+ *
+ * - ^         = plus, minus oder nichts
+ * ggg ^       = ein bis drei Stellen
+ * mm,ss,tt ^  = ein oder zwei Stellen
+ * MM,SS ^     = exakt zwei Stellen
+ * .* ^        = ein oder mehrere Nachkommastellen
+ * </pre>
+ ***********************************************************************************/
 public class GeoCoord {
 
-   public static final int      faktg           = 60 * 60 * 60;
-   public static final int      faktm           = 60 * 60;
-   public static final int      fakts           = 60;
+   static final int             FACTOR_SECONDS = 60;
+   static final int             FACTOR_MINUTES = 60 * 60;
+   static final int             FACTOR_DEGREES = 60 * 60 * 60;
 
-   final static private int     PATTERN_ANZ     = 10;
+   private static final int     _numPatterns;
+   private static final Pattern _allCompiledPatterns[];
+   private static Matcher       _matcher       = null;
 
-   final static private String  patternString[] = new String[PATTERN_ANZ];
+   static {
 
-   final static private Pattern pattern[]       = new Pattern[PATTERN_ANZ];
-   static private Matcher       matcher         = null;
-   public char                  direction;
-   int                          degrees;                                   // 1 Degrees in NS-Direction = 110.946 km
+      // Kommentar s. o.
 
-   int                          minutes;                                   // 1 Min. in NS-Direction = 1.852 km
-   int                          seconds;                                   // 1 Sek. in NS-Direction = 30.68 m
-   int                          tertias;                                   // sechzigstel Seconds  // 1 Trz. in NS-Direction =  0.51 m
-   protected int                decimal;                                   // nur Subklassen (GeoLat, GeoLon) kennen die Variable
+      final String allRegexPatterns[] = {
+
+            "([-+]?)([0-9]{1,3}):([0-9]{1,2})", //                            //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3})([0-9]{2})", //                               //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2})", //               //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2})", //                     //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})", //  //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3}\\.[0-9]+)", //                                //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3}):([0-9]{1,2}\\.[0-9]+)", //                   //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3})([0-9]{2}\\.[0-9]+)", //                      //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+)", //      //$NON-NLS-1$
+            "([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+)", //            //$NON-NLS-1$
+      };
+
+      _numPatterns = allRegexPatterns.length;
+
+      _allCompiledPatterns = new Pattern[_numPatterns];
+
+      // compile pattern
+      for (int patternIndex = 0; patternIndex < _numPatterns; patternIndex++) {
+         _allCompiledPatterns[patternIndex] = Pattern.compile(allRegexPatterns[patternIndex]);
+      }
+   }
+
+   char          direction;
+
+   int           degrees;  // 1 Degrees in NS-Direction = 110.946 km
+   int           minutes;  // 1 Min. in NS-Direction = 1.852 km
+   int           seconds;  // 1 Sek. in NS-Direction = 30.68 m
+   int           tertias;  // sechzigstel Seconds  // 1 Trz. in NS-Direction =  0.51 m
+
+   protected int decimal;  // nur Subklassen (GeoLat, GeoLon) kennen die Variable
+
    // Variable doubleValue wird ausschliesslich für GPS-Dateifiles verwendet
    // (dort, damit keine Rundungsfehler beim Splitten eines großen HST-Files in
    // viele kleine entstehen)
@@ -50,23 +117,8 @@ public class GeoCoord {
    // d.h. add etc. fkt. nicht!
    private double doubleValue = 0.;
 
-   /***********************************************************************************
-    * Zur Erkennung von Strings: zunächst werden Ersetzungen vorgenommen: blank -> (nichts) " ->
-    * (nichts) [SW] vorne -> - vorne [SW] hinten -> - vorne [NEO] -> (nichts) , -> . ° -> : ' -> :
-    * : hinten -> (nichts) danach bleiben folgende Fälle übrig: Symbolisch RegEx -ggg:mm
-    * ([-+]?)([0-9]{1,3}):([0-9]{1,2}) -gggMM ([-+]?)([0-9]{1,3})([0-9]{2}) -ggg:mm:ss
-    * ([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}) -gggMMSS
-    * ([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}) -ggg:mm:ss:tt
-    * ([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}) -ggg.ggggg
-    * ([-+]?)([0-9]{1,3}\\.[0-9]+) -ggg:mm.mmmmm ([-+]?)([0-9]{1,3}):([0-9]{1,2}\\.[0-9]+)
-    * -gggMM.mmmmm ([-+]?)([0-9]{1,3})([0-9]{2}\\.[0-9]+) -ggg:mm:ss.sssss
-    * ([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+) -gggMMSS.sssss
-    * ([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+) dabei bedeutet: - ^= plus, minus oder nichts
-    * ggg ^= ein bis drei Stellen mm,ss,tt ^= ein oder zwei Stellen MM,SS ^= exakt zwei Stellen .*
-    * ^= ein oder mehrere Nachkommastellen
-    ***********************************************************************************/
-
    public GeoCoord() {
+
       degrees = 0;
       minutes = 0;
       seconds = 0;
@@ -74,23 +126,6 @@ public class GeoCoord {
       tertias = 0;
 
       direction = directionPlus();
-
-      // Kommentar s. o.
-      patternString[0] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2})"); //$NON-NLS-1$
-      patternString[1] = new String("([-+]?)([0-9]{1,3})([0-9]{2})"); //$NON-NLS-1$
-      patternString[2] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2})"); //$NON-NLS-1$
-      patternString[3] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2})"); //$NON-NLS-1$
-      patternString[4] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})"); //$NON-NLS-1$
-      patternString[5] = new String("([-+]?)([0-9]{1,3}\\.[0-9]+)"); //$NON-NLS-1$
-      patternString[6] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}\\.[0-9]+)"); //$NON-NLS-1$
-      patternString[7] = new String("([-+]?)([0-9]{1,3})([0-9]{2}\\.[0-9]+)"); //$NON-NLS-1$
-      patternString[8] = new String("([-+]?)([0-9]{1,3}):([0-9]{1,2}):([0-9]{1,2}\\.[0-9]+)"); //$NON-NLS-1$
-      patternString[9] = new String("([-+]?)([0-9]{1,3})([0-9]{2})([0-9]{2}\\.[0-9]+)"); //$NON-NLS-1$
-
-      for (int i = 0; i < PATTERN_ANZ; i++) {
-         pattern[i] = Pattern.compile(patternString[i]);
-      }
-
    }
 
    public double acos() {
@@ -115,7 +150,7 @@ public class GeoCoord {
    }
 
    public void addSecond(final int n) {
-      this.add(n * fakts);
+      this.add(n * FACTOR_SECONDS);
    }
 
 //   public int getHashkey() {
@@ -157,22 +192,6 @@ public class GeoCoord {
       return (decimal == c.decimal);
    }
 
-//	public int getDecimal() {
-//		return decimal;
-//	}
-//
-//	public int getDegrees() {
-//		return degrees;
-//	}
-//
-//	public char getDirection() {
-//		return direction;
-//	}
-//
-//	public double getDoubleValue() {
-//		return doubleValue;
-//	}
-
    public int getHashkeyDist() {
       // Minutes-genau; Wert < 21600; 21600^2 < 2^30
       // absichtlich grob, damit "benachbarte" Punkte in gleiche "Toepfe" fallen
@@ -188,18 +207,6 @@ public class GeoCoord {
       return 60 * (180 + degrees) + minutes;
 
    }
-
-//	public int getMinutes() {
-//		return minutes;
-//	}
-//
-//	public int getSeconds() {
-//		return seconds;
-//	}
-//
-//	public int getTertias() {
-//		return tertias;
-//	}
 
    public boolean greaterOrEqual(final GeoCoord c) {
 
@@ -273,7 +280,7 @@ public class GeoCoord {
 
    public void set(final double d) {
       doubleValue = d;
-      decimal = (int) (d * faktg);
+      decimal = (int) (d * FACTOR_DEGREES);
       updateDegrees();
    }
 
@@ -290,14 +297,14 @@ public class GeoCoord {
       int pat;
       s = normalize(s);
 
-      for (pat = 0; pat < PATTERN_ANZ; pat++) {
-         matcher = pattern[pat].matcher(s);
-         if (matcher.matches()) {
+      for (pat = 0; pat < _numPatterns; pat++) {
+         _matcher = _allCompiledPatterns[pat].matcher(s);
+         if (_matcher.matches()) {
             break;
          }
       }
 
-      if (pat == PATTERN_ANZ) {
+      if (pat == _numPatterns) {
          degrees = minutes = seconds = tertias = 0;
          updateDecimal();
          return;
@@ -307,8 +314,8 @@ public class GeoCoord {
 
       case 0:
       case 1: // -ggg:mm oder -gggMM
-         degrees = new Integer(matcher.group(2)).intValue();
-         minutes = new Integer(matcher.group(3)).intValue();
+         degrees = Integer.valueOf(_matcher.group(2));
+         minutes = Integer.valueOf(_matcher.group(3));
          seconds = 0;
          tertias = 0;
          break;
@@ -316,57 +323,57 @@ public class GeoCoord {
       case 2:
       case 3: // -ggg:mm:ss (z.B. von toString) oder -gggMMSS
 
-         degrees = new Integer(matcher.group(2)).intValue();
-         minutes = new Integer(matcher.group(3)).intValue();
-         seconds = new Integer(matcher.group(4)).intValue();
+         degrees = Integer.valueOf(_matcher.group(2));
+         minutes = Integer.valueOf(_matcher.group(3));
+         seconds = Integer.valueOf(_matcher.group(4));
          tertias = 0;
          break;
 
       case 4: // -ggg:mm:ss:tt z.B. von toStringFine (mit Tertias, d. h. um Faktor 60 genauer)
 
-         degrees = new Integer(matcher.group(2)).intValue();
-         minutes = new Integer(matcher.group(3)).intValue();
-         seconds = new Integer(matcher.group(4)).intValue();
-         tertias = new Integer(matcher.group(5)).intValue();
+         degrees = Integer.valueOf(_matcher.group(2));
+         minutes = Integer.valueOf(_matcher.group(3));
+         seconds = Integer.valueOf(_matcher.group(4));
+         tertias = Integer.valueOf(_matcher.group(5));
          break;
 
       case 5: // -ggg.ggggg
 
-         final double dg = new Double(matcher.group(2)).doubleValue();
+         final double dg = Double.valueOf(_matcher.group(2));
          degrees = (int) dg;
          final double dgg = Math.abs(dg - degrees);
-         minutes = (int) (dgg * fakts);
-         seconds = (int) (dgg * faktm - minutes * fakts);
-         tertias = (int) (dgg * faktg - minutes * faktm - seconds * fakts + 0.5);
+         minutes = (int) (dgg * FACTOR_SECONDS);
+         seconds = (int) (dgg * FACTOR_MINUTES - minutes * FACTOR_SECONDS);
+         tertias = (int) (dgg * FACTOR_DEGREES - minutes * FACTOR_MINUTES - seconds * FACTOR_SECONDS + 0.5);
          break;
 
       case 6:
       case 7: // -ggg:mm.mmmmm oder -gggMM.mmmmm
 
-         degrees = new Integer(matcher.group(2)).intValue();
-         final double dm = new Double(matcher.group(3)).doubleValue();
+         degrees = Integer.valueOf(_matcher.group(2));
+         final double dm = Double.valueOf(_matcher.group(3));
          minutes = (int) dm;
          final double dmm = Math.abs(dm - minutes);
-         seconds = (int) (dmm * fakts);
-         tertias = (int) (dmm * faktm - seconds * fakts + 0.5);
+         seconds = (int) (dmm * FACTOR_SECONDS);
+         tertias = (int) (dmm * FACTOR_MINUTES - seconds * FACTOR_SECONDS + 0.5);
          break;
 
       case 8:
       case 9: // -ggg:mm:ss.sssss oder -gggMMSS.sssss
 
-         degrees = new Integer(matcher.group(2)).intValue();
-         minutes = new Integer(matcher.group(3)).intValue();
-         final double ds = new Double(matcher.group(4)).doubleValue();
+         degrees = Integer.valueOf(_matcher.group(2));
+         minutes = Integer.valueOf(_matcher.group(3));
+         final double ds = Double.valueOf(_matcher.group(4));
          seconds = (int) ds;
          final double dss = Math.abs(ds - seconds);
-         tertias = (int) (dss * fakts + 0.5);
+         tertias = (int) (dss * FACTOR_SECONDS + 0.5);
          break;
 
       default:
          break;
       }
 
-      if (matcher.group(1).equals(UI.DASH)) {
+      if (_matcher.group(1).equals(UI.DASH)) {
          direction = directionMinus();
       } else {
          direction = directionPlus();
@@ -451,7 +458,7 @@ public class GeoCoord {
    }
 
    public void subSecond(final int n) {
-      this.sub(n * fakts);
+      this.sub(n * FACTOR_SECONDS);
    }
 
    public double tan() {
@@ -459,7 +466,7 @@ public class GeoCoord {
    }
 
    public double toDegrees() {
-      return ((double) decimal / faktg);
+      return ((double) decimal / FACTOR_DEGREES);
    }
 
    public void toLeft(final GeoCoord r) {
@@ -481,7 +488,7 @@ public class GeoCoord {
    }
 
    public double toRadians() {
-      return Math.toRadians((double) decimal / faktg);
+      return Math.toRadians((double) decimal / FACTOR_DEGREES);
    }
 
    public void toRight(final GeoCoord r) {
@@ -517,7 +524,7 @@ public class GeoCoord {
    public String toStringDegrees() {
 
       double d = decimal;
-      d /= faktg;
+      d /= FACTOR_DEGREES;
 
       return NumberForm.f6(d);
    }
@@ -525,7 +532,7 @@ public class GeoCoord {
    public String toStringDegreesDirection() {
 
       double d = decimal;
-      d /= faktg;
+      d /= FACTOR_DEGREES;
       if (d < 0) {
          d = -d;
       }
@@ -540,8 +547,8 @@ public class GeoCoord {
       if (m < 0) {
          m = -m;
       }
-      m -= degrees * faktg;
-      m /= faktm;
+      m -= degrees * FACTOR_DEGREES;
+      m /= FACTOR_MINUTES;
       return UI.EMPTY_STRING + NumberForm.n2(degrees) + UI.SYMBOL_COLON + NumberForm.n2f3(m) + UI.SPACE1 + direction;
    }
 
@@ -565,13 +572,13 @@ public class GeoCoord {
    }
 
    public void updateDecimal() {
-      decimal = degrees * faktg;
-      decimal += minutes * faktm;
-      decimal += seconds * fakts;
+      decimal = degrees * FACTOR_DEGREES;
+      decimal += minutes * FACTOR_MINUTES;
+      decimal += seconds * FACTOR_SECONDS;
       decimal += tertias;
 
       doubleValue = decimal;
-      doubleValue /= faktg;
+      doubleValue /= FACTOR_DEGREES;
 
       if (direction == directionMinus()) {
          decimal = -decimal;
@@ -583,21 +590,21 @@ public class GeoCoord {
 
       // optimized: dec = Math.abs(decimal);
       int dec = ((decimal < 0) ? -decimal : decimal);
-      degrees = dec / faktg;
+      degrees = dec / FACTOR_DEGREES;
 
-      dec -= degrees * faktg;
-      minutes = dec / faktm;
+      dec -= degrees * FACTOR_DEGREES;
+      minutes = dec / FACTOR_MINUTES;
 
-      dec -= minutes * faktm;
-      seconds = dec / fakts;
+      dec -= minutes * FACTOR_MINUTES;
+      seconds = dec / FACTOR_SECONDS;
 
-      dec -= seconds * fakts;
+      dec -= seconds * FACTOR_SECONDS;
       tertias = dec;
 
       direction = decimal < 0 ? directionMinus() : directionPlus();
 
       doubleValue = decimal;
-      doubleValue /= faktg;
+      doubleValue /= FACTOR_DEGREES;
    }
 
 }

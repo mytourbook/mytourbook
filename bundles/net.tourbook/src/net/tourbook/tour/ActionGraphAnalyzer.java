@@ -1,20 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -27,29 +28,29 @@ import org.eclipse.ui.PlatformUI;
 
 public class ActionGraphAnalyzer extends Action {
 
-	private final Chart	fChart;
+   private final Chart _chart;
 
-	public ActionGraphAnalyzer(final Chart chart) {
+   public ActionGraphAnalyzer(final Chart chart) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__chart_analyzer));
+      setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourAnalyzer));
 
-		fChart = chart;
-	}
+      _chart = chart;
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-		if (window != null) {
+      if (window != null) {
 
-			Util.showView(TourChartAnalyzerView.ID, true);
+         Util.showView(TourChartAnalyzerView.ID, true);
 
-			// create a new selection to update the analyzer view
-			fChart.fireSliderMoveEvent();
-		}
-	}
+         // create a new selection to update the analyzer view
+         _chart.fireEvent_SliderMove();
+      }
+   }
 }

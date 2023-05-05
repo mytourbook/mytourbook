@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,14 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
+
+import net.tourbook.Images;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.ui.tourChart.SlideoutTourChartInfo;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -30,194 +38,197 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.ui.tourChart.SlideoutTourChartInfo;
-import net.tourbook.ui.tourChart.TourChart;
-
 public class Action_TourChart_Info extends ContributionItem implements IOpeningDialog {
 
-	private static final String	IMAGE_TOUR_INFO				= Messages.Image__TourInfo;
-	private static final String	IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourInfo_Disabled;
+   private String                _dialogId = getClass().getCanonicalName();
 
-	private String						_dialogId						= getClass().getCanonicalName();
+   private TourChart             _tourChart;
 
-	private TourChart					_tourChart;
+   private ToolBar               _toolBar;
+   private ToolItem              _actionToolItem;
 
-	private ToolBar					_toolBar;
-	private ToolItem					_actionToolItem;
+   private SlideoutTourChartInfo _slideoutTourInfo;
 
-	private SlideoutTourChartInfo	_slideoutTourInfo;
+   /*
+    * UI controls
+    */
+   private Control _parent;
 
-	/*
-	 * UI controls
-	 */
-	private Control	_parent;
+   private Image   _imageEnabled;
+   private Image   _imageDisabled;
 
-	private Image		_imageEnabled;
-	private Image		_imageDisabled;
+   public Action_TourChart_Info(final TourChart tourChart, final Control parent) {
 
-	public Action_TourChart_Info(final TourChart tourChart, final Control parent) {
+      _tourChart = tourChart;
+      _parent = parent;
 
-		_tourChart = tourChart;
-		_parent = parent;
+      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourInfo).createImage();
+      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourInfo_Disabled).createImage();
 
-		_imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_INFO).createImage();
-		_imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_INFO_DISABLED).createImage();
-	}
+      parent.addDisposeListener(disposeEvent -> onDispose());
+   }
 
-	@Override
-	public void fill(final ToolBar toolbar, final int index) {
+   @Override
+   public void fill(final ToolBar toolbar, final int index) {
 
-		if (_actionToolItem == null && toolbar != null) {
+      if (_actionToolItem == null && toolbar != null) {
 
-			toolbar.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(final DisposeEvent e) {
-					_actionToolItem.dispose();
-					_actionToolItem = null;
-				}
-			});
+         toolbar.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               _actionToolItem.dispose();
+               _actionToolItem = null;
+            }
+         });
 
-			_toolBar = toolbar;
+         _toolBar = toolbar;
 
-			_actionToolItem = new ToolItem(toolbar, SWT.CHECK);
-			_actionToolItem.setImage(_imageEnabled);
-			_actionToolItem.setDisabledImage(_imageDisabled);
-			_actionToolItem.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onAction();
-				}
-			});
+         _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
+         _actionToolItem.setImage(_imageEnabled);
+         _actionToolItem.setDisabledImage(_imageDisabled);
+         _actionToolItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAction();
+            }
+         });
 
-			toolbar.addMouseMoveListener(new MouseMoveListener() {
-				@Override
-				public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(final MouseEvent e) {
 
-					final Point mousePosition = new Point(e.x, e.y);
-					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+               final Point mousePosition = new Point(e.x, e.y);
+               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-					onMouseMove(hoveredItem, e);
-				}
-			});
+               onMouseMove(hoveredItem, e);
+            }
+         });
 
-			_slideoutTourInfo = new SlideoutTourChartInfo(_parent, _toolBar, _tourChart);
+         _slideoutTourInfo = new SlideoutTourChartInfo(_parent, _toolBar, _tourChart);
 
-			updateUI();
-		}
-	}
+         updateUI();
+      }
+   }
 
-	@Override
-	public String getDialogId() {
-		return _dialogId;
-	}
+   @Override
+   public String getDialogId() {
+      return _dialogId;
+   }
 
-	@Override
-	public void hideDialog() {
-		_slideoutTourInfo.hideNow();
-	}
+   @Override
+   public void hideDialog() {
+      _slideoutTourInfo.hideNow();
+   }
 
-	private void onAction() {
+   private void onAction() {
 
-		updateUI();
+      updateUI();
 
-		final boolean isTourInfoVisible = _actionToolItem.getSelection();
+      final boolean isTourInfoVisible = _actionToolItem.getSelection();
 
-		if (isTourInfoVisible) {
+      if (isTourInfoVisible) {
 
-			final Rectangle itemBounds = _actionToolItem.getBounds();
+         final Rectangle itemBounds = _actionToolItem.getBounds();
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
 
-			openSlideout(itemBounds, false);
+         openSlideout(itemBounds, false);
 
-		} else {
+      } else {
 
-			_slideoutTourInfo.close();
-		}
+         _slideoutTourInfo.close();
+      }
 
-		_tourChart.actionShowTourInfo(isTourInfoVisible);
-	}
+      _tourChart.actionShowTourInfo(isTourInfoVisible);
+   }
 
-	private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
+   private void onDispose() {
 
-		// ignore other items
-		if (item != _actionToolItem) {
-			return;
-		}
+      if (_imageEnabled != null) {
+         _imageEnabled.dispose();
+      }
 
-		if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
+      if (_imageDisabled != null) {
+         _imageDisabled.dispose();
+      }
+   }
 
-			// marker is not displayed
+   private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
-			return;
-		}
+      // ignore other items
+      if (item != _actionToolItem) {
+         return;
+      }
 
-		final boolean isToolItemHovered = item == _actionToolItem;
+      if (_actionToolItem.getSelection() == false || _actionToolItem.isEnabled() == false) {
 
-		Rectangle itemBounds = null;
+         // marker is not displayed
 
-		if (isToolItemHovered) {
+         return;
+      }
 
-			itemBounds = item.getBounds();
+      final boolean isToolItemHovered = item == _actionToolItem;
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+      Rectangle itemBounds = null;
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
-		}
+      if (isToolItemHovered) {
 
-		openSlideout(itemBounds, true);
-	}
+         itemBounds = item.getBounds();
 
-	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-		// ensure other dialogs are closed
-		_tourChart.closeOpenedDialogs(this);
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
+      }
 
-		_slideoutTourInfo.open(itemBounds, isOpenDelayed);
-	}
+      openSlideout(itemBounds, true);
+   }
 
-	public void setEnabled(final boolean isEnabled) {
+   private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-		_actionToolItem.setEnabled(isEnabled);
+      // ensure other dialogs are closed
+      _tourChart.closeOpenedDialogs(this);
 
-		if (isEnabled && _actionToolItem.getSelection() == false) {
+      _slideoutTourInfo.open(itemBounds, isOpenDelayed);
+   }
 
-			// show default icon
-			_actionToolItem.setImage(_imageEnabled);
-		}
-	}
+   public void setEnabled(final boolean isEnabled) {
 
-	public void setSelected(final boolean isSelected) {
+      _actionToolItem.setEnabled(isEnabled);
 
-		if (_actionToolItem == null) {
-			// this happened
-			return;
-		}
+      if (isEnabled && _actionToolItem.getSelection() == false) {
 
-		_actionToolItem.setSelection(isSelected);
+         // show default icon
+         _actionToolItem.setImage(_imageEnabled);
+      }
+   }
 
-		updateUI();
-	}
+   public void setSelected(final boolean isSelected) {
 
-	private void updateUI() {
+      if (_actionToolItem == null) {
+         // this happened
+         return;
+      }
 
-		if (_actionToolItem.getSelection()) {
+      _actionToolItem.setSelection(isSelected);
 
-			// hide tooltip because the tour info options slideout is displayed
+      updateUI();
+   }
 
-			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
+   private void updateUI() {
 
-		} else {
+      if (_actionToolItem.getSelection()) {
 
-			_actionToolItem.setToolTipText(Messages.Tour_Action_TourInfo_Tooltip);
-		}
-	}
+         // hide tooltip because the tour info options slideout is displayed
+
+         _actionToolItem.setToolTipText(UI.EMPTY_STRING);
+
+      } else {
+
+         _actionToolItem.setToolTipText(Messages.Tour_Action_TourInfo_Tooltip);
+      }
+   }
 }

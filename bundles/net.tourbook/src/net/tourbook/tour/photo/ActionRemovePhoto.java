@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.photo;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.PhotoGallery;
@@ -33,7 +34,7 @@ class ActionRemovePhoto extends Action {
 
       _photoGallery = photoGallery;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
    }
 
    public boolean isInModifyTour() {

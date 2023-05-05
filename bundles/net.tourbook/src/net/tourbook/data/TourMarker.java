@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,11 @@
 package net.tourbook.data;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +46,7 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.graphics.Rectangle;
@@ -68,7 +72,11 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
-public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
+public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
+
+   private static final long    serialVersionUID      = 1L;
+
+   private static final char    NL                    = UI.NEW_LINE;
 
    public static final int      DB_LENGTH_URL_TEXT    = 1024;
    public static final int      DB_LENGTH_URL_ADDRESS = 4096;
@@ -80,8 +88,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    static {
 
-      LABEL_POSITIONS = new String[] { //
-            //
+      LABEL_POSITIONS = new String[] {
+
             Messages.Tour_Marker_Position_vertical_above, //               0
             Messages.Tour_Marker_Position_vertical_below, //               1
             Messages.Tour_Marker_Position_vertical_chart_top, //           2
@@ -134,6 +142,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
    private long     markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
@@ -150,6 +159,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * <code>-1</code>.
     */
    @XmlElement
+   @JsonProperty
    private int      time            = -1;
 
    /**
@@ -157,6 +167,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *
     * @since Db version 25
     */
+   @JsonProperty
    private long     tourTime        = Long.MIN_VALUE;
 
    /**
@@ -171,13 +182,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * 20 == db version 20
     */
    @XmlElement
+   @JsonProperty
    private float    distance20      = -1;
+
    /**
     * Contains the marker label visual position which is defined in {@link ChartLabel} like
     * {@link ChartLabel#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
     */
-   private int      visualPosition  =
-         TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
+   private int      visualPosition  = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
 
    private int      labelXOffset;
 
@@ -194,6 +206,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * position of this marker in the data serie
     */
    @XmlAttribute
+   @JsonProperty
    private int      serieIndex;
 
    @XmlElement
@@ -229,16 +242,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private float    altitude        = TourDatabase.DEFAULT_FLOAT;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   latitude        = TourDatabase.DEFAULT_DOUBLE;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   longitude       = TourDatabase.DEFAULT_DOUBLE;
 
    private int      isMarkerVisible = 1;
@@ -281,6 +297,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public TourMarker() {}
 
+   /**
+    * Used for MT import/export
+    *
+    * @param tourData
+    */
+   public TourMarker(final TourData tourData) {
+
+      this.tourData = tourData;
+
+      _createId = _createCounter.incrementAndGet();
+   }
+
    public TourMarker(final TourData tourData, final int markerType) {
 
       this.tourData = tourData;
@@ -297,7 +325,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *         {@link ITourbookPreferences#GRAPH_MARKER_SIGN_IMAGE_SIZE} is used. This size is
     *         converted into pixel with the vertical DLU's.
     */
-   public static int getSignImageMaxSize(final PixelConverter pc) {
+   @SuppressWarnings("unused")
+   private static int getSignImageMaxSize(final PixelConverter pc) {
 
       if (_defaultSignImageMaxSize == -1) {
          _defaultSignImageMaxSize = pc.convertHeightInCharsToPixels(3);
@@ -321,8 +350,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    /**
-    * Creates a clone of another marker but set's new {@link TourData} and set's the state that the
-    * marker is not yet saved
+    * Creates a clone of a marker but sets it in the new {@link TourData} and
+    * sets the state that the marker as not yet saved
     *
     * @param newTourData
     * @return
@@ -429,6 +458,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    public float getDistance() {
       return distance20;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
+   @JsonIgnore
+   public int getIsMarkerVisible() {
+      return isMarkerVisible;
    }
 
    /**
@@ -581,7 +620,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    public boolean isDeviceMarker() {
 
-      return type == ChartLabel.MARKER_TYPE_DEVICE;
+      return type == ChartLabelMarker.MARKER_TYPE_DEVICE;
    }
 
    /**
@@ -706,26 +745,30 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
-      altitude = backupMarker.altitude;
-      description = backupMarker.description;
-      distance20 = backupMarker.distance20;
-      label = backupMarker.label;
-      latitude = backupMarker.latitude;
-      longitude = backupMarker.longitude;
-      labelXOffset = backupMarker.labelXOffset;
-      labelYOffset = backupMarker.labelYOffset;
-      markerId = backupMarker.markerId;
-      markerType = backupMarker.markerType;
-      serieIndex = backupMarker.serieIndex;
-      time = backupMarker.time;
-      tourTime = backupMarker.tourTime;
-      type = backupMarker.type;
-      urlAddress = backupMarker.urlAddress;
-      urlText = backupMarker.urlText;
+// SET_FORMATTING_OFF
+
+      altitude       = backupMarker.altitude;
+      description    = backupMarker.description;
+      distance20     = backupMarker.distance20;
+      label          = backupMarker.label;
+      latitude       = backupMarker.latitude;
+      longitude      = backupMarker.longitude;
+      labelXOffset   = backupMarker.labelXOffset;
+      labelYOffset   = backupMarker.labelYOffset;
+      markerId       = backupMarker.markerId;
+      markerType     = backupMarker.markerType;
+      serieIndex     = backupMarker.serieIndex;
+      time           = backupMarker.time;
+      tourTime       = backupMarker.tourTime;
+      type           = backupMarker.type;
+      urlAddress     = backupMarker.urlAddress;
+      urlText        = backupMarker.urlText;
       visualPosition = backupMarker.visualPosition;
 
-      tourData = backupMarker.tourData;
-//      tourSign = backupMarker.tourSign;
+      tourData       = backupMarker.tourData;
+//    tourSign       = backupMarker.tourSign;
+
+// SET_FORMATTING_ON
    }
 
    public void setAltitude(final float altitude) {
@@ -754,6 +797,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
       this.latitude = latitude;
       this.longitude = longitude;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param isMarkerVisible
+    */
+   public void setIsMarkerVisible(final int isMarkerVisible) {
+      this.isMarkerVisible = isMarkerVisible;
    }
 
    public void setLabel(final String label) {
@@ -794,26 +846,30 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    public void setMarkerBackup(final TourMarker backupMarker) {
 
-      backupMarker.altitude = altitude;
-      backupMarker.description = description;
-      backupMarker.distance20 = distance20;
-      backupMarker.label = label;
-      backupMarker.labelXOffset = labelXOffset;
-      backupMarker.labelYOffset = labelYOffset;
-      backupMarker.latitude = latitude;
-      backupMarker.longitude = longitude;
-      backupMarker.markerId = markerId;
-      backupMarker.markerType = markerType;
-      backupMarker.serieIndex = serieIndex;
-      backupMarker.time = time;
-      backupMarker.tourTime = tourTime;
-      backupMarker.type = type;
-      backupMarker.urlAddress = urlAddress;
-      backupMarker.urlText = urlText;
-      backupMarker.visualPosition = visualPosition;
+// SET_FORMATTING_OFF
 
-      backupMarker.tourData = tourData;
-//      backupMarker.tourSign = tourSign;
+      backupMarker.altitude         = altitude;
+      backupMarker.description      = description;
+      backupMarker.distance20       = distance20;
+      backupMarker.label            = label;
+      backupMarker.labelXOffset     = labelXOffset;
+      backupMarker.labelYOffset     = labelYOffset;
+      backupMarker.latitude         = latitude;
+      backupMarker.longitude        = longitude;
+      backupMarker.markerId         = markerId;
+      backupMarker.markerType       = markerType;
+      backupMarker.serieIndex       = serieIndex;
+      backupMarker.time             = time;
+      backupMarker.tourTime         = tourTime;
+      backupMarker.type             = type;
+      backupMarker.urlAddress       = urlAddress;
+      backupMarker.urlText          = urlText;
+      backupMarker.visualPosition   = visualPosition;
+
+      backupMarker.tourData         = tourData;
+//    backupMarker.tourSign         = tourSign;
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -841,6 +897,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    /**
+    * Used for MT import/export
+    *
+    * @param time
+    */
+   public void setTime(final int time) {
+      this.time = time;
+   }
+
+   /**
     * @param relativeTourTime
     *           Time in seconds relative to the tour start. When value is not available it is set to
     *           -1.
@@ -858,8 +923,26 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       this.tourData = newTourData;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @param tourTime
+    */
+   public void setTourTime(final long tourTime) {
+      this.tourTime = tourTime;
+   }
+
    public void setType(final int markerType) {
       this.type = markerType;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
    }
 
    public void setUrlAddress(final String urlAddress) {
@@ -874,27 +957,50 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       _visibleType = visibleType;
    }
 
+   /**
+    * This method is called in the "Tour Data" view !!!
+    */
    @Override
    public String toString() {
-      return "TourMarker [" //$NON-NLS-1$
-//            + ("markerId=" + markerId + ", ")
-//            + ("tourData=" + tourData + ", ")
-//            + ("type=" + type + ", ")
-            + ("time=" + time + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //            + ("distance=" + distance + ", ")
-            //            + ("distance20=" + distance20 + ", ")
-            //            + ("visualPosition=" + visualPosition + ", ")
-            //            + ("labelXOffset=" + labelXOffset + ", ")
-            //            + ("labelYOffset=" + labelYOffset + ", ")
-            //            + ("markerType=" + markerType + ", ")
-            + ("serieIndex=" + serieIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("label=" + label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //            + ("category=" + category + ", ")
-            //            + ("isMarkerVisible=" + isMarkerVisible + ", ")
-            //            + ("_visibleType=" + _visibleType + ", ")
-            //            + ("_markerBounds=" + _markerBounds + ", ")
-            //            + ("_createId=" + _createId)
-            + "]"; //$NON-NLS-1$
+
+      return UI.EMPTY_STRING
+
+            + "TourMarker" + NL //                                //$NON-NLS-1$
+            + "[" + NL //                                         //$NON-NLS-1$
+
+            + "   markerId          =" + markerId + NL //         //$NON-NLS-1$
+
+            + "   label             =" + label + NL //            //$NON-NLS-1$
+            + "   altitude          =" + altitude + NL //         //$NON-NLS-1$
+            + "   distance20        =" + distance20 + NL //       //$NON-NLS-1$
+
+            + "   latitude          =" + latitude + NL //         //$NON-NLS-1$
+            + "   longitude         =" + longitude + NL //        //$NON-NLS-1$
+
+            + "   labelXOffset      =" + labelXOffset + NL //     //$NON-NLS-1$
+            + "   labelYOffset      =" + labelYOffset + NL //     //$NON-NLS-1$
+            + "   serieIndex        =" + serieIndex + NL //       //$NON-NLS-1$
+            + "   time              =" + time + NL //             //$NON-NLS-1$
+            + "   tourTime          =" + tourTime + NL //         //$NON-NLS-1$
+
+            + "   type              =" + type + NL //$NON-NLS-1$
+            + "   visualPosition    =" + visualPosition + NL //   //$NON-NLS-1$
+            + "   isMarkerVisible   =" + isMarkerVisible + NL //  //$NON-NLS-1$
+
+            + "   urlAddress        =" + urlAddress + NL //       //$NON-NLS-1$
+            + "   urlText           =" + urlText + NL //          //$NON-NLS-1$
+            + "   description       =" + description + NL //      //$NON-NLS-1$
+
+            + "   _createId         =" + _createId + NL //        //$NON-NLS-1$
+
+//          + "   tourData          =" + tourData + NL
+//          + "   markerType        =" + markerType + NL
+//          + "   distance          =" + distance + NL
+//          + "   category          =" + category + NL
+//          + "   _visibleType      =" + _visibleType + NL
+//          + "   _markerBounds     =" + _markerBounds + NL
+
+            + "]" + NL; //                                        //$NON-NLS-1$
    }
 
    @Override
@@ -915,10 +1021,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * Convert fields from old to new data type.
     */
-   public void updateDatabase_019_to_020() {
+   void updateDatabase_019_to_020() {
 
-      distance20 = distance;
-      distance = 0;
+      if (distance > 0) {
+
+         distance20 = distance;
+         distance = 0;
+      }
    }
 
 }

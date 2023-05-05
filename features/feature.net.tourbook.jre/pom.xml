@@ -1,0 +1,147 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+   <modelVersion>4.0.0</modelVersion>
+   
+   <artifactId>feature.net.tourbook.jre</artifactId>           <groupId>net.tourbook</groupId>
+                                                               <version>11.0.13-SNAPSHOT</version>
+   <packaging>eclipse-feature</packaging>
+
+   <parent>
+      <artifactId>mytourbook-app</artifactId>                  <groupId>net.tourbook</groupId>
+                                                               <version>23.3.2-SNAPSHOT</version>
+      <relativePath>../..</relativePath>
+   </parent>
+
+   <properties>
+<!-- 
+      <url.linux.x86_64>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_linux_hotspot_11.0.7_10.tar.gz</url.linux.x86_64>
+      <url.macosx.x86_64>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_mac_hotspot_11.0.7_10.tar.gz</url.macosx.x86_64>
+ -->
+
+      <url.win32.x86_64>https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jre_x64_windows_hotspot_11.0.13_8.zip</url.win32.x86_64>
+      
+      <dir-version>11.0.13+8</dir-version>
+   </properties>
+
+   <build>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+               <groupId>org.eclipse.m2e</groupId>
+               <artifactId>lifecycle-mapping</artifactId>
+               <version>1.0.0</version>
+               <configuration>
+                  <lifecycleMappingMetadata>
+                     <pluginExecutions>
+                        <pluginExecution>
+                           <pluginExecutionFilter>
+                              <groupId>com.googlecode.maven-download-plugin</groupId>
+                              <artifactId>download-maven-plugin</artifactId>
+                              <versionRange>[1.0.0,)</versionRange>
+                              <goals>
+                                 <goal>wget</goal>
+                              </goals>
+                           </pluginExecutionFilter>
+                           <action>
+                              <ignore />
+                           </action>
+                        </pluginExecution>
+                        <pluginExecution>
+                           <pluginExecutionFilter>
+                              <groupId>org.apache.maven.plugins</groupId>
+                              <artifactId>maven-antrun-plugin</artifactId>
+                              <versionRange>[1.8.0,)</versionRange>
+                              <goals>
+                                 <goal>run</goal>
+                              </goals>
+                           </pluginExecutionFilter>
+                           <action>
+                              <ignore />
+                           </action>
+                        </pluginExecution>
+                     </pluginExecutions>
+                  </lifecycleMappingMetadata>
+               </configuration>
+            </plugin>
+         </plugins>
+      </pluginManagement>
+      
+      <plugins>
+         <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <version>1.3.0</version>
+            <executions>
+               <execution>
+                  <id>copy-win64-jre</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                     <goal>wget</goal>
+                  </goals>
+                  <configuration>
+                     <url>${url.win32.x86_64}</url>
+                     <unpack>true</unpack>
+                     <outputDirectory>${project.basedir}/win64</outputDirectory>
+                     <overwrite>true</overwrite>
+                  </configuration>
+               </execution>
+<!-- 
+               <execution>
+                  <id>copy-lnx64-jre</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                     <goal>wget</goal>
+                  </goals>
+                  <configuration>
+                     <url>${url.linux.x86_64}</url>
+                     <unpack>true</unpack>
+                     <outputDirectory>${project.basedir}/lnx64</outputDirectory>
+                     <overwrite>true</overwrite>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>copy-osx64-jre</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                     <goal>wget</goal>
+                  </goals>
+                  <configuration>
+                     <url>${url.macosx.x86_64}</url>
+                     <unpack>true</unpack>
+                     <outputDirectory>${project.basedir}/osx64</outputDirectory>
+                     <overwrite>true</overwrite>
+                  </configuration>
+               </execution>
+ -->               
+            </executions>
+         </plugin>
+         
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+               <execution>
+                  <id>rename-to-jre</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+                  <configuration>
+                     <target>
+                        <move file="win64/jdk-${dir-version}-jre"    tofile="win64/jre" />
+<!-- 
+                        <move file="lnx64/jdk-${dir-version}-jre"    tofile="lnx64/jre" />
+                        <move file="osx64/jdk-${dir-version}-jre"    tofile="osx64/jre" />
+ -->
+                     </target>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+</project>

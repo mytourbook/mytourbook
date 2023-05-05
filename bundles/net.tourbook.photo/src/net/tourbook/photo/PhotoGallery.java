@@ -29,7 +29,6 @@ import net.tourbook.photo.internal.ActionShowPhotoRatingStars;
 import net.tourbook.photo.internal.ActionShowPhotoTooltip;
 import net.tourbook.photo.internal.ActionSortByFileDate;
 import net.tourbook.photo.internal.ActionSortByFileName;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.PhotoDateInfo;
@@ -488,10 +487,7 @@ public class PhotoGallery extends ImageGallery {
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void updateUI_GalleryType(final GalleryType galleryType) {
 
@@ -503,7 +499,7 @@ public class PhotoGallery extends ImageGallery {
 
          text = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail;
          toolTipText = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail);
+         imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoGallery_Thumbnail);
 
       } else {
 
@@ -511,7 +507,7 @@ public class PhotoGallery extends ImageGallery {
 
          text = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails;
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryDetails);
+         imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoGallery_Details);
       }
 
       _actionPhotoGalleryType.setText(text);
@@ -527,19 +523,19 @@ public class PhotoGallery extends ImageGallery {
       if (ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
 
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered);
+         imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar_AndHovered);
 
       } else if (ratingStarBehaviour == RatingStarBehaviour.NO_HOVERED_STARS) {
 
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStar);
+         imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
 
       } else {
 
          // set default: RatingStarBehaviour.HOVERED_STARS
 
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered);
+         imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar_Hovered);
       }
 
       final boolean isShowRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;

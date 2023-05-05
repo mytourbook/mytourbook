@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,15 +25,15 @@ import org.eclipse.swt.widgets.Control;
 
 public class DialogAdjustAltitudeChartContextProvider implements IChartContextProvider {
 
-   private DialogAdjustAltitude    fDialogAdjustAltitude;
+   private DialogAdjustAltitude    _dialogAdjustAltitude;
 
-   private ActionCreateSplinePoint fActionNewSplinePoint;
+   private ActionCreateSplinePoint _actionNewSplinePoint;
 
    public DialogAdjustAltitudeChartContextProvider(final DialogAdjustAltitude dialogAdjustAltitude) {
 
-      fDialogAdjustAltitude = dialogAdjustAltitude;
+      _dialogAdjustAltitude = dialogAdjustAltitude;
 
-      fActionNewSplinePoint = new ActionCreateSplinePoint(dialogAdjustAltitude);
+      _actionNewSplinePoint = new ActionCreateSplinePoint(dialogAdjustAltitude);
    }
 
    @Override
@@ -46,15 +46,14 @@ public class DialogAdjustAltitudeChartContextProvider implements IChartContextPr
                                final int mouseDownDevPositionX,
                                final int mouseDownDevPositionY) {
 
-      fActionNewSplinePoint.fMouseDownDevPositionX = mouseDownDevPositionX;
-      fActionNewSplinePoint.fMouseDownDevPositionY = mouseDownDevPositionY;
+      _actionNewSplinePoint._mouseDownDevPositionX = mouseDownDevPositionX;
+      _actionNewSplinePoint._mouseDownDevPositionY = mouseDownDevPositionY;
 
-      final boolean canCreatePoint = fDialogAdjustAltitude.isActionEnabledCreateSplinePoint(mouseDownDevPositionX,
-            mouseDownDevPositionY);
+      final boolean canCreatePoint = _dialogAdjustAltitude.isActionEnabledCreateSplinePoint(mouseDownDevPositionX);
 
-      fActionNewSplinePoint.setEnabled(canCreatePoint);
+      _actionNewSplinePoint.setEnabled(canCreatePoint);
 
-      menuMgr.add(fActionNewSplinePoint);
+      menuMgr.add(_actionNewSplinePoint);
    }
 
    @Override

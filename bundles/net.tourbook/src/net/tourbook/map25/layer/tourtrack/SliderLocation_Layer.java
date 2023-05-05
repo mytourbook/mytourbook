@@ -4,6 +4,7 @@
 package net.tourbook.map25.layer.tourtrack;
 
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.renderer.LocationRenderer;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.core.GeoPoint;
@@ -13,55 +14,57 @@ import org.oscim.map.Map;
 
 public class SliderLocation_Layer extends Layer {
 
-	public final LocationRenderer locationRenderer;
+   private final LocationRenderer _locationRenderer;
 
-	public SliderLocation_Layer(final Map map) {
+   public SliderLocation_Layer(final Map map) {
 
-		this(map, CanvasAdapter.getScale());
-	}
+      this(map, CanvasAdapter.getScale());
+   }
 
-	public SliderLocation_Layer(final Map map, final float scale) {
+   public SliderLocation_Layer(final Map map, final float scale) {
 
-		super(map);
+      super(map);
 
-		mRenderer = locationRenderer = new LocationRenderer(mMap, this, scale);
-	}
+      mRenderer = _locationRenderer = new LocationRenderer(mMap, this, scale);
+   }
 
-	public void onModifyConfig() {
+   public void onModifyConfig() {
 
-		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-		setEnabled(activeTourTrackConfig.isShowSliderLocation);
+      setEnabled(activeTourTrackConfig.isShowSliderLocation);
 
-		locationRenderer.updateConfig();
-	}
+      _locationRenderer.updateConfig();
+   }
 
-	@Override
-	public void setEnabled(final boolean enabled) {
-		if (enabled == isEnabled()) {
-			return;
-		}
+   @Override
+   public void setEnabled(final boolean isEnabled) {
 
-		super.setEnabled(enabled);
+      if (isEnabled == isEnabled()) {
+         return;
+      }
 
-		if (!enabled) {
-			locationRenderer.animate(false);
-		}
-	}
+      super.setEnabled(isEnabled);
 
-	public void setPosition(final GeoPoint leftGeoPoint, final GeoPoint rightGeoPoint) {
+      if (isEnabled == false) {
+         _locationRenderer.animate(false);
+      }
 
-		final double radius = 10 / MercatorProjection.groundResolutionWithScale(leftGeoPoint.getLatitude(), 1);
+   }
 
-		locationRenderer.setLocation(
+   public void setPosition(final GeoPoint leftGeoPoint, final GeoPoint rightGeoPoint) {
 
-				MercatorProjection.longitudeToX(leftGeoPoint.getLongitude()),
-				MercatorProjection.latitudeToY(leftGeoPoint.getLatitude()),
+      final double radius = 10 / MercatorProjection.groundResolutionWithScale(leftGeoPoint.getLatitude(), 1);
 
-				MercatorProjection.longitudeToX(rightGeoPoint.getLongitude()),
-				MercatorProjection.latitudeToY(rightGeoPoint.getLatitude()),
+      _locationRenderer.setLocation(
 
-				radius);
+            MercatorProjection.longitudeToX(leftGeoPoint.getLongitude()),
+            MercatorProjection.latitudeToY(leftGeoPoint.getLatitude()),
 
-	}
+            MercatorProjection.longitudeToX(rightGeoPoint.getLongitude()),
+            MercatorProjection.latitudeToY(rightGeoPoint.getLatitude()),
+
+            radius);
+
+   }
 }

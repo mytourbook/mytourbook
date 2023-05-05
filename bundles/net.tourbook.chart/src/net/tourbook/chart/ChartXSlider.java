@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,18 +27,19 @@ import net.tourbook.common.RectangleLong;
  */
 public class ChartXSlider {
 
-   private static final int             SLIDER_TYPE_NONE  = 0;
-   public static final int              SLIDER_TYPE_LEFT  = 1;
-   public static final int              SLIDER_TYPE_RIGHT = 2;
+   private static final int             SLIDER_TYPE_NONE        = 0;
+   public static final int              SLIDER_TYPE_LEFT        = 1;
+   public static final int              SLIDER_TYPE_RIGHT       = 2;
+   public static final int              SLIDER_TYPE_VALUE_POINT = 3;
 
    /**
     * position of the slider line within the slider (starting from left)
     */
-   public final static int              SLIDER_LINE_WIDTH = 10;
+   public final static int              SLIDER_LINE_WIDTH       = 10;
 
-   int                                  sliderType        = SLIDER_TYPE_NONE;
+   int                                  sliderType              = SLIDER_TYPE_NONE;
 
-   private final RectangleLong          _hitRectangle     = new RectangleLong(0, 0, SLIDER_LINE_WIDTH * 2, 0);
+   private final RectangleLong          _hitRectangle           = new RectangleLong(0, 0, SLIDER_LINE_WIDTH * 2, 0);
 
    /**
     * keep the ratio of sliderpos/clientwidth, this is needed when changing the client width, so we
@@ -71,7 +72,7 @@ public class ChartXSlider {
 
    /**
     * Constructor
-    * 
+    *
     * @param devVirtualSliderLinePos
     */
    ChartXSlider(final ChartComponentGraph graph, final int xxDevSliderPosition, final int sliderType) {
@@ -135,7 +136,7 @@ public class ChartXSlider {
 
    /**
     * When the width of the graph changed, the slider bar position must be adjusted.
-    * 
+    *
     * @param devGraphHeight
     * @param isFireEvent
     */
@@ -192,7 +193,7 @@ public class ChartXSlider {
    /**
     * Sets a new position for the sliderLine and also updates the slider/line rectangles and value.
     * A Slider move event is fired
-    * 
+    *
     * @param xxDevLinePos
     */
    void moveToXXDevPosition(double xxDevLinePos,
@@ -237,7 +238,7 @@ public class ChartXSlider {
 
       // fire change event when the position has changed
       if (isFireEvent && (long) xxDevLinePos != xxDevOldPos) {
-         _chartGraph._chart.fireSliderMoveEvent();
+         _chartGraph._chart.fireEvent_SliderMove();
       }
    }
 
@@ -266,22 +267,24 @@ public class ChartXSlider {
 
    /**
     * Set position of the slider within value array.
-    * 
+    *
     * @param valueIndex
     */
    void setValueIndex(final int valueIndex) {
-
       _valueIndex = valueIndex;
    }
 
    @Override
    public String toString() {
-      return "ChartXSlider [" //$NON-NLS-1$
-            + ("_positionRatio=" + _positionRatio + " ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_valueIndex=" + _valueIndex + " ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_xxDevSliderLinePos=" + _xxDevSliderLinePos + " ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("sliderType=" + sliderType + " ") //$NON-NLS-1$ //$NON-NLS-2$
-            + "]"; //$NON-NLS-1$
+
+      return "ChartXSlider [" //                                        //$NON-NLS-1$
+
+            + "_positionRatio=" + _positionRatio + " " //               //$NON-NLS-1$ //$NON-NLS-2$
+            + "_valueIndex=" + _valueIndex + " " //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "_xxDevSliderLinePos=" + _xxDevSliderLinePos + " " //     //$NON-NLS-1$ //$NON-NLS-2$
+            + "sliderType=" + sliderType + " " //                       //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]"; //                                                   //$NON-NLS-1$
    }
 
 }

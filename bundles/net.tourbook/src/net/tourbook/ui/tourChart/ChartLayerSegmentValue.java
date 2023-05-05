@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,16 +21,6 @@ package net.tourbook.ui.tourChart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
-
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMouseEvent;
@@ -40,6 +30,16 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
+
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * This layer displays the average values for a segment.
@@ -214,7 +214,13 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
             final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
             final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
-            final int devYSegment = devYBottom - devYGraph;
+
+            int devYSegment = 0;
+            if (yData.isYAxisDirection()) {
+               devYSegment = devYBottom - devYGraph;
+            } else {
+               devYSegment = devYTop + devYGraph;
+            }
 
             boolean isShowValueText = true;
 
@@ -277,7 +283,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                if (_isShowSegmenterLine /* && isShowValueText */) {
 
                   gc.setAlpha(_lineOpacity);
-                  gc.drawLine(//
+                  gc.drawLine(
                         devXPrev,
                         devYSegment,
                         devXSegment,
@@ -347,11 +353,10 @@ public class ChartLayerSegmentValue implements IChartLayer {
                         textWidth + borderWidth2,
                         textHeightWithBorder);
 
-                  final Rectangle validRect = overlapChecker.getValidRect(
+                  final Rectangle validRect = overlapChecker.getNotOverlappedRectangle(
                         textRect,
                         isValueUp,
-                        textHeightWithBorder,
-                        valueText);
+                        textHeightWithBorder);
 
                   // don't draw over the graph borders
                   if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
@@ -359,7 +364,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                      if (isShowValueText) {
 
                         // keep current valid rectangle
-                        overlapChecker.setupNext(validRect, isValueUp);
+                        overlapChecker.setupNext(validRect);
 
                         gc.setAlpha(0xff);
                         gc.drawText(//
@@ -375,11 +380,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
                      segmenterSegment.paintedLabel = validRect;
 
                      // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
-//							final Rectangle hoveredRect = new Rectangle(//
-//									(validRect.x + borderWidth),
-//									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
-//									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
-//									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
+//                     final Rectangle hoveredRect = new Rectangle(//
+//                           (validRect.x + borderWidth),
+//                           (validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+//                           (validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
+//                           (validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
                      final Rectangle hoveredRect = new Rectangle(
                            (validRect.x),
@@ -389,11 +394,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
                      segmenterSegment.hoveredLabelRect = hoveredRect;
 
-//								/*
-//								 * Debugging
-//								 */
-//								gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-//								gc.drawRectangle(hoveredRect);
+//                     /*
+//                      * Debugging
+//                      */
+//                     gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//                     gc.drawRectangle(hoveredRect);
                   }
                }
             }
@@ -439,7 +444,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                 * This algorithm is highly complicated because of the complex start values but now
                 * it seams to work.
                 */
-               for (; tourIndex < multipleTourStartIndex.length;) {
+               while (tourIndex < multipleTourStartIndex.length) {
 
                   if (nextTourStartIndex == 0) {
 
@@ -554,40 +559,58 @@ public class ChartLayerSegmentValue implements IChartLayer {
       return _allPaintedSegments;
    }
 
-   void setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+   ChartLayerSegmentValue setIsShowDecimalPlaces(final boolean isShowDecimalPlaces) {
+
       _isShowDecimalPlaces = isShowDecimalPlaces;
+
+      return this;
    }
 
-   void setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
+   ChartLayerSegmentValue setIsShowSegmenterValues(final boolean isShowSegmenterValues) {
+
       _isShowSegmenterValues = isShowSegmenterValues;
+
+      return this;
    }
 
-   void setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
+   ChartLayerSegmentValue setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
 
       _isShowSegmenterLine = isShowSegmenterLine;
-      _lineOpacity = (int) (lineOpacity / 100.0 * 255);
+      _lineOpacity = lineOpacity;
+
+      return this;
    }
 
-   void setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
+   ChartLayerSegmentValue setSmallHiddenValuesProperties(final boolean isHideSmallValues, final int smallValue) {
 
       _isHideSmallValues = isHideSmallValues;
       _smallValue = smallValue / 100.0;
+
+      return this;
    }
 
-   void setStackedValues(final int stackedValues) {
+   ChartLayerSegmentValue setStackedValues(final int stackedValues) {
+
       _stackedValues = stackedValues;
+
+      return this;
    }
 
-   void setTourData(final TourData tourData) {
+   ChartLayerSegmentValue setTourData(final TourData tourData) {
 
       _tourData = tourData;
 
       // initialize painted labels
       _allPaintedSegments.clear();
       _allGraphAreas.clear();
+
+      return this;
    }
 
-   void setXDataSerie(final double[] dataSerie) {
+   ChartLayerSegmentValue setXDataSerie(final double[] dataSerie) {
+
       _xDataSerie = dataSerie;
+
+      return this;
    }
 }

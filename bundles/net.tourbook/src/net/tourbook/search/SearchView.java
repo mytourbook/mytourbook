@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,29 +15,9 @@
  *******************************************************************************/
 package net.tourbook.search;
 
-import java.util.ArrayList;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.part.PageBook;
-import org.eclipse.ui.part.ViewPart;
+import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -51,375 +31,401 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
+import net.tourbook.web.WebContentServer;
 import net.tourbook.web.preferences.PrefPageWebBrowser;
+
+import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.ViewPart;
 
 public class SearchView extends ViewPart implements ISearchView {
 
-	public static final String			ID											= "net.tourbook.search.SearchView";	//$NON-NLS-1$
+   public static final String   ID                      = "net.tourbook.search.SearchView";                   //$NON-NLS-1$
 
-	private static final String		STATE_USE_EXTERNAL_WEB_BROWSER	= "STATE_USE_EXTERNAL_WEB_BROWSER";	//$NON-NLS-1$
+   private static final String  SYS_PROP__FORCE_BROWSER = "forceBrowserForTourSeachInLinux";                  //$NON-NLS-1$
 
-	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
+   private static final boolean _isForceBrowser         = System.getProperty(SYS_PROP__FORCE_BROWSER) != null;
+   private static final boolean _isUseEmbeddedBrowser   = _isForceBrowser == false;
 
-	private PostSelectionProvider		_postSelectionProvider;
-	private IPartListener2				_partListener;
-	private ITourEventListener			_tourEventListener;
+   static {
 
-	private boolean						_isWinInternalLoaded					= false;
+      if (_isForceBrowser) {
 
-	private ActionExternalSearchUI	_actionExternalSearchUI;
+         Util.logSystemProperty_IsEnabled(
 
-	/*
-	 * UI controls
-	 */
-	private Browser						_browser;
+               SearchView.class,
+               SYS_PROP__FORCE_BROWSER,
+               "The browser UI is forced for the tour search in Linux"); //$NON-NLS-1$
+      }
+   }
 
-	private PageBook						_pageBook;
+   private static final String    STATE_USE_EXTERNAL_WEB_BROWSER = "STATE_USE_EXTERNAL_WEB_BROWSER"; //$NON-NLS-1$
 
-	private Composite						_pageLinux;
-	private Composite						_pageWinExternalBrowser;
-	private Composite						_pageWinInternalBrowser;
+   private final IDialogSettings  _state                         = TourbookPlugin.getState(ID);
 
-	void actionSearchUI() {
-		showUIPage();
-	}
+   private PostSelectionProvider  _postSelectionProvider;
+   private IPartListener2         _partListener;
+   private ITourEventListener     _tourEventListener;
 
-	private void addPartListener() {
+   private boolean                _isWinInternalLoaded           = false;
 
-		_partListener = new IPartListener2() {
+   private ActionExternalSearchUI _actionExternalSearchUI;
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+   /*
+    * UI controls
+    */
+   private Browser   _browser;
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+   private PageBook  _pageBook;
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
+   private Composite _pageLinux;
+   private Composite _pageWinExternalBrowser;
+   private Composite _pageWinInternalBrowser;
 
-				if (partRef.getPart(false) == SearchView.this) {
-					SearchMgr.setSearchView(null);
-				}
-			}
+   void actionSearchUI() {
+      showUIPage();
+   }
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+   private void addPartListener() {
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+      _partListener = new IPartListener2() {
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-				if (partRef.getPart(false) == SearchView.this) {
-					SearchMgr.setSearchView(SearchView.this);
-				}
-			}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
+            if (partRef.getPart(false) == SearchView.this) {
+               SearchManager.setSearchView(null);
+            }
+         }
 
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-	private void addTourEventListener() {
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-				if (part == SearchView.this) {
-					return;
-				}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {
 
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if (partRef.getPart(false) == SearchView.this) {
+               SearchManager.setSearchView(SearchView.this);
+            }
+         }
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
 
-						// update modified tour
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-//						for (final TourData tourData : modifiedTours) {
+   private void addTourEventListener() {
+
+      _tourEventListener = (part, tourEventId, eventData) -> {
+
+         if (part == SearchView.this) {
+            return;
+         }
+
+         if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
+
+               // update modified tour
+
+//                  for (final TourData tourData : modifiedTours) {
 //
-//						}
-					}
+//                  }
+            }
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-					clearView();
+            clearView();
 
-				}
-			}
-		};
+         }
+      };
 
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
 
-	private void clearView() {
+   private void clearView() {
 
-		// removed old tour data from the selection provider
-		_postSelectionProvider.clearSelection();
-	}
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-		_actionExternalSearchUI = new ActionExternalSearchUI(this);
+      _actionExternalSearchUI = new ActionExternalSearchUI(this);
 
-		fillActionBars();
-	}
+      fillActionBars();
+   }
 
-	@Override
-	public void createPartControl(final Composite parent) {
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		FTSearchManager.setupSuggester();
+      FTSearchManager.setupSuggester();
 
-		addPartListener();
-		addTourEventListener();
+      addPartListener();
+      addTourEventListener();
 
-		// this part is a selection provider
-		_postSelectionProvider = new PostSelectionProvider(ID);
-		getSite().setSelectionProvider(_postSelectionProvider);
+      // this part is a selection provider
+      _postSelectionProvider = new PostSelectionProvider(ID);
+      getSite().setSelectionProvider(_postSelectionProvider);
 
-		createUI(parent);
-		createActions();
+      createUI(parent);
+      createActions();
 
-		restoreState();
+      restoreState();
 
-		showUIPage();
-	}
+      showUIPage();
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
+      _pageBook = new PageBook(parent, SWT.NONE);
 
-		if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
-			// internal browser
-			_pageWinInternalBrowser = new Composite(_pageBook, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinInternalBrowser);
-			GridLayoutFactory.fillDefaults().applyTo(_pageWinInternalBrowser);
+         // internal browser
+         _pageWinInternalBrowser = new Composite(_pageBook, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinInternalBrowser);
+         GridLayoutFactory.fillDefaults().applyTo(_pageWinInternalBrowser);
 
-			createUI_10_SearchInternal(_pageWinInternalBrowser);
+         createUI_10_SearchInternal(_pageWinInternalBrowser);
 
-			// external browser
-			_pageWinExternalBrowser = new Composite(_pageBook, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinExternalBrowser);
-			GridLayoutFactory.fillDefaults().applyTo(_pageWinExternalBrowser);
-			createUI_20_SearchExternal(_pageWinExternalBrowser);
+         // external browser
+         _pageWinExternalBrowser = new Composite(_pageBook, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinExternalBrowser);
+         GridLayoutFactory.fillDefaults().applyTo(_pageWinExternalBrowser);
+         createUI_20_SearchExternal(_pageWinExternalBrowser);
 
-		} else {
+      } else {
 
-			// external browser
-			_pageLinux = new Composite(_pageBook, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageLinux);
-			GridLayoutFactory.fillDefaults().applyTo(_pageLinux);
+         // external browser
+         _pageLinux = new Composite(_pageBook, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageLinux);
+         GridLayoutFactory.fillDefaults().applyTo(_pageLinux);
 
-			createUI_30_Linux(_pageLinux);
-		}
-	}
+         createUI_30_Linux(_pageLinux);
+      }
+   }
 
-	private void createUI_10_SearchInternal(final Composite parent) {
-
-		try {
+   private void createUI_10_SearchInternal(final Composite parent) {
 
-			_browser = new Browser(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
+      try {
 
-		} catch (final SWTError e) {
-			StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage(), e);//$NON-NLS-1$
-			return;
-		}
+         _browser = new Browser(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-		_browser.addLocationListener(new LocationAdapter() {
-			@Override
-			public void changing(final LocationEvent event) {
-				SearchMgr.onBrowserLocation(event);
-			}
-		});
+      } catch (final SWTError e) {
+         StatusUtil.showStatus("Could not instantiate Browser: " + e.getMessage(), e);//$NON-NLS-1$
+         return;
+      }
 
-	}
+      _browser.addLocationListener(new LocationAdapter() {
+         @Override
+         public void changing(final LocationEvent event) {
+            SearchManager.onBrowserLocation(event);
+         }
+      });
 
-	private void createUI_20_SearchExternal(final Composite parent) {
+   }
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-		{
-			final Link linkExternalBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.applyTo(linkExternalBrowser);
-
-			linkExternalBrowser.setText(NLS.bind(
-					Messages.Search_View_Link_ExternalBrowser,
-					SearchMgr.SEARCH_URL,
-					SearchMgr.SEARCH_URL));
-
-			linkExternalBrowser.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					WEB.openUrl(SearchMgr.SEARCH_URL);
-				}
-			});
-
-			createUI_50_SetupExternalWebbrowser(parent, container);
-		}
-	}
-
-	private void createUI_30_Linux(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-		{
-			/*
-			 * Link: Search page url
-			 */
-			final Link linkLinuxBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.applyTo(linkLinuxBrowser);
-
-			linkLinuxBrowser.setText(NLS.bind(
-					Messages.Search_View_Link_LinuxBrowser,
-					SearchMgr.SEARCH_URL,
-					SearchMgr.SEARCH_URL));
-
-			linkLinuxBrowser.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					WEB.openUrl(SearchMgr.SEARCH_URL);
-				}
-			});
-
-			createUI_50_SetupExternalWebbrowser(parent, container);
-		}
-	}
+   private void createUI_20_SearchExternal(final Composite parent) {
 
-	private void createUI_50_SetupExternalWebbrowser(final Composite parent, final Composite container) {
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Link linkExternalBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .applyTo(linkExternalBrowser);
+
+         linkExternalBrowser.setText(NLS.bind(
+               Messages.Search_View_Link_ExternalBrowser,
+               SearchManager.SEARCH_URL,
+               SearchManager.SEARCH_URL));
+
+         linkExternalBrowser.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(SearchManager.SEARCH_URL)));
+
+         createUI_50_SetupExternalWebbrowser(parent, container);
+      }
+   }
+
+   private void createUI_30_Linux(final Composite parent) {
 
-		/*
-		 * Link: Setup browser
-		 */
-		final Link linkSetupBrowser = new Link(container, SWT.WRAP);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.END)
-				.applyTo(linkSetupBrowser);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         /*
+          * Link: Search page url
+          */
+         final Link linkLinuxBrowser = new Link(container, SWT.WRAP | SWT.READ_ONLY);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .applyTo(linkLinuxBrowser);
 
-		linkSetupBrowser.setText(Messages.Search_View_Link_SetupExternalBrowser);
-		linkSetupBrowser.setEnabled(true);
-		linkSetupBrowser.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				PreferencesUtil.createPreferenceDialogOn(//
-						parent.getShell(),
-						PrefPageWebBrowser.ID,
-						null,
-						null).open();
-			}
-		});
-	}
+         linkLinuxBrowser.setText(NLS.bind(
+               Messages.Search_View_Link_LinuxBrowser,
+               SearchManager.SEARCH_URL,
+               SearchManager.SEARCH_URL));
 
-	@Override
-	public void dispose() {
+         linkLinuxBrowser.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(SearchManager.SEARCH_URL)));
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+         createUI_50_SetupExternalWebbrowser(parent, container);
+      }
+   }
 
-		if (_partListener != null) {
+   private void createUI_50_SetupExternalWebbrowser(final Composite parent, final Composite container) {
 
-			getViewSite().getPage().removePartListener(_partListener);
-		}
+      /*
+       * Link: Setup browser
+       */
+      final Link linkSetupBrowser = new Link(container, SWT.WRAP);
+      GridDataFactory.fillDefaults()//
+            .align(SWT.FILL, SWT.END)
+            .applyTo(linkSetupBrowser);
 
-		super.dispose();
-	}
+      linkSetupBrowser.setText(Messages.Search_View_Link_SetupExternalBrowser);
+      linkSetupBrowser.setEnabled(true);
+      linkSetupBrowser.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         PreferencesUtil.createPreferenceDialogOn(//
+               parent.getShell(),
+               PrefPageWebBrowser.ID,
+               null,
+               null).open();
+      }));
+   }
 
-	private void enableActions() {
+   @Override
+   public void dispose() {
 
-		_actionExternalSearchUI.setEnabled(UI.IS_WIN);
-	}
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-	private void fillActionBars() {
+      if (_partListener != null) {
 
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+         getViewSite().getPage().removePartListener(_partListener);
+      }
 
-		tbm.add(_actionExternalSearchUI);
-	}
+      super.dispose();
+   }
 
-	@Override
-	public IWorkbenchPart getPart() {
-		return this;
-	}
+   private void enableActions() {
 
-	@Override
-	public PostSelectionProvider getPostSelectionProvider() {
-		return _postSelectionProvider;
-	}
+      _actionExternalSearchUI.setEnabled(UI.IS_WIN || _isUseEmbeddedBrowser);
+   }
 
-	private void restoreState() {
+   private void fillActionBars() {
 
-		_actionExternalSearchUI.setChecked(Util.getStateBoolean(_state, STATE_USE_EXTERNAL_WEB_BROWSER, false));
+      /*
+       * fill view toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		enableActions();
-	}
+      tbm.add(_actionExternalSearchUI);
+   }
 
-	@PersistState
-	private void saveState() {
+   @Override
+   public IWorkbenchPart getPart() {
+      return this;
+   }
 
-		_state.put(STATE_USE_EXTERNAL_WEB_BROWSER, _actionExternalSearchUI.isChecked());
-	}
+   @Override
+   public PostSelectionProvider getPostSelectionProvider() {
+      return _postSelectionProvider;
+   }
 
-	@Override
-	public void setFocus() {
+   private void restoreState() {
 
-		if (UI.IS_WIN) {
+      _actionExternalSearchUI.setChecked(Util.getStateBoolean(_state, STATE_USE_EXTERNAL_WEB_BROWSER, false));
 
-			final boolean isInternal = _actionExternalSearchUI.isChecked() == false;
+      enableActions();
+   }
 
-			if (isInternal) {
+   @PersistState
+   private void saveState() {
 
-				_browser.setFocus();
-			}
-		}
-	}
+      _state.put(STATE_USE_EXTERNAL_WEB_BROWSER, _actionExternalSearchUI.isChecked());
+   }
 
-	private void showUIPage() {
+   @Override
+   public void setFocus() {
 
-		if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
-			final boolean isExternal = _actionExternalSearchUI.isChecked();
+         final boolean isInternal = _actionExternalSearchUI.isChecked() == false;
 
-			if (isExternal) {
+         if (isInternal) {
 
-				_pageBook.showPage(_pageWinExternalBrowser);
+            _browser.setFocus();
+         }
+      }
+   }
 
-			} else {
+   private void showUIPage() {
 
-				_pageBook.showPage(_pageWinInternalBrowser);
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
-				updateUI_WinInternalBrowser();
-			}
+         final boolean isExternal = _actionExternalSearchUI.isChecked();
 
-		} else {
+         WebContentServer.setIsUsingEmbeddedBrowser(isExternal == false);
 
-			_pageBook.showPage(_pageLinux);
-		}
-	}
+         if (isExternal) {
 
-	private void updateUI_WinInternalBrowser() {
+            _pageBook.showPage(_pageWinExternalBrowser);
 
-		if (_isWinInternalLoaded == false) {
+         } else {
 
-			_isWinInternalLoaded = true;
+            _pageBook.showPage(_pageWinInternalBrowser);
 
-			// show search page
-			_browser.setUrl(SearchMgr.SEARCH_URL);
-		}
-	}
+            updateUI_WinInternalBrowser();
+         }
+
+      } else {
+
+         WebContentServer.setIsUsingEmbeddedBrowser(false);
+
+         _pageBook.showPage(_pageLinux);
+      }
+   }
+
+   private void updateUI_WinInternalBrowser() {
+
+      if (_isWinInternalLoaded == false) {
+
+         _isWinInternalLoaded = true;
+
+         // show search page
+         _browser.setUrl(SearchManager.SEARCH_URL);
+      }
+   }
 }

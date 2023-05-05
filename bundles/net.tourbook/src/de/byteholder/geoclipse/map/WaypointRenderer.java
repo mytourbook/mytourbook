@@ -28,6 +28,6 @@ public interface WaypointRenderer {
 	 * @param waypoint
 	 * @param devPartOffset
 	 */
-    public void paintWaypoint(GC gc, Map map, Waypoint waypoint, int devPartOffset);
+    public void paintWaypoint(GC gc, Map2 map, Waypoint waypoint, int devPartOffset);
     
 }

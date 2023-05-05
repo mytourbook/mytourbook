@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
@@ -129,6 +130,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
     * @return the axisImage descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
+
       final Optional<ImageDescriptor> imageDescriptor = ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
@@ -147,6 +149,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
     * Returns the plugin's resource bundle,
     */
    private static ResourceBundle getResourceBundle() {
+
       try {
          if (_resourceBundle == null) {
             _resourceBundle = ResourceBundle.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
@@ -154,6 +157,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
       } catch (final MissingResourceException x) {
          _resourceBundle = null;
       }
+
       return _resourceBundle;
    }
 
@@ -178,14 +182,26 @@ public class TourbookPlugin extends AbstractUIPlugin {
     * @return
     */
    public static IDialogSettings getState(final String stateSectionName) {
+
       return getDefault().getDialogSettingsSection(stateSectionName);
    }
 
+   /**
+    * @param imageName
+    * @return Returns the themed image descriptor from {@link TourbookPlugin} plugin images
+    */
+   public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
+
+      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+   }
+
    public static void setActivePerson(final TourPerson currentPerson) {
+
       _activePerson = currentPerson;
    }
 
    public static void setActivePhotoFilter(final boolean isPhotoFilterActive) {
+
       _isPhotoFilterActive = isPhotoFilterActive;
    }
 
@@ -218,6 +234,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
    }
 
    public void log(final String message, final Throwable exception) {
+
       getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception));
    }
 
@@ -242,7 +259,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
        * StatusUtil will force to load net.tourbook.common plugin which forces to load
        * net.tourbook.common.UI which is initializing the measurement system.
        */
-      StatusUtil.logInfo("AppVersion: " + version.toString());//$NON-NLS-1$
+      StatusUtil.logInfo("[AppVersion] " + version.toString());//$NON-NLS-1$
    }
 
    @Override

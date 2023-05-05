@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -149,6 +149,20 @@ public class TourTypeFilter {
       }
 
       return filterImageDescriptor;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the tour type filter allows {@link TourData}
+    *         <ul>
+    *         <br>
+    *         <li>Which has no {@link TourType}</li>
+    *         <li>When a tour type filter is set, which contains several tour types</li>
+    *         </ul>
+    *         These tours will be painted with the default color
+    */
+   public boolean containsMultipleTourTypes() {
+
+      return _filterType == FILTER_TYPE_SYSTEM || _filterType == FILTER_TYPE_TOURTYPE_SET;
    }
 
    @Override
@@ -341,16 +355,6 @@ public class TourTypeFilter {
       default:
          break;
       }
-   }
-
-   /**
-    * @return Returns <code>true</code> when the filter allows {@link TourData} which has no
-    *         {@link TourType} OR when a tour type filter (contains several tour types) is set,
-    *         these tours will be painted with the default color
-    */
-   public boolean showUndefinedTourTypes() {
-      return _filterType == FILTER_TYPE_SYSTEM || _filterType == FILTER_TYPE_TOURTYPE_SET;
-
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.device.hac4;
 import gnu.io.SerialPort;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,13 +25,15 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -54,16 +55,16 @@ public class HAC4DeviceReader extends TourbookDevice {
    private static final int   HAC4_DATA_SIZE       = 81930;
 
    private class StartBlock {
+
       public short month;
       public short day;
       public short hour;
       public short minute;
    }
 
-   /**
-    * constructor is used when the plugin is loaded
-    */
-   public HAC4DeviceReader() {}
+   public HAC4DeviceReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -170,10 +171,12 @@ public class HAC4DeviceReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;
@@ -190,7 +193,7 @@ public class HAC4DeviceReader extends TourbookDevice {
          hac4DeviceData.readFromFile(fileRawData);
 
          /*
-          * because the tour year is not available we calculate it from the transfer year, this
+          * Because the tour year is not available we calculate it from the transfer year, this
           * might be not correct but there is no other way to get the year
           */
          short tourYear = hac4DeviceData.transferYear;
@@ -230,8 +233,12 @@ public class HAC4DeviceReader extends TourbookDevice {
                break;
             }
 
+//            if (importState_Process.isImportCanceled_ByMonitor().get()) {
+//               break;
+//            }
+
             /*
-             * read tour data
+             * Read tour data
              */
 
             fileRawData.seek(offsetAARecord);
@@ -270,7 +277,7 @@ public class HAC4DeviceReader extends TourbookDevice {
             lastTourMonth = (lastTourMonth == 0) ? startBlock.month : lastTourMonth;
 
             /*
-             * because we read the tours in decending order (last tour first), we check if the
+             * because we read the tours in descending order (last tour first), we check if the
              * month of the current tour is higher than from the last tour, if this is the case,
              * we assume to have data from the previous year
              */
@@ -432,10 +439,8 @@ public class HAC4DeviceReader extends TourbookDevice {
                   // adjust altitude from relative to absolute
                   absoluteAltitude += timeData.altitude;
 
-                  tourData.setTourAltUp(tourData.getTourAltUp()
-                        + ((timeData.altitude > 0) ? timeData.altitude : 0));
-                  tourData.setTourAltDown(tourData.getTourAltDown()
-                        + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+                  tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0));
+                  tourData.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0));
 
                   sumDistance += timeData.distance;
                   sumAltitude += Math.abs(absoluteAltitude);
@@ -491,6 +496,8 @@ public class HAC4DeviceReader extends TourbookDevice {
                tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
                tourData.computeTourMovingTime();
                tourData.computeComputedValues();
+
+               importState_File.isFileImportedWithValidData = true;
             }
 
             // tourData.dumpTourTotal();
@@ -541,7 +548,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
             /*
              * make sure to end not in an endless loop where the current AA offset is the same
-             * as the first AA offset (this seems to be unlikely but it happend already 2 Month
+             * as the first AA offset (this seems to be unlikely but it happened already 2 Month
              * after the first implementation)
              */
             if (offsetAARecord == initialOffsetAARecord) {
@@ -558,8 +565,6 @@ public class HAC4DeviceReader extends TourbookDevice {
       deviceData.transferYear = hac4DeviceData.transferYear;
       deviceData.transferMonth = hac4DeviceData.transferMonth;
       deviceData.transferDay = hac4DeviceData.transferDay;
-
-      return true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
@@ -594,17 +599,6 @@ public class HAC4DeviceReader extends TourbookDevice {
       tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
 
       return startBlock;
-   }
-
-   public final int readSummary(final byte[] buffer) throws IOException {
-      final int ch0 = buffer[0];
-      final int ch1 = buffer[1];
-      final int ch2 = buffer[2];
-      final int ch3 = buffer[3];
-      if ((ch0 | ch1 | ch2 | ch3) < 0) {
-         throw new EOFException();
-      }
-      return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
    }
 
    /**
@@ -655,14 +649,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 
       boolean isValid = false;
 
-      BufferedInputStream inStream = null;
-
-      try {
+      final File dataFile = new File(fileName);
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[5];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
@@ -696,8 +686,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
          if (isChecksumValidation == false && isValid == false) {
 
-            System.out
-                  .println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
+            System.out.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
 
             /*
              * ignore validation
@@ -709,53 +698,6 @@ public class HAC4DeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
-      }
-
-      return isValid;
-   }
-
-   public boolean validateRawDataNEW(final String fileName) {
-
-      boolean isValid = false;
-
-      try (RandomAccessFile file = new RandomAccessFile(fileName, "r")) {//$NON-NLS-1$
-
-         final byte[] buffer = new byte[5];
-
-         // check header
-         file.read(buffer);
-         if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
-            return false;
-         }
-
-         int checksum = 0, lastValue = 0;
-
-         while (file.read(buffer) != -1) {
-            checksum = (checksum + lastValue) & 0xFFFF;
-
-            lastValue = readSummary(buffer);
-
-            // int lastValueOrig = Integer.parseInt(new String(buffer, 0,
-            // 4), 16);
-            // System.out.println(lastValueOrig + " " + lastValue);
-         }
-
-         if (checksum == lastValue) {
-            isValid = true;
-         }
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
-         return false;
       }
 
       return isValid;

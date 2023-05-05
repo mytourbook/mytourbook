@@ -1,0 +1,198 @@
+21.9.0                                                 30. September 2021
+
+
+Experimental
+============
+
+* VERSION 21.9 IS EXPERIMENTAL
+  The import / re-import and save process has been completely reworked 
+  to run it concurrently, with the advantage that this is now many times 
+  faster, depending on the number of CPU cores  
+
+
+New
+===
+
+* Device Battery SoC (State of Charge)   
+  https://en.wikipedia.org/wiki/State_of_charge
+  - Import/Re-import SoC values from .fit files
+  - Show in 
+    - New "Battery SoC" statistics
+    - New columns in "Tour Book" view
+    - Tour info tooltip
+
+
+Improvements
+============
+
+* Tour Import
+  - Ask the user to replace the import filename in a saved tour, when 
+    the import filename is different or empty
+
+* Fitlog/FitlogEx Import (Frederic)
+  - The timezone is used only when available, otherwise it's determined 
+    with the GPS position
+
+* GPX Import 
+  - Expanded geo diff and time diff to not skip waypoints when converted 
+    into tour markers, before the time and distance was too narrow when 
+    a waypoint was converted into a tour marker
+    https://github.com/wolfgang-ch/mytourbook/issues/390
+
+* Tour Book 
+  - Export CSV view values when flat layout is displayed 
+    ATTENTION: Only the fetched tours will be exported, ensure to scroll 
+    this view from top to bottom that all tours are fetched !!!
+
+* Tagged Tours
+  - Tags can be filtered to
+    - Show all tags
+    - Show only tags which contain tours
+    - Show only tags which do not contain tours
+
+* Statistics (Frederic)
+  - Adding the ability to save the Y-axis min/max values for the 
+    athlete's body weight and body fat graphs
+
+* Tour Chart (Frederic)
+  - Added a tour pauses slideout to know the start and end times of a 
+    given pause
+  - When selecting a tour pause in the Tour Chart, the pause is centered 
+    in the 2D Map
+  
+* 2D Map
+  - Show tour direction as marker in the tour track
+  - Customize colors for hovered/selected tour
+  - Hovered/selected tour tooltip 
+    - Better text formatting
+    - Themed foreground/background color
+  - Show themed tour pauses when map is dimmed
+
+* Search Tours                         
+  https://sourceforge.net/p/mytourbook/feature-requests/186/
+  - Search also for these fields:   
+    - Tour start location
+    - Tour end location
+    - Tour weather    
+  - Highlight search string with a color in the search result, the tour 
+    marker color from the chart is used 
+  - Search options dialog
+    - Added new search fields
+    - Replaced ugly close icon 
+    - Disabled autoclosing of this dialog because sometimes it closed 
+      too early
+    - A few UI tweaks
+
+* Tour Photos
+  - Show tour in "Tour Photos" and "Tour Chart" view, when a photo is 
+    selected in the "Photos" view   
+    https://sourceforge.net/p/mytourbook/feature-requests/194/
+  
+* Compare Tours by Elevation
+  - Reference tour view
+    - Show compared tours with year categories or without year 
+      categories
+    - New shortcut action in context menu to compare reference tours 
+      with all tours
+    - A newly create reference tour is selected in this view and 
+      perspective
+  - Compare result view
+    - Compare tours concurrently -> much less waiting time
+    - Use fast app tour filters (person, tour type, tour, photo...)
+    - Tour compare results can be filtered by: all/saved/not saved
+    - Automatically expand reference tour in compare result view after 
+      a comparison is done
+    - New shortcut action in context menu to compare reference tour(s) 
+      with all tours
+    - Tour comparison can be restarted with other parameters, 
+      e.g. different years, other tour filters
+  - Year statistic view
+    - Show reference tour title
+    - Show year statistic view in "Compare Result" perspective
+    - Update year statistic view when compare result is assigned/removed
+
+* Repair Close Button in All Views
+  - It can happen that the close button in the view tab disappear. This 
+    repair feature is performed when MyTourbook is closing.
+    This is an experimental feature and can be activated with the 
+    command line parameter -DsetAllViewsClosable 
+
+
+Changes  
+=======
+
+* 2D Map
+  - Moved option "Show hovered/selected tour" from "2D Map Options" into 
+    "Track Options"
+
+* 2.5D Map (Thomas)
+  - Direction arrows modified so they looking like the arrows in 2D Map
+  - Bolder trackline, when direction arrows are enabled
+  - Enabled building extrusion also for mapilion map
+  - Photolayer on top of all other layers
+
+
+Bugfix
+======
+
+* Tour Re-import
+  - Elevation up/down values were not re-imported
+    https://sourceforge.net/p/mytourbook/bugs/125/
+    
+* Tour Chart
+  - Fixed height of the x-axis: The x-axis text could be vertically 
+    truncated when the system font is too large
+
+* 2D Map
+  - Fixed: "when reaching maxzoom, dont shift the map anymore" 
+    https://github.com/wolfgang-ch/mytourbook/issues/370
+ 
+* 3D Map (Frederic)
+  - Fixed an issue that could happen under Linux with ATI graphic cards 
+    and that could make the 3D map view crash 
+    https://github.com/wolfgang-ch/mytourbook/issues/383
+
+* Tour Marker View (Frederic)
+ - The average speed and pace values are now computed using the distance 
+   and time values instead of using the speed serie values. Previously, 
+   this could lead to erroneous values.
+   https://sourceforge.net/p/mytourbook/discussion/622811/thread/79364ad998/ 
+
+* Tour Cadence Zones Times (Frederic)
+  - Cadence zone times computation should use either the recorded time 
+    or moving time per the computed values preference 
+
+* 4k Display
+  - Fixed positions for the vertical x-Axis units and vertical tour 
+    chart markers
+  - Line width was growing on every paint event 
+    https://github.com/wolfgang-ch/mytourbook/issues/356
+
+
+Translation    
+===========
+
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* FIT SDK 21.60
+
+* Eclipse 2021-06
+
+  With Eclipse 2021-09, 2.5D map will crash MT in W10
+  
+  #
+  # A fatal error has been detected by the Java Runtime Environment:
+  #
+  #  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00000000614819fe, pid=13112, tid=13800
+  #
+  # JRE version: OpenJDK Runtime Environment Temurin-11.0.12+7 (11.0.12+7) (build 11.0.12+7)
+  # Java VM: OpenJDK 64-Bit Server VM Temurin-11.0.12+7 (11.0.12+7, mixed mode, tiered, compressed oops, g1 gc, windows-amd64)
+  # Problematic frame:
+  # C  [vtm-jni64.dll+0x19fe]
+  

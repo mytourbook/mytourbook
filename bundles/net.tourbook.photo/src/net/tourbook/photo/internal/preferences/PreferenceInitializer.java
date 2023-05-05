@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,9 @@
 package net.tourbook.photo.internal.preferences;
 
 import net.tourbook.common.UI;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.internal.Activator;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -33,7 +33,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
    @Override
    public void initializeDefaultPreferences() {
 
-      final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+      final IPreferenceStore store = PhotoActivator.getPrefStore();
 
       /*
        * photo

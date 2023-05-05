@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,8 +35,6 @@ public class MarkerConfig {
     */
    public boolean isShowTourMarker      = true;
    public boolean isShowMapBookmark     = true;
-   public boolean isShowPhoto           = true;
-   public boolean isShowPhotoTitle      = true;
 
    public int     markerOrientation     = Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
    public RGB     markerFill_Color      = Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
@@ -50,7 +48,6 @@ public class MarkerConfig {
     * Cluster
     */
    public boolean                isMarkerClustered      = true;
-   public boolean                isPhotoClustered       = true;
 
    public Enum<ClusterAlgorithm> clusterAlgorithm       = ClusterAlgorithm.FirstMarker_Grid;
    public int                    clusterGrid_Size       = Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
@@ -63,7 +60,6 @@ public class MarkerConfig {
    public int                    clusterSymbol_Size     = Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
    public int                    clusterSymbol_Weight   = Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
 
-   
    @Override
    public boolean equals(final Object obj) {
 

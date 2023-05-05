@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,15 +40,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -66,6 +69,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapManager;
@@ -74,10 +78,10 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.bookmark.MapLocation;
-import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
+import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.action.ActionMap3Color;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
@@ -104,7 +108,7 @@ import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap3Color;
+import net.tourbook.preferences.PrefPageMap25_Map3_Color;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -133,7 +137,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -147,7 +150,6 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
@@ -157,36 +159,31 @@ import org.oscim.core.MapPosition;
  */
 public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener {
 
-// SET_FORMATTING_OFF
+   private static final String              SLIDER_TEXT_ALTITUDE                   = "%.1f %s";                                             //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_GRADIENT                   = "%.1f %%";                                             //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_PACE                       = "%s %s";                                               //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_PULSE                      = "%.0f %s";                                             //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_SPEED                      = "%.1f %s";                                             //$NON-NLS-1$
 
-	private static final String	IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__options;
-	private static final String	GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   public static final String               ID                                     = "net.tourbook.map3.view.Map3ViewId";                   //$NON-NLS-1$
 
-	private static final String	SLIDER_TEXT_ALTITUDE						= "%.1f %s";									//$NON-NLS-1$
-	private static final String	SLIDER_TEXT_GRADIENT						= "%.1f %%";									//$NON-NLS-1$
-	private static final String	SLIDER_TEXT_PACE							= "%s %s";										//$NON-NLS-1$
-	private static final String	SLIDER_TEXT_PULSE							= "%.0f %s";									//$NON-NLS-1$
-	private static final String	SLIDER_TEXT_SPEED							= "%.1f %s";									//$NON-NLS-1$
+   private static final String              STATE_IS_LEGEND_VISIBLE                = "STATE_IS_LEGEND_VISIBLE";                             //$NON-NLS-1$
+   private static final String              STATE_IS_MARKER_VISIBLE                = "STATE_IS_MARKER_VISIBLE";                             //$NON-NLS-1$
+   private static final String              STATE_IS_SYNC_MAP_VIEW_WITH_TOUR       = "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";                    //$NON-NLS-1$
+   private static final String              STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER = "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";              //$NON-NLS-1$
+   private static final String              STATE_IS_SYNC_MAP3_WITH_OTHER_MAP      = "STATE_IS_SYNC_MAP3_WITH_OTHER_MAP";                   //$NON-NLS-1$
+   private static final String              STATE_IS_TOUR_VISIBLE                  = "STATE_IS_TOUR_VISIBLE";                               //$NON-NLS-1$
+   private static final String              STATE_IS_TRACK_SLIDER_VISIBLE          = "STATE_IS_TRACK_SLIDERVISIBLE";                        //$NON-NLS-1$
+   private static final String              STATE_MAP3_VIEW                        = "STATE_MAP3_VIEW";                                     //$NON-NLS-1$
+   private static final String              STATE_TOUR_COLOR_ID                    = "STATE_TOUR_COLOR_ID";                                 //$NON-NLS-1$
 
-	public static final String		ID												= "net.tourbook.map3.view.Map3ViewId";			//$NON-NLS-1$
+   private static final WorldWindowGLCanvas _wwCanvas                              = Map3Manager.getWWCanvas();
 
-	private static final String	STATE_IS_LEGEND_VISIBLE						= "STATE_IS_LEGEND_VISIBLE";					//$NON-NLS-1$
-	private static final String	STATE_IS_MARKER_VISIBLE						= "STATE_IS_MARKER_VISIBLE";					//$NON-NLS-1$
-	private static final String	STATE_IS_SYNC_MAP_VIEW_WITH_TOUR			= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";			//$NON-NLS-1$
-	private static final String	STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";		//$NON-NLS-1$
-	private static final String 	STATE_IS_SYNC_MAP3_WITH_OTHER_MAP		= "STATE_IS_SYNC_MAP3_WITH_OTHER_MAP";			//$NON-NLS-1$
-	private static final String	STATE_IS_TOUR_VISIBLE						= "STATE_IS_TOUR_VISIBLE";						//$NON-NLS-1$
-	private static final String	STATE_IS_TRACK_SLIDER_VISIBLE				= "STATE_IS_TRACK_SLIDERVISIBLE";				//$NON-NLS-1$
-	private static final String	STATE_MAP3_VIEW								= "STATE_MAP3_VIEW";							//$NON-NLS-1$
-	private static final String	STATE_TOUR_COLOR_ID							= "STATE_TOUR_COLOR_ID";						//$NON-NLS-1$
+   private final IPreferenceStore           _prefStore                             = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore           _prefStore_Common                      = CommonActivator.getPrefStore();
+   private final IDialogSettings            _state                                 = TourbookPlugin.getState(getClass().getCanonicalName());
 
-	private static final WorldWindowGLCanvas	_wwCanvas						= Map3Manager.getWWCanvas();
-
-	private final IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore				_prefStore_Common			= CommonActivator.getPrefStore();
-	private final IDialogSettings					_state						= TourbookPlugin.getState(getClass().getCanonicalName());
-
-// SET_FORMATTING_ON
+   // SET_FORMATTING_ON
 
    private ActionMap3Color                   _actionMap3Color;
    private ActionOpenPrefDialog              _actionMap3Colors;
@@ -221,6 +218,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenTour                 _actionOpenTour;
    private ActionPrint                    _actionPrintTour;
+   private ActionUpload                   _actionUploadTour;
    //
    private IPartListener2                 _partListener;
    private ISelectionListener             _postSelectionListener;
@@ -242,11 +240,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private boolean                        _isMapSynched_WithOtherMap;
    private boolean                        _isMapSynched_WithTour;
    private long                           _lastFiredSyncEventTime;
+   private long                           _lastMapSyncEventTime;
    //
    /**
     * Contains all tours which are displayed in the map.
     */
-   private ArrayList<TourData>            _allTours   = new ArrayList<>();
+   private List<TourData>                 _allTours   = new ArrayList<>();
    //
    private int                            _allTourIdHash;
    private int                            _allTourDataHash;
@@ -512,7 +511,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void mouseDragged(final MouseEvent e) {
-            onAWTMouseDragged(e);
+            onAWTMouseDragged();
          }
 
       };
@@ -520,7 +519,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void mouseWheelMoved(final MouseWheelEvent e) {
-            onAWTMouseDragged(e);
+            onAWTMouseDragged();
          }
 
       };
@@ -589,7 +588,14 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
+
             onPartVisible(partRef);
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               // ensure that map sync is working
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+            }
          }
 
          @Override
@@ -601,10 +607,17 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          public void partClosed(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
+            }
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == Map3View.this) {
                _isPartVisible = false;
             }
@@ -628,31 +641,25 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED)) {
 
-               // update map colors
+            // update map colors
 
-               setColorProvider(_graphId);
-            }
+            setColorProvider(_graphId);
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               _actionShowTourInMap.updateMeasurementSystem();
-            }
+            _actionShowTourInMap.updateMeasurementSystem();
          }
       };
 
@@ -665,66 +672,60 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-            if (part == Map3View.this) {
-               // ignore own selections
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (workbenchPart == Map3View.this) {
+            // ignore own selections
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == Map3View.this) {
-               return;
+         if (workbenchPart == Map3View.this) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+            showAllTours_InternalTours();
+
+         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+               updateModifiedTours(modifiedTours);
             }
 
-            if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+         } else if (tourEventId == TourEventId.UPDATE_UI || tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-               showAllTours_InternalTours();
+            clearView();
 
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if (tourEventId == TourEventId.MARKER_SELECTION) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-                  updateModifiedTours(modifiedTours);
-               }
+            if (eventData instanceof SelectionTourMarker) {
 
-            } else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+               final SelectionTourMarker selection = (SelectionTourMarker) eventData;
 
-               clearView();
+               final TourData tourData = selection.getTourData();
+               final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
 
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-               if (eventData instanceof SelectionTourMarker) {
-
-                  final SelectionTourMarker selection = (SelectionTourMarker) eventData;
-
-                  final TourData tourData = selection.getTourData();
-                  final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
-
-                  syncMapWith_TourMarker(tourData, tourMarker);
-               }
-
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
+               syncMapWith_TourMarker(tourData, tourMarker);
             }
+
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
          }
       };
 
@@ -757,7 +758,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          final ToolItem actionToolItem = colorAction.getToolItem();
 
-         // unckeck other colors
+         // uncheck other colors
          if (actionToolItem != selectedToolItem) {
             actionToolItem.setSelection(false);
          }
@@ -853,8 +854,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
       _actionMap3Color = new ActionMap3Color();
-      _actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID, _graphId);
-      _actionMap3Colors.setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_ALL));
+      _actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap25_Map3_Color.ID, _graphId);
+      _actionMap3Colors.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
 
       _actionMapBookmarks = new ActionMapBookmarks(_parent, this);
       _actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
@@ -893,6 +894,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
+      _actionUploadTour = new ActionUpload(this);
    }
 
    /**
@@ -921,13 +923,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-
-                  hideTourInfo();
-               }
-            });
+            Display.getCurrent().asyncExec(Map3View.this::hideTourInfo);
          }
 
          @Override
@@ -950,13 +946,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       final Map3ContextMenu swt_awt_ContextMenu = new Map3ContextMenu(display, _swtContextMenu);
 
-      display.asyncExec(new Runnable() {
-         @Override
-         public void run() {
-//				System.out.println("SWT calling menu"); //$NON-NLS-1$
-            swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen);
-         }
-      });
+      display.asyncExec(() -> swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen));
    }
 
    @Override
@@ -987,30 +977,27 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       /*
        * !!! It requires 2x asyncExec that the a tour provider is providing tours !!!
        */
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            restoreState();
-            enableActions();
+         restoreState();
+         enableActions();
 
-            _isRestored = true;
+         _isRestored = true;
 
-            if (_lastHiddenSelection != null) {
+         if (_lastHiddenSelection != null) {
 
-               onSelectionChanged(_lastHiddenSelection);
+            onSelectionChanged(_lastHiddenSelection);
 
-               _lastHiddenSelection = null;
+            _lastHiddenSelection = null;
 
-            } else if (_allTours.isEmpty()) {
+         } else if (_allTours.isEmpty()) {
 
-               // a tour is not displayed, find a tour provider which provides a tour
-               showToursFromTourProvider();
+            // a tour is not displayed, find a tour provider which provides a tour
+            showToursFromTourProvider();
 
-            } else {
+         } else {
 
-               showAllTours_InternalTours();
-            }
+            showAllTours_InternalTours();
          }
       });
    }
@@ -1046,7 +1033,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final float[] paceSerie = tourData.getPaceSerieSeconds();
          if (paceSerie != null) {
             final float pace = paceSerie[positionIndex];
-            graphValueText = String.format(//
+            graphValueText = String.format(
                   SLIDER_TEXT_PACE,
                   UI.format_mm_ss((long) pace),
                   UI.UNIT_LABEL_PACE);
@@ -1058,8 +1045,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          final float[] pulseSerie = tourData.pulseSerie;
          if (pulseSerie != null) {
-            graphValueText = String
-                  .format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], GRAPH_LABEL_HEARTBEAT_UNIT);
+            graphValueText = String.format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          }
 
          break;
@@ -1104,15 +1090,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             Map3Manager.getLayer_TourLegend().resizeLegendImage();
          }
       });
-
-//		_mapContainer.addControlListener(new ControlAdapter() {
-//
-//			@Override
-//			public void controlResized(final ControlEvent e) {
-//				Map3Manager.getTourLegendLayer().resizeLegendImage();
-//			}
-//
-//		});
 
       parent.layout();
    }
@@ -1241,6 +1218,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenTour.setEnabled(isTourSelected);
       _actionExportTour.setEnabled(isTourSelected);
       _actionPrintTour.setEnabled(isTourSelected);
+      _actionUploadTour.setEnabled(isTourSelected);
    }
 
    private void fillActionBars() {
@@ -1325,6 +1303,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 //		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       (new Separator()).fill(menu, -1);
+      fillMenuItem(menu, _actionUploadTour);
       fillMenuItem(menu, _actionExportTour);
       fillMenuItem(menu, _actionPrintTour);
 
@@ -1348,18 +1327,13 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
 
       // run in SWT thread
-      _mapContainer.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-
-            // activate this view
-
-            TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, Map3View.this);
-         }
+      _mapContainer.getDisplay().asyncExec(() -> {
+         // activate this view
+         TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, Map3View.this);
       });
    }
 
-   public ArrayList<TourData> getAllTours() {
+   public List<TourData> getAllTours() {
       return _allTours;
    }
 
@@ -1386,18 +1360,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    }
 
    @Override
-   public MapLocation getMapLocation() {
-
-      final MapPosition_with_MarkerPosition mapPosition = getMapPosition();
-
-      if (mapPosition == null) {
-         return null;
-      }
-
-      return new MapLocation(mapPosition);
-   }
-
-   private MapPosition_with_MarkerPosition getMapPosition() {
+   public MapPosition getMapPosition() {
 
       final View view = _wwCanvas.getView();
 
@@ -1423,10 +1386,14 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       final double zoomLevel = 20 - Math.log(elevation);
 
-      final MapPosition_with_MarkerPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
+      final MapPosition mapPosition = new MapPosition(
+            geoCenter.latitude,
+            geoCenter.longitude,
+            Math.pow(2, zoomLevel + 2));
 
       mapPosition.bearing = -(float) basicView.getHeading().getDegrees();
       mapPosition.tilt = (float) basicView.getPitch().getDegrees();
+
       return mapPosition;
    }
 
@@ -1438,7 +1405,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     * @param allTours
     * @return Returns only tours which can be displayed in the map (which contains geo coordinates).
     */
-   private ArrayList<TourData> getMapTours(final ArrayList<TourData> allTours) {
+   private ArrayList<TourData> getMapTours(final List<TourData> allTours) {
 
       final ArrayList<TourData> mapTours = new ArrayList<>(allTours.size());
 
@@ -1465,7 +1432,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     * @return Returns {@link TourData} of the selected tour track or <code>null</code> when a tour
     *         is not selected.
     */
-   private TourData getSelectedTour(final TrackSliderLayer trackSliderLayer) {
+   private TourData getSelectedTour() {
 
       TourData tourData;
       final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
@@ -1541,6 +1508,10 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       return sliderYPosition;
    }
 
+   public IDialogSettings getState() {
+      return _state;
+   }
+
    public MapGraphId getTrackColorId() {
       return _graphId;
    }
@@ -1560,16 +1531,24 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public void moveToMapLocation(final MapBookmark mapBookmark) {
 
-      moveToMapLocation(mapBookmark.getMapPosition(), 0);
+      moveToMapLocation(mapBookmark.getMapPosition(), null);
    }
 
-   private void moveToMapLocation(final MapPosition mapPosition, final int positionFlags) {
+   private void moveToMapLocation(final MapPosition mapPosition, final IMapSyncListener.SyncParameter syncParameter) {
 
-      final int zoomLevel = mapPosition.zoomLevel + 0;
+      final int zoomLevel = mapPosition.zoomLevel;
+      final int mapZoomLevel = zoomLevel == ModelPlayerManager.MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE
+
+            // use current zoom
+            ? getMapPosition().zoomLevel
+
+            // use provided zoom
+            : zoomLevel + 1;
+
       final double latitude = mapPosition.getLatitude();
       final double longitude = mapPosition.getLongitude();
 
-      final double zoomElevation = Math.pow(2 * 1.5, 20 - zoomLevel);
+      final double zoomElevation = Math.pow(2 * 1.5, 20.0 - mapZoomLevel);
 
       final LatLon latlon = LatLon.fromDegrees(latitude, longitude);
 
@@ -1585,8 +1564,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final float bearingMapPos = mapPosition.bearing;
          final float tiltMapPos = mapPosition.tilt;
 
-         final boolean isResetBearing = (positionFlags & IMapSyncListener.RESET_BEARING) != 0;
-         final boolean isResetTilt = (positionFlags & IMapSyncListener.RESET_TILT) != 0;
+         final boolean isResetBearing = syncParameter == IMapSyncListener.SyncParameter.RESET_BEARING;
+         final boolean isResetTilt = syncParameter == IMapSyncListener.SyncParameter.RESET_TILT;
 
          if (isResetBearing) {
 
@@ -1622,9 +1601,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-//		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tonAWTMouseClick");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
       final boolean isRightClick = SwingUtilities.isRightMouseButton(mouseEvent);
       if (isRightClick) {
 
@@ -1633,19 +1609,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          // set state here because opening the context menu is async
          _isContextMenuVisible = true;
 
-         _mapContainer.getDisplay().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-
-               createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
-            }
-         });
+         _mapContainer.getDisplay().asyncExec(() -> createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen()));
          mouseEvent.consume();
       }
    }
 
-   private void onAWTMouseDragged(final MouseEvent mouseEvent) {
+   private void onAWTMouseDragged() {
 
       final MapPosition mapPosition = getMapPosition();
 
@@ -1655,7 +1624,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       _lastFiredSyncEventTime = System.currentTimeMillis();
 
-      MapManager.fireSyncMapEvent(mapPosition, this, 0);
+      MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
    @Override
@@ -2075,14 +2044,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    public void setTourInfo(final ITrackPath hoveredTrackPath, final Integer hoveredPositionIndex) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "]")
-//				+ ("\thoveredPositionIndex: " + hoveredPositionIndex)
-//				+ ("\t_currentHoveredTrackPosition: " + _currentHoveredTrackPosition)
-//				+ ("\thoveredTrackPath: " + hoveredTrackPath)
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
       if (hoveredTrackPath == null) {
 
          // hide tour info
@@ -2106,7 +2067,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          } else {
 
-            // ckeck if a new position is hovered
+            // check if a new position is hovered
             if (_currentHoveredTrack != null
                   && _currentHoveredTrack == hoveredTrackPath
                   && _currentHoveredTrackPosition != null
@@ -2160,7 +2121,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          // track layer is displayed
 
-         final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
+         final List<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
          final boolean isTourAvailable = _allTours.size() > 0;
 
@@ -2213,7 +2174,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 //2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
    private void showAllTours_Final(final boolean isSyncMapViewWithTour,
-                                   final ArrayList<TourMap3Position> allPositions) {
+                                   final List<TourMap3Position> allPositions) {
 
       if (isSyncMapViewWithTour) {
 
@@ -2234,7 +2195,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       showAllTours(_isMapSynched_WithTour);
    }
 
-   private void showAllTours_NewTours(final ArrayList<TourData> newTours) {
+   private void showAllTours_NewTours(final List<TourData> newTours) {
 
       // check if new tours are already displayed
       if (newTours.hashCode() == _allTours.hashCode()) {
@@ -2267,7 +2228,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             if (_allTours.size() > 1) {
 
                final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
-               final ArrayList<TourMap3Position> trackPositions = tourTrackLayer.selectTrackPath(newTourData);
+               final List<TourMap3Position> trackPositions = tourTrackLayer.selectTrackPath(newTourData);
 
                if (trackPositions == null) {
                   // track is already selected
@@ -2310,24 +2271,21 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void showToursFromTourProvider() {
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_mapContainer.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_mapContainer.isDisposed()) {
+            return;
+         }
 
-            // check if tour is set from a selection provider
-            if (_allTours.size() > 0) {
-               return;
-            }
+         // check if tour is set from a selection provider
+         if (_allTours.size() > 0) {
+            return;
+         }
 
-            final ArrayList<TourData> allTours = TourManager.getSelectedTours();
-            if (allTours != null) {
-               showAllTours_NewTours(allTours);
-            }
+         final ArrayList<TourData> allTours = TourManager.getSelectedTours();
+         if (allTours != null) {
+            showAllTours_NewTours(allTours);
          }
       });
    }
@@ -2482,7 +2440,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public void syncMapWithOtherMap(final MapPosition mapPosition,
                                    final ViewPart viewPart,
-                                   final int positionFlags) {
+                                   final IMapSyncListener.SyncParameter syncParameter) {
 
       if (!_isMapSynched_WithOtherMap) {
 
@@ -2498,14 +2456,28 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-      final long timeDiff = System.currentTimeMillis() - _lastFiredSyncEventTime;
+      final long currentTime = System.currentTimeMillis();
 
-      if (timeDiff < 1000) {
+      final long timeDiffLastFired = currentTime - _lastFiredSyncEventTime;
+
+      if (timeDiffLastFired < 1000) {
          // ignore because it causes LOTS of problems when synchronizing moved map
          return;
       }
 
-      moveToMapLocation(mapPosition, positionFlags);
+      final long timeDiffLastSync = currentTime - _lastMapSyncEventTime;
+      if (timeDiffLastSync < 2000) {
+
+         /*
+          * This is currently not a very good solution because I didn't found the code to move the
+          * map without any animation which is first zooming out and then zooming in
+          */
+         return;
+      }
+
+      _lastMapSyncEventTime = currentTime;
+
+      moveToMapLocation(mapPosition, syncParameter);
    }
 
    private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
@@ -2527,7 +2499,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-      final TourData tourData = getSelectedTour(trackSliderLayer);
+      final TourData tourData = getSelectedTour();
       if (tourData == null) {
 // ???		trackSliderLayer.setSliderVisible(false);
          return;

@@ -1,0 +1,71 @@
+{
+	"items": [
+		{
+			"id": "634f49bf87e35c5a61e64947",
+			"username": "username123456",
+			"description": "Unnamed route",
+			"activities": [
+				1
+			],
+			"segments": [
+				{
+					"start": {
+						"latitude": 52.525417,
+						"longitude": 13.38985,
+						"altitude": 0,
+						"relativeDistance": 0
+					},
+					"end": {
+						"latitude": 52.524265,
+						"longitude": 13.407783,
+						"altitude": 0,
+						"relativeDistance": 1
+					},
+					"ascent": 0,
+					"descent": 0,
+					"distance": 1221.3,
+					"routePoints": [
+						{
+							"latitude": 52.525417,
+							"longitude": 13.38985,
+							"altitude": 0,
+							"relativeDistance": 0
+						}, {
+							"latitude": 52.524265,
+							"longitude": 13.407783,
+							"altitude": 0,
+							"relativeDistance": 1
+						}
+					]
+				}
+			],
+			"startPoint": {
+				"latitude": 52.525417,
+				"longitude": 13.38985,
+				"altitude": 0,
+				"relativeDistance": 0
+			},
+			"centerPoint": {
+				"latitude": 52.52484,
+				"longitude": 13.398816
+			},
+			"endPoint": {
+				"latitude": 52.524265,
+				"longitude": 13.407783,
+				"altitude": 0,
+				"relativeDistance": 1
+			},
+			"visibility": "PRIVATE",
+			"created": "1661880511019",
+			"averageSpeed": 2.2222223,
+			"totalDistance": 1221.3,
+			"modified": "1661880511037",
+			"turnWaypointsEnabled": false,
+			"producer": {
+				"id": "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8",
+				"name": "MyTourbook",
+				"iconUrl": "https://aspartnercontent.blob.core.windows.net/open-api/partner-images/d8f3e53f-6c20-4d17-9a4e-a4930c8667e8-icon.png"
+			}
+		}
+	]
+}

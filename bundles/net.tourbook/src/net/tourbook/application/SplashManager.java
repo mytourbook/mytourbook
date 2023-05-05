@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -162,7 +162,10 @@ public class SplashManager {
 
    public void close() {
 
-      splashShell.close();
+      if (!splashShell.isDisposed()) {
+         splashShell.close();
+      }
+
       splashShell = null;
       textLabel = null;
       textRect = null;
@@ -354,7 +357,7 @@ public class SplashManager {
    public void setMessage(final String message) {
 
       // log message if the splash screen do not show it
-      System.out.println(UI.timeStamp() + " Splash message: " + message);//$NON-NLS-1$
+      System.out.println(UI.timeStamp() + "[Splash message] " + message);//$NON-NLS-1$
 
       if (textLabel != null && !textLabel.isDisposed()) {
 
@@ -383,13 +386,13 @@ public class SplashManager {
 
    public void setSplashImagePath(final String splashPath) {
 
-      Assert.isLegal(!StringUtils.isNullOrEmpty(splashPath));
+      Assert.isLegal(StringUtils.hasContent(splashPath));
       this.splashPath = splashPath;
    }
 
    public void setSplashPluginId(final String pluginId) {
 
-      Assert.isLegal(!StringUtils.isNullOrEmpty(pluginId));
+      Assert.isLegal(StringUtils.hasContent(pluginId));
       this.pluginId = pluginId;
    }
 

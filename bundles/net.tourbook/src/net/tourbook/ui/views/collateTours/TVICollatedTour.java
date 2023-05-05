@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -38,93 +39,95 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
    static {
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
-            //
-            + "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
-            + "SUM(tourDeviceTime_Elapsed)," //					1	//$NON-NLS-1$
-            + "SUM(TourComputedTime_Moving)," //				2	//$NON-NLS-1$
-            + "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
-            + "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$
-            + "SUM(1)," //											5	//$NON-NLS-1$
-            //
-            + "MAX(MAXSPEED)," //									6	//$NON-NLS-1$
-            + "SUM(TOURDISTANCE)," //								7	//$NON-NLS-1$
-            + "MAX(MAXALTITUDE)," //								8	//$NON-NLS-1$
-            + "MAX(MAXPULSE)," //									9	//$NON-NLS-1$
-            //
-            + "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			10	//$NON-NLS-1$
-            + "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		11	//$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	12	//$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	13	//$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	14	//$NON-NLS-1$
-            + "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			15	//$NON-NLS-1$
-            //
-            + "SUM(CALORIES)," //									16	//$NON-NLS-1$
-            + "SUM(numberOfTimeSlices)," //							17	//$NON-NLS-1$
-            + "SUM(numberOfPhotos)," //								18	//$NON-NLS-1$
-            //
-            + "SUM(frontShiftCount)," //							19	//$NON-NLS-1$
-            + "SUM(rearShiftCount)," //								20	//$NON-NLS-1$
-            + "SUM(TourDeviceTime_Recorded)"; //							21//$NON-NLS-1$
+
+            + "SUM( CAST(TOURDISTANCE              AS BIGINT))," + NL //         0 //$NON-NLS-1$
+            + "SUM( CAST(TourDeviceTime_Elapsed    AS BIGINT))," + NL //         1 //$NON-NLS-1$
+            + "SUM( CAST(TourComputedTime_Moving   AS BIGINT))," + NL //         2 //$NON-NLS-1$
+            + "SUM( CAST(TOURALTUP                 AS BIGINT))," + NL //         3 //$NON-NLS-1$
+            + "SUM( CAST(TOURALTDOWN               AS BIGINT))," + NL //         4 //$NON-NLS-1$
+            + "SUM(1)," + NL //                                                  5 //$NON-NLS-1$
+
+            + "MAX(MAXSPEED)," + NL //                                           6 //$NON-NLS-1$
+            + "SUM( CAST(TOURDISTANCE              AS BIGINT))," + NL //         7 //$NON-NLS-1$
+            + "MAX(MAXALTITUDE)," + NL //                                        8 //$NON-NLS-1$
+            + "MAX(MAXPULSE)," + NL //                                           9 //$NON-NLS-1$
+
+            + "AVG( CASE WHEN AVGPULSE = 0         THEN NULL ELSE AVGPULSE END)," + NL //                                     10 //$NON-NLS-1$
+            + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," + NL //                                  11 //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," //$NON-NLS-1$
+            + NL //   12
+            + "AVG( CASE WHEN WEATHER_WIND_DIRECTION = 0 THEN NULL ELSE WEATHER_WIND_DIRECTION END )," + NL //                              13 //$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHER_WIND_SPEED = 0   THEN NULL ELSE WEATHER_WIND_SPEED END )," + NL //                              14 //$NON-NLS-1$
+            + "AVG( CASE WHEN RESTPULSE = 0        THEN NULL ELSE RESTPULSE END )," + NL //                                   15 //$NON-NLS-1$
+
+            + "SUM( CAST(CALORIES                  AS BIGINT))," + NL //         16 //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices        AS BIGINT))," + NL //         17 //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos            AS BIGINT))," + NL //         18 //$NON-NLS-1$
+
+            + "SUM( CAST(FrontShiftCount           AS BIGINT))," + NL //         19 //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount            AS BIGINT))," + NL //         20 //$NON-NLS-1$
+            + "SUM( CAST(TourDeviceTime_Recorded   AS BIGINT))" //               21 //$NON-NLS-1$
+      ;
    }
 
-   protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   CollatedToursView                collateToursView;
+   CollatedToursView              collateToursView;
 
-   String                           treeColumn;
+   String                         treeColumn;
 
    /**
     * Id's for the tags or <code>null</code> when tags are not available.
     */
-   private ArrayList<Long>          _tagIds;
-   HashSet<Long>                    sqlTagIds;
+   private ArrayList<Long>        _tagIds;
+   Set<Long>                      sqlTagIds;
 
    /**
     * Tour start time in ms.
     */
-   long                             colTourStartTime;
+   long                           colTourStartTime;
 
-   String                           colTourTitle;
-   long                             colPersonId;                               // tourPerson_personId
-   long                             colCounter;
-   long                             colCalories;
+   String                         colTourTitle;
+   long                           colPersonId;                               // tourPerson_personId
+   long                           colCounter;
+   long                           colCalories;
 
-   long                             colDistance;
-   long                             colRecordedTime;
-   long                             colElapsedTime;
-   long                             colMovingTime;
+   long                           colDistance;
+   long                           colRecordedTime;
+   long                           colElapsedTime;
+   long                           colMovingTime;
 
-   long                             colBreakTime;
-   long                             colPausedTime;
-   long                             colAltitudeUp;
-   long                             colAltitudeDown;
+   long                           colBreakTime;
+   long                           colPausedTime;
+   long                           colAltitudeUp;
+   long                           colAltitudeDown;
 
-   float                            colMaxSpeed;
-   long                             colMaxAltitude;
+   float                          colMaxSpeed;
+   long                           colMaxAltitude;
 
-   long                             colMaxPulse;
-   float                            colAvgSpeed;
-   float                            colAvgPace;
+   long                           colMaxPulse;
+   float                          colAvgSpeed;
+   float                          colAvgPace;
 
-   float                            colAvgPulse;
-   float                            colAvgCadence;
-   float                            colAvgTemperature;
-   int                              colWindSpd;
-   int                              colWindDir;
+   float                          colAvgPulse;
+   float                          colAvgCadence;
+   float                          colAvgTemperature_Device;
+   int                            colWindSpd;
+   int                            colWindDir;
 
-   String                           colClouds;
-   int                              colRestPulse;
-   int                              colWeekNo;
-   String                           colWeekDay;
+   String                         colClouds;
+   int                            colRestPulse;
+   int                            colWeekNo;
+   String                         colWeekDay;
 
-   int                              colWeekYear;
-   int                              colNumberOfTimeSlices;
-   int                              colNumberOfPhotos;
+   int                            colWeekYear;
+   int                            colNumberOfTimeSlices;
+   int                            colNumberOfPhotos;
 
-   int                              colDPTolerance;
-   int                              colFrontShiftCount;
+   int                            colDPTolerance;
+   int                            colFrontShiftCount;
 
-   int                              colRearShiftCount;
+   int                            colRearShiftCount;
 
    TVICollatedTour(final CollatedToursView view) {
 
@@ -158,7 +161,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
       colAvgPulse = result.getFloat(startIndex + 10);
       colAvgCadence = result.getFloat(startIndex + 11);
-      colAvgTemperature = result.getFloat(startIndex + 12);
+      colAvgTemperature_Device = result.getFloat(startIndex + 12);
 
       colWindDir = result.getInt(startIndex + 13);
       colWindSpd = result.getInt(startIndex + 14);
@@ -178,7 +181,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       colPausedTime = colElapsedTime - colRecordedTime;
    }
 
-   public ArrayList<Long> getTagIds() {
+   public List<Long> getTagIds() {
 
       if (sqlTagIds != null && _tagIds == null) {
          _tagIds = new ArrayList<>(sqlTagIds);
@@ -192,7 +195,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       return null;
    }
 
-   public void setTagIds(final HashSet<Long> tagIds) {
+   public void setTagIds(final Set<Long> tagIds) {
       sqlTagIds = tagIds;
    }
 

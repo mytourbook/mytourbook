@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,27 +16,29 @@
 package net.tourbook.ui.views.tourMarker;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.PhotoActivator;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionMarkerFilterWithGPS extends Action {
 
-	private TourMarkerAllView	_tourMarkerAllView;
+   private TourMarkerAllView _tourMarkerAllView;
 
-	public ActionMarkerFilterWithGPS(final TourMarkerAllView tourMarkerAllView) {
+   public ActionMarkerFilterWithGPS(final TourMarkerAllView tourMarkerAllView) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Action_MarkerFilter_WithGPS_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MarkerFilter_WithGPS));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MarkerFilter_WithGPS_Disabled));
+      setToolTipText(Messages.Action_MarkerFilter_WithGPS_Tooltip);
 
-		_tourMarkerAllView = tourMarkerAllView;
-	}
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_GPS));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_GPS_Disabled));
 
-	@Override
-	public void run() {
-		_tourMarkerAllView.actionMarkerFilterGPS(this);
-	}
+      _tourMarkerAllView = tourMarkerAllView;
+   }
+
+   @Override
+   public void run() {
+      _tourMarkerAllView.actionMarkerFilterGPS(this);
+   }
 }

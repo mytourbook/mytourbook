@@ -1,0 +1,88 @@
+name: Build
+on:
+  schedule:
+  - cron: "20 7 * * *"
+jobs:
+  build:
+    needs: check_date
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - name: echo-default-env-variables
+        run: echo "github.workspace = ${{ github.workspace }}"
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Make gradlew executable
+        run: chmod +x ./build/build.net.tourbook/gradlew
+      - name: Rename MT to mytourbook
+        run: cd ./build/build.net.tourbook && powershell -Command "(gc CREATE_MT_BuildFiles.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII CREATE_MT_BuildFiles.xml" && cd ../../bundles && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml" && cd ../LANGUAGE-FRAGMENTS && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml" && cd ../bundles/net.tourbook.tests && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml" && cd ../net.tourbook.ui.tests && powershell -Command "(gc pom.xml) -replace '/MT/', '/mytourbook/' | Out-File -encoding ASCII pom.xml"
+      - name: Deactivate the nl repo
+        run: cd ./build/build.net.tourbook.feature && powershell -Command "(gc feature.xml) | select-string -pattern '.nl' -notmatch | Set-Content -encoding ASCII feature.xml" && cd ../build.net.tourbook.product && powershell -Command "(gc net.tourbook.product) | select-string -pattern '.nl' -notmatch | Set-Content -encoding ASCII net.tourbook.product" && powershell -Command "(gc net.tourbook.with.jre.product) | select-string -pattern '.nl' -notmatch | Set-Content -encoding ASCII net.tourbook.with.jre.product" && cd ../../features && powershell -Command "(gc pom.xml) | select-string -pattern '.nl' -notmatch | Set-Content -encoding ASCII pom.xml" && cd .. && powershell -Command "(gc pom.xml) | select-string -pattern '.nl.repo' -notmatch | Set-Content -encoding ASCII pom.xml"
+      - name: Activate the unit tests
+        run: powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml" && cd bundles/net.tourbook.tests && powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml" && cd ../net.tourbook.ui.tests && powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml"
+      - name: Activate JaCoCo for the code coverage
+        run: powershell -Command "(gc pom.xml) -replace '<skip>true</skip>', '<skip>false</skip>' | Out-File -encoding ASCII pom.xml"
+      - name: Build and analyze              
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: cd ./build/build.net.tourbook && ./gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --warning-mode all --stacktrace --info
+      - name: Upload screenshot of failed tests
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Tests-Failures
+          path: |
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.*
+          retention-days: 5
+      - name: Generate artifact name
+        id: generate-artifact-name
+        run: |
+          $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
+          echo "artifactFileName=$FILENAME" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Upload JaCoCo file
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifactFileName }}
+          path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
+          retention-days: 5
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Tests Report
+          path: 'D:/a/mytourbook-BUILD-autocreated/core/**/target/surefire-reports/*.xml'
+          reporter: java-junit
+          
+  check_date:
+    runs-on: windows-latest
+    name: Check latest commit is less than 24 hours old
+    outputs:
+      should_run: ${{ steps.should_run.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: print latest_commit
+        run: echo ${{ github.sha }}
+
+      - id: should_run
+        continue-on-error: true
+        name: check latest commit is less than a day
+        if: ${{ github.event_name == 'schedule' }}
+        run: test -z $(git rev-list --after="24 hours" ${{ github.sha }}) && echo "::set-output name=should_run::false"

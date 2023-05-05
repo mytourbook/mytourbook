@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import java.io.File;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.PicDirFolder;
 import net.tourbook.photo.internal.PicDirImages;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
@@ -48,296 +47,297 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PicDirView extends ViewPart implements IPhotoEventListener {
 
-	static public final String					ID												= "net.tourbook.photo.PicDirView";														//$NON-NLS-1$
+   static public final String  ID                                 = "net.tourbook.photo.PicDirView"; //$NON-NLS-1$
 
-	private static final String				SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR	= "PicDirViewToolBar";																		//$NON-NLS-1$
+   private static final String SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR = "PicDirViewToolBar";             //$NON-NLS-1$
 
-	private static final String				STATE_TREE_WIDTH							= "STATE_TREE_WIDTH";																		//$NON-NLS-1$
+   private static final String STATE_TREE_WIDTH                   = "STATE_TREE_WIDTH";              //$NON-NLS-1$
 
-	private static final IDialogSettings	_state										= Activator.getDefault().getDialogSettingsSection("PhotoDirectoryView");	//$NON-NLS-1$
-	private static final IPreferenceStore	_prefStore									= Activator.getDefault().getPreferenceStore();
+   //
+   private static final IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+   private static final IDialogSettings  _state     = PhotoActivator.getDefault().getDialogSettingsSection("PhotoDirectoryView"); //$NON-NLS-1$
 
-	private IPartListener2						_partListener;
-	private IPropertyChangeListener			_prefChangeListener;
+   private IPartListener2                _partListener;
+   private IPropertyChangeListener       _prefChangeListener;
 
-	private PostSelectionProvider				_postSelectionProvider;
+   private PostSelectionProvider         _postSelectionProvider;
 
-	private PicDirFolder							_picDirFolder;
-	private PicDirImages							_picDirImages;
+   private PicDirFolder                  _picDirFolder;
+   private PicDirImages                  _picDirImages;
 
-	private ISelectionConverter				_selectionConverter;
+   private ISelectionConverter           _selectionConverter;
 
-	/*
-	 * UI controls
-	 */
-	private SashLeftFixedForm					_containerMasterDetail;
-	private Composite								_containerFolder;
-	private Composite								_containerImages;
+   /*
+    * UI controls
+    */
+   private SashLeftFixedForm _containerMasterDetail;
+   private Composite         _containerFolder;
+   private Composite         _containerImages;
 
-	static int compareFiles(final File file1, final File file2) {
+   static int compareFiles(final File file1, final File file2) {
 
 //		boolean aIsDir = a.isDirectory();
 //		boolean bIsDir = b.isDirectory();
 //		if (aIsDir && ! bIsDir) return -1;
 //		if (bIsDir && ! aIsDir) return 1;
 
-		// sort case-sensitive files in a case-insensitive manner
-		final String file1Name = file1.getName();
-		final String file2Name = file2.getName();
+      // sort case-sensitive files in a case-insensitive manner
+      final String file1Name = file1.getName();
+      final String file2Name = file2.getName();
 
-		// try to sort by numbers
-		try {
+      // try to sort by numbers
+      try {
 
-			final int file1No = Integer.parseInt(file1Name);
-			final int file2No = Integer.parseInt(file2Name);
+         final int file1No = Integer.parseInt(file1Name);
+         final int file2No = Integer.parseInt(file2Name);
 
-			return file1No - file2No;
+         return file1No - file2No;
 
-		} catch (final Exception e) {
-			// at least one filename co not contain a number, sort by string
-		}
+      } catch (final Exception e) {
+         // at least one filename co not contain a number, sort by string
+      }
 
-		int compare = file1Name.compareToIgnoreCase(file2Name);
+      int compare = file1Name.compareToIgnoreCase(file2Name);
 
-		if (compare == 0) {
-			compare = file1Name.compareTo(file2Name);
-		}
-		return compare;
-	}
+      if (compare == 0) {
+         compare = file1Name.compareTo(file2Name);
+      }
+      return compare;
+   }
 
-	/**
-	 * Gets a directory listing
-	 *
-	 * @param file
-	 *           the directory to be listed
-	 * @return an array of files this directory contains, may be empty but not null
-	 */
-	static File[] getDirectoryList(final File file) {
-		final File[] list = file.listFiles();
-		if (list == null) {
-			return new File[0];
-		}
-		sortFiles(list);
-		return list;
-	}
+   /**
+    * Gets a directory listing
+    *
+    * @param file
+    *           the directory to be listed
+    * @return an array of files this directory contains, may be empty but not null
+    */
+   static File[] getDirectoryList(final File file) {
+      final File[] list = file.listFiles();
+      if (list == null) {
+         return new File[0];
+      }
+      sortFiles(list);
+      return list;
+   }
 
-	private static void sortBlock(final File[] files, final int start, final int end, final File[] mergeTemp) {
-		final int length = end - start + 1;
-		if (length < 8) {
-			for (int i = end; i > start; --i) {
-				for (int j = end; j > start; --j) {
-					if (compareFiles(files[j - 1], files[j]) > 0) {
-						final File temp = files[j];
-						files[j] = files[j - 1];
-						files[j - 1] = temp;
-					}
-				}
-			}
-			return;
-		}
-		final int mid = (start + end) / 2;
-		sortBlock(files, start, mid, mergeTemp);
-		sortBlock(files, mid + 1, end, mergeTemp);
-		int x = start;
-		int y = mid + 1;
-		for (int i = 0; i < length; ++i) {
-			if ((x > mid) || ((y <= end) && compareFiles(files[x], files[y]) > 0)) {
-				mergeTemp[i] = files[y++];
-			} else {
-				mergeTemp[i] = files[x++];
-			}
-		}
-		for (int i = 0; i < length; ++i) {
-			files[i + start] = mergeTemp[i];
-		}
-	}
+   private static void sortBlock(final File[] files, final int start, final int end, final File[] mergeTemp) {
+      final int length = end - start + 1;
+      if (length < 8) {
+         for (int i = end; i > start; --i) {
+            for (int j = end; j > start; --j) {
+               if (compareFiles(files[j - 1], files[j]) > 0) {
+                  final File temp = files[j];
+                  files[j] = files[j - 1];
+                  files[j - 1] = temp;
+               }
+            }
+         }
+         return;
+      }
+      final int mid = (start + end) / 2;
+      sortBlock(files, start, mid, mergeTemp);
+      sortBlock(files, mid + 1, end, mergeTemp);
+      int x = start;
+      int y = mid + 1;
+      for (int i = 0; i < length; ++i) {
+         if ((x > mid) || ((y <= end) && compareFiles(files[x], files[y]) > 0)) {
+            mergeTemp[i] = files[y++];
+         } else {
+            mergeTemp[i] = files[x++];
+         }
+      }
+      for (int i = 0; i < length; ++i) {
+         files[i + start] = mergeTemp[i];
+      }
+   }
 
-	/**
-	 * Sorts files lexicographically by name.
-	 *
-	 * @param files
-	 *           the array of Files to be sorted
-	 */
-	public static void sortFiles(final File[] files) {
+   /**
+    * Sorts files lexicographically by name.
+    *
+    * @param files
+    *           the array of Files to be sorted
+    */
+   public static void sortFiles(final File[] files) {
 
-		/* Very lazy merge sort algorithm */
-		sortBlock(files, 0, files.length - 1, new File[files.length]);
-	}
+      /* Very lazy merge sort algorithm */
+      sortBlock(files, 0, files.length - 1, new File[files.length]);
+   }
 
-	public void actionRefreshFolder() {
-		_picDirFolder.actionRefreshFolder();
-	}
+   public void actionRefreshFolder() {
+      _picDirFolder.actionRefreshFolder();
+   }
 
-	private void addPartListener() {
+   private void addPartListener() {
 
-		_partListener = new IPartListener2() {
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+      _partListener = new IPartListener2() {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {
 
-				if (partRef.getPart(false) == PicDirView.this) {
+            if (partRef.getPart(false) == PicDirView.this) {
 
                PhotoManager.setPicDirView(null);
 
-					_picDirImages.stopLoadingImages();
+               _picDirImages.stopLoadingImages();
 
-					ThumbnailStore.cleanupStoreFiles(false, false);
-				}
-			}
+               ThumbnailStore.cleanupStoreFiles(false, false);
+            }
+         }
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-	private void addPrefListener() {
+   private void addPrefListener() {
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				_picDirFolder.handlePrefStoreModifications(event);
-				_picDirImages.handlePrefStoreModifications(event);
-			}
-		};
+            _picDirFolder.handlePrefStoreModifications(event);
+            _picDirImages.handlePrefStoreModifications(event);
+         }
+      };
 
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-	@Override
-	public void createPartControl(final Composite parent) {
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		fillActionBarsBeforeUI();
+      fillActionBarsBeforeUI();
 
-		createUI(parent);
+      createUI(parent);
 
-		fillActionBars();
+      fillActionBars();
 
-		addPartListener();
-		addPrefListener();
-		PhotoManager.addPhotoEventListener(this);
+      addPartListener();
+      addPrefListener();
+      PhotoManager.addPhotoEventListener(this);
 
-		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      // set selection provider
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
       PhotoManager.setPicDirView(this);
 
-		/*
-		 * restore async because a previous folder can contain many files and it can take a long time
-		 * to show the UI, this can be worrisome for the user when the UI is not displayed during
-		 * application startup
-		 */
-		parent.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				restoreState();
-			}
-		});
-	}
+      /*
+       * restore async because a previous folder can contain many files and it can take a long time
+       * to show the UI, this can be worrisome for the user when the UI is not displayed during
+       * application startup
+       */
+      parent.getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            restoreState();
+         }
+      });
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		_picDirImages = new PicDirImages(this, _state);
-		_picDirFolder = new PicDirFolder(this, _picDirImages, _state);
+      _picDirImages = new PicDirImages(this, _state);
+      _picDirFolder = new PicDirFolder(this, _picDirImages, _state);
 
-		final Composite masterDetailContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(masterDetailContainer);
-		{
-			// file folder
-			_containerFolder = new Composite(masterDetailContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(_containerFolder);
-			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_containerFolder);
-			{
-				_picDirFolder.createUI(_containerFolder);
-			}
+      final Composite masterDetailContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(masterDetailContainer);
+      {
+         // file folder
+         _containerFolder = new Composite(masterDetailContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().applyTo(_containerFolder);
+         GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_containerFolder);
+         {
+            _picDirFolder.createUI(_containerFolder);
+         }
 
-			// sash
-			final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
+         // sash
+         final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
 
-			// photos
-			_containerImages = new Composite(masterDetailContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(_containerImages);
-			GridLayoutFactory.fillDefaults().applyTo(_containerImages);
+         // photos
+         _containerImages = new Composite(masterDetailContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().applyTo(_containerImages);
+         GridLayoutFactory.fillDefaults().applyTo(_containerImages);
 //			_containerImages.setLayout(new FillLayout());
-			{
-				_picDirImages.createUI(_containerImages, _picDirFolder);
-			}
+         {
+            _picDirImages.createUI(_containerImages, _picDirFolder);
+         }
 
-			// master/detail form
-			_containerMasterDetail = new SashLeftFixedForm(
-					masterDetailContainer,
-					_containerFolder,
-					sash,
-					_containerImages);
-		}
-	}
+         // master/detail form
+         _containerMasterDetail = new SashLeftFixedForm(
+               masterDetailContainer,
+               _containerFolder,
+               sash,
+               _containerImages);
+      }
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		PhotoManager.removePhotoEventListener(this);
+      PhotoManager.removePhotoEventListener(this);
 
-		getViewSite().getPage().removePartListener(_partListener);
+      getViewSite().getPage().removePartListener(_partListener);
 
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		super.dispose();
-	}
+      super.dispose();
+   }
 
-	/**
-	 * fill view menu
-	 */
-	private void fillActionBars() {
+   /**
+    * fill view menu
+    */
+   private void fillActionBars() {
 
-		/*
-		 * fill view menu
-		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+      /*
+       * fill view menu
+       */
+      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		_picDirImages.fillViewMenu(menuMgr);
-	}
+      _picDirImages.fillViewMenu(menuMgr);
+   }
 
-	/**
-	 * fill view toolbar
-	 */
-	private void fillActionBarsBeforeUI() {
+   /**
+    * fill view toolbar
+    */
+   private void fillActionBarsBeforeUI() {
 
-		final IToolBarManager tbmMgr = getViewSite().getActionBars().getToolBarManager();
+      final IToolBarManager tbmMgr = getViewSite().getActionBars().getToolBarManager();
 
-		tbmMgr.add(new Separator(SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR));
-	}
+      tbmMgr.add(new Separator(SEPARATOR_ID_PIC_DIR_VIEW_TOOL_BAR));
+   }
 
-	public void fireCurrentSelection() {
+   public void fireCurrentSelection() {
 
-		final ISelection selectedPhotosWithExif = _picDirImages.getSelectedPhotosWithExif(false);
+      final ISelection selectedPhotosWithExif = _picDirImages.getSelectedPhotosWithExif(false);
 
-		fireSelection(selectedPhotosWithExif);
-	}
+      fireSelection(selectedPhotosWithExif);
+   }
 
-	private void fireSelection(final ISelection selection) {
+   private void fireSelection(final ISelection selection) {
 
-		// fire selection for the selected photos
-		if (selection != null) {
+      // fire selection for the selected photos
+      if (selection != null) {
 
-			_postSelectionProvider.setSelection(selection);
+         _postSelectionProvider.setSelection(selection);
 
 //			/*
 //			 * reset selection because this selection opens a perspective and it causes a runtime
@@ -349,114 +349,123 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 //					return true;
 //				}
 //			});
-		}
-	}
+      }
+   }
 
-	/**
-	 * @return Returns selected folder or <code>null</code> when a folder is not selected.
-	 */
-	public File getSelectedFolder() {
+   /**
+    * @return Returns selected folder or <code>null</code> when a folder is not selected.
+    */
+   public File getSelectedFolder() {
 
-		return _picDirFolder.getSelectedFolder();
-	}
+      return _picDirFolder.getSelectedFolder();
+   }
 
-	/**
-	 * Creates a {@link PhotosWithExifSelection}
-	 *
-	 * @param isAllImages
-	 *           When <code>true</code>, all images which are displayed in the gallery are returned,
-	 *           otherwise the selected images.
-	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> when
-	 *         loading EXIF data was canceled by the user.
-	 */
-	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
-		return _picDirImages.getSelectedPhotosWithExif(isAllImages);
-	}
+   /**
+    * Creates a {@link PhotosWithExifSelection}
+    *
+    * @param isAllImages
+    *           When <code>true</code>, all images which are displayed in the gallery are returned,
+    *           otherwise the selected images.
+    * @return Returns a {@link ISelection} for selected or all images or <code>null</code> when
+    *         loading EXIF data was canceled by the user.
+    */
+   public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
+      return _picDirImages.getSelectedPhotosWithExif(isAllImages);
+   }
 
-	@Override
-	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+   @Override
+   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
-		_picDirImages.photoEvent(photoEventId, data);
-	}
+      _picDirImages.photoEvent(photoEventId, data);
+   }
 
-	public void refreshUI() {
+   public void refreshUI() {
 
-		_picDirImages.refreshUI();
-	}
+      _picDirImages.refreshUI();
+   }
 
-	public void registerContextMenu(final String menuId, final MenuManager menuMgr) {
+   public void registerContextMenu(final String menuId, final MenuManager menuMgr) {
 
-		getSite().registerContextMenu(menuId, menuMgr, _postSelectionProvider);
-	}
+      getSite().registerContextMenu(menuId, menuMgr, _postSelectionProvider);
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
+      _containerMasterDetail.setViewerWidth(Util.getStateInt(_state, STATE_TREE_WIDTH, 200));
 
-		/*
-		 * image restore must be done BEFORE folder restore because folder restore is also loading the
-		 * folder and updates folder history
-		 */
-		// 1.
-		_picDirImages.restoreState();
+      /*
+       * image restore must be done BEFORE folder restore because folder restore is also loading the
+       * folder and updates folder history
+       */
+      // 1.
+      _picDirImages.restoreState();
 
-		// 2.
-		_picDirFolder.restoreState();
+      // 2.
+      _picDirFolder.restoreState();
 
-		setFocus();
+      setFocus();
 
-		// set focus
+      // set focus
 //		getViewSite().getPage().activate(this);
-	}
+   }
 
-	@PersistState
-	private void saveState() {
+   @PersistState
+   private void saveState() {
 
-		if (_containerFolder.isDisposed()) {
-			// this happened
-			return;
-		}
+      if (_containerFolder.isDisposed()) {
+         // this happened
+         return;
+      }
 
-		// keep width of the dir folder view in the master detail container
-		_state.put(STATE_TREE_WIDTH, _containerMasterDetail.getViewerWidth());
+      // keep width of the dir folder view in the master detail container
+      _state.put(STATE_TREE_WIDTH, _containerMasterDetail.getViewerWidth());
 
-		_picDirFolder.saveState();
-		_picDirImages.saveState();
-	}
+      _picDirFolder.saveState();
+      _picDirImages.saveState();
+   }
 
-	@Override
-	public void setFocus() {
+   @Override
+   public void setFocus() {
 
-		// 1st set focus to the gallery when it is maximized
-		final Control maximizedControl = _containerMasterDetail.getMaximizedControl();
+      // 1st set focus to the gallery when it is maximized
+      final Control maximizedControl = _containerMasterDetail.getMaximizedControl();
 
-		if (maximizedControl == _containerImages) {
-			_picDirImages.setFocus();
-		} else {
-			_picDirFolder.getTree().setFocus();
-		}
-	}
+      if (maximizedControl == _containerImages) {
+         _picDirImages.setFocus();
+      } else {
+         _picDirFolder.getTree().setFocus();
+      }
+   }
 
-	public void setMaximizedControl(final boolean isShowFolderAndGallery) {
-		_containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
-	}
+   public void setMaximizedControl(final boolean isShowFolderAndGallery) {
+      _containerMasterDetail.setMaximizedControl(isShowFolderAndGallery ? null : _containerImages);
+   }
 
-	public void setSelection(ISelection selection) {
+   public void setSelection(final ISelection selection) {
 
-		if (_selectionConverter != null) {
+      if (_selectionConverter != null) {
 
-			/*
-			 * convert default selection into a selection from the selection type provider, it mainly
-			 * converts into another type, that the new type is fired instead of the old
-			 */
-			selection = _selectionConverter.convertSelection(selection);
-		}
+         /*
+          * Convert default selection into a selection from the selection converter, it mainly
+          * converts into another type, that the new type is fired instead of the old
+          */
 
-		fireSelection(selection);
-	}
+// Disabled as it seems this selection is fired only the first time -> very strange,
+// however the app is working as expected, when a photo is selected, then "Photos + Tours" is updated
+// and "Tour Photos" display the photo
+//
+//         selection = _selectionConverter.convertSelection(selection);
 
-	public void setSelectionConverter(final ISelectionConverter selectionConverter) {
-		_selectionConverter = selectionConverter;
-	}
+         // The selection converter is used again to ensure, that the link view is opened.
+         // This may be also the reason why the selection converter exists -> complicated
+         _selectionConverter.convertSelection(selection);
+      }
+
+      fireSelection(selection);
+   }
+
+   public void setSelectionConverter(final ISelectionConverter selectionConverter) {
+      _selectionConverter = selectionConverter;
+   }
 
 }

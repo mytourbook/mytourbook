@@ -1,6 +1,8 @@
 plugins {
 
    id 'com.github.dkorotych.gradle-maven-exec' version '2.2.1'
+   id 'org.sonarqube' version '4.0.0.2929'
+   id 'jacoco'
 }
 
 // get MT version and remove quotes
@@ -13,7 +15,7 @@ def _dirProductReleaseNotes      = file('../../info/release-notes')
 def _pathProductArchive          = _dirProductArchive.absolutePath
                                  
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
-def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 5/iscc.exe').absolutePath
+def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
 
 gradle.taskGraph.beforeTask { Task task ->
@@ -40,10 +42,23 @@ mt_0_Build.dependsOn(
    'mt_30_CopyProduct',
    'mt_40_ExtractWinFiles',
    'mt_50_CreateExeFiles',
-   'mt_60_CleanupWinFiles',
+   'mt_60_CleanupFiles',
    'mt_70_CopyReleaseNotes',
 )
 
+sonarqube {
+  properties {
+    property 'sonar.projectKey',                     'wolfgang-ch_mytourbook'
+    property 'sonar.organization',                   'wolfgang-ch'
+    property 'sonar.host.url',                       'https://sonarcloud.io'
+    property 'sonar.sources',                        'bundles'
+    property 'sonar.exclusions',                     'bundles/net.tourbook.ext.jars/**/*'
+    property 'sonar.coverage.exclusions',            'bundles/net.tourbook.tests/**/*.*, **src-test/**/*.*, bundles/net.tourbook.ui.tests/**/*.*, bundles/net.tourbook.p2/**/*.*, bundles/**/Slideout*.java, bundles/**/*_DISABLED.java, bundles/**/*_TEMPLATE_*.java, bundles/net.tourbook/src/net/tourbook/update/**/*.*, bundles/net.tourbook/src/net/tourbook/map3/**/*.*, bundles/**/AbstractRRShell.java, bundles/net.tourbook.cloud/src/net/tourbook/cloud/dropbox/**/*.*, bundles/**/Action_Property_*.java'
+    property 'sonar.java.binaries',                  '.'
+    property 'sonar.java.libraries',                 'bundles/net.tourbook.ext.jars/**/*.jar'
+    property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml, ../../mytourbook-BUILD-autocreated/core/net.tourbook.ui.tests/target/site/jacoco-aggregate/jacoco.xml'
+  }
+}
 
 /*
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
@@ -64,14 +79,14 @@ task mt_20_BuildProduct {
 
    doLast {
 
-      //run: mvn verify -P build-release
+      // run: mvn verify -P build-release
 
       def buildDir = file('../..')
 
       mavenexec {
 
          workingDir  buildDir
-         goals       'verify'
+         goals       'clean', 'verify'
          
          // repos can be used offline when this option "offline true" is set, 
          // by default it is disabled 
@@ -122,10 +137,10 @@ task mt_40_ExtractWinFiles {
 
       file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
 
-         def winZipFileName = winZipFile.name
-         def winZipName = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+         def winZipFileName   = winZipFile.name
+         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
 
-         def outputDir = file(_pathProductArchive + '/' + winZipName)
+         def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
          println '\t' + outputDir
          
@@ -149,14 +164,23 @@ task mt_50_CreateExeFiles {
       
       def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
       
-      def win64SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-64-create-setup_exe.iss').absolutePath
+      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
       exec {
       
-         println '\twin 64'
+         println '\tWin 64'
       
          commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-         args      win64SetupConfigFilename
+         args        configFilename_Win64Setup
+      }
+
+      exec {
+      
+         println '\tWin 64 with Java runtime'
+      
+         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+         args        configFilename_Win64SetupWithJRE
       }
    }
 }
@@ -164,35 +188,41 @@ task mt_50_CreateExeFiles {
 /*
  Cleanup win zip files
 */
-task mt_60_CleanupWinFiles {
+task mt_60_CleanupFiles {
         
    doLast {
        
-      println 'Deleting extracted files from ' + _dirProductArchive
+      /*
+         Deleting extracted files
+      */
+      println 'Deleting extracted files'
       
       def hiddenDir = file(_pathProductArchive + '/hidden')
       
       file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
          
-         def winZipFileName = winZipFile.name
-         def winZipName = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+         def winZipFileName   = winZipFile.name
+         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
          
-         def outputDir = file(_pathProductArchive + '/' + winZipName)
+         def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
-         println '\tdelete\t\t' + outputDir
+         println '\tdelete folder\t\t' + outputDir
          
          // delete extracted files
          outputDir.deleteDir()
+      }
+      
+      /*
+         Delete JRE files      
+      */
+      println '' 
+      println 'Deleting JRE files'
+      
+      file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.zip/) { jreFile->
          
-         // move zip into hidden folder
-         hiddenDir.mkdirs()
-         def hiddenFile = file(hiddenDir.absolutePath + '/' + winZipFileName)
-         println '\tmove into\t' + hiddenFile 
+         println '\tdelete file\t\t' + jreFile
          
-         // delete old file when available
-         hiddenFile.delete()
-         
-         winZipFile.renameTo(hiddenFile)
+         jreFile.delete()
       }
    }
 }

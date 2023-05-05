@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2022 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,20 +22,21 @@ package net.tourbook.device.cm4xxm;
 import gnu.io.SerialPort;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
@@ -158,10 +159,12 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;
@@ -537,7 +540,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       deviceData.transferMonth = cm4xxmDeviceData.transferMonth;
       deviceData.transferDay = cm4xxmDeviceData.transferDay;
 
-      return true;
+      importState_File.isFileImportedWithValidData = true;
    }
 
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
@@ -572,17 +575,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
 
       return startBlock;
-   }
-
-   public final int readSummary(final byte[] buffer) throws IOException {
-      final int ch0 = buffer[0];
-      final int ch1 = buffer[1];
-      final int ch2 = buffer[2];
-      final int ch3 = buffer[3];
-      if ((ch0 | ch1 | ch2 | ch3) < 0) {
-         throw new EOFException();
-      }
-      return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
    }
 
    /**
@@ -632,15 +624,11 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    public boolean validateRawData(final String fileName) {
 
       boolean isValid = false;
+      final File dataFile = new File(fileName);
 
-      BufferedInputStream inStream = null;
-
-      try {
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[5];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
@@ -676,14 +664,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;
@@ -697,11 +677,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
     */
    private boolean verifyReferenceConsitency(final RandomAccessFile file, final int offsetDDRecord) throws IOException {
       final byte[] buffer = new byte[5];
-      String recordType = UI.EMPTY_STRING;
 
       file.seek(offsetDDRecord);
       file.read(buffer);
-      recordType = new String(buffer, 2, 2);
+      String recordType = new String(buffer, 2, 2);
 
       // make sure we read a DD record
       if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$

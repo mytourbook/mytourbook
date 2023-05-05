@@ -1,6 +1,26 @@
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
+[![Downloads](https://img.shields.io/sourceforge/dm/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
+[![Latest release](https://badgen.net/github/tag/wolfgang-ch/mytourbook)](https://github.com/wolfgang-ch/mytourbook/tags/)
+
+[![Build status](https://github.com/wolfgang-ch/mytourbook/actions/workflows/build.yml/badge.svg)](https://github.com/wolfgang-ch/mytourbook/actions/workflows/build.yml)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=coverage)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
+   
+<div>
+   <a href="https://github.com/mytourbook/mytourbook/issues/480"><img src="/info/community/oss-open-source-excellence-black.svg" width="150" height="150" /></a>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <a href="https://github.com/mytourbook/mytourbook/issues/480"><img src="/info/community/oss-community-choice-black.svg" width="150" height="150" /></a>
+</div>
+   
 # MyTourbook
 
-All documentations for this project are available on the website <http://mytourbook.sourceforge.net>
+All documentations for this project are available on the website <https://mytourbook.sourceforge.io/>
 
 **Some contributor links**
 
@@ -30,18 +50,34 @@ _This document will not repeat already written text in the documentation._
 
 -DlogCalendarProfile
 
+
 **Log FIT data**
 
 -DlogFitData
+
 
 ### Other
 
 **Scramble content/values**
 
-It is scrambeling text and values. This is used to create anynymous screenshots
+This will scramble text and values. This is used to create anonymous screenshots
 
 -DscrambleData
+
 
 **Each tour has a unique id so that a tour can be imported multiple times**
 
 -DcreateRandomTourId
+
+
+**Log selected color values**
+
+This can be used to update default values in the Java code
+
+-DlogColorValues
+
+**Silently update the database in the background at startup**
+
+This can be used to update the database when a new version is available
+
+-DsilentDatabaseUpdate

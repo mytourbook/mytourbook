@@ -1,21 +1,20 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.common.util.Util;
 import net.tourbook.data.SplineData;
 import net.tourbook.math.CubicSpline;
 
@@ -38,451 +37,458 @@ import org.eclipse.swt.widgets.Display;
 
 public class SplineGraph extends Canvas {
 
-	private SplineData	_splineData;
+   private SplineData  _splineData;
+
+   private int[]       _devYSplineValues;
+   private boolean     _isComputeGraph;
 
-	private int[]		_devYSplineValues;
-	private boolean		_isComputeGraph;
+   private Rectangle[] _spPointRects;
+   private int         _pointHitIndex;
+   private boolean     _isPointMoved;
 
-	private Rectangle[]	_spPointRects;
-	private int			_pointHitIndex;
-	private boolean		_isPointMoved;
+   private float       _movedScaleX;
+   private float       _movedScaleY;
+   private float       _movedXMin;
+   private float       _movedXMax;
+   private float       _movedYMin;
+   private float       _movedYMax;
+   private int         _movedDevX0;
+   private int         _movedDevY0;
 
-	private float		_movedScaleX;
-	private float		_movedScaleY;
-	private float		_movedXMin;
-	private float		_movedXMax;
-	private float		_movedYMin;
-	private float		_movedYMax;
-	private int			_movedDevX0;
-	private int			_movedDevY0;
+   private Cursor      _cursorDragged;
 
-	private Cursor		_cursorDragged;
+   private double      _graphStartX;
 
-	private double		_graphStartX;
+   private boolean     _isSynchMinMax;
 
-	private boolean		_isSynchMinMax;
+   private float       _xMinComputed;
+   private float       _xMaxComputed;
+   private float       _yMinComputed;
+   private float       _yMaxComputed;
+   private boolean     _isMinMaxComputed;
 
-	private float		_xMinComputed;
-	private float		_xMaxComputed;
-	private float		_yMinComputed;
-	private float		_yMaxComputed;
-	private boolean		_isMinMaxComputed;
+   private int         _devXStartOffset;
 
-	private int			_devXStartOffset;
+   public SplineGraph(final Composite parent, final int style) {
 
-	public SplineGraph(final Composite parent, final int style) {
+      super(parent, style | SWT.DOUBLE_BUFFERED);
 
-		super(parent, style | SWT.DOUBLE_BUFFERED);
+      _cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
 
-		_cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
+      addListener();
+   }
 
-		addListener();
-	}
+   private void addListener() {
+      addPaintListener(new PaintListener() {
+         @Override
+         public void paintControl(final PaintEvent e) {
+            onPaint(e);
+         }
+      });
 
-	private void addListener() {
-		addPaintListener(new PaintListener() {
-			public void paintControl(final PaintEvent e) {
-				onPaint(e);
-			}
-		});
+      addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose(e);
+         }
+      });
 
-		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose(e);
-			}
-		});
+      addMouseMoveListener(new MouseMoveListener() {
+         @Override
+         public void mouseMove(final MouseEvent e) {
+            onMouseMove(e);
+         }
+      });
 
-		addMouseMoveListener(new MouseMoveListener() {
-			public void mouseMove(final MouseEvent e) {
-				onMouseMove(e);
-			}
-		});
+      addMouseListener(new MouseListener() {
+         @Override
+         public void mouseDoubleClick(final MouseEvent e) {
+            onMouseDoubleClick(e);
+         }
 
-		addMouseListener(new MouseListener() {
-			public void mouseDoubleClick(final MouseEvent e) {
-				onMouseDoubleClick(e);
-			}
+         @Override
+         public void mouseDown(final MouseEvent e) {
+            onMouseDown(e);
+         }
 
-			public void mouseDown(final MouseEvent e) {
-				onMouseDown(e);
-			}
+         @Override
+         public void mouseUp(final MouseEvent e) {
+            onMouseUp(e);
+         }
+      });
 
-			public void mouseUp(final MouseEvent e) {
-				onMouseUp(e);
-			}
-		});
+      addControlListener(new ControlListener() {
 
-		addControlListener(new ControlListener() {
+         @Override
+         public void controlMoved(final ControlEvent e) {}
 
-			public void controlMoved(final ControlEvent e) {}
+         @Override
+         public void controlResized(final ControlEvent e) {
+            _isComputeGraph = true;
+            redraw();
+         }
+      });
+   }
 
-			public void controlResized(final ControlEvent e) {
-				_isComputeGraph = true;
-				redraw();
-			}
-		});
-	}
+   private void onDispose(final DisposeEvent e) {
 
-	private void onDispose(final DisposeEvent e) {
+      _cursorDragged = net.tourbook.common.UI.disposeResource(_cursorDragged);
+   }
 
-		_cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
-	}
+   private void onMouseDoubleClick(final MouseEvent e) {
 
-	private void onMouseDoubleClick(final MouseEvent e) {
+   }
 
-	}
+   private void onMouseDown(final MouseEvent e) {
 
-	private void onMouseDown(final MouseEvent e) {
+      if (_spPointRects == null) {
+         return;
+      }
 
-		if (_spPointRects == null) {
-			return;
-		}
+      if (_pointHitIndex != Integer.MIN_VALUE) {
 
-		if (_pointHitIndex != Integer.MIN_VALUE) {
+         // mouse is over a point
 
-			// mouse is over a point
+         _isPointMoved = true;
+      }
 
-			_isPointMoved = true;
-		}
+   }
 
-	}
+   private void onMouseMove(final MouseEvent event) {
 
-	private void onMouseMove(final MouseEvent event) {
+      if (_spPointRects == null) {
+         return;
+      }
 
-		if (_spPointRects == null) {
-			return;
-		}
+      final int devXMouse = event.x;
+      final int devYMouse = event.y;
 
-		final int devXMouse = event.x;
-		final int devYMouse = event.y;
+      if (_isPointMoved) {
 
-		if (_isPointMoved) {
+         final int devX = -_movedDevX0 + devXMouse;
+         final int devY = _movedDevY0 - devYMouse;
 
-			final int devX = -_movedDevX0 + devXMouse;
-			final int devY = _movedDevY0 - devYMouse;
+         double graphPointX = (double) devX / _movedScaleX;
+         final double graphPointY = (double) devY / _movedScaleY;
 
-			double graphPointX = (double) devX / _movedScaleX;
-			final double graphPointY = (double) devY / _movedScaleY;
+         /*
+          * limit horizontal movement to min/max when it's set
+          */
+         final double graphXMin = _splineData.posX_GraphMinValues[_pointHitIndex];
+         final double graphXMax = _splineData.posX_GraphMaxValues[_pointHitIndex];
 
-			/*
-			 * limit horizontal movement to min/max when it's set
-			 */
-			final double graphXMin = _splineData.posX_GraphMinValues[_pointHitIndex];
-			final double graphXMax = _splineData.posX_GraphMaxValues[_pointHitIndex];
+         if (Double.isNaN(graphXMin) == false) {
+            if (graphPointX < graphXMin) {
+               graphPointX = graphXMin;
+            }
+         }
+         if (Double.isNaN(graphXMax) == false) {
+            if (graphPointX > graphXMax) {
+               graphPointX = graphXMax;
+            }
+         }
+         final double[] xPointValues = _splineData.posX_GraphValues;
+         final double[] yPointValues = _splineData.posY_GraphValues;
 
-			if (Double.isNaN(graphXMin) == false) {
-				if (graphPointX < graphXMin) {
-					graphPointX = graphXMin;
-				}
-			}
-			if (Double.isNaN(graphXMax) == false) {
-				if (graphPointX > graphXMax) {
-					graphPointX = graphXMax;
-				}
-			}
-			final double[] xPointValues = _splineData.posX_GraphValues;
-			final double[] yPointValues = _splineData.posY_GraphValues;
+         // update spline points
+         xPointValues[_pointHitIndex] = graphPointX;
+         yPointValues[_pointHitIndex] = graphPointY;
 
-			// update spline points
-			xPointValues[_pointHitIndex] = graphPointX;
-			yPointValues[_pointHitIndex] = graphPointY;
+         _isComputeGraph = true;
+         redraw();
 
-			_isComputeGraph = true;
-			redraw();
+      } else {
 
-		} else {
+         final boolean[] isPointMovable = _splineData.isPointMovable;
 
-			final boolean[] isPointMovable = _splineData.isPointMovable;
+         for (int valueIndex = 0; valueIndex < _spPointRects.length; valueIndex++) {
 
-			for (int valueIndex = 0; valueIndex < _spPointRects.length; valueIndex++) {
+            if (isPointMovable[valueIndex]) {
 
-				if (isPointMovable[valueIndex]) {
+               // keep point dev position
+               final Rectangle pointRect = _spPointRects[valueIndex];
 
-					// keep point dev position
-					final Rectangle pointRect = _spPointRects[valueIndex];
+               if (pointRect.contains(devXMouse, devYMouse)) {
+                  setCursor(_cursorDragged);
+                  _pointHitIndex = valueIndex;
+                  return;
+               }
+            }
+         }
 
-					if (pointRect.contains(devXMouse, devYMouse)) {
-						setCursor(_cursorDragged);
-						_pointHitIndex = valueIndex;
-						return;
-					}
-				}
-			}
+         _pointHitIndex = Integer.MIN_VALUE;
 
-			_pointHitIndex = Integer.MIN_VALUE;
+         setCursor(null);
+      }
+   }
 
-			setCursor(null);
-		}
-	}
+   private void onMouseUp(final MouseEvent e) {
 
-	private void onMouseUp(final MouseEvent e) {
+      if (_isPointMoved) {
 
-		if (_isPointMoved) {
+         _isPointMoved = false;
 
-			_isPointMoved = false;
+         if (_isSynchMinMax) {
+            _isComputeGraph = true;
+         }
 
-			if (_isSynchMinMax) {
-				_isComputeGraph = true;
-			}
+         redraw();
+      }
+   }
 
-			redraw();
-		}
-	}
+   private void onPaint(final PaintEvent e) {
 
-	private void onPaint(final PaintEvent e) {
+      if (_splineData == null) {
+         return;
+      }
 
-		if (_splineData == null) {
-			return;
-		}
+      final double[] graphPointsX = _splineData.posX_GraphValues;
+      final double[] graphPointsY = _splineData.posY_GraphValues;
+      final boolean[] isPointMovable = _splineData.isPointMovable;
 
-		final double[] graphPointsX = _splineData.posX_GraphValues;
-		final double[] graphPointsY = _splineData.posY_GraphValues;
-		final boolean[] isPointMovable = _splineData.isPointMovable;
+      // check if 2 points are available
+      if (graphPointsX == null || graphPointsX.length < 2) {
+         return;
+      }
 
+      final int pointLength = graphPointsX.length;
 
-		// check if 2 points are available
-		if (graphPointsX == null || graphPointsX.length < 2) {
-			return;
-		}
+      float graphXMin = _xMinComputed;
+      float graphXMax = _xMaxComputed;
+      float graphYMin = _yMinComputed;
+      float graphYMax = _yMaxComputed;
 
-		final int pointLength = graphPointsX.length;
+      if (_isSynchMinMax || _isMinMaxComputed == false) {
 
-		float graphXMin = _xMinComputed;
-		float graphXMax = _xMaxComputed;
-		float graphYMin = _yMinComputed;
-		float graphYMax = _yMaxComputed;
+         _isMinMaxComputed = true;
 
-		if (_isSynchMinMax || _isMinMaxComputed == false) {
+         graphXMin = graphXMax = (float) graphPointsX[0];
+         graphYMin = graphYMax = (float) graphPointsY[0];
 
-			_isMinMaxComputed = true;
+         // get x/y min/max values
+         for (int valueIndex = 0; valueIndex < pointLength; valueIndex++) {
 
-			graphXMin = graphXMax = (float) graphPointsX[0];
-			graphYMin = graphYMax = (float) graphPointsY[0];
+            final float graphX = (float) graphPointsX[valueIndex];
+            final float graphY = (float) graphPointsY[valueIndex];
 
-			// get x/y min/max values
-			for (int valueIndex = 0; valueIndex < pointLength; valueIndex++) {
+            graphXMin = graphX < graphXMin ? graphX : graphXMin;
+            graphXMax = graphX > graphXMax ? graphX : graphXMax;
 
-				final float graphX = (float) graphPointsX[valueIndex];
-				final float graphY = (float) graphPointsY[valueIndex];
+            graphYMin = graphY < graphYMin ? graphY : graphYMin;
+            graphYMax = graphY > graphYMax ? graphY : graphYMax;
+         }
 
-				graphXMin = graphX < graphXMin ? graphX : graphXMin;
-				graphXMax = graphX > graphXMax ? graphX : graphXMax;
+         // enforce minimum size
+         if (graphXMin == graphXMax) {
+            graphXMin--;
+            graphXMax++;
+         }
+         if (graphYMin == graphYMax) {
+            graphYMin--;
+            graphYMax++;
+         }
 
-				graphYMin = graphY < graphYMin ? graphY : graphYMin;
-				graphYMax = graphY > graphYMax ? graphY : graphYMax;
-			}
+         _xMinComputed = graphXMin;
+         _xMaxComputed = graphXMax;
+         _yMinComputed = graphYMin;
+         _yMaxComputed = graphYMax;
+      }
 
-			// enforce minimum size
-			if (graphXMin == graphXMax) {
-				graphXMin--;
-				graphXMax++;
-			}
-			if (graphYMin == graphYMax) {
-				graphYMin--;
-				graphYMax++;
-			}
+      if (_isPointMoved) {
+         // use min/max from last none moved graph
+         graphXMin = _movedXMin;
+         graphXMax = _movedXMax;
+         graphYMin = _movedYMin;
+         graphYMax = _movedYMax;
+      } else {
 
-			_xMinComputed = graphXMin;
-			_xMaxComputed = graphXMax;
-			_yMinComputed = graphYMin;
-			_yMaxComputed = graphYMax;
-		}
+         // keep none moved min/max
+         _movedXMin = graphXMin;
+         _movedXMax = graphXMax;
+         _movedYMin = graphYMin;
+         _movedYMax = graphYMax;
 
-		if (_isPointMoved) {
-			// use min/max from last none moved graph
-			graphXMin = _movedXMin;
-			graphXMax = _movedXMax;
-			graphYMin = _movedYMin;
-			graphYMax = _movedYMax;
-		} else {
+         if (_devXStartOffset == 0) {
+            _graphStartX = graphPointsX[0];
+         }
+      }
 
-			// keep none moved min/max
-			_movedXMin = graphXMin;
-			_movedXMax = graphXMax;
-			_movedYMin = graphYMin;
-			_movedYMax = graphYMax;
+      final Display display = Display.getCurrent();
+      final GC gc = e.gc;
+      final Rectangle clientArea = getClientArea();
 
-			if (_devXStartOffset == 0) {
-				_graphStartX = graphPointsX[0];
-			}
-		}
+      final int devWidth = clientArea.width;
+      final int devHeight = clientArea.height;
 
-		final Display display = Display.getCurrent();
-		final GC gc = e.gc;
-		final Rectangle clientArea = getClientArea();
+      final int devMargin = 10;
+      final int devMargin2 = devMargin / 2;
 
-		final int devWidth = clientArea.width;
-		final int devHeight = clientArea.height;
+      final int devGraphWidth = devWidth - devMargin;
+      final int devGraphHeight = devHeight - devMargin;
 
-		final int devMargin = 10;
-		final int devMargin2 = devMargin / 2;
+      final float graphYMaxAbs = (graphYMax < 0) ? -graphYMax : graphYMax;
+      final float graphYMinAbs = (graphYMin < 0) ? -graphYMin : graphYMin;
+      final float graphYMaxAbsAbs = Math.max(graphYMinAbs, graphYMaxAbs);
 
-		final int devGraphWidth = devWidth - devMargin;
-		final int devGraphHeight = devHeight - devMargin;
+      float scaleX, scaleY;
 
-		final float graphYMaxAbs = (graphYMax < 0) ? -graphYMax : graphYMax;
-		final float graphYMinAbs = (graphYMin < 0) ? -graphYMin : graphYMin;
-		final float graphYMaxAbsAbs = Math.max(graphYMinAbs, graphYMaxAbs);
+      scaleX = devGraphWidth / (graphXMax - graphXMin);
+      scaleY = devGraphHeight / (2 * graphYMaxAbsAbs);
 
-		float scaleX, scaleY;
+      final int devX0 = devMargin2 - (int) (graphXMin * scaleX);
+      final int devY0 = (int) (graphYMaxAbsAbs * scaleY) + devMargin2;
 
-		scaleX = devGraphWidth / (graphXMax - graphXMin);
-		scaleY = devGraphHeight / (2 * graphYMaxAbsAbs);
+      _movedScaleX = scaleX;
+      _movedScaleY = scaleY;
+      _movedDevX0 = devX0;
+      _movedDevY0 = devY0;
 
-		final int devX0 = devMargin2 - (int) (graphXMin * scaleX);
-		final int devY0 = (int) (graphYMaxAbsAbs * scaleY) + devMargin2;
+      // compute splines
+      if (_isComputeGraph || _devYSplineValues == null) {
 
-		_movedScaleX = scaleX;
-		_movedScaleY = scaleY;
-		_movedDevX0 = devX0;
-		_movedDevY0 = devY0;
+         _isComputeGraph = false;
 
-		// compute splines
-		if (_isComputeGraph || _devYSplineValues == null) {
+         final double graphXStart = graphPointsX[0];
+         final double graphXEnd = graphPointsX[pointLength - 1];
+         final double graphWidth = graphXEnd - graphXStart;
 
-			_isComputeGraph = false;
+         int devSplineWidth;
 
-			final double graphXStart = graphPointsX[0];
-			final double graphXEnd = graphPointsX[pointLength - 1];
-			final double graphWidth = graphXEnd - graphXStart;
+         if (_isPointMoved) {
 
-			int devSplineWidth;
+            // get spline width
+            devSplineWidth = (int) (graphWidth * _movedScaleX);
 
-			if (_isPointMoved) {
+         } else {
+            devSplineWidth = devGraphWidth;
+         }
 
-				// get spline width
-				devSplineWidth = (int) (graphWidth * _movedScaleX);
+         _devYSplineValues = new int[devSplineWidth];
 
-			} else {
-				devSplineWidth = devGraphWidth;
-			}
+         final double scaleXGraph = graphWidth / devSplineWidth;
 
-			_devYSplineValues = new int[devSplineWidth];
+         final CubicSpline cubicSpline = new CubicSpline(graphPointsX, graphPointsY);
 
-			final double scaleXGraph = graphWidth / devSplineWidth;
+         try {
 
-			final CubicSpline cubicSpline = new CubicSpline(graphPointsX, graphPointsY);
+            for (int devIndex = 0; devIndex < devSplineWidth; devIndex++) {
 
-			try {
+               final double graphX = graphXStart + (devIndex * scaleXGraph);
+               final double graphY = cubicSpline.interpolate(graphX);
 
-				for (int devIndex = 0; devIndex < devSplineWidth; devIndex++) {
+               final int devY = (int) (graphY * scaleY);
 
-					final double graphX = graphXStart + (devIndex * scaleXGraph);
-					final double graphY = cubicSpline.interpolate(graphX);
+               _devYSplineValues[devIndex] = devY;
+            }
 
-					final int devY = (int) (graphY * scaleY);
+         } catch (final IllegalArgumentException e2) {
+            // ignore
+         }
+      }
 
-					_devYSplineValues[devIndex] = devY;
-				}
+      // get fist point offset
+      if (_isSynchMinMax) {
 
-			} catch (final IllegalArgumentException e2) {
-				// ignore
-			}
-		}
+         if (_pointHitIndex == 0 && _isPointMoved) {
+            _devXStartOffset = (int) ((graphPointsX[0] - _graphStartX) * _movedScaleX);
+         } else {
+            _devXStartOffset = 0;
+         }
 
-		// get fist point offset
-		if (_isSynchMinMax) {
+      } else {
+         if (_pointHitIndex == 0 && _isPointMoved) {
+            _devXStartOffset = (int) ((graphPointsX[0] - _graphStartX) * _movedScaleX);
+         }
+      }
 
-			if (_pointHitIndex == 0 && _isPointMoved) {
-				_devXStartOffset = (int) ((graphPointsX[0] - _graphStartX) * _movedScaleX);
-			} else {
-				_devXStartOffset = 0;
-			}
+      /*
+       * paint background
+       */
+      gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+      gc.fillRectangle(clientArea);
 
-		} else {
-			if (_pointHitIndex == 0 && _isPointMoved) {
-				_devXStartOffset = (int) ((graphPointsX[0] - _graphStartX) * _movedScaleX);
-			}
-		}
+      gc.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+      gc.drawRectangle(0, 0, clientArea.width - 1, clientArea.height - 1);
 
-		/*
-		 * paint background
-		 */
-		gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		gc.fillRectangle(clientArea);
+      /*
+       * paint axis
+       */
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-		gc.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
-		gc.drawRectangle(0, 0, clientArea.width - 1, clientArea.height - 1);
+      gc.drawLine(0, devY0, devWidth, devY0); //	x-axis
+      gc.drawLine(devX0, 0, devX0, devHeight); // y-axis
 
-		/*
-		 * paint axis
-		 */
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+      /*
+       * paint splines
+       */
+      gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
-		gc.drawLine(0, devY0, devWidth, devY0); //	x-axis
-		gc.drawLine(devX0, 0, devX0, devHeight); // y-axis
+      int devYPrev = _devYSplineValues[0];
 
-		/*
-		 * paint splines
-		 */
-		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+      for (int devXIndex = 1; devXIndex < _devYSplineValues.length; devXIndex++) {
 
-		int devYPrev = _devYSplineValues[0];
+         final int devY = _devYSplineValues[devXIndex];
 
-		for (int devXIndex = 1; devXIndex < _devYSplineValues.length; devXIndex++) {
+         gc.drawLine(_devXStartOffset + devXIndex - 1 + devMargin2, //
+               devY0 - devYPrev,
+               _devXStartOffset + devXIndex + devMargin2,
+               devY0 - devY);
 
-			final int devY = _devYSplineValues[devXIndex];
+         devYPrev = devY;
+      }
 
-			gc.drawLine(_devXStartOffset + devXIndex - 1 + devMargin2,//
-					devY0 - devYPrev,
-					_devXStartOffset + devXIndex + devMargin2,
-					devY0 - devY);
+      /*
+       * paint spline points
+       */
+      _spPointRects = new Rectangle[pointLength];
 
-			devYPrev = devY;
-		}
+      final int hitSize = 10;
+      final int hitSize2 = hitSize / 2;
+      final int pointSize = 10;
+      final int pointSize2 = pointSize / 2;
 
-		/*
-		 * paint spline points
-		 */
-		_spPointRects = new Rectangle[pointLength];
+      for (int valueIndex = 0; valueIndex < pointLength; valueIndex++) {
 
-		final int hitSize = 10;
-		final int hitSize2 = hitSize / 2;
-		final int pointSize = 10;
-		final int pointSize2 = pointSize / 2;
+         int devX = (int) (graphPointsX[valueIndex] * scaleX);
+         int devY = (int) (graphPointsY[valueIndex] * scaleY);
 
-		for (int valueIndex = 0; valueIndex < pointLength; valueIndex++) {
+         devX = devX0 + devX;
+         devY = devY0 - devY;
 
-			int devX = (int) (graphPointsX[valueIndex] * scaleX);
-			int devY = (int) (graphPointsY[valueIndex] * scaleY);
-
-			devX = devX0 + devX;
-			devY = devY0 - devY;
-
-			// draw movable points with different colors
-			if (isPointMovable[valueIndex]) {
-				gc.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
-			} else {
-				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-			}
+         // draw movable points with different colors
+         if (isPointMovable[valueIndex]) {
+            gc.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
+         } else {
+            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+         }
 
 //			gc.fillRectangle(devX - pointSize2, devY - pointSize2, pointSize, pointSize);
-			gc.fillOval(devX - pointSize2, devY - pointSize2, pointSize, pointSize);
+         gc.fillOval(devX - pointSize2, devY - pointSize2, pointSize, pointSize);
 
-			// keep point position
-			_spPointRects[valueIndex] = new Rectangle(devX - hitSize2, devY - hitSize2, hitSize, hitSize);
-		}
+         // keep point position
+         _spPointRects[valueIndex] = new Rectangle(devX - hitSize2, devY - hitSize2, hitSize, hitSize);
+      }
 
-	}
+   }
 
-	public void updateValues(final SplineData splineData, final boolean isSynchMinMax, final boolean keepSynchMinMax) {
+   public void updateValues(final SplineData splineData, final boolean isSynchMinMax, final boolean keepSynchMinMax) {
 
-		final boolean backupIsSynchMinMax = _isSynchMinMax;
+      final boolean backupIsSynchMinMax = _isSynchMinMax;
 
-		_splineData = splineData;
-		_isSynchMinMax = isSynchMinMax;
+      _splineData = splineData;
+      _isSynchMinMax = isSynchMinMax;
 
-		_isComputeGraph = true;
+      _isComputeGraph = true;
 
-		// recompute min/max values
+      // recompute min/max values
 //		fIsMinMaxComputed = false;
 
-		redraw();
+      redraw();
 
-		if (keepSynchMinMax == false) {
-			// restore synch min/max state
-			_isSynchMinMax = backupIsSynchMinMax;
-		}
-	}
+      if (keepSynchMinMax == false) {
+         // restore synch min/max state
+         _isSynchMinMax = backupIsSynchMinMax;
+      }
+   }
 
 }

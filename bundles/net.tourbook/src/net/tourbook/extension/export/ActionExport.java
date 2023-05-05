@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,15 +42,15 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionExport extends Action implements IMenuCreator {
 
-   private static ArrayList<ExportTourExtension> _exportExtensionPoints;
+   private ArrayList<ExportTourExtension> _exportExtensionPoints;
 
-   private Menu                                  _menu;
-   private ArrayList<ActionExportTour>           _exportTourActions;
+   private Menu                           _menu;
+   private ArrayList<ActionExportTour>    _exportTourActions;
 
-   private final ITourProvider                   _tourProvider;
+   private final ITourProvider            _tourProvider;
 
-   private int                                   _tourStartIndex = -1;
-   private int                                   _tourEndIndex   = -1;
+   private int                            _tourStartIndex = -1;
+   private int                            _tourEndIndex   = -1;
 
    private class ActionExportTour extends Action {
 
@@ -150,28 +150,30 @@ public class ActionExport extends Action implements IMenuCreator {
                   TourbookPlugin.PLUGIN_ID,
                   TourbookPlugin.EXT_POINT_EXPORT_TOUR);
 
-      if (extPoint != null) {
+      if (extPoint == null) {
+         return _exportExtensionPoints;
+      }
 
-         for (final IExtension extension : extPoint.getExtensions()) {
-            for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+      for (final IExtension extension : extPoint.getExtensions()) {
+         for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-               if (configElement.getName().equalsIgnoreCase("export")) { //$NON-NLS-1$
-                  try {
-                     final Object object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
-                     if (object instanceof ExportTourExtension) {
+            if (configElement.getName().equalsIgnoreCase("export") == false) { //$NON-NLS-1$
+               continue;
+            }
+            try {
+               final Object object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+               if (object instanceof ExportTourExtension) {
 
-                        final ExportTourExtension exportTourItem = (ExportTourExtension) object;
+                  final ExportTourExtension exportTourItem = (ExportTourExtension) object;
 
-                        exportTourItem.setExportId(configElement.getAttribute("id")); //$NON-NLS-1$
-                        exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
-                        exportTourItem.setFileExtension(configElement.getAttribute("fileextension")); //$NON-NLS-1$
+                  exportTourItem.setExportId(configElement.getAttribute("id")); //$NON-NLS-1$
+                  exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
+                  exportTourItem.setFileExtension(configElement.getAttribute("fileextension")); //$NON-NLS-1$
 
-                        _exportExtensionPoints.add(exportTourItem);
-                     }
-                  } catch (final CoreException e) {
-                     e.printStackTrace();
-                  }
+                  _exportExtensionPoints.add(exportTourItem);
                }
+            } catch (final CoreException e) {
+               e.printStackTrace();
             }
          }
       }
@@ -190,9 +192,7 @@ public class ActionExport extends Action implements IMenuCreator {
       dispose();
       _menu = new Menu(parent);
 
-      for (final ActionExportTour action : _exportTourActions) {
-         addActionToMenu(action);
-      }
+      _exportTourActions.forEach(this::addActionToMenu);
 
       return _menu;
    }

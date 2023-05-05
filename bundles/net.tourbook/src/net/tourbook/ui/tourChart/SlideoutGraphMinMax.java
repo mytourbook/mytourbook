@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,17 +15,21 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -33,10 +37,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -48,13 +50,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelectorListener {
-
-   private static final String    GRAPH_LABEL_CADENCE_UNIT         = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT       = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String    GRAPH_LABEL_POWER_UNIT           = net.tourbook.common.Messages.Graph_Label_Power_Unit;
-   private static final String    GRAPH_LABEL_SWIM_STROKES         = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String    GRAPH_LABEL_SWIM_SWOLF           = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
+public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final int       ALTIMETER_MIN                    = -10000;
    private static final int       ALTIMETER_MAX                    = 10000;
@@ -69,42 +65,34 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private static final int       TEMPERATURE_MIN                  = -100;
    private static final int       TEMPERATURE_MAX                  = 100;
 
-   private static final int       RUN_DYN_STANCE_TIME_MAX          = 10000;                                                  // ms
-   private static final int       RUN_DYN_STANCE_TIME_BALANCED_MAX = 100;                                                    // %
-   private static final int       RUN_DYN_STEP_LENGTH_MAX          = 10000;                                                  // mm
-   private static final int       RUN_DYN_VERTICAL_OSCILLATION_MAX = 1000;                                                   // mm
-   private static final int       RUN_DYN_VERTICAL_RATIO_MAX       = 100;                                                    // %
+   private static final int       RUN_DYN_STANCE_TIME_MAX          = 10000;                        // ms
+   private static final int       RUN_DYN_STANCE_TIME_BALANCED_MAX = 100;                          // %
+   private static final int       RUN_DYN_STEP_LENGTH_MAX          = 10000;                        // mm
+   private static final int       RUN_DYN_VERTICAL_OSCILLATION_MAX = 1000;                         // mm
+   private static final int       RUN_DYN_VERTICAL_RATIO_MAX       = 100;                          // %
 
    private static final int       SWIM_STROKES_MAX                 = 10000;
    private static final int       SWIM_SWOLF_MAX                   = 10000;
 
    private final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private SelectionAdapter       _defaultSelectionListener;
+   private SelectionListener      _defaultSelectionListener;
    private MouseWheelListener     _defaultMouseWheelListener;
 
    {
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
    }
 
-   private PixelConverter _pc;
+   private PixelConverter        _pc;
 
-   private Action         _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
-   private int            _columnSpacing;
+   private int                   _columnSpacing;
 
    /*
     * UI controls
@@ -274,6 +262,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private CLabel    _iconSwim_Strokes;
    private CLabel    _iconSwim_Swolf;
 
+   private boolean   _isShowPaceChartInverted;
+
    public SlideoutGraphMinMax(final Control ownerControl, final ToolBar toolBar) {
 
       super(ownerControl, toolBar);
@@ -302,19 +292,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -340,7 +318,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -369,7 +347,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private void createUI_12_Actions(final Composite parent) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(toolbar);
@@ -387,7 +365,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().applyTo(container);
-      GridLayoutFactory.swtDefaults()//
+      GridLayoutFactory.swtDefaults()
             .numColumns(7)
             .spacing(_pc.convertHorizontalDLUsToPixels(4), _pc.convertVerticalDLUsToPixels(4))
             .applyTo(container);
@@ -395,7 +373,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          createUI_52_MinMax_Enable(container);
          createUI_54_MinMax_Header(container);
 
-         createUI_61_MinMax_Altitude(container);
+         createUI_61_MinMax_Elevation(container);
          createUI_64_MinMax_Pulse(container);
          createUI_65_MinMax_Speed(container);
          createUI_66_MinMax_Pace(container);
@@ -420,9 +398,9 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private void createUI_52_MinMax_Enable(final Composite container) {
 
-      // ckeckbox: enable min/max
+      // checkbox: enable min/max
       _chkEnableMinMax = new Button(container, SWT.CHECK);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(7, 1)
             .applyTo(_chkEnableMinMax);
       _chkEnableMinMax.setText(Messages.Pref_Graphs_Checkbox_EnableMinMaxValues);
@@ -437,7 +415,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       // label: min value
       _lblMinValue = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(2, 1)
             .indent(_columnSpacing, 0)
             .applyTo(_lblMinValue);
@@ -445,7 +423,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       // label: max value
       _lblMaxValue = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(2, 1)
             .indent(_columnSpacing, 0)
             .applyTo(_lblMaxValue);
@@ -455,7 +433,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       new Label(parent, SWT.NONE);
    }
 
-   private void createUI_61_MinMax_Altitude(final Composite parent) {
+   private void createUI_61_MinMax_Elevation(final Composite parent) {
 
       _iconAltitude = createUI_Icon(parent, _imageAltitude);
 
@@ -519,16 +497,12 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _lblMinMax_Pulse = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForcePulseValue);
 
       _chkMin_Pulse = createUI_Checkbox(parent);
-      _spinnerMin_Pulse = createUI_Spinner(parent, //
-            PrefPagePeople.HEART_BEAT_MIN,
-            PrefPagePeople.HEART_BEAT_MAX);
+      _spinnerMin_Pulse = createUI_Spinner(parent, 0, PrefPagePeople.HEART_BEAT_MAX);
 
       _chkMax_Pulse = createUI_Checkbox(parent);
-      _spinnerMax_Pulse = createUI_Spinner(parent, //
-            PrefPagePeople.HEART_BEAT_MIN,
-            PrefPagePeople.HEART_BEAT_MAX);
+      _spinnerMax_Pulse = createUI_Spinner(parent, 0, PrefPagePeople.HEART_BEAT_MAX);
 
-      _lblMinMax_Pulse_Unit = createUI_Label(parent, GRAPH_LABEL_HEARTBEAT_UNIT);
+      _lblMinMax_Pulse_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
    }
 
    private void createUI_65_MinMax_Speed(final Composite parent) {
@@ -573,7 +547,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Cadence = createUI_Checkbox(parent);
       _spinnerMax_Cadence = createUI_Spinner(parent, 0, CADENCE_MAX);
 
-      _lblMinMax_Cadence_Unit = createUI_Label(parent, GRAPH_LABEL_CADENCE_UNIT);
+      _lblMinMax_Cadence_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_CADENCE_UNIT);
    }
 
    private void createUI_68_MinMax_Power(final Composite parent) {
@@ -588,7 +562,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Power = createUI_Checkbox(parent);
       _spinnerMax_Power = createUI_Spinner(parent, 0, POWER_MAX);
 
-      _lblMinMax_Power_Unit = createUI_Label(parent, GRAPH_LABEL_POWER_UNIT);
+      _lblMinMax_Power_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_POWER_UNIT);
    }
 
    private void createUI_69_MinMax_Temperature(final Composite parent) {
@@ -697,7 +671,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Swim_Strokes = createUI_Checkbox(parent);
       _spinnerMax_Swim_Strokes = createUI_Spinner(parent, 0, SWIM_STROKES_MAX);
 
-      _lblMinMax_Swim_Strokes_Unit = createUI_Label(parent, GRAPH_LABEL_SWIM_STROKES);
+      _lblMinMax_Swim_Strokes_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_SWIM_STROKES);
    }
 
    private void createUI_86_MinMax_Swim_Swolf(final Composite parent) {
@@ -712,15 +686,16 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Swim_Swolf = createUI_Checkbox(parent);
       _spinnerMax_Swim_Swolf = createUI_Spinner(parent, 0, SWIM_SWOLF_MAX);
 
-      _lblMinMax_Swim_Swolf_Unit = createUI_Label(parent, GRAPH_LABEL_SWIM_SWOLF);
+      _lblMinMax_Swim_Swolf_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_SWIM_SWOLF);
    }
 
    private Button createUI_Checkbox(final Composite parent) {
 
-      // ckeckbox
+      // checkbox
       final Button checkbox = new Button(parent, SWT.CHECK);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .indent(_columnSpacing, 0)
+            .align(SWT.FILL, SWT.CENTER)
             .applyTo(checkbox);
       checkbox.addSelectionListener(_defaultSelectionListener);
 
@@ -730,7 +705,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private CLabel createUI_Icon(final Composite parent, final Image image) {
 
       final CLabel icon = new CLabel(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
 //				.indent(16, 0)
             .applyTo(icon);
       icon.setImage(image);
@@ -750,8 +725,9 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private Spinner createUI_Spinner(final Composite parent, final int minValue, final int maxValue) {
 
       final Spinner spinner = new Spinner(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults()//
-            .align(SWT.END, SWT.FILL)
+      GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.FILL)
+//            .grab(true, false)
             .applyTo(spinner);
 
       spinner.setMinimum(minValue);
@@ -907,40 +883,40 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-		_imageAltimeter 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter).createImage();
-		_imageAltimeterDisabled 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter_disabled).createImage();
-		_imageAltitude 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude).createImage();
-		_imageAltitudeDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled).createImage();
-		_imageCadence 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence).createImage();
-		_imageCadenceDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence_disabled).createImage();
-		_imageGradient 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient).createImage();
-		_imageGradientDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled).createImage();
-		_imagePace 											= TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace).createImage();
-		_imagePaceDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled).createImage();
-		_imagePower 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_power).createImage();
-		_imagePowerDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_power_disabled).createImage();
-		_imagePulse 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat).createImage();
-		_imagePulseDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled).createImage();
-		_imageSpeed 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed).createImage();
-		_imageSpeedDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled).createImage();
-		_imageTemperature 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature).createImage();
-		_imageTemperatureDisabled 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled).createImage();
+		_imageAltimeter 									= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Altimeter).createImage();
+		_imageAltimeterDisabled 						= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Altimeter_Disabled).createImage();
+		_imageAltitude 									= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation).createImage();
+		_imageAltitudeDisabled 							= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled).createImage();
+		_imageCadence 										= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Cadence).createImage();
+		_imageCadenceDisabled 							= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Cadence_Disabled).createImage();
+		_imageGradient 									= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient).createImage();
+		_imageGradientDisabled 							= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient_Disabled).createImage();
+		_imagePace 											= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Pace).createImage();
+		_imagePaceDisabled 								= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Pace_Disabled).createImage();
+		_imagePower 										= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Power).createImage();
+		_imagePowerDisabled 								= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Power_Disabled).createImage();
+		_imagePulse 										= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat).createImage();
+		_imagePulseDisabled 								= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat_Disabled).createImage();
+		_imageSpeed 										= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed).createImage();
+		_imageSpeedDisabled 								= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed_Disabled).createImage();
+		_imageTemperature 								= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Temperature).createImage();
+		_imageTemperatureDisabled 						= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Temperature_Disabled).createImage();
 
-		_imageRunDyn_StanceTime							= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime).createImage();
-		_imageRunDyn_StanceTime_Disabled				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime_Disabled).createImage();
-		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance).createImage();
-		_imageRunDyn_StanceTimeBalance_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
-		_imageRunDyn_StepLength							= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength).createImage();
-		_imageRunDyn_StepLength_Disabled				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength_Disabled).createImage();
-		_imageRunDyn_VerticalOscillation				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation).createImage();
-		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
-		_imageRunDyn_VerticalRatio						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio).createImage();
-		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
+		_imageRunDyn_StanceTime							= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_StanceTime).createImage();
+		_imageRunDyn_StanceTime_Disabled				= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_StanceTime_Disabled).createImage();
+		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_StanceTimeBalance).createImage();
+		_imageRunDyn_StanceTimeBalance_Disabled	= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
+		_imageRunDyn_StepLength							= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_StepLength).createImage();
+		_imageRunDyn_StepLength_Disabled				= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_StepLength_Disabled).createImage();
+		_imageRunDyn_VerticalOscillation				= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_VerticalOscillation).createImage();
+		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_VerticalOscillation_Disabled).createImage();
+		_imageRunDyn_VerticalRatio						= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_VerticalRatio).createImage();
+		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getThemedImageDescriptor(Images.Graph_RunDyn_VerticalRatio_Disabled).createImage();
 
-		_imageSwim_Strokes								= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes).createImage();
-		_imageSwim_Strokes_Disabled					= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes_Disabled).createImage();
-		_imageSwim_Swolf									= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf).createImage();
-		_imageSwim_Swolf_Disabled						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf_Disabled).createImage();
+		_imageSwim_Strokes								= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Swim_Strokes).createImage();
+		_imageSwim_Strokes_Disabled					= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Swim_Strokes_Disabled).createImage();
+		_imageSwim_Swolf									= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Swim_Swolf).createImage();
+		_imageSwim_Swolf_Disabled						= TourbookPlugin.getThemedImageDescriptor(Images.Graph_Swim_Swolf_Disabled).createImage();
 
 // SET_FORMATTING_ON
    }
@@ -957,40 +933,40 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    @Override
    public void onDispose() {
 
-      Util.disposeResource(_imageAltimeter);
-      Util.disposeResource(_imageAltimeterDisabled);
-      Util.disposeResource(_imageAltitude);
-      Util.disposeResource(_imageAltitudeDisabled);
-      Util.disposeResource(_imageCadence);
-      Util.disposeResource(_imageCadenceDisabled);
-      Util.disposeResource(_imageGradient);
-      Util.disposeResource(_imageGradientDisabled);
-      Util.disposeResource(_imagePace);
-      Util.disposeResource(_imagePaceDisabled);
-      Util.disposeResource(_imagePower);
-      Util.disposeResource(_imagePowerDisabled);
-      Util.disposeResource(_imagePulse);
-      Util.disposeResource(_imagePulseDisabled);
-      Util.disposeResource(_imageSpeed);
-      Util.disposeResource(_imageSpeedDisabled);
-      Util.disposeResource(_imageTemperature);
-      Util.disposeResource(_imageTemperatureDisabled);
+      UI.disposeResource(_imageAltimeter);
+      UI.disposeResource(_imageAltimeterDisabled);
+      UI.disposeResource(_imageAltitude);
+      UI.disposeResource(_imageAltitudeDisabled);
+      UI.disposeResource(_imageCadence);
+      UI.disposeResource(_imageCadenceDisabled);
+      UI.disposeResource(_imageGradient);
+      UI.disposeResource(_imageGradientDisabled);
+      UI.disposeResource(_imagePace);
+      UI.disposeResource(_imagePaceDisabled);
+      UI.disposeResource(_imagePower);
+      UI.disposeResource(_imagePowerDisabled);
+      UI.disposeResource(_imagePulse);
+      UI.disposeResource(_imagePulseDisabled);
+      UI.disposeResource(_imageSpeed);
+      UI.disposeResource(_imageSpeedDisabled);
+      UI.disposeResource(_imageTemperature);
+      UI.disposeResource(_imageTemperatureDisabled);
 
-      Util.disposeResource(_imageRunDyn_StanceTime);
-      Util.disposeResource(_imageRunDyn_StanceTime_Disabled);
-      Util.disposeResource(_imageRunDyn_StanceTimeBalance);
-      Util.disposeResource(_imageRunDyn_StanceTimeBalance_Disabled);
-      Util.disposeResource(_imageRunDyn_StepLength);
-      Util.disposeResource(_imageRunDyn_StepLength_Disabled);
-      Util.disposeResource(_imageRunDyn_VerticalOscillation);
-      Util.disposeResource(_imageRunDyn_VerticalOscillation_Disabled);
-      Util.disposeResource(_imageRunDyn_VerticalRatio);
-      Util.disposeResource(_imageRunDyn_VerticalRatio_Disabled);
+      UI.disposeResource(_imageRunDyn_StanceTime);
+      UI.disposeResource(_imageRunDyn_StanceTime_Disabled);
+      UI.disposeResource(_imageRunDyn_StanceTimeBalance);
+      UI.disposeResource(_imageRunDyn_StanceTimeBalance_Disabled);
+      UI.disposeResource(_imageRunDyn_StepLength);
+      UI.disposeResource(_imageRunDyn_StepLength_Disabled);
+      UI.disposeResource(_imageRunDyn_VerticalOscillation);
+      UI.disposeResource(_imageRunDyn_VerticalOscillation_Disabled);
+      UI.disposeResource(_imageRunDyn_VerticalRatio);
+      UI.disposeResource(_imageRunDyn_VerticalRatio_Disabled);
 
-      Util.disposeResource(_imageSwim_Strokes);
-      Util.disposeResource(_imageSwim_Strokes_Disabled);
-      Util.disposeResource(_imageSwim_Swolf);
-      Util.disposeResource(_imageSwim_Swolf_Disabled);
+      UI.disposeResource(_imageSwim_Strokes);
+      UI.disposeResource(_imageSwim_Strokes_Disabled);
+      UI.disposeResource(_imageSwim_Swolf);
+      UI.disposeResource(_imageSwim_Swolf_Disabled);
    }
 
    private void prefRestoreDefault(final Button button, final String prefName) {
@@ -1044,7 +1020,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _prefStore.setValue(prefName, prefValue);
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _parent.setRedraw(false);
 
@@ -1071,8 +1048,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefRestoreDefault(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefRestoreDefault(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      if (_isShowPaceChartInverted) {
+         prefRestoreDefault(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+         prefRestoreDefault(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+      } else {
+         prefRestoreDefault(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+         prefRestoreDefault(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      }
 
       // min/max cadence
       prefRestoreDefault(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1160,6 +1142,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       _parent.setRedraw(false);
 
+      _isShowPaceChartInverted = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED);
+
       _chkEnableMinMax.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED));
 
       // min/max altitude
@@ -1183,8 +1167,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefRestoreValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefRestoreValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      if (_isShowPaceChartInverted) {
+         prefRestoreValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+         prefRestoreValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+      } else {
+         prefRestoreValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+         prefRestoreValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      }
 
       // min/max cadence
       prefRestoreValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1291,8 +1280,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefSaveValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefSaveValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      if (_isShowPaceChartInverted) {
+         prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+         prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+      } else {
+         prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+         prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      }
 
       // min/max cadence
       prefSaveValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1416,12 +1410,23 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          final int min = _spinnerMin_Pace.getSelection();
          final int max = _spinnerMax_Pace.getSelection();
 
-         if (min >= max) {
+         if (_isShowPaceChartInverted) {
+            if (min <= max) {
 
-            if (max == PACE_MAX) {
-               _spinnerMin_Pace.setSelection(max - 1);
-            } else {
-               _spinnerMax_Pace.setSelection(min + 1);
+               if (max == PACE_MAX) {
+                  _spinnerMax_Pace.setSelection(max + 1);
+               } else {
+                  _spinnerMin_Pace.setSelection(min + 1);
+               }
+            }
+         } else {
+            if (min >= max) {
+
+               if (max == PACE_MAX) {
+                  _spinnerMin_Pace.setSelection(max - 1);
+               } else {
+                  _spinnerMax_Pace.setSelection(min + 1);
+               }
             }
          }
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.osgi.util.NLS;
@@ -57,7 +58,7 @@ public class TileImageLoader implements Runnable {
 
       if (tile.isLoadingError()) {
 
-         // move tile from tile cache into the cache which contails tiles with errors
+         // move tile from tile cache into the cache which contains tiles with errors
 
          MP.getErrorTiles().add(tileKey, tile);
 
@@ -68,14 +69,14 @@ public class TileImageLoader implements Runnable {
       tile.setLoading(false);
 
       if (isNotifyObserver) {
-         tile.notifyImageObservers();
+         tile.callTileImageLoaderCallback();
       }
 
       MP.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
    }
 
    /**
-    * Get tile tile image from offline file, url or tile painter
+    * Get tile image from offline file, url or tile painter
     */
    private void getTileImage(final Tile tile) {
 
@@ -88,6 +89,7 @@ public class TileImageLoader implements Runnable {
       try {
 
          boolean isSaveImage = false;
+         boolean isLoadingImage = false;
 
          final MP mp = tile.getMP();
          final TileImageCache tileImageCache = mp.getTileImageCache();
@@ -165,7 +167,7 @@ public class TileImageLoader implements Runnable {
 
                         final String userAgent = mp.getUserAgent();
 
-                        if (userAgent != null) {
+                        if (StringUtils.hasContent(userAgent)) {
                            connection.setRequestProperty(HTTP_HEADER_USER_AGENT, userAgent);
                         }
 
@@ -173,10 +175,7 @@ public class TileImageLoader implements Runnable {
 
                      } catch (final FileNotFoundException e) {
 
-                        loadingError = NLS.bind(
-                              Messages.DBG052_Loading_Error_FileNotFoundException,
-                              tile.getUrl(),
-                              e.getMessage());
+                        loadingError = NLS.bind(Messages.DBG052_Loading_Error_FileNotFoundException, tile.getUrl(), e.getMessage());
 
                         // this is hidden because it can happen very often
                         // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
@@ -184,10 +183,7 @@ public class TileImageLoader implements Runnable {
 
                      } catch (final UnknownHostException e) {
 
-                        loadingError = NLS.bind(
-                              Messages.DBG053_Loading_Error_UnknownHostException,
-                              tile.getUrl(),
-                              e.getMessage());
+                        loadingError = NLS.bind(Messages.DBG053_Loading_Error_UnknownHostException, tile.getUrl(), e.getMessage());
 
                         // this is hidden because it can happen very often
                         // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
@@ -195,10 +191,7 @@ public class TileImageLoader implements Runnable {
 
                      } catch (final Exception e) {
 
-                        loadingError = NLS.bind(//
-                              Messages.DBG054_Loading_Error_FromUrl,
-                              tile.getUrl(),
-                              e.getMessage());
+                        loadingError = NLS.bind(Messages.DBG054_Loading_Error_FromUrl, tile.getUrl(), e.getMessage());
 
                         // this is hidden because it can happen very often
                         // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
@@ -206,6 +199,7 @@ public class TileImageLoader implements Runnable {
                      }
                   }
 
+                  isLoadingImage = true;
                   final ImageData[] loadedImageData = new ImageLoader().load(inputStream);
 
                   if (loadedImageData != null && loadedImageData.length > 0) {
@@ -215,15 +209,25 @@ public class TileImageLoader implements Runnable {
                } catch (final Exception e) {
 
                   /*
-                   * exception occures when loading the image, don't remove them from the
+                   * Exception occurs when loading the image, don't remove them from the
                    * loading list, so that the tiles don't get reloaded
                    */
+
+                  if (isLoadingImage) {
+
+                     /*
+                      * Log only when images are loaded to debug this issue
+                      * https://github.com/wolfgang-ch/mytourbook/issues/317
+                      */
+
+                     StatusUtil.logError("Cannot load image from: " + tile.getUrl());//$NON-NLS-1$
+                  }
 
                   try {
                      if (inputStream != null) {
 
                         /*
-                         * Print stack track otherwise many popups can occure
+                         * Print stack track otherwise many popups can occur
                          */
 
                         if (_stackTraceCounter++ > 1) {
@@ -258,7 +262,7 @@ public class TileImageLoader implements Runnable {
          }
 
          /**
-          * tile image is loaded from a url or from an offline file, is painted or is not
+          * Tile image is loaded from a url or from an offline file, is painted or is not
           * available
           */
 
@@ -273,10 +277,9 @@ public class TileImageLoader implements Runnable {
 
             // image data is empty, set error
 
-            tile
-                  .setLoadingError(loadingError == null
-                        ? Messages.DBG051_Loading_Error_EmptyImageData
-                        : loadingError);
+            tile.setLoadingError(loadingError == null
+                  ? Messages.DBG051_Loading_Error_EmptyImageData
+                  : loadingError);
 
             isSetupImage = false;
          }
@@ -483,7 +486,7 @@ public class TileImageLoader implements Runnable {
 
             } else if (tile.isOfflimeImageAvailable()) {
 
-               // parent tile has no chilren which needs to be loaded, behave as a normal tile
+               // parent tile has no children which needs to be loaded, behave as a normal tile
 
                getTileImage(tile);
 

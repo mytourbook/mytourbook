@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -64,8 +66,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
@@ -95,8 +95,8 @@ public class ColorChooser extends Composite {
 
    private static final double                    SINUS_120                             = Math.sin(A_120);
    private static final double                    SINUS_240                             = -SINUS_120;
-   private static final double                    COSINUS120                            = Math.cos(A_120);
-   private static final double                    COSINUS_240                           = COSINUS120;
+   private static final double                    COSINUS_120                            = Math.cos(A_120);
+   private static final double                    COSINUS_240                           = COSINUS_120;
 
    private RGB                                    _chooserRGB;
    private int                                    _chooserSize;
@@ -130,7 +130,7 @@ public class ColorChooser extends Composite {
    /*
     * UI controls
     */
-   private TabFolder   _tabFolder;
+   private CTabFolder  _tabFolder;
 
    private ImageCanvas _hexagonCanvas;
    private Scale       _scaleHexagon;
@@ -296,17 +296,17 @@ public class ColorChooser extends Composite {
 
    private void createUI_10_Tabs(final Composite parent) {
 
-      _tabFolder = new TabFolder(parent, SWT.NONE);
+      _tabFolder = new CTabFolder(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_tabFolder);
-      _tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      _tabFolder.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
       // hexagon
-      final TabItem hexagonTab = new TabItem(_tabFolder, SWT.NONE);
+      final CTabItem hexagonTab = new CTabItem(_tabFolder, SWT.NONE);
       hexagonTab.setText(Messages.color_chooser_hexagon);
       createUI_22_Tab_Hexagon(_tabFolder, hexagonTab);
 
       // rgb / hsb
-      final TabItem rgbTab = new TabItem(_tabFolder, SWT.NONE);
+      final CTabItem rgbTab = new CTabItem(_tabFolder, SWT.NONE);
       rgbTab.setText(Messages.color_chooser_rgb);
       createUI_30_Tab_RGB_HSB(_tabFolder, rgbTab);
 
@@ -316,7 +316,7 @@ public class ColorChooser extends Composite {
    /**
     * Hexagon-Tab
     */
-   private void createUI_22_Tab_Hexagon(final Composite parent, final TabItem hexagonTab) {
+   private void createUI_22_Tab_Hexagon(final Composite parent, final CTabItem hexagonTab) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
@@ -401,7 +401,7 @@ public class ColorChooser extends Composite {
       hexagonTab.setControl(container);
    }
 
-   private void createUI_30_Tab_RGB_HSB(final Composite parent, final TabItem rgbTab) {
+   private void createUI_30_Tab_RGB_HSB(final Composite parent, final CTabItem rgbTab) {
 
       final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
       final int scaleStyle = SWT.NONE;
@@ -935,8 +935,8 @@ public class ColorChooser extends Composite {
          yr = (int) (x * SINUS_240 + y * COSINUS_240);
       } else if (a < 0) {
          sector = 1;
-         xr = (int) (x * COSINUS120 - y * SINUS_120);
-         yr = (int) (x * SINUS_120 + y * COSINUS120);
+         xr = (int) (x * COSINUS_120 - y * SINUS_120);
+         yr = (int) (x * SINUS_120 + y * COSINUS_120);
       } else {
          sector = 0;
          xr = x;

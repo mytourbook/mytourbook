@@ -1,0 +1,26 @@
+name: Feature Request
+description: Request a new Feature
+title: "[Feature : Location] "
+labels: ["Enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this Feature Request!
+        
+        Replace **"Location"** in the title where the bug occurred, e.g.        
+          - [Feature : FIT Import] ...
+          - [Feature : Tour Book View] ...
+          - [Feature : Tour Chart] ...
+          - [Feature : Tour Editor] ...
+          - [Feature : 2D Map] ...
+          . . .
+  - type: textarea
+    id: what-missed
+    attributes:
+      label: What is missing ?
+      description: Tell us your ideas
+      placeholder: Tell us what you like!
+      value: 
+    validations:
+      required: true

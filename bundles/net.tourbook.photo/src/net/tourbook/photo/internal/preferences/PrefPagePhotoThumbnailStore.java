@@ -18,10 +18,10 @@ package net.tourbook.photo.internal.preferences;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.manager.ThumbnailStore;
 
@@ -53,7 +53,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	private IPreferenceStore		_prefStore					= Activator.getDefault().getPreferenceStore();
+	private IPreferenceStore		_prefStore					= PhotoActivator.getPrefStore();
 
 	private final String			_defaultThumbnailStorePath	= Platform.getInstanceLocation().getURL().getPath();
 

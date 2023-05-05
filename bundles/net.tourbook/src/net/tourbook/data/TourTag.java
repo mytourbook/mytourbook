@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,10 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -35,20 +37,25 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourTag implements Cloneable, Comparable<Object> {
+public class TourTag implements Cloneable, Comparable<Object>, Serializable {
 
-   public static final int DB_LENGTH_NAME             = 255;
-   public static final int DB_LENGTH_NOTES            = 32000;
+   private static final long          serialVersionUID           = 1L;
 
-   public static final int EXPAND_TYPE_YEAR_MONTH_DAY = 0;
-   public static final int EXPAND_TYPE_FLAT           = 1;
-   public static final int EXPAND_TYPE_YEAR_DAY       = 2;
+   private static final char          NL                         = UI.NEW_LINE;
+
+   public static final int            DB_LENGTH_FILE_PATH        = 260;
+   public static final int            DB_LENGTH_NAME             = 255;
+   public static final int            DB_LENGTH_NOTES            = 32000;
+
+   public static final int            EXPAND_TYPE_YEAR_MONTH_DAY = 0;
+   public static final int            EXPAND_TYPE_FLAT           = 1;
+   public static final int            EXPAND_TYPE_YEAR_DAY       = 2;
 
    /**
     * Manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static int      _createCounter             = 0;
+   private static final AtomicInteger _createCounter             = new AtomicInteger();
 
    /*
     * DON'T USE THE FINAL KEYWORD FOR THE ID otherwise the Id cannot be set.
@@ -79,6 +86,8 @@ public class TourTag implements Cloneable, Comparable<Object> {
     * structures
     */
    private int    expandType = EXPAND_TYPE_FLAT;
+
+   private String imageFilePath;
 
 //   /**
 //    * A tag belongs to <b>ONE</b> category and not to many as it was implemented in version 14.4
@@ -114,8 +123,10 @@ public class TourTag implements Cloneable, Comparable<Object> {
    public TourTag() {}
 
    public TourTag(final String tagName) {
+
       name = tagName.trim();
-      _createId = ++_createCounter;
+
+      _createId = _createCounter.incrementAndGet();
    }
 
    @Override
@@ -177,6 +188,10 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
    public int getExpandType() {
       return expandType;
+   }
+
+   public String getImageFilePath() {
+      return imageFilePath;
    }
 
    /**
@@ -256,11 +271,29 @@ public class TourTag implements Cloneable, Comparable<Object> {
          notes = notes.substring(0, DB_LENGTH_NOTES);
       }
 
+      /*
+       * Check: Image file path
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            imageFilePath,
+            DB_LENGTH_FILE_PATH,
+            Messages.Db_Field_TourTag_ImageFilePath);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         imageFilePath = imageFilePath.substring(0, DB_LENGTH_FILE_PATH);
+      }
+
       return true;
    }
 
    public void setExpandType(final int expandType) {
       this.expandType = expandType;
+   }
+
+   public void setImageFilePath(final String imageFilePath) {
+      this.imageFilePath = imageFilePath;
    }
 
    public void setNotes(final String notes) {
@@ -284,9 +317,31 @@ public class TourTag implements Cloneable, Comparable<Object> {
       this.name = tagName;
    }
 
+   /**
+    * This method is called in the "Tour Data" view !!!
+    */
    @Override
    public String toString() {
-      return "tag: " + name + " (id:" + tagId + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return UI.EMPTY_STRING
+
+            + "TourTag" + NL //                          //$NON-NLS-1$
+            + "[" + NL //                                //$NON-NLS-1$
+
+            + "   tagId         =" + tagId + NL //         //$NON-NLS-1$
+            + "   isRoot        =" + isRoot + NL //        //$NON-NLS-1$
+            + "   name          =" + name + NL //          //$NON-NLS-1$
+            + "   notes         =" + notes + NL //         //$NON-NLS-1$
+            + "   expandType    =" + expandType + NL //    //$NON-NLS-1$
+
+            + "   _createId     =" + _createId + NL //     //$NON-NLS-1$
+
+            + "   imageFilePath =" + imageFilePath + NL //     //$NON-NLS-1$
+
+//          + "   tourData      =" + tourData + NL //      //$NON-NLS-1$
+
+            + "]" + NL //                                //$NON-NLS-1$
+      ;
    }
 
    /**
@@ -298,6 +353,6 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
       name = modifiedTourTag.name;
       notes = modifiedTourTag.notes;
+      imageFilePath = modifiedTourTag.imageFilePath;
    }
-
 }

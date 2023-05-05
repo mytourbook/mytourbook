@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 
 /**
- * Class used to initialize default preference values.
+ * Initialize default preference values.
  */
 public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -38,24 +38,36 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       final IPreferenceStore store = CommonActivator.getPrefStore();
 
       /*
-       * graph color preferences
+       * Graph default colors
        */
-      for (final ColorDefinition colorDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
+      for (final ColorDefinition colorDefinition : GraphColorManager.getAllColorDefinitions()) {
 
          PreferenceConverter.setDefault(
                store,
-               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT),
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_GRADIENT_BRIGHT),
                colorDefinition.getGradientBright_Default());
-
          PreferenceConverter.setDefault(
                store,
-               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_DARK),
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_GRADIENT_DARK),
                colorDefinition.getGradientDark_Default());
 
          PreferenceConverter.setDefault(
                store,
-               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE),
-               colorDefinition.getLineColor_Default());
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE_LIGHT),
+               colorDefinition.getLineColor_Default_Light());
+         PreferenceConverter.setDefault(
+               store,
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE_DARK),
+               colorDefinition.getLineColor_Default_Dark());
+
+         PreferenceConverter.setDefault(
+               store,
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_TEXT_LIGHT),
+               colorDefinition.getTextColor_Default_Light());
+         PreferenceConverter.setDefault(
+               store,
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_TEXT_DARK),
+               colorDefinition.getTextColor_Default_Dark());
       }
 
 // SET_FORMATTING_OFF
@@ -75,6 +87,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED,                 ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE,           ValueFormat.NUMBER_1_0.name());
 
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME,          ValueFormat.TIME_HH_MM.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME,         ValueFormat.TIME_HH_MM.name());
@@ -88,6 +101,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY,         ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY,         ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY,         ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY,   ValueFormat.NUMBER_1_0.name());
 
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY,  ValueFormat.TIME_HH.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY, ValueFormat.TIME_HH.name());
@@ -114,6 +128,11 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
        */
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK,       DayOfWeek.MONDAY.getValue());
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK,  4);
+
+      /*
+       * Transform values
+       */
+      store.setDefault(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX,           10);
 
 // SET_FORMATTING_ON
    }

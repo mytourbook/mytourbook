@@ -6,9 +6,9 @@ html
 body 
 {
    font-size:           12px;
-   color:               #fff;
-   background-color:    #444;
-   xpadding-left:       5px;
+   color:               #ddd;
+   background-color:    #333;
+   xxxfont-weight:      100;  /* is not working */
 }
 
 html, body 

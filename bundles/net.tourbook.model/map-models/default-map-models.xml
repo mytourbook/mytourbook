@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MapModels Created            ="2023-02-02T15:35:24.821664900+01:00[Europe/Berlin]"
+           VersionMajor       ="22"
+           VersionMicro       ="0"
+           VersionMinor       ="11"
+           VersionQualifier   ="qualifier"
+           configVersion      ="1"
+           >
+<AllMapModels>
+<MapModel 
+          isDefaultModel      ="true"
+          name                ="Skateboard"
+          description         ="Info for the original model which was modified for MyTourbook&#x0D;&#x0A;&#x0D;&#x0A;Model Information:&#x0D;&#x0A;* title:&#x09;Skateboard animated - Blockbench&#x0D;&#x0A;* source:&#x09;https://sketchfab.com/3d-models/skateboard-animated-blockbench-919d58adb0884c8895fc140455169ae0&#x0D;&#x0A;* author:&#x09;Art_bor (https://sketchfab.com/Art_bor)&#x0D;&#x0A;&#x0D;&#x0D;&#x0A;Model License:&#x0D;&#x0A;* license type:&#x09;CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)&#x0D;&#x0A;* requirements:&#x09;Author must be credited. Commercial use is allowed.&#x0D;&#x0A;&#x0D;&#x0A;If you use this 3D model in your project be sure to copy paste this credit wherever you share it:&#x0D;&#x0A;&#x0D;&#x0D;&#x0A;This work is based on &quot;Skateboard animated - Blockbench&quot; (https://sketchfab.com/3d-models/skateboard-animated-blockbench-919d58adb0884c8895fc140455169ae0) by Art_bor (https://sketchfab.com/Art_bor) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)"
+          filePath            ="/map-models/skateboard/mt-skateboard.gltf"
+          forwardAngle        ="95"
+          headPositionFactor  ="1.4"
+          id                  ="35417da1-d92a-4c33-8d0f-41e2d81d94bd"
+          />
+<MapModel 
+          isDefaultModel      ="true"
+          name                ="High wheeler"
+          description         ="Info for the original model which was modified for MyTourbook&#x0D;&#x0A;&#x0D;&#x0A;Model Information:&#x0A;&#x0D;&#x0A;* title:&#x09;Pennyfarthest Bicycle&#x0A;&#x0D;&#x0A;* source:&#x09;https://sketchfab.com/3d-models/pennyfarthest-bicycle-507a9cce128d4263adf3fbc2f134faf4&#x0A;&#x0D;&#x0A;* author:&#x09;Parker (Kobi) Troiani (https://sketchfab.com/BrotherKobi)&#x0A;&#x0A;Model &#x0D;&#x0A;&#x0D;&#x0A;License:&#x0A;&#x0D;&#x0A;&#x0D;&#x0A;* license type:&#x09;CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)&#x0A;&#x0D;&#x0A;* requirements:&#x09;Author must be credited. Commercial use is allowed.&#x0A;&#x0A;&#x0D;&#x0A;&#x0D;&#x0A;If you use this 3D model in your project be sure to copy paste this credit wherever you share it:&#x0A;&#x0D;&#x0A;This work is based on &quot;Pennyfarthest Bicycle&quot; (https://sketchfab.com/3d-models/pennyfarthest-bicycle-507a9cce128d4263adf3fbc2f134faf4) by Parker (Kobi) Troiani (https://sketchfab.com/BrotherKobi) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)"
+          filePath            ="/map-models/high-wheeler/hochrad.gltf"
+          forwardAngle        ="-90"
+          headPositionFactor  ="-7.5"
+          id                  ="76f66cbb-d3ca-447a-9874-643c9ec42399"
+          />
+<MapModel 
+          isDefaultModel      ="true"
+          name                ="Painted bicycle"
+          description         ="Info for the original model which was modified for MyTourbook&#x0D;&#x0A;&#x0D;&#x0A;Model Information:&#x0D;&#x0A;* title:&#x09;2D Bike | Downloadable for first 10 users&#x0D;&#x0A;* source:&#x09;https://sketchfab.com/3d-models/2d-bike-downloadable-for-first-10-users-b2cf1d7d284f46e4b90def4889c4da24&#x0D;&#x0A;* author:&#x09;Sumit Chavan (https://sketchfab.com/sumit.chavan)&#x0D;&#x0A;&#x0D;&#x0A;Model License:&#x0D;&#x0A;* license type:&#x09;CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)&#x0D;&#x0A;* requirements:&#x09;Author must be credited. Commercial use is allowed.&#x0D;&#x0A;&#x0D;&#x0A;If you use this 3D model in your project be sure to copy paste this credit wherever you share it:&#x0D;&#x0A;This work is based on &quot;2D Bike | Downloadable for first 10 users&quot; (https://sketchfab.com/3d-models/2d-bike-downloadable-for-first-10-users-b2cf1d7d284f46e4b90def4889c4da24) by Sumit Chavan (https://sketchfab.com/sumit.chavan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)"
+          filePath            ="/map-models/simple-bicycle/simple-bicycle.gltf"
+          forwardAngle        ="95"
+          headPositionFactor  ="5.0"
+          id                  ="1af34a28-157d-4a31-8065-3bb94fb81094"
+          />
+</AllMapModels>
+</MapModels>

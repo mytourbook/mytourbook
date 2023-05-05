@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -58,13 +59,10 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogHRZones extends TitleAreaDialog {
 
-   private final IDialogSettings       _state      = TourbookPlugin.getDefault()   //
-         .getDialogSettingsSection(getClass().getName());
+   private final IDialogSettings       _state      = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
    private TourPerson                  _person;
 
-   private Image                       _imageTrash = TourbookPlugin
-         .getImageDescriptor(Messages.Image__App_Trash)
-         .createImage();
+   private Image                       _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
 
    private ArrayList<TourPersonHRZone> _hrZones;
    private boolean                     _isUpdateUI;

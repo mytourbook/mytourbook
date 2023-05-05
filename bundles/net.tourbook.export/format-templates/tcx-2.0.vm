@@ -2,27 +2,30 @@
 <TrainingCenterDatabase 
 	xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd http://www.garmin.com/xmlschemas/ActivityExtension/v2 https://www8.garmin.com/xmlschemas/ActivityExtensionv2.xsd">
 #if($iscourses)
 	<Courses>
 		<Course>
 			<Name>$coursename</Name>
+			<Lap>
 #else
 	<Activities>
 		<Activity Sport="$activityType">
-#end
 			<Id>$dateformat.format($starttime)</Id>
 			<Lap StartTime="$dateformat.format($starttime)">
+#end
 				<TotalTimeSeconds>$totaltime</TotalTimeSeconds>
 				<DistanceMeters>$nf3.format($totaldistance)</DistanceMeters>
+#if(!$iscourses)
 				<Calories>$lap.getCalories()</Calories>
+#end
 #if($averageheartrate)
-				<AverageHeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
+				<AverageHeartRateBpm>
 					<Value>$averageheartrate</Value>
 				</AverageHeartRateBpm>
 #end
 #if($maximumheartrate)
-				<MaximumHeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
+				<MaximumHeartRateBpm>
 					<Value>$maximumheartrate</Value>
 				</MaximumHeartRateBpm>
 #end
@@ -30,19 +33,24 @@
 #if($averagecadence)		
 				<Cadence>$averagecadence</Cadence>
 #end
+#if(!$iscourses)
 				<TriggerMethod>Manual</TriggerMethod>
+#end
+#if(!$iscourses)
 #foreach( $track in $tracks )				
 				<Track>
 #set ($points = $track.getWaypoints())
 #foreach ($point in $points)
 					<Trackpoint>
 #if($point.getDate())
-                        <Time>$dateformat.format($point.getDate())</Time>
+						<Time>$dateformat.format($point.getDate())</Time>
 #end
+#if($point.hasValidCoordinates())
 						<Position>
 							<LatitudeDegrees>$nf8.format($point.Latitude)</LatitudeDegrees>
 							<LongitudeDegrees>$nf8.format($point.Longitude)</LongitudeDegrees>
 						</Position>
+#end
 #if($point.hasValidAltitude())
 						<AltitudeMeters>$nf3.format($point.Altitude)</AltitudeMeters>
 #end
@@ -50,32 +58,71 @@
 						<DistanceMeters>$nf3.format($point.Distance)</DistanceMeters>
 #end
 #if($point.hasValidHeartrate())
-						<HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
+						<HeartRateBpm>
 							<Value>$point.Heartrate</Value>
 						</HeartRateBpm>
-#if($point.hasValidCadence())
-						<Cadence type="CadenceValue_t">$point.Cadence</Cadence>
 #end
+#if($point.hasValidCadence())
+						<Cadence>$point.Cadence</Cadence>
+#end
+#if($point.hasValidPower() || $point.hasValidSpeed())
+						<Extensions>
+           						<TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2">
+#if($point.hasValidSpeed())
+              							<Speed>$point.getSpeed()</Speed>
+#end
+#if($point.hasValidPower())
+		              					<Watts>$point.getPower()</Watts>
+#end
+            						</TPX>
+          					</Extensions>
 #end
 					</Trackpoint>
 #end
 				</Track>
 #end
 			</Lap>
+#else
+			</Lap>
+#foreach( $track in $tracks )				
+			<Track>
+#set ($points = $track.getWaypoints())
+#foreach ($point in $points)
+				<Trackpoint>
+#if($point.getDate())
+					<Time>$dateformat.format($point.getDate())</Time>
+#end
+#if($point.hasValidCoordinates())
+					<Position>
+						<LatitudeDegrees>$nf8.format($point.Latitude)</LatitudeDegrees>
+						<LongitudeDegrees>$nf8.format($point.Longitude)</LongitudeDegrees>
+					</Position>
+#end
+#if($point.hasValidAltitude())
+					<AltitudeMeters>$nf3.format($point.Altitude)</AltitudeMeters>
+#end
+#if($point.hasValidDistance())
+					<DistanceMeters>$nf3.format($point.Distance)</DistanceMeters>
+#end
+				</Trackpoint>
+#end
+			</Track>
+#end
+#end
 #if ($lap.hasNotes())
 			<Notes><![CDATA[$!lap.Notes]]></Notes>
 #end
-            <Creator xsi:type="Device_t">
-              <Name>$creator</Name>
-              <UnitId>0</UnitId>
-              <ProductID>0</ProductID>
-              <Version>
-                <VersionMajor>$pluginMajorVersion</VersionMajor>
-                <VersionMinor>$pluginMinorVersion</VersionMinor>
-                <BuildMajor>$pluginMicroVersion</BuildMajor>
-                <BuildMinor>$pluginQualifierVersion</BuildMinor>
-              </Version>
-            </Creator>
+            		<Creator xsi:type="Device_t">
+            			<Name>$creator</Name>
+            			<UnitId>0</UnitId>
+       		       		<ProductID>0</ProductID>
+	              		<Version>
+	                		<VersionMajor>$pluginMajorVersion</VersionMajor>
+        	       		 	<VersionMinor>$pluginMinorVersion</VersionMinor>
+               				<BuildMajor>$pluginMicroVersion</BuildMajor>
+              				<BuildMinor>$pluginQualifierVersion</BuildMinor>
+              			</Version>
+		        </Creator>
 #if($iscourses)
 		</Course>
 	</Courses>

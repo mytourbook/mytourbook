@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -20,21 +20,21 @@ import net.tourbook.ui.ITourProvider;
 
 public class ActionTourToolTip_EditQuick extends ActionEditQuick {
 
-	private final IToolTipProvider	_tourInfo;
+   private final IToolTipProvider _tourInfo;
 
-	public ActionTourToolTip_EditQuick(	final IToolTipProvider tourInfoToolTipProvider,
-										final ITourProvider tourProvider) {
+   public ActionTourToolTip_EditQuick(final IToolTipProvider tourInfoToolTipProvider,
+                                      final ITourProvider tourProvider) {
 
-		super(tourProvider);
+      super(tourProvider);
 
-		_tourInfo = tourInfoToolTipProvider;
-	}
+      _tourInfo = tourInfoToolTipProvider;
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		_tourInfo.hideToolTip();
+      _tourInfo.hideToolTip();
 
-		super.run();
-	}
+      super.run();
+   }
 }

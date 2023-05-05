@@ -1,75 +1,107 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package de.byteholder.geoclipse.poi;
 
+import de.byteholder.gpx.PointOfInterest;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.SAXParser;
+
+import net.tourbook.common.util.XmlUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.byteholder.gpx.PointOfInterest;
-
-public class GeoQuery extends Observable implements Runnable {
+public class GeoQuery implements Runnable {
 
 //	private final static String			URL				= "http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
 //	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
-	private final static String			SEARCH_URL		= "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q=";	//$NON-NLS-1$
+   private static final String   SEARCH_URL    = "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q="; //$NON-NLS-1$
 
-	private ArrayList<PointOfInterest>	_searchResult	= new ArrayList<>();
+   private List<PointOfInterest> _searchResult = new ArrayList<>();
 
-	private Exception							_exception;
+   private Exception             _exception;
 
-	private String								_query;
+   private String                _query;
 
-	public GeoQuery(final String query) {
-		_query = query;
-	}
+   private PropertyChangeSupport _propertyChangeSupport;
 
-	public void asyncFind() {
+   public GeoQuery() {
+      _propertyChangeSupport = new PropertyChangeSupport(this);
+   }
 
-		final Job job = new Job(Messages.job_name_searchingPOI) {
+   public void addPropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
+      _propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+   }
 
-			@Override
-			protected IStatus run(final IProgressMonitor arg0) {
-				GeoQuery.this.run();
-				return Status.OK_STATUS;
-			}
-		};
+   public void asyncFind(final String query) {
 
-		job.schedule();
-	}
+      _query = query;
 
-	public Exception getException() {
-		return _exception;
-	}
+      final Job job = new Job(Messages.job_name_searchingPOI) {
 
-	public List<PointOfInterest> getSearchResult() {
-		return _searchResult;
-	}
+         @Override
+         protected IStatus run(final IProgressMonitor arg0) {
+            GeoQuery.this.run();
+            return Status.OK_STATUS;
+         }
+      };
 
-	@Override
-	public void run() {
+      job.schedule();
+   }
 
-		try {
+   public Exception getException() {
+      return _exception;
+   }
 
-			_searchResult.clear();
+   public List<PointOfInterest> getSearchResult() {
+      return _searchResult;
+   }
 
-			final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
+   public void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
+      _propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+   }
 
-			SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
+   @Override
+   public void run() {
 
-		} catch (final Exception e) {
-			_exception = e;
-		}
+      final List<PointOfInterest> oldValue = List.copyOf(_searchResult);
 
-		setChanged();
-		notifyObservers();
-	}
+      try {
+
+         _searchResult.clear();
+
+         final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
+
+         final SAXParser parser = XmlUtils.initializeParser();
+         parser.parse(uri, new GeoQuerySAXHandler(_searchResult));
+         _propertyChangeSupport.firePropertyChange("_searchResult", oldValue, _searchResult); //$NON-NLS-1$
+
+      } catch (final Exception e) {
+         _exception = e;
+      }
+
+   }
 
 //	private List<PointOfInterest> find() throws Exception {
 //

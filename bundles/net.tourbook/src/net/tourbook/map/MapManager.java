@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,26 +19,32 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.tourbook.map.IMapSyncListener.SyncParameter;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 
 public class MapManager {
 
-   private final static ListenerList<IMapSyncListener> _allMapSyncListener = new ListenerList<>(ListenerList.IDENTITY);
+   public static final String                          STATE_VISIBLE_COLOR_PROFILES         = "STATE_VISIBLE_COLOR_PROFILES";           //$NON-NLS-1$
+   public static final int                             STATE_VISIBLE_COLOR_PROFILES_DEFAULT = 10;
+
+   private final static ListenerList<IMapSyncListener> _allMapSyncListener                  = new ListenerList<>(ListenerList.IDENTITY);
 
    public static void addMapSyncListener(final IMapSyncListener listener) {
+
       _allMapSyncListener.add(listener);
    }
 
    public static void fireSyncMapEvent(final MapPosition mapPosition,
                                        final ViewPart viewPart,
-                                       final int positionFlags) {
+                                       final SyncParameter syncParameter) {
 
       final Object[] allListeners = _allMapSyncListener.getListeners();
 
       for (final Object listener : allListeners) {
-         ((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, positionFlags);
+         ((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, syncParameter);
       }
    }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -33,10 +34,11 @@ class ActionExportViewCSV extends Action {
 
       _tourBookView = tourBookView;
 
-      setText(Messages.Tour_Book_Action_ExportViewCSV);
+      setText(Messages.App_Action_ExportViewCSV);
+      setToolTipText(Messages.Tour_Book_Action_ExportViewCSV_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
    }
 
    @Override

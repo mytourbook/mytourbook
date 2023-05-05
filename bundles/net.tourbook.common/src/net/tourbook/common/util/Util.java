@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,14 +55,14 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Resource;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -80,11 +80,12 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
+// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_MIO_105             = "10500"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_MT                  = "74953"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_NMEA                = "32481"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_HRM           = "63193"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_PDD           = "76913"; //$NON-NLS-1$
@@ -96,7 +97,7 @@ public class Util {
    public static final String UNIQUE_ID_SUFFIX_SUUNTOQUEST         = "41502"; //$NON-NLS-1$
 
    /*
-    * Default xml tags
+    * Default XML tags
     */
    private static final String TAG_ITEM   = "item";  //$NON-NLS-1$
    private static final String TAG_LIST   = "list";  //$NON-NLS-1$
@@ -105,29 +106,61 @@ public class Util {
    private static final String ATTR_VALUE = "value"; //$NON-NLS-1$
 
    /*
-    * default xml attributes
+    * default XML attributes
     */
-   public static final String ATTR_ROOT_DATETIME          = "Created";          //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MINOR     = "VersionMinor";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MICRO     = "VersionMicro";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_QUALIFIER = "VersionQualifier"; //$NON-NLS-1$
+   public static final String ATTR_ROOT_DATETIME          = "Created";                                 //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MINOR     = "VersionMinor";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MICRO     = "VersionMicro";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_QUALIFIER = "VersionQualifier";                        //$NON-NLS-1$
 
-   public static final String ATTR_COLOR_RED              = "red";              //$NON-NLS-1$
-   public static final String ATTR_COLOR_GREEN            = "green";            //$NON-NLS-1$
-   public static final String ATTR_COLOR_BLUE             = "blue";             //$NON-NLS-1$
+   public static final String ATTR_COLOR_RED              = "red";                                     //$NON-NLS-1$
+   public static final String ATTR_COLOR_GREEN            = "green";                                   //$NON-NLS-1$
+   public static final String ATTR_COLOR_BLUE             = "blue";                                    //$NON-NLS-1$
+   public static final String ATTR_COLOR_ALPHA            = "alpha";                                   //$NON-NLS-1$
 
-   public static final String CSV_FILE_EXTENSION          = "csv";              //$NON-NLS-1$
+   public static final String CSV_FILE_EXTENSION          = "csv";                                     //$NON-NLS-1$
 
-   public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
+   private static final char  NL                          = UI.NEW_LINE;
 
-      // accelerate with Ctrl + Shift key
-      final int accelerator = getKeyAccelerator(event);
+   /**
+    * Number of processors available to the Java virtual machine.
+    */
+   public static final int    NUMBER_OF_PROCESSORS        = Runtime.getRuntime().availableProcessors();
 
-      final Scale scale = (Scale) event.widget;
-      final int newValueDiff = event.count > 0 ? accelerator : -accelerator;
+   /**
+    * Prepend a line number to each text line.
+    *
+    * @param text
+    * @return
+    */
+   public static String addLineNumbers(final String text) {
 
-      return scale.getSelection() + newValueDiff;
+      return addLineNumbers(text, 1);
+   }
+
+   /**
+    * Prepend a line number to each text line.
+    *
+    * @param text
+    * @return
+    */
+   public static String addLineNumbers(final String text, final int startLineNumer) {
+
+      final String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+
+         final String line = lines[lineNumber];
+
+         sb.append(String.format("%-4d  ", lineNumber + startLineNumer)); //$NON-NLS-1$
+         sb.append(line);
+         sb.append(UI.NEW_LINE);
+      }
+
+      return sb.toString();
    }
 
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
@@ -141,7 +174,7 @@ public class Util {
    }
 
    /**
-    * Revers an array sort order.
+    * Reverse an array sort order.
     *
     * @param arr
     * @return
@@ -161,7 +194,7 @@ public class Util {
    }
 
    /**
-    * Clear all selection providers in all workench pages.
+    * Clear all selection providers in all workbench pages.
     */
    public static void clearSelection() {
 
@@ -212,7 +245,7 @@ public class Util {
 
    /**
     * @param os
-    * @return Returns <code>false</code> when an exception occures.
+    * @return Returns <code>false</code> when an exception occurs.
     */
    public static boolean close(final OutputStream os) {
 
@@ -285,7 +318,7 @@ public class Util {
 
    /**
     * @param text
-    * @return Returns MD5 for the text or <code>null</code> when an error occures.
+    * @return Returns MD5 for the text or <code>null</code> when an error occurs.
     */
    public static String computeMD5(final String text) {
 
@@ -314,6 +347,22 @@ public class Util {
       return buf.toString();
    }
 
+   /**
+    * Concatenate two int arrays into one
+    *
+    * @param firstValues
+    * @param secondValues
+    * @return
+    */
+   public static int[] concatInt(final int[] firstValues, final int[] secondValues) {
+
+      final int[] concatenatedValues = Arrays.copyOf(firstValues, firstValues.length + secondValues.length);
+
+      System.arraycopy(secondValues, 0, concatenatedValues, firstValues.length, secondValues.length);
+
+      return concatenatedValues;
+   }
+
    public static float[][] convertDoubleToFloat(final double[][] doubleSeries) {
 
       final float[][] floatSeries = new float[doubleSeries.length][];
@@ -339,13 +388,15 @@ public class Util {
          return null;
       }
 
-      if (intValues.length == 0) {
+      final int numValues = intValues.length;
+
+      if (numValues == 0) {
          return new double[0];
       }
 
-      final double[] doubleValues = new double[intValues.length];
+      final double[] doubleValues = new double[numValues];
 
-      for (int valueIndex = 0; valueIndex < intValues.length; valueIndex++) {
+      for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
          doubleValues[valueIndex] = intValues[valueIndex];
       }
 
@@ -397,12 +448,23 @@ public class Util {
    }
 
    /**
+    * Convert Java newline into \n.
+    *
+    * @param text
+    * @return
+    */
+   public static String convertLineBreaks(final String text) {
+
+      return text.replaceAll("\\r\\n|\\r|\\n", "\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
     * Converts a list of strings into a comma-separated string.
     *
     * @param allTexts
     * @return
     */
-   public static String convertListToString(final ArrayList<String> allTexts) {
+   public static String convertListToString(final List<String> allTexts) {
 
       if (allTexts == null) {
          return UI.EMPTY_STRING;
@@ -429,8 +491,27 @@ public class Util {
       return sb.toString();
    }
 
+   public static float[] convertShortToFloat(final short[] values) {
+
+      if (values == null) {
+         return null;
+      }
+
+      if (values.length == 0) {
+         return new float[0];
+      }
+
+      final float[] floatValues = new float[values.length];
+
+      for (int valueIndex = 0; valueIndex < values.length; valueIndex++) {
+         floatValues[valueIndex] = values[valueIndex];
+      }
+
+      return floatValues;
+   }
+
    /**
-    * Converts a comma-seaparated string into a list of strings.
+    * Converts a comma-separated string into a list of strings.
     *
     * @param text
     * @return
@@ -549,19 +630,12 @@ public class Util {
       try {
 
          if (tempFile.delete() == false) {
-            StatusUtil.log(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
+            StatusUtil.logError(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
          }
 
       } catch (final SecurityException e) {
          StatusUtil.showStatus(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
       }
-   }
-
-   public static Resource disposeResource(final Resource resource) {
-      if (resource != null && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
    }
 
    public static void dumpChildren(final Control parent, final int indent) {
@@ -911,12 +985,13 @@ public class Util {
 
    public static String getSQLExceptionText(final SQLException e) {
 
-      final String text = UI.EMPTY_STRING//
+      final String text = UI.EMPTY_STRING
 
-            + ("SQLException" + UI.NEW_LINE2) //$NON-NLS-1$
-            + ("SQLState: " + (e).getSQLState() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("ErrorCode: " + (e).getErrorCode() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("Message: " + (e).getMessage() + UI.NEW_LINE); //$NON-NLS-1$
+            + "SQLException" + NL //$NON-NLS-1$
+            + NL
+            + "SQLState: " + e.getSQLState() + NL //$NON-NLS-1$
+            + "ErrorCode: " + e.getErrorCode() + NL //$NON-NLS-1$
+            + "Message: " + e.getMessage() + NL; //$NON-NLS-1$
 
       return text;
    }
@@ -932,24 +1007,6 @@ public class Util {
       sw.flush();
 
       return sw.toString();
-   }
-
-   /**
-    * @param state
-    * @param key
-    * @param defaultValue
-    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
-    *         default value is returned.
-    */
-   public static String[] getStateArray(final IDialogSettings state, final String key, final String[] defaultValue) {
-
-      if (state == null) {
-         return defaultValue;
-      }
-
-      final String[] stateValue = state.getArray(key);
-
-      return stateValue == null ? defaultValue : stateValue;
    }
 
    /**
@@ -1177,6 +1234,45 @@ public class Util {
       try {
          return state.get(key) == null ? defaultValue : state.getInt(key);
       } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    * @param maxValue
+    * @return Returns an integer value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static int getStateInt(final IDialogSettings state,
+                                 final String key,
+                                 final int defaultValue,
+                                 final int minValue,
+                                 final int maxValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      try {
+
+         final int stateValue = state.get(key) == null ? defaultValue : state.getInt(key);
+
+         if (stateValue < minValue) {
+            return minValue;
+         }
+
+         if (stateValue > maxValue) {
+            return maxValue;
+         }
+
+         return stateValue;
+
+      } catch (final NumberFormatException e) {
+
          return defaultValue;
       }
    }
@@ -1483,6 +1579,13 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param <E>
+    * @param xml
+    * @param attrName
+    * @param defaultValue
+    * @return
+    */
    public static <E extends Enum<E>> Enum<E> getXmlEnum(final IMemento xml,
                                                         final String attrName,
                                                         final Enum<E> defaultValue) {
@@ -1628,6 +1731,35 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static int getXmlIntInt(final XMLMemento xmlMemento,
+                                  final String key,
+                                  final int defaultValue,
+                                  final int minValue,
+                                  final int maxValue) {
+
+      final int value = getXmlInteger(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
+   }
+
    public static Long getXmlLong(final IMemento memento, final String key, final Long defaultValue) {
 
       final String strValue = memento.getString(key);
@@ -1643,7 +1775,7 @@ public class Util {
    }
 
    /**
-    * Get long array from xml list/item tags.
+    * Get long array from XML list/item tags.
     *
     * @param memento
     * @param listKeyName
@@ -1685,6 +1817,35 @@ public class Util {
 
    /**
     * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static long getXmlLongLong(final XMLMemento xmlMemento,
+                                     final String key,
+                                     final long defaultValue,
+                                     final long minValue,
+                                     final long maxValue) {
+
+      final Long value = getXmlLong(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
+   }
+
+   /**
+    * @param xmlMemento
     * @param defaultValue
     * @return Returns {@link RGB} from the attributes red, green and blue attributes.
     */
@@ -1698,27 +1859,70 @@ public class Util {
    }
 
    /**
-    * RBG values are in child tag as attributes
+    * RBGA values are in child tag as attributes
     *
     * @param xmlConfig
-    * @param childTag
+    * @param childTagName
     * @param defaultRgb
     * @return
     */
-   public static RGB getXmlRgb(final XMLMemento xmlConfig, final String childTag, final RGB defaultRgb) {
+   public static RGB getXmlRgb_AsParent(final XMLMemento xmlConfig, final String childTagName, final RGB defaultRgb) {
 
       for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
          final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
          final String configTag = xmlConfigChild.getType();
 
-         if (configTag.equals(childTag)) {
+         if (configTag.equals(childTagName)) {
 
             return Util.getXmlRgb(xmlConfigChild, defaultRgb);
          }
       }
 
       return defaultRgb;
+   }
+
+   /**
+    * @param xmlMemento
+    * @param defaultValue
+    * @return Returns {@link RGBA} from the attributes red, green, blue and alpha attributes.
+    */
+   public static RGBA getXmlRgba(final IMemento xmlMemento, final RGBA defaultValue) {
+
+// SET_FORMATTING_OFF
+
+      final int red     = getXmlInteger(xmlMemento, ATTR_COLOR_RED,     defaultValue.rgb.red);
+      final int green   = getXmlInteger(xmlMemento, ATTR_COLOR_GREEN,   defaultValue.rgb.green);
+      final int blue    = getXmlInteger(xmlMemento, ATTR_COLOR_BLUE,    defaultValue.rgb.blue);
+      final int alpha   = getXmlInteger(xmlMemento, ATTR_COLOR_ALPHA,   defaultValue.alpha);
+
+// SET_FORMATTING_ON
+
+      return new RGBA(red, green, blue, alpha);
+   }
+
+   /**
+    * RBG values are in child tag as attributes
+    *
+    * @param xmlConfig
+    * @param childTagName
+    * @param defaultRgba
+    * @return
+    */
+   public static RGBA getXmlRgba_AsParent(final XMLMemento xmlConfig, final String childTagName, final RGBA defaultRgba) {
+
+      for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
+
+         final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
+         final String configTag = xmlConfigChild.getType();
+
+         if (configTag.equals(childTagName)) {
+
+            return Util.getXmlRgba(xmlConfigChild, defaultRgba);
+         }
+      }
+
+      return defaultRgba;
    }
 
    public static String getXmlString(final IMemento xmlConfig, final String key, final String defaultValue) {
@@ -1784,21 +1988,13 @@ public class Util {
       return file.isDirectory();
    }
 
-   public static void logSimpleMessage(final Class<?> clazz,
-                                       final String message) {
-
-      System.out.println(String.format("%s [%s] %s", //$NON-NLS-1$
-            UI.timeStampNano(),
-            clazz.getSimpleName(),
-            message));
-   }
-
    public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
 
-      System.out.println(UI.timeStampNano()
-            + " [" + clazz.getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
-            + " - System property \"" + propertyName + "\" is enabled -> " //$NON-NLS-1$ //$NON-NLS-2$
-            + propertyDescription);
+      StatusUtil.logInfo(String.format("%s [System Property - %s] - \"%s\" is enabled -> %s", //$NON-NLS-1$
+            UI.timeStampNano(),
+            clazz.getSimpleName(),
+            propertyName,
+            propertyDescription));
    }
 
    public static void logSystemProperty_Value(final Class<?> clazz,
@@ -1806,10 +2002,17 @@ public class Util {
                                               final String propertyValue,
                                               final String propertyDescription) {
 
-      System.out.println(UI.timeStampNano()
-            + " [" + clazz.getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
-            + " - System property \"" + propertyName + "=" + propertyValue + "\" -> " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + propertyDescription);
+      StatusUtil.logInfo(String.format("%s [System Property - %s] - \"%s=%s\" -> %s", //$NON-NLS-1$
+            UI.timeStampNano(),
+            clazz.getSimpleName(),
+            propertyName,
+            propertyValue,
+            propertyDescription));
+   }
+
+   public static boolean parseBoolean(final String textValue) {
+
+      return Boolean.valueOf(textValue);
    }
 
    /**
@@ -1833,6 +2036,10 @@ public class Util {
       return Double.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Double#MIN_VALUE} when not available
+    */
    public static double parseDouble(final String textValue) {
 
       try {
@@ -1844,6 +2051,43 @@ public class Util {
 
       } catch (final NumberFormatException e) {
          return Double.MIN_VALUE;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or default when not available
+    */
+   public static double parseDouble(final String textValue, final double defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Double.parseDouble(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static double parseDouble_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Double.parseDouble(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+         return 0;
       }
    }
 
@@ -1868,6 +2112,10 @@ public class Util {
       return Float.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Float#MIN_VALUE} when not available
+    */
    public static float parseFloat(final String textValue) {
 
       try {
@@ -1879,6 +2127,61 @@ public class Util {
 
       } catch (final NumberFormatException e) {
          return Float.MIN_VALUE;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or default when not available
+    */
+   public static float parseFloat(final String textValue, final float defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static float parseFloat_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+         return 0;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static float parseFloat_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+         return -1;
       }
    }
 
@@ -1921,6 +2224,70 @@ public class Util {
          // do nothing
       }
       return Integer.MIN_VALUE;
+   }
+
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or defaultValue when not available
+    */
+   public static int parseInt(final String textValue, final int defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat(textValue, defaultValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static int parseInt_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static int parseInt_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat_n1(textValue);
+      }
    }
 
    /**
@@ -1968,6 +2335,111 @@ public class Util {
    }
 
    /**
+    * @param textValue
+    * @return Parsed value or {@link Long#MIN_VALUE} when not available
+    */
+   public static long parseLong(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return Long.MIN_VALUE;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static long parseLong_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static long parseLong_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat_n1(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static short parseShort_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Short.parseShort(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (short) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static short parseShort_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Short.parseShort(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (short) parseFloat_n1(textValue);
+      }
+   }
+
+   /**
     * Load a text file.
     *
     * @param fileName
@@ -2003,7 +2475,7 @@ public class Util {
          try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
             while ((line = reader.readLine()) != null) {
-               sb.append(line).append(UI.NEW_LINE);
+               sb.append(line).append(NL);
             }
          } finally {
             inputStream.close();
@@ -2465,7 +2937,16 @@ public class Util {
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
                                                        final String stateKey,
-                                                       final ArrayList<E> allValues) {
+                                                       final Enum<E> value) {
+
+      if (value != null) {
+         state.put(stateKey, value.name());
+      }
+   }
+
+   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+                                                       final String stateKey,
+                                                       final List<E> allValues) {
 
       final ArrayList<String> allEnumNames = new ArrayList<>();
 
@@ -2478,15 +2959,6 @@ public class Util {
 
       if (allEnumNames.size() > 0) {
          state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
-      }
-   }
-
-   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-                                                       final String key,
-                                                       final Enum<E> value) {
-
-      if (value != null) {
-         state.put(key, value.name());
       }
    }
 
@@ -2528,7 +3000,7 @@ public class Util {
    }
 
    /**
-    * Set values into xml list/item tags.
+    * Set values into XML list/item tags.
     *
     * @param memento
     * @param listKeyName
@@ -2567,6 +3039,34 @@ public class Util {
    }
 
    /**
+    * Creates a child for the color.
+    *
+    * @param xmlColor
+    * @param tagName
+    * @param rgba
+    * @return
+    */
+   public static IMemento setXmlRgba(final IMemento xmlColor, final String tagName, final RGBA rgba) {
+
+      final IMemento xmlColorTag = xmlColor.createChild(tagName);
+      {
+         xmlColorTag.putInteger(ATTR_COLOR_RED, rgba.rgb.red);
+         xmlColorTag.putInteger(ATTR_COLOR_GREEN, rgba.rgb.green);
+         xmlColorTag.putInteger(ATTR_COLOR_BLUE, rgba.rgb.blue);
+
+         xmlColorTag.putInteger(ATTR_COLOR_ALPHA, rgba.alpha);
+      }
+
+      return xmlColorTag;
+   }
+
+   public static void showOrHidePassword(final Text text, final boolean showPassword) {
+
+      final char character = showPassword ? '\0' : 0x25cf;
+      text.setEchoChar(character);
+   }
+
+   /**
     * Open view
     *
     * @param viewId
@@ -2576,60 +3076,57 @@ public class Util {
     */
    public static IViewPart showView(final String viewId, final boolean isActivateView) {
 
-      final IViewPart returnValue[] = { null };
+      final IViewPart[] returnValue = { null };
 
       /*
        * Ensure this is running in the UI thread otherwise workbench window is null.
        */
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> {
 
-            try {
+         try {
 
-               final IWorkbench wb = PlatformUI.getWorkbench();
-               if (wb == null) {
-                  return;
-               }
-
-               final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
-               if (wbWin == null) {
-                  return;
-               }
-
-               IWorkbenchPage page = wbWin.getActivePage();
-               if (page == null) {
-
-                  // this case can happen when all perspectives are closed, try to open default perspective
-
-                  final String defaultPerspectiveID = wb.getPerspectiveRegistry().getDefaultPerspective();
-                  if (defaultPerspectiveID == null) {
-                     return;
-                  }
-
-                  try {
-                     page = wb.showPerspective(defaultPerspectiveID, wbWin);
-                  } catch (final WorkbenchException e) {
-                     // ignore
-                  }
-
-                  if (page == null) {
-                     return;
-                  }
-               }
-
-               final int activationMode = isActivateView
-                     ? IWorkbenchPage.VIEW_ACTIVATE
-                     : IWorkbenchPage.VIEW_VISIBLE;
-
-               returnValue[0] = page.showView(viewId, null, activationMode);
-
+            final IWorkbench wb = PlatformUI.getWorkbench();
+            if (wb == null) {
                return;
-
-            } catch (final PartInitException e) {
-               StatusUtil.showStatus(e);
             }
+
+            final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
+            if (wbWin == null) {
+               return;
+            }
+
+            IWorkbenchPage page = wbWin.getActivePage();
+            if (page == null) {
+
+               // this case can happen when all perspectives are closed, try to open default perspective
+
+               final String defaultPerspectiveID = wb.getPerspectiveRegistry().getDefaultPerspective();
+               if (defaultPerspectiveID == null) {
+                  return;
+               }
+
+               try {
+                  page = wb.showPerspective(defaultPerspectiveID, wbWin);
+               } catch (final WorkbenchException e1) {
+                  // ignore
+               }
+
+               if (page == null) {
+                  return;
+               }
+            }
+
+            final int activationMode = isActivateView
+                  ? IWorkbenchPage.VIEW_ACTIVATE
+                  : IWorkbenchPage.VIEW_VISIBLE;
+
+            returnValue[0] = page.showView(viewId, null, activationMode);
+
+            return;
+
+         } catch (final PartInitException e2) {
+            StatusUtil.showStatus(e2);
          }
       });
 

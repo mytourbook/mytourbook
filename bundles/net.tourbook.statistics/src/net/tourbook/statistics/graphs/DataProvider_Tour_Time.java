@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,10 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
-
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,10 +31,13 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
+
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
 public class DataProvider_Tour_Time extends DataProvider {
 
@@ -227,13 +226,9 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          statistic_LastYear = lastYear;
          statistic_NumberOfYears = numberOfYears;
+         final String yearList = getYearList(lastYear, numberOfYears);
 
          setupYearNumbers();
-
-         int colorOffset = 0;
-         if (tourTypeFilter.showUndefinedTourTypes()) {
-            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-         }
 
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
@@ -269,43 +264,44 @@ public class DataProvider_Tour_Time extends DataProvider {
                + "   TourType_typeId," + NL //                                   15 //$NON-NLS-1$
                + "   jTdataTtag.TourTag_tagId" + NL //                           16 //$NON-NLS-1$
 
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //           //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
 
                // get/filter tag id's
                + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //    //$NON-NLS-1$
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                  //$NON-NLS-1$
 
-               + " WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
+               + "WHERE" + NL //                                                    //$NON-NLS-1$
+               + "   StartYear IN (" + yearList + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
+               + "   " + sqlAppFilter.getWhereClause() //                           //$NON-NLS-1$
 
                + " ORDER BY TourStartTime"; //                                      //$NON-NLS-1$
 
-         final TLongArrayList allTourIds = new TLongArrayList();
+         final LongArrayList allTourIds = new LongArrayList();
 
-         final TIntArrayList allTourYear = new TIntArrayList();
-         final TIntArrayList allTourMonths = new TIntArrayList();
-         final TIntArrayList allTourDays = new TIntArrayList();
-         final TIntArrayList allYearsDOY = new TIntArrayList(); // DOY...Day Of Year for all years
+         final IntArrayList allTourYear = new IntArrayList();
+         final IntArrayList allTourMonths = new IntArrayList();
+         final IntArrayList allTourDays = new IntArrayList();
+         final IntArrayList allYearsDOY = new IntArrayList(); // DOY...Day Of Year for all years
 
-         final TIntArrayList allTourStartTime = new TIntArrayList();
-         final TIntArrayList allTourEndTime = new TIntArrayList();
-         final TIntArrayList allTourStartWeek = new TIntArrayList();
+         final IntArrayList allTourStartTime = new IntArrayList();
+         final IntArrayList allTourEndTime = new IntArrayList();
+         final IntArrayList allTourStartWeek = new IntArrayList();
          final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
          final ArrayList<String> allTourTimeOffset = new ArrayList<>();
 
-         final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
-         final TIntArrayList allTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList allTourDeviceTime_Paused = new TIntArrayList();
-         final TIntArrayList allTourComputedTime_Moving = new TIntArrayList();
+         final IntArrayList allTourDeviceTime_Elapsed = new IntArrayList();
+         final IntArrayList allTourDeviceTime_Recorded = new IntArrayList();
+         final IntArrayList allTourDeviceTime_Paused = new IntArrayList();
+         final IntArrayList allTourComputedTime_Moving = new IntArrayList();
 
-         final TFloatArrayList allDistances = new TFloatArrayList();
-         final TFloatArrayList allElevationUp = new TFloatArrayList();
+         final FloatArrayList allDistances = new FloatArrayList();
+         final FloatArrayList allElevationUp = new FloatArrayList();
 
          final ArrayList<String> allTourTitle = new ArrayList<>();
          final ArrayList<String> allTourDescription = new ArrayList<>();
 
-         final TLongArrayList allTypeIds = new TLongArrayList();
-         final TIntArrayList allTypeColorIndex = new TIntArrayList();
+         final LongArrayList allTypeIds = new LongArrayList();
+         final IntArrayList allTypeColorIndex = new IntArrayList();
 
          final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
 
@@ -323,7 +319,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(15);
+            final Object dbTagId = result.getObject(16);
 
             if (dbTourId == lastTourId) {
 
@@ -383,8 +379,11 @@ public class DataProvider_Tour_Time extends DataProvider {
                allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
                allTourStartWeek.add(dbTourStartWeek);
 
+               // start date/time
                allTourStartDateTime.add(zonedStartDateTime);
                allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
+
+               // start/end time only
                allTourStartTime.add(startDayTime);
                allTourEndTime.add((startDayTime + dbRecordedTime));
 
@@ -408,7 +407,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                }
 
                /*
-                * convert type id to the type index in the tour type array, this is also the
+                * Convert type id to the type index in the tour type array, this is also the
                 * color index for the tour type
                 */
                int colorIndex = 0;
@@ -420,7 +419,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                   for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
                      if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-                        colorIndex = colorOffset + typeIndex;
+                        colorIndex = typeIndex;
                         break;
                      }
                   }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -131,7 +132,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
           * an image must be set in the constructor, otherwise the button is small when only ONE
           * action is in the toolbar
           */
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
       }
 
       @Override
@@ -349,8 +350,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       final int gallerySize = galleryPhotos.size();
       if (gallerySize > 0) {
 
-         final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
-         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
+         final long tourStartTime = galleryPhotos.get(0).adjustedTime_Tour;
+         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTime_Tour;
 
          if (tourStartTime < _photoStartTime) {
             _photoStartTime = tourStartTime;
@@ -498,7 +499,10 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionAddPhoto);
+      if (_isLinkPhotoDisplayed) {
+         menuMgr.add(_actionAddPhoto);
+      }
+
       menuMgr.add(_actionRemovePhoto);
 
       enableActions();
@@ -566,6 +570,35 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
          showTourPhotos_FromCurrentSelection(allPhotos, allTourIds.size() + numHistoryTour);
 
+      } else if (selection instanceof PhotoSelection) {
+
+         final PhotoSelection photoSelection = (PhotoSelection) selection;
+
+         final HashSet<Long> allTourIds = new HashSet<>();
+
+         final ArrayList<Photo> allGalleryPhotos = photoSelection.galleryPhotos;
+
+         // count number of tours
+         for (final Photo photo : allGalleryPhotos) {
+
+            // get all tour id's
+            for (final Long tourId : photo.getTourPhotoReferences().keySet()) {
+               allTourIds.add(tourId);
+            }
+
+            // set photo period time, from...until
+            final long photoDateTime = photo.getPhotoTime();
+
+            if (photoDateTime < _photoStartTime) {
+               _photoStartTime = photoDateTime;
+            }
+            if (photoDateTime > _photoEndTime) {
+               _photoEndTime = photoDateTime;
+            }
+         }
+
+         showTourPhotos_FromCurrentSelection(allGalleryPhotos, allTourIds.size());
+
       } else if (selection instanceof SelectionTourMarker) {
 
          final TourData tourData = ((SelectionTourMarker) selection).getTourData();
@@ -608,8 +641,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       }
 
       /*
-       * ensure the selection is set correctly and overwrite PhotogalleryProvider.setSelection()
-       * which caused wrong behaviour
+       * Ensure that the selection is set correctly and overwrite
+       * PhotogalleryProvider.setSelection() which caused wrong behaviour
        */
       _postSelectionProvider.setSelectionNoFireEvent(selection);
    }
@@ -761,12 +794,12 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       if (_isVerticalGallery) {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 }

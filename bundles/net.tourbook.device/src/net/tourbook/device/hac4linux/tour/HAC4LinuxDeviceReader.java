@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,9 +29,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.data.TimeData;
@@ -39,13 +38,16 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
-   private Section m_section = Section.SECTION_NONE;
+
+   private static final String CM414AM = "CM414AM"; //$NON-NLS-1$
 
    /*
     * (non-Javadoc) The file to be parsed includes several sections with different information in
@@ -53,13 +55,28 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * reflected in one of the states to be found below
     */
    private enum Section {
-      SECTION_NONE, SECTION_FILE, SECTION_INFO, SECTION_NOTES, SECTION_FRIENDS, SECTION_PERSON, SECTION_STATISTICS, SECTION_SETTINGS, SECTION_POLAREXTS, SECTION_COACH, SECTION_TOURDATA, SECTION_MARKS
+
+      SECTION_NONE, //
+
+      SECTION_COACH, //
+      SECTION_FILE, //
+      SECTION_FRIENDS, //
+      SECTION_INFO, //
+      SECTION_MARKS, //
+      SECTION_NOTES, //
+      SECTION_PERSON, //
+      SECTION_POLAREXTS, //
+      SECTION_SETTINGS, //
+      SECTION_STATISTICS, //
+      SECTION_TOURDATA, //
    }
 
    /**
     * The box standard constructor
     */
-   public HAC4LinuxDeviceReader() {}
+   public HAC4LinuxDeviceReader() {
+      // plugin constructor
+   }
 
    /*
     * (non-Javadoc)
@@ -80,61 +97,61 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
       /*
        * Files start with HAC4Linux-Tour-File created by HAC4Linux (c) by Rick-Rainer Ludwig
        */
-      if (byteIndex == 0 & newByte == 'H') {
+      if (byteIndex == 0 && newByte == 'H') {
          return true;
       }
-      if (byteIndex == 1 & newByte == 'A') {
+      if (byteIndex == 1 && newByte == 'A') {
          return true;
       }
-      if (byteIndex == 2 & newByte == 'C') {
+      if (byteIndex == 2 && newByte == 'C') {
          return true;
       }
-      if (byteIndex == 3 & newByte == '4') {
+      if (byteIndex == 3 && newByte == '4') {
          return true;
       }
-      if (byteIndex == 4 & newByte == 'L') {
+      if (byteIndex == 4 && newByte == 'L') {
          return true;
       }
-      if (byteIndex == 5 & newByte == 'i') {
+      if (byteIndex == 5 && newByte == 'i') {
          return true;
       }
-      if (byteIndex == 6 & newByte == 'n') {
+      if (byteIndex == 6 && newByte == 'n') {
          return true;
       }
-      if (byteIndex == 7 & newByte == 'u') {
+      if (byteIndex == 7 && newByte == 'u') {
          return true;
       }
-      if (byteIndex == 8 & newByte == 'x') {
+      if (byteIndex == 8 && newByte == 'x') {
          return true;
       }
-      if (byteIndex == 9 & newByte == '-') {
+      if (byteIndex == 9 && newByte == '-') {
          return true;
       }
-      if (byteIndex == 10 & newByte == 'T') {
+      if (byteIndex == 10 && newByte == 'T') {
          return true;
       }
-      if (byteIndex == 11 & newByte == 'o') {
+      if (byteIndex == 11 && newByte == 'o') {
          return true;
       }
-      if (byteIndex == 12 & newByte == 'u') {
+      if (byteIndex == 12 && newByte == 'u') {
          return true;
       }
-      if (byteIndex == 13 & newByte == 'r') {
+      if (byteIndex == 13 && newByte == 'r') {
          return true;
       }
-      if (byteIndex == 14 & newByte == '-') {
+      if (byteIndex == 14 && newByte == '-') {
          return true;
       }
-      if (byteIndex == 15 & newByte == 'F') {
+      if (byteIndex == 15 && newByte == 'F') {
          return true;
       }
-      if (byteIndex == 16 & newByte == 'i') {
+      if (byteIndex == 16 && newByte == 'i') {
          return true;
       }
-      if (byteIndex == 17 & newByte == 'l') {
+      if (byteIndex == 17 && newByte == 'l') {
          return true;
       }
-      if (byteIndex == 18 & newByte == 'e') {
+      if (byteIndex == 18 && newByte == 'e') {
          return true;
       }
 
@@ -148,7 +165,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * object provided.
     */
    private void deviceTotals(final String device, final short modeId, final String line, final TourData tourData) {
-      if (device.equals("CM414AM")) { //$NON-NLS-1$
+      if (device.equals(CM414AM)) {
          tourData.setDeviceTimeInterval((short) 20);
          char bikeNumber = ' ';
          if (modeId == 46) {
@@ -276,28 +293,28 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
    }
 
    @Override
-   public boolean processDeviceData(final String importFilePath,
-                                    final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+   public void processDeviceData(final String importFilePath,
+                                 final DeviceData deviceData,
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours,
+                                 final ImportState_File importState_File,
+                                 final ImportState_Process importState_Process) {
 
-      BufferedReader fileHac4LinuxData = null;
+      if (validateRawData(importFilePath) == false) {
+         return;
+      }
 
       final TourType defaultTourType = getTourType();
-      m_section = Section.SECTION_NONE;
+      Section section = Section.SECTION_NONE;
 
-      try {
-         if (validateRawData(importFilePath) == false) {
-            return false;
-         }
+      try (BufferedReader fileHac4LinuxData = new BufferedReader(new FileReader(importFilePath))) {
 
-         fileHac4LinuxData = new BufferedReader(new FileReader(importFilePath));
          final TourData tourData = new TourData();
 //			final TourPerson tourPerson = new TourPerson();
          final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
 
          String line = null;
-         final StringBuffer tourDescription = new StringBuffer();
+         final StringBuilder tourDescription = new StringBuilder();
          final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
          // time in seconds between time slices 20 seconds as the default
@@ -306,6 +323,9 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          int lastDistance = 0;
          boolean isFirstTimeSlice = true;
          short modeId = 0;
+         int tourYear = 0;
+         int tourMonth = 0;
+         int tourDay = 0;
 
          int friends = -1;
          while ((line = fileHac4LinuxData.readLine()) != null) {
@@ -313,13 +333,13 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                continue;
             }
             if (line.charAt(0) == '[') {
-               switchSection(line.trim());
+               section = switchSection(line.trim());
                continue;
             }
 
             final String[] fields;
             int index = -1;
-            switch (m_section) {
+            switch (section) {
             case SECTION_FILE:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
@@ -343,9 +363,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   tourData.setTourTitle(fields[1]);
                }
 
-               int tourYear = 0;
-               int tourMonth = 0;
-               int tourDay = 0;
                int tourHour = 0;
                int tourMinute = 0;
 
@@ -357,9 +374,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields[0].equals("Time")) {//"hh:mm:ss.00" //$NON-NLS-1$
                   tourHour = (Short.parseShort(fields[1].substring(0, 2)));
                   tourMinute = (Short.parseShort(fields[1].substring(3, 5)));
+                  tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
                }
-
-               tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
 
                if (fields[0].equals("Mode")) { //$NON-NLS-1$
                   modeId = Short.parseShort(fields[1]);
@@ -456,7 +472,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields[0].equals("Temperature")) { //Temperature=24;22;20 //$NON-NLS-1$
                   final String[] sTemps = fields[1].split(";"); //$NON-NLS-1$
                   if (sTemps.length > 1) {
-                     tourData.setAvgTemperature(Integer.parseInt(sTemps[1]));
+                     tourData.setWeather_Temperature_Average_Device(Integer.parseInt(sTemps[1]));
                   }
                }
                // TODO !! statistic information with no fields in tour data base!
@@ -529,7 +545,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                // no pulse is recorded.
                // the data written always form a sawtooth graph
                // 0-256-0-256....
-               if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
+               if (tourData.getDeviceName().equals(CM414AM)) {
                   timeData.pulse = 0;
                }
                // The first time slice seems to be set to the total
@@ -552,7 +568,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields.length < 4) {
                   break;
                }
-               final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+               final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
                final int markerIndex = Integer.parseInt(fields[1]);
                tourMarker.setSerieIndex(markerIndex);
                tourMarker.setLabel(fields[0].substring(1, fields[0].length()));
@@ -596,7 +612,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
             final TimeData firstTimeData = timeDataList.get(0);
 
-            if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
+            if (tourData.getDeviceName().equals(CM414AM)) {
                firstTimeData.pulse = Float.MIN_VALUE;
             }
          }
@@ -622,41 +638,67 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
             tourData.completeTourMarkerWithRelativeTime();
          }
 
+         importState_File.isFileImportedWithValidData = true;
+
       } catch (final Exception e) {
+
          e.printStackTrace();
-         return false;
-      } finally {
-         if (fileHac4LinuxData != null) {
-            try {
-               fileHac4LinuxData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
+
       }
-
-      return true;
-
    }
 
    /*
     * (non-Javadoc) Switching the machine to another state depending on the section of the file
     * currently read.
     */
-   private void switchSection(final String line) {
-      if (line.equals("[FILE]")) {m_section = Section.SECTION_FILE;return;} //$NON-NLS-1$
-      if (line.equals("[INFORMATION]")) {m_section = Section.SECTION_INFO;return;} //$NON-NLS-1$
-      if (line.equals("[NOTES]")) {m_section = Section.SECTION_NOTES;return;} //$NON-NLS-1$
-      if (line.equals("[FRIENDS]")) {m_section = Section.SECTION_FRIENDS;return;} //$NON-NLS-1$
-      if (line.equals("[PERSON]")) {m_section = Section.SECTION_PERSON;return;} //$NON-NLS-1$
-      if (line.equals("[STATISTICS]")) {m_section = Section.SECTION_STATISTICS;return;} //$NON-NLS-1$
-      if (line.equals("[SETTINGS]")) {m_section = Section.SECTION_SETTINGS;return;} //$NON-NLS-1$
-      if (line.equals("[POLAR-EXTENSION]")) {m_section = Section.SECTION_POLAREXTS;return;} //$NON-NLS-1$
-      if (line.equals("[COACH-PARAMETER]")) {m_section = Section.SECTION_COACH;return;} //$NON-NLS-1$
-      if (line.equals("[TOUR-DATA]")) {m_section = Section.SECTION_TOURDATA;return;} //$NON-NLS-1$
-      if (line.equals("[MARKING-DATA]")) {m_section = Section.SECTION_MARKS;return;} //$NON-NLS-1$
+   private Section switchSection(final String line) {
 
-      m_section = Section.SECTION_NONE;
+      if (line.equals("[FILE]")) { //$NON-NLS-1$
+         return Section.SECTION_FILE;
+      }
+
+      if (line.equals("[INFORMATION]")) { //$NON-NLS-1$
+         return Section.SECTION_INFO;
+      }
+
+      if (line.equals("[NOTES]")) { //$NON-NLS-1$
+         return Section.SECTION_NOTES;
+      }
+
+      if (line.equals("[FRIENDS]")) { //$NON-NLS-1$
+         return Section.SECTION_FRIENDS;
+      }
+
+      if (line.equals("[PERSON]")) { //$NON-NLS-1$
+         return Section.SECTION_PERSON;
+      }
+
+      if (line.equals("[STATISTICS]")) { //$NON-NLS-1$
+         return Section.SECTION_STATISTICS;
+      }
+
+      if (line.equals("[SETTINGS]")) { //$NON-NLS-1$
+         return Section.SECTION_SETTINGS;
+      }
+
+      if (line.equals("[POLAR-EXTENSION]")) { //$NON-NLS-1$
+         return Section.SECTION_POLAREXTS;
+      }
+
+      if (line.equals("[COACH-PARAMETER]")) { //$NON-NLS-1$
+         return Section.SECTION_COACH;
+      }
+
+      if (line.equals("[TOUR-DATA]")) { //$NON-NLS-1$
+         return Section.SECTION_TOURDATA;
+      }
+
+      if (line.equals("[MARKING-DATA]")) { //$NON-NLS-1$
+         return Section.SECTION_MARKS;
+      }
+
+      return Section.SECTION_NONE;
+
    }
 
    /*
@@ -667,14 +709,11 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
    public boolean validateRawData(final String fileName) {
       boolean isValid = false;
 
-      BufferedInputStream inStream = null;
+      final File dataFile = new File(fileName);
 
-      try {
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[19];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"HAC4Linux-Tour-File".equalsIgnoreCase(new String(buffer, 0, 19))) { //$NON-NLS-1$
@@ -687,14 +726,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;

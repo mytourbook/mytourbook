@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,15 +15,16 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
-import net.tourbook.tour.filter.geo.Slideout_TourGeoFilter;
+import net.tourbook.tour.filter.geo.SlideoutTourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
@@ -35,9 +36,9 @@ import org.eclipse.ui.IViewPart;
 
 public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourGeoFilter);
+   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.TourGeoFilter);
 
-   private Slideout_TourGeoFilter       _slideoutTourGeoFilter;
+   private SlideoutTourGeoFilter       _slideoutTourGeoFilter;
 
    public ActionTourGeoFilter() {
 
@@ -50,7 +51,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    @Override
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-      _slideoutTourGeoFilter = new Slideout_TourGeoFilter(toolItem);
+      _slideoutTourGeoFilter = new SlideoutTourGeoFilter(toolItem);
       _slideoutTourGeoFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
       return _slideoutTourGeoFilter;
@@ -68,7 +69,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       if (view instanceof Map2View) {
 
          final Map2View map2View = (Map2View) view;
-         final Map map = map2View.getMap();
+         final Map2 map = map2View.getMap();
 
          map.setIsFastMapPainting_Active(isSelected);
       }
@@ -83,13 +84,7 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
       _slideoutTourGeoFilter.open(false);
 
       // delay to be sure that the slideout is opened
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-
-            _slideoutTourGeoFilter.refreshViewer(selectedFilter);
-         }
-      });
+      Display.getCurrent().asyncExec(() -> _slideoutTourGeoFilter.refreshViewer(selectedFilter));
    }
 
    /**

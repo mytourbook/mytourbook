@@ -149,32 +149,35 @@ public class TileImageCache {
    /**
     * Dispose all cached images and clear the cache.
     */
-   public synchronized void dispose() {
+   public void dispose() {
 
-      final Collection<Image> allImages = _imageCache.values();
+      synchronized (_allImages) {
 
-      for (final Image image : allImages) {
-         if (image != null) {
-            try {
-               image.dispose();
-            } catch (final Exception e) {
-               // ignore, another thread can have set the image to null
+         final Collection<Image> allImages = _imageCache.values();
+
+         for (final Image image : allImages) {
+            if (image != null) {
+               try {
+                  image.dispose();
+               } catch (final Exception e) {
+                  // ignore, another thread can have set the image to null
+               }
             }
          }
-      }
 
-      for (final Image image : _allImages) {
-         if (image != null) {
-            try {
-               image.dispose();
-            } catch (final Exception e) {}
+         for (final Image image : _allImages) {
+            if (image != null) {
+               try {
+                  image.dispose();
+               } catch (final Exception e) {}
+            }
          }
+
+         _imageCache.clear();
+         _imageCacheFifo.clear();
+
+         _allImages.clear();
       }
-
-      _imageCache.clear();
-      _imageCacheFifo.clear();
-
-      _allImages.clear();
    }
 
    /**
@@ -682,65 +685,66 @@ public class TileImageCache {
                                     final ImageData loadedImageData,
                                     final Image tileOfflineImage) {
 
+      final Image tileImage = tileOfflineImage != null
+            ? tileOfflineImage
+            : new Image(_display, loadedImageData);
+
+      // cache tile image
+      putIntoImageCache(tileKey, tileImage);
+
       final MP mp = tile.getMP();
 
-      final int dimmingAlphaValue = mp.getDimLevel();
-      if (dimmingAlphaValue == 0xFF) {
+      if (mp.isDimMap()) {
 
-         // tile image is not dimmed
+         // tile image (map) is dimmed
 
-         final Image tileImage = tileOfflineImage != null ? //
-               tileOfflineImage
-               : new Image(_display, loadedImageData);
+         final int dimmingAlphaValue = mp.getDimLevel();
 
-         putIntoImageCache(tileKey, tileImage);
+         if (dimmingAlphaValue == 0xFF) {
 
-         return tileImage;
+            // tile image is not dimmed
 
-      } else {
+         } else {
 
-         // tile image is dimmed
+            // tile image is dimmed
 
-         final Image tileImage = tileOfflineImage != null ? //
-               tileOfflineImage
-               : new Image(_display, loadedImageData);
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //
+            // run in the UI thread
+            //
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            _display.asyncExec(() -> {
 
-         final Rectangle imageBounds = tileImage.getBounds();
-
-         final Image dimmedImage = new Image(_display, imageBounds);
-
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         //
-         // run in the UI thread
-         //
-         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         _display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-
-               final GC gcTileImage = new GC(dimmedImage);
-               final Color dimColor = new Color(_display, mp.getDimColor());
-               {
-                  gcTileImage.setBackground(dimColor);
-                  gcTileImage.fillRectangle(imageBounds);
-
-                  gcTileImage.setAlpha(dimmingAlphaValue);
-                  {
-                     gcTileImage.drawImage(tileImage, 0, 0);
-                  }
-                  gcTileImage.setAlpha(0xff);
+               if (tileImage == null || tileImage.isDisposed()) {
+                  return;
                }
-               dimColor.dispose();
-               gcTileImage.dispose();
+
+               // create dimmed image
+               final Rectangle imageBounds = tileImage.getBounds();
+               final Image dimmedImage = new Image(_display, imageBounds);
+
+               final GC gcDimmedImage = new GC(dimmedImage);
+               {
+                  gcDimmedImage.setBackground(new Color(mp.getDimColor()));
+                  gcDimmedImage.fillRectangle(imageBounds);
+
+                  gcDimmedImage.setAlpha(dimmingAlphaValue);
+                  {
+                     gcDimmedImage.drawImage(tileImage, 0, 0);
+                  }
+                  gcDimmedImage.setAlpha(0xff);
+               }
+               gcDimmedImage.dispose();
 
                tileImage.dispose();
-            }
-         });
 
-         putIntoImageCache(tileKey, dimmedImage);
-
-         return dimmedImage;
+               // replace tile image with the dimmed image
+               putIntoImageCache(tileKey, dimmedImage);
+            });
+         }
       }
+
+      return tileImage;
    }
 
 }

@@ -21,13 +21,13 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Paints waypoints on a {@link Map}. This is an instance of {@link MapPainter} that in turn only
+ * Paints waypoints on a {@link Map2}. This is an instance of {@link Map2Painter} that in turn only
  * can draw on top of Maps.
  *
  * @author rbair
  * @author Michael Kanis
  */
-public class WaypointPainter extends MapPainter {
+public class WaypointPainter extends Map2Painter {
 
    private WaypointRenderer renderer = new DefaultWaypointRenderer();
 
@@ -40,7 +40,7 @@ public class WaypointPainter extends MapPainter {
 
    @Override
    protected boolean doPaint(final GC gc,
-                             final Map map,
+                             final Map2 map,
                              final Tile tile,
                              final int parts,
                              final boolean isPaintFast,
@@ -127,7 +127,7 @@ public class WaypointPainter extends MapPainter {
    }
 
    @Override
-   protected boolean isPaintingNeeded(final Map map, final Tile tile) {
+   protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
       return true;
    }
 
@@ -153,7 +153,7 @@ public class WaypointPainter extends MapPainter {
     * @see setRenderer(WaypointRenderer)
     * @see WaypointRenderer
     */
-   protected void paintWaypoint(final Waypoint w, final Map map, final GC gc, final int devPartOffset) {
+   protected void paintWaypoint(final Waypoint w, final Map2 map, final GC gc, final int devPartOffset) {
       renderer.paintWaypoint(gc, map, w, devPartOffset);
    }
 

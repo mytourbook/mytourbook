@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: World Wind Resources
 Bundle-SymbolicName: net.tourbook.ext.worldwind;singleton:=true
-Bundle-Version: 2.2.20200812.5250a29
+Bundle-Version: 2.2.20220607.9ccf6b8
 Bundle-Vendor: NASA World Wind
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy

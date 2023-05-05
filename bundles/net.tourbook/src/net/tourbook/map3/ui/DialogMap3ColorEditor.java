@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,9 @@
  * @author Alfred Barten
  */
 package net.tourbook.map3.ui;
+
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,18 +60,13 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -189,12 +187,9 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
          }
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onSelectControl();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onSelectControl();
       };
    }
 
@@ -284,32 +279,24 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       shell.setText(Messages.Map3Color_Dialog_Title);
 
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      shell.addDisposeListener(disposeEvent -> onDispose());
 
-      shell.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
+      shell.addControlListener(controlResizedAdapter(controlEvent -> {
 
-            // allow resizing the height, preserve minimum width
+         // allow resizing the height, preserve minimum width
 
-            final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            final Point shellSize = shell.getSize();
+         final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+         final Point shellSize = shell.getSize();
 
-            if (shellSize.x < defaultSize.x) {
+//         if (shellSize.x < defaultSize.x) {
+//
+//         }
 
-            }
+         final int width = defaultSize.x;
+         final int height = shellSize.y;
 
-            final int width = defaultSize.x;
-            final int height = shellSize.y;
-
-            shell.setSize(width, height);
-         }
-      });
+         shell.setSize(width, height);
+      }));
    }
 
    @Override
@@ -441,15 +428,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             _txtProfileName = new Text(container, SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtProfileName);
 
-            _txtProfileName.addTraverseListener(new TraverseListener() {
-
-               @Override
-               public void keyTraversed(final TraverseEvent e) {
-
-                  // do live update
-                  onModifyProfileName(e);
-               }
-            });
+            // do live update
+            _txtProfileName.addTraverseListener(this::onModifyProfileName);
          }
       }
    }
@@ -466,12 +446,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
             .applyTo(_canvasProfileImage);
 
-      _canvasProfileImage.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            drawProfileImage();
-         }
-      });
+      _canvasProfileImage.addControlListener(controlResizedAdapter(controlEvent -> drawProfileImage()));
    }
 
    private void createUI_40_VertexFields(final Composite parent) {
@@ -534,34 +509,19 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       /*
        * Field listener
        */
-      final MouseAdapter colorMouseListener = new MouseAdapter() {
-         @Override
-         public void mouseDown(final MouseEvent e) {
-            onFieldMouseDown(display, e);
-         }
-      };
+      final MouseListener colorMouseListener = MouseListener.mouseDownAdapter(
+            mouseEvent -> onFieldMouseDown(display, mouseEvent));
 
       // value listener
-      final SelectionListener valueSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            onFieldSelectValue(event.widget);
-         }
-      };
-      final MouseWheelListener valueMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onFieldSelectValue(event.widget);
-         }
+      final SelectionListener valueSelectionListener = widgetSelectedAdapter(
+            selectionEvent -> onFieldSelectValue(selectionEvent.widget));
+
+      final MouseWheelListener valueMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onFieldSelectValue(mouseEvent.widget);
       };
 
-      final SelectionListener prontoListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            onFieldSelectPronto(event.widget);
-         }
-      };
+      final SelectionListener prontoListener = widgetSelectedAdapter(this::onFieldSelectPronto);
 
       /*
        * fields
@@ -614,18 +574,16 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
              * Spinner: Opacity
              */
             final Spinner spinnerOpacity = new Spinner(vertexContainer, SWT.BORDER);
-            GridDataFactory.fillDefaults() //
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(spinnerOpacity);
-
-            spinnerOpacity.setMinimum(Map3GradientColorManager.OPACITY_MIN);
-            spinnerOpacity.setMaximum(Map3GradientColorManager.OPACITY_MAX);
-            spinnerOpacity.setDigits(Map3GradientColorManager.OPACITY_DIGITS);
+            spinnerOpacity.setMinimum(0);
+            spinnerOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             spinnerOpacity.setIncrement(1);
             spinnerOpacity.setPageIncrement(10);
             spinnerOpacity.addSelectionListener(_defaultSelectionAdapter);
             spinnerOpacity.addMouseWheelListener(_defaultMouseWheelListener);
-            spinnerOpacity.setToolTipText(Messages.Map3Color_Dialog_Spinner_ColorOpacity_Tooltip);
+            spinnerOpacity.setToolTipText(NLS.bind(Messages.Map3Color_Dialog_Spinner_ColorOpacity_Tooltip, UI.TRANSFORM_OPACITY_MAX));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(spinnerOpacity);
 
             /*
              * Radio: Pronto Color
@@ -674,12 +632,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 //    vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 
       _vertexScrolledContainer.setContent(vertexContainer);
-      _vertexScrolledContainer.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            _vertexScrolledContainer.setMinSize(vertexContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-         }
-      });
+      _vertexScrolledContainer.addControlListener(controlResizedAdapter(controlEvent -> _vertexScrolledContainer.setMinSize(vertexContainer
+            .computeSize(SWT.DEFAULT, SWT.DEFAULT))));
 
       return vertexContainer;
    }
@@ -716,12 +670,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
                   .applyTo(_chkProntoColor);
             _chkProntoColor.setText(Messages.Map3Color_Dialog_Checkbox_EnableProntoColor);
             _chkProntoColor.setToolTipText(Messages.Map3Color_Dialog_Checkbox_EnableProntoColor_Tooltip);
-            _chkProntoColor.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls_Pronto();
-               }
-            });
+            _chkProntoColor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls_Pronto()));
 
             // invalidate pronto color, initially a pronto color is not checked
             _prontoColorVertexIndex = null;
@@ -906,12 +855,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
                IDialogConstants.CLIENT_ID + 6,
                Messages.Map3Color_Dialog_Button_Apply,
                false);
-         _btnApply.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onApply(true);
-            }
-         });
+         _btnApply.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onApply(true)));
       }
 
       // create default buttons (OK, Cancel)
@@ -944,20 +888,22 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       final boolean isDrawUnits = _dialogColorProvider.getMap3ColorProfile().isAbsoluteValues();
 
-      _dialogColorProvider.configureColorProvider(//
+      _dialogColorProvider.configureColorProvider(
             ColorProviderConfig.MAP3_PROFILE,
             imageHeight,
             getRgbVertices(),
             isDrawUnits);
 
-      _profileImage = TourMapPainter.createMapLegendImage(//
+      _profileImage = TourMapPainter.createMap3_LegendImage(
             _dialogColorProvider,
             ColorProviderConfig.MAP3_PROFILE,
             imageWidth,
             imageHeight,
-            true,
-            true,
-            true);
+            true, // is vertical
+            true, // draw units
+            UI.IS_DARK_THEME,
+            false // no shadow
+      );
 
       _canvasProfileImage.setImage(_profileImage);
    }
@@ -1214,9 +1160,9 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       }
    }
 
-   private void onFieldSelectPronto(final Widget widget) {
+   private void onFieldSelectPronto(final SelectionEvent selectionEvent) {
 
-      final Integer vertexIndex = (Integer) widget.getData(DATA_KEY_VERTEX_INDEX);
+      final Integer vertexIndex = (Integer) selectionEvent.widget.getData(DATA_KEY_VERTEX_INDEX);
 
       // keep pronto index
       _prontoColorVertexIndex = vertexIndex;
@@ -1336,7 +1282,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       for (int vertexIndex = 0; vertexIndex < rgbVertexListSize; vertexIndex++) {
 
          /*
-          * create vertices from UI controls
+          * Create vertices from UI controls
           */
          final Spinner spinnerOpacity = _spinnerOpacity[vertexIndex];
          final Spinner spinnerVertexValue = _spinnerVertexValue[vertexIndex];
@@ -1345,12 +1291,11 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
          final Integer sortId = (Integer) spinnerVertexValue.getData(DATA_KEY_SORT_ID);
 
          final RGB rgb = _lblVertexColor[vertexIndex].getBackground().getRGB();
-         final float opacity = (float) (spinnerOpacity.getSelection() / Map3GradientColorManager.OPACITY_DIGITS_FACTOR);
 
          final RGBVertex rgbVertex = new RGBVertex(sortId);
          rgbVertex.setValue(value);
          rgbVertex.setRGB(rgb);
-         rgbVertex.setOpacity(opacity);
+         rgbVertex.setOpacity((float) spinnerOpacity.getSelection() / UI.TRANSFORM_OPACITY_MAX);
 
          newRgbVertices.add(rgbVertex);
       }
@@ -1412,9 +1357,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
             // update opacity
             final Spinner spinnerOpacity = _spinnerOpacity[vertexIndex];
-            final double opacity = vertex.getOpacity() * Map3GradientColorManager.OPACITY_DIGITS_FACTOR
-                  // must be rounded otherwise it can be wrong
-                  + 0.0001;
+            // must be rounded otherwise it can be wrong
+            final double opacity = (vertex.getOpacity() + 0.0001) * UI.TRANSFORM_OPACITY_MAX;
             spinnerOpacity.setSelection((int) opacity);
 
             // update value

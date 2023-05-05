@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -33,7 +34,7 @@ class ActionToggleViewLayout extends Action {
       super(null, AS_PUSH_BUTTON);
 
       setToolTipText(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Month));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Month));
 
       _tourBookView = tourBookView;
    }

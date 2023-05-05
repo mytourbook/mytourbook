@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,7 @@ import org.eclipse.osgi.util.NLS;
 public abstract class SimpleSerialDevice extends ExternalDevice {
 
    protected TourbookDevice            tourbookDevice;
-   protected boolean                   isCancelImport;
+   private boolean                     _isCancelImport;
 
    private final ByteArrayOutputStream _rawDataBuffer = new ByteArrayOutputStream();
    private List<File>                  _receivedFiles;
@@ -55,7 +55,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
    }
 
    public void cancelImport() {
-      isCancelImport = true;
+      _isCancelImport = true;
    }
 
    @Override
@@ -94,7 +94,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 
    @Override
    public boolean isImportCanceled() {
-      return isCancelImport;
+      return _isCancelImport;
    }
 
    /**
@@ -112,7 +112,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
       int receivedData = 0;
       boolean isReceivingStarted = false;
 
-      isCancelImport = false;
+      _isCancelImport = false;
 
       final int importDataSize = tourbookDevice.getTransferDataSize();
       int timer = 0;
@@ -147,15 +147,15 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
           * if receiving data was started and no more data are coming in, stop receiving
           * additional data
           */
-         if (isReceivingStarted && receiveTimer == 10 & rawDataSize == receivedData) {
+         if (isReceivingStarted && receiveTimer == 10 && rawDataSize == receivedData) {
             break;
          }
 
          // if user pressed the cancel button, exit the import
-         if (monitor.isCanceled() || isCancelImport == true) {
+         if (monitor.isCanceled() || _isCancelImport == true) {
 
             // close the dialog when the monitor was canceled
-            isCancelImport = true;
+            _isCancelImport = true;
 
             // reset databuffer to prevent saving the content
             _rawDataBuffer.reset();

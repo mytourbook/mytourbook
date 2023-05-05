@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,16 +22,17 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 
 /**
- * Contains data which are needed to paint a tour into a map.
+ * Contains data which are needed to paint a tour into the 2D map.
  */
 public class TourPainterConfiguration {
 
    private static TourPainterConfiguration _instance;
 
-   private final ArrayList<TourData>       _tourDataList = new ArrayList<>();
-   private final ArrayList<Photo>          _photos       = new ArrayList<>();
+   private final ArrayList<TourData>       _allTourData = new ArrayList<>();
+   private final ArrayList<Photo>          _allPhotos   = new ArrayList<>();
 
    /**
     * contains the upper left and lower right position for a tour
@@ -41,6 +42,8 @@ public class TourPainterConfiguration {
    private int                             _zoomLevelAdjustment;
 
    private IMapColorProvider               _mapColorProvider;
+
+   boolean                                 isBackgroundDark;
 
    boolean                                 isShowStartEndInMap;
    boolean                                 isShowTourMarker;
@@ -54,6 +57,15 @@ public class TourPainterConfiguration {
     * save in a tour) is displayed.
     */
    boolean                                 isLinkPhotoDisplayed;
+
+   boolean                                 isFilterTourPauses;
+   boolean                                 isFilterPauseDuration;
+   boolean                                 isShowAutoPauses;
+   boolean                                 isShowUserPauses;
+   long                                    pauseDuration;
+   Enum<TourFilterFieldOperator>           pauseDurationOperator;
+
+   boolean                                 isShowBreadcrumbs;
 
    private TourPainterConfiguration() {}
 
@@ -71,7 +83,7 @@ public class TourPainterConfiguration {
    }
 
    public ArrayList<Photo> getPhotos() {
-      return _photos;
+      return _allPhotos;
    }
 
    /**
@@ -85,7 +97,7 @@ public class TourPainterConfiguration {
     * @return Returns the current {@link TourData} which is selected in a view or editor
     */
    public ArrayList<TourData> getTourData() {
-      return _tourDataList;
+      return _allTourData;
    }
 
    public int getZoomLevelAdjustment() {
@@ -99,8 +111,8 @@ public class TourPainterConfiguration {
     */
    public void resetTourData() {
 
-      _tourDataList.clear();
-      _tourDataList.add(null);
+      _allTourData.clear();
+      _allTourData.add(null);
    }
 
    public void setMapColorProvider(final IMapColorProvider mapColorProvider) {
@@ -116,19 +128,15 @@ public class TourPainterConfiguration {
     */
    public void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
 
-      _photos.clear();
+      _allPhotos.clear();
 
       if (allPhotos != null) {
-         _photos.addAll(allPhotos);
+         _allPhotos.addAll(allPhotos);
       }
 
-      isPhotoVisible = isShowPhoto && _photos.size() > 0;
+      isPhotoVisible = isShowPhoto && _allPhotos.size() > 0;
 
       isLinkPhotoDisplayed = isLinkPhoto;
-   }
-
-   public void setZoomLevelAdjustment(final int zoomLevel) {
-      _zoomLevelAdjustment = zoomLevel;
    }
 
    public void setTourBounds(final Set<GeoPosition> mapPositions) {
@@ -143,13 +151,13 @@ public class TourPainterConfiguration {
     */
    public void setTourData(final ArrayList<TourData> tourDataList, final boolean isShowTour) {
 
-      _tourDataList.clear();
+      _allTourData.clear();
 
       if (tourDataList != null) {
-         _tourDataList.addAll(tourDataList);
+         _allTourData.addAll(tourDataList);
       }
 
-      isTourVisible = isShowTour && _tourDataList.size() > 0;
+      isTourVisible = isShowTour && _allTourData.size() > 0;
    }
 
    /**
@@ -161,9 +169,13 @@ public class TourPainterConfiguration {
     */
    public void setTourData(final TourData tourData, final boolean isShowTour) {
 
-      _tourDataList.clear();
-      _tourDataList.add(tourData);
+      _allTourData.clear();
+      _allTourData.add(tourData);
 
-      isTourVisible = isShowTour && _tourDataList.size() > 0;
+      isTourVisible = isShowTour && _allTourData.size() > 0;
+   }
+
+   public void setZoomLevelAdjustment(final int zoomLevel) {
+      _zoomLevelAdjustment = zoomLevel;
    }
 }

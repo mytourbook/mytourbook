@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -44,7 +45,7 @@ public class Dialog_SaveTags extends WizardDialog {
 
       super(parentShell, wizard);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.SaveTags).createImage());
    }
 
    @Override

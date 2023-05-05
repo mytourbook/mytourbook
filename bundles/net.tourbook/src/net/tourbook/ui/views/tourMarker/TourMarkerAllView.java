@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,12 +52,10 @@ import net.tourbook.ui.Messages;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -68,14 +66,10 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -89,7 +83,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -97,7 +90,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
@@ -151,7 +143,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
    private IContextMenuProvider        _tableViewerContextMenuProvider   = new TableContextMenuProvider();
    //
    private ActionEditTour              _actionEditTour;
-   private ActionModifyColumns         _actionModifyColumns;
    private ActionOpenMarkerDialog      _actionOpenMarkerDialog;
    private ActionOpenTour              _actionOpenTour;
    private ActionEditQuick             _actionQuickEdit;
@@ -566,43 +557,37 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-               _markerViewer.refresh();
+            _markerViewer.refresh();
 
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _markerViewer.getTable().redraw();
-            }
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _markerViewer.getTable().redraw();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
+            _columnManager.saveState(_state);
+            _columnManager.clearColumns();
 
-               defineAllColumns();
+            defineAllColumns();
 
-               _markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
-            }
+            _markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
          }
       };
 
@@ -612,36 +597,33 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == TourMarkerAllView.this) {
-               return;
-            }
+         if (workbenchPart == TourMarkerAllView.this) {
+            return;
+         }
 
-            if (_isInUpdate) {
-               return;
-            }
+         if (_isInUpdate) {
+            return;
+         }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
 
-                  // update modified tour
-
-                  reloadViewer();
-               }
-
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-               onTourEvent_TourMarker(eventData);
-
-            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+               // update modified tour
 
                reloadViewer();
             }
+
+         } else if (tourEventId == TourEventId.MARKER_SELECTION) {
+
+            onTourEvent_TourMarker(eventData);
+
+         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            reloadViewer();
          }
       };
 
@@ -651,7 +633,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
    private void createActions() {
 
       _actionEditTour = new ActionEditTour(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
       _actionQuickEdit = new ActionEditQuick(this);
@@ -664,13 +645,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-
-            fillContextMenu(manager);
-         }
-      });
+      _viewerMenuManager.addMenuListener(this::fillContextMenu);
    }
 
    @Override
@@ -705,16 +680,13 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 //
 //         }
 //      });
-      BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(parent.getDisplay(), () -> {
 
-            loadAllMarker();
+         loadAllMarker();
 
-            updateUI_SetViewerInput();
+         updateUI_SetViewerInput();
 
-            restoreState_WithUI();
-         }
+         restoreState_WithUI();
       });
    }
 
@@ -742,13 +714,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
        * It took a while that the correct listener is set and also the checked item is fired and not
        * the wrong selection.
        */
-      table.addListener(SWT.Selection, new Listener() {
-
-         @Override
-         public void handleEvent(final Event event) {
-            onSelect_TourMarker(event);
-         }
-      });
+      table.addListener(SWT.Selection, this::onSelect_TourMarker);
 
       /*
        * create table viewer
@@ -762,19 +728,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       _markerViewer.addFilter(new MarkerItemFilter());
       _markerViewer.setComparator(_markerComparator);
 
-      _markerViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onTourMarker_DoubleClick();
-         }
-      });
+      _markerViewer.addDoubleClickListener(doubleClickEvent -> onTourMarker_DoubleClick());
 
-      _markerViewer.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
-            onTourMarker_StateChanged(event);
-         }
-      });
+      _markerViewer.addCheckStateListener(this::onTourMarker_StateChanged);
 
       updateUI_SetSortDirection(//
             _markerComparator.__sortColumnId,
@@ -1162,9 +1118,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       /*
        * Fill view menu
        */
-      final IMenuManager menuMgr = actionBars.getMenuManager();
-
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = actionBars.getMenuManager();
 
       /*
        * Fill view toolbar
@@ -1670,22 +1624,19 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
    private void refilterViewer() {
 
-      BusyIndicator.showWhile(_viewerContainer.getDisplay(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(_viewerContainer.getDisplay(), () -> {
 
-            _viewerContainer.setRedraw(false);
+         _viewerContainer.setRedraw(false);
+         {
+            // keep selection
+            final ISelection selectionBackup = getViewerSelection();
+            final Object[] checkedElements = _markerViewer.getCheckedElements();
             {
-               // keep selection
-               final ISelection selectionBackup = getViewerSelection();
-               final Object[] checkedElements = _markerViewer.getCheckedElements();
-               {
-                  _markerViewer.refresh(false);
-               }
-               updateUI_SelectTourMarker(selectionBackup, checkedElements);
+               _markerViewer.refresh(false);
             }
-            _viewerContainer.setRedraw(true);
+            updateUI_SelectTourMarker(selectionBackup, checkedElements);
          }
+         _viewerContainer.setRedraw(true);
       });
    }
 

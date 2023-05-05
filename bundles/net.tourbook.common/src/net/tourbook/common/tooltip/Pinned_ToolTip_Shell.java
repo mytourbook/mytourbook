@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.common.tooltip;
 
 import net.tourbook.common.PointLong;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -135,11 +136,11 @@ public abstract class Pinned_ToolTip_Shell {
 
          switch (event.type) {
          case SWT.Dispose:
-            toolTipHide(_ttShell, event);
+            toolTip_Hide(_ttShell, event);
             break;
 
          case SWT.Resize:
-            onResizeOwner(event);
+            onOwner_Resize(event);
          }
       }
    }
@@ -164,14 +165,14 @@ public abstract class Pinned_ToolTip_Shell {
 
                   if (_display.getActiveShell() != _ttShell && isHideTooltipWhenOwnerShellIsInactive()) {
 
-                     toolTipHide(_ttShell, event);
+                     toolTip_Hide(_ttShell, event);
                   }
                }
             });
             break;
 
          case SWT.Move:
-            onMoveOwner(event);
+            onOwner_MouseMove(event);
             break;
          }
       }
@@ -209,7 +210,9 @@ public abstract class Pinned_ToolTip_Shell {
                case SWT.MouseMove:
 
                   if (_isTTDragged) {
-                     onMoveTT(event);
+
+                     onTooltipControls_MouseMove(event);
+
                   } else {
 
                      /*
@@ -225,12 +228,21 @@ public abstract class Pinned_ToolTip_Shell {
 
                case SWT.MouseDown:
 
-                  _isTTDragged = true;
+                  if (event.button == 3) {
 
-                  _devXTTMouseDown = event.x;
-                  _devYTTMouseDown = event.y;
+                     // open context menu
 
-                  cursor = _cursorDragged;
+                     onEvent_ContextMenu(event);
+
+                  } else {
+
+                     _isTTDragged = true;
+
+                     _devXTTMouseDown = event.x;
+                     _devYTTMouseDown = event.y;
+
+                     cursor = _cursorDragged;
+                  }
 
                   break;
 
@@ -240,7 +252,7 @@ public abstract class Pinned_ToolTip_Shell {
 
                      _isTTDragged = false;
 
-                     onMouseUpTT(event);
+                     onTooltipControls_MouseUp(event);
                   }
 
                   cursor = _cursorHand;
@@ -274,7 +286,7 @@ public abstract class Pinned_ToolTip_Shell {
             }
 
             /*
-             * shell could be hidden (it was during testing)
+             * Set cursor, shell could be hidden (it was during testing)
              */
             if (_ttShell != null && !_ttShell.isDisposed()) {
 
@@ -319,7 +331,7 @@ public abstract class Pinned_ToolTip_Shell {
                      return;
                   }
 
-                  toolTipHide(_ttShell, null);
+                  toolTip_Hide(_ttShell, null);
                }
             });
          }
@@ -337,6 +349,7 @@ public abstract class Pinned_ToolTip_Shell {
 
       _tooltipOwner = tooltipOwner;
       _ownerControl = tooltipOwner.getControl();
+
       _display = _ownerControl.getDisplay();
 
       this.state = state;
@@ -359,7 +372,7 @@ public abstract class Pinned_ToolTip_Shell {
       _ttShellPositioningRunnable = new Runnable() {
          @Override
          public void run() {
-            setTTShellLocation20Runnable();
+            setTTShellLocation_20_Runnable();
          }
       };
 
@@ -394,7 +407,9 @@ public abstract class Pinned_ToolTip_Shell {
       control.addListener(SWT.MouseVerticalWheel, _ttListener);
 
       if (control instanceof Composite) {
+
          final Control[] children = ((Composite) control).getChildren();
+
          for (final Control child : children) {
             addTooltipListener(child);
          }
@@ -540,7 +555,7 @@ public abstract class Pinned_ToolTip_Shell {
     * Hide and dispose the currently active tool tip
     */
    public void hide() {
-      toolTipHide(_ttShell, null);
+      toolTip_Hide(_ttShell, null);
    }
 
    /**
@@ -553,13 +568,76 @@ public abstract class Pinned_ToolTip_Shell {
 
    protected void onDispose() {
 
-      _cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
-      _cursorHand = (Cursor) Util.disposeResource(_cursorHand);
+      _cursorDragged = UI.disposeResource(_cursorDragged);
+      _cursorHand = UI.disposeResource(_cursorHand);
 
       removeOwnerControlListener();
    }
 
-   private void onMouseUpTT(final Event event) {
+   /**
+    * Open context menu
+    *
+    * @param event
+    */
+   protected void onEvent_ContextMenu(final Event event) {}
+
+   /**
+    * The owner shell has been moved, adjust tooltip shell that it moves also with the owner control
+    * but preserves the display border.
+    */
+   private void onOwner_MouseMove(final Event event) {
+
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
+
+      setTTShellLocation(false, false, false, false);
+   }
+
+   /**
+    * Owner control is resized.
+    *
+    * @param event
+    */
+   private void onOwner_Resize(final Event event) {
+
+      if (_ttShell == null || _ttShell.isDisposed()) {
+         return;
+      }
+
+      setTTShellLocation(false, false, false, false);
+   }
+
+   /**
+    * Tooltip location has been moved with the mouse.
+    *
+    * @param event
+    */
+   private void onTooltipControls_MouseMove(final Event event) {
+
+      final int xDiff = event.x - _devXTTMouseDown;
+      final int yDiff = event.y - _devYTTMouseDown;
+
+      if (pinnedLocation == Pinned_ToolTip_PinLocation.Screen) {
+
+         _ttShellDiff.x = xDiff;
+         _ttShellDiff.y = yDiff;
+
+      } else if (pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition) {
+
+         _ttShellDiff.x = 0;
+         _ttShellDiff.y = yDiff;
+
+      } else {
+
+         _ttShellDiff.x += xDiff;
+         _ttShellDiff.y += yDiff;
+      }
+
+      setTTShellLocation(true, false, false, true);
+   }
+
+   private void onTooltipControls_MouseUp(final Event event) {
 
       /*
        * get the tt vertical position
@@ -589,62 +667,6 @@ public abstract class Pinned_ToolTip_Shell {
       }
 
       setTTShellLocation(false, true, false, true);
-   }
-
-   /**
-    * The owner shell has been moved, adjust tooltip shell that it moves also with the owner control
-    * but preserves the display border.
-    */
-   private void onMoveOwner(final Event event) {
-
-      if (_ttShell == null || _ttShell.isDisposed()) {
-         return;
-      }
-
-      setTTShellLocation(false, false, false, false);
-   }
-
-   /**
-    * Tooltip location has been moved with the mouse.
-    *
-    * @param event
-    */
-   private void onMoveTT(final Event event) {
-
-      final int xDiff = event.x - _devXTTMouseDown;
-      final int yDiff = event.y - _devYTTMouseDown;
-
-      if (pinnedLocation == Pinned_ToolTip_PinLocation.Screen) {
-
-         _ttShellDiff.x = xDiff;
-         _ttShellDiff.y = yDiff;
-
-      } else if (pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition) {
-
-         _ttShellDiff.x = 0;
-         _ttShellDiff.y = yDiff;
-
-      } else {
-
-         _ttShellDiff.x += xDiff;
-         _ttShellDiff.y += yDiff;
-      }
-
-      setTTShellLocation(true, false, false, true);
-   }
-
-   /**
-    * Owner control is resized.
-    *
-    * @param event
-    */
-   private void onResizeOwner(final Event event) {
-
-      if (_ttShell == null || _ttShell.isDisposed()) {
-         return;
-      }
-
-      setTTShellLocation(false, false, false, false);
    }
 
    private void passOnEvent(final Shell tip, final Event event) {
@@ -677,7 +699,7 @@ public abstract class Pinned_ToolTip_Shell {
        */
       if (state.get(STATE_PINNED_TOOLTIP_X) != null) {
 
-         _ttShellDiff = new Point(//
+         _ttShellDiff = new Point(
                Util.getStateInt(state, STATE_PINNED_TOOLTIP_X, 0),
                Util.getStateInt(state, STATE_PINNED_TOOLTIP_Y, 0));
       }
@@ -915,7 +937,7 @@ public abstract class Pinned_ToolTip_Shell {
          Rectangle increasedShellArea;
          if (isSetDefaultLocation) {
 
-            increasedShellArea = new Rectangle(//
+            increasedShellArea = new Rectangle(
                   screenDefaultLocation.x - VALUE_POINT_OFFSET,
                   screenDefaultLocation.y - VALUE_POINT_OFFSET,
                   ttSize.x + 2 * VALUE_POINT_OFFSET,
@@ -923,7 +945,7 @@ public abstract class Pinned_ToolTip_Shell {
 
          } else {
 
-            increasedShellArea = new Rectangle(//
+            increasedShellArea = new Rectangle(
                   _screenRequestedAnimationLocation.x - VALUE_POINT_OFFSET,
                   _screenRequestedAnimationLocation.y - VALUE_POINT_OFFSET + _defaultOffsetY,
                   ttSize.x + 2 * VALUE_POINT_OFFSET,
@@ -995,7 +1017,7 @@ public abstract class Pinned_ToolTip_Shell {
 
             _screenRequestedAnimationLocation = screenNewLocation;
 
-            setTTShellLocation10Start();
+            setTTShellLocation_10_Start();
 
          } else {
 
@@ -1026,7 +1048,7 @@ public abstract class Pinned_ToolTip_Shell {
       setTTShellLocation(false, true, false, true);
    }
 
-   private synchronized void setTTShellLocation10Start() {
+   private synchronized void setTTShellLocation_10_Start() {
 
       final int oldCounter = _animationCounter;
 
@@ -1042,11 +1064,11 @@ public abstract class Pinned_ToolTip_Shell {
       } else {
 
          // do the first movement
-         setTTShellLocation20Runnable();
+         setTTShellLocation_20_Runnable();
       }
    }
 
-   private void setTTShellLocation20Runnable() {
+   private void setTTShellLocation_20_Runnable() {
 
       if (_animationCounter == 0 || _ownerControl.isDisposed() || _ttShell == null || _ttShell.isDisposed()) {
          return;
@@ -1153,7 +1175,7 @@ public abstract class Pinned_ToolTip_Shell {
    public void show(final Point location) {
 
       /*
-       * show tooltip only when this is the active shell, this check is necessary that when a tour
+       * Show tooltip only when this is the active shell, this check is necessary that when a tour
        * chart is opened in a dialog (e.g. adjust altitude) that a hidden tour chart tooltip in the
        * tour chart view is also displayed
        */
@@ -1166,28 +1188,27 @@ public abstract class Pinned_ToolTip_Shell {
       event.y = location.y;
       event.widget = _ownerControl;
 
-      toolTipCreate(event);
+      toolTip_Create(event);
    }
 
-   private void toolTipCreate(final Event event) {
+   private void toolTip_Create(final Event event) {
 
       if (shouldCreateToolTip(event)) {
 
-         final Shell shell = new Shell(_ownerControl.getShell(), //
-               SWT.ON_TOP //
-//                     | SWT.TOOL
+         final Shell shell = new Shell(_ownerControl.getShell(),
+               SWT.ON_TOP
                      | SWT.NO_FOCUS
                      | SWT.NO_TRIM
-         //
+
          );
 
          shell.setLayout(new FillLayout());
 
-         toolTipOpen(shell, event);
+         toolTip_Open(shell, event);
       }
    }
 
-   private void toolTipHide(final Shell ttShell, final Event event) {
+   private void toolTip_Hide(final Shell ttShell, final Event event) {
 
       // initialize next animation, otherwise tooltip would never be displayed again
       _animationCounter = 0;
@@ -1196,7 +1217,7 @@ public abstract class Pinned_ToolTip_Shell {
          return;
       }
 
-      if (shouldHideToolTip(event)) {
+      if (shouldHideToolTip(event) && _ownerControl.isDisposed() == false) {
 
          final Shell ownerShell = _ownerControl.getShell();
          ownerShell.removeListener(SWT.Deactivate, _ownerShellListener);
@@ -1213,11 +1234,11 @@ public abstract class Pinned_ToolTip_Shell {
       }
    }
 
-   private void toolTipOpen(final Shell shell, final Event event) {
+   private void toolTip_Open(final Shell shell, final Event event) {
 
       // Ensure that only one Tooltip is shown in time
       if (_ttShell != null) {
-         toolTipHide(_ttShell, null);
+         toolTip_Hide(_ttShell, null);
       }
 
       _ttShell = shell;
@@ -1229,10 +1250,10 @@ public abstract class Pinned_ToolTip_Shell {
       ownerShell.addListener(SWT.Deactivate, _ownerShellListener);
       ownerShell.addListener(SWT.Move, _ownerShellListener);
 
-      toolTipShow(event);
+      toolTip_Show(event);
    }
 
-   private void toolTipShow(final Event event) {
+   private void toolTip_Show(final Event event) {
 
       if (!_ttShell.isDisposed()) {
 
@@ -1240,6 +1261,7 @@ public abstract class Pinned_ToolTip_Shell {
 
          createToolTipContentArea(event, _ttShell);
 
+         // add listeners to all children
          addTooltipListener(_ttShell);
 
          _ttShell.pack();

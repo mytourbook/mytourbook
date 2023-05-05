@@ -1,0 +1,153 @@
+21.3.0                                                 22. March 2021
+
+EXPERIMENTAL
+============
+Version 21.3 is experimental as the app launch has been reworked to fix 
+the issues why the previous two versions were removed.
+Create a backup of the data directory BEFORE installing this version.
+
+
+New   
+===
+
+* Cloud: Suunto App Integration (Frederic) 299
+  - Download tours (FIT format)
+  - Upload tours as routes to be used for navigation
+ 
+* Cloud: Strava Integration (Frederic) 273
+  - Upload tours to a Strava account
+
+* Compress Database
+  The internal sql database can be compressed.
+  During the update of MyTourbook for this version 21.3, the latitude/
+  longitude values are saved with half of the previous size. 
+  This can reduce the diskspace by many (> 100) MBytes, when the 
+  database is compressed after the update.
+
+
+Improvements   
+============
+
+* Easy Import
+  - Prevent that lines are wrapped in the import file list (the UI do 
+    not look very good). This can occur when a space is in a filename or 
+    am/pm is displayed
+
+* Fit Import
+  - Import R-R intervals
+
+* TCX Export (Frederic) 287
+  - Added speed and power values in the TCX exports
+
+* Tour Chart
+  - Show heartbeat values as
+    - Beat values from device (less accurate)
+    - R-R intervals (saved in milliseconds)
+  - Pace graph (Frederic)
+    - Added checkbox to select the pace graph display type
+      - When checked (default behavior), it will display the pace graph 
+        in descending order to show the low paces (high speeds) at the 
+        top of the graph and the high paces (low speeds) at the bottom 
+        of the graph for a more intuitive chart
+      - When unchecked, the opposite will be displayed
+  - Marker Tooltip (Frederic)
+    - Show/hide
+      - Elevation, Elevation Gain Difference
+      - Distance, Distance Difference
+      - Duration, Duration Difference 
+
+* 2D Map (Frederic) 289
+  - Export map view to an image file (jpeg, png or bmp) or to the clipboard
+  - Set a "User-Agent" for a custom map provider
+
+* Tour Blog
+  - Set content font size
+
+* Tour Database
+  - Overhauled the app (database) startup to have a different version 
+    checking for the database structure and database data
+
+ 
+Changes  
+=======
+
+* 2D Map
+  - Minor reordering of the context menu actions
+
+* Latitude/longitude values are saved in E6 format
+  - This reduces the precision in the worst case (at the equator) 
+    to 0.11132m which is less than the accuracy of the GPS system, 
+    see accuracy
+
+* Dropbox Integration (Frederic) 277
+  - Switched to the new PKCE OAuth2 flow.
+    The Implicit grant flow previously used is now considered deprecated 
+    by Dropbox: "Legacy. We recommend the PKCE flow."
+  - Because Dropbox doesn't support Web Views, the authorization is now 
+    done in the user's default browser. See the PR link for the details 
+    about the new authorization steps
+     
+
+Bugfix   
+======
+
+* Measurement System
+  - A few measurement system values were wrong fb2755bd
+
+* Fit Import (Frederic)
+  - When importing a file without pauses, the recorded time could 
+    sometimes be different by 1 or 2 seconds compared to the elapsed time
+
+* TCX Import (Frederic)
+  - The pause import for some TCX formats could lead to multiple 
+    erroneous pauses
+
+* TCX Export (Frederic) 287
+  - Fixed the TCX Course Export format as it was not properly formatted 
+    before and was preventing from importing TCX Courses in Garmin Connect
+
+* Suunto SML & XML Import (Frederic)
+  - Markers are now imported
+  - Fixed possible NPE
+
+* Pause Re-Import (Frederic)
+  - In some scenarii, the pause re-import could be incomplete if the tour 
+    originally contained pauses and the new file doesn't contain any
+
+* Day Time Statistics (Frederic)
+  - Fixed a bug where dragging the horizontal sliders dragged the 
+    opposite slider. Also, the value of the sliders were inverted 
+
+* Dialog Adjust Elevation
+  - Show dialog tour chart with a better default size when opened 
+    the first time
+    
+* Tour Database Update
+  - Fixed 3 different issues when updating tour database from the very 
+    first public database version 3. These issues occurred, depending on 
+    the version which is being updated
+    - Column renaming could fail
+    - Serie data could be dropped
+    - Entity manager was running in update 3 → 4,
+      moved it into the 3 → 4 post update  
+
+ 
+Translation    
+===========
+* Dutch (Maarten)
+* French (Frederic)
+* German
+* Italian (Doriano)
+
+ 
+Dev Info    
+========
+* Sleak
+* Multiple Messages.java
+* i18n Code Style
+
+ 
+System   
+======
+* Eclipse 2020-09
+* FIT SDK 21.47

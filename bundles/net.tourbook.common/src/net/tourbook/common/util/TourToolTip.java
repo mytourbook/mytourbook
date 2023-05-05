@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -257,9 +257,6 @@ public class TourToolTip extends ToolTip {
    public void setHoveredContext(final HoveredAreaContext hoveredAreaContext) {
 
       _hoveredContext = hoveredAreaContext;
-//
-//		System.out.println(System.currentTimeMillis() + " setHoveredContext()\t" + _hoveredContext);
-//		// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    /*

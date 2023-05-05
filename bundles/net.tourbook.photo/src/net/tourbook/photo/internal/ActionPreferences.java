@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
 import org.eclipse.jface.action.Action;
@@ -23,18 +25,20 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ActionPreferences extends Action {
 
-	public ActionPreferences() {
+   public ActionPreferences() {
 
-		setText(Messages.Pic_Dir_Action_Preferences);
-		setImageDescriptor(Activator.getImageDescriptor(net.tourbook.common.Messages.Image__options));
-	}
+      setText(Messages.Pic_Dir_Action_Preferences);
 
-	@Override
-	public void run() {
-		PreferencesUtil.createPreferenceDialogOn(
-				Display.getCurrent().getActiveShell(),
-				PrefPagePhotoDirectory.ID,
-				null,
-				null).open();
-	}
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
+   }
+
+   @Override
+   public void run() {
+
+      PreferencesUtil.createPreferenceDialogOn(
+            Display.getCurrent().getActiveShell(),
+            PrefPagePhotoDirectory.ID,
+            null,
+            null).open();
+   }
 }

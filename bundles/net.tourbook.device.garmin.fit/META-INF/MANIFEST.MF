@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import tours from .FIT files
 Bundle-SymbolicName: net.tourbook.device.garmin.fit;singleton:=true
-Bundle-Version: 20.12.0.qualifier
+Bundle-Version: 23.3.2.qualifier
 Bundle-Activator: net.tourbook.device.garmin.fit.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
@@ -14,13 +14,13 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Bundle-ClassPath: .,
- fit-21.40.00.jar
+Bundle-ClassPath: .
 Import-Package: net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,
  net.tourbook.importdata,
  net.tourbook.tour,
- net.tourbook.ui.tourChart
+ net.tourbook.ui.tourChart,
+ org.eclipse.collections.impl.list.mutable.primitive
 Automatic-Module-Name: net.tourbook.device.garmin.fit
 Export-Package: net.tourbook.device.garmin.fit

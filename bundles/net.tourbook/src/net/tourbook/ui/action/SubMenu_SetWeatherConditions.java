@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -29,8 +32,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -81,10 +82,12 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
    @Override
    public void dispose() {
 
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
+      if (_menu == null) {
+         return;
       }
+
+      _menu.dispose();
+      _menu = null;
 
    }
 
@@ -107,19 +110,16 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       _menu = new Menu(parent);
 
-      // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
+      // Add listener to re-populate the menu each time
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
-            // dispose old menu items
-            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-               menuItem.dispose();
-            }
-
-            fillMenu(_menu);
+         // dispose old menu items
+         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
+            menuItem.dispose();
          }
-      });
+
+         fillMenu(_menu);
+      }));
 
       return _menu;
    }
@@ -138,7 +138,6 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
       if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
-
          MessageDialog.openInformation(
                shell,
                Messages.Dialog_SetWeatherDescription_Dialog_Title,
@@ -149,14 +148,15 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       for (final TourData tourData : selectedTours) {
 
-         if (tourData.getWeatherClouds() != weatherDescription) {
-
-            // Weather description is not the same
-
-            tourData.setWeatherClouds(weatherDescription);
-
-            modifiedTours.add(tourData);
+         if (Objects.equals(tourData.getWeather_Clouds(), weatherDescription)) {
+            continue;
          }
+
+         // Weather description is not the same
+
+         tourData.setWeather_Clouds(weatherDescription);
+
+         modifiedTours.add(tourData);
       }
 
       if (modifiedTours.size() > 0) {

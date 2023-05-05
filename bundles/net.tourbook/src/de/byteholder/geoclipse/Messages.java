@@ -31,7 +31,9 @@ public class Messages extends NLS {
    public static String        Dialog_CustomConfig_Label_ImageFormat;
    public static String        Dialog_CustomConfig_Label_UrlParts;
    public static String        Dialog_CustomConfig_Label_ZoomLevel;
-   public static String        Dialog_CustomConfig_Text_ImageFormat_Tooltip;
+   public static String        Dialog_CustomConfig_Label_ImageFormat_Tooltip;
+   public static String        Dialog_CustomConfig_Label_UserAgent;
+   public static String        Dialog_CustomConfig_Label_UserAgent_Tooltip;
 
    public static String        Dialog_DropNoPOI_InvalidData;
    public static String        Dialog_DropNoPOI_Message;
@@ -124,21 +126,6 @@ public class Messages extends NLS {
    public static String        Dialog_WmsConfig_Label_ImageSize;
    public static String        Dialog_WmsConfig_Label_Layers;
 
-   public static String        Image__Refresh;
-
-   public static String        Image_Action_SetFavoritePosition;
-   public static String        Image_Action_ShowFavoritePosition;
-   public static String        Image_Action_ZoomIn;
-   public static String        Image_Action_ZoomIn_Disabled;
-   public static String        Image_Action_ZoomOut;
-   public static String        Image_Action_ZoomOut_Disabled;
-   public static String        Image_Action_ZoomOutToMinZoom;
-   public static String        Image_Action_ZoomOutToMinZoom_Disabled;
-   public static String        Image_Action_ZoomShowEntireLayer;
-
-   public static String        Image_ViewIcon_Map;
-   public static String        Image_ViewIcon_Placeholder16;
-
    public static String        Import_Error_Dialog_Title;
 
    public static String        Map_Action_ZoomIn_Tooltip;
@@ -146,6 +133,10 @@ public class Messages extends NLS {
    public static String        Map_Action_ZoomOutToMinZoom_Tooltip;
 
    public static String        Map2_Hovered_Tours;
+
+   public static String        Map2_TourTooltip_Distance;
+   public static String        Map2_TourTooltip_Elevation;
+   public static String        Map2_TourTooltip_Time;
 
    public static String        Map2_TourBreadcrumb_Info_EnhancedPaintingWarning;
    public static String        Map2_TourBreadcrumb_Label_Tours;
@@ -190,13 +181,13 @@ public class Messages extends NLS {
    public static String        DBG028_Wms_Server_Error_MalformedUrl;
    public static String        DBG029_Wms_Server_Error_FileNotFound;
    public static String        DBG030_Wms_Server_Error_CannotConnectToServer;
-   public static String        DBG031_Wms_Server_Error_IoExeption;
-   public static String        DBG032_Wms_Server_Error_ServiceExeption;
-   public static String        DBG033_Wms_Server_Error_OtherExeption;
+   public static String        DBG031_Wms_Server_Error_IoException;
+   public static String        DBG032_Wms_Server_Error_ServiceException;
+   public static String        DBG033_Wms_Server_Error_OtherException;
    public static String        DBG034_Wms_Error_LayersAreNotAvailable;
    public static String        DBG035_Wms_Server_Error_CannotConnectToServer;
-   public static String        DBG036_Wms_Server_Error_IoExeption;
-   public static String        DBG037_Wms_Server_Error_ServiceExeption;
+   public static String        DBG036_Wms_Server_Error_IoException;
+   public static String        DBG037_Wms_Server_Error_ServiceException;
    public static String        DBG038_Wms_Server_Error_CannotLoadImage;
    public static String        DBG039_Error_FileIsNotExported;
    public static String        DBG040_Import_Error_PluginMPIsNotAvailable;

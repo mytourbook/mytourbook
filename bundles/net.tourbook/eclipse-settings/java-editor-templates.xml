@@ -87,7 +87,8 @@ ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true
 	${line_selection}${cursor}
 } while (${condition:var(boolean)});</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a do-while loop" enabled="true" id="org.eclipse.jdt.postfixcompletion.dowhile" name="dowhile">do {&#13;
 	${cursor}&#13;
-} while (${i:inner_expression(boolean)});</template><template autoinsert="false" context="java-statements" deleted="false" description="else block" enabled="true" id="org.eclipse.jdt.ui.templates.else" name="else">else {
+} while (${i:inner_expression(boolean)});</template><template autoinsert="true" context="java-statements" deleted="false" description="Creates code where a breakpoint can be set" enabled="true" name="dummyBreakpoint">int aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = 0;&#13;
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa++;</template><template autoinsert="false" context="java-statements" deleted="false" description="else block" enabled="true" id="org.eclipse.jdt.ui.templates.else" name="else">else {
 	${cursor}
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a negated if statement" enabled="true" id="org.eclipse.jdt.postfixcompletion.else" name="else">if (!${i:inner_expression(boolean)}${}) {&#13;
 	${cursor}&#13;
@@ -116,9 +117,9 @@ public void onFocus() {
 	${cursor}
 }
 ${imp:import(org.eclipse.e4.ui.di.Focus)}
-</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over array" enabled="true" id="org.eclipse.jdt.ui.templates.for_array" name="for">for (int ${index} = 0; ${index} &lt; ${array}.length; ${index}++) {
+</template><template autoinsert="false" context="java-statements" deleted="false" description="use index on array" enabled="true" id="org.eclipse.jdt.ui.templates.for_array" name="for">for (int ${index} = 0; ${index} &lt; ${array}.length; ${index}++) {
 	${line_selection}${cursor}
-}</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over array with temporary variable" enabled="true" id="org.eclipse.jdt.ui.templates.for_temp" name="for">for (int ${index} = 0; ${index} &lt; ${array}.length; ${index}++) {
+}</template><template autoinsert="false" context="java-statements" deleted="false" description="use index on array with temporary variable" enabled="true" id="org.eclipse.jdt.ui.templates.for_temp" name="for">for (int ${index} = 0; ${index} &lt; ${array}.length; ${index}++) {
 	${array_type} ${array_element} = ${array}[${index}];
 	${cursor}
 }</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over collection" enabled="true" id="org.eclipse.jdt.ui.templates.for_collection" name="for">for (${iteratorType:newType(java.util.Iterator)} ${iterator} = ${collection}.iterator(); ${iterator}.hasNext(); ) {
@@ -126,12 +127,20 @@ ${imp:import(org.eclipse.e4.ui.di.Focus)}
 	${cursor}
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a for statement" enabled="true" id="org.eclipse.jdt.postfixcompletion.for" name="for">for (${type:newActualType(i)} ${n:newName(i)} : ${i:inner_expression(java.util.Collection,array)}) {&#13;
 	${cursor}&#13;
-}</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over an array or Iterable" enabled="true" id="org.eclipse.jdt.ui.templates.for_iterable" name="foreach">for (${iterable_type} ${iterable_element} : ${iterable}) {
+}</template><template autoinsert="true" context="java-statements" deleted="false" description="foreach REPLACEMENT" enabled="true" name="for_each">for (${iterable_type} iter${iterable_element} : ${iterable}) {&#13;
+	${cursor}&#13;
+}&#13;
+&#13;
+</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over an array or Iterable" enabled="true" id="org.eclipse.jdt.ui.templates.for_iterable" name="foreach">for (${iterable_type} ${iterable_element} : ${iterable}) {
 	${cursor}
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a for statement which iterates over an array" enabled="true" id="org.eclipse.jdt.postfixcompletion.fori" name="fori">for (int ${index} = 0; i &lt; ${i:inner_expression(array)}.length; ${index}++) {&#13;
 	${cursor}&#13;
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an indexed for statement which uses the given integer as upper bound" enabled="true" id="org.eclipse.jdt.postfixcompletion.foriub" name="foriub">for (int ${index} = 0; i &lt; ${i:inner_expression(int)}; ${index}++) {&#13;
 	${cursor}&#13;
+}</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over map" enabled="true" id="org.eclipse.jdt.ui.templates.for_map" name="formap">for (Map.Entry&lt;${keyType}, ${valType}&gt; ${entry}: ${map}.entrySet()) {
+	${keyType} ${key} = ${entry}.getKey();
+	${valType} ${val} = ${entry}.getValue();
+	${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="Set formatting ON/OFF" enabled="true" name="formatting">// SET_FORMATTING_OFF&#13;
 // SET_FORMATTING_ON</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a for statement which iterates over an array in reverse order" enabled="true" id="org.eclipse.jdt.postfixcompletion.forr" name="forr">for (int ${index} = ${i:inner_expression(array)}.length - 1; i &gt;= 0; ${index}--) {&#13;
 	${cursor}&#13;
@@ -264,23 +273,23 @@ long end = System.nanoTime();&#13;
 System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")&#13;
 				+ (((float) (end - start) / 1000000) + " ms"));&#13;
 // TODO remove SYSTEM.OUT.PRINTLN&#13;
-</template><template autoinsert="false" context="java" deleted="false" description="create new object" enabled="true" id="org.eclipse.jdt.ui.templates.new" name="new">${type} ${name} = new ${type}(${});</template><template autoinsert="false" context="java-empty" deleted="false" description="create new class" enabled="true" id="org.eclipse.jdt.ui.templates.new_class" name="new_class">${package_declaration}
+</template><template autoinsert="false" context="java" deleted="false" description="create new object" enabled="true" id="org.eclipse.jdt.ui.templates.new" name="new">${type} ${name} = new ${type}(${});</template><template autoinsert="false" context="java-empty" deleted="false" description="create new class" enabled="true" id="org.eclipse.jdt.ui.templates.new_class" name="new_class">package ${enclosing_package};
 
-public class ${class_name} ${line_selection}${cursor} {
+public class ${primary_type_name} ${cursor} {
 
-}</template><template autoinsert="false" context="java-empty" deleted="false" description="create new enumeration" enabled="true" id="org.eclipse.jdt.ui.templates.new_enum" name="new_enum">${package_declaration}
+}</template><template autoinsert="false" context="java-empty" deleted="false" description="create new enumeration" enabled="true" id="org.eclipse.jdt.ui.templates.new_enum" name="new_enum">package ${enclosing_package};
 
-public enum ${class_name} ${line_selection}${cursor} {
+public enum ${primary_type_name} ${cursor} {
 
-}</template><template autoinsert="false" context="java-empty" deleted="false" description="create new interface" enabled="true" id="org.eclipse.jdt.ui.templates.new_iface" name="new_iface">${package_declaration}
+}</template><template autoinsert="false" context="java-empty" deleted="false" description="create new interface" enabled="true" id="org.eclipse.jdt.ui.templates.new_iface" name="new_iface">package ${enclosing_package};
 
-public interface ${class_name} ${line_selection}${cursor} {
+public interface ${primary_type_name} ${cursor} {
 
 }</template><template autoinsert="false" context="module" deleted="false" description="create module declaration" enabled="true" id="org.eclipse.jdt.ui.templates.new_module" name="new_module">module ${name} {
 	${cursor}
-}</template><template autoinsert="false" context="java-empty" deleted="false" description="create new record" enabled="true" id="org.eclipse.jdt.ui.templates.new_record" name="new_record">${package_declaration}
+}</template><template autoinsert="false" context="java-empty" deleted="false" description="create new record" enabled="true" id="org.eclipse.jdt.ui.templates.new_record" name="new_record">package ${enclosing_package};
 
-public record ${class_name}(${cursor})${line_selection} {
+public record ${primary_type_name}(${cursor}) {
 
 }</template><template autoinsert="false" context="java" deleted="false" description="non-externalized string marker" enabled="true" id="org.eclipse.jdt.ui.templates.non-nls" name="nls">//$$NON-NLS-${1}$$</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an if statement and checks if the expression does not resolve to null" enabled="true" id="org.eclipse.jdt.postfixcompletion.nnull" name="nnull">if (${i:inner_expression(java.lang.Object,array)} != null) {&#13;
 	${cursor}&#13;
@@ -330,7 +339,7 @@ ${imp:import(org.eclipse.swt.SWT)}${cursor}
 ${scrolled}.setContent(${content});
 Point ${contentSize:newName(org.eclipse.swt.graphics.Point)} = ${content}.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 ${content}.setSize(${contentSize});
-${scrolled}.setMinSize(${contentSize});</template><template autoinsert="false" context="swt-statements" deleted="false" description="new Shell" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.shell" name="Shell">${shellType:newType(org.eclipse.swt.widgets.Shell)} ${shell:newName(org.eclipse.swt.widgets.Shell)} = new ${shellType}(${parent:var(org.eclipse.swt.widgets.Shell)}, ${style:link('SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL', 'SWT.DIALOG_TRIM | SWT.MODELESS', 'SWT.SHELL_TRIM | SWT.MODELESS', 'SWT.SHELL_TRIM | SWT.PRIMARY_MODAL')});
+${scrolled}.setMinSize(${contentSize});</template><template autoinsert="true" context="swt" deleted="false" description="" enabled="true" name="selectionlistener">SelectionListener.widgetSelectedAdapter(selectionEvent -&gt; ${cursor})</template><template autoinsert="false" context="swt-statements" deleted="false" description="new Shell" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.shell" name="Shell">${shellType:newType(org.eclipse.swt.widgets.Shell)} ${shell:newName(org.eclipse.swt.widgets.Shell)} = new ${shellType}(${parent:var(org.eclipse.swt.widgets.Shell)}, ${style:link('SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL', 'SWT.DIALOG_TRIM | SWT.MODELESS', 'SWT.SHELL_TRIM | SWT.MODELESS', 'SWT.SHELL_TRIM | SWT.PRIMARY_MODAL')});
 ${shell}.setLayout(new ${layoutType:newType(org.eclipse.swt.layout.GridLayout)}(${numberColumns:link(1, 2, 3, 4, 5)}, ${equalColumns:link(false, true)}));
 
 ${imp:import(org.eclipse.swt.SWT)}${cursor}
@@ -341,7 +350,7 @@ ${shell}.open();</template><template autoinsert="true" context="postfix" deleted
 ${spinner}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(BEGINNING, CENTER, END, FILL)}, SWT.${vertical:link(CENTER, TOP, BOTTOM, FILL)}, ${hex:link(false, true)}, ${vex:link(false, true)}));
 ${spinner}.setMaximum(${max:link(10)});
 ${spinner}.setIncrement(${inc:link(1)});
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="java-members" deleted="false" description="static final field" enabled="true" id="org.eclipse.jdt.ui.templates.static_final" name="static_final">${visibility:link('public ','protected ','','private ')}static final ${type:link(String,int)} ${NAME} = ${expr:link('""',0)};</template><template autoinsert="false" context="swt-statements" deleted="false" description="new StyledText " enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.styledtext" name="StyledText">${type:newType(org.eclipse.swt.custom.StyledText)} ${text:newName(org.eclipse.swt.custom.StyledText)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link('SWT.V_SCROLL | SWT.H_SCROLL', 'SWT.V_SCROLL | SWT.H_SCROLL | SWT.READ_ONLY', 'SWT.WRAP | SWT.V_SCROLL', SWT.NONE, SWT.BORDER, SWT.FULL_SELECTION)});
+${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="java-members" deleted="false" description="static final field" enabled="true" id="org.eclipse.jdt.ui.templates.static_final" name="static_final">${visibility:link('public ','protected ','','private ')}static final ${type:link(String,int)} ${NAME} = ${expr:link('""',0)};</template><template autoinsert="true" context="java" deleted="false" description="Format float value" enabled="true" name="str">String.format("%${}8.1f", ${cursor})</template><template autoinsert="false" context="swt-statements" deleted="false" description="new StyledText " enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.styledtext" name="StyledText">${type:newType(org.eclipse.swt.custom.StyledText)} ${text:newName(org.eclipse.swt.custom.StyledText)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link('SWT.V_SCROLL | SWT.H_SCROLL', 'SWT.V_SCROLL | SWT.H_SCROLL | SWT.READ_ONLY', 'SWT.WRAP | SWT.V_SCROLL', SWT.NONE, SWT.BORDER, SWT.FULL_SELECTION)});
 ${text}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(true, false)}));
 ${text}.setText(${word_selection}${});
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="swt-statements" deleted="false" description="new StyleRange for a StyledText" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.stylerange" name="StyleRange">${type:newType(org.eclipse.swt.custom.StyleRange)} ${range:newName(org.eclipse.swt.custom.StyleRange)}= new ${type}();
@@ -386,7 +395,9 @@ ${imp:import(org.eclipse.swt.SWT, org.eclipse.swt.widgets.Display)}${cursor}</te
 });&#13;
 </template><template autoinsert="false" context="java-statements" deleted="false" description="synchronized block" enabled="true" id="org.eclipse.jdt.ui.templates.synchronized" name="synchronized">synchronized (${mutex:var}) {
 	${line_selection}
-}</template><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template><template autoinsert="true" context="java-statements" deleted="false" description="print to standard error" enabled="true" id="org.eclipse.jdt.ui.templates.syserr" name="syserr">System.err.println(${word_selection}${});${cursor}</template><template autoinsert="true" context="java-statements" deleted="false" description="system out with system time" enabled="true" name="sysn">System.out.println((System.currentTimeMillis() + " ${cursor}"));&#13;
+}</template><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template><template autoinsert="true" context="java-statements" deleted="false" description="print to standard error" enabled="true" id="org.eclipse.jdt.ui.templates.syserr" name="syserr">System.err.println(${word_selection}${});${cursor}</template><template autoinsert="true" context="java-statements" deleted="false" description="System.out with millisecond system time" enabled="true" name="sysm">System.out.println(UI.timeStamp() + " ${}: " + ${cursor});&#13;
+// TODO remove SYSTEM.OUT.PRINTLN&#13;
+</template><template autoinsert="true" context="java-statements" deleted="false" description="System.out with nano system time" enabled="true" name="sysn">System.out.println(UI.timeStampNano() + " ${}: " + ${cursor});&#13;
 // ${todo} remove SYSTEM.OUT.PRINTLN&#13;
 </template><template autoinsert="true" context="java-statements" deleted="false" description="system out with nano system time" enabled="true" id="org.eclipse.jdt.ui.templates.sysout" name="sysout">System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ${cursor}()"&#13;
 	+ "\t: " + &#13;

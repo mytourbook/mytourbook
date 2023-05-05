@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import com.garmin.fit.DateTime;
 import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
+import com.garmin.fit.util.SemicirclesConverter;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TimeData;
@@ -77,6 +78,9 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    @Override
    public void onMesg(final RecordMesg mesg) {
 
+//      System.out.println((System.currentTimeMillis() + " onMesg Record"));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
       fitData.onSetup_Record_10_Initialize();
       {
          setRecord(mesg);
@@ -105,10 +109,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
          boolean isCreateExceededMarker = false;
 
-         // convert garmin time into java time
-         final long garminTimeS = garminTime.getTimestamp();
-         final long garminTimeMS = garminTimeS * 1000;
-         final long sliceJavaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
+         final long sliceJavaTime = garminTime.getDate().getTime();
 
          absoluteTime = sliceJavaTime;
          long timeDiff = 0;
@@ -179,12 +180,12 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
        */
       final Integer positionLat = mesg.getPositionLat();
       if (positionLat != null) {
-         timeData.latitude = DataConverters.convertSemicirclesToDegrees(positionLat);
+         timeData.latitude = SemicirclesConverter.semicirclesToDegrees(positionLat);
       }
 
       final Integer positionLong = mesg.getPositionLong();
       if (positionLong != null) {
-         timeData.longitude = DataConverters.convertSemicirclesToDegrees(positionLong);
+         timeData.longitude = SemicirclesConverter.semicirclesToDegrees(positionLong);
       }
 
       /*
@@ -265,13 +266,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-
+      
       //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
       //	|| fieldName.equals("step_length") //				    1526.0  mm
       // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
       // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
-
+      
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();
@@ -297,6 +298,12 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
       final Float verticalRatio = mesg.getVerticalRatio();
       if (verticalRatio != null) {
          timeData.runDyn_VerticalRatio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
+      }
+
+      final Float batterySoc = mesg.getBatterySoc();
+      if (batterySoc != null) {
+//         System.out.println((System.currentTimeMillis() + " battery Soc: " + batterySoc));
+         // TODO remove SYSTEM.OUT.PRINTLN
       }
 
       setRecord_DeveloperData(mesg, timeData);
