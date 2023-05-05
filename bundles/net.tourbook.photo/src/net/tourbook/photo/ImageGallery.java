@@ -374,7 +374,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
          }
       };
 
-      SORT_BY_IMAGE_DATE = new Comparator<Photo>() {
+      SORT_BY_IMAGE_DATE = new Comparator<>() {
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
 
@@ -389,7 +389,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
          }
       };
 
-      SORT_BY_FILE_NAME = new Comparator<Photo>() {
+      SORT_BY_FILE_NAME = new Comparator<>() {
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
 
