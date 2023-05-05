@@ -18,8 +18,6 @@ package utils;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 
-import javax.persistence.Persistence;
-
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -27,6 +25,8 @@ import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
+
+import jakarta.persistence.Persistence;
 
 public class Initializer {
 

@@ -6,14 +6,14 @@ Bundle-Version: 23.3.2.qualifier
 Require-Bundle: org.junit.jupiter.api,
  net.tourbook,
  net.tourbook.ext.jars,
- net.tourbook.ext.ejb3,
  net.tourbook.cloud,
  org.eclipse.ui,
  net.tourbook.common,
- org.opentest4j
+ org.opentest4j,
+ net.tourbook.ext.jpa
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- hibernate-entitymanager.jar,
+ hibernate-core-6.2.2.Final.jar,
  jsonassert-1.5.1.jar,
  xmlunit-core-2.9.1.jar,
  HttpClientMock-1.0.0.jar,
