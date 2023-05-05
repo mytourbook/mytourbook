@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,6 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.util.ArrayList;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -60,6 +57,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 // author: Wolfgang Schramm
 // create: 06.09.2007

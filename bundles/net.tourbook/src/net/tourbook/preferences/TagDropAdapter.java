@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,8 +17,6 @@ package net.tourbook.preferences;
 
 import java.util.ArrayList;
 import java.util.Set;
-
-import jakarta.persistence.EntityManager;
 
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourTag;
@@ -34,6 +32,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.dnd.TransferData;
+
+import jakarta.persistence.EntityManager;
 
 final class TagDropAdapter extends ViewerDropAdapter {
 
@@ -254,7 +254,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 	/**
 	 * A tag item is dragged and is dropped into a target
-	 * 
+	 *
 	 * @param draggedTagItem
 	 *            tag tree item which is dragged
 	 * @return Returns <code>true</code> when the tag is dropped
@@ -451,7 +451,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	 * !!! Recursive method !!!<br>
 	 * <br>
 	 * This will check if the dragged item is dropped in one of it's children
-	 * 
+	 *
 	 * @param itemDraggedCategory
 	 * @param targetCategoryId
 	 * @return Returns <code>true</code> when the dragged category will be dropped on its children
@@ -553,7 +553,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 	/**
 	 * Add tag to the category
-	 * 
+	 *
 	 * @param draggedTag
 	 * @param targetCategory
 	 * @param em
@@ -619,7 +619,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 	/**
 	 * Remove tag from the category
-	 * 
+	 *
 	 * @param draggedTag
 	 * @param parentCategory
 	 * @param em

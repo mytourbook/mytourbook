@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,8 +20,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import java.util.HashMap;
 
-import jakarta.persistence.EntityManager;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
@@ -32,6 +30,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+
+import jakarta.persistence.EntityManager;
 
 /**
  *

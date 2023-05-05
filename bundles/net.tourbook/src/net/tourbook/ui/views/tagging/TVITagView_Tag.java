@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import jakarta.persistence.EntityManager;
-
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
@@ -34,6 +32,8 @@ import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.TreeViewer;
+
+import jakarta.persistence.EntityManager;
 
 public class TVITagView_Tag extends TVITagViewItem {
 

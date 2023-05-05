@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,11 @@ package net.tourbook.data;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.database.FIELD_VALIDATION;
+import net.tourbook.database.TourDatabase;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -28,11 +33,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Transient;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.database.FIELD_VALIDATION;
-import net.tourbook.database.TourDatabase;
 
 @Entity
 public class TourTagCategory implements Cloneable, Comparable<Object> {
@@ -61,8 +61,7 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
    private final Set<TourTag>         tourTags         = new HashSet<>();
 
    @ManyToMany(fetch = FetchType.LAZY)
-   @JoinTable(
-         joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
+   @JoinTable(joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
          inverseJoinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID2", referencedColumnName = "TagCategoryId")//
    )
    private final Set<TourTagCategory> tourTagCategory  = new HashSet<>();

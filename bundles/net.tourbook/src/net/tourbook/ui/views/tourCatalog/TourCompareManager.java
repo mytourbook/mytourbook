@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,9 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.application.TourbookPlugin;
@@ -56,6 +53,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+
 /**
  * The manages the comparison between reference and all selected tours.
  */
@@ -76,7 +76,7 @@ public class TourCompareManager {
 
    //
    private static ArrayList<RefTourItem>                        _allRefTourItems_FromLastCompare;
-   private final static ArrayList<TVICompareResultComparedTour> _allComparedTourItems = new ArrayList<>();
+   private static final ArrayList<TVICompareResultComparedTour> _allComparedTourItems = new ArrayList<>();
 
    //
    private static ThreadPoolExecutor       _compareTour_Executor;

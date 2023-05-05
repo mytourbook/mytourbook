@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,8 +16,6 @@
 package net.tourbook.tag;
 
 import java.util.HashMap;
-
-import jakarta.persistence.EntityManager;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourTag;
@@ -35,6 +33,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import jakarta.persistence.EntityManager;
 
 public class ActionMenuSetAllTagStructures extends Action implements IMenuCreator {
 
@@ -64,7 +64,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 
 			final Runnable runnable = new Runnable() {
 
-				public void run() {
+				@Override public void run() {
 
 					final EntityManager em = TourDatabase.getInstance().getEntityManager();
 					try {
@@ -127,18 +127,18 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 		item.fill(_menu, -1);
 	}
 
-	public void dispose() {
+	@Override public void dispose() {
 		if (_menu != null) {
 			_menu.dispose();
 			_menu = null;
 		}
 	}
 
-	public Menu getMenu(final Control parent) {
+	@Override public Menu getMenu(final Control parent) {
 		return null;
 	}
 
-	public Menu getMenu(final Menu parent) {
+	@Override public Menu getMenu(final Menu parent) {
 
 		dispose();
 		_menu = new Menu(parent);

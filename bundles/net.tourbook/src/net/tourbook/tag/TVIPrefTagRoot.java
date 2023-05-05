@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,14 +19,14 @@ import de.byteholder.geoclipse.map.UI;
 
 import java.util.ArrayList;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 public class TVIPrefTagRoot extends TVIPrefTagItem {
 
