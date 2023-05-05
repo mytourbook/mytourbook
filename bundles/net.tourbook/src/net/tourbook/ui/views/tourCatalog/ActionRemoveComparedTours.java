@@ -18,7 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;

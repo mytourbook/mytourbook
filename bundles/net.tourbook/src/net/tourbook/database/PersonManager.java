@@ -17,8 +17,8 @@ package net.tourbook.database;
 
 import java.util.ArrayList;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;

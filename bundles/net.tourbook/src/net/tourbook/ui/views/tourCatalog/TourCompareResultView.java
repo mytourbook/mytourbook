@@ -20,8 +20,8 @@ import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;

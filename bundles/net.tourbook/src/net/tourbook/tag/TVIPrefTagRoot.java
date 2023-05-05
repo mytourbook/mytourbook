@@ -19,8 +19,8 @@ import de.byteholder.geoclipse.map.UI;
 
 import java.util.ArrayList;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;

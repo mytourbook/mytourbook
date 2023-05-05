@@ -18,7 +18,7 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourTag;

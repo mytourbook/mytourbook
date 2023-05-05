@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;

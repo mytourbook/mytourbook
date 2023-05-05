@@ -1,35 +1,35 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.LAZY;
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Transient;
-
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Transient;
 
 /**
  * Shared marker entity.
@@ -37,63 +37,63 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class SharedMarker_DISABLED implements Cloneable, Comparable<Object> {
 
-	/**
-	 * Unique id for a {@link SharedMarker} entity.
-	 */
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long				sharedMarkerId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+   /**
+    * A manually created shared marker creates a unique id to identify it, saved shared markers are
+    * compared with the {@link #sharedMarkerId}.
+    */
+   @Transient
+   private static int          _createCounter = 0;
 
-	/**
-	 * Contains all tours are associated with this tag.
-	 */
-	@ManyToMany(mappedBy = "sharedMarker", cascade = ALL, fetch = LAZY)
-	private final Set<TourData>	tourData		= new HashSet<TourData>();
+   /**
+    * Unique id for a {@link SharedMarker} entity.
+    */
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long                sharedMarkerId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	private String				name;
-	private String				description;
-	private String				comment;
+   /**
+    * Contains all tours are associated with this tag.
+    */
+   @ManyToMany(mappedBy = "sharedMarker", cascade = ALL, fetch = LAZY)
+   private final Set<TourData> tourData       = new HashSet<>();
+   private String              name;
+   private String              description;
 
-	// initialize with invalid values
-	private double				longitude		= Double.MIN_VALUE;
-	private double				latitude		= Double.MIN_VALUE;
+   private String              comment;
+   // initialize with invalid values
+   private double              longitude      = Double.MIN_VALUE;
 
-	/**
-	 * Altitude in meters.
-	 */
-	private float				altitude		= Float.MIN_VALUE;
+   private double              latitude       = Double.MIN_VALUE;
 
-	/**
-	 * Can be <code>null</code>
-	 * 
-	 * @since db version 24
-	 */
-	private String				urlText;
+   /**
+    * Altitude in meters.
+    */
+   private float               altitude       = Float.MIN_VALUE;
 
-	/**
-	 * Can be <code>null</code>
-	 * 
-	 * @since db version 24
-	 */
-	private String				urlAddress;
+   /**
+    * Can be <code>null</code>
+    *
+    * @since db version 24
+    */
+   private String              urlText;
 
-	/**
-	 * Unique id for manually created shared markers because the {@link #sharedMarkerId} is 0 when
-	 * the marker is not persisted.
-	 */
-	@Transient
-	private long				_createId		= 0;
+   /**
+    * Can be <code>null</code>
+    *
+    * @since db version 24
+    */
+   private String              urlAddress;
 
-	/**
-	 * A manually created shared marker creates a unique id to identify it, saved shared markers are
-	 * compared with the {@link #sharedMarkerId}.
-	 */
-	@Transient
-	private static int			_createCounter	= 0;
+   /**
+    * Unique id for manually created shared markers because the {@link #sharedMarkerId} is 0 when
+    * the marker is not persisted.
+    */
+   @Transient
+   private long                _createId      = 0;
 
-	public SharedMarker_DISABLED() {}
+   public SharedMarker_DISABLED() {}
 
-	public SharedMarker_DISABLED clone(final TourData wpTourData) {
+   public SharedMarker_DISABLED clone(final TourData wpTourData) {
 
 //		try {
 //
@@ -113,15 +113,15 @@ public class SharedMarker_DISABLED implements Cloneable, Comparable<Object> {
 //			StatusUtil.log(e);
 //		}
 
-		return null;
-	}
+      return null;
+   }
 
-	@Override
-	public int compareTo(final Object other) {
+   @Override
+   public int compareTo(final Object other) {
 
-		/*
-		 * set default sorting by time or by id (creation time)
-		 */
+      /*
+       * set default sorting by time or by id (creation time)
+       */
 
 //		if (other instanceof SharedMarker) {
 //
@@ -151,20 +151,20 @@ public class SharedMarker_DISABLED implements Cloneable, Comparable<Object> {
 //			}
 //		}
 
-		return 0;
-	}
+      return 0;
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
 //		final SharedMarker other = (SharedMarker) obj;
 //		if (_createId == 0) {
@@ -180,108 +180,108 @@ public class SharedMarker_DISABLED implements Cloneable, Comparable<Object> {
 //				return false;
 //			}
 //		}
-		return true;
-	}
+      return true;
+   }
 
-	public float getAltitude() {
-		return altitude;
-	}
+   public float getAltitude() {
+      return altitude;
+   }
 
-	public String getComment() {
-		return comment;
-	}
+   public String getComment() {
+      return comment;
+   }
 
-	/**
-	 * @return Returns a unique id for manually created shared marker because the
-	 *         {@link #sharedMarkerId} is {@link TourDatabase#ENTITY_IS_NOT_SAVED} when it's not yet
-	 *         persisted.
-	 */
-	public long getCreateId() {
-		return _createId;
-	}
+   /**
+    * @return Returns a unique id for manually created shared marker because the
+    *         {@link #sharedMarkerId} is {@link TourDatabase#ENTITY_IS_NOT_SAVED} when it's not yet
+    *         persisted.
+    */
+   public long getCreateId() {
+      return _createId;
+   }
 
-	public String getDescription() {
-		return description;
-	}
+   public String getDescription() {
+      return description;
+   }
 
-	/**
-	 * @return Returns the entity id or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when the entity is
-	 *         not yet saved.
-	 */
-	public long getId() {
-		return sharedMarkerId;
-	}
+   /**
+    * @return Returns the entity id or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when the entity is
+    *         not yet saved.
+    */
+   public long getId() {
+      return sharedMarkerId;
+   }
 
-	public double getLatitude() {
-		return latitude;
-	}
+   public double getLatitude() {
+      return latitude;
+   }
 
-	public double getLongitude() {
-		return longitude;
-	}
+   public double getLongitude() {
+      return longitude;
+   }
 
-	public String getName() {
-		return name;
-	}
+   public String getName() {
+      return name;
+   }
 
-	public Set<TourData> getTourData() {
-		return tourData;
-	}
+   public Set<TourData> getTourData() {
+      return tourData;
+   }
 
-	public String getUrlAddress() {
-		return urlAddress == null ? UI.EMPTY_STRING : urlAddress;
-	}
+   public String getUrlAddress() {
+      return urlAddress == null ? UI.EMPTY_STRING : urlAddress;
+   }
 
-	public String getUrlText() {
-		return urlText == null ? UI.EMPTY_STRING : urlText;
-	}
+   public String getUrlText() {
+      return urlText == null ? UI.EMPTY_STRING : urlText;
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		result = prime * result + (int) (sharedMarkerId ^ (sharedMarkerId >>> 32));
-		return result;
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_createId ^ (_createId >>> 32));
+      result = prime * result + (int) (sharedMarkerId ^ (sharedMarkerId >>> 32));
+      return result;
+   }
 
-	/**
-	 * Set altitude in meters.
-	 * 
-	 * @param altitude
-	 */
-	public void setAltitude(final float altitude) {
-		this.altitude = altitude;
-	}
+   /**
+    * Set altitude in meters.
+    *
+    * @param altitude
+    */
+   public void setAltitude(final float altitude) {
+      this.altitude = altitude;
+   }
 
-	public void setComment(final String comment) {
-		this.comment = comment;
-	}
+   public void setComment(final String comment) {
+      this.comment = comment;
+   }
 
-	public void setDescription(final String description) {
-		this.description = description;
-	}
+   public void setDescription(final String description) {
+      this.description = description;
+   }
 
-	public void setLatitude(final double latitude) {
+   public void setLatitude(final double latitude) {
 
-		this.latitude = latitude;
-	}
+      this.latitude = latitude;
+   }
 
-	public void setLongitude(final double longitude) {
+   public void setLongitude(final double longitude) {
 
-		this.longitude = longitude;
-	}
+      this.longitude = longitude;
+   }
 
-	public void setName(final String name) {
-		this.name = name;
-	}
+   public void setName(final String name) {
+      this.name = name;
+   }
 
-	public void setUrlAddress(final String urlAddress) {
-		this.urlAddress = urlAddress;
-	}
+   public void setUrlAddress(final String urlAddress) {
+      this.urlAddress = urlAddress;
+   }
 
-	public void setUrlText(final String urlText) {
-		this.urlText = urlText;
-	}
+   public void setUrlText(final String urlText) {
+      this.urlText = urlText;
+   }
 
 }

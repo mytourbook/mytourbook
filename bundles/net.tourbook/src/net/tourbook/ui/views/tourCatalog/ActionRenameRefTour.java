@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourReference;

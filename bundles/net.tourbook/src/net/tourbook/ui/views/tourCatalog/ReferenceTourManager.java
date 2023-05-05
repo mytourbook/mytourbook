@@ -20,7 +20,7 @@ package net.tourbook.ui.views.tourCatalog;
 
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;

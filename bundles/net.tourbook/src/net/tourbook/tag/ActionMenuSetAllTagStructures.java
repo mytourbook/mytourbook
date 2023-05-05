@@ -17,7 +17,7 @@ package net.tourbook.tag;
 
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourTag;

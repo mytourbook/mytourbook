@@ -17,7 +17,7 @@ package net.tourbook.tag;
 
 import java.util.Set;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
