@@ -7,7 +7,9 @@ Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook 
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Bundle-ClassPath: log4j-core-2.20.0.jar,
+Bundle-ClassPath: slf4j-api-1.7.25.jar,
+ slf4j-log4j12-1.7.30,
+ log4j-core-2.20.0.jar,
  lib/classmate-1.5.1.jar,
  lib/jandex-3.0.5.jar,
  lib/hibernate-core-6.2.2.Final.jar,
