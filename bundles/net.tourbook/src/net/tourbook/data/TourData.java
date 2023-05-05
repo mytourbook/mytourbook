@@ -1006,7 +1006,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
-   @Cascade(CascadeType.DELETE_ORPHAN)
    @JsonProperty
    private Set<TourTag>                tourTags                            = new HashSet<>();
 
