@@ -6,12 +6,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="derby-10.16.1.1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.derby/derby -->
-	<classpathentry exported="true" kind="lib" path="derbyclient-10.16.1.1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.derby/derbyclient -->
-	<classpathentry exported="true" kind="lib" path="derbynet-10.16.1.1.jar"/>  <!-- https://mvnrepository.com/artifact/org.apache.derby/derbynet -->
-	<classpathentry exported="true" kind="lib" path="derbyoptionaltools-10.16.1.1.jar"/>  <!-- https://mvnrepository.com/artifact/org.apache.derby/derbyoptionaltools -->
-	<classpathentry exported="true" kind="lib" path="derbytools-10.16.1.1.jar"/>  <!-- https://mvnrepository.com/artifact/org.apache.derby/derbytools -->
-	<classpathentry exported="true" kind="lib" path="derbyshared-10.16.1.1.jar"/>  <!-- https://mvnrepository.com/artifact/org.apache.derby/derbyshared -->
+	<classpathentry exported="true" kind="lib" path="derby-10.14.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="derbyclient-10.14.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="derbynet-10.14.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="derbyoptionaltools-10.14.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="derbytools-10.14.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lucene-analyzers-common-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common -->
 	<classpathentry exported="true" kind="lib" path="lucene-core-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
 	<classpathentry exported="true" kind="lib" path="lucene-highlighter-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-highlighter -->

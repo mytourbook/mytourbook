@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,8 +21,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.derby.shared.common.error.PublicAPI;
-import org.apache.derby.shared.common.error.StandardException;
+import org.apache.derby.iapi.error.PublicAPI;
+import org.apache.derby.iapi.error.StandardException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
@@ -41,7 +41,7 @@ public class SearchUtils {
    private static HashMap<String, Class<? extends Analyzer>> _analyzerClasses;
 
    static {
-      _analyzerClasses = new HashMap<>();
+      _analyzerClasses = new HashMap<String, Class<? extends Analyzer>>();
 
       storeAnalyzerClass(org.apache.lucene.analysis.ar.ArabicAnalyzer.class);
       storeAnalyzerClass(org.apache.lucene.analysis.hy.ArmenianAnalyzer.class);
@@ -78,7 +78,7 @@ public class SearchUtils {
 
    /**
     * Enable Lucene tool.
-    *
+    * 
     * @param conn
     * @param monitor
     * @throws SQLException
