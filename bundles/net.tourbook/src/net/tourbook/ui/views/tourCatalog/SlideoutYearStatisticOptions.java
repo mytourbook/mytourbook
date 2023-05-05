@@ -54,9 +54,9 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
    /*
     * UI controls
     */
-   private Button _chkShowAvgSpeed;
    private Button _chkShowAvgAltimeter;
    private Button _chkShowAvgPulse;
+   private Button _chkShowAvgSpeed;
    private Button _chkShowMaxPulse;
 
    public SlideoutYearStatisticOptions(final RefTour_YearStatistic_View refTour_YearStatistic_View,

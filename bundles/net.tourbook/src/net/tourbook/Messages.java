@@ -3178,6 +3178,7 @@ public class Messages extends NLS {
 
    public static String        ui_tour_not_defined;
 
+   public static String        Year_Statistic_Action_ShowAllValues_Tooltip;
    public static String        Year_Statistic_Combo_LastYears_Tooltip;
    public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;
    public static String        Year_Statistic_Label_NumberOfYears;
