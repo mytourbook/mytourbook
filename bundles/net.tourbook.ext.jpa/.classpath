@@ -2,6 +2,8 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="slf4j-api-1.7.25.jar" sourcepath="C:/E/java-resources/slf4j/slf4j-api-1.7.25.zip"/>
+	<classpathentry exported="true" kind="lib" path="slf4j-log4j12-1.7.30.jar"/> <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
 	<classpathentry exported="true" kind="lib" path="log4j-core-2.20.0.jar" sourcepath="C:/E/java-resources/apache/logging-log4j-1.2.14.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-6.2.2.Final.jar"/> <!--  https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 	<classpathentry exported="true" kind="lib" path="lib/antlr4-runtime-4.10.1.jar"/>
