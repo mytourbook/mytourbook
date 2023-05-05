@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.jpa"
       label="JPA Service"
-      version="3.4.0.2020-07-19"
+      version="6.2.2.Final"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
