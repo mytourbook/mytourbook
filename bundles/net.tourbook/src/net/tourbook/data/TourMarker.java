@@ -67,6 +67,8 @@ import jakarta.xml.bind.annotation.XmlType;
  * </pre>
  */
 
+//todo fb update derby to 16.1.1 (did that create the build issue ?)
+//only put the needed jars for hibernate 6.2.2
 @Entity
 @XmlType(name = "TourMarker")
 @XmlRootElement(name = "TourMarker")
@@ -936,7 +938,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       this.type = markerType;
    }
 
-   public void setupDeepClone(final TourData tourDataFromClone) {
+   void setupDeepClone(final TourData tourDataFromClone) {
 
       _createId = _createCounter.incrementAndGet();
 
