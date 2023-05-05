@@ -33,7 +33,7 @@
  
 		<properties>
 			<property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/tourbook;create=true"/>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect"/>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
 			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
 
 			<property name="hibernate.connection.password" value="adsf"/>
