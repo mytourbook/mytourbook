@@ -95,6 +95,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -971,13 +972,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Photos for this tour
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(CascadeType.DELETE_ORPHAN)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    /**
     * Tour marker
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
    @JsonProperty
@@ -986,14 +989,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Contains the tour way points
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(CascadeType.DELETE_ORPHAN)
    @JsonProperty
    private  Set<TourWayPoint>          tourWayPoints                       = new HashSet<>();
 
    /**
     * Reference tours
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(CascadeType.DELETE_ORPHAN)
    private  Set<TourReference>    tourReferences                     = new HashSet<>();
 
    /**
@@ -1001,6 +1006,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
+   @Cascade(CascadeType.DELETE_ORPHAN)
    @JsonProperty
    private Set<TourTag>                tourTags                            = new HashSet<>();
 
@@ -1008,7 +1014,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Sensors
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @Cascade(CascadeType.DELETE_ORPHAN)
    private Set<DeviceSensorValue>      deviceSensorValues                  = new HashSet<>();
 
 //   /**
