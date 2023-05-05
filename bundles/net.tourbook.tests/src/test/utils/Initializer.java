@@ -94,6 +94,6 @@ public class Initializer {
 
    public static void initializeDatabase() {
 
-      Persistence.createEntityManagerFactory("tourdatabase").createEntityManager(); //$NON-NLS-1$
+      Persistence.createEntityManagerFactory("tourdatabasetests").createEntityManager(); //$NON-NLS-1$
    }
 }
