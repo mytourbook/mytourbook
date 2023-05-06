@@ -8,7 +8,6 @@ Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
- net.tourbook.ext.geoclipse,
  net.tourbook.ext.jars,
  net.tourbook.common,
  net.tourbook.ext.velocity
@@ -20,7 +19,6 @@ Import-Package: net.tourbook,
  net.tourbook.common.util,
  net.tourbook.data,
  net.tourbook.database,
- net.tourbook.device.garmin.fit,
  net.tourbook.ext.velocity,
  net.tourbook.extension.export,
  net.tourbook.tour,
@@ -29,7 +27,6 @@ Import-Package: net.tourbook,
  org.apache.velocity,
  org.apache.velocity.app,
  org.dinopolis.gpstool.gpsinput,
- org.dinopolis.gpstool.gpsinput.garmin,
- org.dinopolis.util.text
+ org.dinopolis.gpstool.gpsinput.garmin
 Automatic-Module-Name: net.tourbook.export
 Export-Package: net.tourbook.export
