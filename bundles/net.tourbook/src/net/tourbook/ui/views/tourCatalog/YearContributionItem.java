@@ -61,8 +61,7 @@ public class YearContributionItem extends ControlContribution {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
-            .extendedMargins(0, 10, 0, 0)
-            //				.spacing(0, 0)
+            .extendedMargins(0, 5, 0, 0)
             .applyTo(container);
       {
          {

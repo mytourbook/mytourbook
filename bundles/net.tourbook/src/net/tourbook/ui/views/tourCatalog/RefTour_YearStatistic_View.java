@@ -36,6 +36,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -433,10 +434,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _pageBook.showPage(_pageNoChart);
 
       restoreState();
-      enableControls();
 
       // restore selection
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+      parent.getDisplay().asyncExec(() -> enableControls());
    }
 
    /**
@@ -641,7 +643,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
-      container.setBackground(UI.SYS_COLOR_YELLOW);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          createUI_20_Title(container);
          createUI_30_Chart(container);
@@ -664,7 +666,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
             .numColumns(1)
             .margins(3, 3)
             .applyTo(container);
-      container.setBackground(UI.SYS_COLOR_GREEN);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
+      container.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
       {
          {
             /*
@@ -672,9 +675,10 @@ public class RefTour_YearStatistic_View extends ViewPart {
              */
             _lblRefTourTitle = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
                   .grab(true, true)
+                  .align(SWT.CENTER, SWT.CENTER)
                   .applyTo(_lblRefTourTitle);
+//            _lblRefTourTitle.setBackground(UI.SYS_COLOR_RED);
          }
       }
    }
@@ -731,9 +735,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       _yearSelector = new YearContributionItem(this);
 
-      tbm.add(_actionShowAllValues);
       tbm.add(_yearSelector);
 
+      tbm.add(_actionShowAllValues);
       tbm.add(_actionSyncMinMaxValues);
 //    tbm.add(_actionCopyStatValuesIntoClipboard);
       tbm.add(_actionYearStatOptions);
@@ -1389,5 +1393,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _yearSelector.comboLastVisibleYear.select(_numVisibleYears);
 
       _lblRefTourTitle.setText(_currentRefItem.label);
+
+      // layout is needed otherwise the horizontal centered text is not displayed
+      _lblRefTourTitle.getParent().layout(true, true);
    }
 }
