@@ -58,7 +58,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -75,6 +74,9 @@ import org.eclipse.ui.part.ViewPart;
 public class RefTour_YearStatistic_View extends ViewPart {
 
    public static final String  ID                            = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
+
+   private static final char   NL                            = UI.NEW_LINE;
+   private static final char   FIELD_DELIMITER               = UI.TAB;
 
    private static final String STATE_IS_SHOW_ALL_VALUES      = "STATE_IS_SHOW_ALL_VALUES";                         //$NON-NLS-1$
    private static final String STATE_IS_SYNC_MIN_MAX_VALUES  = "STATE_IS_SYNC_MIN_MAX_VALUES";                     //$NON-NLS-1$
@@ -95,9 +97,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private static final String   GRID_HORIZONTAL_DISTANCE            = PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
 
 // SET_FORMATTING_ON
-
-   private static final boolean          IS_OSX            = net.tourbook.common.UI.IS_OSX;
-   private static final boolean          IS_LINUX          = net.tourbook.common.UI.IS_LINUX;
 
    private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
@@ -167,8 +166,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    private YearStatisticTourToolTip          _tourToolTip;
    private TourInfoIconToolTipProvider       _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
-
-   private PixelConverter                    _pc;
 
    private YearContributionItem              _yearSelector;
 
@@ -419,7 +416,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
-      initUI(parent);
       createUI(parent);
 
       addSelectionListener();
@@ -614,6 +610,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       final ZonedDateTime tourDate = ZonedDateTime
             .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
             .plusDays(tourDOY);
+
       final String title = tourDate.format(TimeTools.Formatter_Date_F);
 
       new RefTour_YearStatistic_TooltipUI().createContentArea(
@@ -739,7 +736,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       tbm.add(_actionShowAllValues);
       tbm.add(_actionSyncMinMaxValues);
-//    tbm.add(_actionCopyStatValuesIntoClipboard);
+      tbm.add(_actionCopyValuesIntoClipboard);
       tbm.add(_actionYearStatOptions);
 
       tbm.update(true);
@@ -774,22 +771,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
       }
 
       return yearDOYs;
-   }
-
-   private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
-   }
-
-   /**
-    * get numbers for each year <br>
-    * <br>
-    * all years into {@link #fYears} <br>
-    * number of day's into {@link #_allNumberOfDaysInYear} <br>
-    * number of week's into {@link #fYearWeeks}
-    */
-   void initYearNumbers() {
-
    }
 
    TVICatalogComparedTour navigateTour(final boolean isNextTour) {
@@ -832,8 +813,59 @@ public class RefTour_YearStatistic_View extends ViewPart {
    }
 
    private void onAction_CopyIntoClipboard() {
-      // TODO Auto-generated method stub
 
+      final StringBuilder sb = new StringBuilder();
+
+      /*
+       * Header
+       */
+      sb.append("Date");
+      sb.append(FIELD_DELIMITER);
+
+      sb.append("Avg Speed");
+      sb.append(FIELD_DELIMITER);
+
+      sb.append("Avg Altimeter");
+      sb.append(FIELD_DELIMITER);
+
+      sb.append("Avg Heart Rate");
+      sb.append(FIELD_DELIMITER);
+
+      sb.append("Max Heart Rate");
+      sb.append(FIELD_DELIMITER);
+
+      sb.append("Tour Title");
+      sb.append(FIELD_DELIMITER);
+
+      sb.append(NL);
+
+      /*
+       * Data
+       */
+      for (final TVICatalogComparedTour comparedTour : _statValues_AllTours) {
+
+         sb.append(TimeTools.Formatter_Date_S.format(comparedTour.tourDate));
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(comparedTour.avgSpeed);
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(comparedTour.avgAltimeter);
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(comparedTour.avgPulse);
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(comparedTour.maxPulse);
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(comparedTour.tourTitle);
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(NL);
+      }
+
+      UI.copyTextIntoClipboard(sb.toString(), Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
    }
 
    private void onAction_ShowAllValues(final boolean isShowAllValues) {
@@ -841,6 +873,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _isShowAllValues = isShowAllValues;
 
       updateUI_YearChart(false);
+
+      // reset selectable bars otherwise some bars on the right side could not be selectable !!!
+      _yearChart.setSelectedBars(null);
 
       enableControls();
    }
@@ -1117,7 +1152,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    }
 
    /**
-    * select the tour in the year map chart
+    * Select tour in the year chart and update selectable bars
     *
     * @param tourIdToSelect
     *           tour id which should be selected
@@ -1131,11 +1166,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
          return;
       }
 
-      final int tourLength = _statValues_AllTours.size();
-      final boolean[] selectedTours = new boolean[tourLength];
+      final int numTours = _statValues_AllTours.size();
+      final boolean[] selectedTours = new boolean[numTours];
       boolean isTourSelected = false;
 
-      for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
+      for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
 
          final TVICatalogComparedTour comparedItem = _statValues_AllTours.get(tourIndex);
 

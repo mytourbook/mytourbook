@@ -151,7 +151,7 @@ public class StatisticManager {
 
       if (statValues.length() > 0) {
 
-         UI.copyTextToClipboard(statValues, Messages.Tour_StatisticValues_Info_DataAreCopied);
+         UI.copyTextIntoClipboard(statValues, Messages.Tour_StatisticValues_Info_DataAreCopied);
       }
    }
 

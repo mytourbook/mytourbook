@@ -51,8 +51,8 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    float           avgAltimeter;
    float           avgPulse;
-   float           maxPulse;
    float           avgSpeed;
+   float           maxPulse;
 
    ArrayList<Long> tagIds;
 

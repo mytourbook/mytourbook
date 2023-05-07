@@ -1261,7 +1261,7 @@ public class UI {
       return (temperature - UNIT_FAHRENHEIT_ADD) / UNIT_FAHRENHEIT_MULTI;
    }
 
-   public static void copyTextToClipboard(final String text, final String statusMessage) {
+   public static void copyTextIntoClipboard(final String text, final String statusMessage) {
 
       final Display display = Display.getDefault();
       final TextTransfer textTransfer = TextTransfer.getInstance();

@@ -749,7 +749,7 @@ public class TourDataView extends ViewPart {
 
       if (logText.length() > 0) {
 
-         UI.copyTextToClipboard(logText, Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
+         UI.copyTextIntoClipboard(logText, Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
       }
    }
 

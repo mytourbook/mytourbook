@@ -949,7 +949,7 @@ public class Map2View extends ViewPart implements
             mouseDown_GeoPosition.latitude,
             mouseDown_GeoPosition.longitude);
 
-      UI.copyTextToClipboard(geoPosition, statusMessage);
+      UI.copyTextIntoClipboard(geoPosition, statusMessage);
    }
 
    private void actionGotoLocation() {
