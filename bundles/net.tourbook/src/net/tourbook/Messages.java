@@ -2208,11 +2208,13 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_Dialog_DeleteModel_Title;
    public static String        Slideout_MapModel_Label_Title;
 
-   public static String        Slideout_RefTour_Checkbox_AvgAltimeter;
-   public static String        Slideout_RefTour_Checkbox_AvgPulse;
-   public static String        Slideout_RefTour_Checkbox_AvgSpeed;
-   public static String        Slideout_RefTour_Checkbox_MaxPulse;
+   public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
+   public static String        Slideout_RefTour_Checkbox_Pulse_Avg;
+   public static String        Slideout_RefTour_Checkbox_Pulse_AvgMax;
+   public static String        Slideout_RefTour_Checkbox_Speed_Avg;
    public static String        Slideout_RefTour_Group_Graphs;
+   public static String        Slideout_RefTour_Label_BarSize;
+   public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
    public static String        Slideout_RefTour_YearStatisticOptions_Label_Title;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
@@ -3179,6 +3181,7 @@ public class Messages extends NLS {
    public static String        ui_tour_not_defined;
 
    public static String        Year_Statistic_Action_ShowAllValues_Tooltip;
+   public static String        Year_Statistic_Action_SyncMinMaxValues_Tooltip;
    public static String        Year_Statistic_Combo_LastYears_Tooltip;
    public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;
    public static String        Year_Statistic_Label_NumberOfYears;

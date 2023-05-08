@@ -150,7 +150,8 @@ public class Messages extends NLS {
    public static String        Graph_Label_Gradient;
    public static String        Graph_Label_Gradient_Unit;
    public static String        Graph_Label_Heartbeat;
-   public static String        Graph_Label_Heartbeat_Max;
+   public static String        Graph_Label_Heartbeat_Avg;
+   public static String        Graph_Label_Heartbeat_AvgMax;
    public static String        Graph_Label_Heartbeat_Unit;
    public static String        Graph_Label_HeartRateVariability;
    public static String        Graph_Label_HeartRateVariability_Unit;
