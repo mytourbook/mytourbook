@@ -16,9 +16,11 @@
 package net.tourbook.tour.printing;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -32,31 +34,29 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
-public class ActionPrint extends Action implements IMenuCreator {
+public class ActionPrint extends SubMenu {
 
-   private static ArrayList<PrintTourExtension> fPrintExtensionPoints;
+   private static List<PrintTourExtension> _printExtensionPoints;
 
-   private Menu                                 fMenu;
-   private ArrayList<ActionPrintTour>           fPrintTourActions;
+   private Menu                            _menu;
+   private ArrayList<ActionPrintTour>      _printTourActions;
 
-   private ITourProvider                        fTourProvider;
+   private ITourProvider                   _tourProvider;
 
-   private int                                  fTourStartIndex = -1;
-   private int                                  fTourEndIndex   = -1;
+   private int                             _tourStartIndex = -1;
+   private int                             _tourEndIndex   = -1;
 
    private class ActionPrintTour extends Action {
 
-      private PrintTourExtension fPrintTourExtension;
+      private PrintTourExtension _PrintTourExtension;
 
       public ActionPrintTour(final PrintTourExtension printTourExtension) {
 
          super(printTourExtension.getVisibleName());
          setImageDescriptor(printTourExtension.getImageDescriptor());
-         fPrintTourExtension = printTourExtension;
+         _PrintTourExtension = printTourExtension;
       }
 
       @SuppressWarnings("unused")
@@ -65,17 +65,17 @@ public class ActionPrint extends Action implements IMenuCreator {
       @Override
       public void run() {
          final ArrayList<TourData> selectedTours;
-         if (fTourProvider instanceof ITourProviderAll) {
-            selectedTours = ((ITourProviderAll) fTourProvider).getAllSelectedTours();
+         if (_tourProvider instanceof ITourProviderAll) {
+            selectedTours = ((ITourProviderAll) _tourProvider).getAllSelectedTours();
          } else {
-            selectedTours = fTourProvider.getSelectedTours();
+            selectedTours = _tourProvider.getSelectedTours();
          }
 
          if (selectedTours == null || selectedTours.isEmpty()) {
             return;
          }
 
-         fPrintTourExtension.printTours(selectedTours, fTourStartIndex, fTourEndIndex);
+         _PrintTourExtension.printTours(selectedTours, _tourStartIndex, _tourEndIndex);
       }
 
    }
@@ -92,52 +92,55 @@ public class ActionPrint extends Action implements IMenuCreator {
 
       super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
 
-      fTourProvider = tourProvider;
+      _tourProvider = tourProvider;
 
       setText(Messages.action_print_tour);
-      setMenuCreator(this);
 
       getExtensionPoints();
       createActions();
    }
 
    private void addActionToMenu(final Action action) {
+
       final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(fMenu, -1);
+      item.fill(_menu, -1);
    }
 
    private void createActions() {
 
-      if (fPrintTourActions != null) {
+      if (_printTourActions != null) {
          return;
       }
 
-      fPrintTourActions = new ArrayList<>();
+      _printTourActions = new ArrayList<>();
 
       // create action for each extension point
-      for (final PrintTourExtension printTourExtension : fPrintExtensionPoints) {
-         fPrintTourActions.add(new ActionPrintTour(printTourExtension));
+      for (final PrintTourExtension printTourExtension : _printExtensionPoints) {
+         _printTourActions.add(new ActionPrintTour(printTourExtension));
       }
    }
 
    @Override
-   public void dispose() {
-      if (fMenu != null) {
-         fMenu.dispose();
-         fMenu = null;
-      }
+   public void enableActions() {}
+
+   @Override
+   public void fillMenu(final Menu menu) {
+
+      _menu = menu;
+
+      _printTourActions.forEach(this::addActionToMenu);
    }
 
    /**
     * read extension points {@link TourbookPlugin#EXT_POINT_PRINT_TOUR}
     */
-   private ArrayList<PrintTourExtension> getExtensionPoints() {
+   private List<PrintTourExtension> getExtensionPoints() {
 
-      if (fPrintExtensionPoints != null) {
-         return fPrintExtensionPoints;
+      if (_printExtensionPoints != null) {
+         return _printExtensionPoints;
       }
 
-      fPrintExtensionPoints = new ArrayList<>();
+      _printExtensionPoints = new ArrayList<>();
 
       final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
             TourbookPlugin.EXT_POINT_PRINT_TOUR);
@@ -157,7 +160,7 @@ public class ActionPrint extends Action implements IMenuCreator {
                         printTourItem.setPrintId(configElement.getAttribute("id")); //$NON-NLS-1$
                         printTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
 
-                        fPrintExtensionPoints.add(printTourItem);
+                        _printExtensionPoints.add(printTourItem);
                      }
                   } catch (final CoreException e) {
                      e.printStackTrace();
@@ -167,30 +170,12 @@ public class ActionPrint extends Action implements IMenuCreator {
          }
       }
 
-      return fPrintExtensionPoints;
-   }
-
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-      fMenu = new Menu(parent);
-
-      for (final ActionPrintTour action : fPrintTourActions) {
-         addActionToMenu(action);
-      }
-
-      return fMenu;
+      return _printExtensionPoints;
    }
 
    public void setTourRange(final int tourStartIndex, final int tourEndIndex) {
-      fTourStartIndex = tourStartIndex;
-      fTourEndIndex = tourEndIndex;
-   }
 
+      _tourStartIndex = tourStartIndex;
+      _tourEndIndex = tourEndIndex;
+   }
 }
