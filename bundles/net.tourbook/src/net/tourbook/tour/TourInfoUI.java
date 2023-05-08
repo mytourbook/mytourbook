@@ -148,13 +148,14 @@ public class TourInfoUI {
    }
 
    private boolean        _hasRecordingDeviceBattery;
-   private boolean        _hasDescription;
    private boolean        _hasGears;
    private boolean        _hasRunDyn;
    private boolean        _hasSensorValues;
    private boolean        _hasTags;
    private boolean        _hasTourType;
-   private boolean        _hasWeather;
+
+   private boolean        _hasTourDescription;
+   private boolean        _hasWeatherDescription;
 
    private int            _textWidthInPixel;
 
@@ -394,14 +395,15 @@ public class TourInfoUI {
 
 // SET_FORMATTING_OFF
 
-      _hasDescription               = tourDescription != null && tourDescription.length() > 0;
       _hasGears                     = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
       _hasRecordingDeviceBattery    = tourData.getBattery_Percentage_Start() != -1;
       _hasRunDyn                    = _tourData.isRunDynAvailable();
       _hasTags                      = tourTags != null && tourTags.size() > 0;
       _hasTourType                  = tourType != null;
       _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
-      _hasWeather                   = _tourData.getWeather().length() > 0;
+
+      _hasTourDescription           = tourDescription != null && tourDescription.length() > 0;
+      _hasWeatherDescription        = _tourData.getWeather().length() > 0;
 
 // SET_FORMATTING_ON
 
@@ -1338,12 +1340,16 @@ public class TourInfoUI {
 //         return;
 //      }
 
+      final boolean hasDescription = _hasTourDescription || _hasWeatherDescription;
+
+      final int numColumns = hasDescription ? 3 : 2;
+
       final Composite container = new Composite(parent, SWT.NONE);
       container.setForeground(_fgColor);
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
+            .numColumns(numColumns)
             .spacing(20, 5)
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -1392,9 +1398,11 @@ public class TourInfoUI {
                      .applyTo(_lblDateTimeModifiedValue);
             }
          }
-         {
+
+         if (hasDescription) {
+
             /*
-             * Text width in pixel
+             * Text width in pixel, show only when needed
              */
             _spinnerTextWidth = new Spinner(container, SWT.BORDER);
             _spinnerTextWidth.setMinimum(STATE_TEXT_WITH_MIN);
@@ -1601,7 +1609,10 @@ public class TourInfoUI {
 
    private void restoreState() {
 
-      _spinnerTextWidth.setSelection(_textWidthInPixel);
+      if (_spinnerTextWidth != null && _spinnerTextWidth.isDisposed() == false) {
+
+         _spinnerTextWidth.setSelection(_textWidthInPixel);
+      }
    }
 
    private void restoreState_BeforeUI() {
@@ -1745,16 +1756,16 @@ public class TourInfoUI {
       /*
        * Lower part container contains sensor values, weather, tour type, tags and description
        */
-      showHideControl(_lowerPartContainer, _hasSensorValues || _hasWeather || _hasTourType || _hasTags || _hasDescription);
+      showHideControl(_lowerPartContainer, _hasSensorValues || _hasWeatherDescription || _hasTourType || _hasTags || _hasTourDescription);
 
       /*
-       * Weather
+       * Weather description
        */
-      if (_hasWeather) {
+      if (_hasWeatherDescription) {
          _txtWeather.setText(_tourData.getWeather());
       }
-      showHideControl(_lblWeather, _hasWeather);
-      showHideControl(_txtWeather, _hasWeather, _textWidthInPixel);
+      showHideControl(_lblWeather, _hasWeatherDescription);
+      showHideControl(_txtWeather, _hasWeatherDescription, _textWidthInPixel);
 
       /*
        * Tour type
@@ -1775,19 +1786,19 @@ public class TourInfoUI {
       showHideControl(_lblTourTags_Value, _hasTags);
 
       /*
-       * Description
+       * Tour description
        */
-      if (_hasDescription) {
+      if (_hasTourDescription) {
          _txtDescription.setText(_tourData.getTourDescription());
       }
-      showHideControl(_lblDescription, _hasDescription);
+      showHideControl(_lblDescription, _hasTourDescription);
 
       if (_descriptionLineCount > _descriptionScroll_Lines) {
          // show with vertical scrollbar
-         showHideControl(_txtDescription, _hasDescription, _textWidthInPixel, _descriptionScroll_Height);
+         showHideControl(_txtDescription, _hasTourDescription, _textWidthInPixel, _descriptionScroll_Height);
       } else {
          // vertical scrollbar is not necessary
-         showHideControl(_txtDescription, _hasDescription, _textWidthInPixel);
+         showHideControl(_txtDescription, _hasTourDescription, _textWidthInPixel);
       }
 
       /*
