@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,12 +29,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.widgets.Display;
 
 public class StatisticManager {
 
@@ -146,42 +141,17 @@ public class StatisticManager {
       final boolean isRemoveZeros = false;
       final boolean isShowRawData = false;
 
-      final String statValues = formatStatValues(rawStatisticValues,
+      final String statValues = formatStatValues(
+            
+            rawStatisticValues,
             isCSVFormat,
             isRemoveZeros,
             isGroupValues,
             isShowRawData);
 
-      final Display display = Display.getDefault();
-
       if (statValues.length() > 0) {
 
-         final TextTransfer textTransfer = TextTransfer.getInstance();
-
-         final Clipboard clipBoard = new Clipboard(display);
-         {
-            clipBoard.setContents(
-
-                  new Object[] { statValues },
-                  new Transfer[] { textTransfer }
-
-            );
-         }
-         clipBoard.dispose();
-
-         final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
-         if (statusLineMgr != null) {
-
-            // show info that data are copied
-            statusLineMgr.setMessage(Messages.Tour_StatisticValues_Info_DataAreCopied);
-
-            display.timerExec(2000,
-                  () -> {
-
-                     // cleanup message
-                     statusLineMgr.setMessage(null);
-                  });
-         }
+         UI.copyTextIntoClipboard(statValues, Messages.Tour_StatisticValues_Info_DataAreCopied);
       }
    }
 

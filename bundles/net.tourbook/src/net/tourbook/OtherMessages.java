@@ -50,6 +50,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_GRADIENT                       = net.tourbook.common.Messages.Graph_Label_Gradient;
    public static final String GRAPH_LABEL_GRADIENT_UNIT                  = net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
    public static final String GRAPH_LABEL_HEARTBEAT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat;
+   public static final String GRAPH_LABEL_HEARTBEAT_MAX                  = net.tourbook.common.Messages.Graph_Label_Heartbeat_Max;
    public static final String GRAPH_LABEL_HEARTBEAT_UNIT                 = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    public static final String GRAPH_LABEL_HEART_RATE_VARIABILITY         = net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
    public static final String GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT    = net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;

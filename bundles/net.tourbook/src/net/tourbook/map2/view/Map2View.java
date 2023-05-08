@@ -165,7 +165,6 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -176,9 +175,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -943,37 +939,17 @@ public class Map2View extends ViewPart implements
 
    private void actionCopyLocationToClipboard() {
 
-      final Display display = Display.getDefault();
-
       final GeoPosition mouseDown_GeoPosition = _map.get_mouseDown_GeoPosition();
 
       final String geoPosition = String.format(Messages.Clipboard_Content_MapLocation,
             mouseDown_GeoPosition.latitude,
             mouseDown_GeoPosition.longitude);
 
-      final TextTransfer textTransfer = TextTransfer.getInstance();
+      final String statusMessage = String.format(Messages.StatusLine_Message_CopiedLatitudeLongitude,
+            mouseDown_GeoPosition.latitude,
+            mouseDown_GeoPosition.longitude);
 
-      final Clipboard clipBoard = new Clipboard(display);
-      {
-         clipBoard.setContents(
-
-               new Object[] { geoPosition },
-               new Transfer[] { textTransfer } //
-         );
-      }
-      clipBoard.dispose();
-
-      final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
-      if (statusLineMgr != null) {
-
-         // show info that data are copied
-         statusLineMgr.setMessage(String.format(Messages.StatusLine_Message_CopiedLatitudeLongitude,
-               mouseDown_GeoPosition.latitude,
-               mouseDown_GeoPosition.longitude));
-
-         // cleanup message
-         display.timerExec(4000, () -> statusLineMgr.setMessage(null));
-      }
+      UI.copyTextIntoClipboard(geoPosition, statusMessage);
    }
 
    private void actionGotoLocation() {

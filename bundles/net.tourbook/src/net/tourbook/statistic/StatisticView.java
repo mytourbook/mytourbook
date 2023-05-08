@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -78,78 +79,77 @@ import org.eclipse.ui.part.ViewPart;
 
 public class StatisticView extends ViewPart implements ITourProvider {
 
-   public static final String           ID                       = "net.tourbook.statistic.StatisticView";        //$NON-NLS-1$
+   public static final String                ID                       = "net.tourbook.statistic.StatisticView";        //$NON-NLS-1$
 
-   private static final String          COMBO_MINIMUM_WIDTH      = "1234567890";                                  //$NON-NLS-1$
-   private static final String          COMBO_MAXIMUM_WIDTH      = "123456789012345678901234567890";              //$NON-NLS-1$
+   private static final String               COMBO_MINIMUM_WIDTH      = "1234567890";                                  //$NON-NLS-1$
+   private static final String               COMBO_MAXIMUM_WIDTH      = "123456789012345678901234567890";              //$NON-NLS-1$
 
-   private static final String          STATE_SELECTED_STATISTIC = "statistic.container.selected_statistic";      //$NON-NLS-1$
-   private static final String          STATE_SELECTED_YEAR      = "statistic.container.selected-year";           //$NON-NLS-1$
-   private static final String          STATE_NUMBER_OF_YEARS    = "statistic.container.number_of_years";         //$NON-NLS-1$
+   private static final String               STATE_SELECTED_STATISTIC = "statistic.container.selected_statistic";      //$NON-NLS-1$
+   private static final String               STATE_SELECTED_YEAR      = "statistic.container.selected-year";           //$NON-NLS-1$
+   private static final String               STATE_NUMBER_OF_YEARS    = "statistic.container.number_of_years";         //$NON-NLS-1$
 
-   private static final char            NL                       = net.tourbook.common.UI.NEW_LINE;
+   private static final char                 NL                       = net.tourbook.common.UI.NEW_LINE;
 
-   private static final boolean         IS_OSX                   = net.tourbook.common.UI.IS_OSX;
-   private static final boolean         IS_LINUX                 = net.tourbook.common.UI.IS_LINUX;
+   private static final boolean              IS_OSX                   = net.tourbook.common.UI.IS_OSX;
+   private static final boolean              IS_LINUX                 = net.tourbook.common.UI.IS_LINUX;
 
-   private static boolean               _isInUpdateUI;
+   private static boolean                    _isInUpdateUI;
 
-   private final IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore       _prefStore_Common        = CommonActivator.getPrefStore();
-   private final IDialogSettings        _state                   = TourbookPlugin.getState("TourStatisticsView"); //$NON-NLS-1$
+   private final IPreferenceStore            _prefStore               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore            _prefStore_Common        = CommonActivator.getPrefStore();
+   private final IDialogSettings             _state                   = TourbookPlugin.getState("TourStatisticsView"); //$NON-NLS-1$
 
-   private IPartListener2               _partListener;
-   private IPropertyChangeListener      _prefChangeListener;
-   private IPropertyChangeListener      _prefChangeListener_Common;
-   private ITourEventListener           _tourEventListener;
-   private ISelectionListener           _postSelectionListener;
+   private IPartListener2                    _partListener;
+   private IPropertyChangeListener           _prefChangeListener;
+   private IPropertyChangeListener           _prefChangeListener_Common;
+   private ITourEventListener                _tourEventListener;
+   private ISelectionListener                _postSelectionListener;
 
-   private TourPerson                   _activePerson;
-   private TourTypeFilter               _activeTourTypeFilter;
-   private TourbookStatistic            _activeStatistic;
+   private TourPerson                        _activePerson;
+   private TourTypeFilter                    _activeTourTypeFilter;
+   private TourbookStatistic                 _activeStatistic;
 
-   private int                          _selectedYear            = -1;
+   private int                               _selectedYear            = -1;
 
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private IntArrayList                 _availableYears          = new IntArrayList();
+   private IntArrayList                      _availableYears          = new IntArrayList();
 
    /**
     * contains the statistics in the same sort order as the statistic combo box
     */
-   private ArrayList<TourbookStatistic> _allStatisticProvider;
-   private Action_StatisticOptions      _action_StatisticOptions;
-   private ActionSynchChartScale        _action_SynchChartScale;
+   private ArrayList<TourbookStatistic>      _allStatisticProvider;
 
-//   private boolean                      _isInTourSelection;
-   private boolean        _isSynchScaleEnabled;
-   private boolean        _isVerticalOrderDisabled;
+   private ActionCopyStatValuesIntoClipboard _actionCopyStatValuesIntoClipboard;
+   private ActionStatisticOptions            _actionStatisticOptions;
+   private ActionSyncMinMaxValues            _actionSyncMinMaxValues;
 
-   private int            _minimumComboWidth;
-   private int            _maximumComboWidth;
+   private boolean                           _isSynchScaleEnabled;
+   private boolean                           _isVerticalOrderDisabled;
 
-   private PixelConverter _pc;
+   private int                               _minimumComboWidth;
+   private int                               _maximumComboWidth;
+
+   private PixelConverter                    _pc;
 
    /*
     * UI controls
     */
-   private Combo                              _comboYear;
-   private Combo                              _comboStatistics;
-   private Combo                              _comboNumberOfYears;
-   private Combo                              _comboBarVerticalOrder;
+   private Combo                    _comboYear;
+   private Combo                    _comboStatistics;
+   private Combo                    _comboNumberOfYears;
+   private Combo                    _comboBarVerticalOrder;
 
-   private Composite                          _statContainer;
+   private Composite                _statContainer;
 
-   private PageBook                           _pageBookStatistic;
+   private PageBook                 _pageBookStatistic;
 
-   private SlideoutStatisticOptions           _slideoutStatisticOptions;
+   private SlideoutStatisticOptions _slideoutStatisticOptions;
 
-   private Action_CopyStatValuesIntoClipboard _action_CopyStatValuesIntoClipboard;
+   private class ActionCopyStatValuesIntoClipboard extends Action {
 
-   private class Action_CopyStatValuesIntoClipboard extends Action {
-
-      Action_CopyStatValuesIntoClipboard() {
+      ActionCopyStatValuesIntoClipboard() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
@@ -165,7 +165,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       }
    }
 
-   private class Action_StatisticOptions extends ActionToolbarSlideout {
+   private class ActionStatisticOptions extends ActionToolbarSlideout {
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
@@ -173,6 +173,26 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _slideoutStatisticOptions = new SlideoutStatisticOptions(_statContainer, toolbar);
 
          return _slideoutStatisticOptions;
+      }
+   }
+
+   private class ActionSyncMinMaxValues extends Action {
+
+      private StatisticView _statView;
+
+      public ActionSyncMinMaxValues(final StatisticView statView) {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+         _statView = statView;
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
+         setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
+      }
+
+      @Override
+      public void run() {
+         _statView.actionSynchScale(isChecked());
       }
    }
 
@@ -358,9 +378,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private void createActions() {
 
-      _action_CopyStatValuesIntoClipboard = new Action_CopyStatValuesIntoClipboard();
-      _action_StatisticOptions = new Action_StatisticOptions();
-      _action_SynchChartScale = new ActionSynchChartScale(this);
+      _actionCopyStatValuesIntoClipboard = new ActionCopyStatValuesIntoClipboard();
+      _actionStatisticOptions = new ActionStatisticOptions();
+      _actionSyncMinMaxValues = new ActionSyncMinMaxValues(this);
    }
 
    @Override
@@ -1229,9 +1249,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
       tbm.removeAll();
 
-      tbm.add(_action_SynchChartScale);
-      tbm.add(_action_CopyStatValuesIntoClipboard);
-      tbm.add(_action_StatisticOptions);
+      tbm.add(_actionSyncMinMaxValues);
+      tbm.add(_actionCopyStatValuesIntoClipboard);
+      tbm.add(_actionStatisticOptions);
 
       // add actions from the statistic
       _activeStatistic.updateToolBar();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,9 @@ public class TourPropertyCompareTourChanged {
    int     startIndex;
    int     endIndex;
 
+   float   avgAltimeter;
    float   avgPulse;
+   float   maxPulse;
    float   speed;
    int     tourDeviceTime_Elapsed;
 
