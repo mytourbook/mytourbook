@@ -45,15 +45,15 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionExport extends SubMenu {
 
-   private ArrayList<ExportTourExtension> _exportExtensionPoints;
+   private List<ExportTourExtension>    _exportExtensionPoints;
 
-   private List<ActionExportTour>         _exportTourActions;
-   private List<ActionContributionItem>   _exportTourContributionItems;
+   private List<ActionExportTour>       _exportTourActions;
+   private List<ActionContributionItem> _exportTourContributionItems;
 
-   private final ITourProvider            _tourProvider;
+   private final ITourProvider          _tourProvider;
 
-   private int                            _tourStartIndex = -1;
-   private int                            _tourEndIndex   = -1;
+   private int                          _tourStartIndex = -1;
+   private int                          _tourEndIndex   = -1;
 
    private class ActionExportTour extends Action {
 
@@ -167,9 +167,9 @@ public class ActionExport extends SubMenu {
    }
 
    /**
-    * read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
+    * Read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
     */
-   private ArrayList<ExportTourExtension> getExtensionPoints() {
+   private List<ExportTourExtension> getExtensionPoints() {
 
       if (_exportExtensionPoints != null) {
          return _exportExtensionPoints;

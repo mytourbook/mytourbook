@@ -41,7 +41,7 @@ public class ActionPrint extends SubMenu {
    private static List<PrintTourExtension> _printExtensionPoints;
 
    private Menu                            _menu;
-   private ArrayList<ActionPrintTour>      _printTourActions;
+   private List<ActionPrintTour>           _printTourActions;
 
    private ITourProvider                   _tourProvider;
 
