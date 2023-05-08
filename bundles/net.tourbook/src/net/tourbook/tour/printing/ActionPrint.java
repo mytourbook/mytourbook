@@ -50,13 +50,13 @@ public class ActionPrint extends SubMenu {
 
    private class ActionPrintTour extends Action {
 
-      private PrintTourExtension _PrintTourExtension;
+      private PrintTourExtension _printTourExtension;
 
       public ActionPrintTour(final PrintTourExtension printTourExtension) {
 
          super(printTourExtension.getVisibleName());
          setImageDescriptor(printTourExtension.getImageDescriptor());
-         _PrintTourExtension = printTourExtension;
+         _printTourExtension = printTourExtension;
       }
 
       @SuppressWarnings("unused")
@@ -75,7 +75,7 @@ public class ActionPrint extends SubMenu {
             return;
          }
 
-         _PrintTourExtension.printTours(selectedTours, _tourStartIndex, _tourEndIndex);
+         _printTourExtension.printTours(selectedTours, _tourStartIndex, _tourEndIndex);
       }
 
    }
