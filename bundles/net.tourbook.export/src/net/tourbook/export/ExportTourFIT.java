@@ -33,8 +33,9 @@ public class ExportTourFIT extends ExportTourExtension {
     */
    public ExportTourFIT() {
 
-      setImageDescriptor(Activator.getImageDescriptor(
-            UI.IS_DARK_THEME ? ExportImages.Export_FIT_Logo_Dark : ExportImages.Export_FIT_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(UI.IS_DARK_THEME
+            ? ExportImages.Export_FIT_Logo_Dark
+            : ExportImages.Export_FIT_Logo));
    }
 
    @Override

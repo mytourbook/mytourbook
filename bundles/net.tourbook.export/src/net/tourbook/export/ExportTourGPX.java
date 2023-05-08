@@ -17,6 +17,7 @@ package net.tourbook.export;
 
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
@@ -34,7 +35,9 @@ public class ExportTourGPX extends ExportTourExtension {
     */
    public ExportTourGPX() {
 
-      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_GPX_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(UI.IS_DARK_THEME
+            ? ExportImages.Export_GPX_Logo_Dark
+            : ExportImages.Export_GPX_Logo));
    }
 
    @Override
