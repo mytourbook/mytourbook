@@ -16,6 +16,7 @@
 package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 

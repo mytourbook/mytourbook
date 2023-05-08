@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;

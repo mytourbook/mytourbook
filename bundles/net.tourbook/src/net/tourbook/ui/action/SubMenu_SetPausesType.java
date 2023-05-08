@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;

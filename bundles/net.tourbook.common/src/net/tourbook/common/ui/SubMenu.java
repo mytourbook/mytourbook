@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.common.ui;
 
 import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 
@@ -24,7 +24,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
-abstract class SubMenu extends Action implements IMenuCreator {
+public abstract class SubMenu extends Action implements IMenuCreator {
 
    private Menu _menu;
 

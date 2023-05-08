@@ -18,6 +18,7 @@ package net.tourbook.ui.action;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider2;
 
