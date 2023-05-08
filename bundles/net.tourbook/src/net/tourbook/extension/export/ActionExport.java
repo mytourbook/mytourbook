@@ -18,6 +18,7 @@ package net.tourbook.extension.export;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
@@ -36,6 +37,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -45,8 +47,8 @@ public class ActionExport extends SubMenu {
 
    private ArrayList<ExportTourExtension> _exportExtensionPoints;
 
-   private Menu                           _menu;
-   private ArrayList<ActionExportTour>    _exportTourActions;
+   private List<ActionExportTour>         _exportTourActions;
+   private List<ActionContributionItem>   _exportTourContributionItems;
 
    private final ITourProvider            _tourProvider;
 
@@ -63,6 +65,10 @@ public class ActionExport extends SubMenu {
          setImageDescriptor(exportTourExtension.getImageDescriptor());
 
          _exportTourExtension = exportTourExtension;
+      }
+
+      public ExportTourExtension getExportTourExtension() {
+         return _exportTourExtension;
       }
 
       @Override
@@ -83,9 +89,8 @@ public class ActionExport extends SubMenu {
          // sort by date/time
          Collections.sort(selectedTours);
 
-         _exportTourExtension.exportTours(selectedTours, _tourStartIndex, _tourEndIndex);
+         getExportTourExtension().exportTours(selectedTours, _tourStartIndex, _tourEndIndex);
       }
-
    }
 
    /**
@@ -108,11 +113,6 @@ public class ActionExport extends SubMenu {
       createActions();
    }
 
-   private void addActionToMenu(final Action action) {
-      final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(_menu, -1);
-   }
-
    private void createActions() {
 
       if (_exportTourActions != null) {
@@ -121,13 +121,32 @@ public class ActionExport extends SubMenu {
 
       _exportTourActions = new ArrayList<>();
 
-      final List<ExportTourExtension> sortedExportExtensionPoints = _exportExtensionPoints.stream()
-            .sorted((o1, o2) -> o1.getVisibleName().compareTo(o2.getVisibleName()))
-            .collect(Collectors.toList());
-
       // create action for each extension point
-      sortedExportExtensionPoints.forEach(exportTourExtension -> _exportTourActions.add(
+      _exportExtensionPoints.forEach(exportTourExtension -> _exportTourActions.add(
             new ActionExportTour(exportTourExtension)));
+
+      // create a menu item for each extension point as the MT extension point
+      // needs to be at the end
+      _exportTourContributionItems = new ArrayList<>();
+
+      final Optional<ActionExportTour> mtExtension = _exportTourActions.stream().filter(extension -> extension.getExportTourExtension()
+            .getFileExtension().equals(
+                  "mt")).findFirst(); //$NON-NLS-1$
+      ActionExportTour mtActionExportTour = null;
+      if (mtExtension.isPresent()) {
+
+         mtActionExportTour = mtExtension.get();
+         _exportTourActions.remove(mtActionExportTour);
+      }
+
+      final List<ActionExportTour> sortedExportTourActions = _exportTourActions.stream()
+            .sorted((o1, o2) -> o1.getExportTourExtension().getVisibleName().compareTo(o2.getExportTourExtension().getVisibleName()))
+            .collect(Collectors.toList());
+      sortedExportTourActions.forEach(action -> _exportTourContributionItems.add(new ActionContributionItem(action)));
+      if (mtActionExportTour != null) {
+
+         _exportTourContributionItems.add(new ActionContributionItem(mtActionExportTour));
+      }
    }
 
    @Override
@@ -136,8 +155,15 @@ public class ActionExport extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
-      _menu = menu;
-      _exportTourActions.forEach(this::addActionToMenu);
+      for (final ActionContributionItem _exportTourContributionItem : _exportTourContributionItems) {
+
+         if (((ActionExportTour) _exportTourContributionItem.getAction()).getExportTourExtension().getFileExtension().equals("mt")) {
+
+            (new Separator()).fill(menu, -1);
+         }
+
+         _exportTourContributionItem.fill(menu, -1);
+      }
    }
 
    /**
