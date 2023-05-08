@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
@@ -26,8 +28,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -70,7 +71,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private PixelConverter        _pc;
 
-   private SelectionAdapter      _defaultSelectionListener;
+   private SelectionListener     _defaultSelectionListener;
 
    /*
     * UI controls
@@ -335,12 +336,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
                updateUI_SplitTour();
             });
-            _spinnerExceededDuration.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  updateUI_SplitTour();
-               }
-            });
+            _spinnerExceededDuration.addSelectionListener(widgetSelectedAdapter(selectionEvent -> updateUI_SplitTour()));
          }
 
          // label: duration in year/months/days/...
@@ -413,12 +409,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             // checkbox: enable/disable setting Tour Type
             _chkFitImportTourType = new Button(container, SWT.CHECK);
             _chkFitImportTourType.setText(Messages.PrefPage_Fit_Checkbox_FitImportTourType);
-            _chkFitImportTourType.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls();
-               }
-            });
+            _chkFitImportTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
          }
 
          // container: Tour Type import options
@@ -502,12 +493,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       _pc = new PixelConverter(parent);
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableControls();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
    }
 
    @Override

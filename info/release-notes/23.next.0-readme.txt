@@ -69,6 +69,15 @@ Improvements
 * Tour Pauses View (Frederic)
   - Added a Pause Type column
 
+* Reference Tours 
+  - Show altimeter (VAM) and max pulse values
+    https://github.com/mytourbook/mytourbook/issues/1086
+  
+* Reference Tour Year Statistic
+  - Show altimeter (VAM) and max pulse values
+  - New Action: Show all available compared tours without selecting last year and number of years
+  - Fixed min/max values when selecting different years, ...
+
 * Tour Geo Filter
   - Toggle name in the filter history viewer between read and edit mode
 

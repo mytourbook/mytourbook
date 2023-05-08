@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,12 +63,12 @@ public class TourCompareManager {
 
    private static final String          NL                                           = UI.NEW_LINE;
 
-   private static final String          NUMBER_FORMAT_1F                             = "%.1f";                                       //$NON-NLS-1$
+   private static final String          NUMBER_FORMAT_1F                             = "%.1f";                                        //$NON-NLS-1$
 
    public static final int              REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES    = 0;
    public static final int              REF_TOUR_VIEW_LAYOUT_WITHOUT_YEAR_CATEGORIES = 10;
 
-   private static final String          STATE_REFERENCE_TOUR_VIEW_LAYOUT             = "STATE_REFERENCE_TOUR_VIEW_LAYOUT";           //$NON-NLS-1$
+   private static final String          STATE_REFERENCE_TOUR_VIEW_LAYOUT             = "STATE_REFERENCE_TOUR_VIEW_LAYOUT";            //$NON-NLS-1$
 
    private static final IDialogSettings _state                                       = TourbookPlugin.getState("TourCompareManager"); //$NON-NLS-1$
 
@@ -764,7 +764,17 @@ public class TourCompareManager {
 
       final TourData tourData = comparedTourItem.getComparedTourData();
 
+      final float avgAltimeter = tourData.computeAvg_FromValues(
+            tourData.getAltimeterSerie(),
+            comparedTourItem.computedStartIndex,
+            comparedTourItem.computedEndIndex);
+
       final float avgPulse = tourData.computeAvg_PulseSegment(
+            comparedTourItem.computedStartIndex,
+            comparedTourItem.computedEndIndex);
+
+      final float maxPulse = tourData.computeMax_FromValues(
+            tourData.getPulse_SmoothedSerie(),
             comparedTourItem.computedStartIndex,
             comparedTourItem.computedEndIndex);
 
@@ -788,7 +798,9 @@ public class TourCompareManager {
       comparedTour.setTourDate(tourData.getTourStartTimeMS());
       comparedTour.setStartYear(tourData.getTourStartTime().getYear());
 
+      comparedTour.setAvgAltimeter(avgAltimeter);
       comparedTour.setAvgPulse(avgPulse);
+      comparedTour.setMaxPulse(maxPulse);
       comparedTour.setTourSpeed(speed);
       comparedTour.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
 

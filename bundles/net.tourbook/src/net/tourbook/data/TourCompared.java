@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -69,6 +69,20 @@ public class TourCompared {
     */
    private float avgPulse;
 
+   /**
+    * @since Db version 50
+    */
+   private float maxPulse;
+
+   /**
+    * @since Db version 50
+    */
+   private float avgAltimeter;
+
+   public float getAvgAltimeter() {
+      return avgAltimeter;
+   }
+
    public float getAvgPulse() {
       return avgPulse;
    }
@@ -79,6 +93,10 @@ public class TourCompared {
 
    public int getEndIndex() {
       return endIndex;
+   }
+
+   public float getMaxPulse() {
+      return maxPulse;
    }
 
    public long getRefTourId() {
@@ -105,12 +123,20 @@ public class TourCompared {
       return tourSpeed;
    }
 
+   public void setAvgAltimeter(final float avgAltimeter) {
+      this.avgAltimeter = avgAltimeter;
+   }
+
    public void setAvgPulse(final float avgPulse) {
       this.avgPulse = avgPulse;
    }
 
    public void setEndIndex(final int endIndex) {
       this.endIndex = endIndex;
+   }
+
+   public void setMaxPulse(final float maxPulse) {
+      this.maxPulse = maxPulse;
    }
 
    public void setRefTourId(final long refTourId) {

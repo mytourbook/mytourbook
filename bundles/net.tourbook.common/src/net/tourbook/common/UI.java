@@ -73,6 +73,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.VerifyListener;
@@ -1202,17 +1205,6 @@ public class UI {
    }
 
    /**
-    * Convert a speed value from km/h to m/s
-    *
-    * @param speed
-    * @return Returns the speed value in m/s.
-    */
-   public static float convertSpeed_FromKphToMps(final float speed) {
-
-      return speed * 0.277777778f;
-   }
-
-   /**
     * @param speed
     * @return Returns the speed value in the current measurement system.
     */
@@ -1229,6 +1221,17 @@ public class UI {
       }
 
       return speed;
+   }
+
+   /**
+    * Convert a speed value from km/h to m/s
+    *
+    * @param speed
+    * @return Returns the speed value in m/s.
+    */
+   public static float convertSpeed_KmhToMs(final float speed) {
+
+      return speed * 0.277777778f;
    }
 
    /**
@@ -1256,6 +1259,32 @@ public class UI {
       }
 
       return (temperature - UNIT_FAHRENHEIT_ADD) / UNIT_FAHRENHEIT_MULTI;
+   }
+
+   public static void copyTextIntoClipboard(final String text, final String statusMessage) {
+
+      final Display display = Display.getDefault();
+      final TextTransfer textTransfer = TextTransfer.getInstance();
+
+      final Clipboard clipBoard = new Clipboard(display);
+      {
+         clipBoard.setContents(
+
+               new Object[] { text },
+               new Transfer[] { textTransfer });
+      }
+      clipBoard.dispose();
+
+      final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+      if (statusLineMgr != null) {
+
+         // show info that data are copied
+         // "Data were copied into the clipboard"
+         statusLineMgr.setMessage(statusMessage);
+
+         // cleanup message
+         display.timerExec(3000, () -> statusLineMgr.setMessage(null));
+      }
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,7 +58,6 @@ import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -69,9 +68,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Point;
@@ -753,28 +749,7 @@ public class TourDataView extends ViewPart {
 
       if (logText.length() > 0) {
 
-         final Display display = Display.getDefault();
-         final TextTransfer textTransfer = TextTransfer.getInstance();
-
-         final Clipboard clipBoard = new Clipboard(display);
-         {
-            clipBoard.setContents(
-
-                  new Object[] { logText },
-                  new Transfer[] { textTransfer });
-         }
-         clipBoard.dispose();
-
-         final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
-         if (statusLineMgr != null) {
-
-            // show info that data are copied
-            // "Data were copied into the clipboard"
-            statusLineMgr.setMessage(Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
-
-            // cleanup message
-            display.timerExec(3000, () -> statusLineMgr.setMessage(null));
-         }
+         UI.copyTextIntoClipboard(logText, Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
       }
    }
 
