@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
@@ -32,10 +32,13 @@ public class ExportTour_MT extends ExportTourExtension {
    /**
     * Plugin extension constructor
     */
-   public ExportTour_MT() {}
+   public ExportTour_MT() {
+
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_MyTourbook_Logo));
+   }
 
    @Override
-   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
       new DialogExportTour(
             Display.getCurrent().getActiveShell(),

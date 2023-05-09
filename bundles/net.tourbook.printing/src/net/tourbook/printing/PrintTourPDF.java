@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
@@ -62,6 +62,7 @@ public class PrintTourPDF extends PrintTourExtension {
     */
    public PrintTourPDF() {
 
+      setImageDescriptor(Activator.getImageDescriptor(PrintImages.Print_PDF_Logo));
    }
 
    /**
@@ -171,15 +172,15 @@ public class PrintTourPDF extends PrintTourExtension {
    }
 
    @Override
-   public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void printTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
-      final DialogPrintTour dpt = new DialogPrintTour(
+      final DialogPrintTour dialogPrintTour = new DialogPrintTour(
             Display.getCurrent().getActiveShell(),
             this,
             tourDataList,
             tourStartIndex,
             tourEndIndex);
-      dpt.open();
+      dialogPrintTour.open();
 
       // hardcoded PDF output path for development
       // final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");

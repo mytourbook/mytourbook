@@ -28,6 +28,7 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -45,6 +46,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.action.SubMenu_SetPausesType;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -52,6 +54,8 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -70,6 +74,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -79,11 +84,11 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPausesView extends ViewPart implements ITourProvider, ITourViewer {
 
-   public static final String      ID                = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
+   public static final String      ID                              = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
 
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
@@ -94,19 +99,22 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private TourData                _tourData;
 
-//   private MenuManager             _viewerMenuManager;
-//   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private TableViewer            _pausesViewer;
-   private ColumnManager          _columnManager;
+   private ColumnManager           _columnManager;
 
-   private ArrayList<DevicePause> _allDevicePauses;
+   private ArrayList<DevicePause>  _allDevicePauses;
 
-   private boolean                _isInUpdate;
+   private boolean                 _isInUpdate;
 
-   private PixelConverter         _pc;
+   private PixelConverter          _pc;
 
-   private ZonedDateTime          _tourStartTime;
+   private TableViewer             _pausesViewer;
+
+   private ZonedDateTime           _tourStartTime;
+
+   private SubMenu_SetPausesType   _subMenu_SetPauseType;
 
    /*
     * UI controls
@@ -116,9 +124,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private Composite _pageNoData;
    private Composite _viewerContainer;
 
-//   private Menu      _tableContextMenu;
+   private Menu      _tableContextMenu;
 
-   private class DevicePause {
+   public class DevicePause {
 
       long type;
 
@@ -171,32 +179,34 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-//   private class TableContextMenuProvider implements IContextMenuProvider {
-//
-//      @Override
-//      public void disposeContextMenu() {
-//
-//         if (_tableContextMenu != null) {
-//            _tableContextMenu.dispose();
-//         }
-//      }
-//
-//      @Override
-//      public Menu getContextMenu() {
-//         return _tableContextMenu;
-//      }
-//
-//      @Override
-//      public Menu recreateContextMenu() {
-//
-//         disposeContextMenu();
-//
-//         _tableContextMenu = createUI_22_CreateViewerContextMenu();
-//
-//         return _tableContextMenu;
-//      }
-//
-//   }
+   private class TableContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+
+         return _pausesViewer.getTable().getSelectionCount() > 0
+               ? _tableContextMenu : null;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_22_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+
+   }
 
    public TourPausesView() {
       super();
@@ -353,6 +363,14 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private void createActions() {
 
+      _subMenu_SetPauseType = new SubMenu_SetPausesType(this, false);
+   }
+
+   private void createMenuManager() {
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(manager -> fillContextMenu(manager));
    }
 
    @Override
@@ -360,7 +378,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       _pc = new PixelConverter(parent);
 
-//      createMenuManager();
+      createMenuManager();
 
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
@@ -443,12 +461,19 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
     */
    private void createUI_20_ContextMenu() {
 
-//      _tableContextMenu = createUI_22_CreateViewerContextMenu();
+      _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
       final Table table = (Table) _pausesViewer.getControl();
 
-//      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
-      _columnManager.createHeaderContextMenu(table, null);
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
+
+   private Menu createUI_22_CreateViewerContextMenu() {
+
+      final Table table = (Table) _pausesViewer.getControl();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+
+      return tableContextMenu;
    }
 
    private void defineAllColumns() {
@@ -651,6 +676,17 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
     */
    private void enableActions() {
 
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_subMenu_SetPauseType);
+
+      // set the pause currently selected by the user
+      final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+      _subMenu_SetPauseType.setTourPauses(selectedIndices);
+
+      enableActions();
    }
 
    /**
