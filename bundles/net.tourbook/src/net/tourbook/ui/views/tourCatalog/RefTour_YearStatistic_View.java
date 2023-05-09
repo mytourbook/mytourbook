@@ -955,6 +955,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
       setYearData();
 
       updateUI_YearChart(false);
+
+      // reset selectable bars otherwise some bars on the right side could not be selectable !!!
+      _yearChart.setSelectedBars(null);
    }
 
    /**
