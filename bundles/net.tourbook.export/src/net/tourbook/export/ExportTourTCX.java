@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
@@ -32,10 +32,13 @@ public class ExportTourTCX extends ExportTourExtension {
    /**
     * Plugin extension constructor
     */
-   public ExportTourTCX() {}
+   public ExportTourTCX() {
+
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_Garmin_Logo));
+   }
 
    @Override
-   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
       new DialogExportTour(
             Display.getCurrent().getActiveShell(),
@@ -45,5 +48,4 @@ public class ExportTourTCX extends ExportTourExtension {
             tourEndIndex,
             TCX_2_0_TEMPLATE).open();
    }
-
 }

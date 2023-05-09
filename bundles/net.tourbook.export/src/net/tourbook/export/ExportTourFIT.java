@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
@@ -30,10 +31,15 @@ public class ExportTourFIT extends ExportTourExtension {
    /**
     * Plugin extension constructor
     */
-   public ExportTourFIT() {}
+   public ExportTourFIT() {
+
+      setImageDescriptor(Activator.getImageDescriptor(UI.IS_DARK_THEME
+            ? ExportImages.Export_FIT_Logo_Dark
+            : ExportImages.Export_FIT_Logo));
+   }
 
    @Override
-   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
       new DialogExportTour(
             Display.getCurrent().getActiveShell(),
@@ -43,5 +49,4 @@ public class ExportTourFIT extends ExportTourExtension {
             tourEndIndex,
             "fit").open(); //$NON-NLS-1$
    }
-
 }

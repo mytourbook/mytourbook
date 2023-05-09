@@ -73,7 +73,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       super(CLOUD_UPLOADER_ID,
             Messages.VendorName_Suunto_Routes,
-            Activator.getImageDescriptor(CloudImages.Cloud_Suunto));
+            Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo));
 
       _tourExporter.setUseDescription(true);
 
