@@ -171,7 +171,7 @@
 
       <plugin>
          <artifactId>maven-surefire-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.0.0</version>
+                                                               <version>3.1.0</version>
          <configuration>
             <skipTests>true</skipTests>
          </configuration>
