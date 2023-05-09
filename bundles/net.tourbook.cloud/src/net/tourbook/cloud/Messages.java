@@ -67,8 +67,6 @@ public class Messages extends NLS {
    public static String PrefPage_UploadConfiguration_Button_SendDescription;
    public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription;
    public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip;
-   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping;
-   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip;
    public static String VendorName_Strava;
 
    //SUUNTO
