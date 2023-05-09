@@ -117,16 +117,17 @@ public class StravaUploader extends TourbookCloudUploader {
 
       ActivityUpload activityUpload = new ActivityUpload();
 
-      if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
+      final String responseBody = response.body();
+      if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(responseBody)) {
 
          final ObjectMapper mapper = new ObjectMapper();
          try {
-            activityUpload = mapper.readValue(response.body(), ActivityUpload.class);
+            activityUpload = mapper.readValue(responseBody, ActivityUpload.class);
          } catch (final JsonProcessingException e) {
             StatusUtil.log(e);
          }
       } else {
-         activityUpload.setError(response.body());
+         activityUpload.setError(responseBody);
       }
 
       activityUpload.setTourDate(tourDate);
