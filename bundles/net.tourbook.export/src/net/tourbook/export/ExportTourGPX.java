@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
@@ -32,10 +33,15 @@ public class ExportTourGPX extends ExportTourExtension {
    /**
     * plugin extension constructor
     */
-   public ExportTourGPX() {}
+   public ExportTourGPX() {
+
+      setImageDescriptor(Activator.getImageDescriptor(UI.IS_DARK_THEME
+            ? ExportImages.Export_GPX_Logo_Dark
+            : ExportImages.Export_GPX_Logo));
+   }
 
    @Override
-   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
       new DialogExportTour(
             Display.getCurrent().getActiveShell(),
@@ -45,5 +51,4 @@ public class ExportTourGPX extends ExportTourExtension {
             tourEndIndex,
             GPX_1_0_TEMPLATE).open();
    }
-
 }

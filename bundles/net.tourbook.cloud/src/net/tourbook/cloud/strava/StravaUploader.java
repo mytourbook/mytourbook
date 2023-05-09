@@ -117,7 +117,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       super(CLOUD_UPLOADER_ID,
             Messages.VendorName_Strava,
-            Activator.getImageDescriptor(CloudImages.Cloud_Strava));
+            Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo));
 
       VelocityService.init();
    }

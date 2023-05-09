@@ -80,7 +80,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       super("SUUNTO", //$NON-NLS-1$
             Messages.VendorName_Suunto,
             Messages.Import_Data_HTML_SuuntoWorkoutsDownloader_Tooltip,
-            Activator.getImageAbsoluteFilePath(CloudImages.Cloud_Suunto));
+            Activator.getImageAbsoluteFilePath(CloudImages.Cloud_Suunto_Logo));
    }
 
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {

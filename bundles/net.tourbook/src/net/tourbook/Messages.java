@@ -37,6 +37,10 @@ public class Messages extends NLS {
    public static String        Action_MarkerFilter_WithGPS_Tooltip;
    public static String        Action_MarkerFilter_WithoutGPS_Tooltip;
 
+   public static String        Action_PauseType_Set;
+   public static String        Action_PauseType_Set_Automatic;
+   public static String        Action_PauseType_Set_Manual;
+
    public static String        Action_PhotosAndTours_AddPhoto;
    public static String        Action_PhotosAndTours_FilterNoTours_Tooltip;
    public static String        Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
@@ -2674,6 +2678,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_MultiplyCaloriesBy1000_Apply;
    public static String        Tour_Action_MultiplyCaloriesBy1000_Message;
    public static String        Tour_Action_MultiplyCaloriesBy1000_Title;
+   public static String        Tour_Action_Pauses;
    public static String        Tour_Action_RetrieveWeatherData;
    public static String        Tour_Action_RunDyn_StanceTimeBalance_Tooltip;
    public static String        Tour_Action_RunDyn_StanceTime_Tooltip;
