@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  net.tourbook.common
 Bundle-ActivationPolicy: lazy
-Export-Package: net.tourbook.chart
+Export-Package: net.tourbook.chart,
+ net.tourbook.chart.preferences
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: net.tourbook.common,
  net.tourbook.common.form,

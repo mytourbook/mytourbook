@@ -45,6 +45,7 @@ New
 * Tour Pauses (Frederic)
   - Added the ability to change pause types individually (Tour Pauses view) and in bulk (Tour Book view)
 
+
 Improvements
 ============
 
@@ -86,6 +87,12 @@ Improvements
 
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
+
+* Bar Chart Selection
+  - Set direction for the mouse wheel, e.g.
+    mouse wheel up is moving the bar selection to the left (default until now)
+    or mouse wheel up is moving the bar selection to the right
+    https://github.com/mytourbook/mytourbook/issues/1096
 
 Changes
 =======
