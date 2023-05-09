@@ -90,7 +90,9 @@ Improvements
 Changes
 =======
 
-* 
+* Strava Integration (Frederic)
+  - Changed the tour upload to use the FIT format instead of the TCX format
+
 
 
 Bugfix
