@@ -50,7 +50,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.export.TourExporter;
-import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
@@ -109,8 +108,6 @@ public class StravaUploader extends TourbookCloudUploader {
       super(CLOUD_UPLOADER_ID,
             Messages.VendorName_Strava,
             Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo));
-
-      VelocityService.init();
    }
 
    private static ActivityUpload convertResponseToUpload(final HttpResponse<String> response, final String tourDate) {

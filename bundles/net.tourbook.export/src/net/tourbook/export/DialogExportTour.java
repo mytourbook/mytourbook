@@ -284,8 +284,10 @@ public class DialogExportTour extends TitleAreaDialog {
 
       _dlgDefaultMessage = NLS.bind(Messages.dialog_export_dialog_message, _exportExtensionPoint.getVisibleName());
 
-      // initialize velocity
-      VelocityService.init();
+      // initialize velocity for GPX and TCX exports
+      if (_isGPXorTCX) {
+         VelocityService.init();
+      }
    }
 
    private String appendSurfingParameters(final TourData minTourData) {
