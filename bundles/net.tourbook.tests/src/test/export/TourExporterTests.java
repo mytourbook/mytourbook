@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -140,7 +141,7 @@ public class TourExporterTests {
       _tourExporter.setIsExportSurfingWaves(true);
       _tourExporter.setIsExportWithBarometer(true);
       _tourExporter.setIsCamouflageSpeed(true);
-      _tourExporter.setCamouflageSpeed(15 / 3.6f); // 15km/h
+      _tourExporter.setCamouflageSpeed(UI.convertSpeed_KmhToMs(15)); // 15km/h
 
       executeGpxTest(controlTourFileName);
    }
@@ -165,7 +166,7 @@ public class TourExporterTests {
       _tourExporter.setUseActivityType(true);
       _tourExporter.setActivityType("Biking"); //$NON-NLS-1$
       _tourExporter.setIsCamouflageSpeed(true);
-      _tourExporter.setCamouflageSpeed(15 / 3.6f);
+      _tourExporter.setCamouflageSpeed(UI.convertSpeed_KmhToMs(15)); // 15km/h
       _tour.setCalories(0);
 
       final String controlTourFileName = "LongsPeak-CamouflageSpeed-15kmh-BikingActivity.tcx"; //$NON-NLS-1$
