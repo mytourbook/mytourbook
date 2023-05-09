@@ -67,42 +67,42 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                 //$NON-NLS-1$
+   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";            //$NON-NLS-1$
 
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter     = new TourExporter("fit"); //$NON-NLS-1$
+   private static TourExporter     _tourExporter     = new TourExporter("fit");                    //$NON-NLS-1$
 
-   private static String           CLOUD_UPLOADER_ID = "Strava";                                        //$NON-NLS-1$
+   private static String           CLOUD_UPLOADER_ID = "Strava";                                   //$NON-NLS-1$
 
    // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
-   private static final List<String> StravaManualActivityTypes       = List.of(
-         "InlineSkate",                                                                                    //$NON-NLS-1$
-         "Kayaking",                                                                                       //$NON-NLS-1$
-         "Kitesurf",                                                                                       //$NON-NLS-1$
-         "NordicSki",                                                                                      //$NON-NLS-1$
-         "Ride",                                                                                           //$NON-NLS-1$
-         "RockClimbing",                                                                                   //$NON-NLS-1$
-         "RollerSki",                                                                                      //$NON-NLS-1$
-         "Rowing",                                                                                         //$NON-NLS-1$
-         "Run",                                                                                            //$NON-NLS-1$
-         "Sail",                                                                                           //$NON-NLS-1$
-         "Skateboard",                                                                                     //$NON-NLS-1$
-         "Snowboard",                                                                                      //$NON-NLS-1$
-         "Snowshoe",                                                                                       //$NON-NLS-1$
-         "Soccer",                                                                                         //$NON-NLS-1$
-         "StairStepper",                                                                                   //$NON-NLS-1$
-         "StandUpPaddling",                                                                                //$NON-NLS-1$
-         "Surfing",                                                                                        //$NON-NLS-1$
-         "Swim",                                                                                           //$NON-NLS-1$
-         "Velomobile",                                                                                     //$NON-NLS-1$
-         "VirtualRide",                                                                                    //$NON-NLS-1$
-         "VirtualRun",                                                                                     //$NON-NLS-1$
-         "Walk",                                                                                           //$NON-NLS-1$
-         "WeightTraining",                                                                                 //$NON-NLS-1$
-         "Wheelchair",                                                                                     //$NON-NLS-1$
-         "Windsurf",                                                                                       //$NON-NLS-1$
-         "Workout",                                                                                        //$NON-NLS-1$
-         "Yoga");                                                                                          //$NON-NLS-1$
+   private static final List<String> StravaManualActivityTypes = List.of(
+         "InlineSkate", //$NON-NLS-1$
+         "Kayaking", //$NON-NLS-1$
+         "Kitesurf", //$NON-NLS-1$
+         "NordicSki", //$NON-NLS-1$
+         "Ride", //$NON-NLS-1$
+         "RockClimbing", //$NON-NLS-1$
+         "RollerSki", //$NON-NLS-1$
+         "Rowing", //$NON-NLS-1$
+         "Run", //$NON-NLS-1$
+         "Sail", //$NON-NLS-1$
+         "Skateboard", //$NON-NLS-1$
+         "Snowboard", //$NON-NLS-1$
+         "Snowshoe", //$NON-NLS-1$
+         "Soccer", //$NON-NLS-1$
+         "StairStepper", //$NON-NLS-1$
+         "StandUpPaddling", //$NON-NLS-1$
+         "Surfing", //$NON-NLS-1$
+         "Swim", //$NON-NLS-1$
+         "Velomobile", //$NON-NLS-1$
+         "VirtualRide", //$NON-NLS-1$
+         "VirtualRun", //$NON-NLS-1$
+         "Walk", //$NON-NLS-1$
+         "WeightTraining", //$NON-NLS-1$
+         "Wheelchair", //$NON-NLS-1$
+         "Windsurf", //$NON-NLS-1$
+         "Workout", //$NON-NLS-1$
+         "Yoga"); //$NON-NLS-1$
 
    public StravaUploader() {
 
