@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import net.tourbook.common.color.ThemeUtil;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -65,6 +66,11 @@ public class ChartActivator extends AbstractUIPlugin {
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
    }
 
+   public static IPreferenceStore getPrefStore() {
+
+      return getDefault().getPreferenceStore();
+   }
+
    /**
     * @param imageName
     * @return Returns the themed image descriptor from {@link ChartActivator} plugin images
@@ -74,19 +80,11 @@ public class ChartActivator extends AbstractUIPlugin {
       return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
    }
 
-   /*
-    * (non-Javadoc)
-    * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-    */
    @Override
    public void start(final BundleContext context) throws Exception {
       super.start(context);
    }
 
-   /*
-    * (non-Javadoc)
-    * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-    */
    @Override
    public void stop(final BundleContext context) throws Exception {
       plugin = null;

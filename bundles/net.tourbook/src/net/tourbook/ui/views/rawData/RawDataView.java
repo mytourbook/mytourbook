@@ -7102,6 +7102,18 @@ public class RawDataView extends ViewPart implements
 
    private void updateUI_DeviceState_SimpleUI() {
 
+      final ToolItem deviceState_ActionToolItem = _actionSimpleUI_DeviceState.getActionToolItem();
+
+      if (deviceState_ActionToolItem == null) {
+
+         /*
+          * This happend during development when closing the import view. It may be possible that
+          * this UI was not yet displayed.
+          */
+
+         return;
+      }
+
       /*
        * Device watching On/Off
        */
@@ -7132,7 +7144,7 @@ public class RawDataView extends ViewPart implements
          // watching is off
 
          _actionSimpleUI_DeviceState.notSelectedTooltip = Messages.Import_Data_HTML_WatchingIsOff;
-         _actionSimpleUI_DeviceState.getActionToolItem().setImage(_images.get(IMAGE_DEVICE_FOLDER_OFF));
+         deviceState_ActionToolItem.setImage(_images.get(IMAGE_DEVICE_FOLDER_OFF));
 
       } else if (isWatchAnything && _isDeviceStateValid) {
 
@@ -7154,7 +7166,7 @@ public class RawDataView extends ViewPart implements
                : Messages.Import_Data_HTML_NothingIsWatched;
 
          _actionSimpleUI_DeviceState.notSelectedTooltip = tooltip;
-         _actionSimpleUI_DeviceState.getActionToolItem().setImage(stateImage);
+         deviceState_ActionToolItem.setImage(stateImage);
       }
    }
 

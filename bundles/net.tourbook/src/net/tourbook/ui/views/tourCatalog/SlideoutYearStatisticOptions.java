@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
@@ -30,6 +31,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -37,6 +39,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IActionResetToDefault {
@@ -49,15 +52,18 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 
    private IDialogSettings            _state;
 
+   private MouseWheelListener         _defaultMouseWheelListener;
    private SelectionListener          _defaultSelectionListener;
 
    /*
     * UI controls
     */
-   private Button _chkShowAvgAltimeter;
-   private Button _chkShowAvgPulse;
-   private Button _chkShowAvgSpeed;
-   private Button _chkShowMaxPulse;
+   private Button  _chkShowAltimeter_Avg;
+   private Button  _chkShowPulse_Avg;
+   private Button  _chkShowPulse_AvgMax;
+   private Button  _chkShowSpeed_Avg;
+
+   private Spinner _spinnerBarHeight;
 
    public SlideoutYearStatisticOptions(final RefTour_YearStatistic_View refTour_YearStatistic_View,
                                        final Control ownerControl,
@@ -151,46 +157,75 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 
    private void createUI_20_Graphs(final Composite parent) {
 
+      final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false).span(2, 1);
+
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Slideout_RefTour_Group_Graphs);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .span(2, 1)
-            .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      gd.applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //    group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
              * Show avg speed
              */
-            _chkShowAvgSpeed = new Button(group, SWT.CHECK);
-            _chkShowAvgSpeed.setText(Messages.Slideout_RefTour_Checkbox_AvgSpeed);
-            _chkShowAvgSpeed.addSelectionListener(_defaultSelectionListener);
+            _chkShowSpeed_Avg = new Button(group, SWT.CHECK);
+            _chkShowSpeed_Avg.setText(Messages.Slideout_RefTour_Checkbox_Speed_Avg);
+            _chkShowSpeed_Avg.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_chkShowSpeed_Avg);
+
          }
          {
             /*
              * Show avg altimeter (VAM)
              */
-            _chkShowAvgAltimeter = new Button(group, SWT.CHECK);
-            _chkShowAvgAltimeter.setText(Messages.Slideout_RefTour_Checkbox_AvgAltimeter);
-            _chkShowAvgAltimeter.addSelectionListener(_defaultSelectionListener);
+            _chkShowAltimeter_Avg = new Button(group, SWT.CHECK);
+            _chkShowAltimeter_Avg.setText(Messages.Slideout_RefTour_Checkbox_Altimeter_Avg);
+            _chkShowAltimeter_Avg.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_chkShowAltimeter_Avg);
          }
          {
             /*
              * Show avg pulse
              */
-            _chkShowAvgPulse = new Button(group, SWT.CHECK);
-            _chkShowAvgPulse.setText(Messages.Slideout_RefTour_Checkbox_AvgPulse);
-            _chkShowAvgPulse.addSelectionListener(_defaultSelectionListener);
+            _chkShowPulse_Avg = new Button(group, SWT.CHECK);
+            _chkShowPulse_Avg.setText(Messages.Slideout_RefTour_Checkbox_Pulse_Avg);
+            _chkShowPulse_Avg.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_chkShowPulse_Avg);
          }
          {
             /*
-             * Show max pulse
+             * Show avg/max pulse
              */
-            _chkShowMaxPulse = new Button(group, SWT.CHECK);
-            _chkShowMaxPulse.setText(Messages.Slideout_RefTour_Checkbox_MaxPulse);
-            _chkShowMaxPulse.addSelectionListener(_defaultSelectionListener);
+            _chkShowPulse_AvgMax = new Button(group, SWT.CHECK);
+            _chkShowPulse_AvgMax.setText(Messages.Slideout_RefTour_Checkbox_Pulse_AvgMax);
+            _chkShowPulse_AvgMax.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_chkShowPulse_AvgMax);
+         }
+         {
+            /*
+             * Bar size
+             */
+            final String tooltip = Messages.Slideout_RefTour_Spinner_BarSize_Tooltip;
+
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Slideout_RefTour_Label_BarSize);
+            label.setToolTipText(tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+
+            _spinnerBarHeight = new Spinner(group, SWT.BORDER);
+            _spinnerBarHeight.setMinimum(1);
+            _spinnerBarHeight.setMaximum(100);
+            _spinnerBarHeight.setIncrement(1);
+            _spinnerBarHeight.setPageIncrement(10);
+            _spinnerBarHeight.setToolTipText(tooltip);
+            _spinnerBarHeight.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinnerBarHeight.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerBarHeight);
          }
       }
    }
@@ -198,6 +233,12 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
    private void initUI() {
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+         onChangeUI();
+      };
    }
 
    private void onChangeUI() {
@@ -215,31 +256,56 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
    @Override
    public void resetToDefaults() {
 
+// SET_FORMATTING_OFF
+
       _gridUI.resetToDefaults();
       _gridUI.saveState();
 
-      _chkShowAvgAltimeter.setSelection(true);
-      _chkShowAvgPulse.setSelection(true);
-      _chkShowAvgSpeed.setSelection(true);
-      _chkShowMaxPulse.setSelection(true);
+      _chkShowAltimeter_Avg   .setSelection(true);
+      _chkShowPulse_Avg       .setSelection(true);
+      _chkShowPulse_AvgMax    .setSelection(false);
+      _chkShowSpeed_Avg       .setSelection(true);
+
+      _spinnerBarHeight       .setSelection(RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_DEFAULT);
+
+// SET_FORMATTING_ON
+
+      onChangeUI();
    }
 
    private void restoreState() {
 
       _gridUI.restoreState();
 
-      _chkShowAvgAltimeter.setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_AVG_ALTIMETER, true));
-      _chkShowAvgPulse.setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_AVG_PULSE, true));
-      _chkShowAvgSpeed.setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_AVG_SPEED, true));
-      _chkShowMaxPulse.setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_MAX_PULSE, true));
+// SET_FORMATTING_OFF
+
+      _chkShowAltimeter_Avg   .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_ALTIMETER_AVG, true));
+      _chkShowPulse_Avg       .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG,     true));
+      _chkShowPulse_AvgMax    .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_MAX, false));
+      _chkShowSpeed_Avg       .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_SPEED_AVG,     true));
+
+// SET_FORMATTING_ON
+
+      _spinnerBarHeight.setSelection(Util.getStateInt(_state,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MIN,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MAX));
    }
 
    private void saveState() {
 
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_AVG_ALTIMETER, _chkShowAvgAltimeter.getSelection());
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_AVG_PULSE, _chkShowAvgPulse.getSelection());
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_AVG_SPEED, _chkShowAvgSpeed.getSelection());
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_MAX_PULSE, _chkShowMaxPulse.getSelection());
+      _gridUI.saveState();
+
+// SET_FORMATTING_OFF
+
+      _state.put(RefTour_YearStatistic_View.STATE_SHOW_ALTIMETER_AVG,   _chkShowAltimeter_Avg   .getSelection());
+      _state.put(RefTour_YearStatistic_View.STATE_SHOW_SPEED_AVG,       _chkShowSpeed_Avg       .getSelection());
+      _state.put(RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG,       _chkShowPulse_Avg       .getSelection());
+      _state.put(RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_MAX,   _chkShowPulse_AvgMax    .getSelection());
+      _state.put(RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT,  _spinnerBarHeight       .getSelection());
+
+// SET_FORMATTING_ON
    }
 
 }

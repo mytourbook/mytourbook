@@ -320,6 +320,21 @@ public class TVICatalogRefTourItem extends TVICatalogTourItem {
       }
    }
 
+   public void resetMinMaxValues() {
+
+      avgAltimeter_MinMax[0] = Float.MIN_VALUE;
+      avgAltimeter_MinMax[1] = Float.MAX_VALUE;
+
+      avgPulse_MinMax[0] = Float.MIN_VALUE;
+      avgPulse_MinMax[1] = Float.MAX_VALUE;
+
+      maxPulse_MinMax[0] = Float.MIN_VALUE;
+      maxPulse_MinMax[1] = Float.MAX_VALUE;
+
+      avgSpeed_MinMax[0] = Float.MIN_VALUE;
+      avgSpeed_MinMax[1] = Float.MAX_VALUE;
+   }
+
    @Override
    public String toString() {
 

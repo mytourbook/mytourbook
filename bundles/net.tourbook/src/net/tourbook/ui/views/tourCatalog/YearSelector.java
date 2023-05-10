@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Spinner;
 
-public class YearContributionItem extends ControlContribution {
+public class YearSelector extends ControlContribution {
 
    private static final String        ID       = "net.tourbook.ui.views.tourCatalog.YearContributionItem"; //$NON-NLS-1$
 
@@ -45,7 +45,7 @@ public class YearContributionItem extends ControlContribution {
    Combo   comboLastVisibleYear;
    Spinner spinnerNumberOfVisibleYears;
 
-   protected YearContributionItem(final RefTour_YearStatistic_View refTour_YearStatistic_View) {
+   protected YearSelector(final RefTour_YearStatistic_View refTour_YearStatistic_View) {
 
       super(ID);
 

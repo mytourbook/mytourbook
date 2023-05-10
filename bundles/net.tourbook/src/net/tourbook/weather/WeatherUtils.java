@@ -209,7 +209,7 @@ public class WeatherUtils {
 //               // Hot face 🥵
 //               weatherDataList.add(UI.SPACE + "\ud83e\udd75"); //$NON-NLS-1$
 //            }
-            weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Avg
+            weatherAvgValues.add(UI.SYMBOL_AVERAGE
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature))
                   + UI.UNIT_LABEL_TEMPERATURE);
@@ -217,13 +217,13 @@ public class WeatherUtils {
 
          if (isDisplayMaximumMinimumTemperature) {
 
-         // Minimum temperature
+            // Minimum temperature
             weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min()))
                   + UI.UNIT_LABEL_TEMPERATURE);
 
-         // Maximum temperature
+            // Maximum temperature
             weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max()))

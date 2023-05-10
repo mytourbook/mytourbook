@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import net.tourbook.chart.preferences.IChartPreferences;
 import net.tourbook.common.DPITools;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
@@ -8410,15 +8411,31 @@ public class ChartComponentGraph extends Canvas {
          // mouse mode: move slider
 
          /**
-          * when a slider in a graph is moved with the mouse wheel the direction is the same as when
+          * When a slider in a graph is moved with the mouse wheel the direction is the same as when
           * the mouse wheel is scrolling in the tour editor:
           * <p>
-          * wheel up -> tour editor up
+          * Wheel up -> Tour editor up
           */
-         if (event.count < 0) {
-            event.keyCode |= SWT.ARROW_RIGHT;
+         final MouseWheel2KeyTranslation mouseKeyTranslation = (MouseWheel2KeyTranslation) net.tourbook.common.util.Util.getEnumValue(
+
+               ChartActivator.getPrefStore().getString(IChartPreferences.GRAPH_MOUSE_KEY_TRANSLATION),
+               MouseWheel2KeyTranslation.Up_Left);
+
+         if (mouseKeyTranslation.equals(MouseWheel2KeyTranslation.Up_Left)) {
+
+            if (event.count < 0) {
+               event.keyCode |= SWT.ARROW_RIGHT;
+            } else {
+               event.keyCode |= SWT.ARROW_LEFT;
+            }
+
          } else {
-            event.keyCode |= SWT.ARROW_LEFT;
+
+            if (event.count < 0) {
+               event.keyCode |= SWT.ARROW_LEFT;
+            } else {
+               event.keyCode |= SWT.ARROW_RIGHT;
+            }
          }
 
          /*

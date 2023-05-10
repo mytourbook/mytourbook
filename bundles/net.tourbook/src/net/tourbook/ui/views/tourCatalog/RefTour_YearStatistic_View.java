@@ -63,7 +63,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.ISelectionListener;
@@ -73,19 +75,22 @@ import org.eclipse.ui.part.ViewPart;
 
 public class RefTour_YearStatistic_View extends ViewPart {
 
-   public static final String  ID                            = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
+   public static final String  ID                                = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
-   private static final char   NL                            = UI.NEW_LINE;
-   private static final char   FIELD_DELIMITER               = UI.TAB;
+   private static final char   NL                                = UI.NEW_LINE;
+   private static final char   FIELD_DELIMITER                   = UI.TAB;
 
-   private static final String STATE_IS_SHOW_ALL_VALUES      = "STATE_IS_SHOW_ALL_VALUES";                         //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_MIN_MAX_VALUES  = "STATE_IS_SYNC_MIN_MAX_VALUES";                     //$NON-NLS-1$
-   private static final String STATE_NUMBER_OF_VISIBLE_YEARS = "STATE_NUMBER_OF_VISIBLE_YEARS";                    //$NON-NLS-1$
-
-   static final String         STATE_SHOW_AVG_PULSE          = "STATE_SHOW_AVG_PULSE";                             //$NON-NLS-1$
-   static final String         STATE_SHOW_MAX_PULSE          = "STATE_SHOW_MAX_PULSE";                             //$NON-NLS-1$
-   static final String         STATE_SHOW_AVG_SPEED          = "STATE_SHOW_AVG_SPEED";                             //$NON-NLS-1$
-   static final String         STATE_SHOW_AVG_ALTIMETER      = "STATE_SHOW_AVG_ALTIMETER";                         //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ALL_VALUES          = "STATE_IS_SHOW_ALL_VALUES";                         //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_MIN_MAX_VALUES      = "STATE_IS_SYNC_MIN_MAX_VALUES";                     //$NON-NLS-1$
+   private static final String STATE_NUMBER_OF_VISIBLE_YEARS     = "STATE_NUMBER_OF_VISIBLE_YEARS";                    //$NON-NLS-1$
+   static final String         STATE_RELATIVE_BAR_HEIGHT         = "STATE_RELATIVE_BAR_HEIGHT";                        //$NON-NLS-1$
+   static final int            STATE_RELATIVE_BAR_HEIGHT_DEFAULT = 20;
+   static final int            STATE_RELATIVE_BAR_HEIGHT_MIN     = 1;
+   static final int            STATE_RELATIVE_BAR_HEIGHT_MAX     = 100;
+   static final String         STATE_SHOW_ALTIMETER_AVG          = "STATE_SHOW_ALTIMETER_AVG";                         //$NON-NLS-1$
+   static final String         STATE_SHOW_PULSE_AVG              = "STATE_SHOW_PULSE_AVG";                             //$NON-NLS-1$
+   static final String         STATE_SHOW_PULSE_AVG_MAX          = "STATE_SHOW_PULSE_AVG_MAX";                         //$NON-NLS-1$
+   static final String         STATE_SHOW_SPEED_AVG              = "STATE_SHOW_SPEED_AVG";                             //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -130,13 +135,18 @@ public class RefTour_YearStatistic_View extends ViewPart {
    /*
     * Statistic values for all visible years
     */
-   private ArrayList<TVICatalogComparedTour> _statValues_AllTours     = new ArrayList<>();
-   private ArrayList<Integer>                _statValues_DOYValues    = new ArrayList<>();
+   private ArrayList<TVICatalogComparedTour> _statValues_AllTours          = new ArrayList<>();
+   private ArrayList<Integer>                _statValues_DOYValues         = new ArrayList<>();
 
-   private ArrayList<Float>                  _statValues_AvgAltimeter = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgPulse     = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgSpeed     = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_MaxPulse     = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgAltimeter_High = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgAltimeter_Low  = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgSpeed_High     = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgSpeed_Low      = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgPulse_Low      = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_AvgPulse_High     = new ArrayList<>();
+   private ArrayList<Float>                  _statValues_MaxPulse          = new ArrayList<>();
+
+   private int                               _barRelativeHeight;
 
    /**
     * Reference tour item for which the statistic is displayed. This statistic can display only
@@ -165,9 +175,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private ActionYearStatisticOptions        _actionYearStatOptions;
 
    private YearStatisticTourToolTip          _tourToolTip;
-   private TourInfoIconToolTipProvider       _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private TourInfoIconToolTipProvider       _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
 
-   private YearContributionItem              _yearSelector;
+   private YearSelector                      _yearSelector;
 
    /*
     * UI controls
@@ -175,6 +185,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private PageBook  _pageBook;
    private Composite _pageChart;
    private Composite _pageNoChart;
+   private Composite _titleContainer;
 
    private Chart     _yearChart;
 
@@ -223,16 +234,19 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-         setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
+         // Use the same scaling for different years, people or tour types,
+         // this makes it easier to compare numbers
+         setToolTipText(Messages.Year_Statistic_Action_SyncMinMaxValues_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
       }
 
       @Override
-      public void run() {
+      public void runWithEvent(final Event event) {
 
-         onAction_SyncMinMaxValues(isChecked());
+         onAction_SyncMinMaxValues(event, isChecked());
       }
+
    }
 
    private class ActionYearStatisticOptions extends ActionToolbarSlideout {
@@ -252,7 +266,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(GRID_HORIZONTAL_DISTANCE)
+         if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+
+               || property.equals(GRID_HORIZONTAL_DISTANCE)
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
@@ -332,6 +348,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       final float dataMinValue = (float) yData.getVisibleMinValue();
       final float dataMaxValue = (float) yData.getVisibleMaxValue();
+
+      if (dataMinValue == 0 && dataMaxValue == 0) {
+
+         // data are not valid, this prevents to set wrong min/max values
+
+         return;
+      }
 
       if (_isSynchMinMaxValue) {
 
@@ -438,68 +461,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
    }
 
    /**
-    * All items from the ref tour are from type {@link TVICatalogComparedTour}
-    *
-    * @param firstVisibleYear
-    * @param isShowLatestYear
-    */
-   private void createStatisticData_WithoutYearCategories(int firstVisibleYear,
-                                                          final boolean isShowLatestYear) {
-
-      final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
-
-      if (_isShowAllValues
-            && allItems != null
-            && allItems.length > 0
-            && allItems[0] instanceof TVICatalogComparedTour
-            && allItems[allItems.length - 1] instanceof TVICatalogComparedTour) {
-
-         final int firstYear = ((TVICatalogComparedTour) allItems[0]).year;
-         final int lastYear = ((TVICatalogComparedTour) allItems[allItems.length - 1]).year;
-
-         firstVisibleYear = firstYear;
-         _lastVisibleYear = lastYear;
-
-         _numVisibleYears = lastYear - firstYear + 1;
-         _yearSelector.spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
-
-         // update year data
-         setYearData();
-      }
-
-      // loop: all tours
-      for (final Object item : allItems) {
-
-         if (item instanceof TVICatalogComparedTour) {
-
-            final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) item;
-
-            final int tourYear = tourItem.year;
-
-            if (tourYear >= firstVisibleYear && tourYear <= _lastVisibleYear) {
-
-               final LocalDate tourDate = tourItem.tourDate;
-
-               _statValues_AllTours.add(tourItem);
-               _statValues_DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
-
-               _statValues_AvgAltimeter.add(tourItem.getAvgAltimeter());
-               _statValues_AvgPulse.add(tourItem.getAvgPulse());
-               _statValues_MaxPulse.add(tourItem.getMaxPulse());
-               _statValues_AvgSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
-            }
-         }
-      }
-   }
-
-   /**
     * All items from the ref tour are from type {@link TVICatalogYearItem}
     *
     * @param firstVisibleYear
     * @param isShowLatestYear
     */
-   private void createStatisticData_WithYearCategories(int firstVisibleYear,
-                                                       final boolean isShowLatestYear) {
+   private void createStatisticData_1_WithYearCategories(int firstVisibleYear,
+                                                         final boolean isShowLatestYear) {
 
       final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
 
@@ -566,20 +534,83 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
                      final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) tourItemObj;
 
-                     final LocalDate tourDate = tourItem.tourDate;
-
-                     _statValues_AllTours.add(tourItem);
-                     _statValues_DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
-
-                     _statValues_AvgAltimeter.add(tourItem.getAvgAltimeter());
-                     _statValues_AvgPulse.add(tourItem.getAvgPulse());
-                     _statValues_MaxPulse.add(tourItem.getMaxPulse());
-                     _statValues_AvgSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
+                     createStatisticData_5_OneTour(tourItem);
                   }
                }
             }
          }
       }
+   }
+
+   /**
+    * All items from the ref tour are from type {@link TVICatalogComparedTour}
+    *
+    * @param firstVisibleYear
+    * @param isShowLatestYear
+    */
+   private void createStatisticData_2_WithoutYearCategories(int firstVisibleYear,
+                                                            final boolean isShowLatestYear) {
+
+      final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
+
+      if (_isShowAllValues
+            && allItems != null
+            && allItems.length > 0
+            && allItems[0] instanceof TVICatalogComparedTour
+            && allItems[allItems.length - 1] instanceof TVICatalogComparedTour) {
+
+         final int firstYear = ((TVICatalogComparedTour) allItems[0]).year;
+         final int lastYear = ((TVICatalogComparedTour) allItems[allItems.length - 1]).year;
+
+         firstVisibleYear = firstYear;
+         _lastVisibleYear = lastYear;
+
+         _numVisibleYears = lastYear - firstYear + 1;
+         _yearSelector.spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
+
+         // update year data
+         setYearData();
+      }
+
+      // loop: all tours
+      for (final Object item : allItems) {
+
+         if (item instanceof TVICatalogComparedTour) {
+
+            final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) item;
+
+            final int tourYear = tourItem.year;
+
+            if (tourYear >= firstVisibleYear && tourYear <= _lastVisibleYear) {
+
+               createStatisticData_5_OneTour(tourItem);
+            }
+         }
+      }
+   }
+
+   private void createStatisticData_5_OneTour(final TVICatalogComparedTour tourItem) {
+
+// SET_FORMATTING_OFF
+
+      final LocalDate tourDate   = tourItem.tourDate;
+      final float avgAltimeter   = tourItem.getAvgAltimeter();
+      final float avgPulse       = tourItem.getAvgPulse();
+      final float avgSpeed       = tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE;
+
+      _statValues_AllTours          .add(tourItem);
+      _statValues_DOYValues         .add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
+
+      _statValues_AvgAltimeter_Low  .add(avgAltimeter - avgAltimeter / 100 * _barRelativeHeight);
+      _statValues_AvgAltimeter_High .add(avgAltimeter);
+      _statValues_AvgSpeed_Low      .add(avgSpeed - avgSpeed / 100 * _barRelativeHeight);
+      _statValues_AvgSpeed_High     .add(avgSpeed);
+
+      _statValues_AvgPulse_Low      .add(avgPulse -avgPulse / 100 * _barRelativeHeight);
+      _statValues_AvgPulse_High     .add(avgPulse);
+      _statValues_MaxPulse          .add(tourItem.getMaxPulse());
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -620,10 +651,10 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
             title,
 
-            _statValues_AvgAltimeter.get(valueIndex),
-            _statValues_AvgPulse.get(valueIndex),
+            _statValues_AvgAltimeter_High.get(valueIndex),
+            _statValues_AvgPulse_High.get(valueIndex),
             _statValues_MaxPulse.get(valueIndex),
-            _statValues_AvgSpeed.get(valueIndex));
+            _statValues_AvgSpeed_High.get(valueIndex));
    }
 
    private void createUI(final Composite parent) {
@@ -654,23 +685,23 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private void createUI_20_Title(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
+      _titleContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.FILL, SWT.FILL)
-            .applyTo(container);
+            .applyTo(_titleContainer);
       GridLayoutFactory.fillDefaults()
             .numColumns(1)
             .margins(3, 3)
-            .applyTo(container);
+            .applyTo(_titleContainer);
 //      container.setBackground(UI.SYS_COLOR_GREEN);
-      container.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+      _titleContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
       {
          {
             /*
              * Ref tour title
              */
-            _lblRefTourTitle = new Label(container, SWT.NONE);
+            _lblRefTourTitle = new Label(_titleContainer, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .align(SWT.CENTER, SWT.CENTER)
@@ -730,7 +761,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      _yearSelector = new YearContributionItem(this);
+      _yearSelector = new YearSelector(this);
 
       tbm.add(_yearSelector);
 
@@ -819,22 +850,22 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /*
        * Header
        */
-      sb.append("Date");
+      sb.append("Date"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Avg Speed");
+      sb.append("Avg Speed"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Avg Altimeter");
+      sb.append("Avg Altimeter"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Avg Heart Rate");
+      sb.append("Avg Heart Rate"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Max Heart Rate");
+      sb.append("Max Heart Rate"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Tour Title");
+      sb.append("Tour Title"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
       sb.append(NL);
@@ -880,7 +911,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
       enableControls();
    }
 
-   private void onAction_SyncMinMaxValues(final boolean isSyncMinMaxValue) {
+   private void onAction_SyncMinMaxValues(final Event event, final boolean isSyncMinMaxValue) {
+
+      if (UI.isCtrlKey(event)) {
+         _currentRefItem.resetMinMaxValues();
+      }
 
       _isSynchMinMaxValue = isSyncMinMaxValue;
 
@@ -920,6 +955,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
       setYearData();
 
       updateUI_YearChart(false);
+
+      // reset selectable bars otherwise some bars on the right side could not be selectable !!!
+      _yearChart.setSelectedBars(null);
    }
 
    /**
@@ -1241,25 +1279,37 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _statValues_AllTours.clear();
       _statValues_DOYValues.clear();
 
-      _statValues_AvgAltimeter.clear();
-      _statValues_AvgPulse.clear();
-      _statValues_AvgSpeed.clear();
+      _statValues_AvgAltimeter_Low.clear();
+      _statValues_AvgAltimeter_High.clear();
+      _statValues_AvgSpeed_Low.clear();
+      _statValues_AvgSpeed_High.clear();
+      _statValues_AvgPulse_Low.clear();
+      _statValues_AvgPulse_High.clear();
       _statValues_MaxPulse.clear();
 
-      final int firstVisibleYear = getFirstVisibleYear();
+      int firstVisibleYear = getFirstVisibleYear();
+
+      _barRelativeHeight = Util.getStateInt(_state,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MIN,
+            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MAX);
 
       if (TourCompareManager.getReferenceTour_ViewLayout() == TourCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
 
          // compared tours are displayed with year categories
 
-         createStatisticData_WithYearCategories(firstVisibleYear, isShowLatestYear);
+         createStatisticData_1_WithYearCategories(firstVisibleYear, isShowLatestYear);
 
       } else {
 
          // compared tours are displayed without year categories
 
-         createStatisticData_WithoutYearCategories(firstVisibleYear, isShowLatestYear);
+         createStatisticData_2_WithoutYearCategories(firstVisibleYear, isShowLatestYear);
       }
+
+      // first visible year could be changed when all values are displayed
+      firstVisibleYear = getFirstVisibleYear();
 
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
@@ -1271,12 +1321,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Speed
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_AVG_SPEED, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, true)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
                ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgSpeed),
+               ArrayListToArray.toFloat(_statValues_AvgSpeed_Low),
+               ArrayListToArray.toFloat(_statValues_AvgSpeed_High),
                true);
 
          final float[] minMaxValues = _currentRefItem.avgSpeed_MinMax;
@@ -1294,7 +1345,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
           * ensure that painting of the bar is started at the bottom and not at the visible min
           * which is above the bottom !!!
           */
-         yDataSpeed.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+//         yDataSpeed.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
          chartModel.addYData(yDataSpeed);
       }
@@ -1302,12 +1353,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Altimeter (VAM)
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_AVG_ALTIMETER, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, true)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
                ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgAltimeter),
+               ArrayListToArray.toFloat(_statValues_AvgAltimeter_Low),
+               ArrayListToArray.toFloat(_statValues_AvgAltimeter_High),
                true);
 
          final float[] minMaxValues = _currentRefItem.avgAltimeter_MinMax;
@@ -1325,50 +1377,52 @@ public class RefTour_YearStatistic_View extends ViewPart {
           * ensure that painting of the bar is started at the bottom and not at the visible min
           * which is above the bottom !!!
           */
-         yDataAltimeter.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+//         yDataAltimeter.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
          chartModel.addYData(yDataAltimeter);
       }
 
       /**
-       * Avg Pulse
+       * Avg pulse
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_AVG_PULSE, true)) {
-
-         // set the bar low/high data
-         final ChartDataYSerie yDataAvgPulse = new ChartDataYSerie(
-               ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgPulse),
-               true);
-
-         final float[] minMaxValues = _currentRefItem.avgPulse_MinMax;
-         yDataAvgPulse.setSliderMinMaxValue(minMaxValues);
-         adjustMinMaxValues(yDataAvgPulse, minMaxValues);
-
-         TourManager.setBarColors(yDataAvgPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
-         TourManager.setGraphColors(yDataAvgPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
-
-         yDataAvgPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT);
-         yDataAvgPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
-         yDataAvgPulse.setShowYSlider(true);
-
-         /*
-          * ensure that painting of the bar is started at the bottom and not at the visible min
-          * which is above the bottom !!!
-          */
-         yDataAvgPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
-
-         chartModel.addYData(yDataAvgPulse);
-      }
-
-      /**
-       * Max Pulse
-       */
-      if (Util.getStateBoolean(_state, STATE_SHOW_MAX_PULSE, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG, true)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
                ChartType.BAR,
+               ArrayListToArray.toFloat(_statValues_AvgPulse_Low),
+               ArrayListToArray.toFloat(_statValues_AvgPulse_High),
+               true);
+
+         final float[] minMaxValues = _currentRefItem.maxPulse_MinMax;
+         yDataMaxPulse.setSliderMinMaxValue(minMaxValues);
+         adjustMinMaxValues(yDataMaxPulse, minMaxValues);
+
+         TourManager.setBarColors(yDataMaxPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+         TourManager.setGraphColors(yDataMaxPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
+
+         yDataMaxPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT_AVG);
+         yDataMaxPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
+         yDataMaxPulse.setShowYSlider(true);
+
+         /*
+          * Ensure that painting of the bar is started at the bottom and not at the visible min
+          * which is above the bottom !!!
+          */
+//         yDataMaxPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+
+         chartModel.addYData(yDataMaxPulse);
+      }
+
+      /**
+       * Avg/max pulse
+       */
+      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, true)) {
+
+         // set the bar low/high data
+         final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
+               ChartType.BAR,
+               ArrayListToArray.toFloat(_statValues_AvgPulse_High),
                ArrayListToArray.toFloat(_statValues_MaxPulse),
                true);
 
@@ -1379,7 +1433,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          TourManager.setBarColors(yDataMaxPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
          TourManager.setGraphColors(yDataMaxPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-         yDataMaxPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT_MAX);
+         yDataMaxPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT_AVG_MAX);
          yDataMaxPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          yDataMaxPulse.setShowYSlider(true);
 
@@ -1387,7 +1441,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
           * Ensure that painting of the bar is started at the bottom and not at the visible min
           * which is above the bottom !!!
           */
-         yDataMaxPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+//         yDataMaxPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
          chartModel.addYData(yDataMaxPulse);
       }
@@ -1416,18 +1470,24 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /*
        * Update start year combo box
        */
-      _yearSelector.comboLastVisibleYear.removeAll();
+      final Combo comboLastVisibleYear = _yearSelector.comboLastVisibleYear;
+
+      comboLastVisibleYear.removeAll();
       _allSelectableYears.clear();
 
       for (int year = firstVisibleYear - 1; year <= _lastVisibleYear + _numVisibleYears; year++) {
 
          _allSelectableYears.add(year);
-         _yearSelector.comboLastVisibleYear.add(Integer.toString(year));
+         comboLastVisibleYear.add(Integer.toString(year));
       }
 
-      _yearSelector.comboLastVisibleYear.select(_numVisibleYears);
+      comboLastVisibleYear.select(_numVisibleYears);
 
       _lblRefTourTitle.setText(_currentRefItem.label);
+      _lblRefTourTitle.setForeground(ThemeUtil.getDefaultForegroundColor_Table());
+
+      // set background again otherwise the original is displayed
+      _titleContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
 
       // layout is needed otherwise the horizontal centered text is not displayed
       _lblRefTourTitle.getParent().layout(true, true);

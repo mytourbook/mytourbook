@@ -1269,7 +1269,6 @@ public class Messages extends NLS {
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Pressure;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Avg;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
@@ -1572,6 +1571,7 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Group_Graphs;
    public static String        Pref_Graphs_Group_Grid;
    public static String        Pref_Graphs_Group_mouse_mode;
+   public static String        Pref_Graphs_Group_MouseKeyTranslation;
    public static String        Pref_Graphs_Group_units_for_xaxis;
    public static String        Pref_Graphs_Group_zoom_options;
    public static String        Pref_Graphs_Label_GraphTransparency;
@@ -1587,6 +1587,10 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_move_sliders_when_zoomed;
    public static String        Pref_Graphs_Radio_mouse_mode_slider;
    public static String        Pref_Graphs_Radio_mouse_mode_zoom;
+   public static String        Pref_Graphs_Radio_MouseKey_UpLeft;
+   public static String        Pref_Graphs_Radio_MouseKey_UpLeft_Tooltip;
+   public static String        Pref_Graphs_Radio_MouseKey_UpRight;
+   public static String        Pref_Graphs_Radio_MouseKey_UpRight_Tooltip;
    public static String        Pref_Graphs_Radio_show_distance;
    public static String        Pref_Graphs_Radio_show_time;
    public static String        Pref_Graphs_Tab_graph_defaults;
@@ -2212,11 +2216,13 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_Dialog_DeleteModel_Title;
    public static String        Slideout_MapModel_Label_Title;
 
-   public static String        Slideout_RefTour_Checkbox_AvgAltimeter;
-   public static String        Slideout_RefTour_Checkbox_AvgPulse;
-   public static String        Slideout_RefTour_Checkbox_AvgSpeed;
-   public static String        Slideout_RefTour_Checkbox_MaxPulse;
+   public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
+   public static String        Slideout_RefTour_Checkbox_Pulse_Avg;
+   public static String        Slideout_RefTour_Checkbox_Pulse_AvgMax;
+   public static String        Slideout_RefTour_Checkbox_Speed_Avg;
    public static String        Slideout_RefTour_Group_Graphs;
+   public static String        Slideout_RefTour_Label_BarSize;
+   public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
    public static String        Slideout_RefTour_YearStatisticOptions_Label_Title;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
@@ -2296,6 +2302,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
    public static String        Slideout_TourCollectionFilter_Action_Tooltip;
+   public static String        Slideout_TourCollectionFilter_Label_FilterHint;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfAllTours;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfCollectedTours;
    public static String        Slideout_TourCollectionFilter_Label_Title;
@@ -3184,9 +3191,9 @@ public class Messages extends NLS {
    public static String        ui_tour_not_defined;
 
    public static String        Year_Statistic_Action_ShowAllValues_Tooltip;
+   public static String        Year_Statistic_Action_SyncMinMaxValues_Tooltip;
    public static String        Year_Statistic_Combo_LastYears_Tooltip;
    public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;
-   public static String        Year_Statistic_Label_NumberOfYears;
 
 //   public static String        Pref_SignImages_Dialog_ConfirmDelete_Message;
 //   public static String        Pref_SignImages_Dialog_Delete_Title;
