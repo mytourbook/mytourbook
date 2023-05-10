@@ -121,7 +121,7 @@ public class DialogExportTour extends TitleAreaDialog {
    }
 
    // Source: https://developers.strava.com/docs/uploads/#tcx-training-center-database-xml
-   protected static final String[]   StravaActivityTypes = new String[] {
+   private static final String[]     StravaActivityTypes = new String[] {
 
          "Biking",                                                                                      //$NON-NLS-1$
          "Running",                                                                                     //$NON-NLS-1$
