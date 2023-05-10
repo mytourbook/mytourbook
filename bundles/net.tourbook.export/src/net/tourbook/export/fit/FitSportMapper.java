@@ -26,7 +26,12 @@ public class FitSportMapper {
 
    public static Sport mapTourTypeToSport(final TourType tourType) {
 
-      Sport sport;
+      Sport sport = Sport.GENERIC;
+
+      if (tourType == null) {
+         return sport;
+      }
+
       final String tourTypeName = tourType.getName().trim();
 
       try {
@@ -73,7 +78,11 @@ public class FitSportMapper {
 
    public static SubSport mapTourTypeToSubSport(final TourType tourType) {
 
-      SubSport subSport;
+      SubSport subSport = SubSport.GENERIC;
+
+      if (tourType == null) {
+         return subSport;
+      }
 
       final String tourTypeName = tourType.getName().trim();
 
