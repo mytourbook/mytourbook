@@ -50,10 +50,6 @@ public class FitSportMapper {
          sport = Sport.CYCLING;
          break;
 
-      case "hiking": //$NON-NLS-1$
-         sport = Sport.HIKING;
-         break;
-
       case "trail": //$NON-NLS-1$
          sport = Sport.RUNNING;
          break;
