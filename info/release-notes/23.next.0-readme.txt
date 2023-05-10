@@ -4,6 +4,14 @@
 TODO's
 ======               
 
+* Pref Cloud      - Remove on/off switch it is not accessable with mnemonics or tab key
+
+.avg              - Replace with ø in Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Avg
+
+heartbeat -> heart rate
+
+
+
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3
 
