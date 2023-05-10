@@ -3195,7 +3195,6 @@ public class Messages extends NLS {
    public static String        Year_Statistic_Action_SyncMinMaxValues_Tooltip;
    public static String        Year_Statistic_Combo_LastYears_Tooltip;
    public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;
-   public static String        Year_Statistic_Label_NumberOfYears;
 
 //   public static String        Pref_SignImages_Dialog_ConfirmDelete_Message;
 //   public static String        Pref_SignImages_Dialog_Delete_Title;
