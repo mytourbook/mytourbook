@@ -15,10 +15,12 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoUI;
@@ -34,10 +36,7 @@ import org.eclipse.jface.preference.FontFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -61,8 +60,8 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
    private boolean                _isImageViewerUIModified;
    private boolean                _isImageQualityModified;
 
-   private SelectionAdapter       _viewerUISelectionListener;
-   private SelectionAdapter       _imageQualitySelectionListener;
+   private SelectionListener      _viewerUISelectionListener;
+   private SelectionListener      _imageQualitySelectionListener;
 
    /*
     * UI controls
@@ -270,12 +269,9 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
          _spinnerImageBorderSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip);
 
          _spinnerImageBorderSize.addSelectionListener(_viewerUISelectionListener);
-         _spinnerImageBorderSize.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               _isImageViewerUIModified = true;
-            }
+         _spinnerImageBorderSize.addMouseWheelListener(mouseEvent -> {
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            _isImageViewerUIModified = true;
          });
 
          /*
@@ -316,12 +312,9 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
          _spinnerTextMinThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip);
 
          _spinnerTextMinThumbSize.addSelectionListener(_viewerUISelectionListener);
-         _spinnerTextMinThumbSize.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               _isImageViewerUIModified = true;
-            }
+         _spinnerTextMinThumbSize.addMouseWheelListener(mouseEvent -> {
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            _isImageViewerUIModified = true;
          });
 
          /*
@@ -431,12 +424,9 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
          _spinnerThumbSize.setToolTipText(Messages.PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip);
 
          _spinnerThumbSize.addSelectionListener(_viewerUISelectionListener);
-         _spinnerThumbSize.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               _isImageViewerUIModified = true;
-            }
+         _spinnerThumbSize.addMouseWheelListener(mouseEvent -> {
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            _isImageViewerUIModified = true;
          });
 
          /*
@@ -511,22 +501,14 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 
    private void initUI() {
 
-      _viewerUISelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
+      _viewerUISelectionListener = widgetSelectedAdapter(selectionEvent -> {
 
-            _isImageViewerUIModified = true;
+         _isImageViewerUIModified = true;
 
-            enableControls();
-         }
-      };
+         enableControls();
+      });
 
-      _imageQualitySelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            _isImageQualityModified = true;
-         }
-      };
+      _imageQualitySelectionListener = widgetSelectedAdapter(selectionEvent -> _isImageQualityModified = true);
    }
 
    @Override
