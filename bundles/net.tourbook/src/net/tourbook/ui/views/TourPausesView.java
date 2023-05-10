@@ -671,11 +671,11 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       super.dispose();
    }
 
-   /**
-    * enable actions
-    */
    private void enableActions() {
 
+      final boolean isTourInDb = _tourData != null && _tourData.getTourPerson() != null;
+
+      _subMenu_SetPauseType.setEnabled(isTourInDb);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
