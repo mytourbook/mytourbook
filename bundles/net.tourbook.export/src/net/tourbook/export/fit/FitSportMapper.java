@@ -22,19 +22,24 @@ import net.tourbook.data.TourType;
 
 public class FitSportMapper {
 
+   private FitSportMapper() {}
+
    public static Sport mapTourTypeToSport(final TourType tourType) {
 
-      Sport sport = Sport.GENERIC;
+      Sport sport;
+      final String tourTypeName = tourType.getName().trim();
 
-      if (tourType == null) {
+      try {
+
+         sport = Sport.valueOf(tourTypeName.toUpperCase().replace(' ', '_'));
          return sport;
+
+      } catch (IllegalArgumentException | NullPointerException e) {
+         //ignore
       }
 
-      final String tourTypeName = tourType.getName();
+      switch (tourTypeName.toLowerCase()) {
 
-      switch (tourTypeName.toLowerCase().trim()) {
-
-      case "cycling": //$NON-NLS-1$
       case "trainer": //$NON-NLS-1$
          sport = Sport.CYCLING;
          break;
@@ -43,12 +48,11 @@ public class FitSportMapper {
          sport = Sport.HIKING;
          break;
 
-      case "running": //$NON-NLS-1$
       case "trail": //$NON-NLS-1$
          sport = Sport.RUNNING;
          break;
 
-      case "snowshoeing": //$NON-NLS-1$
+      case "snow-shoeing": //$NON-NLS-1$
          sport = Sport.SNOWSHOEING;
          break;
 
@@ -57,10 +61,6 @@ public class FitSportMapper {
       case "skate-skiing": //$NON-NLS-1$
 
          sport = Sport.CROSS_COUNTRY_SKIING;
-         break;
-
-      case "walking": //$NON-NLS-1$
-         sport = Sport.WALKING;
          break;
 
       default:
@@ -73,22 +73,23 @@ public class FitSportMapper {
 
    public static SubSport mapTourTypeToSubSport(final TourType tourType) {
 
-      SubSport subSport = SubSport.GENERIC;
+      SubSport subSport;
 
-      if (tourType == null) {
+      final String tourTypeName = tourType.getName().trim();
+
+      try {
+
+         subSport = SubSport.valueOf(tourTypeName.toUpperCase().replace(' ', '_'));
          return subSport;
+
+      } catch (IllegalArgumentException | NullPointerException e) {
+         //ignore
       }
 
-      final String tourTypeName = tourType.getName();
-
-      switch (tourTypeName.toLowerCase().trim()) {
+      switch (tourTypeName.toLowerCase()) {
 
       case "skating": //$NON-NLS-1$
          subSport = SubSport.SKATE_SKIING;
-         break;
-
-      case "trail": //$NON-NLS-1$
-         subSport = SubSport.TRAIL;
          break;
 
       case "trainer": //$NON-NLS-1$
