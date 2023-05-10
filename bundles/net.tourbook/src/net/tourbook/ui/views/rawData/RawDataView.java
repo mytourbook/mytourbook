@@ -2507,6 +2507,7 @@ public class RawDataView extends ViewPart implements
          htmlImage = "style='" // //$NON-NLS-1$
 
                + "background-image:   url(" + imageUrl + ");" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "background-size:    16px;" + NL //$NON-NLS-1$
 
                + "'"; //$NON-NLS-1$
       }
