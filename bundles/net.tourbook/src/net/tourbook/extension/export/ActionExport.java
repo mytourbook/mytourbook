@@ -157,7 +157,7 @@ public class ActionExport extends SubMenu {
 
       for (final ActionContributionItem _exportTourContributionItem : _exportTourContributionItems) {
 
-         if (((ActionExportTour) _exportTourContributionItem.getAction()).getExportTourExtension().getFileExtension().equals("mt")) {
+         if (((ActionExportTour) _exportTourContributionItem.getAction()).getExportTourExtension().getFileExtension().equals("mt")) { //$NON-NLS-1$
 
             (new Separator()).fill(menu, -1);
          }

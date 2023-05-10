@@ -850,22 +850,22 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /*
        * Header
        */
-      sb.append("Date");
+      sb.append("Date"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Avg Speed");
+      sb.append("Avg Speed"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Avg Altimeter");
+      sb.append("Avg Altimeter"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Avg Heart Rate");
+      sb.append("Avg Heart Rate"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Max Heart Rate");
+      sb.append("Max Heart Rate"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
-      sb.append("Tour Title");
+      sb.append("Tour Title"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
       sb.append(NL);
