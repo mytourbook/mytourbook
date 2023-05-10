@@ -55,7 +55,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
    private TourBlogView                 _tourBlogView;
 
    private MouseWheelListener           _defaultMouseWheelListener;
-   private SelectionListener            _defaultSelectionAdapter;
+   private SelectionListener            _defaultSelectionListener;
 
    /*
     * UI controls
@@ -164,7 +164,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
 
             _chkShowHiddenMarker = new Button(container, SWT.CHECK);
             _chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
-            _chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
+            _chkShowHiddenMarker.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowHiddenMarker);
          }
          {
@@ -175,7 +175,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
             _chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
             _chkDrawMarkerWithDefaultColor.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
             _chkDrawMarkerWithDefaultColor.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
-            _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
+            _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDrawMarkerWithDefaultColor);
 
          }
@@ -196,7 +196,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
             _spinnerFontSize.setMaximum(WEB.STATE_BODY_FONT_SIZE_MAX);
             _spinnerFontSize.setToolTipText(APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP);
             _spinnerFontSize.addMouseWheelListener(_defaultMouseWheelListener);
-            _spinnerFontSize.addSelectionListener(_defaultSelectionAdapter);
+            _spinnerFontSize.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_spinnerFontSize);
 
             // px
@@ -213,7 +213,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
 
    private void initUI() {
 
-      _defaultSelectionAdapter = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
       _defaultMouseWheelListener = mouseEvent -> {
          net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
