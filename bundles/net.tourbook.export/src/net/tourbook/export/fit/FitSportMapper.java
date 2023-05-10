@@ -18,6 +18,7 @@ package net.tourbook.export.fit;
 import com.garmin.fit.Sport;
 import com.garmin.fit.SubSport;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 
 public class FitSportMapper {
@@ -36,7 +37,7 @@ public class FitSportMapper {
 
       try {
 
-         sport = Sport.valueOf(tourTypeName.toUpperCase().replace(' ', '_'));
+         sport = Sport.valueOf(tourTypeName.toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0)));
          return sport;
 
       } catch (IllegalArgumentException | NullPointerException e) {
@@ -88,7 +89,7 @@ public class FitSportMapper {
 
       try {
 
-         subSport = SubSport.valueOf(tourTypeName.toUpperCase().replace(' ', '_'));
+         subSport = SubSport.valueOf(tourTypeName.toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0)));
          return subSport;
 
       } catch (IllegalArgumentException | NullPointerException e) {
