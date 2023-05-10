@@ -50,7 +50,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.nebula.widgets.opal.switchbutton.SwitchButton;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -102,6 +101,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 
    private Button                      _btnCleanup;
    private Button                      _btnSelectFolder;
+   private Button                      _chkShowHideTokens;
    private Button                      _chkUseStartDateFilter;
    private Button                      _chkUseEndDateFilter;
    private Combo                       _comboDownloadFolderPath;
@@ -114,7 +114,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private Label                       _labelExpiresAt_Value;
    private Label                       _labelRefreshToken;
    private Label                       _labelDownloadFolder;
-   private SwitchButton                _chkShowHideTokens;
    private Text                        _txtAccessToken_Value;
    private Text                        _txtCustomFileName;
    private Text                        _txtRefreshToken_Value;
@@ -381,10 +380,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _chkShowHideTokens = new SwitchButton(_groupCloudAccount, SWT.NONE);
+            _chkShowHideTokens = new Button(_groupCloudAccount, SWT.CHECK);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(!_chkShowHideTokens
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
                   .getSelection())));
             GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
@@ -755,7 +754,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
       _chkShowHideTokens.setEnabled(isAuthorized);
-      _chkShowHideTokens.setSelection(true);
       _labelDownloadFolder.setEnabled(isAuthorized);
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);
