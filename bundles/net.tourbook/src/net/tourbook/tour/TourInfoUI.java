@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static net.tourbook.common.UI.showHideControl;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
@@ -80,7 +81,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -94,9 +94,9 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String            ID                      = "net.tourbook.tour.TourInfoUI";                               //$NON-NLS-1$
+   private static final String            ID                      = "net.tourbook.tour.TourInfoUI";       //$NON-NLS-1$
 
-   private static final String            STATE_TEXT_WITH         = "STATE_TEXT_WITH";                                            //$NON-NLS-1$
+   private static final String            STATE_TEXT_WITH         = "STATE_TEXT_WITH";                    //$NON-NLS-1$
    private static final int               STATE_TEXT_WITH_DEFAULT = 600;
    private static final int               STATE_TEXT_WITH_MIN     = 100;
    private static final int               STATE_TEXT_WITH_MAX     = 3000;
@@ -104,15 +104,13 @@ public class TourInfoUI {
    private static final int               SHELL_MARGIN            = 5;
    private static final int               MAX_DATA_WIDTH          = 300;
 
-   private static final String            BATTERY_FORMAT          = "... %d %%";                                                  //$NON-NLS-1$
-   private static final String            GEAR_SHIFT_FORMAT       = "%d / %d";                                                    //$NON-NLS-1$
+   private static final String            BATTERY_FORMAT          = "... %d %%";                          //$NON-NLS-1$
+   private static final String            GEAR_SHIFT_FORMAT       = "%d / %d";                            //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStoreCommon        = CommonActivator.getPrefStore();
 
-   private static final GridDataFactory   _gridDataHint_Zero      = GridDataFactory.fillDefaults().hint(0, 0);
-   private static final GridDataFactory   _gridDataHint_Default   = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
-
-   private static final DateTimeFormatter _dtHistoryFormatter     = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL,
+   private static final DateTimeFormatter _dtHistoryFormatter     = DateTimeFormatter.ofLocalizedDateTime(
+         FormatStyle.FULL,
          FormatStyle.MEDIUM);
 
    private static PeriodType              _tourPeriodTemplate     = PeriodType.yearMonthDayTime()
@@ -1655,81 +1653,6 @@ public class TourInfoUI {
 
    public void setPart(final IWorkbenchPart part) {
       _part = part;
-   }
-
-   /**
-    * Set control visible or hidden
-    *
-    * @param control
-    * @param isVisible
-    */
-   private void showHideControl(final Control control,
-                                final boolean isVisible) {
-
-      showHideControl(control, isVisible, SWT.DEFAULT, SWT.DEFAULT);
-   }
-
-   /**
-    * Set control visible or hidden
-    *
-    * @param control
-    * @param isVisible
-    * @param defaultWidth
-    */
-   private void showHideControl(final Control control,
-                                final boolean isVisible,
-                                final int defaultWidth) {
-
-      showHideControl(control, isVisible, defaultWidth, SWT.DEFAULT);
-   }
-
-   /**
-    * Set control visible or hidden
-    *
-    * @param control
-    * @param isVisible
-    * @param defaultWidth
-    * @param defaultHeight
-    */
-   private void showHideControl(final Control control,
-                                final boolean isVisible,
-                                final int defaultWidth,
-                                final int defaultHeight) {
-
-      if (isVisible) {
-
-         if (control.getLayoutData() instanceof GridData) {
-
-            final GridData gridData = (GridData) control.getLayoutData();
-
-            gridData.widthHint = defaultWidth;
-            gridData.heightHint = defaultHeight;
-
-         } else {
-
-            _gridDataHint_Default.applyTo(control);
-         }
-
-         // allow tab access
-         control.setVisible(true);
-
-      } else {
-
-         if (control.getLayoutData() instanceof GridData) {
-
-            final GridData gridData = (GridData) control.getLayoutData();
-
-            gridData.widthHint = 0;
-            gridData.heightHint = 0;
-
-         } else {
-
-            _gridDataHint_Zero.applyTo(control);
-         }
-
-         // deny tab access
-         control.setVisible(false);
-      }
    }
 
    private void updateUI() {

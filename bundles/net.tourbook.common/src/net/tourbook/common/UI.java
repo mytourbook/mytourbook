@@ -675,6 +675,9 @@ public class UI {
     */
    public static int                     TRANSFORM_OPACITY_MAX;
 
+   private static final GridDataFactory  _gridDataHint_Zero          = GridDataFactory.fillDefaults().hint(0, 0);
+   private static final GridDataFactory  _gridDataHint_Default       = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
+
    private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
    static {
@@ -1447,14 +1450,16 @@ public class UI {
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
 
       final Composite pageNoData = new Composite(parent, SWT.NONE);
+
       // use a dimmed color, default is white
       pageNoData.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
       GridDataFactory.fillDefaults().grab(true, true).applyTo(pageNoData);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(pageNoData);
       {
          final Label lblNoData = new Label(pageNoData, SWT.WRAP);
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(lblNoData);
          lblNoData.setText(message);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(lblNoData);
       }
 
       return pageNoData;
@@ -2809,6 +2814,81 @@ public class UI {
       }
 
       return shortedText;
+   }
+
+   /**
+    * Set control visible or hidden
+    *
+    * @param control
+    * @param isVisible
+    */
+   public static void showHideControl(final Control control,
+                                      final boolean isVisible) {
+
+      showHideControl(control, isVisible, SWT.DEFAULT, SWT.DEFAULT);
+   }
+
+   /**
+    * Set control visible or hidden
+    *
+    * @param control
+    * @param isVisible
+    * @param defaultWidth
+    */
+   public static void showHideControl(final Control control,
+                                      final boolean isVisible,
+                                      final int defaultWidth) {
+
+      showHideControl(control, isVisible, defaultWidth, SWT.DEFAULT);
+   }
+
+   /**
+    * Set control visible or hidden
+    *
+    * @param control
+    * @param isVisible
+    * @param defaultWidth
+    * @param defaultHeight
+    */
+   public static void showHideControl(final Control control,
+                                      final boolean isVisible,
+                                      final int defaultWidth,
+                                      final int defaultHeight) {
+
+      if (isVisible) {
+
+         if (control.getLayoutData() instanceof GridData) {
+
+            final GridData gridData = (GridData) control.getLayoutData();
+
+            gridData.widthHint = defaultWidth;
+            gridData.heightHint = defaultHeight;
+
+         } else {
+
+            _gridDataHint_Default.applyTo(control);
+         }
+
+         // allow tab access
+         control.setVisible(true);
+
+      } else {
+
+         if (control.getLayoutData() instanceof GridData) {
+
+            final GridData gridData = (GridData) control.getLayoutData();
+
+            gridData.widthHint = 0;
+            gridData.heightHint = 0;
+
+         } else {
+
+            _gridDataHint_Zero.applyTo(control);
+         }
+
+         // deny tab access
+         control.setVisible(false);
+      }
    }
 
    /**

@@ -2303,6 +2303,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
    public static String        Slideout_TourCollectionFilter_Action_Tooltip;
+   public static String        Slideout_TourCollectionFilter_Label_FilterHint;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfAllTours;
    public static String        Slideout_TourCollectionFilter_Label_NumberOfCollectedTours;
    public static String        Slideout_TourCollectionFilter_Label_Title;
