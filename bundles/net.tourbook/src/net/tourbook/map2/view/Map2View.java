@@ -4765,16 +4765,16 @@ public class Map2View extends ViewPart implements
 
    private void setVisibleDataPoints(final TourData tourData) {
 
+      if (tourData == null) {
+         return;
+      }
+
       if (_map.isCutOffLinesInPauses() == false) {
 
          // all lines are visible -> reset visible points
 
          tourData.visibleDataPointSerie = null;
 
-         return;
-      }
-
-      if (tourData == null) {
          return;
       }
 
