@@ -71,14 +71,14 @@ public class Comparison {
          final List<String> controlFileContentArray = Files.readAllLines(controlTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
 
          //Modify the test and control files to ignore the software version
-         final String genericSoftwareVersion = "software_version,";
-         final String genericApplicationVersion = "application_version,";
+         final String genericSoftwareVersion = "software_version,"; //$NON-NLS-1$
+         final String genericApplicationVersion = "application_version,"; //$NON-NLS-1$
 
-         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"23.3\"", genericSoftwareVersion));
-         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2330\"", genericApplicationVersion));
+         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"23.3\"", genericSoftwareVersion)); //$NON-NLS-1$
+         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2330\"", genericApplicationVersion)); //$NON-NLS-1$
 
-         testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"[0-9][0-9].[0-9]\"", genericSoftwareVersion));
-         testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"[0-9][0-9][0-9][0-9]\"", genericApplicationVersion));
+         testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
+         testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
          //Compare with the control file
          if (!controlFileContentArray.equals(testFileContentArray)) {
