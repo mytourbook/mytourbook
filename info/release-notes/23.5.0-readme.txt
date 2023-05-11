@@ -1,25 +1,12 @@
 23.5.0                                                 ?. May 2023
 
 
-TODO's
-======               
-
-* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
-
-                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-
 New
 ===
 
 * Easy Import
   - Simple UI to start an easy import launcher
     https://github.com/mytourbook/mytourbook/issues/1065
-
-* Tour Weather (Frederic)
-  - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
 * Tour Export (Frederic)
   - Added the ability to export tours in FIT format
@@ -29,6 +16,9 @@ New
 
 * Tour Pauses (Frederic)
   - Added the ability to change pause types individually (Tour Pauses view) and in bulk (Tour Book view)
+
+* Tour Weather (Frederic)
+  - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
 
 Improvements
@@ -41,22 +31,31 @@ Improvements
   - Filter tours which are collected or not collected
     https://github.com/mytourbook/mytourbook/issues/1050
   - Delete tours with the keyboard <Ctrl><Shift><Delete>
+  
+* Tour Chart
+  - Show "Recorded Time" in the value point tooltip 
+    https://github.com/mytourbook/mytourbook/issues/502
 
 * 2D Map (Meinhard)
   - Make power a selectable option for coloring the tour graph 
     https://github.com/mytourbook/mytourbook/issues/1071
+  
+* Tour Pauses View (Frederic)
+  - Added a Pause Type column
 
 * Tour Info Tooltip
   - Adjust width of the tour info tooltip
     https://github.com/mytourbook/mytourbook/issues/1077
   - Added, when available, the time and percentage of time spent in each HR zone (Frederic)
-  
-* Tour Chart
-  - Show "Recorded Time" in the value point tooltip 
-    https://github.com/mytourbook/mytourbook/issues/502
-  
-* Tour Pauses View (Frederic)
-  - Added a Pause Type column
+
+* Bar Chart Selection
+  - Set direction for the mouse wheel, e.g.
+    mouse wheel up is moving the bar selection to the left (default until now)
+    or mouse wheel up is moving the bar selection to the right
+    https://github.com/mytourbook/mytourbook/issues/1096
+
+* Tour Geo Filter
+  - Toggle name in the filter history viewer between read and edit mode
 
 * Reference Tours 
   - Show altimeter (VAM) and max pulse values
@@ -67,17 +66,8 @@ Improvements
   - New Action: Show all available compared tours without selecting last year and number of years
   - Fixed min/max values when selecting different years, ...
 
-* Tour Geo Filter
-  - Toggle name in the filter history viewer between read and edit mode
-
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
-
-* Bar Chart Selection
-  - Set direction for the mouse wheel, e.g.
-    mouse wheel up is moving the bar selection to the left (default until now)
-    or mouse wheel up is moving the bar selection to the right
-    https://github.com/mytourbook/mytourbook/issues/1096
 
 
 Changes
@@ -116,7 +106,7 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 23.3   https://github.com/mytourbook/mytourbook/milestone/6?closed=1
+* MyTourbook Milestone 23.5   https://github.com/mytourbook/mytourbook/milestone/10?closed=1
 * Eclipse 2022-06
 * NatTable 2.03               https://www.eclipse.org/nattable/download.php
 * FIT SDK 21.105
