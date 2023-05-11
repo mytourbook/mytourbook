@@ -4,34 +4,11 @@
 TODO's
 ======               
 
-* Pref Cloud      - Remove on/off switch it is not accessable with mnemonics or tab key
-
-.avg              - Replace with ø in Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Avg
-
-heartbeat -> heart rate
-
-
-
-* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
-                    Released: 23.3
-
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-
-Issues
-======
-
-*
-
-
-Experimental
-============
-
-* 
 
 
 New
@@ -102,11 +79,16 @@ Improvements
     or mouse wheel up is moving the bar selection to the right
     https://github.com/mytourbook/mytourbook/issues/1096
 
+
 Changes
 =======
 
 * Strava Integration (Frederic)
   - Changed the tour upload to use the FIT format instead of the TCX format
+  
+* Changed Wording 
+  - The words "pulse" or "heartbeat" are replaced with "heart rate"
+    https://github.com/mytourbook/mytourbook/discussions/1089  
 
 
 Bugfix
