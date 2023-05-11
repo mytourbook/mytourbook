@@ -100,6 +100,9 @@ Bugfix
 * Tour Info Tooltip (Frederic)
   - Fixed a bug where the time formats were not correctly applied
 
+* Tour Cache
+  - Fixed "java.lang.IllegalStateException: Queue full" when cache size is 1
+  
 
 Translation    
 ===========

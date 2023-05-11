@@ -362,7 +362,11 @@ public class TourManager {
    private TourManager() {
 
       final int cacheSize = _prefStore.getInt(ITourbookPreferences.TOUR_CACHE_SIZE);
-      if (cacheSize > 0) {
+      if (cacheSize > 1) {
+
+         /*
+          * Cache size == 1 causes "java.lang.IllegalStateException: Queue full"
+          */
 
          _tourDataCache = new TourDataCache(cacheSize);
 
