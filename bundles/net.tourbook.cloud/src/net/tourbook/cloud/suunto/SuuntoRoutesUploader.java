@@ -48,7 +48,6 @@ import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -165,11 +164,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          return SuuntoTokensRetrievalHandler.getRefreshToken_AllPeople();
       }
       return UI.EMPTY_STRING;
-   }
-
-   @Override
-   public List<TourTypeFilter> getTourTypeFilters() {
-      return new ArrayList<>();
    }
 
    @Override

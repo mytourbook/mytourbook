@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
@@ -28,8 +30,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -41,11 +42,11 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionResetToDefault {
 
-   private IDialogSettings  _state;
+   private IDialogSettings       _state;
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
-   private SelectionAdapter _defaultSelectionListener;
+   private SelectionListener     _defaultSelectionListener;
 
    /*
     * UI controls
@@ -62,9 +63,9 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
    private Button   _chkShowInChartToolbar_HrZone;
 
    public SlideoutMap2_TourColors(final Control ownerControl,
-                                   final ToolBar toolBar,
-                                   final Map2View map2View,
-                                   final IDialogSettings state) {
+                                  final ToolBar toolBar,
+                                  final Map2View map2View,
+                                  final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
@@ -80,7 +81,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
@@ -203,14 +204,9 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
       return checkbox;
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
    }
 
    @Override

@@ -56,24 +56,17 @@ public class Messages extends NLS {
    public static String Dialog_UploadToursToStrava_SubTask;
    public static String Dialog_UploadToursToStrava_Task;
    public static String Dialog_UploadToursToStrava_Title;
-   public static String Dialog_UseTourTypeMappingModified_Title;
-   public static String Dialog_UseTourTypeMappingActivated_Message;
-   public static String Dialog_UseTourTypeMappingDeactivated_Message;
    public static String Log_UploadToursToStrava_001_Start;
    public static String Log_UploadToursToStrava_002_NoTourTitle;
    public static String Log_UploadToursToStrava_003_ActivityLink;
    public static String Log_UploadToursToStrava_003_UploadStatus;
    public static String Log_UploadToursToStrava_004_UploadError;
-   public static String Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes;
    public static String PrefPage_AccountInformation_Label_AthleteName;
    public static String PrefPage_AccountInformation_Label_AthleteWebPage;
-   public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
    public static String PrefPage_UploadConfiguration_Button_AddWeatherIconInTitle;
    public static String PrefPage_UploadConfiguration_Button_SendDescription;
    public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription;
    public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip;
-   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping;
-   public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip;
    public static String VendorName_Strava;
 
    //SUUNTO

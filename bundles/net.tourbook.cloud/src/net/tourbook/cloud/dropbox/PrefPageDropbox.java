@@ -41,7 +41,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.nebula.widgets.opal.switchbutton.SwitchButton;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -70,13 +69,13 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     * UI controls
     */
    private Button                  _btnCleanup;
+   private Button                  _chkShowHideTokens;
    private Group                   _group;
    private Label                   _labelAccessToken;
    private Label                   _labelExpiresAt;
    private Label                   _labelExpiresAt_Value;
    private Label                   _labelRefreshToken;
    private Link                    _linkRevokeAccess;
-   private SwitchButton            _chkShowHideTokens;
    private Text                    _txtAccessToken_Value;
    private Text                    _txtRefreshToken_Value;
 
@@ -212,10 +211,10 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _chkShowHideTokens = new SwitchButton(_group, SWT.NONE);
+            _chkShowHideTokens = new Button(_group, SWT.CHECK);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(!_chkShowHideTokens
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
                   .getSelection())));
             GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
@@ -241,7 +240,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
       _chkShowHideTokens.setEnabled(isAuthorized);
-      _chkShowHideTokens.setSelection(true);
       _linkRevokeAccess.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
    }

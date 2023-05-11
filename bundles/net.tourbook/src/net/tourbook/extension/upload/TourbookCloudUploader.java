@@ -18,7 +18,6 @@ package net.tourbook.extension.upload;
 import java.util.List;
 
 import net.tourbook.data.TourData;
-import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 
@@ -48,8 +47,6 @@ public abstract class TourbookCloudUploader {
    public String getName() {
       return CLOUD_UPLOADER_NAME;
    }
-
-   public abstract List<TourTypeFilter> getTourTypeFilters();
 
    protected abstract boolean isReady();
 

@@ -810,8 +810,8 @@ public class TourExporter {
          }
 
          if (isSpeed) {
-            final double speedValueMetersPerSecond = speedSerie[serieIndex] / 3.6; // speed km/h -> m/s
-            final double speedValue = Math.round(speedValueMetersPerSecond * 10.0) / 10.0;
+
+            final double speedValue = Math.round(UI.convertSpeed_KmhToMs(speedSerie[serieIndex]) * 10.0) / 10.0;
             tpExt.setSpeed(speedValue);
          }
 

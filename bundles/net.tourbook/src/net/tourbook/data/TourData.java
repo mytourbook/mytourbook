@@ -8990,7 +8990,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
-         final float speed = speedSerie[timeIndex] / 3.6f; // speed km/h -> m/s
+         final float speed = UI.convertSpeed_KmhToMs(speedSerie[timeIndex]);
          float gradient = gradientSerie[timeIndex] / 100; // gradient (%) /100
 
          // adjust computed errors

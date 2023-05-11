@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.ui.ITourProvider2;
 
@@ -36,6 +38,7 @@ public class SubMenu_Weather extends SubMenu {
    public SubMenu_Weather(final ITourProvider2 tourProvider) {
 
       super(Messages.Tour_Action_Weather, AS_DROP_DOWN_MENU);
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.State_RetrieveWeatherData));
 
       _tourProvider = tourProvider;
 

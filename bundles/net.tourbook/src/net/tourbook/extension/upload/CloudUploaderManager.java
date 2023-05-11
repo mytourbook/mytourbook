@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,6 @@ package net.tourbook.extension.upload;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.ui.TourTypeFilter;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -29,19 +27,6 @@ import org.eclipse.core.runtime.Platform;
 public class CloudUploaderManager {
 
    private static List<TourbookCloudUploader> _cloudUploadersList;
-
-   public static List<TourTypeFilter> getCloudTourTypeFilters() {
-
-      if (_cloudUploadersList == null) {
-         getCloudUploaderList();
-      }
-
-      final List<TourTypeFilter> cloudTourTypeFilters = new ArrayList<>();
-      _cloudUploadersList.forEach(
-            tourbookCloudUploader -> cloudTourTypeFilters.addAll(tourbookCloudUploader.getTourTypeFilters()));
-
-      return cloudTourTypeFilters;
-   }
 
    public static List<String> getCloudUploaderIds() {
 

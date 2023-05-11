@@ -175,7 +175,6 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -418,7 +417,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private SelectionListener                  _selectionListener;
    private SelectionListener                  _selectionListener_Temperature;
    private SelectionListener                  _columnSortListener;
-   private SelectionAdapter                   _tourTimeListener;
+   private SelectionListener                  _tourTimeListener;
    private ModifyListener                     _verifyFloatValue;
    private ModifyListener                     _verifyIntValue;
    //
@@ -3157,20 +3156,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * listener for elapsed/moving/paused time
        */
-      _tourTimeListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
+      _tourTimeListener = widgetSelectedAdapter(selectionEvent -> {
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            updateModel_FromUI();
-            setTourDirty();
-
-            updateUI_Time(event.widget);
+         if (_isSetField || _isSavingInProgress) {
+            return;
          }
-      };
+
+         updateModel_FromUI();
+         setTourDirty();
+
+         updateUI_Time(selectionEvent.widget);
+      });
 
       _verifyFloatValue = modifyEvent -> {
 

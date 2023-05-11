@@ -28,7 +28,6 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -139,12 +137,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          return SuuntoTokensRetrievalHandler.getRefreshToken_AllPeople();
       }
       return UI.EMPTY_STRING;
-   }
-
-   @Override
-   public List<TourTypeFilter> getTourTypeFilters() {
-
-      return new ArrayList<>();
    }
 
    private WorkoutUpload initializeWorkoutUpload(final TourData tourData) {

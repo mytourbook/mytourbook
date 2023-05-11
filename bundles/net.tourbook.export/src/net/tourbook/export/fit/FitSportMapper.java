@@ -18,9 +18,12 @@ package net.tourbook.export.fit;
 import com.garmin.fit.Sport;
 import com.garmin.fit.SubSport;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 
 public class FitSportMapper {
+
+   private FitSportMapper() {}
 
    public static Sport mapTourTypeToSport(final TourType tourType) {
 
@@ -30,25 +33,28 @@ public class FitSportMapper {
          return sport;
       }
 
-      final String tourTypeName = tourType.getName();
+      final String tourTypeName = tourType.getName().trim();
 
-      switch (tourTypeName.toLowerCase().trim()) {
+      try {
 
-      case "cycling": //$NON-NLS-1$
+         sport = Sport.valueOf(tourTypeName.toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0)));
+         return sport;
+
+      } catch (IllegalArgumentException | NullPointerException e) {
+         //ignore
+      }
+
+      switch (tourTypeName.toLowerCase()) {
+
       case "trainer": //$NON-NLS-1$
          sport = Sport.CYCLING;
          break;
 
-      case "hiking": //$NON-NLS-1$
-         sport = Sport.HIKING;
-         break;
-
-      case "running": //$NON-NLS-1$
       case "trail": //$NON-NLS-1$
          sport = Sport.RUNNING;
          break;
 
-      case "snowshoeing": //$NON-NLS-1$
+      case "snow-shoeing": //$NON-NLS-1$
          sport = Sport.SNOWSHOEING;
          break;
 
@@ -57,10 +63,6 @@ public class FitSportMapper {
       case "skate-skiing": //$NON-NLS-1$
 
          sport = Sport.CROSS_COUNTRY_SKIING;
-         break;
-
-      case "walking": //$NON-NLS-1$
-         sport = Sport.WALKING;
          break;
 
       default:
@@ -79,16 +81,21 @@ public class FitSportMapper {
          return subSport;
       }
 
-      final String tourTypeName = tourType.getName();
+      final String tourTypeName = tourType.getName().trim();
 
-      switch (tourTypeName.toLowerCase().trim()) {
+      try {
+
+         subSport = SubSport.valueOf(tourTypeName.toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0)));
+         return subSport;
+
+      } catch (IllegalArgumentException | NullPointerException e) {
+         //ignore
+      }
+
+      switch (tourTypeName.toLowerCase()) {
 
       case "skating": //$NON-NLS-1$
          subSport = SubSport.SKATE_SKIING;
-         break;
-
-      case "trail": //$NON-NLS-1$
-         subSport = SubSport.TRAIL;
          break;
 
       case "trainer": //$NON-NLS-1$

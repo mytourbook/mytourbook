@@ -29,18 +29,14 @@ import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.preferences.PrefPageTourTypeFilterList;
 import net.tourbook.web.WEB;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.nebula.widgets.opal.switchbutton.SwitchButton;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -48,13 +44,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.PreferenceLinkArea;
-import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -66,7 +58,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private static final String     _stravaApp_WebPage_Link = "https://www.strava.com";                                                    //$NON-NLS-1$
    private IPreferenceStore        _prefStore              = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
-   private SelectionListener       _defaultSelectionListener;
 
    private LocalHostServer         _server;
    private String                  _athleteId;
@@ -78,25 +69,23 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    /*
     * UI controls
     */
-   private Button             _btnCleanup;
-   private Button             _chkAddWeatherIconInTitle;
-   private Button             _chkSendDescription;
-   private Button             _chkSendWeatherDataInDescription;
+   private Button _btnCleanup;
+   private Button _chkAddWeatherIconInTitle;
+   private Button _chkSendDescription;
+   private Button _chkSendWeatherDataInDescription;
+   private Button _chkShowHideTokens;
 
-   private Button             _chkUseTourTypeMapping;
-   private Label              _labelAccessToken;
-   private Label              _labelAthleteName;
-   private Label              _labelAthleteName_Value;
-   private Label              _labelAthleteWebPage;
-   private Label              _labelExpiresAt;
-   private Label              _labelExpiresAt_Value;
-   private Label              _labelRefreshToken;
-   private Link               _linkAthleteWebPage;
-   private Link               _linkRevokeAccess;
-   private PreferenceLinkArea _linkTourTypeFilters;
-   private SwitchButton       _chkShowHideTokens;
-   private Text               _txtAccessToken_Value;
-   private Text               _txtRefreshToken_Value;
+   private Label  _labelAccessToken;
+   private Label  _labelAthleteName;
+   private Label  _labelAthleteName_Value;
+   private Label  _labelAthleteWebPage;
+   private Label  _labelExpiresAt;
+   private Label  _labelExpiresAt_Value;
+   private Label  _labelRefreshToken;
+   private Link   _linkAthleteWebPage;
+   private Link   _linkRevokeAccess;
+   private Text   _txtAccessToken_Value;
+   private Text   _txtRefreshToken_Value;
 
    private String constructAthleteWebPageLink(final String athleteId) {
 
@@ -262,10 +251,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _chkShowHideTokens = new SwitchButton(group, SWT.NONE);
+            _chkShowHideTokens = new Button(group, SWT.CHECK);
             _chkShowHideTokens.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
             _chkShowHideTokens.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(!_chkShowHideTokens
+            _chkShowHideTokens.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
                   .getSelection())));
             GridDataFactory.fillDefaults().applyTo(_chkShowHideTokens);
          }
@@ -317,29 +306,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkSendWeatherDataInDescription.setText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription);
             _chkSendWeatherDataInDescription.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip);
          }
-         {
-            /*
-             * Checkbox: Use tour type mapping
-             */
-            _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
-            GridDataFactory.fillDefaults().applyTo(_chkUseTourTypeMapping);
-            _chkUseTourTypeMapping.setText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping);
-            _chkUseTourTypeMapping.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip);
-            _chkUseTourTypeMapping.addSelectionListener(_defaultSelectionListener);
-         }
-         {
-            _linkTourTypeFilters = new PreferenceLinkArea(
-                  group,
-                  SWT.MULTI | SWT.WRAP,
-                  PrefPageTourTypeFilterList.ID,
-                  Messages.PrefPage_TourTypeFilter_Link_StravaTourTypes,
-                  (IWorkbenchPreferenceContainer) getContainer(),
-                  new PrefPageTourTypeFilterList());
-
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(_linkTourTypeFilters.getControl());
-         }
       }
    }
 
@@ -367,15 +333,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _labelExpiresAt.setEnabled(isAuthorized);
       _linkRevokeAccess.setEnabled(isAuthorized);
       _chkShowHideTokens.setEnabled(isAuthorized);
-      _chkShowHideTokens.setSelection(true);
       _chkAddWeatherIconInTitle.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
       _chkSendWeatherDataInDescription.setEnabled(isAuthorized);
-      _chkUseTourTypeMapping.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
-
-      _linkTourTypeFilters.getControl().setEnabled(_chkUseTourTypeMapping.getSelection());
-
    }
 
    private String getLocalExpireAtDateTime() {
@@ -391,7 +352,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private void initUI() {
 
       noDefaultAndApplyButton();
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> enableControls());
    }
 
    @Override
@@ -464,7 +424,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _chkAddWeatherIconInTitle.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
       _chkSendWeatherDataInDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION));
-      _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
 
       enableControls();
 
@@ -487,36 +446,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          _prefStore.setValue(Preferences.STRAVA_SENDDESCRIPTION, _chkSendDescription.getSelection());
          _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, _chkSendWeatherDataInDescription.getSelection());
 
-         final boolean prefUseTourTypeMapping = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING);
-         final boolean currentUseTourTypeMapping = _chkUseTourTypeMapping.getSelection();
-         _prefStore.setValue(Preferences.STRAVA_USETOURTYPEMAPPING, currentUseTourTypeMapping);
-         if (prefUseTourTypeMapping != currentUseTourTypeMapping) {
-
-            final Shell activeShell = Display.getDefault().getActiveShell();
-            if (currentUseTourTypeMapping) {
-
-               //If the user has just activated the tour type mapping, a restart
-               //is needed in order for the Strava tour type filters to be created.
-               if (MessageDialog.openQuestion(
-                     activeShell,
-                     Messages.Dialog_UseTourTypeMappingModified_Title,
-                     Messages.Dialog_UseTourTypeMappingActivated_Message)) {
-
-                  Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
-
-               }
-            } else {
-
-               //If the user has just deactivated the tour type mapping, we need
-               //to let them know that they can safely remove all the Strava tour
-               //type filters from the filter list.
-               MessageDialog.openInformation(
-                     activeShell,
-                     Messages.Dialog_UseTourTypeMappingModified_Title,
-                     Messages.Dialog_UseTourTypeMappingDeactivated_Message);
-            }
-         }
-
          if (_server != null) {
             _server.stopCallBackServer();
          }
@@ -538,7 +467,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _chkAddWeatherIconInTitle.setSelection(_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
       _chkSendWeatherDataInDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION));
-      _chkUseTourTypeMapping.setSelection(_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
    }
 
    private void showOrHideAllPasswords(final boolean showPasswords) {

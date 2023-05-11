@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,10 @@ public class PrintSettings {
       return _paperSize;
    }
 
+   public boolean isOpenFile() {
+      return _isOpenFile;
+   }
+
    public boolean isOverwriteFiles() {
       return _isOverwriteFiles;
    }
@@ -50,35 +54,31 @@ public class PrintSettings {
    }
 
    public void setCompleteFilePath(final String completeFilePath) {
-      this._completeFilePath = completeFilePath;
-   }
-
-   public void setOverwriteFiles(final boolean isOverwriteFiles) {
-      this._isOverwriteFiles = isOverwriteFiles;
-   }
-
-   public void setPaperOrientation(final PaperOrientation paperOrientation) {
-      this._paperOrientation = paperOrientation;
-   }
-
-   public void setPaperSize(final PaperSize paperSize) {
-      this._paperSize = paperSize;
-   }
-
-   public void setPrintDescription(final boolean isPrintDescription) {
-      this._isPrintDescription = isPrintDescription;
-   }
-
-   public void setPrintMarkers(final boolean isPrintMarkers) {
-      this._isPrintMarkers = isPrintMarkers;
-   }
-
-   public boolean isOpenFile() {
-      return _isOpenFile;
+      _completeFilePath = completeFilePath;
    }
 
    public void setOpenFile(final boolean isOpenFile) {
-      this._isOpenFile = isOpenFile;
+      _isOpenFile = isOpenFile;
+   }
+
+   public void setOverwriteFiles(final boolean isOverwriteFiles) {
+      _isOverwriteFiles = isOverwriteFiles;
+   }
+
+   public void setPaperOrientation(final PaperOrientation paperOrientation) {
+      _paperOrientation = paperOrientation;
+   }
+
+   public void setPaperSize(final PaperSize paperSize) {
+      _paperSize = paperSize;
+   }
+
+   public void setPrintDescription(final boolean isPrintDescription) {
+      _isPrintDescription = isPrintDescription;
+   }
+
+   public void setPrintMarkers(final boolean isPrintMarkers) {
+      _isPrintMarkers = isPrintMarkers;
    }
 
 }

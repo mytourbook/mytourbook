@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,8 +42,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
@@ -100,7 +99,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private FileCollisionBehavior _exportState_FileCollisionBehavior;
 
    private ModifyListener        _filePathModifyListener;
-   private SelectionAdapter      _selectionAdapter;
+   private SelectionListener     _selectionListener;
 
    /*
     * UI controls
@@ -191,12 +190,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       _filePathModifyListener = modifyEvent -> validateFields();
 
-      _selectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            validateFields();
-         }
-      };
+      _selectionListener = widgetSelectedAdapter(selectionEvent -> validateFields());
 
       _inputContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_inputContainer);
@@ -306,7 +300,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
          _comboFile.setVisibleItemCount(20);
          _comboFile.addVerifyListener(UI.verifyFilenameInput());
          _comboFile.addModifyListener(_filePathModifyListener);
-         _comboFile.addSelectionListener(_selectionAdapter);
+         _comboFile.addSelectionListener(_selectionListener);
 
          /*
           * button: browse
@@ -334,7 +328,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboPath);
          _comboPath.setVisibleItemCount(20);
          _comboPath.addModifyListener(_filePathModifyListener);
-         _comboPath.addSelectionListener(_selectionAdapter);
+         _comboPath.addSelectionListener(_selectionListener);
 
          /*
           * button: browse

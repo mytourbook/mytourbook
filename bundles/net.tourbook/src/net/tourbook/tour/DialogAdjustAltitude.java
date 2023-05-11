@@ -232,10 +232,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       }
    }
 
-   public DialogAdjustAltitude(final Shell parentShell,
-                               final TourData tourData,
-                               final boolean isSaveTour,
-                               final boolean isCreateDummyAltitude) {
+   DialogAdjustAltitude(final Shell parentShell,
+                        final TourData tourData,
+                        final boolean isSaveTour,
+                        final boolean isCreateDummyAltitude) {
 
       super(parentShell);
 
@@ -1338,20 +1338,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          GridLayoutFactory.swtDefaults().applyTo(groupKeep);
          groupKeep.setText(Messages.Dlg_AdjustAltitude_Group_options);
          {
-            final SelectionListener keepButtonSelectionAdapter = widgetSelectedAdapter(selectionEvent -> onChangeAltitude());
+            final SelectionListener keepButtonSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeAltitude());
 
             _rdoKeepBottom = new Button(groupKeep, SWT.RADIO);
             _rdoKeepBottom.setText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude);
             _rdoKeepBottom.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip);
             _rdoKeepBottom.setLayoutData(new GridData());
-            _rdoKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
+            _rdoKeepBottom.addSelectionListener(keepButtonSelectionListener);
             // fRadioKeepBottom.setSelection(true);
 
             _rdoKeepStart = new Button(groupKeep, SWT.RADIO);
             _rdoKeepStart.setText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude);
             _rdoKeepStart.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip);
             _rdoKeepStart.setLayoutData(new GridData());
-            _rdoKeepStart.addSelectionListener(keepButtonSelectionAdapter);
+            _rdoKeepStart.addSelectionListener(keepButtonSelectionListener);
          }
       }
    }
