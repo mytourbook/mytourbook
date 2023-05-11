@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,8 +17,10 @@ package net.tourbook.ui.views.tourSegmenter;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -26,7 +28,7 @@ import net.tourbook.common.util.StatusUtil;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-public class CSVExport {
+class CSVExport {
 
    private static char         SEPARATOR = UI.TAB;
 
@@ -40,7 +42,7 @@ public class CSVExport {
     * @param segmentViewerTable
     * @param selectedFilePath
     */
-   public CSVExport(final Table segmentViewerTable, final String selectedFilePath) {
+   CSVExport(final Table segmentViewerTable, final String selectedFilePath) {
 
       _segmentViewerTable = segmentViewerTable;
 
@@ -49,7 +51,8 @@ public class CSVExport {
 
    private void csvExport_CurrentView(final String selectedFilePath) {
 
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(selectedFilePath)))) {
+      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(selectedFilePath)),
+            StandardCharsets.UTF_8))) {
 
          final int[] columnOrder = _segmentViewerTable.getColumnOrder();
 
