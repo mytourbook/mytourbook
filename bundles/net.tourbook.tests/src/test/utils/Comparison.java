@@ -51,7 +51,7 @@ public class Comparison {
 
    private Comparison() {}
 
-   public static void compareFitAgainstControl(final String controlTourFilePath,
+   public static void compareFitAgainstControl(final String controlTourFilePathFit,
                                                final String testTourFilePathFit) {
 
       //Convert the test FIT file to CSV for a human readable comparison
@@ -61,7 +61,7 @@ public class Comparison {
       final Path testTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
       assertTrue(Files.exists(testTourAbsoluteFilePathCsv));
 
-      final String controlTourFilePathCsv = controlTourFilePath.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
+      final String controlTourFilePathCsv = controlTourFilePathFit.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
       final Path controlTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePathCsv));
       assertTrue(Files.exists(controlTourAbsoluteFilePathCsv));
 
