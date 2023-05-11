@@ -69,9 +69,6 @@ Improvements
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
 
-* View CSV Export (Frederic)
-  - Exporting properly special characters and symbols
-
 
 Changes
 =======
