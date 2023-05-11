@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -145,6 +145,43 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 
       this.comparedTourData = comparedTourData;
       this.tourId = comparedTourData.getTourId();
+   }
+
+   @Override
+   public String toString() {
+
+//      final int maxLen = 5;
+
+      return "TVICompareResultComparedTour" + NL //                     //$NON-NLS-1$
+
+            + "   compareId            =" + compareId + NL //              //$NON-NLS-1$
+            + "   tourId               =" + tourId + NL //                 //$NON-NLS-1$
+
+//            + "timeInterval         =" + timeInterval + NL //           //$NON-NLS-1$
+//            + "minAltitudeDiff      =" + minAltitudeDiff + NL //        //$NON-NLS-1$
+//            + "computedStartIndex   =" + computedStartIndex + NL //     //$NON-NLS-1$
+//            + "computedEndIndex     =" + computedEndIndex + NL //       //$NON-NLS-1$
+//            + "normalizedStartIndex =" + normalizedStartIndex + NL //   //$NON-NLS-1$
+//            + "normalizedEndIndex   =" + normalizedEndIndex + NL //     //$NON-NLS-1$
+//            + "compareMovingTime    =" + compareMovingTime + NL //      //$NON-NLS-1$
+//            + "compareElapsedTime   =" + compareElapsedTime + NL //     //$NON-NLS-1$
+//            + "compareDistance      =" + compareDistance + NL //        //$NON-NLS-1$
+//            + "compareSpeed         =" + compareSpeed + NL //           //$NON-NLS-1$
+//            + "avgAltimeter         =" + avgAltimeter + NL //           //$NON-NLS-1$
+//            + "movedSpeed           =" + movedSpeed + NL //             //$NON-NLS-1$
+
+//            + "dbStartIndex         =" + dbStartIndex + NL //           //$NON-NLS-1$
+//            + "dbEndIndex           =" + dbEndIndex + NL //             //$NON-NLS-1$
+//            + "dbSpeed              =" + dbSpeed + NL //                //$NON-NLS-1$
+//            + "dbElapsedTime        =" + dbElapsedTime + NL //          //$NON-NLS-1$
+
+//            + "refTour              =" + refTour + NL //                //$NON-NLS-1$
+//            + "altitudeDiffSerie=" + (altitudeDiffSerie != null //      //$NON-NLS-1$
+//                  ? Arrays.toString(Arrays.copyOf(altitudeDiffSerie, Math.min(altitudeDiffSerie.length, maxLen)))
+//                  : null) + NL
+
+            + NL
+      ;
    }
 
 }

@@ -1562,7 +1562,9 @@ public class TourCompareResultView extends ViewPart implements
             final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
 
             final ArrayList<TreeViewerItem> children = refTourItem.getChildren();
-            for (int childIndex = 0; childIndex < children.size(); childIndex++) {
+            final int numChildren = children.size();
+
+            for (int childIndex = 0; childIndex < numChildren; childIndex++) {
 
                final TreeViewerItem refTourChild = children.get(childIndex);
                if (refTourChild == selectedCompareResult) {
@@ -1571,23 +1573,17 @@ public class TourCompareResultView extends ViewPart implements
 
                      // navigate next
 
-                     if (childIndex < children.size() - 1) {
+                     if (childIndex < numChildren - 1) {
 
                         // next tour is available
 
-                        final TreeViewerItem nextRefTourChild = children.get(childIndex + 1);
-                        if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-                           return (TVICompareResultComparedTour) nextRefTourChild;
-                        }
+                        return navigateTour_Next(children, childIndex);
 
                      } else {
 
                         // return first tour
 
-                        final TreeViewerItem nextRefTourChild = children.get(0);
-                        if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-                           return (TVICompareResultComparedTour) nextRefTourChild;
-                        }
+                        return navigateTour_Next(children, -1);
                      }
 
                   } else {
@@ -1598,19 +1594,13 @@ public class TourCompareResultView extends ViewPart implements
 
                         // previous tour is available
 
-                        final TreeViewerItem nextChild = children.get(childIndex - 1);
-                        if (nextChild instanceof TVICompareResultComparedTour) {
-                           return (TVICompareResultComparedTour) nextChild;
-                        }
+                        return navigateTour_Previous(children, childIndex);
 
                      } else {
 
                         // return last tour
 
-                        final TreeViewerItem prevChild = children.get(children.size() - 1);
-                        if (prevChild instanceof TVICompareResultComparedTour) {
-                           return (TVICompareResultComparedTour) prevChild;
-                        }
+                        return navigateTour_Previous(children, numChildren);
                      }
                   }
                }
@@ -1636,6 +1626,91 @@ public class TourCompareResultView extends ViewPart implements
                if (nextRefTourChild instanceof TVICompareResultComparedTour) {
                   return (TVICompareResultComparedTour) nextRefTourChild;
                }
+            }
+         }
+      }
+
+      return null;
+   }
+
+   private TVICompareResultComparedTour navigateTour_Next(final ArrayList<TreeViewerItem> children,
+                                                          final int lastChildIndex) {
+
+      final int numChildren = children.size();
+
+      for (int childIndex = lastChildIndex + 1; childIndex < numChildren; childIndex++) {
+
+         final TreeViewerItem nextRefTourChild = children.get(childIndex);
+         if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+
+            final TVICompareResultComparedTour nextComparedTour = (TVICompareResultComparedTour) nextRefTourChild;
+
+            // navigate with the compare filter
+
+            if (_compareFilter == CompareFilter.ALL_IS_DISPLAYED) {
+
+               // nothing is filtered
+
+               return nextComparedTour;
+            }
+
+            // compare results are filtered
+
+            final boolean isSaved = nextComparedTour.isSaved();
+
+            if (_compareFilter == CompareFilter.SAVED && isSaved) {
+
+               // saved results are displayed
+
+               return nextComparedTour;
+
+            } else if (_compareFilter == CompareFilter.NOT_SAVED && isSaved == false) {
+
+               // not saved results are displayed
+
+               return nextComparedTour;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   private TVICompareResultComparedTour navigateTour_Previous(final ArrayList<TreeViewerItem> children,
+                                                              final int lastChildIndex) {
+
+      for (int childIndex = lastChildIndex - 1; childIndex >= 0; childIndex--) {
+
+         final TreeViewerItem prevRefTourChild = children.get(childIndex);
+
+         if (prevRefTourChild instanceof TVICompareResultComparedTour) {
+
+            final TVICompareResultComparedTour prevComparedTour = (TVICompareResultComparedTour) prevRefTourChild;
+
+            // navigate with the compare filter
+
+            if (_compareFilter == CompareFilter.ALL_IS_DISPLAYED) {
+
+               // nothing is filtered
+
+               return prevComparedTour;
+            }
+
+            // compare results are filtered
+
+            final boolean isSaved = prevComparedTour.isSaved();
+
+            if (_compareFilter == CompareFilter.SAVED && isSaved) {
+
+               // saved results are displayed
+
+               return prevComparedTour;
+
+            } else if (_compareFilter == CompareFilter.NOT_SAVED && isSaved == false) {
+
+               // not saved results are displayed
+
+               return prevComparedTour;
             }
          }
       }
