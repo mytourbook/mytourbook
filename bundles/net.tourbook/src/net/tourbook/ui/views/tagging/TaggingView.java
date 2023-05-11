@@ -2040,6 +2040,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                   return;
                }
 
+               if (_tagViewer.getTree().isDisposed()) {
+                  return;
+               }
+
                onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(
                      __treeSelection,
                      __selectedTreePath);
