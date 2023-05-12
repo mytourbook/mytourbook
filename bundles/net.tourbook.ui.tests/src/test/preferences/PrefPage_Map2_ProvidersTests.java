@@ -157,7 +157,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
    @Disabled
    /**
     * Disabled because of the restart needed
-    * Messages.pref_cache_message_box_text
+    * See {@value Messages#pref_cache_message_box_text}
     */
    void openOfflineMapPreferencePage() {
 
