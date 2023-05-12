@@ -152,7 +152,6 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-
    @Test
    @Disabled
    /**
