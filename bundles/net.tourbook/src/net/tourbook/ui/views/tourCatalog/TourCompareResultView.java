@@ -1589,12 +1589,12 @@ public class TourCompareResultView extends ViewPart implements
 
             final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
 
-            final Object[] allSortedFilteredCompareResults = refTourItem.sortedAndFilteredCompareResults;
-            final int numChildren = allSortedFilteredCompareResults.length;
+            final Object[] allSortedAndFilteredCompareResults = refTourItem.sortedAndFilteredCompareResults;
+            final int numChildren = allSortedAndFilteredCompareResults.length;
 
             for (int childIndex = 0; childIndex < numChildren; childIndex++) {
 
-               final Object refTourChild = allSortedFilteredCompareResults[childIndex];
+               final Object refTourChild = allSortedAndFilteredCompareResults[childIndex];
 
                if (refTourChild == selectedCompareResult) {
 
@@ -1606,7 +1606,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // next tour is available
 
-                        final Object nextRefTourChild = allSortedFilteredCompareResults[childIndex + 1];
+                        final Object nextRefTourChild = allSortedAndFilteredCompareResults[childIndex + 1];
                         if (nextRefTourChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) nextRefTourChild;
                         }
@@ -1615,7 +1615,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // return first tour
 
-                        final Object nextRefTourChild = allSortedFilteredCompareResults[0];
+                        final Object nextRefTourChild = allSortedAndFilteredCompareResults[0];
                         if (nextRefTourChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) nextRefTourChild;
                         }
@@ -1629,7 +1629,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // previous tour is available
 
-                        final Object nextChild = allSortedFilteredCompareResults[childIndex - 1];
+                        final Object nextChild = allSortedAndFilteredCompareResults[childIndex - 1];
                         if (nextChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) nextChild;
                         }
@@ -1638,7 +1638,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // return last tour
 
-                        final Object prevChild = allSortedFilteredCompareResults[numChildren - 1];
+                        final Object prevChild = allSortedAndFilteredCompareResults[numChildren - 1];
                         if (prevChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) prevChild;
                         }
@@ -1667,10 +1667,14 @@ public class TourCompareResultView extends ViewPart implements
 
                final Object[] allRefSortedAndFilteredChildren = selectedRefTour.sortedAndFilteredCompareResults;
 
-               // return first tour
-               final Object nextRefTourChild = allRefSortedAndFilteredChildren[0];
-               if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-                  return (TVICompareResultComparedTour) nextRefTourChild;
+               if (allRefSortedAndFilteredChildren.length > 0) {
+
+                  // return first tour
+                  final Object nextRefTourChild = allRefSortedAndFilteredChildren[0];
+
+                  if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                     return (TVICompareResultComparedTour) nextRefTourChild;
+                  }
                }
             }
          }
