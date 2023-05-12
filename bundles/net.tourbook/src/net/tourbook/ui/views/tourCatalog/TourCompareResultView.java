@@ -273,6 +273,32 @@ public class TourCompareResultView extends ViewPart implements
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
+   public class ResultTreeViewer extends ContainerCheckedTreeViewer {
+
+      public ResultTreeViewer(final Tree tree) {
+         super(tree);
+      }
+
+      @Override
+      protected Object[] getSortedChildren(final Object parentElementOrTreePath) {
+
+         final Object[] sortedChildren = super.getSortedChildren(parentElementOrTreePath);
+
+         /*
+          * Keep sorted and filtered children which are used to navigate them programmatically
+          */
+         if (parentElementOrTreePath instanceof TVICompareResultReferenceTour) {
+
+            final TVICompareResultReferenceTour comparedRefTour = (TVICompareResultReferenceTour) parentElementOrTreePath;
+
+            comparedRefTour.sortedAndFilteredCompareResults = sortedChildren;
+         }
+
+         return sortedChildren;
+      }
+
+   }
+
    public class TourCompareFilter extends ViewerFilter {
 
       @Override
@@ -697,7 +723,7 @@ public class TourCompareResultView extends ViewPart implements
       tree.setHeaderVisible(true);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      _tourViewer = new ContainerCheckedTreeViewer(tree);
+      _tourViewer = new ResultTreeViewer(tree);
       _columnManager.createColumns(_tourViewer);
 
       _tourViewer.setContentProvider(new ResultContentProvider());
@@ -1554,19 +1580,22 @@ public class TourCompareResultView extends ViewPart implements
       final TVICompareResultComparedTour selectedCompareResult = getSelectedComparedTour();
       if (selectedCompareResult != null) {
 
-         // compared tour is selected
+         /*
+          * A compared tour is selected
+          */
 
          final TreeViewerItem parentItem = selectedCompareResult.getParentItem();
          if (parentItem instanceof TVICompareResultReferenceTour) {
 
             final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
 
-            final ArrayList<TreeViewerItem> children = refTourItem.getChildren();
-            final int numChildren = children.size();
+            final Object[] allSortedFilteredCompareResults = refTourItem.sortedAndFilteredCompareResults;
+            final int numChildren = allSortedFilteredCompareResults.length;
 
             for (int childIndex = 0; childIndex < numChildren; childIndex++) {
 
-               final TreeViewerItem refTourChild = children.get(childIndex);
+               final Object refTourChild = allSortedFilteredCompareResults[childIndex];
+
                if (refTourChild == selectedCompareResult) {
 
                   if (isNextTour) {
@@ -1577,13 +1606,19 @@ public class TourCompareResultView extends ViewPart implements
 
                         // next tour is available
 
-                        return navigateTour_Next(children, childIndex);
+                        final Object nextRefTourChild = allSortedFilteredCompareResults[childIndex + 1];
+                        if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) nextRefTourChild;
+                        }
 
                      } else {
 
                         // return first tour
 
-                        return navigateTour_Next(children, -1);
+                        final Object nextRefTourChild = allSortedFilteredCompareResults[0];
+                        if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) nextRefTourChild;
+                        }
                      }
 
                   } else {
@@ -1594,13 +1629,19 @@ public class TourCompareResultView extends ViewPart implements
 
                         // previous tour is available
 
-                        return navigateTour_Previous(children, childIndex);
+                        final Object nextChild = allSortedFilteredCompareResults[childIndex - 1];
+                        if (nextChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) nextChild;
+                        }
 
                      } else {
 
                         // return last tour
 
-                        return navigateTour_Previous(children, numChildren);
+                        final Object prevChild = allSortedFilteredCompareResults[numChildren - 1];
+                        if (prevChild instanceof TVICompareResultComparedTour) {
+                           return (TVICompareResultComparedTour) prevChild;
+                        }
                      }
                   }
                }
@@ -1612,105 +1653,25 @@ public class TourCompareResultView extends ViewPart implements
          final TVICompareResultReferenceTour selectedRefTour = getSelectedRefTour();
          if (selectedRefTour != null) {
 
-            // ref tour is selected
+            /*
+             * A ref tour is selected
+             */
 
-            final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
-            if (refChildren.size() > 0) {
+            final ArrayList<TreeViewerItem> allRefChildren = selectedRefTour.getFetchedChildren();
+
+            if (allRefChildren.size() > 0) {
 
                // navigate to the first child and ignore direction
 
                _tourViewer.expandToLevel(selectedRefTour, 1);
 
+               final Object[] allRefSortedAndFilteredChildren = selectedRefTour.sortedAndFilteredCompareResults;
+
                // return first tour
-               final TreeViewerItem nextRefTourChild = refChildren.get(0);
+               final Object nextRefTourChild = allRefSortedAndFilteredChildren[0];
                if (nextRefTourChild instanceof TVICompareResultComparedTour) {
                   return (TVICompareResultComparedTour) nextRefTourChild;
                }
-            }
-         }
-      }
-
-      return null;
-   }
-
-   private TVICompareResultComparedTour navigateTour_Next(final ArrayList<TreeViewerItem> children,
-                                                          final int lastChildIndex) {
-
-      final int numChildren = children.size();
-
-      for (int childIndex = lastChildIndex + 1; childIndex < numChildren; childIndex++) {
-
-         final TreeViewerItem nextRefTourChild = children.get(childIndex);
-         if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-
-            final TVICompareResultComparedTour nextComparedTour = (TVICompareResultComparedTour) nextRefTourChild;
-
-            // navigate with the compare filter
-
-            if (_compareFilter == CompareFilter.ALL_IS_DISPLAYED) {
-
-               // nothing is filtered
-
-               return nextComparedTour;
-            }
-
-            // compare results are filtered
-
-            final boolean isSaved = nextComparedTour.isSaved();
-
-            if (_compareFilter == CompareFilter.SAVED && isSaved) {
-
-               // saved results are displayed
-
-               return nextComparedTour;
-
-            } else if (_compareFilter == CompareFilter.NOT_SAVED && isSaved == false) {
-
-               // not saved results are displayed
-
-               return nextComparedTour;
-            }
-         }
-      }
-
-      return null;
-   }
-
-   private TVICompareResultComparedTour navigateTour_Previous(final ArrayList<TreeViewerItem> children,
-                                                              final int lastChildIndex) {
-
-      for (int childIndex = lastChildIndex - 1; childIndex >= 0; childIndex--) {
-
-         final TreeViewerItem prevRefTourChild = children.get(childIndex);
-
-         if (prevRefTourChild instanceof TVICompareResultComparedTour) {
-
-            final TVICompareResultComparedTour prevComparedTour = (TVICompareResultComparedTour) prevRefTourChild;
-
-            // navigate with the compare filter
-
-            if (_compareFilter == CompareFilter.ALL_IS_DISPLAYED) {
-
-               // nothing is filtered
-
-               return prevComparedTour;
-            }
-
-            // compare results are filtered
-
-            final boolean isSaved = prevComparedTour.isSaved();
-
-            if (_compareFilter == CompareFilter.SAVED && isSaved) {
-
-               // saved results are displayed
-
-               return prevComparedTour;
-
-            } else if (_compareFilter == CompareFilter.NOT_SAVED && isSaved == false) {
-
-               // not saved results are displayed
-
-               return prevComparedTour;
             }
          }
       }
