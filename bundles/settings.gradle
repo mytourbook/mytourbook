@@ -15,7 +15,9 @@ include ':vtm'
 include ':vtm-desktop'
 include ':vtm-desktop-lwjgl'
 include ':vtm-gdx'
+include ':vtm-gdx-poi3d'
 include ':vtm-http'
+include ':vtm-models'
 include ':vtm-mvt'
 include ':vtm-themes'
 
@@ -23,6 +25,8 @@ project(':vtm'                ).projectDir   = new File('../../vtm-parent/vtm')
 project(':vtm-desktop'        ).projectDir   = new File('../../vtm-parent/vtm-desktop')
 project(':vtm-desktop-lwjgl'  ).projectDir   = new File('../../vtm-parent/vtm-desktop-lwjgl')
 project(':vtm-gdx'            ).projectDir   = new File('../../vtm-parent/vtm-gdx')
+project(':vtm-gdx-poi3d'      ).projectDir   = new File('../../vtm-parent/vtm-gdx-poi3d')
 project(':vtm-http'           ).projectDir   = new File('../../vtm-parent/vtm-http')
+project(':vtm-models'         ).projectDir   = new File('../../vtm-parent/vtm-models')
 project(':vtm-mvt'            ).projectDir   = new File('../../vtm-parent/vtm-mvt')
 project(':vtm-themes'         ).projectDir   = new File('../../vtm-parent/vtm-themes')

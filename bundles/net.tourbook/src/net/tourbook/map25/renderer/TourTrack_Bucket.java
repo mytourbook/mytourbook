@@ -1,32 +1,26 @@
-/**
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016-2021 devemux86
+/*******************************************************************************
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
  *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General License for more details.
- *
- * You should have received a copy of the GNU Lesser General License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
-
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.renderer.MapRenderer;
@@ -35,71 +29,63 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Note:
- * <p>
- * Coordinates must be in range +/- (Short.MAX_VALUE / COORD_SCALE) if using GL.SHORT
- * <p>
- * The maximum resolution for coordinates is 0.25 as points will be converted
- * to fixed point values.
+ * Original class org.oscim.renderer.bucket.LineBucket but with many modifications
  */
 public class TourTrack_Bucket {
 
-   static final Logger                  log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
+   static final Logger        log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float            DIR_SCALE        = 2048;
+   public static final float  DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   private static final float           MIN_DIST         = 1 / 8f;
+   private static final float MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float           MIN_BEVEL        = MIN_DIST * 4;
+   private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int             DIR_MASK         = 0xFFFFFFFC;
+   private static final int   DIR_MASK         = 0xFFFFFFFC;
 
-   public LineStyle                     lineStyle;
-   public int                           lineColorMode;
+   public LineStyle           lineStyle;
+   public int                 lineColorMode;
 
-   private float                        _minimumDistance = MIN_DIST;
-   private float                        _minimumBevel    = MIN_BEVEL;
+   boolean                    isCapRounded;
+   float                      heightOffset;
 
-   boolean                              _isCapRounded;
-   float                                _heightOffset;
+   private float              _minimumDistance = MIN_DIST;
+   private float              _minimumBevel    = MIN_BEVEL;
 
-   private int                          _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
+   private int                _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
 
    /**
     * Number of vertices for this layer.
     */
-   protected int                        numVertices;
+   int                        numTrackVertices;
 
-   /**
-    * Temporary list of vertex data.
-    */
-   protected final TourTrack_VertexData vertexItems;
+   TourTrack_VertexData       trackVertexData;
 
    /**
     * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
     * <p>
     *
     * <pre>
-    * x1    y2    z1
-    * x2    y2    z2
+    * x1    y2    z1    arrowPart
+    * x2    y2    z2    arrowPart
     * ...
     * </pre>
     */
-   protected ShortArrayList             directionArrow_XYZPositions;
+   ShortArrayList             directionArrow_Vertices;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -108,17 +94,37 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   protected ShortArrayList             directionArrow_ColorCoords;
+   ShortArrayList             directionArrow_ColorCoords;
 
-   protected FloatArrayList             directionArrow_ArrowIndices;
+   /**
+    * Indices for {@link #allVisible_PixelPositions} into the tour track data
+    */
+   int[]                      allVisible_GeoLocationIndices;
+
+   /**
+    * Contains indices into all geo positions for all selected tours. They are optimized for a
+    * minimum distance, so they can be also outside of the clipper (visible) area -2048...2048
+    */
+   int[]                      allNotClipped_GeoLocationIndices;
+
+   double[]                   allProjectedPoints;
+
+   double[]                   allProjectedPoints_ReturnTrack;
+
+   /**
+    * Distance in pixel between the end and start point of the track for the current map scale
+    */
+   double                     trackEnd2StartPixelDistance;
+
+   int[]                      allTimeSeries;
+   float[]                    allDistanceSeries;
 
    public TourTrack_Bucket() {
 
-      vertexItems = new TourTrack_VertexData();
+      trackVertexData = new TourTrack_VertexData();
 
-      directionArrow_XYZPositions = new ShortArrayList();
+      directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
-      directionArrow_ArrowIndices = new FloatArrayList();
    }
 
    /**
@@ -126,34 +132,20 @@ public class TourTrack_Bucket {
     *
     * @param pixelPoints
     *           -2048 ... 2048
+    * @param index
     * @param numPoints
     * @param isCapClosed
     * @param pixelPointColors
     *           One {@link #pixelPointColors} has two {@link #pixelPoints}
     */
-   public void addLine(final float[] pixelPoints,
-                       final int numPoints,
-                       final boolean isCapClosed,
-                       final int[] pixelPointColors) {
+   void addLine(final float[] pixelPoints,
+                final int numPoints,
+                final boolean isCapClosed,
+                final int[] pixelPointColors) {
 
-      if (numPoints >= 4) {
-         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors);
+      if (numPoints < 4) {
+         return;
       }
-   }
-
-   /**
-    * @param pixelPoints
-    *           -2048 ... 2048
-    * @param index
-    * @param numPoints
-    * @param isCapClosed
-    * @param pixelPointColors
-    */
-   private void addLine(final float[] pixelPoints,
-                        final int[] index,
-                        final int numPoints,
-                        final boolean isCapClosed,
-                        final int[] pixelPointColors) {
 
       // test minimum distance
 //      _minimumDistance = testValue * 2.0f;
@@ -167,43 +159,19 @@ public class TourTrack_Bucket {
          isCapSquared = true;
       }
 
-      /*
-       * Note: just a hack to save some vertices, when there are
-       * more than 200 lines per type. FIXME make optional!
-       */
-      if (isCapRounded && index != null) {
-         int cnt = 0;
-         for (int i = 0, n = index.length; i < n; i++, cnt++) {
-            if (index[i] < 0) {
-               break;
-            }
-            if (cnt > 400) {
-               isCapRounded = false;
-               break;
-            }
-         }
-      }
-      _isCapRounded = isCapRounded;
+      this.isCapRounded = isCapRounded;
 
       int numIndices;
       int numLinePoints = 0;
 
-      if (index == null) {
-         numIndices = 1;
-         if (numPoints > 0) {
-            numLinePoints = numPoints;
-         } else {
-            numLinePoints = pixelPoints.length;
-         }
+      numIndices = 1;
+      if (numPoints > 0) {
+         numLinePoints = numPoints;
       } else {
-         numIndices = index.length;
+         numLinePoints = pixelPoints.length;
       }
 
       for (int indexIndex = 0, pos = 0; indexIndex < numIndices; indexIndex++) {
-
-         if (index != null) {
-            numLinePoints = index[indexIndex];
-         }
 
          /* check end-marker in indices */
          if (numLinePoints < 0) {
@@ -236,8 +204,6 @@ public class TourTrack_Bucket {
 
          addLine_ToVertices(
 
-               vertexItems,
-
                pixelPoints,
                pixelPointColors,
                startIndex,
@@ -249,7 +215,6 @@ public class TourTrack_Bucket {
    }
 
    /**
-    * @param vertices
     * @param pixelPoints
     *           -2048 ... 2048
     * @param pixelPointColors
@@ -259,8 +224,7 @@ public class TourTrack_Bucket {
     * @param isSquared
     * @param isClosed
     */
-   private void addLine_ToVertices(final TourTrack_VertexData vertices,
-                                   final float[] pixelPoints,
+   private void addLine_ToVertices(final float[] pixelPoints,
                                    final int[] pixelPointColors,
                                    final int startIndex,
                                    final int numLinePoints,
@@ -276,13 +240,15 @@ public class TourTrack_Bucket {
       double unitDistance;
       int pixelColor;
 
+      final TourTrack_VertexData vertices = trackVertexData;
+
       /*
        * amount of vertices used
        * + 2 for drawing triangle-strip
        * + 4 for round caps
        * + 2 for closing polygons
        */
-      numVertices += numLinePoints
+      numTrackVertices += numLinePoints
             + (isRounded ? 6 : 2)
             + (isClosed ? 2 : 0);
 
@@ -346,7 +312,7 @@ public class TourTrack_Bucket {
 
          /*
           * Outside means line is probably clipped
-          * TODO should align ending with tile boundary
+          * Todo: should align ending with tile boundary
           * for now, just extend the line a little
           */
 
@@ -365,7 +331,7 @@ public class TourTrack_Bucket {
          }
 
          if (isRounded) {
-            numVertices -= 2;
+            numTrackVertices -= 2;
          }
 
          // add first vertex twice
@@ -423,7 +389,7 @@ public class TourTrack_Bucket {
          // skip too short segments
          if (unitDistance < _minimumDistance) {
 
-            numVertices -= 2;
+            numTrackVertices -= 2;
 
             continue;
          }
@@ -437,7 +403,7 @@ public class TourTrack_Bucket {
          if (dotp > 0.65) {
 
             // add bevel join to avoid miter going to infinity
-            numVertices += 2;
+            numTrackVertices += 2;
 
             // dotp = FastMath.clamp(dotp, -1, 1);
             // double cos = Math.acos(dotp);
@@ -559,7 +525,7 @@ public class TourTrack_Bucket {
          }
 
          if (isRounded) {
-            numVertices -= 2;
+            numTrackVertices -= 2;
          }
 
          ddx = (int) ((ux - unit1X) * DIR_SCALE);
@@ -633,175 +599,57 @@ public class TourTrack_Bucket {
     */
    protected void clear() {
 
-      vertexItems.dispose();
-
-      numVertices = 0;
-   }
-
-   private void createArrow_MiddleFin(final short p2X,
-                                      final short p2Y,
-                                      final short pBackX,
-                                      final short pBackY,
-                                      final short pOnLineX,
-                                      final short pOnLineY,
-                                      final short arrowZ,
-                                      final short finTopZ,
-                                      final short arrowPart_Fin,
-                                      final int arrowIndex) {
-// SET_FORMATTING_OFF
-
-      // fin: middle
-      directionArrow_XYZPositions.addAll(
-
-            p2X,        p2Y,        arrowZ,  arrowPart_Fin,
-            pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
-            pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
-
-      directionArrow_ColorCoords.addAll(
-
-            (short) 1, (short) 1, (short) 0,
-            (short) 0, (short) 1, (short) 0,
-            (short) 0, (short) 0, (short) 1);
-
-      directionArrow_ArrowIndices.addAll(
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex);
-
-// SET_FORMATTING_ON
-   }
-
-   private void createArrow_OuterFins(final short p2X,
-                                      final short p2Y,
-                                      final short pLeftX,
-                                      final short pLeftY,
-                                      final short pRightX,
-                                      final short pRightY,
-                                      final short arrowZ,
-                                      final short finBottomZ,
-                                      final short arrowPart_Fin,
-                                      final int arrowIndex) {
-// SET_FORMATTING_OFF
-
-      directionArrow_XYZPositions.addAll(
-
-            // fin: left
-            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
-            pLeftX,     pLeftY,     arrowZ,     arrowPart_Fin,
-            pLeftX,     pLeftY,     finBottomZ, arrowPart_Fin,
-
-            // fin: right
-            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
-            pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
-            pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
-
-      directionArrow_ColorCoords.addAll(
-
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 1, (short) 0,
-            (short) 0, (short) 0, (short) 1,
-
-            (short) 0, (short) 1, (short) 0,
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 0, (short) 1);
-
-      directionArrow_ArrowIndices.addAll(
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex,
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex);
-
-// SET_FORMATTING_ON
-   }
-
-   private void createArrow_Wings(final short p2X,
-                                  final short p2Y,
-                                  final short pLeftX,
-                                  final short pLeftY,
-                                  final short pRight,
-                                  final short pRightY,
-                                  final short pBackX,
-                                  final short pBackY,
-                                  final short arrowZ,
-                                  final short arrowPart_Wing,
-                                  final int arrowIndex) {
-// SET_FORMATTING_OFF
-
-      /*
-       * When the head and tail have the same z-value then the overlapping part is flickering
-       */
-      final short arrowHeadZ = (short) (arrowZ+1);
-
-      directionArrow_XYZPositions.addAll(
-
-            // wing: left
-            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
-            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
-            pLeftX,     pLeftY,  arrowZ,     arrowPart_Wing,
-
-            // wing: right
-            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
-            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
-            pRight,     pRightY, arrowZ,     arrowPart_Wing);
-
-      directionArrow_ColorCoords.addAll(
-
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 1, (short) 1,
-            (short) 0, (short) 0, (short) 1,
-
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 1, (short) 1,
-            (short) 0, (short) 0, (short) 1);
-
-      directionArrow_ArrowIndices.addAll(
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex,
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex);
-
-// SET_FORMATTING_ON
+      numTrackVertices = 0;
    }
 
    /**
-    * @param allDirectionArrowPixel_Raw
+    * Creates direction arrow vertices from it's x/y position
+    *
+    * @param allDirectionArrow_PixelList
     *           Contains the x/y pixel positions for the direction arrows
+    * @param allDirectionArrow_LocationIndices
+    *           Contains the indices into the tour track data, e.g geo location
     */
-   public void createDirectionArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
+   public void createArrowVertices(final float[] allDirectionArrowPixel) {
 
-      directionArrow_XYZPositions.clear();
+      directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
-      directionArrow_ArrowIndices.clear();
 
       // at least 2 positions are needed
-      if (allDirectionArrowPixel_Raw.size() < 4) {
+      if (allDirectionArrowPixel.length < 4) {
          return;
       }
 
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      if (Map25ConfigManager.getActiveTourTrackConfig().isShowDirectionArrow) {
 
-      final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
+         createArrowVertices_100_NotAnimated(allDirectionArrowPixel);
+      }
+   }
+
+   /**
+    * Arrows are not animated, draw static arrows
+    *
+    * @param allDirectionArrowPixel
+    */
+   private void createArrowVertices_100_NotAnimated(final float[] allDirectionArrowPixel) {
+
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 // SET_FORMATTING_OFF
 
-      final float configArrowScale           = trackConfig.arrow_Scale / 10f;
-      final int   configArrowLength          = (int) (configArrowScale * trackConfig.arrow_Length);
-      final int   configArrowLengthCenter    = (int) (configArrowScale * trackConfig.arrow_LengthCenter);
-      final int   configArrowWidth           = (int) (configArrowScale * trackConfig.arrow_Width);
-      final int   configArrowHeight          = (int) (configArrowScale * trackConfig.arrow_Height);
+      final float  configArrowScale          = trackConfig.arrow_Scale / 10f;
+      final int    configArrowLength         = (int) (configArrowScale * trackConfig.arrow_Length);
+      final int    configArrowLengthCenter   = (int) (configArrowScale * trackConfig.arrow_LengthCenter);
+      final int    configArrowWidth          = (int) (configArrowScale * trackConfig.arrow_Width);
+      final int    configArrowHeight         = (int) (configArrowScale * trackConfig.arrow_Height);
 
-      final short arrowZ      = (short) trackConfig.arrow_VerticalOffset;
-      final short finTopZ     = (short) (arrowZ + configArrowHeight);
-      final short finBottomZ  = (short) (arrowZ - configArrowHeight);
+      final short  arrowZ                    = (short) trackConfig.arrow_VerticalOffset;
+      final short  finTopZ                   = (short) (arrowZ + configArrowHeight);
+      final short  finBottomZ                = (short) (arrowZ - configArrowHeight);
+
+      final double arrowLength               = configArrowLength;
+      final double arrowLengthMiddle         = configArrowLengthCenter;
+      final double arrowHalfWidth            = configArrowWidth / 2; // half arrow width
 
 // SET_FORMATTING_ON
 
@@ -815,23 +663,16 @@ public class TourTrack_Bucket {
          final float p2X = allDirectionArrowPixel[pixelIndex++];
          final float p2Y = allDirectionArrowPixel[pixelIndex++];
 
-         // get direction/unit vector: dir = (P2-P1)/|P2-P1|
-         final float diffX = p2X - p1X;
-         final float diffY = p2Y - p1Y;
-
-         // distance between P1 and P2
-         final double p12Distance = Math.sqrt(diffX * diffX + diffY * diffY);
-
-         final double p12UnitX = diffX / p12Distance;
-         final double p12UnitY = diffY / p12Distance;
+         // get unit (direction) vector: unit = (P2-P1)/|P2-P1|
+         final float p21DiffX = p2X - p1X;
+         final float p21DiffY = p2Y - p1Y;
+         final double p12Distance = Math.sqrt(p21DiffX * p21DiffX + p21DiffY * p21DiffY); // distance between P1 and P2
+         final double p12UnitX = p21DiffX / p12Distance;
+         final double p12UnitY = p21DiffY / p12Distance;
 
          // get perpendicular vector for the arrow head
          final double unitPerpendX = p12UnitY;
          final double unitPerpendY = -p12UnitX;
-
-         final double arrowLength = configArrowLength; //               Math.min(configArrowLength, p12Distance);
-         final double arrowLengthMiddle = configArrowLengthCenter; //   Math.min(configArrowLengthCenter, p12Distance);
-         final double arrowWidth2 = configArrowWidth / 2; // half arrow width
 
          // point on line between P1 and P2
          final double pOnLineX = p2X - (arrowLength * p12UnitX);
@@ -839,8 +680,8 @@ public class TourTrack_Bucket {
          final double pBackX = p2X - (arrowLengthMiddle * p12UnitX);
          final double pBackY = p2Y - (arrowLengthMiddle * p12UnitY);
 
-         final double vFinX = unitPerpendX * arrowWidth2;
-         final double vFinY = unitPerpendY * arrowWidth2;
+         final double vFinX = unitPerpendX * arrowHalfWidth;
+         final double vFinY = unitPerpendY * arrowHalfWidth;
 
          // set arrow points which are left/right of the line
          final float pLeftX = (float) (pOnLineX + vFinX);
@@ -920,7 +761,6 @@ public class TourTrack_Bucket {
 
          final int arrowIndex = (pixelIndex - 2) / 2;
 
-
          /**
           * !!! VERY IMPORTANT !!! <p>
           *
@@ -931,76 +771,73 @@ public class TourTrack_Bucket {
 
          case WINGS_WITH_MIDDLE_FIN:
 
-            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    arrowZ,
-                                    arrowPart_Wing,
-                                    arrowIndex);
+            createArrowVertices_120_Wings(      p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                arrowZ,
+                                                arrowPart_Wing,
+                                                arrowIndex);
 
-            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    pOnLineX_scaled,  pOnLineY_scaled,
-                                    arrowZ,
-                                    finTopZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
-
+            createArrowVertices_130_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                pOnLineX_scaled,  pOnLineY_scaled,
+                                                arrowZ,
+                                                finTopZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case WINGS_WITH_OUTER_FINS:
 
-            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    arrowZ,
-                                    arrowPart_Wing,
-                                    arrowIndex);
+            createArrowVertices_120_Wings(      p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                arrowZ,
+                                                arrowPart_Wing,
+                                                arrowIndex);
 
-            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    arrowZ,
-                                    finBottomZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
-
+            createArrowVertices_140_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                arrowZ,
+                                                finBottomZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case MIDDLE_FIN:
 
-            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    pOnLineX_scaled,  pOnLineY_scaled,
-                                    arrowZ,
-                                    finTopZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
+            createArrowVertices_130_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                pOnLineX_scaled,  pOnLineY_scaled,
+                                                arrowZ,
+                                                finTopZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case OUTER_FINS:
 
-            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    arrowZ,
-                                    finBottomZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
-
+            createArrowVertices_140_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                arrowZ,
+                                                finBottomZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case WINGS:
          default:
-            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    arrowZ,
-                                    arrowPart_Wing,
-                                    arrowIndex);
+            createArrowVertices_120_Wings(      p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                arrowZ,
+                                                arrowPart_Wing,
+                                                arrowIndex);
             break;
          }
 
@@ -1012,9 +849,112 @@ public class TourTrack_Bucket {
       }
    }
 
-   protected void fillVerticesBuffer(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
+   private void createArrowVertices_120_Wings(final short p2X,
+                                              final short p2Y,
+                                              final short pLeftX,
+                                              final short pLeftY,
+                                              final short pRight,
+                                              final short pRightY,
+                                              final short pBackX,
+                                              final short pBackY,
+                                              final short arrowZ,
+                                              final short arrowPart_Wing,
+                                              final int arrowIndex) {
+// SET_FORMATTING_OFF
 
-      vertexItems.fillVerticesBuffer(vboBuffer, colorBuffer);
+      /*
+       * When the head and tail have the same z-value then the overlapping part is flickering
+       */
+      final short arrowHeadZ = (short) (arrowZ+1);
+
+      directionArrow_Vertices.addAll(
+
+            // wing: left
+            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
+            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
+            pLeftX,     pLeftY,  arrowZ,     arrowPart_Wing,
+
+            // wing: right
+            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
+            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
+            pRight,     pRightY, arrowZ,     arrowPart_Wing);
+
+      directionArrow_ColorCoords.addAll(
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 1,
+            (short) 0, (short) 0, (short) 1,
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 1,
+            (short) 0, (short) 0, (short) 1);
+
+// SET_FORMATTING_ON
+   }
+
+   private void createArrowVertices_130_MiddleFin(final short p2X,
+                                                  final short p2Y,
+                                                  final short pBackX,
+                                                  final short pBackY,
+                                                  final short pOnLineX,
+                                                  final short pOnLineY,
+                                                  final short arrowZ,
+                                                  final short finTopZ,
+                                                  final short arrowPart_Fin,
+                                                  final int arrowIndex) {
+// SET_FORMATTING_OFF
+
+      // fin: middle
+      directionArrow_Vertices.addAll(
+
+            p2X,        p2Y,        arrowZ,  arrowPart_Fin,
+            pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
+            pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
+
+      directionArrow_ColorCoords.addAll(
+
+            (short) 1, (short) 1, (short) 0,
+            (short) 0, (short) 1, (short) 0,
+            (short) 0, (short) 0, (short) 1);
+
+// SET_FORMATTING_ON
+   }
+
+   private void createArrowVertices_140_OuterFins(final short p2X,
+                                                  final short p2Y,
+                                                  final short pLeftX,
+                                                  final short pLeftY,
+                                                  final short pRightX,
+                                                  final short pRightY,
+                                                  final short arrowZ,
+                                                  final short finBottomZ,
+                                                  final short arrowPart_Fin,
+                                                  final int arrowIndex) {
+// SET_FORMATTING_OFF
+
+      directionArrow_Vertices.addAll(
+
+            // fin: left
+            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
+            pLeftX,     pLeftY,     arrowZ,     arrowPart_Fin,
+            pLeftX,     pLeftY,     finBottomZ, arrowPart_Fin,
+
+            // fin: right
+            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
+            pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
+            pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
+
+      directionArrow_ColorCoords.addAll(
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 0,
+            (short) 0, (short) 0, (short) 1,
+
+            (short) 0, (short) 1, (short) 0,
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 0, (short) 1);
+
+// SET_FORMATTING_ON
    }
 
 }

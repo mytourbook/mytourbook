@@ -1,0 +1,69 @@
+23.next.0                                                 ?. March 2023
+
+
+TODO's
+======               
+
+* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
+                    Released: 23.3
+
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+
+
+Issues
+======
+
+*
+
+
+Experimental
+============
+
+* 
+
+
+New
+===
+
+* 
+
+
+Improvements
+============
+
+* 
+
+
+Changes
+=======
+
+* 
+
+
+Bugfix
+======
+
+* 
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.3   https://github.com/mytourbook/mytourbook/milestone/6?closed=1
+* Eclipse 2022-06
+* NatTable 2.03               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.105
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

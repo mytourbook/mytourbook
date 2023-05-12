@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -38,134 +38,145 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourBookOptions extends ToolbarSlideout {
 
-	private SelectionAdapter	_defaultSelectionListener;
+   private IDialogSettings  _state;
 
-	/*
-	 * UI controls
-	 */
-	private Button				_chkShowSummaryRow;
+   private TourBookView     _tourBookView;
 
-	private TourBookView		_tourBookView;
+   private SelectionAdapter _defaultSelectionListener;
 
-	private IDialogSettings		_state;
+   /*
+    * UI controls
+    */
+   private Button _chkShowSummaryRow;
 
-	/**
-	 * @param ownerControl
-	 * @param toolBar
-	 * @param tourBookView
-	 * @param state
-	 * @param gridPrefPrefix
-	 */
-	public SlideoutTourBookOptions(	final Control ownerControl,
-									final ToolBar toolBar,
-									final TourBookView tourBookView,
-									final IDialogSettings state) {
+   /**
+    * @param ownerControl
+    * @param toolBar
+    * @param tourBookView
+    * @param state
+    * @param gridPrefPrefix
+    */
+   public SlideoutTourBookOptions(final Control ownerControl,
+                                  final ToolBar toolBar,
+                                  final TourBookView tourBookView,
+                                  final IDialogSettings state) {
 
-		super(ownerControl, toolBar);
+      super(ownerControl, toolBar);
 
-		_tourBookView = tourBookView;
-		_state = state;
-	}
+      _tourBookView = tourBookView;
+      _state = state;
+   }
 
-	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+   @Override
+   protected Composite createToolTipContentArea(final Composite parent) {
 
-		initUI();
+      initUI();
 
-		final Composite ui = createUI(parent);
+      final Composite ui = createUI(parent);
 
-		restoreState();
+      restoreState();
+      enableControls();
 
-		return ui;
-	}
+      return ui;
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
-		{
-			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults()//
+      final Composite shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+      {
+         final Composite container = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults()//
 //					.numColumns(2)
-					.applyTo(container);
+               .applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_10_Title(container);
-				createUI_20_Controls(container);
-			}
-		}
+         {
+            createUI_10_Title(container);
+            createUI_20_Controls(container);
+         }
+      }
 
-		return shellContainer;
-	}
+      return shellContainer;
+   }
 
-	private void createUI_10_Title(final Composite parent) {
+   private void createUI_10_Title(final Composite parent) {
 
-		/*
-		 * Label: Slideout title
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_TourBookOptions_Label_Title);
-		label.setFont(JFaceResources.getBannerFont());
+      /*
+       * Label: Slideout title
+       */
+      final Label label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(label);
+      label.setText(Messages.Slideout_TourBookOptions_Label_Title);
+      label.setFont(JFaceResources.getBannerFont());
 
-		MTFont.setBannerFont(label);
-	}
+      MTFont.setBannerFont(label);
+   }
 
-	private void createUI_20_Controls(final Composite parent) {
+   private void createUI_20_Controls(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				//				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Show break time values
-				 */
-				_chkShowSummaryRow = new Button(container, SWT.CHECK);
-				_chkShowSummaryRow.setText(Messages.Slideout_TourBookOptions_Checkbox_ShowTotalRow);
-				_chkShowSummaryRow.setToolTipText(Messages.Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            //				.span(2, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Show break time values
+             */
+            _chkShowSummaryRow = new Button(container, SWT.CHECK);
+            _chkShowSummaryRow.setText(Messages.Slideout_TourBookOptions_Checkbox_ShowTotalRow);
+            _chkShowSummaryRow.setToolTipText(Messages.Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip);
 
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowSummaryRow);
+            GridDataFactory.fillDefaults()//
+                  .span(2, 1)
+                  .applyTo(_chkShowSummaryRow);
 
-				_chkShowSummaryRow.addSelectionListener(_defaultSelectionListener);
-			}
-		}
-	}
+            _chkShowSummaryRow.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+   }
 
-	private void initUI() {
+   private void enableControls() {
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
-			}
-		};
-	}
+      /*
+       * Currently the summary row is displayed only in the categorized views
+       */
+      final boolean isCategorizedView = _tourBookView.isLayoutNatTable() == false;
 
-	private void onChangeUI() {
+      _chkShowSummaryRow.setEnabled(isCategorizedView);
+   }
 
-		saveState();
+   private void initUI() {
 
-		// update chart with new settings
-		_tourBookView.updateTourBookOptions();
-	}
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onChangeUI();
+         }
+      };
+   }
 
-	private void restoreState() {
+   private void onChangeUI() {
 
-		_chkShowSummaryRow.setSelection(Util.getStateBoolean(_state,
-				TourBookView.STATE_IS_SHOW_SUMMARY_ROW,
-				TourBookView.STATE_IS_SHOW_SUMMARY_ROW_DEFAULT));
-	}
+      saveState();
 
-	private void saveState() {
+      // update chart with new settings
+      _tourBookView.updateTourBookOptions();
+   }
 
-		_state.put(TourBookView.STATE_IS_SHOW_SUMMARY_ROW, _chkShowSummaryRow.getSelection());
-	}
+   private void restoreState() {
+
+      _chkShowSummaryRow.setSelection(Util.getStateBoolean(_state,
+            TourBookView.STATE_IS_SHOW_SUMMARY_ROW,
+            TourBookView.STATE_IS_SHOW_SUMMARY_ROW_DEFAULT));
+   }
+
+   private void saveState() {
+
+      _state.put(TourBookView.STATE_IS_SHOW_SUMMARY_ROW, _chkShowSummaryRow.getSelection());
+   }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,14 +26,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,15 +49,14 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 
-public class DropboxClient {
+class DropboxClient {
 
-   private static HttpClient     _httpClient        = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
-   private static DbxClientV2    _dropboxClient;
+   private static DbxClientV2            _dropboxClient;
 
-   private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                                         //$NON-NLS-1$
-   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/";            //$NON-NLS-1$ //$NON-NLS-2$
+   private static final String           DropboxApiBaseUrl  = "https://api.dropboxapi.com";                              //$NON-NLS-1$
+   static final String                   DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
-   static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
 
    static {
 
@@ -85,7 +82,7 @@ public class DropboxClient {
     *           The Dropbox path of the file
     * @return The local path of the downloaded file
     */
-   public static final Path CopyLocally(String dropboxFilePath) {
+   static final Path CopyLocally(String dropboxFilePath) {
 
       if (StringUtils.isNullOrEmpty(dropboxFilePath)) {
          return null;
@@ -156,7 +153,7 @@ public class DropboxClient {
     * @param accessToken
     * @return
     */
-   public static final DbxClientV2 getDefault(final String accessToken) {
+   static final DbxClientV2 getDefault(final String accessToken) {
 
       if (StringUtils.isNullOrEmpty(accessToken)) {
          return _dropboxClient;
@@ -165,10 +162,10 @@ public class DropboxClient {
       return createDropboxClient(accessToken);
    }
 
-   public static final DropboxTokens getTokens(final String authorizationCode,
-                                               final boolean isRefreshToken,
-                                               final String refreshToken,
-                                               final String codeVerifier) {
+   static final DropboxTokens getTokens(final String authorizationCode,
+                                        final boolean isRefreshToken,
+                                        final String refreshToken,
+                                        final String codeVerifier) {
 
       final Map<String, String> data = new HashMap<>();
       data.put(OAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
@@ -194,7 +191,7 @@ public class DropboxClient {
 
       DropboxTokens token = new DropboxTokens();
       try {
-         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+         final HttpResponse<String> response = OAuth2Utils.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
             token = new ObjectMapper().readValue(response.body(), DropboxTokens.class);
@@ -211,7 +208,7 @@ public class DropboxClient {
       return token;
    }
 
-   public static final String getValidTokens() {
+   static final String getValidTokens() {
 
       if (StringUtils.isNullOrEmpty(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN))) {
          return UI.EMPTY_STRING;

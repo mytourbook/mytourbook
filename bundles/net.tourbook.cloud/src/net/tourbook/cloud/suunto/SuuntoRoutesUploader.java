@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -34,10 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -48,9 +48,7 @@ import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.TourTypeFilter;
 
-import org.apache.http.HttpHeaders;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -64,15 +62,17 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    private static final String LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
    private static final String LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static HttpClient   _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static TourExporter _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
 
+   private static String       CLOUD_UPLOADER_ID             = "Suunto";                                                 //$NON-NLS-1$
    private boolean             _useActivePerson;
    private boolean             _useAllPeople;
 
    public SuuntoRoutesUploader() {
 
-      super("SUUNTO", Messages.VendorName_Suunto_Routes); //$NON-NLS-1$
+      super(CLOUD_UPLOADER_ID,
+            Messages.VendorName_Suunto_Routes,
+            Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo));
 
       _tourExporter.setUseDescription(true);
 
@@ -113,7 +113,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
     */
    private String convertTourToGpx(final TourData tourData) {
 
-      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "gpx"); //$NON-NLS-1$
+      final String absoluteTourFilePath = FileUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "gpx"); //$NON-NLS-1$
 
       _tourExporter.useTourData(tourData);
 
@@ -138,9 +138,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       _tourExporter.export(absoluteTourFilePath);
 
-      final String tourGpx = FilesUtils.readFileContentString(absoluteTourFilePath);
+      final String tourGpx = FileUtils.readFileContentString(absoluteTourFilePath);
 
-      FilesUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
+      FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
       return tourGpx;
    }
@@ -164,11 +164,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          return SuuntoTokensRetrievalHandler.getRefreshToken_AllPeople();
       }
       return UI.EMPTY_STRING;
-   }
-
-   @Override
-   public List<TourTypeFilter> getTourTypeFilters() {
-      return new ArrayList<>();
    }
 
    @Override
@@ -211,7 +206,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    private CompletableFuture<RouteUpload> sendAsyncRequest(final String tourStartTime, final HttpRequest request) {
 
-      final CompletableFuture<RouteUpload> routeUpload = _httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+      final CompletableFuture<RouteUpload> routeUpload = OAuth2Utils.httpClient.sendAsync(
+            request,
+            HttpResponse.BodyHandlers.ofString())
             .thenApply(routeUploadResponse -> convertResponseToUpload(routeUploadResponse, tourStartTime))
             .exceptionally(e -> {
                final RouteUpload errorUpload = new RouteUpload();
@@ -232,9 +229,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       try {
          final HttpRequest request = HttpRequest.newBuilder()
-               .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/route/import"))//$NON-NLS-1$
+               .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/route/import"))//$NON-NLS-1$
                .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
-               .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken()) //     .timeout(Duration.ofMinutes(5))
+               .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
                .POST(BodyPublishers.ofString(payload.toString()))
                .build();
 
@@ -343,7 +340,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
                Messages.Dialog_UploadRoutesToSuunto_Title,
-               NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
+               NLS.bind(Messages.Dialog_UploadToursToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);

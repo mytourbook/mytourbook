@@ -21,7 +21,7 @@ public class MultiPartBodyPublisher {
    private List<PartsSpecification> partsSpecificationList = new ArrayList<>();
    private String                   boundary               = UUID.randomUUID().toString();
 
-   class PartsIterator implements Iterator<byte[]> {
+   private class PartsIterator implements Iterator<byte[]> {
 
       private Iterator<PartsSpecification> iter;
       private InputStream                  currentFileInput;
@@ -119,7 +119,7 @@ public class MultiPartBodyPublisher {
       }
    }
 
-   static class PartsSpecification {
+   private static class PartsSpecification {
 
       PartsSpecification.TYPE type;
 
@@ -157,17 +157,6 @@ public class MultiPartBodyPublisher {
       newPart.type = PartsSpecification.TYPE.STRING;
       newPart.name = name;
       newPart.value = value;
-      partsSpecificationList.add(newPart);
-      return this;
-   }
-
-   public MultiPartBodyPublisher addPart(final String name, final Supplier<InputStream> value, final String filename, final String contentType) {
-      final PartsSpecification newPart = new PartsSpecification();
-      newPart.type = PartsSpecification.TYPE.STREAM;
-      newPart.name = name;
-      newPart.stream = value;
-      newPart.filename = filename;
-      newPart.contentType = contentType;
       partsSpecificationList.add(newPart);
       return this;
    }

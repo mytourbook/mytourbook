@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import org.eclipse.jface.action.Action;
 
 class ActionDeleteTimeSlices_KeepTime extends Action {
 
-   private final TourDataEditorView fTourPropertiesView;
+   private final TourDataEditorView _tourDataEditorView;
 
    public ActionDeleteTimeSlices_KeepTime(final TourDataEditorView tourPropertiesView) {
 
@@ -32,11 +32,11 @@ class ActionDeleteTimeSlices_KeepTime extends Action {
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
-      fTourPropertiesView = tourPropertiesView;
+      _tourDataEditorView = tourPropertiesView;
    }
 
    @Override
    public void run() {
-      fTourPropertiesView.actionDelete_TimeSlices(false, false);
+      _tourDataEditorView.actionDelete_TimeSlices(false, true, false);
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,13 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.data.AltitudeUpDown;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -59,12 +60,8 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String     GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String     GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String     GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
-
-   private static final int        DEFAULT_TEXT_WIDTH   = 50;
-   private static final int        DEFAULT_TEXT_HEIGHT  = 20;
+   private static final int        DEFAULT_TEXT_WIDTH  = 50;
+   private static final int        DEFAULT_TEXT_HEIGHT = 20;
 
    /**
     * Visual position for marker tooltip, they must correspond to the position id
@@ -362,7 +359,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          valueIndex = _hoveredTourMarker.getSerieIndex();
       }
 
-      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
+      final int index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
       TourMarker previousTourMarker = null;
       if (index > 0) {
          previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);
@@ -385,7 +382,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           */
          if (isShowElevation || isShowElevation_Diff) {
 
-            UI.createLabel(container, GRAPH_LABEL_ALTITUDE);
+            UI.createLabel(container, OtherMessages.GRAPH_LABEL_ALTITUDE);
 
             if (isShowElevation) {
                final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
@@ -407,11 +404,11 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             if (isShowElevation_Diff) {
 
                final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
-               final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex, _hoveredTourMarker.getSerieIndex());
+               final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex, _hoveredTourMarker.getSerieIndex());
 
                if (elevationGainLoss != null) {
 
-                  final float value = elevationGainLoss.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
+                  final float value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
 
                   createUI_72_ValueField(
                         container,
@@ -430,7 +427,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           */
          if (isShowDistance || isShowDistance_Diff) {
 
-            UI.createLabel(container, GRAPH_LABEL_DISTANCE);
+            UI.createLabel(container, OtherMessages.GRAPH_LABEL_DISTANCE);
 
             if (isShowDistance) {
 
@@ -498,7 +495,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           */
          if (isShowDuration || isShowDuration_Diff) {
 
-            UI.createLabel(container, GRAPH_LABEL_TIME);
+            UI.createLabel(container, OtherMessages.GRAPH_LABEL_TIME);
 
             if (isShowDuration) {
 

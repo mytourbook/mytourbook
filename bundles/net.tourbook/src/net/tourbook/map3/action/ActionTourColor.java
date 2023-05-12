@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map3.action;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
@@ -27,12 +29,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -65,11 +61,11 @@ public class ActionTourColor extends ContributionItem implements IOpeningDialog 
     */
    private Control _parent;
 
-   ActionTourColor(final MapGraphId graphId,
-                   final boolean isGradientColorProvider,
-                   final Map3View mapView,
-                   final Control parent,
-                   final String toolTipText) {
+   private ActionTourColor(final MapGraphId graphId,
+                           final boolean isGradientColorProvider,
+                           final Map3View mapView,
+                           final Control parent,
+                           final String toolTipText) {
 
       _graphId = graphId;
       _dialogId = getClass().getCanonicalName() + _graphId.name();
@@ -112,7 +108,7 @@ public class ActionTourColor extends ContributionItem implements IOpeningDialog 
                true,
                map3View,
                parent,
-               Messages.map_action_tour_color_pase_tooltip);
+               Messages.map_action_tour_color_pace_tooltip);
 
       case Pulse:
          return new ActionTourColor(MapGraphId.Pulse,
@@ -175,22 +171,14 @@ public class ActionTourColor extends ContributionItem implements IOpeningDialog 
          // keep toolbar for tooltip/dialog positioning
          _toolBar = toolbar;
 
-         toolbar.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               onDispose();
-            }
-         });
+         toolbar.addDisposeListener(disposeEvent -> onDispose());
 
-         toolbar.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(mouseEvent -> {
 
-               final Point mousePosition = new Point(e.x, e.y);
-               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-               onMouseMove(hoveredItem, e);
-            }
+            onMouseMove(hoveredItem);
          });
 
          _actionColor = new ToolItem(toolbar, SWT.CHECK);
@@ -204,12 +192,7 @@ public class ActionTourColor extends ContributionItem implements IOpeningDialog 
 
          _actionColor.setToolTipText(_toolTipText);
 
-         _actionColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect();
-            }
-         });
+         _actionColor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect()));
 
          if (_isGradientColorProvider) {
 
@@ -251,7 +234,7 @@ public class ActionTourColor extends ContributionItem implements IOpeningDialog 
       _actionColor = null;
    }
 
-   private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
+   private void onMouseMove(final ToolItem hoveredItem) {
 
       if (_colorSelectDialog == null || _actionColor.getSelection() == false || _actionColor.isEnabled() == false) {
 

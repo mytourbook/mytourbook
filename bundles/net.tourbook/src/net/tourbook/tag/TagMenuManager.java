@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.Util;
@@ -39,7 +40,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tagging.TourTags_View;
 
 import org.eclipse.jface.action.Action;
@@ -149,7 +149,7 @@ public class TagMenuManager {
    private static class ActionAllPreviousTags extends Action {
 
       public ActionAllPreviousTags() {
-         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
       }
 
       @Override
@@ -176,7 +176,7 @@ public class TagMenuManager {
       private TourTag _tag;
 
       public ActionRecentTag() {
-         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
       }
 
       @Override
@@ -236,6 +236,7 @@ public class TagMenuManager {
 
       // create pref listener
       _prefChangeListener = propertyChangeEvent -> {
+
          final String property = propertyChangeEvent.getProperty();
 
          // check if the number of recent tags has changed
@@ -255,7 +256,7 @@ public class TagMenuManager {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   public static void clearRecentTags() {
+   static void clearRecentTags() {
 
       _allPreviousTags.clear();
       _recentTags.clear();

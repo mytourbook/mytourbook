@@ -23,13 +23,12 @@ import utils.Utils;
 public class TourInfoUITests extends UITest {
 
    @Test
-   void testTourTagsView() {
+   void openTourInfoView() {
 
-      Utils.showTourBookView(bot);
       Utils.getTour(bot);
 
       //Open the Tour Info UI view
-      bot.menu("Tour").menu("Tour Info").click();
-      bot.viewByTitle("Tour Info").show();
+      bot.menu("Tour").menu("Tour Info").click(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.viewByTitle("Tour Info").show(); //$NON-NLS-1$
    }
 }

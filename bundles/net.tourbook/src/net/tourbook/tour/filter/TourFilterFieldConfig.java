@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.tour.filter;
 
 import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.common.UI;
 
@@ -23,6 +24,8 @@ import net.tourbook.common.UI;
  * Configuration for a tour filter field
  */
 public class TourFilterFieldConfig {
+
+   private static final char       NL                    = UI.NEW_LINE;
 
    /**
     * Visible field name
@@ -68,7 +71,7 @@ public class TourFilterFieldConfig {
 
    private TourFilterFieldConfig(final String name) {
 
-      this.name = name;//UI.SPACE2 + name;
+      this.name = name;
    }
 
    /**
@@ -225,12 +228,26 @@ public class TourFilterFieldConfig {
 
    @Override
    public String toString() {
-      return "TourFilterFieldConfig [\n" //$NON-NLS-1$
-            + ("name=" + name + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("fieldId=" + fieldId + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("fieldType=" + fieldType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("fieldOperators=" + Arrays.toString(fieldOperators)) //$NON-NLS-1$
-            + "\n]\n"; //$NON-NLS-1$
+
+      final int maxLen = 5;
+
+      final List<TourFilterFieldOperator> fieldOperatorsAsText = fieldOperators != null
+            ? Arrays.asList(fieldOperators).subList(0, Math.min(fieldOperators.length, maxLen))
+            : null;
+
+      return UI.EMPTY_STRING
+
+            + "TourFilterFieldConfig" + NL //                     //$NON-NLS-1$
+
+            + "[" + NL //                                         //$NON-NLS-1$
+
+            + "name           =" + name + NL //                   //$NON-NLS-1$
+            + "fieldId        =" + fieldId + NL //                //$NON-NLS-1$
+            + "fieldType      =" + fieldType + NL //              //$NON-NLS-1$
+            + "fieldOperators =" + fieldOperatorsAsText + NL //   //$NON-NLS-1$
+
+            + "]" + NL //                                         //$NON-NLS-1$
+      ;
    }
 
    /**

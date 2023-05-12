@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.AltitudeUpDown;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
@@ -232,10 +232,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       }
    }
 
-   public DialogAdjustAltitude(final Shell parentShell,
-                               final TourData tourData,
-                               final boolean isSaveTour,
-                               final boolean isCreateDummyAltitude) {
+   DialogAdjustAltitude(final Shell parentShell,
+                        final TourData tourData,
+                        final boolean isSaveTour,
+                        final boolean isCreateDummyAltitude) {
 
       super(parentShell);
 
@@ -530,13 +530,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       /*
        * Update UI up/down values
        */
-      final AltitudeUpDown adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
+      final ElevationGainLoss adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
 
       final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION;
       final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION;
 
-      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
-      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / UI.UNIT_VALUE_ELEVATION;
+      final float adjustedElevationUp = adjustedElevationUpDown.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+      final float adjustedElevationDown = adjustedElevationUpDown.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
 
       final float tourElevationUp_Diff = adjustedElevationUp - measurementSystem_TourElevationUp;
       final float tourElevationDown_Diff = adjustedElevationDown - measurementSystem_TourElevationDown;
@@ -1338,20 +1338,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          GridLayoutFactory.swtDefaults().applyTo(groupKeep);
          groupKeep.setText(Messages.Dlg_AdjustAltitude_Group_options);
          {
-            final SelectionListener keepButtonSelectionAdapter = widgetSelectedAdapter(selectionEvent -> onChangeAltitude());
+            final SelectionListener keepButtonSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeAltitude());
 
             _rdoKeepBottom = new Button(groupKeep, SWT.RADIO);
             _rdoKeepBottom.setText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude);
             _rdoKeepBottom.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip);
             _rdoKeepBottom.setLayoutData(new GridData());
-            _rdoKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
+            _rdoKeepBottom.addSelectionListener(keepButtonSelectionListener);
             // fRadioKeepBottom.setSelection(true);
 
             _rdoKeepStart = new Button(groupKeep, SWT.RADIO);
             _rdoKeepStart.setText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude);
             _rdoKeepStart.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip);
             _rdoKeepStart.setLayoutData(new GridData());
-            _rdoKeepStart.addSelectionListener(keepButtonSelectionAdapter);
+            _rdoKeepStart.addSelectionListener(keepButtonSelectionListener);
          }
       }
    }

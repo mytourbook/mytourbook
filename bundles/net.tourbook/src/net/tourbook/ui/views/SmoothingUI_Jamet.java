@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageComputedValues;
@@ -412,10 +413,10 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
    @Override
    public void dispose() {
 
-      Util.disposeResource(_imageAltitude);
-      Util.disposeResource(_imageGradient);
-      Util.disposeResource(_imagePulse);
-      Util.disposeResource(_imageSpeed);
+      UI.disposeResource(_imageAltitude);
+      UI.disposeResource(_imageGradient);
+      UI.disposeResource(_imagePulse);
+      UI.disposeResource(_imageSpeed);
    }
 
    private void enableControls() {

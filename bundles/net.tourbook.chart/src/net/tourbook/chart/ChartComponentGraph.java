@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import net.tourbook.chart.preferences.IChartPreferences;
+import net.tourbook.common.DPITools;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
@@ -689,7 +691,7 @@ public class ChartComponentGraph extends Canvas {
    private void adjustYSlider() {
 
       /*
-       * check if the y slider was outside of the bounds, recompute the chart when necessary
+       * Check if the y slider was outside of the bounds, recompute the chart when necessary
        */
 
       final GraphDrawingData drawingData = _ySliderDragged.getDrawingData();
@@ -707,24 +709,39 @@ public class ChartComponentGraph extends Canvas {
       final int devYSliderLine1 = slider1.getDevYSliderLine();
       final int devYSliderLine2 = slider2.getDevYSliderLine();
 
+      final boolean isBottomToTop = drawingData.getYData().isYAxisDirection();
+
       double graphValue1 = 0;
       double graphValue2 = 0;
-      if (drawingData.getYData().isYAxisDirection()) {
+
+      if (isBottomToTop) {
+
          graphValue1 = (((double) devYBottom - devYSliderLine1) / scaleY + graphYBottom);
          graphValue2 = (((double) devYBottom - devYSliderLine2) / scaleY + graphYBottom);
+
       } else {
+
          graphValue1 = (((double) devYSliderLine1 - devYTop) / scaleY + graphYBottom);
          graphValue2 = (((double) devYSliderLine2 - devYTop) / scaleY + graphYBottom);
       }
 
+      boolean isAdjustedSlider1 = false;
+
       // get value which was adjusted
       if (_ySliderDragged == slider1) {
+
          yData.adjustedYValue = (float) graphValue1;
+
+         isAdjustedSlider1 = true;
+
       } else if (_ySliderDragged == slider2) {
+
          yData.adjustedYValue = (float) graphValue2;
+
       } else {
+
          // this case should not happen
-         System.out.println("y-slider is not set correctly\t");//$NON-NLS-1$
+         System.out.println("y-slider is not set correctly");//$NON-NLS-1$
          return;
       }
 
@@ -751,8 +768,41 @@ public class ChartComponentGraph extends Canvas {
          slider1.setDevYSliderLine(devYTop);
          slider2.setDevYSliderLine(devYBottom);
       }
+
       yData.setVisibleMinValue(minValue);
       yData.setVisibleMaxValue(maxValue);
+
+      /*
+       * Keep slider positions which are used to force these values when creating new chart data
+       */
+      final float[] sliderMinMaxValue = yData.getSliderMinMaxValue();
+      if (sliderMinMaxValue != null) {
+
+         // set only the adjusted value
+
+         if (isBottomToTop) {
+
+            if (isAdjustedSlider1) {
+
+               sliderMinMaxValue[1] = (float) maxValue;
+
+            } else {
+
+               sliderMinMaxValue[0] = (float) minValue;
+            }
+
+         } else {
+
+            if (isAdjustedSlider1) {
+
+               sliderMinMaxValue[0] = (float) minValue;
+
+            } else {
+
+               sliderMinMaxValue[1] = (float) maxValue;
+            }
+         }
+      }
 
       _ySliderDragged = null;
 
@@ -760,12 +810,12 @@ public class ChartComponentGraph extends Canvas {
 //      setCursorStyle();
 
       /*
-       * the hited slider could be outsite of the chart, hide the labels on the slider
+       * The hited slider could be outsite of the chart, hide the labels on the slider
        */
       _hitYSlider = null;
 
       /*
-       * when the chart is synchronized, the y-slider position is modified, so we overwrite the
+       * When the chart is synchronized, the y-slider position is modified, so we overwrite the
        * synchronized chart y-slider positions until the zoom in marker is overwritten
        */
       final SynchConfiguration synchedChartConfig = _chartComponents._synchConfigSrc;
@@ -990,12 +1040,14 @@ public class ChartComponentGraph extends Canvas {
     */
    private Cursor createCursorFromImage(final String imageName) {
 
+      final String imageName4K = DPITools.get4kImageName(imageName);
+
       Image cursorImage = null;
-      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName);
+      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName4K);
 
       if (imageDescriptor == null) {
 
-         final String resourceName = "icons/" + imageName;//$NON-NLS-1$
+         final String resourceName = "icons/" + imageName4K;//$NON-NLS-1$
 
          final ClassLoader classLoader = getClass().getClassLoader();
 
@@ -7256,29 +7308,29 @@ public class ChartComponentGraph extends Canvas {
 
 // SET_FORMATTING_OFF
 
-      _cursorResizeLeftRight           = Util.disposeResource(_cursorResizeLeftRight);
-      _cursorResizeTopDown             = Util.disposeResource(_cursorResizeTopDown);
-      _cursorDragged                   = Util.disposeResource(_cursorDragged);
-      _cursorArrow                     = Util.disposeResource(_cursorArrow);
-      _cursorModeSlider                = Util.disposeResource(_cursorModeSlider);
-      _cursorModeZoom                  = Util.disposeResource(_cursorModeZoom);
-      _cursorModeZoomMove              = Util.disposeResource(_cursorModeZoomMove);
-      _cursorDragXSlider_ModeZoom      = Util.disposeResource(_cursorDragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider    = Util.disposeResource(_cursorDragXSlider_ModeSlider);
+      _cursorResizeLeftRight           = UI.disposeResource(_cursorResizeLeftRight);
+      _cursorResizeTopDown             = UI.disposeResource(_cursorResizeTopDown);
+      _cursorDragged                   = UI.disposeResource(_cursorDragged);
+      _cursorArrow                     = UI.disposeResource(_cursorArrow);
+      _cursorModeSlider                = UI.disposeResource(_cursorModeSlider);
+      _cursorModeZoom                  = UI.disposeResource(_cursorModeZoom);
+      _cursorModeZoomMove              = UI.disposeResource(_cursorModeZoomMove);
+      _cursorDragXSlider_ModeZoom      = UI.disposeResource(_cursorDragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider    = UI.disposeResource(_cursorDragXSlider_ModeSlider);
 
-      _cursorMove1x                    = Util.disposeResource(_cursorMove1x);
-      _cursorMove2x                    = Util.disposeResource(_cursorMove2x);
-      _cursorMove3x                    = Util.disposeResource(_cursorMove3x);
-      _cursorMove4x                    = Util.disposeResource(_cursorMove4x);
-      _cursorMove5x                    = Util.disposeResource(_cursorMove5x);
+      _cursorMove1x                    = UI.disposeResource(_cursorMove1x);
+      _cursorMove2x                    = UI.disposeResource(_cursorMove2x);
+      _cursorMove3x                    = UI.disposeResource(_cursorMove3x);
+      _cursorMove4x                    = UI.disposeResource(_cursorMove4x);
+      _cursorMove5x                    = UI.disposeResource(_cursorMove5x);
 
-      _cursorXSliderLeft               = Util.disposeResource(_cursorXSliderLeft);
-      _cursorXSliderRight              = Util.disposeResource(_cursorXSliderRight);
+      _cursorXSliderLeft               = UI.disposeResource(_cursorXSliderLeft);
+      _cursorXSliderRight              = UI.disposeResource(_cursorXSliderRight);
 
-      _chartImage_20_Chart             = Util.disposeResource(_chartImage_20_Chart);
-      _chartImage_10_Graphs            = Util.disposeResource(_chartImage_10_Graphs);
-      _chartImage_40_Overlay           = Util.disposeResource(_chartImage_40_Overlay);
-      _chartImage_30_Custom            = Util.disposeResource(_chartImage_30_Custom);
+      _chartImage_20_Chart             = UI.disposeResource(_chartImage_20_Chart);
+      _chartImage_10_Graphs            = UI.disposeResource(_chartImage_10_Graphs);
+      _chartImage_40_Overlay           = UI.disposeResource(_chartImage_40_Overlay);
+      _chartImage_30_Custom            = UI.disposeResource(_chartImage_30_Custom);
 
 // SET_FORMATTING_ON
 
@@ -8359,15 +8411,31 @@ public class ChartComponentGraph extends Canvas {
          // mouse mode: move slider
 
          /**
-          * when a slider in a graph is moved with the mouse wheel the direction is the same as when
+          * When a slider in a graph is moved with the mouse wheel the direction is the same as when
           * the mouse wheel is scrolling in the tour editor:
           * <p>
-          * wheel up -> tour editor up
+          * Wheel up -> Tour editor up
           */
-         if (event.count < 0) {
-            event.keyCode |= SWT.ARROW_RIGHT;
+         final MouseWheel2KeyTranslation mouseKeyTranslation = (MouseWheel2KeyTranslation) net.tourbook.common.util.Util.getEnumValue(
+
+               ChartActivator.getPrefStore().getString(IChartPreferences.GRAPH_MOUSE_KEY_TRANSLATION),
+               MouseWheel2KeyTranslation.Up_Left);
+
+         if (mouseKeyTranslation.equals(MouseWheel2KeyTranslation.Up_Left)) {
+
+            if (event.count < 0) {
+               event.keyCode |= SWT.ARROW_RIGHT;
+            } else {
+               event.keyCode |= SWT.ARROW_LEFT;
+            }
+
          } else {
-            event.keyCode |= SWT.ARROW_LEFT;
+
+            if (event.count < 0) {
+               event.keyCode |= SWT.ARROW_LEFT;
+            } else {
+               event.keyCode |= SWT.ARROW_RIGHT;
+            }
          }
 
          /*

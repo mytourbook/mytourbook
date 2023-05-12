@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.srtm;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.InputStream;
 
@@ -33,13 +35,9 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -159,12 +157,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                   group);
             _useDefaultLocation.setPage(this);
             _useDefaultLocation.setPreferenceStore(_prefStore);
-            _useDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
-               @Override
-               public void propertyChange(final PropertyChangeEvent event) {
-                  enableControls();
-               }
-            });
+            _useDefaultLocation.setPropertyChangeListener(propertyChangeEvent -> enableControls());
             new Label(group, SWT.NONE);
          }
          {
@@ -185,12 +178,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                _dataPathEditor.setPage(this);
                _dataPathEditor.setPreferenceStore(_prefStore);
                _dataPathEditor.setEmptyStringAllowed(false);
-               _dataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-                  @Override
-                  public void propertyChange(final PropertyChangeEvent event) {
-                     validateData();
-                  }
-               });
+               _dataPathEditor.setPropertyChangeListener(propertyChangeEvent -> validateData());
             }
          }
       }
@@ -220,12 +208,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             final Link link = new Link(group, SWT.NONE);
             link.setText(NLS.bind(Messages.PrefPage_SRTMData_Link_AccountInfo, HTTPS_NASA_EARTHDATA_LOGIN));
             link.setToolTipText(HTTPS_NASA_EARTHDATA_LOGIN);
-            link.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(HTTPS_NASA_EARTHDATA_LOGIN);
-               }
-            });
+            link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_NASA_EARTHDATA_LOGIN)));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .hint(defaultCommentWidth, SWT.DEFAULT)
@@ -271,12 +254,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                    */
                   _btnValidateDownloadOfSRTMData = new Button(container, SWT.NONE);
                   _btnValidateDownloadOfSRTMData.setText(Messages.PrefPage_SRTMData_Button_ValidateDownloadOfSrtmData);
-                  _btnValidateDownloadOfSRTMData.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        onSelect_ValidateSrtmDownload();
-                     }
-                  });
+                  _btnValidateDownloadOfSRTMData.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ValidateSrtmDownload()));
                }
                {
                   /*
@@ -284,12 +262,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                    */
                   _btnResetValidation = new Button(container, SWT.NONE);
                   _btnResetValidation.setText(Messages.PrefPage_SRTMData_Button_ResetValidation);
-                  _btnResetValidation.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        onSelect_ResetValidation();
-                     }
-                  });
+                  _btnResetValidation.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ResetValidation()));
                }
                {
                   /*
@@ -299,12 +272,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                   final Button btnSrtmDummyValidation = new Button(container, SWT.NONE);
                   btnSrtmDummyValidation.setText(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation);
                   btnSrtmDummyValidation.setToolTipText(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation_Tooltip);
-                  btnSrtmDummyValidation.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        onSelect_DummyValidation();
-                     }
-                  });
+                  btnSrtmDummyValidation.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_DummyValidation()));
                }
             }
          }

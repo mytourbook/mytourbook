@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -34,14 +35,12 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
 /**
  * Submenu for uploading tours
  */
-public class ActionUpload extends Action implements IMenuCreator {
+public class ActionUpload extends SubMenu {
 
    private List<TourbookCloudUploader> _tourbookCloudUploaders = new ArrayList<>();
 
@@ -57,6 +56,7 @@ public class ActionUpload extends Action implements IMenuCreator {
       public ActionUploadTour(final TourbookCloudUploader tourbookCloudUploader) {
 
          super(tourbookCloudUploader.getName());
+         setImageDescriptor(tourbookCloudUploader.getImageDescriptor());
 
          _tourbookCloudUploader = tourbookCloudUploader;
       }
@@ -103,13 +103,13 @@ public class ActionUpload extends Action implements IMenuCreator {
       _tourProvider = tourProvider;
 
       setText(Messages.App_Action_Upload_Tour);
-      setMenuCreator(this);
 
       getCloudUploaders();
       createActions();
    }
 
    private void addActionToMenu(final Action action) {
+
       final ActionContributionItem item = new ActionContributionItem(action);
       item.fill(_menu, -1);
    }
@@ -126,14 +126,14 @@ public class ActionUpload extends Action implements IMenuCreator {
    }
 
    @Override
-   public void dispose() {
+   public void enableActions() {}
 
-      if (_menu == null) {
-         return;
-      }
+   @Override
+   public void fillMenu(final Menu menu) {
 
-      _menu.dispose();
-      _menu = null;
+      _menu = menu;
+
+      _uploadTourActions.forEach(this::addActionToMenu);
    }
 
    /**
@@ -146,22 +146,6 @@ public class ActionUpload extends Action implements IMenuCreator {
       }
 
       return _tourbookCloudUploaders;
-   }
-
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-      _menu = new Menu(parent);
-
-      _uploadTourActions.forEach(this::addActionToMenu);
-
-      return _menu;
    }
 
    /**

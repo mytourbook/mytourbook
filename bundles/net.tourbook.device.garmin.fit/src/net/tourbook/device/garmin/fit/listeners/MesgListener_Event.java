@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,20 +25,19 @@ import java.util.List;
 
 import net.tourbook.data.GearData;
 import net.tourbook.device.garmin.fit.FitData;
-import net.tourbook.device.garmin.fit.FitUtils;
 
 /**
  * Set gear data
  */
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
-   List<GearData>     _gearData;
+   private List<GearData> _gearData;
 
-   private List<Long> _pausedTime_Start = new ArrayList<>();
-   private List<Long> _pausedTime_End   = new ArrayList<>();
-   private List<Long> _pausedTime_Data  = new ArrayList<>();
+   private List<Long>     _pausedTime_Start = new ArrayList<>();
+   private List<Long>     _pausedTime_End   = new ArrayList<>();
+   private List<Long>     _pausedTime_Data  = new ArrayList<>();
 
-   private boolean    _isTimerStopped   = true;
+   private boolean        _isTimerStopped   = true;
 
    public MesgListener_Event(final FitData fitData) {
 
@@ -97,14 +96,17 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
        */
       final Event event = mesg.getEvent();
       final EventType eventType = mesg.getEventType();
-      final long javaTime = FitUtils.convertGarminTimeToJavaTime(mesg.getTimestamp().getTimestamp());
+      final long javaTime = mesg.getTimestamp().getDate().getTime();
 
       if (event != null && event == Event.TIMER && eventType != null) {
 
          switch (eventType) {
 
-         //The Garmin usage of START/STOP/STOP_ALL is described here:
-         //https://www.thisisant.com/forum/viewthread/4319/#7452
+         // The Garmin usage of START/STOP/STOP_ALL is described here:
+         // https://www.thisisant.com/forum/viewthread/4319/#7452
+
+         // Garmin: Elapsed, Timer, and Moving Durations
+         // https://developer.garmin.com/fit/cookbook/durations/
 
          case START:
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,8 @@ public class ActionSetupImport extends Action {
 
    @Override
    public void run() {
-      _rawDataView.action_Easy_SetupImport(-1);
+
+      _rawDataView.onSelect_SetupEasyImport(-1);
    }
 
 }

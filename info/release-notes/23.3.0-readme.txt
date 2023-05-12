@@ -1,0 +1,109 @@
+23.3.0                                                     7. March 2023
+
+New
+===
+    
+2.5D Map
+  - Show an animated 3D model which is moving along the tour track
+  - The installation file of MyTourbook is about 50 MByte larger because
+    of the 3 default models
+  - A new map model player is managing the moving model
+
+Tour Tags (Frederic)
+  - Added the ability to add an image to a tag and display its
+    accumulated values in the Tour Data Editor View
+    https://github.com/mytourbook/mytourbook/issues/805
+    
+
+Improvements
+============
+
+TCX Import (Frederic)
+  - Import of calories and average power values
+
+Tour Filter
+  - Filter tours by "Most Recent", e.g. show tours for the last 15 months
+    https://github.com/mytourbook/mytourbook/issues/976
+
+Tour Blog (Frederic)
+  - Display of the weather summary
+
+Tour Editor
+  - Keep distance values when time slices are deleted
+    https://github.com/mytourbook/mytourbook/issues/986
+
+Concatenate Tours (Frederic)
+  - Added the ability to delete the source tours
+  
+4k Display
+  - Increased cursor size in Tour Chart and 2D Map, when displayed on
+    4k displays
+
+
+Changes
+=======
+
+Tour Search
+  - After some testing and no app crashes, the embedded browser is now
+    also used in Linux. The old behaviour can be enabled by setting the
+    command line parameter "-DforceBrowserForTourSeachInLinux"
+    when starting MyTourbook
+    https://github.com/mytourbook/mytourbook/issues/1000
+
+Map Player -> Model Player
+  - The "Map Player" view was renamed to "Model Player" view. Ignore the
+    following error, close this view and open the "Model Player" view
+  
+2 Year Digits -> 4 Year Digits
+  - For some locales e.g. german the short formatting for a year has
+    2 digits, this is now changed to 4 year digits
+
+
+Experimental
+============
+
+Duplicate Tour
+  - The action "Duplicate Tour" in the "Tour Book" context menu is now
+    enabled for all tours, not only for manual tours as it was before.
+    All data are now duplicated, e.g. data series, markers or photos except
+    the reference tours. A "copy" label is appended to the tour title.
+    Use this feature with care, mainly the duplicated tours, as it is
+    not yet fully tested.
+    One issue could be that when a duplicated tour is selected then it's
+    data are not displayed because the original tour was selected before.
+    This issue happened in the flat "Tour Book" view and is fixed.
+    There are so many possibilities in MyTourbook where issues could
+    occure that not all of them are tested now.
+    https://github.com/mytourbook/mytourbook/issues/937
+
+
+Bugfix
+======
+
+Concatenate Tours (Frederic)
+  - Fixed a bug where the markers and pause times in the concatenated
+    tour had erroneous time values
+
+People Preference Page (Frederic)
+  - Fixed an issue where the BMI (Body Mass Index) would be erroneous
+    whenever the measurement system is not in metric
+
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.3   https://github.com/mytourbook/mytourbook/milestone/6?closed=1
+* Eclipse 2022-06			      https://github.com/mytourbook/mytourbook/issues/973
+* NatTable 2.03               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.105
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

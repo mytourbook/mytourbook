@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,7 @@ import org.oscim.core.MapPosition;
 
 public class MapBookmark {
 
-   private static final char NL = UI.NEW_LINE                  //
-   ;
+   private static final char NL = UI.NEW_LINE;
 
    public String             id = UUID.randomUUID().toString();
 

@@ -40,12 +40,12 @@ import org.eclipse.swt.widgets.Display;
 
 public abstract class HistoricalWeatherRetriever {
 
-   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
-   public TourData          tour;
-   public LatLng            searchAreaCenter;
-   public long              tourEndTime;
-   public long              tourMiddleTime;
-   public long              tourStartTime;
+   private static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   public TourData           tour;
+   public LatLng             searchAreaCenter;
+   public long               tourEndTime;
+   public long               tourMiddleTime;
+   public long               tourStartTime;
 
    protected HistoricalWeatherRetriever(final TourData tourData) {
       tour = tourData;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,13 @@ package net.tourbook.extension.export;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -33,24 +37,23 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Menu;
 
 /**
  * Submenu for exporting tours
  */
-public class ActionExport extends Action implements IMenuCreator {
+public class ActionExport extends SubMenu {
 
-   private ArrayList<ExportTourExtension> _exportExtensionPoints;
+   private List<ExportTourExtension>    _exportExtensionPoints;
 
-   private Menu                           _menu;
-   private ArrayList<ActionExportTour>    _exportTourActions;
+   private List<ActionExportTour>       _exportTourActions;
+   private List<ActionContributionItem> _exportTourContributionItems;
 
-   private final ITourProvider            _tourProvider;
+   private final ITourProvider          _tourProvider;
 
-   private int                            _tourStartIndex = -1;
-   private int                            _tourEndIndex   = -1;
+   private int                          _tourStartIndex = -1;
+   private int                          _tourEndIndex   = -1;
 
    private class ActionExportTour extends Action {
 
@@ -59,8 +62,13 @@ public class ActionExport extends Action implements IMenuCreator {
       public ActionExportTour(final ExportTourExtension exportTourExtension) {
 
          super(exportTourExtension.getVisibleName());
+         setImageDescriptor(exportTourExtension.getImageDescriptor());
 
          _exportTourExtension = exportTourExtension;
+      }
+
+      public ExportTourExtension getExportTourExtension() {
+         return _exportTourExtension;
       }
 
       @Override
@@ -81,9 +89,8 @@ public class ActionExport extends Action implements IMenuCreator {
          // sort by date/time
          Collections.sort(selectedTours);
 
-         _exportTourExtension.exportTours(selectedTours, _tourStartIndex, _tourEndIndex);
+         getExportTourExtension().exportTours(selectedTours, _tourStartIndex, _tourEndIndex);
       }
-
    }
 
    /**
@@ -101,15 +108,9 @@ public class ActionExport extends Action implements IMenuCreator {
       _tourProvider = tourProvider;
 
       setText(Messages.action_export_tour);
-      setMenuCreator(this);
 
       getExtensionPoints();
       createActions();
-   }
-
-   private void addActionToMenu(final Action action) {
-      final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(_menu, -1);
    }
 
    private void createActions() {
@@ -121,23 +122,54 @@ public class ActionExport extends Action implements IMenuCreator {
       _exportTourActions = new ArrayList<>();
 
       // create action for each extension point
-      for (final ExportTourExtension exportTourExtension : _exportExtensionPoints) {
-         _exportTourActions.add(new ActionExportTour(exportTourExtension));
+      _exportExtensionPoints.forEach(exportTourExtension -> _exportTourActions.add(
+            new ActionExportTour(exportTourExtension)));
+
+      // create a menu item for each extension point as the MT extension point
+      // needs to be at the end
+      _exportTourContributionItems = new ArrayList<>();
+
+      final Optional<ActionExportTour> mtExtension = _exportTourActions.stream().filter(extension -> extension.getExportTourExtension()
+            .getFileExtension().equals(
+                  "mt")).findFirst(); //$NON-NLS-1$
+      ActionExportTour mtActionExportTour = null;
+      if (mtExtension.isPresent()) {
+
+         mtActionExportTour = mtExtension.get();
+         _exportTourActions.remove(mtActionExportTour);
+      }
+
+      final List<ActionExportTour> sortedExportTourActions = _exportTourActions.stream()
+            .sorted((o1, o2) -> o1.getExportTourExtension().getVisibleName().compareTo(o2.getExportTourExtension().getVisibleName()))
+            .collect(Collectors.toList());
+      sortedExportTourActions.forEach(action -> _exportTourContributionItems.add(new ActionContributionItem(action)));
+      if (mtActionExportTour != null) {
+
+         _exportTourContributionItems.add(new ActionContributionItem(mtActionExportTour));
       }
    }
 
    @Override
-   public void dispose() {
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
+   public void enableActions() {}
+
+   @Override
+   public void fillMenu(final Menu menu) {
+
+      for (final ActionContributionItem _exportTourContributionItem : _exportTourContributionItems) {
+
+         if (((ActionExportTour) _exportTourContributionItem.getAction()).getExportTourExtension().getFileExtension().equals("mt")) { //$NON-NLS-1$
+
+            (new Separator()).fill(menu, -1);
+         }
+
+         _exportTourContributionItem.fill(menu, -1);
       }
    }
 
    /**
-    * read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
+    * Read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
     */
-   private ArrayList<ExportTourExtension> getExtensionPoints() {
+   private List<ExportTourExtension> getExtensionPoints() {
 
       if (_exportExtensionPoints != null) {
          return _exportExtensionPoints;
@@ -155,6 +187,7 @@ public class ActionExport extends Action implements IMenuCreator {
       }
 
       for (final IExtension extension : extPoint.getExtensions()) {
+
          for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
             if (configElement.getName().equalsIgnoreCase("export") == false) { //$NON-NLS-1$
@@ -181,28 +214,13 @@ public class ActionExport extends Action implements IMenuCreator {
       return _exportExtensionPoints;
    }
 
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-      _menu = new Menu(parent);
-
-      _exportTourActions.forEach(this::addActionToMenu);
-
-      return _menu;
-   }
-
    public void setNumberOfTours(final int numTours) {
 
       setText(Messages.action_export_tour + String.format(" (%d)", numTours)); //$NON-NLS-1$
    }
 
    public void setTourRange(final int tourStartIndex, final int tourEndIndex) {
+
       _tourStartIndex = tourStartIndex;
       _tourEndIndex = tourEndIndex;
    }

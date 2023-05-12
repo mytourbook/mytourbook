@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
+
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
@@ -27,12 +29,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
@@ -171,14 +169,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    private void addListener(final Control ownerControl) {
 
-      ownerControl.addMouseTrackListener(new MouseTrackAdapter() {
-         @Override
-         public void mouseExit(final MouseEvent e) {
+      ownerControl.addMouseTrackListener(mouseExitAdapter(mouseEvent -> {
 
-            // prevent to open the tooltip
-            _canOpenToolTip = false;
-         }
-      });
+         // prevent to open the tooltip
+         _canOpenToolTip = false;
+      }));
    }
 
    @Override
@@ -299,12 +294,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
             onMouseUp(e);
          }
       });
-      _labelDragSlideout.addMouseMoveListener(new MouseMoveListener() {
-         @Override
-         public void mouseMove(final MouseEvent e) {
-            onMouseMove(e);
-         }
-      });
+      _labelDragSlideout.addMouseMoveListener(mouseEvent -> onMouseMove(mouseEvent));
    }
 
    /**
@@ -410,7 +400,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       if (isCheckAbove && (devY < 0)) {
          devY = devYBelow;
       }
-      if (isCheckBelow & (devY + slideoutHeight > displayHeight)) {
+      if (isCheckBelow && (devY + slideoutHeight > displayHeight)) {
          devY = devYAbove;
       }
 
@@ -429,12 +419,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _cursorResize = new Cursor(display, SWT.CURSOR_SIZEALL);
       _cursorHand = new Cursor(display, SWT.CURSOR_HAND);
 
-      ownerControl.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      ownerControl.addDisposeListener(disposeEvent -> AdvancedSlideout.this.onDispose());
    }
 
    @Override
@@ -456,7 +441,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _cursorHand.dispose();
    }
 
-   abstract protected void onFocus();
+   protected abstract void onFocus();
 
    private void onMouseDown(final MouseEvent e) {
 
@@ -560,10 +545,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    }
 
    public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
+
       _slideoutLocation = slideoutLocation;
    }
 
    protected void setTitleText(final String titleText) {
+
       _titleText = titleText;
    }
 

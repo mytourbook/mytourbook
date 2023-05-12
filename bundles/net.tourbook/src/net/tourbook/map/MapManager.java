@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.tourbook.map.IMapSyncListener.SyncParameter;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
@@ -37,12 +39,12 @@ public class MapManager {
 
    public static void fireSyncMapEvent(final MapPosition mapPosition,
                                        final ViewPart viewPart,
-                                       final int positionFlags) {
+                                       final SyncParameter syncParameter) {
 
       final Object[] allListeners = _allMapSyncListener.getListeners();
 
       for (final Object listener : allListeners) {
-         ((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, positionFlags);
+         ((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, syncParameter);
       }
    }
 

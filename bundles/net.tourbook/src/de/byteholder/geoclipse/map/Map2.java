@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -69,8 +69,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -79,7 +77,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.Images;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.DPITools;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ThemeUtil;
@@ -148,7 +148,6 @@ import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -156,11 +155,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 
 public class Map2 extends Canvas {
-
-   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE                    = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
-   private static final String          TOUR_TOOLTIP_LABEL_ELEVATION_UP                = net.tourbook.ui.Messages.Tour_Tooltip_Label_AltitudeUp;
-   private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME                 = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
-   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
    private static final char            NL                                             = UI.NEW_LINE;
 
@@ -185,12 +179,12 @@ public class Map2 extends Canvas {
    public static final int              EXPANDED_HOVER_SIZE                            = 20;
    public static final int              EXPANDED_HOVER_SIZE2                           = EXPANDED_HOVER_SIZE / 2;
 
-   private static final String          DIRECTION_E                                    = "E";                                                     //$NON-NLS-1$
-   private static final String          DIRECTION_N                                    = "N";                                                     //$NON-NLS-1$
+   private static final String          DIRECTION_E                                    = "E";                             //$NON-NLS-1$
+   private static final String          DIRECTION_N                                    = "N";                             //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
-   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                                //$NON-NLS-1$
+   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                        //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -281,31 +275,31 @@ public class Map2 extends Canvas {
     * Map zoom level which is currently be used to display tiles. Normally a value between around 0
     * and 20.
     */
-   private int                     _mapZoomLevel;
+   private int                           _mapZoomLevel;
 
-   private CenterMapBy             _centerMapBy;
+   private CenterMapBy                   _centerMapBy;
 
    /**
     * This image contains the map which is painted in the map viewport
     */
-   private Image                   _mapImage;
+   private Image                         _mapImage;
 
-   private Image                   _9PartImage;
-   private GC                      _9PartGC;
+   private Image                         _9PartImage;
+   private GC                            _9PartGC;
 
    /**
     * Indicates whether or not to draw the borders between tiles. Defaults to false. not very nice
     * looking, very much a product of testing Consider whether this should really be a property or
     * not.
     */
-   private boolean                 _isShowDebug_TileInfo;
-   private boolean                 _isShowDebug_TileBorder;
-   private boolean                 _isShowDebug_GeoGrid;
+   private boolean                       _isShowDebug_TileInfo;
+   private boolean                       _isShowDebug_TileBorder;
+   private boolean                       _isShowDebug_GeoGrid;
 
    /**
     * Factory used by this component to grab the tiles necessary for painting the map.
     */
-   private MP                      _mp;
+   private MP                            _mp;
 
    /**
     * The position in latitude/longitude of the "address" being mapped. This is a special coordinate
@@ -314,48 +308,48 @@ public class Map2 extends Canvas {
     * when panning or zooming. Whenever the addressLocation is changed, however, the map will be
     * repositioned.
     */
-   private GeoPosition             _addressLocation;
+   private GeoPosition                   _addressLocation;
 
    /**
     * The overlay to delegate to for painting the "foreground" of the map component. This would
     * include painting waypoints, day/night, etc. also receives mouse events.
     */
-   private final List<Map2Painter> _allMapPainter           = new ArrayList<>();
+   private final List<Map2Painter>       _allMapPainter           = new ArrayList<>();
 
-   private final TileLoadObserver  _tileImageLoadObserver   = new TileLoadObserver();
+   private final TileImageLoaderCallback _tileImageLoaderCallback = new TileImageLoaderCallback_ForTileImages();
 
-   private Cursor                  _currentCursor;
-   private final Cursor            _cursorCross;
-   private final Cursor            _cursorDefault;
-   private final Cursor            _cursorHand;
-   private final Cursor            _cursorPan;
-   private final Cursor            _cursorSearchTour;
-   private final Cursor            _cursorSearchTour_Scroll;
-   private final Cursor            _cursorSelect;
+   private Cursor                        _currentCursor;
+   private final Cursor                  _cursorCross;
+   private final Cursor                  _cursorDefault;
+   private final Cursor                  _cursorHand;
+   private final Cursor                  _cursorPan;
+   private final Cursor                  _cursorSearchTour;
+   private final Cursor                  _cursorSearchTour_Scroll;
+   private final Cursor                  _cursorSelect;
 
-   private final AtomicInteger     _redrawMapCounter        = new AtomicInteger();
-   private final AtomicInteger     _overlayRunnableCounter  = new AtomicInteger();
+   private final AtomicInteger           _redrawMapCounter        = new AtomicInteger();
+   private final AtomicInteger           _overlayRunnableCounter  = new AtomicInteger();
 
-   private boolean                 _isLeftMouseButtonPressed;
-   private boolean                 _isMapPanned;
+   private boolean                       _isLeftMouseButtonPressed;
+   private boolean                       _isMapPanned;
 
-   private Point                   _mouseDownPosition;
-   private GeoPosition             _mouseDown_ContextMenu_GeoPosition;
-   private int                     _mouseMove_DevPosition_X = Integer.MIN_VALUE;
-   private int                     _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
-   private int                     _mouseMove_DevPosition_X_Last;
-   private int                     _mouseMove_DevPosition_Y_Last;
-   private GeoPosition             _mouseMove_GeoPosition;
+   private Point                         _mouseDownPosition;
+   private GeoPosition                   _mouseDown_ContextMenu_GeoPosition;
+   private int                           _mouseMove_DevPosition_X = Integer.MIN_VALUE;
+   private int                           _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
+   private int                           _mouseMove_DevPosition_X_Last;
+   private int                           _mouseMove_DevPosition_Y_Last;
+   private GeoPosition                   _mouseMove_GeoPosition;
 
-   private Thread                  _overlayThread;
+   private Thread                        _overlayThread;
 
-   private long                    _nextOverlayRedrawTime;
+   private long                          _nextOverlayRedrawTime;
 
-   private final NumberFormat      _nf0;
-   private final NumberFormat      _nf1;
-   private final NumberFormat      _nf2;
-   private final NumberFormat      _nf3;
-   private final NumberFormat      _nfLatLon;
+   private final NumberFormat            _nf0;
+   private final NumberFormat            _nf1;
+   private final NumberFormat            _nf2;
+   private final NumberFormat            _nf3;
+   private final NumberFormat            _nfLatLon;
    {
       _nf0 = NumberFormat.getNumberInstance();
       _nf1 = NumberFormat.getNumberInstance();
@@ -650,27 +644,20 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * This observer is called in the {@link Tile} when a tile image is set into the tile
+    * This callback is called when a tile image was loaded and is set into the tile
     */
-   private final class TileLoadObserver implements Observer {
+   final class TileImageLoaderCallback_ForTileImages implements TileImageLoaderCallback {
 
       @Override
-      public void update(final Observable observable, final Object arg) {
+      public void update(final Tile tile) {
 
-         if (observable instanceof Tile) {
+         if (tile.getZoom() == _mapZoomLevel) {
 
-            final Tile tile = (Tile) observable;
-
-            if (tile.getZoom() == _mapZoomLevel) {
-
-               /*
-                * Because we are not in the UI thread, we have to queue the call for redraw and
-                * cannot do it directly.
-                */
-               paint();
-
-               tile.deleteObserver(this);
-            }
+            /*
+             * Because we are not in the UI thread, we have to queue the call for redraw and
+             * cannot do it directly.
+             */
+            paint();
          }
       }
    }
@@ -698,14 +685,18 @@ public class Map2 extends Canvas {
 
       grid_UpdatePaintingStateData();
 
-      _cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
-      _cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
-      _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
-      _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
+// SET_FORMATTING_OFF
 
-      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
-      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
-      _cursorSelect = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.Cursor_Select));
+      _cursorCross               = new Cursor(_display, SWT.CURSOR_CROSS);
+      _cursorDefault             = new Cursor(_display, SWT.CURSOR_ARROW);
+      _cursorHand                = new Cursor(_display, SWT.CURSOR_HAND);
+      _cursorPan                 = new Cursor(_display, SWT.CURSOR_SIZEALL);
+
+      _cursorSearchTour          = createCursorFromImage(Images.SearchTours_ByLocation);
+      _cursorSearchTour_Scroll   = createCursorFromImage(Images.SearchTours_ByLocation_Scroll);
+      _cursorSelect              = createCursorFromImage(Images.Cursor_Select);
+
+// SET_FORMATTING_ON
 
       _transparentColor = new Color(MAP_TRANSPARENT_RGB);
 
@@ -1091,6 +1082,13 @@ public class Map2 extends Canvas {
       setMenu(menuMgr.createContextMenu(this));
    }
 
+   private Cursor createCursorFromImage(final String imageName) {
+
+      final String imageName4k = DPITools.get4kImageName(imageName);
+
+      return UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(imageName4k));
+   }
+
    /**
     * Creates a new image, old image is disposed
     *
@@ -1160,14 +1158,8 @@ public class Map2 extends Canvas {
       grid_UpdatePaintingStateData();
    }
 
-   private void disposeResource(final Resource resource) {
-
-      if ((resource != null) && !resource.isDisposed()) {
-         resource.dispose();
-      }
-   }
-
    public void disposeTiles() {
+
       _mp.disposeTiles();
    }
 
@@ -2719,19 +2711,19 @@ public class Map2 extends Canvas {
          _dropTarget.dispose();
       }
 
-      disposeResource(_mapImage);
-      disposeResource(_poiImage);
+      UI.disposeResource(_mapImage);
+      UI.disposeResource(_poiImage);
 
-      disposeResource(_9PartImage);
-      disposeResource(_9PartGC);
+      UI.disposeResource(_9PartImage);
+      UI.disposeResource(_9PartGC);
 
-      disposeResource(_cursorCross);
-      disposeResource(_cursorDefault);
-      disposeResource(_cursorHand);
-      disposeResource(_cursorPan);
-      disposeResource(_cursorSearchTour);
-      disposeResource(_cursorSearchTour_Scroll);
-      disposeResource(_cursorSelect);
+      UI.disposeResource(_cursorCross);
+      UI.disposeResource(_cursorDefault);
+      UI.disposeResource(_cursorHand);
+      UI.disposeResource(_cursorPan);
+      UI.disposeResource(_cursorSearchTour);
+      UI.disposeResource(_cursorSearchTour_Scroll);
+      UI.disposeResource(_cursorSelect);
 
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
@@ -2747,7 +2739,7 @@ public class Map2 extends Canvas {
 
       // dispose legend image
       if (_mapLegend != null) {
-         disposeResource(_mapLegend.getImage());
+         UI.disposeResource(_mapLegend.getImage());
       }
 
       if (_poi_Tooltip != null) {
@@ -2947,6 +2939,8 @@ public class Map2 extends Canvas {
 
       } else if (_isShowHoveredOrSelectedTour
             && _isShowBreadcrumbs
+
+            // check if breadcrumb is hit
             && _tourBreadcrumb.onMouseDown(devMousePosition)) {
 
          // a crumb is selected
@@ -4597,20 +4591,20 @@ public class Map2 extends Canvas {
        * Tour values
        */
       final String text_TourMovingTime = String.format(Messages.Map2_TourTooltip_Time,
-            TOUR_TOOLTIP_LABEL_MOVING_TIME,
+            OtherMessages.TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
       final String text_TourRecordedTime = String.format(Messages.Map2_TourTooltip_Time,
-            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+            OtherMessages.TOUR_TOOLTIP_LABEL_RECORDED_TIME,
             FormatManager.formatMovingTime(recordedTime));
 
       final String text_TourDistance = String.format(Messages.Map2_TourTooltip_Distance,
-            TOUR_TOOLTIP_LABEL_DISTANCE,
+            OtherMessages.TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
       final String text_ElevationUp = String.format(Messages.Map2_TourTooltip_Elevation,
-            TOUR_TOOLTIP_LABEL_ELEVATION_UP,
+            OtherMessages.TOUR_TOOLTIP_LABEL_ELEVATION_UP,
             FormatManager.formatElevation(elevationUp),
             UI.UNIT_LABEL_ELEVATION);
 
@@ -4748,7 +4742,7 @@ public class Map2 extends Canvas {
           * Combine tour values
           */
          sb.append(NL);
-         sb.append(String.format("%s\t%s\t%s\t%s", //$NON-NLS-1$
+         sb.append(String.format("%s\t%s\t%8s\t%10s", //$NON-NLS-1$
                text_TourDateTime,
                text_TourMovingTime,
                text_TourDistance,
@@ -5852,7 +5846,7 @@ public class Map2 extends Canvas {
        * image is available. Tile image loading is started, when the tile is retrieved from the tile
        * factory which is done in drawTile()
        */
-      tile.addObserver(_tileImageLoadObserver);
+      tile.setImageLoaderCallback(_tileImageLoaderCallback);
 
       if (_isLiveView == false) {
 
@@ -6780,10 +6774,10 @@ public class Map2 extends Canvas {
     */
    public void setLegend(final MapLegend legend) {
 
-      if ((legend == null) && (_mapLegend != null)) {
+      if (legend == null && _mapLegend != null) {
 
          // dispose legend image
-         disposeResource(_mapLegend.getImage());
+         UI.disposeResource(_mapLegend.getImage());
       }
 
       _mapLegend = legend;

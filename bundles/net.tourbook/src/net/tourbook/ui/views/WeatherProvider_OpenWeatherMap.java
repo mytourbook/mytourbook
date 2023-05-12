@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,14 +35,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
+class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
 
    private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
-
-   /*
-    * UI controls
-    */
-   private Button _btnTestConnection;
 
    public WeatherProvider_OpenWeatherMap() {}
 
@@ -74,17 +69,17 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          /*
           * Button: test connection
           */
-         _btnTestConnection = new Button(container, SWT.NONE);
-         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
-         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         final Button btnTestConnection = new Button(container, SWT.NONE);
+         btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+         btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final var previousHour = Instant
+            final long previousHour = Instant
                   .now()
                   .minus(1, ChronoUnit.HOURS)
                   .toEpochMilli() / 1000;
 
             HistoricalWeatherRetriever.checkVendorConnection(
-                  OpenWeatherMapRetriever.getBaseApiUrl() +
+                  OpenWeatherMapRetriever.getBaseTimeMachineApiUrl() +
                         "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
                         previousHour,
                   IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
@@ -94,7 +89,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)
                .span(2, 1)
-               .applyTo(_btnTestConnection);
+               .applyTo(btnTestConnection);
       }
 
       {

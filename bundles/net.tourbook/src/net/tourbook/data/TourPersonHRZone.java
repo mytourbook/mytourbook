@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
+
+import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,119 +32,121 @@ import net.tourbook.ui.UI;
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
-public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone> {
+public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>, Serializable {
 
-	private static final String	NAME_SHORTCUT_PREFIX	= " (";							//$NON-NLS-1$
-	private static final String	NAME_SHORTCUT_POSTFIX	= ")";								//$NON-NLS-1$
+   private static final long   serialVersionUID      = 1L;
 
-	public static final int		DB_LENGTH_ZONE_NAME		= 255;
-	public static final int		DB_LENGTH_DESCRIPTION	= 2000;
+   private static final String NAME_SHORTCUT_PREFIX  = " (";                            //$NON-NLS-1$
+   private static final String NAME_SHORTCUT_POSTFIX = ")";                             //$NON-NLS-1$
 
-	/**
-	 * Unique id for the {@link TourPersonHRZone} entity
-	 */
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long				hrZoneId				= TourDatabase.ENTITY_IS_NOT_SAVED;
+   public static final int     DB_LENGTH_ZONE_NAME   = 255;
+   public static final int     DB_LENGTH_DESCRIPTION = 2000;
 
-	@ManyToOne(optional = false)
-	private TourPerson			tourPerson;
+   /**
+    * Unique id for the {@link TourPersonHRZone} entity
+    */
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long                hrZoneId              = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	/**
-	 * Name for the zone
-	 */
-	private String				zoneName;
+   @ManyToOne(optional = false)
+   private TourPerson          tourPerson;
 
-	/**
-	 * Shortcut name for the zone
-	 */
-	private String				nameShortcut;
+   /**
+    * Name for the zone
+    */
+   private String              zoneName;
 
-	/**
-	 * Description
-	 */
-	private String				description;
+   /**
+    * Shortcut name for the zone
+    */
+   private String              nameShortcut;
 
-	/**
-	 * Minimum value of the hr zone in % of hr max
-	 */
-	private int					zoneMinValue;
+   /**
+    * Description
+    */
+   private String              description;
 
-	/**
-	 * Maximum value of the hr zone in % of hr max
-	 */
-	private int					zoneMaxValue;
+   /**
+    * Minimum value of the hr zone in % of hr max
+    */
+   private int                 zoneMinValue;
 
-	/**
-	 * HR zone color
-	 */
-	private int					colorRed;
-	private int					colorGreen;
-	private int					colorBlue;
+   /**
+    * Maximum value of the hr zone in % of hr max
+    */
+   private int                 zoneMaxValue;
 
-	/**
-	 * unique id for manually created markers because the {@link #hrZoneId} is 0 when the marker is
-	 * not persisted
-	 */
-	@Transient
-	private long				_createId				= 0;
+   /**
+    * HR zone color
+    */
+   private int                 colorRed;
+   private int                 colorGreen;
+   private int                 colorBlue;
 
-	/**
-	 * cached color
-	 */
-	@Transient
-	private RGB					_color;
-	@Transient
-	private RGB					_colorDark;
-	@Transient
-	private RGB					_colorBright;
+   /**
+    * unique id for manually created markers because the {@link #hrZoneId} is 0 when the marker is
+    * not persisted
+    */
+   @Transient
+   private long                _createId             = 0;
 
-	@Transient
-	private HSLColor			_hslColor				= new HSLColor();
+   /**
+    * cached color
+    */
+   @Transient
+   private RGB                 _color;
+   @Transient
+   private RGB                 _colorDark;
+   @Transient
+   private RGB                 _colorBright;
 
-	/**
-	 * manually created marker or imported marker create a unique id to identify them, saved marker
-	 * are compared with the marker id
-	 */
-	private static int			_createCounter			= 0;
+   @Transient
+   private HSLColor            _hslColor             = new HSLColor();
 
-	public TourPersonHRZone() {}
+   /**
+    * manually created marker or imported marker create a unique id to identify them, saved marker
+    * are compared with the marker id
+    */
+   private static int          _createCounter        = 0;
 
-	public TourPersonHRZone(final TourPerson tourPerson) {
+   public TourPersonHRZone() {}
 
-		this.tourPerson = tourPerson;
+   public TourPersonHRZone(final TourPerson tourPerson) {
 
-		_createId = ++_createCounter;
-	}
+      this.tourPerson = tourPerson;
 
-	private void checkColors() {
-		if (_color == null) {
-			_color = new RGB(colorRed, colorGreen, colorBlue);
-			_colorDark = getColorDark(_color);
-			_colorBright = getColorBright(_color);
-		}
-	}
+      _createId = ++_createCounter;
+   }
 
-	@Override
-	public TourPersonHRZone clone() {
+   private void checkColors() {
+      if (_color == null) {
+         _color = new RGB(colorRed, colorGreen, colorBlue);
+         _colorDark = getColorDark(_color);
+         _colorBright = getColorBright(_color);
+      }
+   }
 
-		try {
+   @Override
+   public TourPersonHRZone clone() {
 
-			// create clones for shallow copied fields so that they can be modified
+      try {
 
-			final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
+         // create clones for shallow copied fields so that they can be modified
 
-			newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
-			newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
-			newHrZone.description = description == null ? null : new String(description);
+         final TourPersonHRZone newHrZone = (TourPersonHRZone) super.clone();
 
-			return newHrZone;
+         newHrZone.zoneName = zoneName == null ? null : new String(zoneName);
+         newHrZone.nameShortcut = nameShortcut == null ? null : new String(nameShortcut);
+         newHrZone.description = description == null ? null : new String(description);
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-			return null;
-		}
-	}
+         return newHrZone;
+
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+         return null;
+      }
+   }
 
 //	/**
 //	 * @return Returns a deep clone of {@link TourPersonHRZone}
@@ -168,222 +172,221 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 //		}
 //	}
 
-	@Override
-	public int compareTo(final TourPersonHRZone otherHrZone) {
+   @Override
+   public int compareTo(final TourPersonHRZone otherHrZone) {
 
-		return zoneMinValue < otherHrZone.zoneMinValue ? //
-				-1
-				: zoneMinValue == otherHrZone.zoneMinValue ? //
-						0
-						: 1;
-	}
+      return zoneMinValue < otherHrZone.zoneMinValue ? //
+            -1
+            : zoneMinValue == otherHrZone.zoneMinValue ? //
+                  0
+                  : 1;
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
+   @Override
+   public boolean equals(final Object obj) {
 
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TourPersonHRZone)) {
-			return false;
-		}
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TourPersonHRZone)) {
+         return false;
+      }
 
-		final TourPersonHRZone other = (TourPersonHRZone) obj;
+      final TourPersonHRZone other = (TourPersonHRZone) obj;
 
-		if (_createId == 0) {
+      if (_createId == 0) {
 
-			// hr zone is from the database
-			if (hrZoneId != other.hrZoneId) {
-				return false;
-			}
-		} else {
+         // hr zone is from the database
+         if (hrZoneId != other.hrZoneId) {
+            return false;
+         }
+      } else {
 
-			// hr zone was create
-			if (_createId != other._createId) {
-				return false;
-			}
-		}
+         // hr zone was create
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	public RGB getColor() {
-		checkColors();
-		return _color;
-	}
+   public RGB getColor() {
+      checkColors();
+      return _color;
+   }
 
-	public RGB getColorBright() {
-		checkColors();
-		return _colorBright;
-	}
+   public RGB getColorBright() {
+      checkColors();
+      return _colorBright;
+   }
 
-	private RGB getColorBright(final RGB rgb) {
+   private RGB getColorBright(final RGB rgb) {
 
-		_hslColor.initHSLbyRGB(rgb);
-		_hslColor.brighten(1.2f);
+      _hslColor.initHSLbyRGB(rgb);
+      _hslColor.brighten(1.2f);
 
-		return _hslColor.getRGB();
-	}
+      return _hslColor.getRGB();
+   }
 
-	public RGB getColorDark() {
-		checkColors();
-		return _colorDark;
-	}
+   public RGB getColorDark() {
+      checkColors();
+      return _colorDark;
+   }
 
+   private RGB getColorDark(final RGB rgb) {
 
-	private RGB getColorDark(final RGB rgb) {
+      _hslColor.initHSLbyRGB(rgb);
+      _hslColor.brighten(0.9f);
 
-		_hslColor.initHSLbyRGB(rgb);
-		_hslColor.brighten(0.9f);
+      return _hslColor.getRGB();
+   }
 
-		return _hslColor.getRGB();
-	}
+   public String getDescription() {
+      return description;
+   }
 
-	public String getDescription() {
-		return description;
-	}
+   /**
+    * @return Returns the name of the zone combined with the zone name shortcut
+    */
+   public String getNameLong() {
 
-	/**
-	 * @return Returns the name of the zone combined with the zone name shortcut
-	 */
-	public String getNameLong() {
+      if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
+         // nothing is defined
+         return UI.EMPTY_STRING;
+      }
 
-		if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
-			// nothing is defined
-			return UI.EMPTY_STRING;
-		}
+      if (zoneName == null || zoneName.length() == 0) {
+         return nameShortcut;
+      }
 
-		if (zoneName == null || zoneName.length() == 0) {
-			return nameShortcut;
-		}
+      if (nameShortcut == null || nameShortcut.length() == 0) {
+         return zoneName;
+      }
 
-		if (nameShortcut == null || nameShortcut.length() == 0) {
-			return zoneName;
-		}
+      return zoneName + NAME_SHORTCUT_PREFIX + nameShortcut + NAME_SHORTCUT_POSTFIX;
+   }
 
-		return zoneName + NAME_SHORTCUT_PREFIX + nameShortcut + NAME_SHORTCUT_POSTFIX;
-	}
+   /**
+    * @return Returns the name of the zone combined with the zone name shortcut
+    */
+   public String getNameLongShortcutFirst() {
 
-	/**
-	 * @return Returns the name of the zone combined with the zone name shortcut
-	 */
-	public String getNameLongShortcutFirst() {
+      if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
+         // nothing is defined
+         return UI.EMPTY_STRING;
+      }
 
-		if ((zoneName == null || zoneName.length() == 0) && (nameShortcut == null || nameShortcut.length() == 0)) {
-			// nothing is defined
-			return UI.EMPTY_STRING;
-		}
+      if (zoneName == null || zoneName.length() == 0) {
+         return nameShortcut;
+      }
 
-		if (zoneName == null || zoneName.length() == 0) {
-			return nameShortcut;
-		}
+      if (nameShortcut == null || nameShortcut.length() == 0) {
+         return zoneName;
+      }
 
-		if (nameShortcut == null || nameShortcut.length() == 0) {
-			return zoneName;
-		}
+      return nameShortcut + UI.SYMBOL_COLON + UI.SPACE + zoneName;
+   }
 
-		return nameShortcut + UI.SYMBOL_COLON + UI.SPACE + zoneName;
-	}
+   /**
+    * @return Returns the short name or the name when the short name is not available.
+    */
+   public String getNameShort() {
 
-	/**
-	 * @return Returns the short name or the name when the short name is not available.
-	 */
-	public String getNameShort() {
+      if (nameShortcut != null && nameShortcut.length() > 0) {
+         return nameShortcut;
+      }
 
-		if (nameShortcut != null && nameShortcut.length() > 0) {
-			return nameShortcut;
-		}
+      if (zoneName != null && zoneName.length() > 0) {
+         return zoneName;
+      }
 
-		if (zoneName != null && zoneName.length() > 0) {
-			return zoneName;
-		}
+      return UI.EMPTY_STRING;
+   }
 
-		return UI.EMPTY_STRING;
-	}
+   public String getNameShortcut() {
+      return nameShortcut;
+   }
 
-	public String getNameShortcut() {
-		return nameShortcut;
-	}
+   public TourPerson getTourPerson() {
+      return tourPerson;
+   }
 
-	public TourPerson getTourPerson() {
-		return tourPerson;
-	}
+   /**
+    * @return Returns maximum value of the hr zone in % of hr max
+    */
+   public int getZoneMaxValue() {
+      return zoneMaxValue;
+   }
 
-	/**
-	 * @return Returns maximum value of the hr zone in % of hr max
-	 */
-	public int getZoneMaxValue() {
-		return zoneMaxValue;
-	}
+   /**
+    * @return Returns minimum value of the hr zone in % of hr max
+    */
+   public int getZoneMinValue() {
+      return zoneMinValue;
+   }
 
-	/**
-	 * @return Returns minimum value of the hr zone in % of hr max
-	 */
-	public int getZoneMinValue() {
-		return zoneMinValue;
-	}
+   public String getZoneName() {
+      return zoneName;
+   }
 
-	public String getZoneName() {
-		return zoneName;
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_createId ^ (_createId >>> 32));
+      result = prime * result + (int) (hrZoneId ^ (hrZoneId >>> 32));
+      return result;
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		result = prime * result + (int) (hrZoneId ^ (hrZoneId >>> 32));
-		return result;
-	}
+   public void setColor(final RGB rgb) {
 
-	public void setColor(final RGB rgb) {
+      // cache rgb values
+      _color = rgb;
+      _colorDark = getColorDark(rgb);
+      _colorBright = getColorBright(rgb);
 
-		// cache rgb values
-		_color = rgb;
-		_colorDark = getColorDark(rgb);
-		_colorBright = getColorBright(rgb);
+      colorRed = rgb.red;
+      colorGreen = rgb.green;
+      colorBlue = rgb.blue;
+   }
 
-		colorRed = rgb.red;
-		colorGreen = rgb.green;
-		colorBlue = rgb.blue;
-	}
+   public void setDescription(final String description) {
+      this.description = description;
+   }
 
-	public void setDescription(final String description) {
-		this.description = description;
-	}
+   public void setNameShortcut(final String nameShortcut) {
+      this.nameShortcut = nameShortcut;
+   }
 
-	public void setNameShortcut(final String nameShortcut) {
-		this.nameShortcut = nameShortcut;
-	}
+   public void setTourPerson(final TourPerson tourPerson) {
+      this.tourPerson = tourPerson;
+   }
 
-	public void setTourPerson(final TourPerson tourPerson) {
-		this.tourPerson = tourPerson;
-	}
+   public void setZoneMaxValue(final int zoneMaxValue) {
+      this.zoneMaxValue = zoneMaxValue;
+   }
 
-	public void setZoneMaxValue(final int zoneMaxValue) {
-		this.zoneMaxValue = zoneMaxValue;
-	}
+   public void setZoneMinValue(final int zoneMinValue) {
+      this.zoneMinValue = zoneMinValue;
+   }
 
-	public void setZoneMinValue(final int zoneMinValue) {
-		this.zoneMinValue = zoneMinValue;
-	}
+   public void setZoneName(final String zoneName) {
+      this.zoneName = zoneName;
+   }
 
-	public void setZoneName(final String zoneName) {
-		this.zoneName = zoneName;
-	}
-
-	@Override
-	public String toString() {
-		return "TourPersonHRZone [zoneMinValue=" //$NON-NLS-1$
-				+ zoneMinValue
-				+ ", zoneMaxValue=" //$NON-NLS-1$
-				+ zoneMaxValue
-				+ ", zoneName=" //$NON-NLS-1$
-				+ zoneName
-				+ "]"; //$NON-NLS-1$
-	}
+   @Override
+   public String toString() {
+      return "TourPersonHRZone [zoneMinValue=" //$NON-NLS-1$
+            + zoneMinValue
+            + ", zoneMaxValue=" //$NON-NLS-1$
+            + zoneMaxValue
+            + ", zoneName=" //$NON-NLS-1$
+            + zoneName
+            + "]"; //$NON-NLS-1$
+   }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
@@ -121,7 +121,7 @@ public class DialogExportTour extends TitleAreaDialog {
    }
 
    // Source: https://developers.strava.com/docs/uploads/#tcx-training-center-database-xml
-   public static final String[]      StravaActivityTypes = new String[] {
+   private static final String[]     StravaActivityTypes = new String[] {
 
          "Biking",                                                                                      //$NON-NLS-1$
          "Running",                                                                                     //$NON-NLS-1$
@@ -243,14 +243,13 @@ public class DialogExportTour extends TitleAreaDialog {
     * @param tourStartIndex
     * @param tourEndIndex
     * @param formatTemplate
-    * @param isOptionDistance
     */
-   public DialogExportTour(final Shell parentShell,
-                           final ExportTourExtension exportExtensionPoint,
-                           final List<TourData> tourDataList,
-                           final int tourStartIndex,
-                           final int tourEndIndex,
-                           final String formatTemplate) {
+   DialogExportTour(final Shell parentShell,
+                    final ExportTourExtension exportExtensionPoint,
+                    final List<TourData> tourDataList,
+                    final int tourStartIndex,
+                    final int tourEndIndex,
+                    final String formatTemplate) {
 
       super(parentShell);
 
@@ -285,8 +284,10 @@ public class DialogExportTour extends TitleAreaDialog {
 
       _dlgDefaultMessage = NLS.bind(Messages.dialog_export_dialog_message, _exportExtensionPoint.getVisibleName());
 
-      // initialize velocity
-      VelocityService.init();
+      // initialize velocity for GPX and TCX exports
+      if (_isGPXorTCX) {
+         VelocityService.init();
+      }
    }
 
    private String appendSurfingParameters(final TourData minTourData) {
@@ -1234,7 +1235,6 @@ public class DialogExportTour extends TitleAreaDialog {
     *
     * @param monitor
     * @param exportFileName
-    * @param exported
     * @param tourSize
     * @throws IOException
     */
@@ -1610,7 +1610,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          String fileName = getExportFileName();
 
-         fileName = FilesUtils.removeExtensions(fileName);
+         fileName = FileUtils.removeExtensions(fileName);
 
          // build file path with extension
          filePath = filePath

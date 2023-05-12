@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -116,7 +116,7 @@ public class EasyConfig {
    public ArrayList<OSFile>         notImportedFiles = new ArrayList<>();
 
    /** Contains files which are available in the backup folder but not in the device folder. */
-   public ArrayList<OSFile>         movedFiles;
+   public ArrayList<OSFile>         movedFiles       = new ArrayList<>();
 
    /**
     * This constructor is used to find new instances during development

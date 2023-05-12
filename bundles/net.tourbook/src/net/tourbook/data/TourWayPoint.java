@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.data;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -46,7 +47,10 @@ import org.eclipse.swt.graphics.Image;
  */
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "wayPointId")
-public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
+
+public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea, Serializable {
+
+   private static final long          serialVersionUID            = 1L;
 
    private static final char          NL                          = UI.NEW_LINE;
 
@@ -466,6 +470,15 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
    public void setTourData(final TourData newTourData) {
       tourData = newTourData;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      wayPointId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
    }
 
    public void setUrlAddress(final String urlAddress) {

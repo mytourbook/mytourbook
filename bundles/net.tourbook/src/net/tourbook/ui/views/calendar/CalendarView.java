@@ -26,8 +26,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
@@ -89,8 +87,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView"); //$NON-NLS-1$
 
    private boolean                 _stateIsLinked;
-
-   ColorDefinition[]               _allColorDefinition             = GraphColorManager.getAllColorDefinitions();
 
    private ISelectionListener      _selectionListener;
    private IPartListener2          _partListener;

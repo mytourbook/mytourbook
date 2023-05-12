@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.util;
+
+import java.util.Arrays;
 
 /**
  * MyTourbook Mathematics
@@ -41,7 +43,7 @@ public class MtMath {
     *
 	 * @param   {Number} lat1, lon1: first point in decimal degrees
 	 * @param   {Number} lat2, lon2: second point in decimal degrees
-	 * @returns (Number} distance in metres between points
+    * @returns (Number} distance in metres between points
     *
     *    function distVincenty(lat1, lon1, lat2, lon2) {
     *      var a = 6378137, b = 6356752.314245,  f = 1/298.257223563;  // WGS-84 ellipsoid params
@@ -88,7 +90,7 @@ public class MtMath {
     *    }
     *
     *    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  *
-	 * 
+	 *
     * </pre>
     */
 
@@ -98,6 +100,16 @@ public class MtMath {
 
    // = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
    private static final double ABPLATTUNG_F = (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
+
+   public static double angleFromShorts(final short x1, final short y1, final short x2, final short y2) {
+
+      final double deltaY = y1 - y2;
+      final double deltaX = x2 - x1;
+
+      final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
+
+      return (result < 0) ? (360d + result) : result;
+   }
 
    /**
     * Work out the angle from the x horizontal winding anti-clockwise
@@ -251,5 +263,98 @@ public class MtMath {
 //
 //      return km * 1000;
 //   }
+
+   /**
+    * @param allValues
+    * @param value
+    * @return Returns the index for the searched value which is the exact index or the index before
+    *         the searched value
+    */
+   public static int searchIndex(final float[] allValues, final float value) {
+
+      if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
+         return 0;
+      }
+
+      if (value >= allValues[allValues.length - 1]) {
+         return allValues.length - 1;
+      }
+
+      final int result = Arrays.binarySearch(allValues, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+      final int indexBeforeInsertionPoint = insertionPoint - 1;
+
+      return indexBeforeInsertionPoint;
+   }
+
+   /**
+    * @param allValues
+    * @param value
+    * @return Returns the index for the searched value which is the exact index or the index before
+    *         the searched value
+    */
+   public static int searchIndex(final int[] allValues, final int value) {
+
+      if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
+         return 0;
+      }
+
+      if (value >= allValues[allValues.length - 1]) {
+         return allValues.length - 1;
+      }
+
+      final int result = Arrays.binarySearch(allValues, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+      final int indexBeforeInsertionPoint = insertionPoint - 1;
+
+      return indexBeforeInsertionPoint;
+   }
+
+   /**
+    * Find the nearest values in a sorted array
+    * <p>
+    * Original source<br>
+    * <a href=
+    * "https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398">https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398</a>
+    *
+    * @param allValues
+    * @param value
+    * @return Returns the index of the nearest value and not the nearest value itself
+    */
+   public static int searchNearestIndex(final int[] allValues, final int value) {
+
+      if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
+         return 0;
+      }
+
+      if (value >= allValues[allValues.length - 1]) {
+         return allValues.length - 1;
+      }
+
+      final int result = Arrays.binarySearch(allValues, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+
+      final int nearestDiff1 = allValues[insertionPoint] - value;
+      final int nearestDiff2 = value - allValues[insertionPoint - 1];
+
+      return nearestDiff1 < nearestDiff2
+            ? insertionPoint
+            : insertionPoint - 1;
+   }
 
 }

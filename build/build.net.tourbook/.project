@@ -7,7 +7,6 @@
 	<buildSpec>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
@@ -54,6 +53,11 @@
 			<name>pom.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
+		</link>
+		<link>
+			<name>settings-bundles.gradle</name>
+			<type>1</type>
+			<location>PARENT-2-PROJECT_LOC/bundles/settings.gradle</location>
 		</link>
 	</linkedResources>
 </projectDescription>

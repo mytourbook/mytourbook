@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -823,6 +823,33 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          });
          treeLayout.setColumnData(tvcColumn, new ColumnWeightData(80, true));
       }
+      {
+         // column: image file name
+
+         tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
+         tvcColumn = tvc.getColumn();
+         tvcColumn.setText(Messages.Pref_TourTag_Column_ImageFilePath);
+
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               String imageFilePath = UI.EMPTY_STRING;
+
+               final Object element = cell.getElement();
+               if (element instanceof TVIPrefTag) {
+
+                  final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
+
+                  imageFilePath = tourTag.getImageFilePath();
+
+               }
+
+               cell.setText(imageFilePath);
+            }
+         });
+         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(80, true));
+      }
    }
 
    @Override
@@ -1422,7 +1449,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       _tagViewer.getTree().setFocus();
    }
 
-   public void setIsModified() {
+   void setIsModified() {
       _isModified = true;
    }
 

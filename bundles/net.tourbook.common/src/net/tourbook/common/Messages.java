@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,13 +127,14 @@ public class Messages extends NLS {
    public static String        Direction_ArrowDesign_Wings_MiddleFin;
    public static String        Direction_ArrowDesign_Wings_OuterFins;
    public static String        Direction_ArrowLayout_OuterFins;
-   
+
    public static String        Font_Editor_Label_FontSize;
 
-   public static String        Format_hh;
-   public static String        Format_hhmm;
-   public static String        Format_hhmmss;
-   public static String        Format_yyyymmdd_hhmmss;
+   public static String        Format_DateTime_yyyymmdd_hhmmss;
+
+   public static String        Format_TimeDuration_hh;
+   public static String        Format_TimeDuration_hhmm;
+   public static String        Format_TimeDuration_hhmmss;
 
    public static String        Graph_Label_Altimeter;
    public static String        Graph_Label_Altitude;
@@ -149,6 +150,8 @@ public class Messages extends NLS {
    public static String        Graph_Label_Gradient;
    public static String        Graph_Label_Gradient_Unit;
    public static String        Graph_Label_Heartbeat;
+   public static String        Graph_Label_Heartbeat_Avg;
+   public static String        Graph_Label_Heartbeat_AvgMax;
    public static String        Graph_Label_Heartbeat_Unit;
    public static String        Graph_Label_HeartRateVariability;
    public static String        Graph_Label_HeartRateVariability_Unit;
@@ -282,6 +285,13 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_SmallLength_Millimeter;
    public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
+
+   public static String        Weather_AirQuality_Good;
+   public static String        Weather_AirQuality_Fair;
+   public static String        Weather_AirQuality_IsNotDefined;
+   public static String        Weather_AirQuality_Moderate;
+   public static String        Weather_AirQuality_Poor;
+   public static String        Weather_AirQuality_VeryPoor;
 
    public static String        Weather_Clouds_Clouds;
    public static String        Weather_Clouds_Cloudy;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import javax.persistence.EntityTransaction;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -110,17 +111,11 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourCompareResultView extends ViewPart implements
+
       ITourViewer,
       ITourProvider,
       ITreeViewer,
       IReferenceTourProvider {
-
-// SET_FORMATTING_OFF
-
-   private static final String COLUMN_FACTORY_MOTION_ALTIMETER          = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter;
-   private static final String COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter_Tooltip;
-
-// SET_FORMATTING_ON
 
    public static final String                  ID                                = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
@@ -276,6 +271,32 @@ public class TourCompareResultView extends ViewPart implements
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   public class ResultTreeViewer extends ContainerCheckedTreeViewer {
+
+      public ResultTreeViewer(final Tree tree) {
+         super(tree);
+      }
+
+      @Override
+      protected Object[] getSortedChildren(final Object parentElementOrTreePath) {
+
+         final Object[] sortedChildren = super.getSortedChildren(parentElementOrTreePath);
+
+         /*
+          * Keep sorted and filtered children which are used to navigate them programmatically
+          */
+         if (parentElementOrTreePath instanceof TVICompareResultReferenceTour) {
+
+            final TVICompareResultReferenceTour comparedRefTour = (TVICompareResultReferenceTour) parentElementOrTreePath;
+
+            comparedRefTour.sortedAndFilteredCompareResults = sortedChildren;
+         }
+
+         return sortedChildren;
+      }
+
    }
 
    public class TourCompareFilter extends ViewerFilter {
@@ -702,7 +723,7 @@ public class TourCompareResultView extends ViewPart implements
       tree.setHeaderVisible(true);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      _tourViewer = new ContainerCheckedTreeViewer(tree);
+      _tourViewer = new ResultTreeViewer(tree);
       _columnManager.createColumns(_tourViewer);
 
       _tourViewer.setContentProvider(new ResultContentProvider());
@@ -1075,8 +1096,8 @@ public class TourCompareResultView extends ViewPart implements
       colDef.setIsDefaultColumn();
       colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTIMETER);
       colDef.setColumnUnit(UI.UNIT_LABEL_ALTIMETER);
-      colDef.setColumnHeaderToolTipText(COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
-      colDef.setColumnLabel(COLUMN_FACTORY_MOTION_ALTIMETER);
+      colDef.setColumnHeaderToolTipText(OtherMessages.COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
+      colDef.setColumnLabel(OtherMessages.COLUMN_FACTORY_MOTION_ALTIMETER);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
       colDef.setValueFormats(//
@@ -1559,28 +1580,33 @@ public class TourCompareResultView extends ViewPart implements
       final TVICompareResultComparedTour selectedCompareResult = getSelectedComparedTour();
       if (selectedCompareResult != null) {
 
-         // compared tour is selected
+         /*
+          * A compared tour is selected
+          */
 
          final TreeViewerItem parentItem = selectedCompareResult.getParentItem();
          if (parentItem instanceof TVICompareResultReferenceTour) {
 
             final TVICompareResultReferenceTour refTourItem = (TVICompareResultReferenceTour) parentItem;
 
-            final ArrayList<TreeViewerItem> children = refTourItem.getChildren();
-            for (int childIndex = 0; childIndex < children.size(); childIndex++) {
+            final Object[] allSortedAndFilteredCompareResults = refTourItem.sortedAndFilteredCompareResults;
+            final int numChildren = allSortedAndFilteredCompareResults.length;
 
-               final TreeViewerItem refTourChild = children.get(childIndex);
+            for (int childIndex = 0; childIndex < numChildren; childIndex++) {
+
+               final Object refTourChild = allSortedAndFilteredCompareResults[childIndex];
+
                if (refTourChild == selectedCompareResult) {
 
                   if (isNextTour) {
 
                      // navigate next
 
-                     if (childIndex < children.size() - 1) {
+                     if (childIndex < numChildren - 1) {
 
                         // next tour is available
 
-                        final TreeViewerItem nextRefTourChild = children.get(childIndex + 1);
+                        final Object nextRefTourChild = allSortedAndFilteredCompareResults[childIndex + 1];
                         if (nextRefTourChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) nextRefTourChild;
                         }
@@ -1589,7 +1615,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // return first tour
 
-                        final TreeViewerItem nextRefTourChild = children.get(0);
+                        final Object nextRefTourChild = allSortedAndFilteredCompareResults[0];
                         if (nextRefTourChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) nextRefTourChild;
                         }
@@ -1603,7 +1629,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // previous tour is available
 
-                        final TreeViewerItem nextChild = children.get(childIndex - 1);
+                        final Object nextChild = allSortedAndFilteredCompareResults[childIndex - 1];
                         if (nextChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) nextChild;
                         }
@@ -1612,7 +1638,7 @@ public class TourCompareResultView extends ViewPart implements
 
                         // return last tour
 
-                        final TreeViewerItem prevChild = children.get(children.size() - 1);
+                        final Object prevChild = allSortedAndFilteredCompareResults[numChildren - 1];
                         if (prevChild instanceof TVICompareResultComparedTour) {
                            return (TVICompareResultComparedTour) prevChild;
                         }
@@ -1627,19 +1653,28 @@ public class TourCompareResultView extends ViewPart implements
          final TVICompareResultReferenceTour selectedRefTour = getSelectedRefTour();
          if (selectedRefTour != null) {
 
-            // ref tour is selected
+            /*
+             * A ref tour is selected
+             */
 
-            final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
-            if (refChildren.size() > 0) {
+            final ArrayList<TreeViewerItem> allRefChildren = selectedRefTour.getFetchedChildren();
+
+            if (allRefChildren.size() > 0) {
 
                // navigate to the first child and ignore direction
 
                _tourViewer.expandToLevel(selectedRefTour, 1);
 
-               // return first tour
-               final TreeViewerItem nextRefTourChild = refChildren.get(0);
-               if (nextRefTourChild instanceof TVICompareResultComparedTour) {
-                  return (TVICompareResultComparedTour) nextRefTourChild;
+               final Object[] allRefSortedAndFilteredChildren = selectedRefTour.sortedAndFilteredCompareResults;
+
+               if (allRefSortedAndFilteredChildren.length > 0) {
+
+                  // return first tour
+                  final Object nextRefTourChild = allRefSortedAndFilteredChildren[0];
+
+                  if (nextRefTourChild instanceof TVICompareResultComparedTour) {
+                     return (TVICompareResultComparedTour) nextRefTourChild;
+                  }
                }
             }
          }

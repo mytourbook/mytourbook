@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,8 +34,8 @@ import org.oscim.utils.animation.Easing;
 
 public class InputHandlerMT extends InputHandler {
 
-   private Map25View      _mapView;
-   private Map25App       _mapApp;
+   private Map25View      _map25View;
+   private Map25App       _map25App;
 
    private Map            _map;
    private ViewController _viewport;
@@ -55,8 +55,8 @@ public class InputHandlerMT extends InputHandler {
 
       super(mapApp);
 
-      _mapApp = mapApp;
-      _mapView = _mapApp.getMap25View();
+      _map25App = mapApp;
+      _map25View = _map25App.getMap25View();
 
       _map = mapApp.getMap();
       _viewport = _map.viewport();
@@ -96,14 +96,13 @@ public class InputHandlerMT extends InputHandler {
 //						+ ("\tkeyDown:\t" + keycode)
 ////				+ ("\t: " + )
 //		);
-//// TODO remove SYSTEM.OUT.PRINTLN
 //
 //		return false;
 
       /*
        * Disable keys which work ONLY with openscimap
        */
-      final Map25Provider selectedMapProvider = _mapApp.getSelectedMapProvider();
+      final Map25Provider selectedMapProvider = _map25App.getSelectedMapProvider();
       if (selectedMapProvider.tileEncoding != TileEncoding.VTM) {
 
          // disable themes
@@ -203,7 +202,7 @@ public class InputHandlerMT extends InputHandler {
       // Grid
       case Input.Keys.G:
 
-         final TileGridLayerMT layerTileInfo = _mapApp.getLayer_TileInfo();
+         final TileGridLayerMT layerTileInfo = _map25App.getLayer_TileInfo();
 
          layerTileInfo.setEnabled(!layerTileInfo.isEnabled());
 
@@ -214,7 +213,7 @@ public class InputHandlerMT extends InputHandler {
       // Tour
       case Input.Keys.T:
 
-         final TourTrack_Layer layerTour = _mapApp.getLayer_Tour();
+         final TourTrack_Layer layerTour = _map25App.getLayer_Tour();
          layerTour.setEnabled(!layerTour.isEnabled());
 
          _map.render();
@@ -223,7 +222,7 @@ public class InputHandlerMT extends InputHandler {
          Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-               _mapView.enableActions();
+               _map25View.enableActions();
             }
          });
 
@@ -269,7 +268,7 @@ public class InputHandlerMT extends InputHandler {
             _map.setMapPosition(mapPosition);
             _map.render();
 
-            _mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
+            _map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.SyncParameter.RESET_TILT);
 
          } else {
 
@@ -281,7 +280,7 @@ public class InputHandlerMT extends InputHandler {
             _map.setMapPosition(mapPosition);
             _map.render();
 
-            _mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
+            _map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.SyncParameter.RESET_BEARING);
          }
 
          return true;
@@ -320,7 +319,6 @@ public class InputHandlerMT extends InputHandler {
 //						+ ("\t\tkeyTyped:\t" + Integer.toString(character))
 ////				+ ("\t: " + )
 //		);
-//// TODO remove SYSTEM.OUT.PRINTLN
 
       final MapPosition mapPosition = _map.getMapPosition();
 
@@ -469,7 +467,6 @@ public class InputHandlerMT extends InputHandler {
 //						+ ("\tkeyUp:\t" + keycode)
 ////				+ ("\t: " + )
 //		);
-//// TODO remove SYSTEM.OUT.PRINTLN
 //
 //		return false;
 
@@ -505,7 +502,7 @@ public class InputHandlerMT extends InputHandler {
       final MapPosition mapPosition = new MapPosition();
       _map.viewport().getMapPosition(mapPosition);
 
-      _mapView.onMapPosition(mapGeoPoint, mapPosition.zoomLevel);
+      _map25View.onMapPosition(mapGeoPoint, mapPosition.zoomLevel);
 
       return super.mouseMoved(screenX, screenY);
    }
@@ -544,7 +541,7 @@ public class InputHandlerMT extends InputHandler {
 
       if (button == Buttons.LEFT) {
 
-         if (!_mapApp.getAndReset_IsMapItemHit()) {
+         if (!_map25App.getAndReset_IsMapItemHit()) {
 
             _isReCenter = true;
          }
@@ -564,8 +561,6 @@ public class InputHandlerMT extends InputHandler {
 
       // prevent opening context menu
       _isMouseRightButtonDown = false;
-
-//		fireMapPosition();
 
       return super.touchDragged(screenX, screenY, pointer);
    }
@@ -588,7 +583,7 @@ public class InputHandlerMT extends InputHandler {
          _isReCenter = false;
 
          // get map center
-			final GeoPoint mapCenter = _viewport.fromScreenPoint(screenX, screenY);
+         final GeoPoint mapCenter = _viewport.fromScreenPoint(screenX, screenY);
 
          _map.animator().animateTo(800, mapCenter, 1, true, Easing.Type.SINE_INOUT);
          _map.updateMap(false);
@@ -599,7 +594,7 @@ public class InputHandlerMT extends InputHandler {
 
          // open context menu
 
-         _mapView.actionContextMenu(screenX, screenY);
+         _map25View.actionContextMenu(screenX, screenY);
 
          return true;
       }

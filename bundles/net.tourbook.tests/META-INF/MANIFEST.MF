@@ -2,19 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Integration tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.tests;singleton:=true
-Bundle-Version: 22.8.0.qualifier
+Bundle-Version: 23.5.0.qualifier
 Require-Bundle: org.junit.jupiter.api,
  net.tourbook,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3,
  net.tourbook.cloud,
  org.eclipse.ui,
- net.tourbook.common
+ net.tourbook.common,
+ org.opentest4j
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
  jsonassert-1.5.1.jar,
- xmlunit-core-2.9.0.jar,
+ xmlunit-core-2.9.1.jar,
  HttpClientMock-1.0.0.jar,
  hamcrest-all-1.3.jar
 Bundle-Vendor: MyTourbook
@@ -43,6 +44,7 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.device.suunto,
  net.tourbook.device.tur,
  net.tourbook.export,
+ org.apache.commons.io,
  org.eclipse.jface.preference,
  org.eclipse.swt,
  org.eclipse.swt.widgets,

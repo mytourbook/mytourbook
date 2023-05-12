@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.measurement_system.MeasurementSystem;
@@ -40,26 +41,15 @@ import org.eclipse.swt.widgets.Control;
 
 public class MeasurementSystemContributionItem extends CustomControlContribution {
 
-   private static final String           MEASUREMENT_SYSTEM_TOOLTIP            = net.tourbook.common.Messages.Measurement_System_Tooltip;
-   private static final String           PREF_SYSTEM_LABEL_DISTANCE            = net.tourbook.common.Messages.Pref_System_Label_Distance;
-   private static final String           PREF_SYSTEM_LABEL_ELEVATION           = net.tourbook.common.Messages.Pref_System_Label_Elevation;
-   private static final String           PREF_SYSTEM_LABEL_HEIGHT              = net.tourbook.common.Messages.Pref_System_Label_Height;
-   private static final String           PREF_SYSTEM_LABEL_LENGTH              = net.tourbook.common.Messages.Pref_System_Label_Length;
-   private static final String           PREF_SYSTEM_LABEL_LENGTH_SMALL        = net.tourbook.common.Messages.Pref_System_Label_Length_Small;
-   private static final String           PREF_SYSTEM_LABEL_PACE                = net.tourbook.common.Messages.Pref_System_Label_Pace;
-   private static final String           PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere;
-   private static final String           PREF_SYSTEM_LABEL_TEMPERATURE         = net.tourbook.common.Messages.Pref_System_Label_Temperature;
-   private static final String           PREF_SYSTEM_LABEL_WEIGHT              = net.tourbook.common.Messages.Pref_System_Label_Weight;
+   private static final String           ID                    = "net.tourbook.measurementSelector"; //$NON-NLS-1$
 
-   private static final String           ID                                    = "net.tourbook.measurementSelector";                                //$NON-NLS-1$
+   private static final char             NL                    = UI.NEW_LINE;
 
-   private static final char             NL                                    = UI.NEW_LINE;
-
-   private final static IPreferenceStore _prefStore_Common                     = CommonActivator.getPrefStore();
+   private final static IPreferenceStore _prefStore_Common     = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener       _prefChangeListener_Common;
 
-   private boolean                       _isFireSelectionEvent                 = true;
+   private boolean                       _isFireSelectionEvent = true;
 
    private Combo                         _combo;
 
@@ -193,15 +183,15 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
       final String tooltipData = UI.EMPTY_STRING
 
-         + PREF_SYSTEM_LABEL_DISTANCE              + DASH + MeasurementSystem_Manager.getActiveSystemOption_Distance().getLabel()      + NL
-         + PREF_SYSTEM_LABEL_LENGTH                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length().getLabel()        + NL
-         + PREF_SYSTEM_LABEL_LENGTH_SMALL          + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length_Small().getLabel()  + NL
-         + PREF_SYSTEM_LABEL_ELEVATION             + DASH + MeasurementSystem_Manager.getActiveSystemOption_Elevation().getLabel()     + NL
-         + PREF_SYSTEM_LABEL_HEIGHT                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Height().getLabel()        + NL
-         + PREF_SYSTEM_LABEL_PACE                  + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pace().getLabel()          + NL
-         + PREF_SYSTEM_LABEL_TEMPERATURE           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Temperature().getLabel()   + NL
-         + PREF_SYSTEM_LABEL_WEIGHT                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Weight().getLabel()        + NL
-         + PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE   + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pressure_Atmospheric().getLabel()
+         + OtherMessages.PREF_SYSTEM_LABEL_DISTANCE              + DASH + MeasurementSystem_Manager.getActiveSystemOption_Distance().getLabel()      + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_LENGTH                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length().getLabel()        + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_LENGTH_SMALL          + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length_Small().getLabel()  + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_ELEVATION             + DASH + MeasurementSystem_Manager.getActiveSystemOption_Elevation().getLabel()     + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_HEIGHT                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Height().getLabel()        + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_PACE                  + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pace().getLabel()          + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_TEMPERATURE           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Temperature().getLabel()   + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_WEIGHT                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Weight().getLabel()        + NL
+         + OtherMessages.PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE   + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pressure_Atmospheric().getLabel()
 
       ;
 // SET_FORMATTING_ON
@@ -209,7 +199,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       final int activeSystemProfileIndex = MeasurementSystem_Manager.getActiveSystem_ProfileIndex();
       _combo.select(activeSystemProfileIndex);
 
-      _combo.setToolTipText(String.format(MEASUREMENT_SYSTEM_TOOLTIP, tooltipData));
+      _combo.setToolTipText(String.format(OtherMessages.MEASUREMENT_SYSTEM_TOOLTIP, tooltipData));
    }
 
    private void updateUI_MeasurementSystem() {

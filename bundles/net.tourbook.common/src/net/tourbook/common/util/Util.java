@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,13 +56,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
@@ -130,15 +128,39 @@ public class Util {
     */
    public static final int    NUMBER_OF_PROCESSORS        = Runtime.getRuntime().availableProcessors();
 
-   public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
+   /**
+    * Prepend a line number to each text line.
+    *
+    * @param text
+    * @return
+    */
+   public static String addLineNumbers(final String text) {
 
-      // accelerate with Ctrl + Shift key
-      final int accelerator = getKeyAccelerator(event);
+      return addLineNumbers(text, 1);
+   }
 
-      final Scale scale = (Scale) event.widget;
-      final int newValueDiff = event.count > 0 ? accelerator : -accelerator;
+   /**
+    * Prepend a line number to each text line.
+    *
+    * @param text
+    * @return
+    */
+   public static String addLineNumbers(final String text, final int startLineNumer) {
 
-      return scale.getSelection() + newValueDiff;
+      final String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+
+         final String line = lines[lineNumber];
+
+         sb.append(String.format("%-4d  ", lineNumber + startLineNumer)); //$NON-NLS-1$
+         sb.append(line);
+         sb.append(UI.NEW_LINE);
+      }
+
+      return sb.toString();
    }
 
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
@@ -426,6 +448,17 @@ public class Util {
    }
 
    /**
+    * Convert Java newline into \n.
+    *
+    * @param text
+    * @return
+    */
+   public static String convertLineBreaks(final String text) {
+
+      return text.replaceAll("\\r\\n|\\r|\\n", "\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
     * Converts a list of strings into a comma-separated string.
     *
     * @param allTexts
@@ -603,13 +636,6 @@ public class Util {
       } catch (final SecurityException e) {
          StatusUtil.showStatus(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
       }
-   }
-
-   public static Resource disposeResource(final Resource resource) {
-      if (resource != null && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
    }
 
    public static void dumpChildren(final Control parent, final int indent) {
@@ -1212,6 +1238,45 @@ public class Util {
       }
    }
 
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    * @param maxValue
+    * @return Returns an integer value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static int getStateInt(final IDialogSettings state,
+                                 final String key,
+                                 final int defaultValue,
+                                 final int minValue,
+                                 final int maxValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      try {
+
+         final int stateValue = state.get(key) == null ? defaultValue : state.getInt(key);
+
+         if (stateValue < minValue) {
+            return minValue;
+         }
+
+         if (stateValue > maxValue) {
+            return maxValue;
+         }
+
+         return stateValue;
+
+      } catch (final NumberFormatException e) {
+
+         return defaultValue;
+      }
+   }
+
    public static int[] getStateIntArray(final IDialogSettings state, final String key, final int[] defaultValue) {
 
       if (state == null) {
@@ -1666,6 +1731,35 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static int getXmlIntInt(final XMLMemento xmlMemento,
+                                  final String key,
+                                  final int defaultValue,
+                                  final int minValue,
+                                  final int maxValue) {
+
+      final int value = getXmlInteger(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
+   }
+
    public static Long getXmlLong(final IMemento memento, final String key, final Long defaultValue) {
 
       final String strValue = memento.getString(key);
@@ -1719,6 +1813,35 @@ public class Util {
       }
 
       return values;
+   }
+
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static long getXmlLongLong(final XMLMemento xmlMemento,
+                                     final String key,
+                                     final long defaultValue,
+                                     final long minValue,
+                                     final long maxValue) {
+
+      final Long value = getXmlLong(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
    }
 
    /**

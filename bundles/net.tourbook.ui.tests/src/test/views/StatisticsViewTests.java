@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,13 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,9 @@ public class StatisticsViewTests extends UITest {
    @Test
    public void testStatisticsView() {
 
-      final SWTBot statisticsViewBot = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME).bot();
+      bot.toolbarButtonWithTooltip("Statistics (Ctrl+Shift+S)").click(); //$NON-NLS-1$
+      final SWTBotView statisticsView = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME);
+      final SWTBot statisticsViewBot = statisticsView.bot();
       bot.sleep(3000);
 
       final SWTBotCombo statisticsTypeComboBox = statisticsViewBot.comboBox(0);
@@ -41,11 +45,15 @@ public class StatisticsViewTests extends UITest {
       statisticsTypeComboBox.setSelection(0);
       assertEquals("Daytime", statisticsTypeComboBox.selection()); //$NON-NLS-1$
 
-      final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(2);
-      assertNotNull(yearComboBox);
-      assertEquals(11, yearComboBox.itemCount());
-      yearComboBox.setSelection("9"); //$NON-NLS-1$
-      assertEquals("9", yearComboBox.selection()); //$NON-NLS-1$
+      final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(1);
+
+      final SWTBotCombo numYearComboBox = statisticsViewBot.comboBox(2);
+      assertAll(
+            () -> assertNotNull(numYearComboBox),
+            () -> assertEquals(yearComboBox.itemCount(), numYearComboBox.itemCount()));
+
+      numYearComboBox.setSelection("9"); //$NON-NLS-1$
+      assertEquals("9", numYearComboBox.selection()); //$NON-NLS-1$
 
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
@@ -73,5 +81,7 @@ public class StatisticsViewTests extends UITest {
       statisticsTypeComboBox.setSelection("Athlete's Data - Month"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Year"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Battery SoC"); //$NON-NLS-1$
+
+      statisticsView.close();
    }
 }

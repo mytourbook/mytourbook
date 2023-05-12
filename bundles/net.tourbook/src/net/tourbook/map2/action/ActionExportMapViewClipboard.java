@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
@@ -67,7 +67,7 @@ public class ActionExportMapViewClipboard extends Action {
          try {
             final String absoluteFilePath = Files.createTempFile("map", ".png").toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
-            //We export the image to a file as a JPEG image
+            //We export the image to a file as a PNG image
             final ImageLoader loader = new ImageLoader();
             loader.data = new ImageData[] { mapViewImage.getImageData() };
             loader.save(absoluteFilePath, SWT.IMAGE_PNG);
@@ -78,7 +78,7 @@ public class ActionExportMapViewClipboard extends Action {
                   new Transfer[] { ImageTransfer.getInstance() });
             image.dispose();
 
-            FilesUtils.deleteIfExists(Paths.get(absoluteFilePath));
+            FileUtils.deleteIfExists(Paths.get(absoluteFilePath));
          } catch (final IOException e) {
             StatusUtil.log(e);
          }

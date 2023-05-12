@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,30 +18,24 @@ package net.tourbook.ui.action;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  */
-public class SubMenu_SetCadence extends Action implements IMenuCreator {
+public class SubMenu_SetCadence extends SubMenu {
 
-   private Menu          _menu;
+   private ActionSetNone  _actionSetNone;
+   private ActionSetRpm   _actionSetRpm;
+   private ActionSetSpm   _actionSetSpm;
 
-   private ActionSetNone _actionSetNone;
-   private ActionSetRpm  _actionSetRpm;
-   private ActionSetSpm  _actionSetSpm;
-
-   private ITourProvider _tourProvider;
+   private ITourProvider2 _tourProvider;
 
    private class ActionSetNone extends Action {
 
@@ -80,13 +74,11 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
       }
    }
 
-   public SubMenu_SetCadence(final ITourProvider tourViewer) {
+   public SubMenu_SetCadence(final ITourProvider2 tourProvider) {
 
       super(Messages.Action_Cadence_Set, AS_DROP_DOWN_MENU);
 
-      setMenuCreator(this);
-
-      _tourProvider = tourViewer;
+      _tourProvider = tourProvider;
 
       _actionSetNone = new ActionSetNone();
       _actionSetRpm = new ActionSetRpm();
@@ -94,15 +86,7 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
    }
 
    @Override
-   public void dispose() {
-
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
-      }
-   }
-
-   private void enableActions() {
+   public void enableActions() {
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
@@ -113,6 +97,7 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
       for (final TourData tourData : selectedTours) {
 
          switch ((int) tourData.getCadenceMultiplier()) {
+
          case 0:
             numNone++;
             break;
@@ -130,41 +115,12 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
       _actionSetNone.setChecked(numNone > 0);
    }
 
-   private void fillMenu(final Menu menu) {
+   @Override
+   public void fillMenu(final Menu menu) {
+
       new ActionContributionItem(_actionSetNone).fill(menu, -1);
       new ActionContributionItem(_actionSetRpm).fill(menu, -1);
       new ActionContributionItem(_actionSetSpm).fill(menu, -1);
-   }
-
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-
-      _menu = new Menu(parent);
-
-      // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
-
-            // dispose old menu items
-            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-               menuItem.dispose();
-            }
-
-            fillMenu(_menu);
-
-            enableActions();
-         }
-      });
-
-      return _menu;
    }
 
    private void setCadenceMultiplier(final float cadenceMultiplier) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
@@ -40,6 +41,7 @@ import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
@@ -56,6 +58,9 @@ import org.shredzone.commons.suncalc.SunTimes;
 
 public class TimeTools {
 
+   private static final String                   YEAR_YY               = "yy";                                 //$NON-NLS-1$
+   private static final String                   YEAR_YYY              = "yyy";                                //$NON-NLS-1$
+   private static final String                   YEAR_YYYY             = "yyyy";                               //$NON-NLS-1$
    private static final String                   ZERO_0                = ":0";                                 //$NON-NLS-1$
    private static final String                   ZERO_00_00            = "+00:00";                             //$NON-NLS-1$
    private static final String                   ZERO_00_00_DEFAULT    = "*";                                  //$NON-NLS-1$
@@ -65,12 +70,19 @@ public class TimeTools {
     */
    private static final IntObjectHashMap<String> _timeZoneOffsetLabels = new IntObjectHashMap<>();
 
-   /** Minutes per hour. */
+   /** Minutes per hour */
    private static final int                      MINUTES_PER_HOUR      = 60;
-   /** Seconds per minute. */
+
+   /** Seconds per minute */
    private static final int                      SECONDS_PER_MINUTE    = 60;
-   /** Seconds per hour. */
+
+   /** Seconds per hour */
    private static final int                      SECONDS_PER_HOUR      = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+
+   /**
+    * Number of millisecond for one day
+    */
+   public static final int                       DAY_MILLISECONDS      = 86400_000;
 
    private static final PeriodFormatter          DURATION_FORMATTER;
 
@@ -99,26 +111,26 @@ public class TimeTools {
 
 // SET_FORMATTING_OFF
 
-   public static final DateTimeFormatter   Formatter_Date_S             = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+   public static final DateTimeFormatter   Formatter_Date_S;
    public static final DateTimeFormatter   Formatter_Date_M             = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_Date_L             = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_Date_F             = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
-
    public static final DateTimeFormatter   Formatter_Time_S             = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+
    public static final DateTimeFormatter   Formatter_Time_M             = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_Time_F             = DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL);
+   public static final DateTimeFormatter   Formatter_DateTime_S;
 
-   public static final DateTimeFormatter   Formatter_DateTime_S         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-   public static final DateTimeFormatter   Formatter_DateTime_SM        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,  FormatStyle.MEDIUM);
+   public static final DateTimeFormatter   Formatter_DateTime_SM;
    public static final DateTimeFormatter   Formatter_DateTime_M         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_DateTime_MS        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
    public static final DateTimeFormatter   Formatter_DateTime_ML        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_DateTime_F         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
-
-
    public static final DateTimeFormatter   Formatter_FileName           = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");    //$NON-NLS-1$
 
+
    public static final DateTimeFormatter   Formatter_Day                = DateTimeFormatter.ofPattern("d");                      //$NON-NLS-1$
+
    public static final DateTimeFormatter   Formatter_DayMonth           = DateTimeFormatter.ofPattern("d MMM");                  //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_DayMonthYear       = DateTimeFormatter.ofPattern("d MMM uu");               //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_Month              = DateTimeFormatter.ofPattern("MMM");                    //$NON-NLS-1$
@@ -127,12 +139,11 @@ public class TimeTools {
    public static final DateTimeFormatter   Formatter_Weekday            = DateTimeFormatter.ofPattern("E");                      //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_Weekday_L          = DateTimeFormatter.ofPattern("EEEE");                   //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_YearMonthDay       = DateTimeFormatter.ofPattern("yyyy-MM-dd");             //$NON-NLS-1$
-
    public static final DateTimeFormatter   Formatter_DayTimeSecondsAmPm = DateTimeFormatter.ofPattern("h:mm:ss a");              //$NON-NLS-1$
 
-// SET_FORMATTING_ON
-
    public static final DateTimeFormatter  Formatter_Time_ISO;
+
+// SET_FORMATTING_ON
 
    private static final IPreferenceStore  _prefStoreCommon     = CommonActivator.getPrefStore();
 
@@ -151,6 +162,53 @@ public class TimeTools {
    private static final Object            TIME_ZONE_LOCK       = new Object();
 
    static {
+
+      /**
+       * Force 4 year digits, for some locales e.g. german the short formatting for a year has 2
+       * digits
+       * <p>
+       * Source:
+       * https://stackoverflow.com/questions/40813476/force-4-digit-year-in-localized-strings-generated-from-datetimeformatter-ofloca#answer-40870943
+       */
+      final Locale defaultLocale = Locale.getDefault();
+
+      String shortDatePattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+            FormatStyle.SHORT, //      date
+            null, //                   time
+            IsoChronology.INSTANCE,
+            defaultLocale);
+
+      String shortDateTimePattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+            FormatStyle.SHORT, //      date
+            FormatStyle.SHORT, //      time
+            IsoChronology.INSTANCE,
+            defaultLocale);
+
+      String shortDateMediumTimePattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+            FormatStyle.SHORT, //      date
+            FormatStyle.MEDIUM, //     time
+            IsoChronology.INSTANCE,
+            defaultLocale);
+
+      if (shortDatePattern.contains(YEAR_YY) && shortDatePattern.contains(YEAR_YYY) == false) {
+         shortDatePattern = shortDatePattern.replace(YEAR_YY, YEAR_YYYY);
+      }
+
+      if (shortDateTimePattern.contains(YEAR_YY) && shortDateTimePattern.contains(YEAR_YYY) == false) {
+         shortDateTimePattern = shortDateTimePattern.replace(YEAR_YY, YEAR_YYYY);
+      }
+
+      if (shortDateMediumTimePattern.contains(YEAR_YY) && shortDateMediumTimePattern.contains(YEAR_YYY) == false) {
+         shortDateMediumTimePattern = shortDateMediumTimePattern.replace(YEAR_YY, YEAR_YYYY);
+      }
+
+// SET_FORMATTING_OFF
+
+      Formatter_Date_S        = DateTimeFormatter.ofPattern(shortDatePattern,             defaultLocale);
+      Formatter_DateTime_S    = DateTimeFormatter.ofPattern(shortDateTimePattern,         defaultLocale);
+      Formatter_DateTime_SM   = DateTimeFormatter.ofPattern(shortDateMediumTimePattern,   defaultLocale);
+
+// SET_FORMATTING_ON
 
       Formatter_Time_ISO = new DateTimeFormatterBuilder()
 
@@ -233,6 +291,8 @@ public class TimeTools {
             weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
       };
    }
+
+   private TimeTools() {}
 
    /**
     * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss

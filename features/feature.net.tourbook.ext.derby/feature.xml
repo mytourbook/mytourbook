@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update label="MyTourbook Update Site" url="https://mytourbook.sourceforge.io/updates/"/>
+      <update label="MyTourbook Update Site" url="https://github.com/mytourbook/mytourbook.github.io/"/>
    </url>
 
    <plugin

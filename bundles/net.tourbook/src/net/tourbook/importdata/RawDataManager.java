@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -54,7 +55,7 @@ import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
 import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -75,6 +76,7 @@ import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -101,18 +103,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
-
-// SET_FORMATTING_OFF
-
-   private static final String   COLUMN_FACTORY_CATEGORY_MARKER              = net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
-   private static final String   COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL  = net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
-   private static final String   COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL = net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
-   private static final String   VALUE_UNIT_CADENCE                          = net.tourbook.ui.Messages.Value_Unit_Cadence;
-   private static final String   VALUE_UNIT_CADENCE_SPM                      = net.tourbook.ui.Messages.Value_Unit_Cadence_Spm;
-   private static final String   VALUE_UNIT_K_CALORIES                       = net.tourbook.ui.Messages.Value_Unit_KCalories;
-   private static final String   VALUE_UNIT_PULSE                            = net.tourbook.ui.Messages.Value_Unit_Pulse;
-
-// SET_FORMATTING_ON
 
    /**
     * This can be useful that the logged import events have a defined sequence instead of
@@ -620,12 +610,12 @@ public class RawDataManager {
 
          previousData.add(
                Math.round(oldTourData.getAvgCadence()) + (oldTourData.isCadenceSpm()
-                     ? VALUE_UNIT_CADENCE_SPM
-                     : VALUE_UNIT_CADENCE));
+                     ? OtherMessages.VALUE_UNIT_CADENCE_SPM
+                     : OtherMessages.VALUE_UNIT_CADENCE));
          newData.add(
                Math.round(newTourData.getAvgCadence()) + (newTourData.isCadenceSpm()
-                     ? VALUE_UNIT_CADENCE_SPM
-                     : VALUE_UNIT_CADENCE));
+                     ? OtherMessages.VALUE_UNIT_CADENCE_SPM
+                     : OtherMessages.VALUE_UNIT_CADENCE));
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
@@ -650,21 +640,21 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
          previousData.add(
-               oldTourData.getFrontShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
-                     + UI.COMMA_SPACE + oldTourData.getRearShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
+               oldTourData.getFrontShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
+                     + UI.COMMA_SPACE + oldTourData.getRearShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
          newData.add(
-               newTourData.getFrontShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
-                     + UI.COMMA_SPACE + newTourData.getRearShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
+               newTourData.getFrontShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
+                     + UI.COMMA_SPACE + newTourData.getRearShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_PULSE) {
 
          previousData.add(
                Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-                     + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE);
+                     + Math.round(oldTourData.getAvgPulse()) + OtherMessages.VALUE_UNIT_PULSE);
          newData.add(
                Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-                     + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE);
+                     + Math.round(newTourData.getAvgPulse()) + OtherMessages.VALUE_UNIT_PULSE);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_SPEED) {
@@ -676,23 +666,27 @@ public class RawDataManager {
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
          previousData.add(
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
+               oldTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + UI.COMMA_SPACE +
+                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
                      + UI.COMMA_SPACE +
                      UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min())) + UI.UNIT_LABEL_TEMPERATURE
                      + UI.COMMA_SPACE +
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
-                     + UI.UNIT_LABEL_TEMPERATURE);
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     oldTourData.getWeather_AirQuality());
          newData.add(
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
+               newTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE +
+                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_WindChill()))
-                     + UI.UNIT_LABEL_TEMPERATURE);
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     newTourData.getWeather_AirQuality());
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
@@ -724,16 +718,16 @@ public class RawDataManager {
        */
       if (isEntireTour || tourValueType == TourValueType.TOUR__CALORIES) {
 
-         previousData.add(oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
-         newData.add(newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
+         previousData.add(oldTourData.getCalories() / 1000f + OtherMessages.VALUE_UNIT_K_CALORIES);
+         newData.add(newTourData.getCalories() / 1000f + OtherMessages.VALUE_UNIT_K_CALORIES);
       }
 
       if (isEntireTour || tourValueType == TourValueType.TOUR__MARKER) {
 
          previousData.add(
-               oldTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER);
+               oldTourData.getTourMarkers().size() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_CATEGORY_MARKER);
          newData.add(
-               newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER);
+               newTourData.getTourMarkers().size() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_CATEGORY_MARKER);
       }
 
       if (isEntireTour || tourValueType == TourValueType.TOUR__IMPORT_FILE_LOCATION) {
@@ -755,7 +749,7 @@ public class RawDataManager {
       }
    }
 
-   public static boolean doesInvalidFileExist(final String fileName) {
+   static boolean doesInvalidFileExist(final String fileName) {
 
       final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
 
@@ -1391,13 +1385,13 @@ public class RawDataManager {
       _allInvalidFiles.clear();
    }
 
-   private TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
+   public TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
 
       TourData tourDataDummyClone = null;
 
       try {
 
-         tourDataDummyClone = (TourData) oldTourData.clone();
+         tourDataDummyClone = (TourData) oldTourData.clonePartly();
 
          /*
           * Loop: For each tour value type, we save the associated data for future display
@@ -1424,6 +1418,12 @@ public class RawDataManager {
             if (isEntireTour || tourValueType == TourValueType.TOUR__IMPORT_FILE_LOCATION) {
 
                tourDataDummyClone.setImportFilePath(oldTourData.getImportFilePathName());
+            }
+
+            if (isEntireTour || tourValueType == TourValueType.TOUR__WEATHER) {
+
+               tourDataDummyClone.setWeather(oldTourData.getWeather());
+               tourDataDummyClone.setWeather_Clouds(oldTourData.getWeather_Clouds());
             }
 
             /*
@@ -1551,7 +1551,7 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_SwimmingValues);
          }
 
-         // Temperature
+         // Weather values
          if (isAllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_WeatherValues);
          }
@@ -1710,7 +1710,7 @@ public class RawDataManager {
       TourData clonedTourData = null;
       try {
 
-         clonedTourData = (TourData) tourData.clone();
+         clonedTourData = (TourData) tourData.clonePartly();
 
          // loop: For each tour value type, we save the associated data for future display
          //to compare with the new data
@@ -1767,6 +1767,7 @@ public class RawDataManager {
                tourData.pulseTime_Milliseconds = null;
                tourData.pulseTime_TimeIndex = null;
                tourData.setAvgPulse(0);
+               tourData.setNumberOfHrZones(0);
                break;
 
             case TIME_SLICES__POWER_AND_SPEED:
@@ -1804,6 +1805,7 @@ public class RawDataManager {
                clonedTourData.setWeather_Snowfall(tourData.getWeather_Snowfall());
                clonedTourData.setWeather_Wind_Direction(tourData.getWeather_Wind_Direction());
                clonedTourData.setWeather_Wind_Speed(tourData.getWeather_Wind_Speed());
+               clonedTourData.setWeather_AirQuality(tourData.getWeather_AirQuality());
 
                tourData.setIsWeatherDataFromProvider(false);
                tourData.setWeather_Temperature_Average(0);
@@ -1818,6 +1820,7 @@ public class RawDataManager {
                tourData.setWeather_Snowfall(0);
                tourData.setWeather_Wind_Direction(-1);
                tourData.setWeather_Wind_Speed(0);
+               tourData.setWeather_AirQuality(UI.EMPTY_STRING);
                break;
 
             case TIME_SLICES__TIME:
@@ -2030,9 +2033,9 @@ public class RawDataManager {
     * @param importState_Process
     * @return
     */
-   public void importTours_FromMultipleFiles(final ArrayList<OSFile> allImportFiles,
-                                             final String fileGlobPattern,
-                                             final ImportState_Process importState_Process) {
+   void importTours_FromMultipleFiles(final List<OSFile> allImportFiles,
+                                      final String fileGlobPattern,
+                                      final ImportState_Process importState_Process) {
 
       try {
 
@@ -2336,7 +2339,7 @@ public class RawDataManager {
       if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
 
          // Delete the temporary created file
-         FilesUtils.deleteIfExists(importFile.toPath());
+         FileUtils.deleteIfExists(importFile.toPath());
       }
    }
 
@@ -3374,6 +3377,12 @@ public class RawDataManager {
                oldTourData.setDeviceFirmwareVersion(reimportedTourData.getDeviceFirmwareVersion());
             }
 
+            if (tourValueTypes.contains(TourValueType.TOUR__WEATHER)) {
+
+               oldTourData.setWeather(reimportedTourData.getWeather());
+               oldTourData.setWeather_Clouds(reimportedTourData.getWeather_Clouds());
+            }
+
             newTourData = oldTourData;
          }
 
@@ -3749,7 +3758,7 @@ public class RawDataManager {
       return null;
    }
 
-   private List<OSFile> skipFitLogFiles(final ArrayList<OSFile> allImportFiles) {
+   private List<OSFile> skipFitLogFiles(final List<OSFile> allImportFiles) {
 
       final List<OSFile> allNotSkippedFiles = new ArrayList<>();
 
@@ -4080,7 +4089,7 @@ public class RawDataManager {
     *
     * @param modifiedTours
     */
-   public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
+   public void updateTourDataModel(final List<TourData> modifiedTours) {
 
       for (final TourData tourData : modifiedTours) {
          if (tourData != null) {

@@ -29,7 +29,7 @@ public class DialogAdjustAltitudeTests extends UITest {
 
    private void adjustAltitude(final String newElevationValue, final String adjustmentMethod) {
 
-      selectTour();
+      Utils.getTourWithSRTM(bot);
 
       bot.viewByTitle(Utils.TOUREDITOR_VIEW_NAME).show();
       bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
@@ -50,17 +50,8 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      final SWTBotTreeItem tour = selectTour();
+      final SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
       assertEquals(newElevationValue, tour.cell(tourBookView_ElevationGain_Column_Index));
-   }
-
-   /**
-    * Select a tour for which we have SRTM3 data
-    */
-   private SWTBotTreeItem selectTour() {
-
-      return bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    @Test

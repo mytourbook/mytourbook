@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,7 +25,7 @@ import java.util.HashMap;
 import net.tourbook.common.util.TreeViewerItem;
 
 /**
- * contains tree viewer items (TVI) for reference tours
+ * Contains tree viewer items (TVI) for reference tours
  */
 public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
@@ -49,9 +51,10 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
    long                                      tourId;
 
    RefTourItem                               refTourItem;
+   Object[]                                  sortedAndFilteredCompareResults;
 
    /**
-    * keeps the tourId's for all compared tours which have already been stored in the db
+    * Keeps the tourId's for all compared tours which have already been stored in the db
     */
    private HashMap<Long, StoredComparedTour> _storedComparedTours;
 
@@ -149,6 +152,25 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
       int result = 1;
       result = prime * result + ((refTourItem == null) ? 0 : refTourItem.hashCode());
       return result;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "TVICompareResultReferenceTour" + NL //       //$NON-NLS-1$
+
+            + "[" + NL //                                   //$NON-NLS-1$
+
+            + "   label       =" + label + NL //            //$NON-NLS-1$
+            + "   tourId      =" + tourId + NL //           //$NON-NLS-1$
+
+//          + "   refTourItem =" + refTourItem + NL //      //$NON-NLS-1$
+
+            + "]" + NL //                                   //$NON-NLS-1$
+
+      ;
    }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
@@ -28,8 +30,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -41,11 +42,11 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionResetToDefault {
 
-   private IDialogSettings  _state;
+   private IDialogSettings       _state;
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
-   private SelectionAdapter _defaultSelectionListener;
+   private SelectionListener     _defaultSelectionListener;
 
    /*
     * UI controls
@@ -55,15 +56,16 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
    private Button   _chkShowInChartToolbar_Altitude;
    private Button   _chkShowInChartToolbar_Gradient;
    private Button   _chkShowInChartToolbar_Pace;
+   private Button   _chkShowInChartToolbar_Power;
    private Button   _chkShowInChartToolbar_Pulse;
    private Button   _chkShowInChartToolbar_Speed;
    private Button   _chkShowInChartToolbar_RunDyn_StepLength;
    private Button   _chkShowInChartToolbar_HrZone;
 
    public SlideoutMap2_TourColors(final Control ownerControl,
-                                   final ToolBar toolBar,
-                                   final Map2View map2View,
-                                   final IDialogSettings state) {
+                                  final ToolBar toolBar,
+                                  final Map2View map2View,
+                                  final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
@@ -79,7 +81,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
@@ -141,7 +143,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(7).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(8).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
 
@@ -153,6 +155,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
                createUI_GraphAction(container, MapGraphId.Altitude);
                createUI_GraphAction(container, MapGraphId.Pulse);
                createUI_GraphAction(container, MapGraphId.Speed);
+               createUI_GraphAction(container, MapGraphId.Power);
                createUI_GraphAction(container, MapGraphId.Pace);
                createUI_GraphAction(container, MapGraphId.Gradient);
                createUI_GraphAction(container, MapGraphId.RunDyn_StepLength);
@@ -165,6 +168,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
                _chkShowInChartToolbar_Altitude = createUI_GraphCheckbox(container);
                _chkShowInChartToolbar_Pulse = createUI_GraphCheckbox(container);
                _chkShowInChartToolbar_Speed = createUI_GraphCheckbox(container);
+               _chkShowInChartToolbar_Power = createUI_GraphCheckbox(container);
                _chkShowInChartToolbar_Pace = createUI_GraphCheckbox(container);
                _chkShowInChartToolbar_Gradient = createUI_GraphCheckbox(container);
                _chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox(container);
@@ -200,14 +204,9 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
       return checkbox;
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
    }
 
    @Override
@@ -237,6 +236,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,            Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT);
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,             Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT);
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE,                Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT);
+      _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_POWER,               Map2View.STATE_IS_SHOW_IN_TOOLBAR_POWER_DEFAULT);
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE,               Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT);
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH, Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT);
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED,               Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT);
@@ -258,6 +258,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
       _chkShowInChartToolbar_Gradient.setSelection(            Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,         Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT));
       _chkShowInChartToolbar_HrZone.setSelection(              Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,            Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT));
       _chkShowInChartToolbar_Pace.setSelection(                Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE,            Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE_DEFAULT));
+      _chkShowInChartToolbar_Power.setSelection(               Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_POWER,            Map2View.STATE_IS_SHOW_IN_TOOLBAR_POWER_DEFAULT));
       _chkShowInChartToolbar_Pulse.setSelection(               Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE,            Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE_DEFAULT));
       _chkShowInChartToolbar_RunDyn_StepLength.setSelection(   Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH,   Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT));
       _chkShowInChartToolbar_Speed.setSelection(               Util.getStateBoolean(_state, Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED,            Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED_DEFAULT));
@@ -273,6 +274,7 @@ public class SlideoutMap2_TourColors extends ToolbarSlideout implements IActionR
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_GRADIENT,            _chkShowInChartToolbar_Gradient.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE,             _chkShowInChartToolbar_HrZone.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PACE,                _chkShowInChartToolbar_Pace.getSelection());
+      _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_POWER,               _chkShowInChartToolbar_Power.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_PULSE,               _chkShowInChartToolbar_Pulse.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH, _chkShowInChartToolbar_RunDyn_StepLength.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_IN_TOOLBAR_SPEED,               _chkShowInChartToolbar_Speed.getSelection());

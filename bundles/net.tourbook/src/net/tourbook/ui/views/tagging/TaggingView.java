@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -492,7 +492,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
    }
 
-   public class TagFilter extends ViewerFilter {
+   private class TagFilter extends ViewerFilter {
 
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
@@ -929,6 +929,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       defineColumn_Tour_Tags();
       defineColumn_Tour_TagAndCategoryNotes();
       defineColumn_Tour_TagID();
+      defineColumn_Tour_TagImageFilePath();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_MaxSpeed();
@@ -1372,7 +1373,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
 
-               cell.setText(TourDatabase.getTagNotes((tagItem).tagId));
+               cell.setText(TourDatabase.getTagPropertyValue((tagItem).tagId, TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES_ID));
 
             } else if (viewItem instanceof TVITagView_TagCategory) {
 
@@ -1415,6 +1416,31 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             } else {
 
                cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   private void defineColumn_Tour_TagImageFilePath() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH
+            .createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(UI.EMPTY_STRING);
+
+            final Object element = cell.getElement();
+            if (element instanceof TVITagView_Tag) {
+
+               final TVITagView_Tag tagItem = (TVITagView_Tag) element;
+
+               cell.setText(TourDatabase.getTagPropertyValue(
+                     (tagItem).tagId,
+                     TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH_ID));
             }
          }
       });
@@ -1534,6 +1560,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public void dispose() {
 
+      getViewSite().getPage().removePartListener(_partListener);
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -2010,6 +2037,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                // check if a newer expand event occured
                if (__expandRunnableCounter != _expandRunnableCounter) {
+                  return;
+               }
+
+               if (_tagViewer.getTree().isDisposed()) {
                   return;
                }
 

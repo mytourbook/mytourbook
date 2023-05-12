@@ -26,6 +26,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageWeatherTests extends UITest {
 
@@ -42,13 +43,13 @@ public class PrefPageWeatherTests extends UITest {
 
       assertEquals(message, shell.bot().label(message).getText());
 
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
    }
 
    @Test
    void testVendorConnections() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Weather").select(); //$NON-NLS-1$
 
       bot.comboBox().setSelection(0);
@@ -65,7 +66,7 @@ public class PrefPageWeatherTests extends UITest {
       //Restore the selection of OpenWeatherMap as the default weather vendor
       bot.comboBox().setSelection(1);
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 
    private void testWorldWeatherOnlineConnection() {
@@ -91,7 +92,7 @@ public class PrefPageWeatherTests extends UITest {
 
       assertEquals(message, shell.bot().label(message).getText());
 
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
 
       bot.button("Restore Defaults").click(); //$NON-NLS-1$
    }

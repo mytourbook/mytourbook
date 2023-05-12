@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamSource;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.SerieData;
@@ -52,7 +53,7 @@ import net.tourbook.tour.TourLogManager;
 /**
  * Import tours which are exported from MyTourbook
  */
-public class MT_StAXHandler {
+class MT_StAXHandler {
 
    private static final String              TAG_MT                          = "mt";             //$NON-NLS-1$
    private static final String              TAG_TOUR                        = "tour";           //$NON-NLS-1$
@@ -106,14 +107,14 @@ public class MT_StAXHandler {
    private long          _data_TourDeviceTime_Recorded;
    private float         _data_TourAltDown;
 
-   public MT_StAXHandler(final TourbookDevice deviceDataReader,
-                         final String importFilePath,
+   MT_StAXHandler(final TourbookDevice deviceDataReader,
+                  final String importFilePath,
 
-                         final Map<Long, TourData> alreadyImportedTours,
-                         final Map<Long, TourData> newlyImportedTours,
+                  final Map<Long, TourData> alreadyImportedTours,
+                  final Map<Long, TourData> newlyImportedTours,
 
-                         final ImportState_File importState_File,
-                         final ImportState_Process importState_Process) throws XMLStreamException {
+                  final ImportState_File importState_File,
+                  final ImportState_Process importState_Process) throws XMLStreamException {
 
       _device = deviceDataReader;
       _importFilePath = importFilePath;
@@ -127,7 +128,7 @@ public class MT_StAXHandler {
       parseXML(importFilePath);
    }
 
-   public void dispose() {
+   void dispose() {
 
    }
 
@@ -302,7 +303,7 @@ public class MT_StAXHandler {
 
    private void parseXML(final String importFilePath) throws FactoryConfigurationError, XMLStreamException {
 
-      final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+      final XMLInputFactory inputFactory = XmlUtils.initializeFactory();
       final XMLEventReader eventReader = inputFactory.createXMLEventReader(new StreamSource("file:" + importFilePath)); //$NON-NLS-1$
 
       while (eventReader.hasNext()) {
@@ -389,7 +390,7 @@ public class MT_StAXHandler {
 
       _tourData = new TourData();
 
-      startElement_Parent.getAttributes().forEachRemaining(attribute -> setValues_Tour_Attributes(attribute));
+      startElement_Parent.getAttributes().forEachRemaining(this::setValues_Tour_Attributes);
 
       /**
        * !!! VERY IMPORTANT !!!
@@ -751,7 +752,7 @@ public class MT_StAXHandler {
 
                // <sensorvalue>
 
-               parseXML_072_SensorValue(eventReader, startElement);
+               parseXML_072_SensorValue(startElement);
             }
          }
 
@@ -768,8 +769,7 @@ public class MT_StAXHandler {
       _tourData.getDeviceSensorValues().addAll(_importedData_AllSensorValues);
    }
 
-   private void parseXML_072_SensorValue(final XMLEventReader eventReader,
-                                         final StartElement startElement_SensorValue) throws XMLStreamException {
+   private void parseXML_072_SensorValue(final StartElement startElement_SensorValue) {
 
       final DeviceSensorValue sensorValue = new DeviceSensorValue(_tourData);
 

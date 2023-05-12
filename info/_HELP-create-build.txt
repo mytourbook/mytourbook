@@ -20,6 +20,7 @@ AND REVIEW IT MANUALLY IN ALL MODIFIED FILES, subversions must not be modified e
 
 * Set version number in gradle.properties in the .git root
 * Set version number as described below (Build with POM)
+
 * Run "gradlew" in "C:\DAT\MT\mytourbook\build\build.net.tourbook" this will run the default task
 
 
@@ -40,29 +41,49 @@ Setup the graddle wrapper in the build folder:
 #################
 
    Setup Gradle environment
-   - Set "org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-11.0.13.8-hotspot"
+   - Set "org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-11.0.17.8-hotspot"
      in C:\Users\Wolfgang\.gradle\gradle.properties
    
 
-   Build plugin
-   - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
-   - Update VTM files,  run task assemble:   C:\DAT\MT\vtm-parent>gradlew ass
-   - Update VTM plugin, run task assemble:   C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm>gradle ass
-
-   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
-    
-      Update manifest.MF
-      - Select 'EGradle virtual root project' in 'Package Explorer'
-      - Select in the contextmenu 'Egradle/Refresh eclipse dependencies'  
-      
-      Build plugin
-      - Open 'Gradle Tasks' view
-      - Select 'net.tourbook.ext.vtm'
-      - Double click 'assemble'
+   Build VTM plugin for MT
    
-   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD 
+   - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
+   
+   - Update VTM files, run task assemble:   
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew clean ass
+      
+      
+   - Update VTM plugin, run task assemble:   
+     
+     cd C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm
+     gradle clean ass
 
 
+   TEST VTM
+   
+   - Run playground
+   
+      cd C:\DAT\MT\vtm-parent
+      run-playground.cmd
+
+
+   - Copy debug files
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew copyDebugFiles   
+
+
+   - Fat jar
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew :vtm-playground:fatJar
+
+
+   - Other VTM Tests
+   
+     https://github.com/mapsforge/vtm/blob/master/docs/desktop.md   
 
 ###########################
  Update Eclipse NL repo
@@ -161,24 +182,26 @@ Build Product
       - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
 
 
-Build Update site
+Build Update Site
 ------------------
 
-   BEFORE !!!
+   !!! BEFORE !!!
    
    1. Set version numbers like in this commit https://github.com/mytourbook/mytourbook/commit/4ad360673bea889647dfb54f7c754c8bb41984b0
    2. Run "CREATE_MT_BuildFiles.xml" BEFORE the following commands
 
-   Open cmd
-      - Select folder "C:\DAT\MT\mytourbook"
-      - Run "mvn verify -P build-update-site"
+   * WITH NL
+   
+      Open cmd
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site"
 
 
-   * without NL
+   * WITHOUT NL
 
-   Open cmd
-      - Select folder "C:\DAT\MT\mytourbook"
-      - Run "mvn verify -P build-update-site-no-nl"
+      Open cmd
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site-no-nl"
 
 
 

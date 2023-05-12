@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,13 +61,14 @@ public final class TourWeatherRetriever {
          return false;
       }
 
-      final boolean retrievalStatus = historicalWeatherRetriever.retrieveHistoricalWeatherData();
+      final boolean isWeatherRetrieved = historicalWeatherRetriever.retrieveHistoricalWeatherData();
+      if (isWeatherRetrieved) {
 
-      if (retrievalStatus) {
+         tourData.setIsWeatherDataFromProvider(true);
 
          TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(tourData) +
                UI.SYMBOL_COLON + UI.SPACE +
-               WeatherUtils.buildWeatherDataString(tourData, true, true, true));
+               WeatherUtils.buildWeatherDataString(tourData, true, true, false));
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
 
@@ -90,6 +91,6 @@ public final class TourWeatherRetriever {
                TourManager.getTourDateTimeShort(tourData)));
       }
 
-      return retrievalStatus;
+      return isWeatherRetrieved;
    }
 }

@@ -1066,7 +1066,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
 
          final Image oldImage = _profileImages.put(colorProvider, image);
 
-         Util.disposeResource(oldImage);
+         UI.disposeResource(oldImage);
 
          _oldImageWidth = imageWidth;
       }

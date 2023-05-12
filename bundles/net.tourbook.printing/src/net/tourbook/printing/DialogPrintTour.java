@@ -32,7 +32,7 @@ import javax.xml.transform.TransformerException;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.printing.PrintTourExtension;
@@ -839,7 +839,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
       String fileName = getPrintFileName();
 
-      fileName = FilesUtils.removeExtensions(fileName);
+      fileName = FileUtils.removeExtensions(fileName);
 
       // build file path with extension
       filePath = filePath.addTrailingSeparator().append(fileName).addFileExtension(PDF_FILE_EXTENSION);

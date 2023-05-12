@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -36,7 +35,6 @@ import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
@@ -105,7 +103,6 @@ public class UI {
    public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                    //$NON-NLS-1$
    public static final String            SLASH_WITH_SPACE              = " / ";                        //$NON-NLS-1$
    public static final String            EMPTY_STRING_FORMAT           = "%s";                         //$NON-NLS-1$
-   public static final String            MNEMONIC                      = "&";                          //$NON-NLS-1$
 
    /**
     * contains a new line
@@ -190,77 +187,39 @@ public class UI {
        */
       IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
+// SET_FORMATTING_OFF
+
       /*
        * Chart and map graphs.
        */
-      createGraphImageInRegistry(
-            MapGraphId.Altimeter,
-            Images.Graph_Altimeter,
-            Images.Graph_Altimeter_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Altitude,
-            Images.Graph_Elevation,
-            Images.Graph_Elevation_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Cadence,
-            Images.Graph_Cadence,
-            Images.Graph_Cadence_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Gradient,
-            Images.Graph_Gradient,
-            Images.Graph_Gradient_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.HrZone,
-            Images.PulseZones,
-            Images.PulseZones_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Pace,
-            Images.Graph_Pace,
-            Images.Graph_Pace_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Power,
-            Images.Graph_Power,
-            Images.Graph_Power_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Pulse,
-            Images.Graph_Heartbeat,
-            Images.Graph_Heartbeat_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Speed,
-            Images.Graph_Speed,
-            Images.Graph_Speed_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Temperature,
-            Images.Graph_Temperature,
-            Images.Graph_Temperature_Disabled);
+      createGraphImageInRegistry(MapGraphId.Altimeter,   Images.Graph_Altimeter,    Images.Graph_Altimeter_Disabled);
+      createGraphImageInRegistry(MapGraphId.Altitude,    Images.Graph_Elevation,    Images.Graph_Elevation_Disabled);
+      createGraphImageInRegistry(MapGraphId.Cadence,     Images.Graph_Cadence,      Images.Graph_Cadence_Disabled);
+      createGraphImageInRegistry(MapGraphId.Gradient,    Images.Graph_Gradient,     Images.Graph_Gradient_Disabled);
+      createGraphImageInRegistry(MapGraphId.HrZone,      Images.PulseZones,         Images.PulseZones_Disabled);
+      createGraphImageInRegistry(MapGraphId.Pace,        Images.Graph_Pace,         Images.Graph_Pace_Disabled);
+      createGraphImageInRegistry(MapGraphId.Power,       Images.Graph_Power,        Images.Graph_Power_Disabled);
+      createGraphImageInRegistry(MapGraphId.Pulse,       Images.Graph_Heartbeat,    Images.Graph_Heartbeat_Disabled);
+      createGraphImageInRegistry(MapGraphId.Speed,       Images.Graph_Speed,        Images.Graph_Speed_Disabled);
+      createGraphImageInRegistry(MapGraphId.Temperature, Images.Graph_Temperature,  Images.Graph_Temperature_Disabled);
 
       // tour type images
-      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter));
-      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM, TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter_System));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,               TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,        TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter_System));
 
       // photo
       IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, TourbookPlugin.getImageDescriptor(Images.PhotoDirectoryView));
-      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO, TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,  TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       /*
        * set tag styler
        */
-      TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
-      TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
-      TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
-   }
+      TAG_CATEGORY_STYLER  = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
+      TAG_STYLER           = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
+      TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 
-   // pref store var cannot be set from a static field because it can be null !!!
-// private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+// SET_FORMATTING_ON
+   }
 
    private UI() {}
 
@@ -308,7 +267,7 @@ public class UI {
 
       final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-      final MessageDialog dialog = new MessageDialog(//
+      final MessageDialog dialog = new MessageDialog(
             shell,
             Messages.app_dlg_confirmFileOverwrite_title,
             null,
@@ -340,7 +299,7 @@ public class UI {
          Display.getDefault().syncExec(() -> {
 
             final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-            final MessageDialog dialog = new MessageDialog(//
+            final MessageDialog dialog = new MessageDialog(
                   shell,
                   Messages.app_dlg_confirmFileOverwrite_title,
                   null,
@@ -479,28 +438,6 @@ public class UI {
    }
 
    /**
-    * Creates a page with a static text.
-    *
-    * @param formToolkit
-    * @param parent
-    * @param labelText
-    * @return
-    */
-   public static Composite createPage(final Composite parent, final String labelText) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-      {
-         final Label label = new Label(container, SWT.WRAP);
-         label.setText(labelText);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-      }
-
-      return container;
-   }
-
-   /**
     * Creates a page with a static text by using a {@link FormToolkit}
     *
     * @param formToolkit
@@ -557,15 +494,16 @@ public class UI {
 
       final ZonedDateTime dt = tourData.getTourStartTime();
 
-      return _formatter
-            .format(//
-                  Messages.Format_yyyymmdd_hhmmss,
-                  dt.getYear(),
-                  dt.getMonthValue(),
-                  dt.getDayOfMonth(),
-                  dt.getHour(),
-                  dt.getMinute(),
-                  dt.getSecond())//
+      return _formatter.format(
+
+            Messages.Format_yyyymmdd_hhmmss,
+            dt.getYear(),
+            dt.getMonthValue(),
+            dt.getDayOfMonth(),
+            dt.getHour(),
+            dt.getMinute(),
+            dt.getSecond())
+
             .toString();
    }
 
@@ -1044,6 +982,7 @@ public class UI {
       // year
       colorRegistry.put(VIEW_COLOR_SUB,
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
+
       // month
       colorRegistry.put(VIEW_COLOR_SUB_SUB,
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
@@ -1116,35 +1055,6 @@ public class UI {
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
 
       );
-   }
-
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
-
-      updateUI_Tags(tourData, tourTagLabel, false);
-   }
-
-   /**
-    * @param tourData
-    * @param tourTagLabel
-    * @param isVertical
-    *           When <code>true</code> the tags are displayed as a list, otherwise horizontally
-    */
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel, final boolean isVertical) {
-
-      // tour tags
-      final Set<TourTag> tourTags = tourData.getTourTags();
-
-      if (tourTags == null || tourTags.isEmpty()) {
-
-         tourTagLabel.setText(UI.EMPTY_STRING);
-
-      } else {
-
-         final String tagLabels = TourDatabase.getTagNames(tourTags, isVertical);
-
-         tourTagLabel.setText(tagLabels);
-         tourTagLabel.setToolTipText(tagLabels);
-      }
    }
 
    /**

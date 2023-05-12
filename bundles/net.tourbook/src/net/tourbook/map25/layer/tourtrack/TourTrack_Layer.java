@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -46,13 +46,23 @@ public class TourTrack_Layer extends Layer {
       mRenderer = _tourTrackRenderer = new TourTrack_LayerRenderer(this, map);
    }
 
-   public void onModifyConfig(final boolean isVerticesModified) {
+   public TourTrack_LayerRenderer getTourTrackRenderer() {
 
-      _tourTrackRenderer.onModifyConfig(isVerticesModified);
+      return _tourTrackRenderer;
    }
 
-   public void setupTourPositions(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
+   public void setupTourPositions(final GeoPoint[] allGeoPoints,
+                                  final int[] allGeoPointColors,
+                                  final IntArrayList allTourStarts,
+                                  final int[] allTimeSeries,
+                                  final float[] allDistanceSeries) {
 
-      _tourTrackRenderer.setupTourPositions(allGeoPoints, allGeoPointColors, allTourStarts);
+      _tourTrackRenderer.setupTourPositions(
+
+            allGeoPoints,
+            allGeoPointColors,
+            allTourStarts,
+            allTimeSeries,
+            allDistanceSeries);
    }
 }

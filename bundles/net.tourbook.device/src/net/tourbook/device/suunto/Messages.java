@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,22 +17,22 @@ package net.tourbook.device.suunto;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS {
+class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.device.suunto.messages";	//$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.device.suunto.messages"; //$NON-NLS-1$
 
-	public static String				pref_data_source;
-	public static String				pref_altitude_source;
-	public static String				pref_altitude_gps;
-	public static String				pref_altitude_barometer;
-	public static String				pref_distance_source;
-	public static String				pref_distance_gps;
-	public static String				pref_distance_providedvalues;
+   static String               pref_data_source;
+   static String               pref_altitude_source;
+   static String               pref_altitude_gps;
+   static String               pref_altitude_barometer;
+   static String               pref_distance_source;
+   static String               pref_distance_gps;
+   static String               pref_distance_providedvalues;
 
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
+   static {
+      // initialize resource bundle
+      NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+   }
 
-	private Messages() {}
+   private Messages() {}
 }

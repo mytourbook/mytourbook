@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.io.File;
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -52,7 +53,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 
-public class Photo {
+public class Photo implements Serializable {
+
+   private static final long                           serialVersionUID               = 1L;
 
    public static final int                             MAP_IMAGE_DEFAULT_WIDTH_HEIGHT = 80;
 
@@ -313,7 +316,7 @@ public class Photo {
       _photoServiceProvider = photoServiceProvider;
    }
 
-   public static void setupTimeZone() {
+   static void setupTimeZone() {
 
       _dtParser = DateTimeFormatter//
             .ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
@@ -464,7 +467,7 @@ public class Photo {
       return sb.toString();
    }
 
-   public void dumpTourReferences() {
+   void dumpTourReferences() {
 
       for (final TourPhotoReference ref : _tourPhotoRef.values()) {
          System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId); //$NON-NLS-1$
@@ -803,8 +806,8 @@ public class Photo {
       try {
 
          /*
-          * read metadata WITH thumbnail image info, this is the default when the pamameter is
-          * ommitted
+          * read metadata WITH thumbnail image info, this is the default when the parameter is
+          * omitted
           */
          final HashMap<String, Object> params = new HashMap<>();
          params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
@@ -1145,7 +1148,7 @@ public class Photo {
       }
    }
 
-   public void replaceImageFile(final IPath newImageFilePathName) {
+   void replaceImageFile(final IPath newImageFilePathName) {
 
       // force loading of metadata
       _photoImageMetadata = null;
@@ -1167,7 +1170,7 @@ public class Photo {
       _linkWorldPosition.clear();
    }
 
-   public void resetTourExifState() {
+   private void resetTourExifState() {
 
       // photo is not saved any more in a tour
 
@@ -1338,7 +1341,7 @@ public class Photo {
       ;
    }
 
-   public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
+   void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
       _photoImageMetadata = photoImageMetadata;
 

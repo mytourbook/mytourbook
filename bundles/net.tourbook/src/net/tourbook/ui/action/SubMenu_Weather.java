@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,23 +15,18 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
-
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.ui.ITourProvider2;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  */
-public class SubMenu_Weather extends Action implements IMenuCreator {
-
-   private Menu                           _menu;
+public class SubMenu_Weather extends SubMenu {
 
    private ActionAdjustTemperature        _action_AdjustTemperature;
    private ActionRetrieveWeatherData      _action_RetrieveWeatherData;
@@ -40,13 +35,12 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
 
    private ITourProvider2                 _tourProvider;
 
-   public SubMenu_Weather(final ITourProvider2 tourViewer) {
+   public SubMenu_Weather(final ITourProvider2 tourProvider) {
 
       super(Messages.Tour_Action_Weather, AS_DROP_DOWN_MENU);
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.State_RetrieveWeatherData));
 
-      setMenuCreator(this);
-
-      _tourProvider = tourViewer;
+      _tourProvider = tourProvider;
 
       _action_AdjustTemperature = new ActionAdjustTemperature(_tourProvider);
       _action_ComputeMinMaxTemperature = new ActionComputeMinMaxTemperature(_tourProvider);
@@ -55,15 +49,10 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
    }
 
    @Override
-   public void dispose() {
+   public void enableActions() {}
 
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
-      }
-   }
-
-   private void fillMenu(final Menu menu) {
+   @Override
+   public void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_action_AdjustTemperature).fill(menu, -1);
       new ActionContributionItem(_action_ComputeMinMaxTemperature).fill(menu, -1);
@@ -74,31 +63,4 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
    public ActionRetrieveWeatherData getActionRetrieveWeatherData() {
       return _action_RetrieveWeatherData;
    }
-
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-
-      _menu = new Menu(parent);
-
-      // Add listener to re-populate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
-
-         // dispose old menu items
-         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
-            menuItem.dispose();
-         }
-
-         fillMenu(_menu);
-      }));
-
-      return _menu;
-   }
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
@@ -23,7 +23,7 @@ import net.tourbook.extension.export.ExportTourExtension;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Export tours in the GPX data format
+ * Export tours in the TCX data format
  */
 public class ExportTourTCX extends ExportTourExtension {
 
@@ -32,10 +32,13 @@ public class ExportTourTCX extends ExportTourExtension {
    /**
     * Plugin extension constructor
     */
-   public ExportTourTCX() {}
+   public ExportTourTCX() {
+
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_Garmin_Logo));
+   }
 
    @Override
-   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
       new DialogExportTour(
             Display.getCurrent().getActiveShell(),
@@ -45,5 +48,4 @@ public class ExportTourTCX extends ExportTourExtension {
             tourEndIndex,
             TCX_2_0_TEMPLATE).open();
    }
-
 }

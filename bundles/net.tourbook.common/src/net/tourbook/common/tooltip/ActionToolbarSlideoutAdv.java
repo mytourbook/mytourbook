@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
     * This tooltip will be displayed when the action is not selected which causes that the slideout
     * is not displayed.
     */
-   protected String         notSelectedTooltip = UI.EMPTY_STRING;
+   public String            notSelectedTooltip = UI.EMPTY_STRING;
 
    private boolean          _isCreatedImage_EnabledDisabled;
    private boolean          _isCreatedImage_Selected;
@@ -167,7 +167,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
    }
 
    /**
-    * Is called before the slideout is opened, this allows to close other dialogs, default do
+    * Is called before the slideout is opened, this allows to close other dialogs, default is doing
     * nothing.
     */
    protected void onBeforeOpenSlideout() {}

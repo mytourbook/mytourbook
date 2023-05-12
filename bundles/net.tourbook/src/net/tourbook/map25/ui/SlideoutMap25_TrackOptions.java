@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
     */
    private Composite             _shellContainer;
    //
-   private Button                _chkAnimateDirectionArrows;
    private Button                _chkShowDirectionArrows;
    private Button                _chkShowOutline;
    private Button                _chkShowSliderLocation;
@@ -126,7 +125,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Label                 _lblSliderPath_Width;
    private Label                 _lblSliderPath_Color;
    //
-   private Spinner               _spinnerArrow_ArrowsPerSecond;
    private Spinner               _spinnerArrow_MinimumDistance;
    private Spinner               _spinnerArrow_Scale;
    private Spinner               _spinnerArrow_VerticalOffset;
@@ -512,30 +510,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                   .grab(true, false)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_comboArrowDesign);
-         }
-         {
-            /*
-             * Animation
-             */
 
-            // checkbox
-            _chkAnimateDirectionArrows = new Button(container, SWT.CHECK);
-            _chkAnimateDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows);
-            _chkAnimateDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows_Tooltip);
-            _chkAnimateDirectionArrows.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_chkAnimateDirectionArrows);
-
-            // spinner
-            _spinnerArrow_ArrowsPerSecond = new Spinner(container, SWT.BORDER);
-            _spinnerArrow_ArrowsPerSecond.setToolTipText(Messages.Slideout_Map25TrackOptions_ArrowsPerSecond_Tooltip);
-            _spinnerArrow_ArrowsPerSecond.setMinimum(1);
-            _spinnerArrow_ArrowsPerSecond.setMaximum(Map25FPSManager.DEFAULT_FOREGROUND_FPS);
-            _spinnerArrow_ArrowsPerSecond.setIncrement(1);
-            _spinnerArrow_ArrowsPerSecond.setPageIncrement(5);
-            _spinnerArrow_ArrowsPerSecond.addSelectionListener(_defaultSelectionListener);
-            _spinnerArrow_ArrowsPerSecond.addMouseWheelListener(_defaultMouseWheelListener);
+            UI.createSpacer_Horizontal(container, 2);
          }
          {
             /*
@@ -1018,7 +994,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 // SET_FORMATTING_OFF
 
-      final boolean isAnimateArrow        = _chkAnimateDirectionArrows.getSelection();
       final boolean isShowSliderPath      = _chkShowSliderPath.getSelection();
       final boolean isShowSliderLocation  = _chkShowSliderLocation.getSelection();
       final boolean isTrackVerticalOffset = _chkTrackVerticalOffset.getSelection();
@@ -1079,9 +1054,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _lblArrow_VerticalOffset            .setEnabled(isShowDirectionArrows);
       _lblArrow_Wing                      .setEnabled(isShowDirectionArrows);
       _lblArrow_Wing_Scale                .setEnabled(isShowDirectionArrows);
-
-      _chkAnimateDirectionArrows          .setEnabled(isShowDirectionArrows);
-      _spinnerArrow_ArrowsPerSecond       .setEnabled(isShowDirectionArrows && isAnimateArrow);
 
       _comboArrowDesign                   .setEnabled(isShowDirectionArrows);
 
@@ -1277,14 +1249,9 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final Map25App mapApp = _map25View.getMapApp();
 
       mapApp.getLayer_Legend().updateLegend();
-      mapApp.getLayer_Tour().onModifyConfig(_isVerticesModified);
+      mapApp.getLayer_Tour().getTourTrackRenderer().onModifyConfig(_isVerticesModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
-
-      // update animation
-      final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
-      Map25FPSManager.setAnimation(config.arrow_IsAnimate);
-      Map25FPSManager.setBackgroundFPSToAnimationFPS(config.arrow_IsAnimate);
    }
 
    private void onModifyName() {
@@ -1387,9 +1354,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerArrow_MinimumDistance       .setSelection(config.arrow_MinimumDistance);
       _spinnerArrow_VerticalOffset        .setSelection(config.arrow_VerticalOffset);
       _comboArrowDesign                   .select(getDirectionArrowDesignIndex(config.arrow_Design));
-
-      _chkAnimateDirectionArrows          .setSelection(config.arrow_IsAnimate);
-      _spinnerArrow_ArrowsPerSecond       .setSelection(config.arrow_ArrowsPerSecond);
 
       _spinnerArrow_Scale                 .setSelection(config.arrow_Scale);
       _spinnerArrow_Length                .setSelection(config.arrow_Length);
@@ -1501,9 +1465,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.arrow_MinimumDistance           = arrowMinDistance;
       config.arrow_VerticalOffset            = arrowVerticalOffset;
 
-      config.arrow_IsAnimate                 = _chkAnimateDirectionArrows.getSelection();
-      config.arrow_ArrowsPerSecond           = _spinnerArrow_ArrowsPerSecond.getSelection();
-
       config.arrow_Scale                     = arrowScale;
       config.arrow_Length                    = arrowLength;
       config.arrow_LengthCenter              = arrowLengthCenter;
@@ -1592,7 +1553,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Tour().onModifyConfig(_isVerticesModified);
+      mapApp.getLayer_Tour().getTourTrackRenderer().onModifyConfig(_isVerticesModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }

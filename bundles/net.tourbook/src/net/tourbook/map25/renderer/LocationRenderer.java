@@ -29,7 +29,7 @@ import org.oscim.utils.math.Interpolation;
 public class LocationRenderer extends LayerRenderer {
 
    private static final long ANIM_RATE                    = 50;
-   private static final long INTERVAL                     = 2000;
+   private static final long ANIMATION_DURATION           = 2000;                        // milliseconds
 
    private static final int  SHOW_ACCURACY_ZOOM           = 16;
 
@@ -66,6 +66,9 @@ public class LocationRenderer extends LayerRenderer {
     */
    private final boolean     _isLocationVisible[]         = new boolean[2];
 
+   /**
+    * Projected lat/lon -> 0...1
+    */
    private final Point       _locationLatLon[]            = {
          new Point(Double.NaN, Double.NaN),
          new Point(Double.NaN, Double.NaN)
@@ -112,32 +115,36 @@ public class LocationRenderer extends LayerRenderer {
          return;
       }
 
-      final Runnable action = new Runnable() {
-         private long lastRun;
+      final Runnable animationRunnable = new Runnable() {
+
+         private long __lastRun;
 
          @Override
          public void run() {
+
             if (!_isAnimationEnabled) {
                return;
             }
 
-            final long diff = System.currentTimeMillis() - lastRun;
-            _map.postDelayed(this, Math.min(ANIM_RATE, diff));
+            final long timeDiff = System.currentTimeMillis() - __lastRun;
+
+            _map.postDelayed(this, Math.min(ANIM_RATE, timeDiff));
 
             if (_isLocationVisible[0] == false || _isLocationVisible[1] == false) {
                _map.render();
             }
 
-            lastRun = System.currentTimeMillis();
+            __lastRun = System.currentTimeMillis();
          }
       };
 
       _animStart = System.currentTimeMillis();
-      _map.postDelayed(action, ANIM_RATE);
+      _map.postDelayed(animationRunnable, ANIM_RATE);
    }
 
    private float animPhase() {
-      return (float) ((MapRenderer.frametime - _animStart) % INTERVAL) / INTERVAL;
+
+      return (float) ((MapRenderer.frametime - _animStart) % ANIMATION_DURATION) / ANIMATION_DURATION;
    }
 
    private boolean initShader() {
@@ -174,21 +181,21 @@ public class LocationRenderer extends LayerRenderer {
       GLState.enableVertexArrays(_shader_a_pos, -1);
       MapRenderer.bindQuadVertexVBO(_shader_a_pos/* , true */);
 
-      final MapPosition viewPortPosition = viewPort.pos;
+      final MapPosition viewPort_MapPosition = viewPort.pos;
       float radius = _render_CircleSize * _render_Scale;
 
       for (int locationIndex = 0; locationIndex < 2; locationIndex++) {
 
          boolean isViewShed = false;
 
-         // reduce CPU cycles
+// reduce CPU cycles, this could be improved by making it customizable
 //			animate(true);
 
          final boolean isLocationVisible = _isLocationVisible[locationIndex];
          if (isLocationVisible) {
 
-            if (viewPortPosition.zoomLevel >= _render_ShowAccuracyZoom) {
-               radius = (float) (_render_Radius * viewPortPosition.scale);
+            if (viewPort_MapPosition.zoomLevel >= _render_ShowAccuracyZoom) {
+               radius = (float) (_render_Radius * viewPort_MapPosition.scale);
             }
             radius = Math.max(_render_CircleSize * _render_Scale, radius);
 
@@ -197,11 +204,14 @@ public class LocationRenderer extends LayerRenderer {
          gl.uniform1f(_shader_u_scale, radius);
 
          final Point locationPosition = _render_IndicatorPositions[locationIndex];
-         final double x = locationPosition.x - viewPortPosition.x;
-         final double y = locationPosition.y - viewPortPosition.y;
-         final double tileScale = Tile.SIZE * viewPortPosition.scale;
+         final double diffX = locationPosition.x - viewPort_MapPosition.x;
+         final double diffY = locationPosition.y - viewPort_MapPosition.y;
+         final double tileScale = Tile.SIZE * viewPort_MapPosition.scale;
 
-         viewPort.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
+         final float scaledDiffX = (float) (diffX * tileScale);
+         final float scaledDiffY = (float) (diffY * tileScale);
+
+         viewPort.mvp.setTransScale(scaledDiffX, scaledDiffY, 1);
          viewPort.mvp.multiplyMM(viewPort.viewproj, viewPort.mvp);
          viewPort.mvp.setAsUniform(_shader_u_mvp);
 
@@ -306,8 +316,8 @@ public class LocationRenderer extends LayerRenderer {
 
       setReady(true);
 
-      final int width = _map.getWidth();
-      final int height = _map.getHeight();
+      final int mapWidth = _map.getWidth();
+      final int mapHeight = _map.getHeight();
 
       // clamp location to a position that can be savely translated to screen coordinates
       viewport.getBBox(_viewportBBox, 0);
@@ -317,6 +327,7 @@ public class LocationRenderer extends LayerRenderer {
          double x = _locationLatLon[locationIndex].x;
          double y = _locationLatLon[locationIndex].y;
 
+         // clamp location to viewport
          if (!_viewportBBox.contains(_locationLatLon[locationIndex])) {
             x = FastMath.clamp(x, _viewportBBox.xmin, _viewportBBox.xmax);
             y = FastMath.clamp(y, _viewportBBox.ymin, _viewportBBox.ymax);
@@ -325,22 +336,22 @@ public class LocationRenderer extends LayerRenderer {
          // get position of location in pixel relative to screen center
          viewport.toScreenPoint(x, y, _screenPoint);
 
-         x = _screenPoint.x + width / 2;
-         y = _screenPoint.y + height / 2;
+         x = _screenPoint.x + mapWidth / 2;
+         y = _screenPoint.y + mapHeight / 2;
 
          // clip position to screen boundaries
          int visible = 0;
 
-         if (x > width - 5) {
-            x = width;
+         if (x > mapWidth - 5) {
+            x = mapWidth;
          } else if (x < 5) {
             x = 0;
          } else {
             visible++;
          }
 
-         if (y > height - 5) {
-            y = height;
+         if (y > mapHeight - 5) {
+            y = mapHeight;
          } else if (y < 5) {
             y = 0;
          } else {

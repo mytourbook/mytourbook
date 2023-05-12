@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
+import com.garmin.fit.DateTime;
 import com.garmin.fit.Decode;
 import com.garmin.fit.DeveloperField;
 import com.garmin.fit.Field;
@@ -719,7 +720,7 @@ public class FitDataReader extends TourbookDevice {
             final Long garminTimestamp = (Long) fieldValue_Time;
             final Integer batteryPercentage = (Integer) fieldValue_0;
 
-            final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+            final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
             fitData.getBattery_Time().add(javaTime);
             fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
@@ -743,10 +744,10 @@ public class FitDataReader extends TourbookDevice {
             final Long garminTimestamp = (Long) fieldValue_Time;
             final Short batteryPercentage = (Short) fieldValue_Percentage;
 
-            final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+            final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
             fitData.getBattery_Time().add(javaTime);
-            fitData.getBattery_Percentage().add(batteryPercentage.shortValue());
+            fitData.getBattery_Percentage().add(batteryPercentage);
          }
       }
    }
@@ -762,9 +763,14 @@ public class FitDataReader extends TourbookDevice {
             || mesgNum == 79 //     79    unknown
             || mesgNum == 113 //    113   unknown
             || mesgNum == 140 //    140   unknown
-            || mesgNum == 216 //    216   unknown
+            || mesgNum == 141 //    141   unknown
+            || mesgNum == 233 //    233   unknown
             || mesgNum == 261 //    261   unknown
             || mesgNum == 288 //    288   unknown
+            || mesgNum == 324 //    324   unknown
+            || mesgNum == 325 //    325   unknown
+            || mesgNum == 326 //    326   unknown
+            || mesgNum == 327 //    327   unknown
 
             || mesgNum == 0 //      FILE_ID
             || mesgNum == 2 //      DEVICE_SETTINGS
@@ -775,7 +781,7 @@ public class FitDataReader extends TourbookDevice {
             || mesgNum == 19 //     LAP
             || mesgNum == 20 //     RECORD
             || mesgNum == 21 //     EVENT
-//            || mesgNum == 23 //     DEVICE_INFO
+            || mesgNum == 23 //     DEVICE_INFO
             || mesgNum == 34 //     ACTIVITY
             || mesgNum == 49 //     FILE_CREATOR
             || mesgNum == 72 //     TRAINING_FILE
@@ -784,6 +790,24 @@ public class FitDataReader extends TourbookDevice {
             || mesgNum == 104 //    Device Battery (not documented)
             || mesgNum == 147 //    Registered Device Sensor (not documented)
 
+            || mesgNum == 132 //    HR
+
+//             Message  132   HR  Fields: 3
+//             [FitDataReader] 8598    1989-12-31T01:00+01:00[Europe/Zurich]  631065600   0    6         filtered_bpm                  174 bpm
+//             [FitDataReader] 8599    1989-12-31T01:00+01:00[Europe/Zurich]  631065600   0   10   event_timestamp_12                  249
+//             [FitDataReader] 8600    1989-12-31T01:00+01:00[Europe/Zurich]  631065600   0    9      event_timestamp    816311.9931640625 s
+
+            || mesgNum == 160 //    GPS_METADATA
+
+//             Message  160   GPS_METADATA  Fields: 2
+//             [FitDataReader] 430     1989-12-31T01:00+01:00[Europe/Zurich]  631065600   0    3   enhanced_altitude    34.0 m
+//             [FitDataReader] 431     1989-12-31T01:00+01:00[Europe/Zurich]  631065600   0    4      enhanced_speed    5.89 m/s
+
+            // developer fields
+            || mesgNum == 206 //    FIELD_DESCRIPTION
+            || mesgNum == 207 //    DEVELOPER_DATA_ID
+
+            || mesgNum == 216 //    TIME_IN_ZONE
       ;
 
       // hide IDE warning
@@ -845,7 +869,7 @@ public class FitDataReader extends TourbookDevice {
             continue;
          }
 
-         final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+         final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
          final String logMessage = String.format(UI.EMPTY_STRING
 
@@ -913,7 +937,7 @@ public class FitDataReader extends TourbookDevice {
             continue;
          }
 
-         final long javaTime = FitUtils.convertGarminTimeToJavaTime(garminTimestamp);
+         final long javaTime = new DateTime(garminTimestamp).getDate().getTime();
 
          System.out.println(String.format(UI.EMPTY_STRING
 

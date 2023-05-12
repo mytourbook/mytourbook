@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.garmin.fit.FitData;
-import net.tourbook.device.garmin.fit.FitUtils;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 
@@ -156,7 +155,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
       ) {
 
-         final long javaTime = FitUtils.convertGarminTimeToJavaTime(timestamp.getTimestamp());
+         final long javaTime = timestamp.getDate().getTime();
 
          System.out.println(String.format(UI.EMPTY_STRING
 
@@ -165,7 +164,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                + "   prod:" + LOG_SEPARATOR //                          //$NON-NLS-1$
                + FORMAT_STRING_10 + LOG_SEPARATOR //     manufacturer
                + FORMAT_STRING_10 + LOG_SEPARATOR //     product
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     prduct name
+               + FORMAT_STRING_10 + LOG_SEPARATOR //     product name
                + FORMAT_STRING_10 + LOG_SEPARATOR //     garmin product
                + FORMAT_STRING_10 + LOG_SEPARATOR //     descriptor
 
@@ -178,15 +177,15 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                + "   bat:" + LOG_SEPARATOR //                           //$NON-NLS-1$
                + FORMAT_STRING_10 + LOG_SEPARATOR //     battery status
                + FORMAT_STRING_10 + LOG_SEPARATOR //     battery voltage
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     cummulated operating time
+               + FORMAT_STRING_10 + LOG_SEPARATOR //     accumulated operating time
 
                + "  ant:" + LOG_SEPARATOR //                            //$NON-NLS-1$
                + FORMAT_STRING_10 + LOG_SEPARATOR //     source type
                + FORMAT_STRING_10 + LOG_SEPARATOR //     ant network
                + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device type
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device nummer
+               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device number
                + FORMAT_STRING_10 + LOG_SEPARATOR //     ant plus
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant transmision type
+               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant transmission type
 
                + "   src:" //                                           //$NON-NLS-1$
                + FORMAT_STRING_10 + LOG_SEPARATOR //     sensorPosition

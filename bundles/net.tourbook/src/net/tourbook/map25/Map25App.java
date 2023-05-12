@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -38,8 +38,10 @@ import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.animation.GLTFModel_Layer;
 import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.legend.LegendLayer;
@@ -52,7 +54,6 @@ import net.tourbook.map25.layer.marker.MarkerRendererMT;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
-import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -66,11 +67,10 @@ import org.oscim.backend.DateTime;
 import org.oscim.backend.DateTimeAdapter;
 import org.oscim.backend.GLAdapter;
 import org.oscim.core.MapPosition;
-import org.oscim.event.Event;
 import org.oscim.gdx.GdxAssets;
 import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
-import org.oscim.gdx.LwjglGL20;
+import org.oscim.gdx.LwjglGL30;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
@@ -80,7 +80,7 @@ import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.S3DBLayer;
 import org.oscim.map.Layers;
-import org.oscim.map.Map.UpdateListener;
+import org.oscim.map.Map;
 import org.oscim.map.ViewController;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.ExtrusionRenderer;
@@ -153,18 +153,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static final String                  STATE_SUFFIX_MAP_CURRENT_POSITION             = "MapCurrentPosition";                           //$NON-NLS-1$
    static final String                          STATE_SUFFIX_MAP_DEFAULT_POSITION             = "MapDefaultPosition";                           //$NON-NLS-1$
    //
+   private static final String                  STATE_IS_BACKGROUND_FPS                       = "STATE_IS_BACKGROUND_FPS";                      //$NON-NLS-1$
+   private static final String                  STATE_BACKGROUND_FPS                          = "STATE_BACKGROUND_FPS";                         //$NON-NLS-1$
+   //
    public static final String                   THEME_STYLE_ALL                               = "theme-style-all";                              //$NON-NLS-1$
    //
    public static final float                    SUN_TIME_RANGE                                = 10;
    public static final float                    SUN_TIME_DETAIL_RANGE                         = 50;
    //
-   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
+   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 1000.0f;
    //
    private static IDialogSettings               _state;
    //
    private static Map25View                     _map25View;
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;
+   //
+   private static boolean                       _isBackgroundFPS;
+   private static int                           _backgroundFPS;
    //
    private Map25Provider                        _selectedMapProvider;
    //
@@ -209,6 +215,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private S3DBLayer                            _layer_Building_S3DB;
    private GenericLayer                         _layer_Building_S3DB_SunUpdate;
    private CompassRoseLayer                     _layer_CompassRose;
+   private GLTFModel_Layer                      _layer_GLTFModel;
    private Layer                                _layer_HillShading_AFTER;
    private BitmapTileLayer                      _layer_HillShading_TILE_LOADING;
    private LabelLayerMT                         _layer_Label;
@@ -264,11 +271,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private boolean      _isPhotoScaled    = false;
    //
    private int          _photoSize;
+
    /**
     * Is <code>true</code> when a tour marker is hit.
     */
    private boolean      _isMapItemHit;
 
+   //
    private static enum OffOnline {
       IS_ONLINE, IS_OFFLINE
    }
@@ -494,6 +503,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return mapApp;
    }
 
+   public static int getBackgroundFPS() {
+
+      return _backgroundFPS;
+   }
+
    private static LwjglApplicationConfiguration getConfig() {
 
       LwjglApplicationConfiguration.disableAudio = true;
@@ -504,7 +518,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       appConfig.width = 1200;
       appConfig.height = 1000;
       appConfig.stencil = 8;
-      appConfig.samples = 2;
+
+      // Multisample anti-aliasing (MSAA)
+      appConfig.samples = 8; //2;
 
       appConfig.forceExit = false;
 
@@ -552,11 +568,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          GdxAssets.init("resources/assets/"); //$NON-NLS-1$
       }
 
-      GLAdapter.init(new LwjglGL20());
+      GLAdapter.init(new LwjglGL30());
 
       GLAdapter.GDX_DESKTOP_QUIRKS = true;
 
       DateTimeAdapter.init(new DateTime());
+   }
+
+   public static boolean isBackgroundFPS() {
+
+      return _isBackgroundFPS;
    }
 
    /**
@@ -665,11 +686,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       super.create();
 
-      // initially _lwjglApp is not set when the tour track config is restored
-      // -> it is too complicated to set it correctly
-      // -> therefore this post enablement
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate);
+      // !!! restore it after super.create() !!!
+      ModelPlayerManager.restoreState_UI();
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(
@@ -687,11 +705,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       Gdx.input.setInputProcessor(mux);
 
-      mMap.events.bind(new UpdateListener() {
-         @Override
-         public void onMapEvent(final Event e, final MapPosition mapPosition) {
+      mMap.events.bind((event, mapPosition) -> {
 
-            _map25View.fireSyncMapEvent(mapPosition, 0);
+         if (event == Map.POSITION_EVENT) {
+
+            // map position is moved
+
+            /*
+             * Prevent to "refire" the last sync map position. This is the cheapest solution
+             * otherwise fireSyncMapEvent had to be called on each map position change methods
+             */
+            final long timeDiff = System.currentTimeMillis() - _map25View.getLastReceivedSyncEventTime();
+            if (timeDiff > 2000) {
+
+//               System.out.println((System.currentTimeMillis() + " fire timeDiff:" + timeDiff));
+//               // TODO remove SYSTEM.OUT.PRINTLN
+
+               _map25View.fireSyncMapEvent(mapPosition, null);
+            }
          }
       });
    }
@@ -742,7 +773,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          // offline map
 
-         setMapProvider_02_Offline(_selectedMapProvider);
+         try {
+
+            setMapProvider_02_Offline(_selectedMapProvider);
+
+         } catch (final Exception e) {
+
+            setMapProvider_01_Online(Map25ProviderManager.getDefaultMapProvider());
+         }
       }
 
       createLayers_SetupLayers();
@@ -919,6 +957,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
 
+      // add gdx models to show animations
+      _layer_GLTFModel = new GLTFModel_Layer(mMap);
+      allMapLayer.add(_layer_GLTFModel);
+
 //      /*
 //       * OpenGL test
 //       */
@@ -977,6 +1019,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       // stop loading tiles
       _layer_BaseMap.getManager().clearJobs();
+
+      _layer_GLTFModel.dispose();
 
       saveState();
 
@@ -1431,11 +1475,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _building_IsShowShadow           = (Bool)       Util.getStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    Bool.TRUE);
       _building_SunDaytime             = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,      SunDayTime.CURRENT_TIME);
 
-      _cartography_IsLuminance         = Util.getStateBoolean( _state, STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,   false) ;
+      _cartography_IsLuminance         = Util.getStateBoolean( _state, STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,   false);
       _cartography_Luminance           = Util.getStateFloat(   _state, STATE_LAYER_CARTOGRAPHY_LUMINANCE,      0);
 
-      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true) ;
-      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true) ;
+      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true);
+      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true);
+
+      // currently this is not working properly -> default is false
+      _isBackgroundFPS                 = Util.getStateBoolean( _state,  STATE_IS_BACKGROUND_FPS,               false);
+      _backgroundFPS                   = Util.getStateInt(     _state,  STATE_BACKGROUND_FPS,                  5);
 
 // SET_FORMATTING_ON
    }
@@ -1469,6 +1517,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private void saveState() {
 
 // SET_FORMATTING_OFF
+
+      _state.put(STATE_IS_BACKGROUND_FPS,                            _isBackgroundFPS);
+      _state.put(STATE_BACKGROUND_FPS,                               _backgroundFPS);
 
       _state.put(STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED,      _mapCenter_VerticalPosition_IsEnabled);
       _state.put(STATE_MAP_CENTER_VERTICAL_POSITION,                 _mapCenter_VerticalPosition);
@@ -1511,6 +1562,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _state.put(STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, mapPosition.zoomLevel);
 
 // SET_FORMATTING_ON
+   }
+
+   public void setBackgroundFPS(final boolean isBackgroundFPS, final int backgroundFPS) {
+
+      _isBackgroundFPS = isBackgroundFPS;
+      _backgroundFPS = backgroundFPS;
    }
 
    /**
@@ -1635,8 +1692,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          // offline map
 
-         setMapProvider_02_Offline(mapProvider);
+         try {
 
+            setMapProvider_02_Offline(_selectedMapProvider);
+
+         } catch (final Exception e) {
+
+            setMapProvider_01_Online(Map25ProviderManager.getDefaultMapProvider());
+         }
       } else {
 
          // online map
@@ -1699,8 +1762,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Setup offline map for mapsforge
     *
     * @param mapProvider
+    * @throws Exception
     */
-   private void setMapProvider_02_Offline(final Map25Provider mapProvider) {
+   private void setMapProvider_02_Offline(final Map25Provider mapProvider) throws Exception {
 
       // check if off/online has changed
       final boolean isUpdateAll = isUpdateAll(OffOnline.IS_OFFLINE);
@@ -1738,14 +1802,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          } else {
             final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
-            throw new IllegalArgumentException(errorText);
+            throw new Exception(errorText);
          }
 
          tileSource = getAllOfflineMapFiles(offlineMapFilePath);
          if (_numOfflineMapFiles == 0) {
             final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
-            throw new IllegalArgumentException(errorText);
+            throw new Exception(errorText);
          }
 
          _currentOffline_TileSource = tileSource;

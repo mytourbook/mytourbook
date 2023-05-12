@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,14 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-public class TourPhotoReference {
+import java.io.Serializable;
 
-   public long tourId;
-   public long photoId;
+public class TourPhotoReference implements Serializable {
+
+   private static final long serialVersionUID = 1L;
+
+   public long               tourId;
+   public long               photoId;
 
    public TourPhotoReference(final long tourId, final long photoId) {
 

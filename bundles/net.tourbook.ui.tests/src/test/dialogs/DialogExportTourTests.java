@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.tourbook.Messages;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -31,6 +31,23 @@ import utils.UITest;
 import utils.Utils;
 
 public class DialogExportTourTests extends UITest {
+
+   @Test
+   void testExportFit() {
+
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.action_export_tour).menu("FIT").click(); //$NON-NLS-1$
+      final String fileName = bot.comboBox(0).getText() + ".fit"; //$NON-NLS-1$
+      bot.comboBox(1).setText(Utils.workingDirectory);
+      bot.button(Messages.dialog_export_btn_export).click();
+
+      final Path fitFilePath = Paths.get(Utils.workingDirectory, fileName);
+      assertTrue(Files.exists(fitFilePath));
+
+      FileUtils.deleteIfExists(fitFilePath);
+      assertTrue(!Files.exists(fitFilePath));
+   }
 
    @Test
    void testExportGpx() {
@@ -54,7 +71,7 @@ public class DialogExportTourTests extends UITest {
       final Path gpxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(gpxFilePath));
 
-      FilesUtils.deleteIfExists(gpxFilePath);
+      FileUtils.deleteIfExists(gpxFilePath);
       assertTrue(!Files.exists(gpxFilePath));
    }
 
@@ -71,7 +88,7 @@ public class DialogExportTourTests extends UITest {
       final Path mtFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(mtFilePath));
 
-      FilesUtils.deleteIfExists(mtFilePath);
+      FileUtils.deleteIfExists(mtFilePath);
       assertTrue(!Files.exists(mtFilePath));
    }
 
@@ -92,7 +109,7 @@ public class DialogExportTourTests extends UITest {
       final Path tcxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(tcxFilePath));
 
-      FilesUtils.deleteIfExists(tcxFilePath);
+      FileUtils.deleteIfExists(tcxFilePath);
       assertTrue(!Files.exists(tcxFilePath));
    }
 }

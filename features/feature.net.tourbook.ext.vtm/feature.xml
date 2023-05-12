@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.vtm"
       label="Feature for vector tile map"
-      version="22.8.0.qualifier"
+      version="23.5.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="https://mytourbook.sourceforge.io/updates/"/>
+      <update label="%updateSiteName" url="https://github.com/mytourbook/mytourbook.github.io/"/>
    </url>
 
    <plugin

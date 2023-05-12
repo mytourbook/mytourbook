@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Basic;
@@ -31,7 +36,10 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
-public class TourType implements Comparable<Object> {
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "typeId")
+public class TourType implements Comparable<Object>, Serializable {
+
+   private static final long          serialVersionUID                      = 1L;
 
    private static final char          NL                                    = UI.NEW_LINE;
 
@@ -39,14 +47,6 @@ public class TourType implements Comparable<Object> {
 
    /** Width/height of the tour type image. */
    public static final int            TOUR_TYPE_IMAGE_SIZE                  = 16;
-
-   /**
-    * Color which is transparent in the tour type image.
-    * <p>
-    * The color is used in the easy import view, the previous color looked really ugly with a dark
-    * background.
-    */
-   public static final RGB            TRANSPARENT_COLOR                     = new RGB(67, 67, 67);
 
    public static final long           IMAGE_KEY_DIALOG_SELECTION            = -2;
 
@@ -71,9 +71,11 @@ public class TourType implements Comparable<Object> {
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
    private long                       typeId                                = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @Basic(optional = false)
+   @JsonProperty
    private String                     name;
 
    private int                        color_Gradient_Bright;

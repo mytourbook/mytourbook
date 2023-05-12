@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,11 +17,10 @@ package weather;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.weather.WeatherUtils;
@@ -51,6 +50,8 @@ public class WeatherUtilsTests {
             ZoneId.of(andorraZoneId));
 
       final String fullWeatherDataString = WeatherUtils.buildFullWeatherDataString(6.09f,
+            "⛅", //$NON-NLS-1$
+            "Partly cloudy", //$NON-NLS-1$
             8.52f,
             9.216f,
             156,
@@ -58,11 +59,12 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
+            1,
             new TourDateTime(zonedDateTime),
             true);
 
       assertEquals(
-            "17h       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm", //$NON-NLS-1$
+            "17h   ⛅   Partly cloudy       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 1", //$NON-NLS-1$
             fullWeatherDataString);
    }
 
@@ -70,6 +72,8 @@ public class WeatherUtilsTests {
    void testBuildFullWeatherDataString_ShouldReturnEmptyString() {
 
       final String fullWeatherDataString = WeatherUtils.buildFullWeatherDataString(6.09f,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING,
             8.52f,
             9.216f,
             156,
@@ -77,6 +81,7 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
+            0,
             null,
             true);
 

@@ -1,0 +1,113 @@
+23.5.0                                                 ?. May 2023
+
+
+New
+===
+
+* Easy Import
+  - Simple UI to start an easy import launcher
+    https://github.com/mytourbook/mytourbook/issues/1065
+
+* Tour Export (Frederic)
+  - Added the ability to export tours in FIT format
+  
+* Suunto App Integration (Frederic)
+  - Added the ability to upload tours as workouts
+
+* Tour Pauses (Frederic)
+  - Added the ability to change pause types individually (Tour Pauses view) and in bulk (Tour Book view)
+
+* Tour Weather (Frederic)
+  - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
+
+
+Improvements
+============
+
+* Tour Reimport (Frederic)
+  - Added the ability to reimport weather information (clouds and description)
+
+* Tour Book View
+  - Filter tours which are collected or not collected
+    https://github.com/mytourbook/mytourbook/issues/1050
+  - Delete tours with the keyboard <Ctrl><Shift><Delete>
+  
+* Tour Chart
+  - Show "Recorded Time" in the value point tooltip 
+    https://github.com/mytourbook/mytourbook/issues/502
+
+* 2D Map (Meinhard)
+  - Make power a selectable option for coloring the tour graph 
+    https://github.com/mytourbook/mytourbook/issues/1071
+  
+* Tour Pauses View (Frederic)
+  - Added a Pause Type column
+
+* Tour Info Tooltip
+  - Adjust width of the tour info tooltip
+    https://github.com/mytourbook/mytourbook/issues/1077
+  - Added, when available, the time and percentage of time spent in each HR zone (Frederic)
+
+* Bar Chart Selection
+  - Set direction for the mouse wheel, e.g.
+    mouse wheel up is moving the bar selection to the left (default until now)
+    or mouse wheel up is moving the bar selection to the right
+    https://github.com/mytourbook/mytourbook/issues/1096
+
+* Tour Geo Filter
+  - Toggle name in the filter history viewer between read and edit mode
+
+* Reference Tours 
+  - Show altimeter (VAM) and max pulse values
+    https://github.com/mytourbook/mytourbook/issues/1086
+  
+* Reference Tour Year Statistic
+  - Show altimeter (VAM) and max pulse values
+  - New Action: Show all available compared tours without selecting last year and number of years
+  - Fixed min/max values when selecting different years, ...
+
+* Weather (Frederic)
+  - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
+
+
+Changes
+=======
+
+* Strava Integration (Frederic)
+  - Changed the tour upload to use the FIT format instead of the TCX format
+  
+* Changed Wording 
+  - The words "pulse" or "heartbeat" are replaced with "heart rate"
+    https://github.com/mytourbook/mytourbook/discussions/1089  
+
+
+Bugfix
+======
+
+* Tour Import
+  - "distanceSerie" is null                  https://github.com/mytourbook/mytourbook/issues/1044
+
+* Tour Info Tooltip (Frederic)
+  - Fixed a bug where the time formats were not correctly applied
+
+* Tour Cache
+  - Fixed "java.lang.IllegalStateException: Queue full" when cache size is 1
+  
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.5   https://github.com/mytourbook/mytourbook/milestone/10?closed=1
+* Eclipse 2022-06
+* NatTable 2.03               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.105
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

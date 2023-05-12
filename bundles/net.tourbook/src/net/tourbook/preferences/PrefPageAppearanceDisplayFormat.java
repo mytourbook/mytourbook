@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1379,7 +1379,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
       final String elapsedFormat = _rdoTime_Elapsed_HH.getSelection()
             ? ValueFormat.TIME_HH.name()
-            : _rdoTime_Moving_HH_MM.getSelection()
+            : _rdoTime_Elapsed_HH_MM.getSelection()
                   ? ValueFormat.TIME_HH_MM.name()
                   : ValueFormat.TIME_HH_MM_SS.name();
 

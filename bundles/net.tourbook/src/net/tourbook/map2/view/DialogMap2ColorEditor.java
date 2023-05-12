@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private final IGradientColorProvider _colorProvider;
    private Map2ColorProfile             _mapColorWorkingCopy;
 
-   private SelectionListener            _defaultSelectionAdapter;
+   private SelectionListener            _defaultSelectionListener;
 
    private ColorDefinition              _colorDefinition;
 
@@ -452,7 +452,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             label.setToolTipText(Messages.legendcolor_dialog_max_brightness_tooltip);
 
             _cboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _cboMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+            _cboMaxBrightness.addSelectionListener(_defaultSelectionListener);
             for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
                _cboMaxBrightness.add(comboLabel);
             }
@@ -461,7 +461,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             _scaleMaxBrightness.setMinimum(0);
             _scaleMaxBrightness.setMaximum(100);
             _scaleMaxBrightness.setPageIncrement(10);
-            _scaleMaxBrightness.addSelectionListener(_defaultSelectionAdapter);
+            _scaleMaxBrightness.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMaxBrightness);
 
             _lblMaxBrightnessValue = new Label(group, SWT.NONE);
@@ -478,7 +478,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
 
             _cboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _cboMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+            _cboMinBrightness.addSelectionListener(_defaultSelectionListener);
             for (final String comboLabel : MapColorProfile.BRIGHTNESS_LABELS) {
                _cboMinBrightness.add(comboLabel);
             }
@@ -487,7 +487,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
             _scaleMinBrightness.setMinimum(0);
             _scaleMinBrightness.setMaximum(100);
             _scaleMinBrightness.setPageIncrement(10);
-            _scaleMinBrightness.addSelectionListener(_defaultSelectionAdapter);
+            _scaleMinBrightness.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleMinBrightness);
 
             _lblMinBrightnessValue = new Label(group, SWT.NONE);
@@ -581,7 +581,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
 
    private void initUI() {
 
-      _defaultSelectionAdapter = widgetSelectedAdapter(selectionEvent -> {
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> {
          updateModelFromUI();
          doLiveUpdate();
       });

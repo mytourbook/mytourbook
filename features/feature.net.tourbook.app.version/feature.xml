@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.version"
       label="MyTourbook Version"
-      version="22.8.0.qualifier"
+      version="23.5.0.qualifier"
       provider-name="MyTourbook">
 
    <description>
@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update url="https://mytourbook.sourceforge.io/updates/"/>
+      <update url="https://github.com/mytourbook/mytourbook.github.io/"/>
    </url>
 
 </feature>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,8 +17,10 @@ package net.tourbook.data;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -70,7 +72,9 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
-public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
+public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
+
+   private static final long    serialVersionUID      = 1L;
 
    private static final char    NL                    = UI.NEW_LINE;
 
@@ -138,6 +142,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
    private long     markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
@@ -154,6 +159,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * <code>-1</code>.
     */
    @XmlElement
+   @JsonProperty
    private int      time            = -1;
 
    /**
@@ -161,6 +167,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *
     * @since Db version 25
     */
+   @JsonProperty
    private long     tourTime        = Long.MIN_VALUE;
 
    /**
@@ -175,6 +182,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * 20 == db version 20
     */
    @XmlElement
+   @JsonProperty
    private float    distance20      = -1;
 
    /**
@@ -198,6 +206,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * position of this marker in the data serie
     */
    @XmlAttribute
+   @JsonProperty
    private int      serieIndex;
 
    @XmlElement
@@ -233,16 +242,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private float    altitude        = TourDatabase.DEFAULT_FLOAT;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   latitude        = TourDatabase.DEFAULT_DOUBLE;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   longitude       = TourDatabase.DEFAULT_DOUBLE;
 
    private int      isMarkerVisible = 1;
@@ -313,7 +325,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *         {@link ITourbookPreferences#GRAPH_MARKER_SIGN_IMAGE_SIZE} is used. This size is
     *         converted into pixel with the vertical DLU's.
     */
-   public static int getSignImageMaxSize(final PixelConverter pc) {
+   @SuppressWarnings("unused")
+   private static int getSignImageMaxSize(final PixelConverter pc) {
 
       if (_defaultSignImageMaxSize == -1) {
          _defaultSignImageMaxSize = pc.convertHeightInCharsToPixels(3);
@@ -337,8 +350,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    /**
-    * Creates a clone of another marker but set's new {@link TourData} and set's the state that the
-    * marker is not yet saved
+    * Creates a clone of a marker but sets it in the new {@link TourData} and
+    * sets the state that the marker as not yet saved
     *
     * @param newTourData
     * @return
@@ -923,6 +936,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       this.type = markerType;
    }
 
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
+   }
+
    public void setUrlAddress(final String urlAddress) {
       this.urlAddress = urlAddress;
    }
@@ -999,7 +1021,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * Convert fields from old to new data type.
     */
-   public void updateDatabase_019_to_020() {
+   void updateDatabase_019_to_020() {
 
       if (distance > 0) {
 

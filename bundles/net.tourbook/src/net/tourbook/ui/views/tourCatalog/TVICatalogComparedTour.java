@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,11 +47,12 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
    LocalDate       tourDate;
    int             year;
-
-   float           tourSpeed;
    int             tourDeviceTime_Elapsed;
 
+   float           avgAltimeter;
    float           avgPulse;
+   float           avgSpeed;
+   float           maxPulse;
 
    ArrayList<Long> tagIds;
 
@@ -84,6 +85,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    @Override
    protected void fetchChildren() {}
 
+   public float getAvgAltimeter() {
+      return avgAltimeter;
+   }
+
    public float getAvgPulse() {
       return avgPulse;
    }
@@ -99,6 +104,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
       return endIndex;
    }
 
+   public float getMaxPulse() {
+      return maxPulse;
+   }
+
    public long getRefId() {
       return refId;
    }
@@ -108,7 +117,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    }
 
    public float getTourSpeed() {
-      return tourSpeed;
+      return avgSpeed;
    }
 
    @Override
@@ -137,12 +146,20 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
       }
    }
 
+   public void setAvgAltimeter(final float avgAltimeter) {
+      this.avgAltimeter = avgAltimeter;
+   }
+
    public void setAvgPulse(final float avgPulse) {
       this.avgPulse = avgPulse;
    }
 
    void setEndIndex(final int endIndex) {
       this.endIndex = endIndex;
+   }
+
+   public void setMaxPulse(final float maxPulse) {
+      this.maxPulse = maxPulse;
    }
 
    void setStartIndex(final int startIndex) {
@@ -154,7 +171,7 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
    }
 
    void setTourSpeed(final float tourSpeed) {
-      this.tourSpeed = tourSpeed;
+      this.avgSpeed = tourSpeed;
    }
 
    @Override

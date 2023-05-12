@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,17 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
    private static final String FILES_PATH    = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
 
    private FitDataReader       fitDataReader = new FitDataReader();
+
+   /**
+    * Test with a file containing swimming data
+    * Sample provided by Doriano
+    * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-5728661
+    */
+   @Test
+   void testFitImport_SwimmingData() {
+
+      testImportFile(fitDataReader, FILES_PATH + "8ADG5025", ".FIT"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
 
    /**
     * Regression test. This test can be useful when updating the FIT SDK and

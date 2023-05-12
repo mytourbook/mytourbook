@@ -1,0 +1,34 @@
+23.3.1                                                 24. March 2023
+
+
+Improvements
+============
+
+* Tour Editor
+  - Tag data and image are optional and can be customized
+    https://github.com/mytourbook/mytourbook/issues/1015#issuecomment-1467547405
+    
+* Tag Image
+  - Increased tag image size for 4k display
+  - On Linux the tag images looked pixilated, now they are higher interpolated
+    https://github.com/mytourbook/mytourbook/discussions/1020
+    
+* Tour Blog
+  - Show weather common data on a separate line
+    https://github.com/mytourbook/mytourbook/commit/9670c325e46c018f487ef739cddcb01ca78b5514#r104670740
+
+
+Bugfix
+======
+
+* Tour Editor
+  - Fixed SQLException        
+    https://github.com/mytourbook/mytourbook/issues/1022
+  - Fixed the never ending "Our of sync error" in one more case
+    https://github.com/mytourbook/mytourbook/issues/1035
+    
+
+System   
+======
+
+* MyTourbook Milestone 23.3.1             https://github.com/mytourbook/mytourbook/milestone/9?closed=1

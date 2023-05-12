@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
@@ -56,15 +57,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final String     APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_ForegroundColor_Dark_Tooltip;
-   private static final String     APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_ForegroundColor_Light_Tooltip;
-
-   private static final String     GRAPH_LABEL_ALTITUDE                     = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String     GRAPH_LABEL_TIME                         = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String     GRAPH_LABEL_DISTANCE                     = net.tourbook.common.Messages.Graph_Label_Distance;
-   private static final String     GRAPH_LABEL_ELEVATIONGAIN                = net.tourbook.common.Messages.Graph_Label_ElevationGain;
-
-   private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
 
    private SelectionListener       _defaultSelectionListener;
    private MouseWheelListener      _defaultMouseWheelListener;
@@ -398,27 +391,27 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       GridDataFactory.fillDefaults().grab(true, false).applyTo(groupData);
       {
          _chkTooltipData_Elevation = new Button(groupData, SWT.CHECK);
-         _chkTooltipData_Elevation.setText(GRAPH_LABEL_ALTITUDE);
+         _chkTooltipData_Elevation.setText(OtherMessages.GRAPH_LABEL_ALTITUDE);
          _chkTooltipData_Elevation.addSelectionListener(_defaultSelectionListener);
 
          _chkTooltipData_ElevationGainDifference = new Button(groupData, SWT.CHECK);
-         _chkTooltipData_ElevationGainDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN);
+         _chkTooltipData_ElevationGainDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + OtherMessages.GRAPH_LABEL_ELEVATION_GAIN);
          _chkTooltipData_ElevationGainDifference.addSelectionListener(_defaultSelectionListener);
 
          _chkTooltipData_Distance = new Button(groupData, SWT.CHECK);
-         _chkTooltipData_Distance.setText(GRAPH_LABEL_DISTANCE);
+         _chkTooltipData_Distance.setText(OtherMessages.GRAPH_LABEL_DISTANCE);
          _chkTooltipData_Distance.addSelectionListener(_defaultSelectionListener);
 
          _chkTooltipData_DistanceDifference = new Button(groupData, SWT.CHECK);
-         _chkTooltipData_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
+         _chkTooltipData_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + OtherMessages.GRAPH_LABEL_DISTANCE);
          _chkTooltipData_DistanceDifference.addSelectionListener(_defaultSelectionListener);
 
          _chkTooltipData_Duration = new Button(groupData, SWT.CHECK);
-         _chkTooltipData_Duration.setText(GRAPH_LABEL_TIME);
+         _chkTooltipData_Duration.setText(OtherMessages.GRAPH_LABEL_TIME);
          _chkTooltipData_Duration.addSelectionListener(_defaultSelectionListener);
 
          _chkTooltipData_DurationDifference = new Button(groupData, SWT.CHECK);
-         _chkTooltipData_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
+         _chkTooltipData_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + OtherMessages.GRAPH_LABEL_TIME);
          _chkTooltipData_DurationDifference.addSelectionListener(_defaultSelectionListener);
       }
    }
@@ -542,14 +535,14 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
             _colorDefaultMarker_Light = new ColorSelectorExtended(container);
             _colorDefaultMarker_Light.addOpenListener(this);
             _colorDefaultMarker_Light.addListener(_defaultPropertyChangeListener);
-            _colorDefaultMarker_Light.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
+            _colorDefaultMarker_Light.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
             colorLayout.applyTo(_colorDefaultMarker_Light.getButton());
 
             // Color selector: dark
             _colorDefaultMarker_Dark = new ColorSelectorExtended(container);
             _colorDefaultMarker_Dark.addOpenListener(this);
             _colorDefaultMarker_Dark.addListener(_defaultPropertyChangeListener);
-            _colorDefaultMarker_Dark.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
+            _colorDefaultMarker_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
             colorLayout.applyTo(_colorDefaultMarker_Dark.getButton());
          }
 
@@ -569,14 +562,14 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
             _colorDeviceMarker_Light = new ColorSelectorExtended(container);
             _colorDeviceMarker_Light.addOpenListener(this);
             _colorDeviceMarker_Light.addListener(_defaultPropertyChangeListener);
-            _colorDeviceMarker_Light.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
+            _colorDeviceMarker_Light.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
             colorLayout.applyTo(_colorDeviceMarker_Light.getButton());
 
             // Color selector: light
             _colorDeviceMarker_Dark = new ColorSelectorExtended(container);
             _colorDeviceMarker_Dark.addOpenListener(this);
             _colorDeviceMarker_Dark.addListener(_defaultPropertyChangeListener);
-            _colorDeviceMarker_Dark.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
+            _colorDeviceMarker_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
             colorLayout.applyTo(_colorDeviceMarker_Dark.getButton());
          }
 
@@ -596,14 +589,14 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
             _colorHiddenMarker_Light = new ColorSelectorExtended(container);
             _colorHiddenMarker_Light.addOpenListener(this);
             _colorHiddenMarker_Light.addListener(_defaultPropertyChangeListener);
-            _colorHiddenMarker_Light.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
+            _colorHiddenMarker_Light.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
             colorLayout.applyTo(_colorHiddenMarker_Light.getButton());
 
             // Color selector: light
             _colorHiddenMarker_Dark = new ColorSelectorExtended(container);
             _colorHiddenMarker_Dark.addOpenListener(this);
             _colorHiddenMarker_Dark.addListener(_defaultPropertyChangeListener);
-            _colorHiddenMarker_Dark.getButton().setToolTipText(APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
+            _colorHiddenMarker_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
             colorLayout.applyTo(_colorHiddenMarker_Dark.getButton());
          }
       }

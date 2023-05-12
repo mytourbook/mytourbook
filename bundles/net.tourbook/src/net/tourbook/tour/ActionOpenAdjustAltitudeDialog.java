@@ -51,7 +51,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
       _isFromEditor = isFromEditor;
    }
 
-   public static void doAction(final ITourProvider tourProvider, final boolean isFromEditor) {
+   static void doAction(final ITourProvider tourProvider, final boolean isFromEditor) {
 
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 

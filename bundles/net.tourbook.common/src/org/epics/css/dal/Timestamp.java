@@ -34,9 +34,9 @@ import java.util.Date;
  * the original code has been modified:
  * - format modifications
  * - new format
- * 
+ *
  * 2012-04-25 original location
- * 
+ *
  * http://cs-studio.hg.sourceforge.net/hgweb/cs-studio/cs-studio/raw-file/b4516ab19b6b/core/plugins/org.csstudio.platform.libs.dal/src/org/epics/css/dal/Timestamp.java
  */
 
@@ -44,239 +44,252 @@ import java.util.Date;
  * This is timestamp object with nanosecond resolution. It holds two long values. One is with
  * millisoecnd resolution and represents Java standart UTC format. Second long value is with
  * nanosecond resolution and its absolute value is lower than 1ms or 1000000ns.
- * 
+ *
  * @author ikriznar
  */
 public final class Timestamp implements Comparable<Timestamp> {
 
-	private long							milliseconds;
-	private long							nanoseconds;
+   private final static SimpleDateFormat formatFull            = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
+   private final static SimpleDateFormat formatDateTimeSeconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");     //$NON-NLS-1$
+   private final static SimpleDateFormat formatDateTime        = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");      //$NON-NLS-1$
+   private final static SimpleDateFormat formatDate            = new SimpleDateFormat("yyyy-MM-dd");              //$NON-NLS-1$
+   private final static SimpleDateFormat formatLog             = new SimpleDateFormat("HH:mm:ss.SSS");            //$NON-NLS-1$
 
-	private final static SimpleDateFormat	formatFull				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //$NON-NLS-1$
-	private final static SimpleDateFormat	formatDateTimeSeconds	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
-	private final static SimpleDateFormat	formatDateTime			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); //$NON-NLS-1$
-	private final static SimpleDateFormat	formatDate				= new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
-	private final static SimpleDateFormat	formatLog				= new SimpleDateFormat("HH:mm:ss.SSS "); //$NON-NLS-1$
+   private long                          milliseconds;
+   private long                          nanoseconds;
 
-	public enum Format {
-		/** Format to ISO with "YYYY-MM-DD". */
-		Date,
+   public enum Format {
+      /** Format to ISO with "YYYY-MM-DD". */
+      Date,
 
-		/** Format to ISO with "YYYY-MM-DDTHH:MM". */
-		DateTime,
+      /** Format to ISO with "YYYY-MM-DDTHH:MM". */
+      DateTime,
 
-		/** Format to ISO with "YYYY-MM-DD HH:MM:SS". */
-		DateTimeSeconds,
+      /** Format to ISO with "YYYY-MM-DD HH:MM:SS". */
+      DateTimeSeconds,
 
-		/** Format to ISO with full precision "YYYY/MM/DD HH:MM:SS.000000000". */
-		Full,
+      /** Format to ISO with full precision "YYYY/MM/DD HH:MM:SS.000000000". */
+      Full,
 
-		/** HH:mm:ss.SSS */
-		Log;
-	}
+      /** HH:mm:ss.SSS */
+      Log;
+   }
 
-	/**
-	 * Default constructor, uses system time for initialization.
-	 */
-	public Timestamp() {
-		this((System.currentTimeMillis() / 1000) * 1000, currentSecondInNano());
-	}
+   /**
+    * Default constructor, uses system time for initialization.
+    */
+   public Timestamp() {
+      this((System.currentTimeMillis() / 1000) * 1000, currentSecondInNano());
+   }
 
-	/**
-	 * Creates timestamp representing provided values. If nanoseconds exceed 1000000 or -1000000
-	 * then they are truncated to nanoseconds within millisecond and millisecond is corrected.
-	 * 
-	 * @param milli
-	 * @param nano
-	 */
-	public Timestamp(final long milli, long nano) {
-		// reduce precision
-		nano /= 1000;
-		nano *= 1000;
+   /**
+    * Creates timestamp representing provided values. If nanoseconds exceed 1000000 or -1000000
+    * then they are truncated to nanoseconds within millisecond and millisecond is corrected.
+    *
+    * @param milli
+    * @param nano
+    */
+   public Timestamp(final long milli, long nano) {
+      // reduce precision
+      nano /= 1000;
+      nano *= 1000;
 
-		// correction if there is more nanoseconds than it fits in
-		if (nano >= 1000000) {
-			final long t = nano / 1000000;
-			milliseconds = milli + t;
-			nanoseconds = nano - t * 1000000;
-		} else if (nano <= -1000000) {
-			final long t = nano / 1000000;
-			milliseconds = milli + t - 1;
-			nanoseconds = nano - t * 1000000 + 1000000;
-		} else if (nano < 0) {
-			milliseconds = milli - 1;
-			nanoseconds = nano + 1000000;
-		} else {
-			milliseconds = milli;
-			nanoseconds = nano;
-		}
-	}
+      // correction if there is more nanoseconds than it fits in
+      if (nano >= 1000000) {
+         final long t = nano / 1000000;
+         milliseconds = milli + t;
+         nanoseconds = nano - t * 1000000;
+      } else if (nano <= -1000000) {
+         final long t = nano / 1000000;
+         milliseconds = milli + t - 1;
+         nanoseconds = nano - t * 1000000 + 1000000;
+      } else if (nano < 0) {
+         milliseconds = milli - 1;
+         nanoseconds = nano + 1000000;
+      } else {
+         milliseconds = milli;
+         nanoseconds = nano;
+      }
+   }
 
-	private final static long currentSecondInNano() {
-		final long l = System.nanoTime();
+   private final static long currentSecondInNano() {
+      final long l = System.nanoTime();
 
-		return l - ((l / 1000000000) * 1000000000);
-	}
+      return l - ((l / 1000000000) * 1000000000);
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(T)
-	 */
-	public int compareTo(final Timestamp o) {
-		if (o instanceof Timestamp) {
-			final Timestamp t = o;
-			long d = milliseconds - t.milliseconds;
+   /*
+    * (non-Javadoc)
+    * @see java.lang.Comparable#compareTo(T)
+    */
+   @Override
+   public int compareTo(final Timestamp o) {
+      if (o instanceof Timestamp) {
+         final Timestamp t = o;
+         long d = milliseconds - t.milliseconds;
 
-			if (d != 0) {
-				return (int) d;
-			}
+         if (d != 0) {
+            return (int) d;
+         }
 
-			d = nanoseconds - t.nanoseconds;
+         d = nanoseconds - t.nanoseconds;
 
-			return (int) d;
-		}
+         return (int) d;
+      }
 
-		return 0;
-	}
+      return 0;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj instanceof Timestamp) {
-			final Timestamp t = (Timestamp) obj;
+   /*
+    * (non-Javadoc)
+    * @see java.lang.Object#equals(java.lang.Object)
+    */
+   @Override
+   public boolean equals(final Object obj) {
+      if (obj instanceof Timestamp) {
+         final Timestamp t = (Timestamp) obj;
 
-			return t.milliseconds == milliseconds && t.nanoseconds == nanoseconds;
-		}
+         return t.milliseconds == milliseconds && t.nanoseconds == nanoseconds;
+      }
 
-		return false;
-	}
+      return false;
+   }
 
-	/**
-	 * Returns time in milliseconds since epoch (standard Java UTC time, as returned by
-	 * System.currentTimeMillis())
-	 * 
-	 * @return Returns the milliseconds.
-	 */
-	public long getMilliseconds() {
-		return milliseconds;
-	}
+   /**
+    * Returns time in milliseconds since epoch (standard Java UTC time, as returned by
+    * System.currentTimeMillis())
+    *
+    * @return Returns the milliseconds.
+    */
+   public long getMilliseconds() {
+      return milliseconds;
+   }
 
-	/**
-	 * @return Returns the nanoseconds within the millisecond.
-	 */
-	public long getNanoseconds() {
-		return nanoseconds;
-	}
+   /**
+    * @return Returns the nanoseconds within the millisecond.
+    */
+   public long getNanoseconds() {
+      return nanoseconds;
+   }
 
-	/**
-	 * Get seconds since epoch, i.e. 1 January 1970 0:00 UTC.
-	 * 
-	 * @return Seconds since 1970.
-	 */
-	public long getSeconds() {
-		return milliseconds / 1000L;
-	}
+   /**
+    * Get seconds since epoch, i.e. 1 January 1970 0:00 UTC.
+    *
+    * @return Seconds since 1970.
+    */
+   public long getSeconds() {
+      return milliseconds / 1000L;
+   }
 
-	/**
-	 * @return Returns <code>true</code> if this time stamp is greater than or equal to the
-	 *         <code>other</code> time stamp.
-	 * @param other
-	 *            Other time stamp
-	 */
-	public boolean isGreaterOrEqual(final Timestamp other) {
-		if (milliseconds < other.milliseconds) {
-			return false;
-		}
-		if (milliseconds == other.milliseconds) {
-			return nanoseconds >= other.nanoseconds;
-		}
-		return true;
-	}
+   /**
+    * @return Returns <code>true</code> if this time stamp is greater than or equal to the
+    *         <code>other</code> time stamp.
+    * @param other
+    *           Other time stamp
+    */
+   public boolean isGreaterOrEqual(final Timestamp other) {
+      if (milliseconds < other.milliseconds) {
+         return false;
+      }
+      if (milliseconds == other.milliseconds) {
+         return nanoseconds >= other.nanoseconds;
+      }
+      return true;
+   }
 
-	/**
-	 * @return Returns <code>true</code> if this time stamp is greater than the <code>other</code>
-	 *         time stamp.
-	 * @param other
-	 *            Other time stamp
-	 */
-	public boolean isGreaterThan(final Timestamp other) {
-		if (milliseconds < other.milliseconds) {
-			return false;
-		}
-		if (milliseconds == other.milliseconds) {
-			return nanoseconds > other.nanoseconds;
-		}
-		return true;
-	}
+   /**
+    * @return Returns <code>true</code> if this time stamp is greater than the <code>other</code>
+    *         time stamp.
+    * @param other
+    *           Other time stamp
+    */
+   public boolean isGreaterThan(final Timestamp other) {
+      if (milliseconds < other.milliseconds) {
+         return false;
+      }
+      if (milliseconds == other.milliseconds) {
+         return nanoseconds > other.nanoseconds;
+      }
+      return true;
+   }
 
-	/**
-	 * @return Returns <code>true</code> if this time stamp is smaller than or equal to the
-	 *         <code>other</code> time stamp.
-	 * @param other
-	 *            Other time stamp
-	 */
-	public boolean isLessOrEqual(final Timestamp other) {
-		if (milliseconds > other.milliseconds) {
-			return false;
-		}
-		if (milliseconds == other.milliseconds) {
-			return nanoseconds <= other.nanoseconds;
-		}
-		return true;
-	}
+   /**
+    * @return Returns <code>true</code> if this time stamp is smaller than or equal to the
+    *         <code>other</code> time stamp.
+    * @param other
+    *           Other time stamp
+    */
+   public boolean isLessOrEqual(final Timestamp other) {
+      if (milliseconds > other.milliseconds) {
+         return false;
+      }
+      if (milliseconds == other.milliseconds) {
+         return nanoseconds <= other.nanoseconds;
+      }
+      return true;
+   }
 
-	/**
-	 * @return Returns <code>true</code> if this time stamp is smaller than the <code>other</code>
-	 *         time stamp.
-	 * @param other
-	 *            Other time stamp
-	 */
-	public boolean isLessThan(final Timestamp other) {
-		if (milliseconds > other.milliseconds) {
-			return false;
-		}
-		if (milliseconds == other.milliseconds) {
-			return nanoseconds < other.nanoseconds;
-		}
-		return true;
-	}
+   /**
+    * @return Returns <code>true</code> if this time stamp is smaller than the <code>other</code>
+    *         time stamp.
+    * @param other
+    *           Other time stamp
+    */
+   public boolean isLessThan(final Timestamp other) {
+      if (milliseconds > other.milliseconds) {
+         return false;
+      }
+      if (milliseconds == other.milliseconds) {
+         return nanoseconds < other.nanoseconds;
+      }
+      return true;
+   }
 
-	/**
-	 * @return Returns <code>true</code> if time fields &gt; 0.
-	 */
-	public boolean isValid() {
-		return milliseconds > 0;
-	}
+   /**
+    * @return Returns <code>true</code> if time fields &gt; 0.
+    */
+   public boolean isValid() {
+      return milliseconds > 0;
+   }
 
-	/**
-	 * Converts timestamp to double.
-	 * 
-	 * @return Return seconds and fractional nanoseconds.
-	 */
-	public double toDouble() {
-		return milliseconds / 1000.0 + nanoseconds / 1000000000.0;
-	}
+   public String logWithNano() {
 
-	/**
-	 * Returns time in nanoseconds since epoch. Not that this in only usefull for calculating time
-	 * difference for up to 292 years (2<sup>63</sup> nanoseconds) since this is maximum time
-	 * possible in nanoseconds due to long value range overflow.
-	 * 
-	 * @return up to approx. 292 years big nano time
-	 */
-	public long toNanoTime() {
-		return milliseconds * 1000000 + nanoseconds;
-	}
+      final StringBuffer sb = new StringBuffer(32);
 
-	@Override
-	public String toString() {
+      formatLog.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
 
-		final StringBuffer sb = new StringBuffer(32);
+      // append nano seconds
+      sb.append(String.format("'%,03d", nanoseconds / 1000)); //$NON-NLS-1$
 
-		formatFull.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
+      return sb.toString();
+   }
+
+   /**
+    * Converts timestamp to double.
+    *
+    * @return Return seconds and fractional nanoseconds.
+    */
+   public double toDouble() {
+      return milliseconds / 1000.0 + nanoseconds / 1000000000.0;
+   }
+
+   /**
+    * Returns time in nanoseconds since epoch. Not that this in only usefull for calculating time
+    * difference for up to 292 years (2<sup>63</sup> nanoseconds) since this is maximum time
+    * possible in nanoseconds due to long value range overflow.
+    *
+    * @return up to approx. 292 years big nano time
+    */
+   public long toNanoTime() {
+      return milliseconds * 1000000 + nanoseconds;
+   }
+
+   @Override
+   public String toString() {
+
+      final StringBuffer sb = new StringBuffer(32);
+
+      formatFull.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
 
 //		if (nanoseconds < 100000) {
 //			sb.append('0');
@@ -298,32 +311,32 @@ public final class Timestamp implements Comparable<Timestamp> {
 //			}
 //		}
 
-		sb.append(String.format("'%,03d", nanoseconds / 1000)); //$NON-NLS-1$
+      sb.append(String.format("'%,03d", nanoseconds / 1000)); //$NON-NLS-1$
 
-		return sb.toString();
-	}
+      return sb.toString();
+   }
 
-	/**
-	 * @return Returns timestamp as string formated as specified.
-	 */
-	public String toString(final Format format) {
-		final StringBuffer sb = new StringBuffer(32);
-		switch (format.ordinal()) {
-		case 0:
-			formatDate.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
-			return sb.toString();
-		case 1:
-			formatDateTime.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
-			return sb.toString();
-		case 2:
-			formatDateTimeSeconds.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
-			return sb.toString();
-		case 4:
-			formatLog.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
-			return sb.toString();
-		default:
-			return toString();
-		}
-	}
+   /**
+    * @return Returns timestamp as string formated as specified.
+    */
+   public String toString(final Format format) {
+      final StringBuffer sb = new StringBuffer(32);
+      switch (format.ordinal()) {
+      case 0:
+         formatDate.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
+         return sb.toString();
+      case 1:
+         formatDateTime.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
+         return sb.toString();
+      case 2:
+         formatDateTimeSeconds.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
+         return sb.toString();
+      case 4:
+         formatLog.format(new Date(milliseconds), sb, new FieldPosition(DateFormat.FULL));
+         return sb.toString();
+      default:
+         return toString();
+      }
+   }
 
 }

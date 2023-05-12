@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.AltitudeUpDown;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
@@ -146,7 +146,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private Menu      _tableContextMenu;
 
-   class MarkerViewerContentProvider implements IStructuredContentProvider {
+   private class MarkerViewerContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -203,7 +203,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       }
    }
 
-   public class TableContextMenuProvider implements IContextMenuProvider {
+   private class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -215,7 +215,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       @Override
       public Menu getContextMenu() {
-         return _tableContextMenu;
+
+         return _markerViewer.getTable().getSelectionCount() > 0
+               ? _tableContextMenu : null;
       }
 
       @Override
@@ -656,13 +658,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
+            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
 
             if (elevationGainLoss == null) {
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
                colDef.printValue_0(cell, value);
             }
          }
@@ -683,7 +685,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(
+            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(
                   previousMarkerIndex,
                   currentMarkerIndex);
 
@@ -691,7 +693,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getAltitudeDown() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
             }

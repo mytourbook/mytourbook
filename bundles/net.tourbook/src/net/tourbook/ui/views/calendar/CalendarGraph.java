@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2021 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -811,13 +811,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    private void disposeFonts() {
 
-      _fontDateColumn = UI.disposeResource(_fontDateColumn);
-      _fontDayHeader = UI.disposeResource(_fontDayHeader);
-      _fontTourContent = UI.disposeResource(_fontTourContent);
-      _fontTourTitle = UI.disposeResource(_fontTourTitle);
-      _fontTourValue = UI.disposeResource(_fontTourValue);
-      _fontWeekValue = UI.disposeResource(_fontWeekValue);
-      _fontYearHeader = UI.disposeResource(_fontYearHeader);
+// SET_FORMATTING_OFF
+
+      _fontDateColumn   = UI.disposeResource(_fontDateColumn);
+      _fontDayHeader    = UI.disposeResource(_fontDayHeader);
+      _fontTourContent  = UI.disposeResource(_fontTourContent);
+      _fontTourTitle    = UI.disposeResource(_fontTourTitle);
+      _fontTourValue    = UI.disposeResource(_fontTourValue);
+      _fontWeekValue    = UI.disposeResource(_fontWeekValue);
+      _fontYearHeader   = UI.disposeResource(_fontYearHeader);
+
+// SET_FORMATTING_ON
    }
 
    void draw() {
@@ -2932,7 +2936,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             try {
 
-               final TourData tourDataCopy = (TourData) dragedTourData.clone();
+               final TourData tourDataCopy = (TourData) dragedTourData.clonePartly();
 
                // set tour start date/time AFTER tour is copied !!!
                tourDataCopy.setTourStartTime(newTourStartTime);
@@ -3696,47 +3700,28 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       final LocalDateTime firstDayOfMonth = currentFirstDay.with(TemporalAdjusters.firstDayOfMonth());
 
+// SET_FORMATTING_OFF
+
       switch (_currentProfile.yearColumnsStart) {
 
-      case JAN:
-         return firstDayOfMonth.withMonth(Month.JANUARY.getValue());
-
-      case FEB:
-         return firstDayOfMonth.withMonth(Month.FEBRUARY.getValue());
-
-      case MAR:
-         return firstDayOfMonth.withMonth(Month.MARCH.getValue());
-
-      case APR:
-         return firstDayOfMonth.withMonth(Month.APRIL.getValue());
-
-      case MAY:
-         return firstDayOfMonth.withMonth(Month.MAY.getValue());
-
-      case JUN:
-         return firstDayOfMonth.withMonth(Month.JUNE.getValue());
-
-      case JUL:
-         return firstDayOfMonth.withMonth(Month.JULY.getValue());
-
-      case AUG:
-         return firstDayOfMonth.withMonth(Month.AUGUST.getValue());
-
-      case SEP:
-         return firstDayOfMonth.withMonth(Month.SEPTEMBER.getValue());
-
-      case OCT:
-         return firstDayOfMonth.withMonth(Month.OCTOBER.getValue());
-
-      case NOV:
-         return firstDayOfMonth.withMonth(Month.NOVEMBER.getValue());
-
-      case DEC:
-         return firstDayOfMonth.withMonth(Month.DECEMBER.getValue());
+      case JAN: return firstDayOfMonth.withMonth(Month.JANUARY.getValue());
+      case FEB: return firstDayOfMonth.withMonth(Month.FEBRUARY.getValue());
+      case MAR: return firstDayOfMonth.withMonth(Month.MARCH.getValue());
+      case APR: return firstDayOfMonth.withMonth(Month.APRIL.getValue());
+      case MAY: return firstDayOfMonth.withMonth(Month.MAY.getValue());
+      case JUN: return firstDayOfMonth.withMonth(Month.JUNE.getValue());
+      case JUL: return firstDayOfMonth.withMonth(Month.JULY.getValue());
+      case AUG: return firstDayOfMonth.withMonth(Month.AUGUST.getValue());
+      case SEP: return firstDayOfMonth.withMonth(Month.SEPTEMBER.getValue());
+      case OCT: return firstDayOfMonth.withMonth(Month.OCTOBER.getValue());
+      case NOV: return firstDayOfMonth.withMonth(Month.NOVEMBER.getValue());
+      case DEC: return firstDayOfMonth.withMonth(Month.DECEMBER.getValue());
 
       default:
          break;
       }
+
+// SET_FORMATTING_ON      
 
       // this is used for continuously column start
       return currentFirstDay;

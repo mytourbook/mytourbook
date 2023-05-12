@@ -69,7 +69,7 @@ public class TileImageLoader implements Runnable {
       tile.setLoading(false);
 
       if (isNotifyObserver) {
-         tile.notifyImageObservers();
+         tile.callTileImageLoaderCallback();
       }
 
       MP.fireTileEvent(TileEventId.TILE_END_LOADING, tile);

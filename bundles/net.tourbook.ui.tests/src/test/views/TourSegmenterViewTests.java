@@ -35,6 +35,8 @@ public class TourSegmenterViewTests extends UITest {
    @Test
    void testSegmenterAlgorithms_All() {
 
+      Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
+
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
@@ -81,6 +83,8 @@ public class TourSegmenterViewTests extends UITest {
 
    @Test
    void testSelectSegments() {
+
+      Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$

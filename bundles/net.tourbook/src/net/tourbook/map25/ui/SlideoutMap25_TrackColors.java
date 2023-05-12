@@ -737,7 +737,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
          final Image oldImage = _allProfileImages.put(colorProvider, image);
 
-         Util.disposeResource(oldImage);
+         UI.disposeResource(oldImage);
       }
 
       return image;

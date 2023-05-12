@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,11 +58,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    /*
     * UI controls
     */
+   private Button  _chkIsBackgroundFPS;
    private Button  _chkUseDraggedKeyboardNavigation;
    private Button  _chkMapCenter_VerticalPosition;
 
    private Link    _linkKeyboardShortcuts;
 
+   private Spinner _spinnerBackgroundFPS;
    private Spinner _spinnerMapCenter_VerticalPosition;
 
    /**
@@ -109,7 +111,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 //       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
-            createUI_80_Other(container);
+            createUI_20_Controls(container);
          }
       }
 
@@ -129,7 +131,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             .applyTo(label);
    }
 
-   private void createUI_80_Other(final Composite parent) {
+   private void createUI_20_Controls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -150,11 +152,33 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _spinnerMapCenter_VerticalPosition.setMinimum((int) -Map25App.MAP_CENTER_VERTICAL_MAX_VALUE);
             _spinnerMapCenter_VerticalPosition.setMaximum((int) Map25App.MAP_CENTER_VERTICAL_MAX_VALUE);
             _spinnerMapCenter_VerticalPosition.setIncrement(1);
-            _spinnerMapCenter_VerticalPosition.setPageIncrement(5);
+            _spinnerMapCenter_VerticalPosition.setPageIncrement(10);
             _spinnerMapCenter_VerticalPosition.setToolTipText(Messages.Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition_Tooltip);
 
             _spinnerMapCenter_VerticalPosition.addSelectionListener(_defaultSelectionListener);
-            _spinnerMapCenter_VerticalPosition.addMouseWheelListener(_mouseWheelListener);
+            _spinnerMapCenter_VerticalPosition.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onChangeUI();
+            });
+         }
+         {
+            /*
+             * Background FPS
+             */
+            _chkIsBackgroundFPS = new Button(container, SWT.CHECK);
+            _chkIsBackgroundFPS.setText(Messages.Slideout_Map25Options_Checkbox_BackgroundFPS);
+            _chkIsBackgroundFPS.setToolTipText(Messages.Slideout_Map25Options_Checkbox_BackgroundFPS_Tooltip);
+            _chkIsBackgroundFPS.addSelectionListener(_defaultSelectionListener);
+
+            _spinnerBackgroundFPS = new Spinner(container, SWT.BORDER);
+            _spinnerBackgroundFPS.setMinimum(-1);
+            _spinnerBackgroundFPS.setMaximum(30);
+            _spinnerBackgroundFPS.setIncrement(1);
+            _spinnerBackgroundFPS.setPageIncrement(5);
+            _spinnerBackgroundFPS.setToolTipText(Messages.Slideout_Map25Options_Checkbox_BackgroundFPS_Tooltip);
+
+            _spinnerBackgroundFPS.addSelectionListener(_defaultSelectionListener);
+            _spinnerBackgroundFPS.addMouseWheelListener(_mouseWheelListener);
          }
          {
             /*
@@ -182,7 +206,9 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private void enableControls() {
 
       final boolean isMapCenter_VerticalPosition = _chkMapCenter_VerticalPosition.getSelection();
+      final boolean isBackgroundFPS = _chkIsBackgroundFPS.getSelection();
 
+      _spinnerBackgroundFPS.setEnabled(isBackgroundFPS);
       _spinnerMapCenter_VerticalPosition.setEnabled(isMapCenter_VerticalPosition);
    }
 
@@ -205,9 +231,16 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
    private void restoreState() {
 
-      _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
-      _chkMapCenter_VerticalPosition.setSelection(_mapApp.getMapCenter_VerticalPosition_IsEnabled());
-      _spinnerMapCenter_VerticalPosition.setSelection(_mapApp.getMapCenter_VerticalPosition());
+// SET_FORMATTING_OFF
+
+      _chkIsBackgroundFPS                 .setSelection(Map25App.isBackgroundFPS());
+      _chkUseDraggedKeyboardNavigation    .setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
+      _chkMapCenter_VerticalPosition      .setSelection(_mapApp.getMapCenter_VerticalPosition_IsEnabled());
+
+      _spinnerBackgroundFPS               .setSelection(Map25App.getBackgroundFPS());
+      _spinnerMapCenter_VerticalPosition  .setSelection(_mapApp.getMapCenter_VerticalPosition());
+
+// SET_FORMATTING_ON
    }
 
    private void saveState() {
@@ -217,6 +250,11 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _spinnerMapCenter_VerticalPosition.getSelection());
 
       Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
+
+      _mapApp.setBackgroundFPS(
+
+            _chkIsBackgroundFPS.getSelection(),
+            _spinnerBackgroundFPS.getSelection());
 
       _mapApp.updateMap();
    }

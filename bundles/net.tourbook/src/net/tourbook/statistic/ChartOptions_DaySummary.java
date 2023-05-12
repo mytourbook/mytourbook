@@ -187,7 +187,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
 
       enableControls();
 
-      Display.getCurrent().asyncExec(this::saveState);
+      Display.getCurrent().asyncExec(() -> saveState());
    }
 
    @Override

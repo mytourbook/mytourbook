@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2023 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -50,28 +51,25 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class DialogEditTimeSlicesValues extends TitleAreaDialog {
 
-   private static final String   GRAPH_LABEL_CADENCE_UNIT_RPM_SPM = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
-   private static final String   GRAPH_LABEL_HEARTBEAT_UNIT       = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String   STATE_IS_ALTITUDE_MODIFIED    = "STATE_IS_ALTITUDE_MODIFIED";    //$NON-NLS-1$
+   private static final String   STATE_IS_CADENCE_MODIFIED     = "STATE_IS_CADENCE_MODIFIED";     //$NON-NLS-1$
+   private static final String   STATE_IS_PULSE_MODIFIED       = "STATE_IS_PULSE_MODIFIED";       //$NON-NLS-1$
+   private static final String   STATE_IS_TEMPERATURE_MODIFIED = "STATE_IS_TEMPERATURE_MODIFIED"; //$NON-NLS-1$
 
-   private static final String   STATE_IS_ALTITUDE_MODIFIED       = "STATE_IS_ALTITUDE_MODIFIED";                                //$NON-NLS-1$
-   private static final String   STATE_IS_CADENCE_MODIFIED        = "STATE_IS_CADENCE_MODIFIED";                                 //$NON-NLS-1$
-   private static final String   STATE_IS_PULSE_MODIFIED          = "STATE_IS_PULSE_MODIFIED";                                   //$NON-NLS-1$
-   private static final String   STATE_IS_TEMPERATURE_MODIFIED    = "STATE_IS_TEMPERATURE_MODIFIED";                             //$NON-NLS-1$
+   private static final String   STATE_IS_ALTITUDE_OFFSET      = "STATE_IS_ALTITUDE_OFFSET";      //$NON-NLS-1$
+   private static final String   STATE_IS_CADENCE_OFFSET       = "STATE_IS_CADENCE_OFFSET";       //$NON-NLS-1$
+   private static final String   STATE_IS_PULSE_OFFSET         = "STATE_IS_PULSE_OFFSET";         //$NON-NLS-1$
+   private static final String   STATE_IS_TEMPERATURE_OFFSET   = "STATE_IS_TEMPERATURE_OFFSET";   //$NON-NLS-1$
 
-   private static final String   STATE_IS_ALTITUDE_OFFSET         = "STATE_IS_ALTITUDE_OFFSET";                                  //$NON-NLS-1$
-   private static final String   STATE_IS_CADENCE_OFFSET          = "STATE_IS_CADENCE_OFFSET";                                   //$NON-NLS-1$
-   private static final String   STATE_IS_PULSE_OFFSET            = "STATE_IS_PULSE_OFFSET";                                     //$NON-NLS-1$
-   private static final String   STATE_IS_TEMPERATURE_OFFSET      = "STATE_IS_TEMPERATURE_OFFSET";                               //$NON-NLS-1$
-
-   private static final String   STATE_ALTITUDE_VALUE             = "STATE_ALTITUDE_VALUE";                                      //$NON-NLS-1$
-   private static final String   STATE_CADENCE_VALUE              = "STATE_CADENCE_VALUE";                                       //$NON-NLS-1$
-   private static final String   STATE_PULSE_VALUE                = "STATE_PULSE_VALUE";                                         //$NON-NLS-1$
-   private static final String   STATE_TEMPERATURE_VALUE          = "STATE_TEMPERATURE_VALUE";                                   //$NON-NLS-1$
+   private static final String   STATE_ALTITUDE_VALUE          = "STATE_ALTITUDE_VALUE";          //$NON-NLS-1$
+   private static final String   STATE_CADENCE_VALUE           = "STATE_CADENCE_VALUE";           //$NON-NLS-1$
+   private static final String   STATE_PULSE_VALUE             = "STATE_PULSE_VALUE";             //$NON-NLS-1$
+   private static final String   STATE_TEMPERATURE_VALUE       = "STATE_TEMPERATURE_VALUE";       //$NON-NLS-1$
 
    private final IDialogSettings _state;
 
-   private final boolean         _isOSX                           = UI.IS_OSX;
-   private final boolean         _isLinux                         = UI.IS_LINUX;
+   private final boolean         _isOSX                        = UI.IS_OSX;
+   private final boolean         _isLinux                      = UI.IS_LINUX;
 
    private final TourData        _tourData;
 
@@ -331,7 +329,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             _spinner_PulseValue.addMouseWheelListener(_defaultMouseWheelListener);
 
             // label: bpm
-            _label_PulseUnit = _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+            _label_PulseUnit = _tk.createLabel(container, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
 
             final Composite containerPulse = _tk.createComposite(container);
             GridDataFactory.fillDefaults()
@@ -373,7 +371,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             _spinner_CadenceValue.addMouseWheelListener(_defaultMouseWheelListener);
 
             // label: "rpm"
-            _label_CadenceUnit = _tk.createLabel(container, GRAPH_LABEL_CADENCE_UNIT_RPM_SPM);
+            _label_CadenceUnit = _tk.createLabel(container, OtherMessages.GRAPH_LABEL_CADENCE_UNIT_RPM_SPM);
 
             final Composite containerCadence = _tk.createComposite(container);
             GridDataFactory.fillDefaults()

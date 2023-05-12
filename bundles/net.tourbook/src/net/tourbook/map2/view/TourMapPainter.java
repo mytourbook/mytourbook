@@ -823,10 +823,10 @@ public class TourMapPainter extends Map2Painter {
    @Override
    protected void dispose() {
 
-      Util.disposeResource(_tourEndMarker);
-      Util.disposeResource(_tourStartMarker);
+      UI.disposeResource(_tourEndMarker);
+      UI.disposeResource(_tourStartMarker);
 
-      Util.disposeResource(_tourWayPointImage);
+      UI.disposeResource(_tourWayPointImage);
 
       _isImageAvailable = false;
    }
@@ -3012,6 +3012,10 @@ public class TourMapPainter extends Map2Painter {
 
       case Gradient:
          _dataSerie = tourData.getGradientSerie();
+         break;
+
+      case Power:
+         _dataSerie = tourData.getPowerSerie();
          break;
 
       case Pulse:

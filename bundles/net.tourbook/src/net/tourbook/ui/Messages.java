@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -426,6 +426,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagID_Label;
    public static String        ColumnFactory_TagID_Tooltip;
 
+   public static String        ColumnFactory_TagImageFilePath_Header;
+   public static String        ColumnFactory_TagImageFilePath_Label;
+   public static String        ColumnFactory_TagImageFilePath_Tooltip;
+
    public static String        ColumnFactory_TagNotes_Header;
    public static String        ColumnFactory_TagNotes_Label;
    public static String        ColumnFactory_TagNotes_Tooltip;
@@ -559,6 +563,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Format_Pace;
    public static String        Tour_Tooltip_Format_WindDirectionUnit;
    public static String        Tour_Tooltip_Format_WindSpeedUnit;
+   public static String        Tour_Tooltip_Label_AirQuality;
    public static String        Tour_Tooltip_Label_AltitudeDown;
    public static String        Tour_Tooltip_Label_AltitudeUp;
    public static String        Tour_Tooltip_Label_AvgCadence;
@@ -619,6 +624,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_Weather;
    public static String        Tour_Tooltip_Label_WindDirection;
    public static String        Tour_Tooltip_Label_WindSpeed;
+   public static String        Tour_Tooltip_Spinner_TextWidth_Tooltip;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;

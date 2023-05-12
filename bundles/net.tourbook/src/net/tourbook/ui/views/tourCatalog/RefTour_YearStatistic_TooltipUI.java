@@ -1,5 +1,5 @@
 /******************************************************  *************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
@@ -40,10 +41,8 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class RefTour_YearStatistic_TooltipUI {
 
-   private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-
-   private static final int    VERTICAL_LINE_SPACE      = 8;
-   private static final int    SHELL_MARGIN             = 5;
+   private static final int VERTICAL_LINE_SPACE = 8;
+   private static final int SHELL_MARGIN        = 5;
 
    /*
     * Tooltip context
@@ -62,7 +61,9 @@ public class RefTour_YearStatistic_TooltipUI {
    private Color  _bgColor;
    private Color  _fgColor;
 
+   private Float  _avgAltimeter;
    private Float  _avgPulse;
+   private Float  _maxPulse;
    private Float  _avgSpeed;
    private String _title;
 
@@ -71,10 +72,14 @@ public class RefTour_YearStatistic_TooltipUI {
     */
    private Composite _ttContainer;
 
+   private Label     _lblAvgAltimeter;
+   private Label     _lblAvgAltimeterUnit;
    private Label     _lblAvgPulse;
    private Label     _lblAvgPulseUnit;
    private Label     _lblAvgSpeed;
    private Label     _lblAvgSpeedUnit;
+   private Label     _lblMaxPulse;
+   private Label     _lblMaxPulseUnit;
    private Label     _lblTitle;
 
    private class ActionCloseTooltip extends Action {
@@ -83,7 +88,7 @@ public class RefTour_YearStatistic_TooltipUI {
 
          super(null, Action.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
@@ -110,30 +115,27 @@ public class RefTour_YearStatistic_TooltipUI {
    /**
     * @param parent
     * @param toolTipProvider
-    * @param statisticData_Frequency
-    * @param frequencyStatistic
-    * @param serieIndex
-    * @param valueIndex
     * @param uiText_Title
-    * @param avgSpeed
+    * @param avgAltimeter
     * @param avgPulse
-    * @param tourTypeId
-    * @param toolTip_Title
-    * @param toolTip_SubTitle
-    * @param summaryColumn_HeaderTitle
-    * @param isShowSummary
-    * @param isShowPercentage
+    * @param maxPulse
+    * @param avgSpeed
     */
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
                           final String uiText_Title,
+                          final Float avgAltimeter,
                           final Float avgPulse,
+                          final Float maxPulse,
                           final Float avgSpeed) {
 
       _toolTipProvider = toolTipProvider;
 
       _title = uiText_Title;
+
+      _avgAltimeter = avgAltimeter;
       _avgPulse = avgPulse;
+      _maxPulse = maxPulse;
       _avgSpeed = avgSpeed;
 
       final Display display = parent.getDisplay();
@@ -271,12 +273,30 @@ public class RefTour_YearStatistic_TooltipUI {
       }
       {
          /*
+          * Max Pulse
+          */
+         createUI_Label(parent, Messages.Tour_Tooltip_Label_MaxPulse);
+
+         _lblMaxPulse = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblMaxPulseUnit = createUI_LabelValue(parent, SWT.LEAD);
+      }
+      {
+         /*
           * Avg Speed
           */
          createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
 
          _lblAvgSpeed = createUI_LabelValue(parent, SWT.TRAIL);
          _lblAvgSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
+      }
+      {
+         /*
+          * Avg Altimeter (VAM)
+          */
+         createUI_Label(parent, Messages.ColumnFactory_Motion_Altimeter);
+
+         _lblAvgAltimeter = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblAvgAltimeterUnit = createUI_LabelValue(parent, SWT.LEAD);
       }
    }
 
@@ -373,9 +393,12 @@ public class RefTour_YearStatistic_TooltipUI {
 
       _lblTitle.setText(_title);
 
-      // avg pulse
+      _lblAvgAltimeter.setText(FormatManager.formatElevation(_avgAltimeter));
+      _lblAvgAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
       _lblAvgPulse.setText(FormatManager.formatPulse(_avgPulse));
       _lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
+      _lblMaxPulse.setText(FormatManager.formatPulse(_maxPulse));
+      _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
 
       _lblAvgSpeed.setText(FormatManager.formatSpeed(_avgSpeed));
       _lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);

@@ -2,19 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Velocity 1.5
 Bundle-SymbolicName: net.tourbook.ext.velocity;singleton:=true
-Bundle-Version: 15.6.0.qualifier
+Bundle-Version: 23.5.0.qualifier
 Bundle-Activator: net.tourbook.ext.velocity.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.common,
+ net.tourbook.ext.jars,
  net.tourbook.ext.rxtx_2.2
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Eclipse-BuddyPolicy: registered
 Bundle-ActivationPolicy: lazy
+Eclipse-RegisterBuddy: net.tourbook.ext.jars
 Bundle-ClassPath: .,
  commons-collections4-4.4.jar,
- commons-lang3-3.12.0.jar,
  slf4j-api-1.7.30.jar,
  log4j-1.2.17.jar,
  slf4j-simple-1.7.30.jar,
@@ -25,7 +26,6 @@ Bundle-ClassPath: .,
 Export-Package: net.tourbook.ext.velocity,
  org.apache.commons.collections4,
  org.apache.commons.collections4.collection,
- org.apache.commons.lang3.text,
  org.apache.velocity,
  org.apache.velocity.app,
  org.apache.velocity.app.event,
@@ -58,5 +58,8 @@ Export-Package: net.tourbook.ext.velocity,
  org.dinopolis.util.servicediscovery,
  org.dinopolis.util.text,
  org.slf4j
-Import-Package: net.tourbook.common.util
+Import-Package: net.tourbook.common.util,
+ org.apache.commons.lang3,
+ org.apache.commons.lang3.reflect,
+ org.apache.commons.lang3.tuple
 Automatic-Module-Name: net.tourbook.ext.velocity
