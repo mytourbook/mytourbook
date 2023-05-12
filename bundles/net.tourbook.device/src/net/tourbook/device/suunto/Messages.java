@@ -21,13 +21,13 @@ class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.device.suunto.messages"; //$NON-NLS-1$
 
-   static String               pref_data_source;
-   static String               pref_altitude_source;
-   static String               pref_altitude_gps;
-   static String               pref_altitude_barometer;
-   static String               pref_distance_source;
-   static String               pref_distance_gps;
-   static String               pref_distance_providedvalues;
+   public static String        pref_data_source;
+   public static String        pref_altitude_source;
+   public static String        pref_altitude_gps;
+   public static String        pref_altitude_barometer;
+   public static String        pref_distance_source;
+   public static String        pref_distance_gps;
+   public static String        pref_distance_providedvalues;
 
    static {
       // initialize resource bundle
