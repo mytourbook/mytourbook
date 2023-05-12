@@ -25,7 +25,6 @@ import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -153,7 +152,6 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
    }
 
    @Test
-   @Disabled
    void openOfflineMapPreferencePage() {
 
       Utils.openPreferences(bot);
