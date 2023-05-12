@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
@@ -48,7 +49,9 @@ public class Comparison {
 
    private static final String JSON = ".json"; //$NON-NLS-1$
 
-   public static void compareFitAgainstControl(final String controlTourFilePath,
+   private Comparison() {}
+
+   public static void compareFitAgainstControl(final String controlTourFilePathFit,
                                                final String testTourFilePathFit) {
 
       //Convert the test FIT file to CSV for a human readable comparison
@@ -58,22 +61,32 @@ public class Comparison {
       final Path testTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
       assertTrue(Files.exists(testTourAbsoluteFilePathCsv));
 
-      final String controlTourFilePathCsv = controlTourFilePath.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
+      final String controlTourFilePathCsv = controlTourFilePathFit.replace(".fit", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
       final Path controlTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePathCsv));
       assertTrue(Files.exists(controlTourAbsoluteFilePathCsv));
 
       try {
 
          final List<String> testFileContentArray = Files.readAllLines(testTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
-         final List<String> controlFileContent = Files.readAllLines(controlTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
+         final List<String> controlFileContentArray = Files.readAllLines(controlTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
+
+         //Modify the test and control files to ignore the software version
+         final String genericSoftwareVersion = "software_version,"; //$NON-NLS-1$
+         final String genericApplicationVersion = "application_version,"; //$NON-NLS-1$
+
+         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"23.3\"", genericSoftwareVersion)); //$NON-NLS-1$
+         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2330\"", genericApplicationVersion)); //$NON-NLS-1$
+
+         testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
+         testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
          //Compare with the control file
-         if (!controlFileContent.equals(testFileContentArray)) {
+         if (!controlFileContentArray.equals(testFileContentArray)) {
 
-            final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
+            final String testFileContent = String.join(UI.SYSTEM_NEW_LINE, testFileContentArray);
             writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$ //$NON-NLS-2$
          }
-         assertLinesMatch(controlFileContent, testFileContentArray);
+         assertLinesMatch(controlFileContentArray, testFileContentArray);
 
       } catch (final IOException e) {
          StatusUtil.log(e);
