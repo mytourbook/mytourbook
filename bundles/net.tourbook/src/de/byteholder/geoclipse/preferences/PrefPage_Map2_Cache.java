@@ -135,7 +135,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
       }
 
       /*
-       * hide error messages, this happend when the cache path is invalid but the offline cache is
+       * hide error messages, this happened when the cache path is invalid but the offline cache is
        * disabled
        */
       if (_boolEditorUseOffLineCache.getBooleanValue() == false) {
@@ -305,7 +305,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
    }
 
    /**
-    * !!!!! Recursive funktion to count files/size !!!!!
+    * !!!!! Recursive function to count files/size !!!!!
     *
     * @param listOfFiles
     */
