@@ -192,7 +192,11 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       @Override
       public void run() {
+
          saveComparedTour();
+
+         // after saving, navigate to the next tour, I'm not sure if this is always good but for now I change it
+         _pageBook.getDisplay().asyncExec(() -> actionNavigateTour(true));
       }
    }
 

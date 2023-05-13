@@ -2603,6 +2603,68 @@ public class UI {
    }
 
    /**
+    * Set selection color which is displayed when table/tree item is selected or hovered.
+    * <p>
+    * The code is from here
+    * https://www.eclipse.org/articles/article.php?file=Article-CustomDrawingTableAndTreeItems/index.html
+    * <p>
+    */
+   public static void setSelectionColor(final Control control) {
+
+      final Color hoveredColor = new Color(177, 77, 77);
+      final Color selectionColor = new Color(77, 177, 77);
+      final Color hoveredAndSelectionColor = new Color(77, 77, 177);
+
+      /*
+       * NOTE: EraseItem is called repeatedly. Therefore it is critical
+       * for performance that this method is efficient as possible.
+       */
+      control.addListener(SWT.EraseItem, event -> {
+
+         if (net.tourbook.common.UI.IS_DARK_THEME == false) {
+            return;
+         }
+
+
+         if ((event.detail & SWT.HOT) != 0) {
+
+            // item is hovered
+
+            final Rectangle bounds = event.getBounds();
+
+            event.gc.setBackground(hoveredColor);
+            event.gc.fillRectangle(bounds);
+
+            event.detail &= ~SWT.HOT;
+
+
+         } else if ((event.detail & SWT.SELECTED) != 0) {
+
+            // item is selected
+
+            final Rectangle bounds = event.getBounds();
+
+            event.gc.setBackground(selectionColor);
+            event.gc.fillRectangle(bounds);
+
+            event.detail &= ~SWT.SELECTED;
+
+         } else if ((event.detail & SWT.SELECTED) != 0 && (event.detail & SWT.HOT) != 0) {
+
+            // item is selected + hovered
+
+            final Rectangle bounds = event.getBounds();
+
+            event.gc.setBackground(hoveredAndSelectionColor);
+            event.gc.fillRectangle(bounds);
+
+            event.detail &= ~SWT.SELECTED;
+            event.detail &= ~SWT.HOT;
+         }
+      });
+   }
+
+   /**
     * Set the themed image descriptor for a {@link UIElement} with images from the
     * {@link TourbookPlugin} plugin
     *
