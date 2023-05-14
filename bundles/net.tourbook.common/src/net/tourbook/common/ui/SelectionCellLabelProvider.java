@@ -35,7 +35,7 @@ public class SelectionCellLabelProvider extends StyledCellLabelProvider {
    private Color _selectionColor = new Color(111, 111, 111);
 
    private Color _hoveredColor             = new Color(177, 77, 77);
-   private Color _hoveredAndSelectionColor = new Color(77, 77, 177);
+   private Color _hoveredAndSelectionColor = new Color(54, 85, 108);
 
    @Override
    protected void erase(final Event event, final Object element) {
@@ -51,6 +51,7 @@ public class SelectionCellLabelProvider extends StyledCellLabelProvider {
 //            final Rectangle bounds = event.getBounds();
 //
 //            event.gc.setBackground(_hoveredAndSelectionColor);
+//            event.gc.setBackground(_selectionColor);
 //            event.gc.fillRectangle(bounds);
 //
 //            event.detail &= ~SWT.SELECTED;

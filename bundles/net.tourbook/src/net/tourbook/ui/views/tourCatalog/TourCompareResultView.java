@@ -832,9 +832,8 @@ public class TourCompareResultView extends ViewPart implements
    private void defineAllColumns(final Composite parent) {
 
       defineColumn_1st_ComparedTour();
-      defineColumn_Data_Diff();
-
       defineColumn_Tour_Type();
+      defineColumn_Data_Diff();
 
       defineColumn_Motion_SpeedComputed();
       defineColumn_Motion_SpeedSaved();

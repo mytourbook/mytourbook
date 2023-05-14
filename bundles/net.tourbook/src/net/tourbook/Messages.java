@@ -2538,6 +2538,7 @@ public class Messages extends NLS {
    public static String        TourCatalog_View_Action_NavigatePrevTour;
    public static String        tourCatalog_view_action_rename_reference_tour;
    public static String        tourCatalog_view_action_save_marker;
+   public static String        TourCatalog_View_Action_SaveAndNext;
    public static String        tourCatalog_view_action_synch_charts_byScale_tooltip;
    public static String        tourCatalog_view_action_synch_charts_bySize_tooltip;
    public static String        tourCatalog_view_action_synch_chart_years_tooltip;

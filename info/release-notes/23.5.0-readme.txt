@@ -65,6 +65,9 @@ Improvements
   - Show altimeter (VAM) and max pulse values
   - New Action: Show all available compared tours without selecting last year and number of years
   - Fixed min/max values when selecting different years, ...
+  
+* Compared Tour Chart
+  - New Action: Save compared tour and then select the next compared tour
 
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
