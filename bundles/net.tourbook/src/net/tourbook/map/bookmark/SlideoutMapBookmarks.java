@@ -276,7 +276,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
          tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
          tc = tvc.getColumn();
          tc.setText(Messages.Map_Bookmark_Column_Latitude);
-         tc.setToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+         tc.setToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip2);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -295,7 +295,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
          tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
          tc = tvc.getColumn();
          tc.setText(Messages.Map_Bookmark_Column_Longitude);
-         tc.setToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+         tc.setToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip2);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {

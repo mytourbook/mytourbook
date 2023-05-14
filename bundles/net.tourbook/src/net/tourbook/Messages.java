@@ -1298,9 +1298,9 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Column_Bearing2;                                             //2, because of refactoring
    public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                     //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
-   public static String        Map_Bookmark_Column_Latitude_Tooltip;
+   public static String        Map_Bookmark_Column_Latitude_Tooltip2;
    public static String        Map_Bookmark_Column_Longitude;
-   public static String        Map_Bookmark_Column_Longitude_Tooltip;
+   public static String        Map_Bookmark_Column_Longitude_Tooltip2;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
    public static String        Map_Bookmark_Column_Tilt2;                                                //2, because of refactoring
