@@ -561,9 +561,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "latitude", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip2);
       colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Latitude);
-      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip2);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
@@ -588,9 +588,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "longitude", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip2);
       colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Longitude);
-      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip2);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
