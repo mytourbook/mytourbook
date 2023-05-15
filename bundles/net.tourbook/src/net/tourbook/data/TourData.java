@@ -8968,6 +8968,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       powerSerie = new float[timeSerie.length];
 
+      /*
+       * Power is computed with a formula from http://kreuzotter.de/deutsch/speed.htm
+       */
+
       final float weightBody = 75;
       final float weightBike = 10;
       final float bodyHeight = 188;
@@ -8975,7 +8979,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
       final float cD = 0.8f; // Streomungskoeffizient
       final float p = 1.145f; // 20C / 400m
-//      float p = 0.968f; // 10C / 2000m
+//    float p = 0.968f; // 10C / 2000m
 
       final float weightTotal = weightBody + weightBike;
       final float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
@@ -8985,8 +8989,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final float slope = weightTotal * 9.81f; // * gradient/100
       final float air = 0.5f * p * cD * aP; // * v2;
 
-//      int joule = 0;
-//      int prefTime = 0;
+//    int joule = 0;
+//    int prefTime = 0;
 
       for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 

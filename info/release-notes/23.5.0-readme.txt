@@ -83,8 +83,6 @@ Changes
   - The words "pulse" or "heartbeat" are replaced with "heart rate"
     https://github.com/mytourbook/mytourbook/discussions/1089  
 
-* Compared Tour
-  - When a compared tour is saved in the "Compared Tours" chart view, then after saving it, the next compared tour is selected
 
 Bugfix
 ======
