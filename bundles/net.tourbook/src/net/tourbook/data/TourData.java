@@ -8969,7 +8969,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       powerSerie = new float[timeSerie.length];
 
       /*
-       * Power is computed with a formula from http://kreuzotter.de/deutsch/speed.htm
+       * Power is computed with a formula from http://kreuzotter.de/english/espeed.htm
        */
 
       final float weightBody = 75;
