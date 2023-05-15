@@ -6154,7 +6154,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       /*
-       * a bar is selected
+       * A bar is selected
        */
 
       // get the chart data
@@ -6196,7 +6196,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * current bar is selected, draw the selected bar
+          * Current bar is selected, draw the selected bar
           */
 
          final Rectangle barShapeSelected = new Rectangle(
@@ -6220,10 +6220,12 @@ public class ChartComponentGraph extends Canvas {
          final Color colorDarkSelected = getColor(rgbDarkDef);
          final Color colorLineSelected = getColor(rgbLineDef);
 
-         // do't write into the x-axis units which also contains the
-         // selection marker
+         // don't write into the x-axis units which also contains the selection marker
          if (barShapeSelected.y + barShapeSelected.height > devYBottom) {
             barShapeSelected.height = devYBottom - barShapeSelected.y;
+         }
+         if (barBarSelected.y + barBarSelected.height > devYBottom) {
+            barBarSelected.height = devYBottom - barBarSelected.y;
          }
 
          // draw the selection darker when the focus is set
@@ -6242,7 +6244,7 @@ public class ChartComponentGraph extends Canvas {
             // bar is below the x-axis, just draw a simple line
 
             gc.setForeground(colorLineSelected);
-            gc.drawLine(//
+            gc.drawLine(
                   barShapeSelected.x,
                   devYBottom + 1,
                   barShapeSelected.x + barShapeSelected.width,
@@ -6268,7 +6270,7 @@ public class ChartComponentGraph extends Canvas {
 
             // draw bar thicker
             gc.setBackground(colorDarkSelected);
-            gc.fillRoundRectangle(//
+            gc.fillRoundRectangle(
                   barBarSelected.x,
                   barBarSelected.y,
                   barBarSelected.width,
@@ -6278,7 +6280,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * draw a marker below the x-axis to make the selection more visible
+          * Draw a marker below the x-axis to make the selection more visible
           */
          if (_isFocusActive) {
 
@@ -6964,6 +6966,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          final int serieLength = barFocusRectangles.length;
+         final int devYBottom = drawingData.getDevYBottom();
 
          // find the rectangle which is hovered by the mouse
          for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -6981,7 +6984,18 @@ public class ChartComponentGraph extends Canvas {
                   _hoveredBarSerieIndex = serieIndex;
                   _hoveredBarValueIndex = valueIndex;
 
-                  _hoveredBar_ToolTip.open(barFocusRectangle, serieIndex, valueIndex);
+                  final Rectangle barTooltipRectangle = new Rectangle(
+
+                        barFocusRectangle.x,
+                        barFocusRectangle.y,
+                        barFocusRectangle.width,
+                        barFocusRectangle.height);
+
+                  // ensure the tooltip position is not below the chart
+                  if (barFocusRectangle.y + barFocusRectangle.height > devYBottom) {
+                     barTooltipRectangle.height = devYBottom - barFocusRectangle.y;
+                  }
+                  _hoveredBar_ToolTip.open(barTooltipRectangle, serieIndex, valueIndex);
 
                   isBarHit = true;
                   break;
