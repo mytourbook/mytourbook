@@ -92,9 +92,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
    static final int            STATE_RELATIVE_BAR_HEIGHT_MIN     = 1;
    static final int            STATE_RELATIVE_BAR_HEIGHT_MAX     = 100;
    static final String         STATE_SHOW_ALTIMETER_AVG          = "STATE_SHOW_ALTIMETER_AVG";                         //$NON-NLS-1$
+   static final boolean        STATE_SHOW_ALTIMETER_AVG_DEFAULT  = true;
    static final String         STATE_SHOW_PULSE_AVG              = "STATE_SHOW_PULSE_AVG";                             //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PULSE_AVG_DEFAULT      = true;
    static final String         STATE_SHOW_PULSE_AVG_MAX          = "STATE_SHOW_PULSE_AVG_MAX";                         //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PULSE_AVG_MAX_DEFAULT  = false;
    static final String         STATE_SHOW_SPEED_AVG              = "STATE_SHOW_SPEED_AVG";                             //$NON-NLS-1$
+   static final boolean        STATE_SHOW_SPEED_AVG_DEFAULT      = true;
 
 // SET_FORMATTING_OFF
 
@@ -1377,7 +1381,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Speed
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, STATE_SHOW_SPEED_AVG_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
@@ -1409,7 +1413,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Altimeter (VAM)
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, STATE_SHOW_ALTIMETER_AVG_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
@@ -1441,7 +1445,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Avg pulse
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG, STATE_SHOW_PULSE_AVG_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
@@ -1473,7 +1477,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Avg/max pulse
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, STATE_SHOW_PULSE_AVG_MAX_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(

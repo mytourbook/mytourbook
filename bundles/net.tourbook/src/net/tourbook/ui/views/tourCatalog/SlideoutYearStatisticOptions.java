@@ -15,6 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_ALTIMETER_AVG;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_ALTIMETER_AVG_DEFAULT;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_DEFAULT;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_MAX;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_MAX_DEFAULT;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_SPEED_AVG;
+import static net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View.STATE_SHOW_SPEED_AVG_DEFAULT;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
@@ -264,6 +272,7 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
       _chkShowAltimeter_Avg   .setSelection(true);
       _chkShowPulse_Avg       .setSelection(true);
       _chkShowPulse_AvgMax    .setSelection(false);
+
       _chkShowSpeed_Avg       .setSelection(true);
 
       _spinnerBarHeight       .setSelection(RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_DEFAULT);
@@ -279,10 +288,10 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 
 // SET_FORMATTING_OFF
 
-      _chkShowAltimeter_Avg   .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_ALTIMETER_AVG, true));
-      _chkShowPulse_Avg       .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG,     true));
-      _chkShowPulse_AvgMax    .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_MAX, false));
-      _chkShowSpeed_Avg       .setSelection(Util.getStateBoolean(_state, RefTour_YearStatistic_View.STATE_SHOW_SPEED_AVG,     true));
+      _chkShowAltimeter_Avg   .setSelection(Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, STATE_SHOW_ALTIMETER_AVG_DEFAULT));
+      _chkShowPulse_Avg       .setSelection(Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG,     STATE_SHOW_PULSE_AVG_DEFAULT));
+      _chkShowPulse_AvgMax    .setSelection(Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, STATE_SHOW_PULSE_AVG_MAX_DEFAULT));
+      _chkShowSpeed_Avg       .setSelection(Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG,     STATE_SHOW_SPEED_AVG_DEFAULT));
 
 // SET_FORMATTING_ON
 
@@ -299,10 +308,11 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 
 // SET_FORMATTING_OFF
 
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_ALTIMETER_AVG,   _chkShowAltimeter_Avg   .getSelection());
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_SPEED_AVG,       _chkShowSpeed_Avg       .getSelection());
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG,       _chkShowPulse_Avg       .getSelection());
-      _state.put(RefTour_YearStatistic_View.STATE_SHOW_PULSE_AVG_MAX,   _chkShowPulse_AvgMax    .getSelection());
+      _state.put(STATE_SHOW_ALTIMETER_AVG,   _chkShowAltimeter_Avg   .getSelection());
+      _state.put(STATE_SHOW_PULSE_AVG,       _chkShowPulse_Avg       .getSelection());
+      _state.put(STATE_SHOW_PULSE_AVG_MAX,   _chkShowPulse_AvgMax    .getSelection());
+      _state.put(STATE_SHOW_SPEED_AVG,       _chkShowSpeed_Avg       .getSelection());
+
       _state.put(RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT,  _spinnerBarHeight       .getSelection());
 
 // SET_FORMATTING_ON
