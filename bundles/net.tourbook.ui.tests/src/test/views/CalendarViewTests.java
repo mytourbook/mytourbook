@@ -29,7 +29,7 @@ public class CalendarViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       final SWTBotView calendarView = Utils.showView(bot, "Calendar"); //$NON-NLS-1$
 
-      bot.comboBox(0).setSelection("App : Classic"); //$NON-NLS-1$
+      bot.comboBox(2).setSelection("App : Classic"); //$NON-NLS-1$
 
       calendarView.close();
    }
