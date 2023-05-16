@@ -6167,7 +6167,7 @@ public class ChartComponentGraph extends Canvas {
       final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
       final int devYBottom = drawingData.getDevYBottom();
-//      final int devYBottom = drawingData.devGraphHeight;
+      final int devYTop = drawingData.getDevYTop();
 
       final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
@@ -6199,13 +6199,13 @@ public class ChartComponentGraph extends Canvas {
           * Current bar is selected, draw the selected bar
           */
 
-         final Rectangle barShapeSelected = new Rectangle(
+         final Rectangle barOutline_Selected = new Rectangle(
                (barRectangle.x - markerWidth2),
                (barRectangle.y - markerWidth2),
                (barRectangle.width + markerWidth),
                (barRectangle.height + markerWidth));
 
-         final Rectangle barBarSelected = new Rectangle(
+         final Rectangle barLine_Selected = new Rectangle(
                barRectangle.x - 1,
                barRectangle.y - barThickness,
                barRectangle.width + barThickness,
@@ -6220,13 +6220,8 @@ public class ChartComponentGraph extends Canvas {
          final Color colorDarkSelected = getColor(rgbDarkDef);
          final Color colorLineSelected = getColor(rgbLineDef);
 
-         // don't write into the x-axis units which also contains the selection marker
-         if (barShapeSelected.y + barShapeSelected.height > devYBottom) {
-            barShapeSelected.height = devYBottom - barShapeSelected.y;
-         }
-         if (barBarSelected.y + barBarSelected.height > devYBottom) {
-            barBarSelected.height = devYBottom - barBarSelected.y;
-         }
+         // don't write above the top or below the bottom of the graph canvas
+         gc.setClipping(0, devYTop, _clientArea.width, devYBottom - devYTop);
 
          // draw the selection darker when the focus is set
          if (_isFocusActive) {
@@ -6239,45 +6234,62 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorDarkSelected);
          gc.setBackground(colorBrightSelected);
 
-         if (barShapeSelected.height < 0) {
+         if (barOutline_Selected.y > devYBottom) {
 
-            // bar is below the x-axis, just draw a simple line
+            // bar is below the x-axis, just draw a thicker line
 
-            gc.setForeground(colorLineSelected);
-            gc.drawLine(
-                  barShapeSelected.x,
-                  devYBottom + 1,
-                  barShapeSelected.x + barShapeSelected.width,
-                  devYBottom + 1);
+            gc.setBackground(colorLineSelected);
+            gc.fillRectangle(
+                  barOutline_Selected.x,
+                  devYBottom - 4,
+                  barOutline_Selected.width,
+                  3);
+
+         } else if (barOutline_Selected.y + barOutline_Selected.height < devYTop) {
+
+            // bar is above the x-axis, just draw a thicker line
+
+            gc.setBackground(colorLineSelected);
+            gc.fillRectangle(
+                  barOutline_Selected.x,
+                  devYTop + 2,
+                  barOutline_Selected.width,
+                  3);
+
          } else {
 
+            // bar is in the visible clipping area
+
             gc.fillGradientRectangle(
-                  barShapeSelected.x + 1,
-                  barShapeSelected.y + 1,
-                  barShapeSelected.width - 1,
-                  barShapeSelected.height - 1,
+                  barOutline_Selected.x + 1,
+                  barOutline_Selected.y + 1,
+                  barOutline_Selected.width - 1,
+                  barOutline_Selected.height - 1,
                   true);
 
-            // draw bar border
+            // draw bar outline
             gc.setForeground(colorLineSelected);
             gc.drawRoundRectangle(
-                  barShapeSelected.x,
-                  barShapeSelected.y,
-                  barShapeSelected.width,
-                  barShapeSelected.height,
+                  barOutline_Selected.x,
+                  barOutline_Selected.y,
+                  barOutline_Selected.width,
+                  barOutline_Selected.height,
                   4,
                   4);
 
             // draw bar thicker
             gc.setBackground(colorDarkSelected);
             gc.fillRoundRectangle(
-                  barBarSelected.x,
-                  barBarSelected.y,
-                  barBarSelected.width,
-                  barBarSelected.height,
+                  barLine_Selected.x,
+                  barLine_Selected.y,
+                  barLine_Selected.width,
+                  barLine_Selected.height,
                   2,
                   2);
          }
+
+         // reset clipping
+         gc.setClipping((Rectangle) null);
 
          /*
           * Draw a marker below the x-axis to make the selection more visible
@@ -6335,15 +6347,18 @@ public class ChartComponentGraph extends Canvas {
          final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
          final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
-         final int devYBottom = drawingData.getDevYBottom();
-//         final int devYBottom = drawingData.devGraphHeight;
-
          final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
          if (barRectangeleSeries == null) {
             // this occurred
             continue;
          }
+
+         final int devYBottom = drawingData.getDevYBottom();
+         final int devYTop = drawingData.getDevYTop();
+
+         // do't write into the x-axis units which also contains the selection marker
+         gcOverlay.setClipping(0, devYTop, _clientArea.width, devYBottom - devYTop);
 
          final int markerWidth = BAR_MARKER_WIDTH;
          final int markerWidth2 = markerWidth / 2;
@@ -6381,12 +6396,6 @@ public class ChartComponentGraph extends Canvas {
                   (hoveredRectangle.width + markerWidth),
                   (hoveredRectangle.height + markerWidth));
 
-            // do't write into the x-axis units which also contains the
-            // selection marker
-            if (hoveredBarShape.y + hoveredBarShape.height > devYBottom) {
-               hoveredBarShape.height = devYBottom - hoveredBarShape.y;
-            }
-
             // fill bar background
             gcOverlay.setForeground(colorDark);
             gcOverlay.setBackground(colorBright);
@@ -6411,6 +6420,9 @@ public class ChartComponentGraph extends Canvas {
       }
 
       gcOverlay.setAlpha(0xff);
+
+      // reset clipping
+      gcOverlay.setClipping((Rectangle) null);
    }
 
    private void drawSync_460_HoveredLine(final GC gcOverlay) {
