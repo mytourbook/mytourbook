@@ -264,6 +264,24 @@ public class RefTour_YearStatistic_TooltipUI {
 
       {
          /*
+          * Avg Speed
+          */
+         createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
+
+         _lblAvgSpeed = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblAvgSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
+      }
+      {
+         /*
+          * Avg Altimeter (VAM)
+          */
+         createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgAltimeter);
+
+         _lblAvgAltimeter = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblAvgAltimeterUnit = createUI_LabelValue(parent, SWT.LEAD);
+      }
+      {
+         /*
           * Avg Pulse
           */
          createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPulse);
@@ -279,24 +297,6 @@ public class RefTour_YearStatistic_TooltipUI {
 
          _lblMaxPulse = createUI_LabelValue(parent, SWT.TRAIL);
          _lblMaxPulseUnit = createUI_LabelValue(parent, SWT.LEAD);
-      }
-      {
-         /*
-          * Avg Speed
-          */
-         createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
-
-         _lblAvgSpeed = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblAvgSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
-      }
-      {
-         /*
-          * Avg Altimeter (VAM)
-          */
-         createUI_Label(parent, Messages.ColumnFactory_Motion_Altimeter);
-
-         _lblAvgAltimeter = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblAvgAltimeterUnit = createUI_LabelValue(parent, SWT.LEAD);
       }
    }
 
