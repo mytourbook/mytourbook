@@ -10179,6 +10179,7 @@ public class ChartComponentGraph extends Canvas {
 
          // compute only value point labels
 
+         final int numLabels = allValuePointLabels.size();
          int labelIndex = 0;
 
          if (allTopLabels != null) {
@@ -10186,7 +10187,7 @@ public class ChartComponentGraph extends Canvas {
             for (final ChartXSliderLabel topLabel : allTopLabels) {
 
                // fixed java.lang.IndexOutOfBoundsException
-               if (labelIndex >= allValuePointLabels.size()) {
+               if (labelIndex >= numLabels) {
                   break;
                }
 
@@ -10213,6 +10214,11 @@ public class ChartComponentGraph extends Canvas {
             labelIndex = 0;
 
             for (final ChartXSliderLabel topLabel : allBottomLabels) {
+
+               // fixed java.lang.IndexOutOfBoundsException
+               if (labelIndex >= numLabels) {
+                  break;
+               }
 
                final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
 
