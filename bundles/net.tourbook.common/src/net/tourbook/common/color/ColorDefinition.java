@@ -358,29 +358,6 @@ public class ColorDefinition {
    }
 
    /**
-    * Log RGB values as Java code:
-    * <p>
-    * <code>
-    *  new RGB(0x5B, 0x5B, 0x5B),
-    * </code>
-    *
-    * @param rgb
-    * @return
-    */
-   private String logRGB(final RGB rgb) {
-
-      if (rgb == null) {
-         return "null"; //$NON-NLS-1$
-      }
-
-      return "new RGB(" //$NON-NLS-1$
-            + "0x" + Integer.toHexString(rgb.red) + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "0x" + Integer.toHexString(rgb.green) + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "0x" + Integer.toHexString(rgb.blue) //$NON-NLS-1$
-            + "),"; //$NON-NLS-1$
-   }
-
-   /**
     * Set color items for this color definition, the color items are children in the tree.
     *
     * @param children
@@ -458,14 +435,14 @@ public class ColorDefinition {
 
             + "_colorDefinitionId = " + _colorDefinitionId  + NL + NL //$NON-NLS-1$
 
-            + logRGB(_gradientBright_New)    + NL
-            + logRGB(_gradientDark_New)      + NL
+            + UI.logRGB(_gradientBright_New)    + NL
+            + UI.logRGB(_gradientDark_New)      + NL
 
-            + logRGB(_lineColor_New_LightTheme)   + NL
-            + logRGB(_lineColor_New_DarkTheme)    + NL
+            + UI.logRGB(_lineColor_New_LightTheme)   + NL
+            + UI.logRGB(_lineColor_New_DarkTheme)    + NL
 
-            + logRGB(_textColor_New_LightTheme)   + NL
-            + logRGB(_textColor_New_DarkTheme)    + NL
+            + UI.logRGB(_textColor_New_LightTheme)   + NL
+            + UI.logRGB(_textColor_New_DarkTheme)    + NL
 
       ;
 // SET_FORMATTING_ON

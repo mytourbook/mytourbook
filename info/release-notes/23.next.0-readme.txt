@@ -35,13 +35,14 @@ New
 Improvements
 ============
 
-* 
+* Categorized View Colors
+  - Colors can be set for bright and dark theme
 
 
 Changes
 =======
 
-* 
+* Colors for the categorized views, e.g. tag categoy color in the tagging view are reset
 
 
 Bugfix

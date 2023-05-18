@@ -818,7 +818,6 @@ public class UI {
             .toFormatter();
 
    }
-
    /**
     * Number of horizontal dialog units per character, value <code>4</code>.
     */
@@ -1997,6 +1996,29 @@ public class UI {
       }
 
       return isShiftKey;
+   }
+
+   /**
+    * Log RGB values as Java code:
+    * <p>
+    * <code>
+    *  new RGB(0x5B, 0x5B, 0x5B),
+    * </code>
+    *
+    * @param rgb
+    * @return
+    */
+   public static String logRGB(final RGB rgb) {
+
+      if (rgb == null) {
+         return "null"; //$NON-NLS-1$
+      }
+
+      return "new RGB(" //$NON-NLS-1$
+            + "0x" + Integer.toHexString(rgb.red) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "0x" + Integer.toHexString(rgb.green) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "0x" + Integer.toHexString(rgb.blue) //$NON-NLS-1$
+            + "),"; //$NON-NLS-1$
    }
 
    public static String nanoTime(final int nanoValue) {

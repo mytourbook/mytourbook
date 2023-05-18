@@ -131,7 +131,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
    static {
 
-      DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
+      DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY, null);
    }
 
    private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();

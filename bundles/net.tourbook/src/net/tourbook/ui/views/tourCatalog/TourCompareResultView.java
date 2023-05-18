@@ -171,7 +171,7 @@ public class TourCompareResultView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-   private Color    _titleColor = JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE);
+   private Color    _titleColor = JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
 
 // SET_FORMATTING_ON
 
@@ -555,7 +555,7 @@ public class TourCompareResultView extends ViewPart implements
 
                _tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-               _titleColor = JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE);
+               _titleColor = JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
 
                _tourViewer.refresh();
 
