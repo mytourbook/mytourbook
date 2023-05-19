@@ -128,9 +128,24 @@ public class UI {
    public static final String            GRAPH_SPEED                     = "GRAPH_SPEED";                     //$NON-NLS-1$
    public static final String            GRAPH_TEMPERATURE               = "GRAPH_TEMPERATURE";               //$NON-NLS-1$
 
+   /**
+    * Content category e.g. tag category
+    */
    public static final String            VIEW_COLOR_CONTENT_CATEGORY     = "VIEW_COLOR_CONTENT_CATEGORY";     //$NON-NLS-1$
+
+   /**
+    * Cntent subcategory e.g. tag
+    */
    public static final String            VIEW_COLOR_CONTENT_SUB_CATEGORY = "VIEW_COLOR_CONTENT_SUB_CATEGORY"; //$NON-NLS-1$
+
+   /**
+    * Date category e.g. year
+    */
    public static final String            VIEW_COLOR_DATE_CATEGORY        = "VIEW_COLOR_DATE_CATEGORY";        //$NON-NLS-1$
+
+   /**
+    * Date subcategory, e.g. month
+    */
    public static final String            VIEW_COLOR_DATE_SUB_CATEGORY    = "VIEW_COLOR_DATE_SUB_CATEGORY";    //$NON-NLS-1$
 
    public static final String            SYMBOL_AVERAGE                  = "\u00f8";                          //$NON-NLS-1$

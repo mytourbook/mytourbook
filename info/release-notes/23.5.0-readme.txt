@@ -72,6 +72,9 @@ Improvements
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
 
+* Categorized View Colors
+  - Colors can be set for bright and dark theme
+
 
 Changes
 =======
@@ -82,6 +85,9 @@ Changes
 * Changed Wording 
   - The words "pulse" or "heartbeat" are replaced with "heart rate"
     https://github.com/mytourbook/mytourbook/discussions/1089  
+
+* Categorized Views Colors
+  - These colors are reset to the new default values, e.g. tag category color in the tagging view
 
 
 Bugfix
