@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
@@ -119,15 +120,15 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
          {
             UI.createSpacer_Horizontal(group, 1);
 
-            final Label labelBright = UI.createLabel(group, "Bright");
+            final Label labelBright = UI.createLabel(group, OtherMessages.APP_THEME_BRIGHT_THEME);
+            labelBright.setToolTipText(OtherMessages.APP_THEME_BRIGHT_THEME_TOOLTIP);
             GridDataFactory.fillDefaults()
-//                  .grab(true, false)
                   .align(SWT.CENTER, SWT.FILL)
                   .applyTo(labelBright);
 
-            final Label labelDark = UI.createLabel(group, "Dark");
+            final Label labelDark = UI.createLabel(group, OtherMessages.APP_THEME_DARK_THEME);
+            labelDark.setToolTipText(OtherMessages.APP_THEME_DARK_THEME_TOOLTIP);
             GridDataFactory.fillDefaults()
-//            .grab(true, false)
                   .align(SWT.CENTER, SWT.FILL)
                   .applyTo(labelDark);
          }
