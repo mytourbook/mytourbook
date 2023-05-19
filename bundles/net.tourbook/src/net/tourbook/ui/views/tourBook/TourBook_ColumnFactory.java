@@ -37,7 +37,6 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
-import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
@@ -49,7 +48,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.swt.graphics.Image;
 
 class TourBook_ColumnFactory {
 
@@ -78,6 +76,8 @@ class TourBook_ColumnFactory {
    private ColumnManager        _columnManager_Tree;
 
    private TreeColumnDefinition _colDef_TimeZoneOffset_Tree;
+   private TreeColumnDefinition _colDef_TourTypeImage_Tree;
+   private TreeColumnDefinition _colDef_WeatherClouds_Tree;
 
    private boolean              _isShowSummaryRow;
 
@@ -3323,25 +3323,15 @@ class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager_Tree, _pc);
-      colDef_Tree.setIsDefaultColumn();
-      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+      _colDef_TourTypeImage_Tree = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager_Tree, _pc);
+      _colDef_TourTypeImage_Tree.setIsDefaultColumn();
+
+      _colDef_TourTypeImage_Tree.setLabelProvider(new CellLabelProvider() {
+
+         // !!! When using cell.setImage() then it is not centered !!!
+         // !!! Set dummy label provider, otherwise an error occures !!!
          @Override
-         public void update(final ViewerCell cell) {
-            final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
-
-               final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
-
-               /*
-                * when a tour type image is modified, it will keep the same image resource only the
-                * content is modified but in the rawDataView the modified image is not displayed
-                * compared with the tourBookView which displays the correct image
-                */
-               cell.setImage(tourTypeImage);
-            }
-         }
+         public void update(final ViewerCell cell) {}
       });
    }
 
@@ -3627,28 +3617,15 @@ class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager_Tree, _pc);
-      colDef_Tree.setIsDefaultColumn();
-      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+      _colDef_WeatherClouds_Tree = TreeColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager_Tree, _pc);
+      _colDef_WeatherClouds_Tree.setIsDefaultColumn();
+
+      _colDef_WeatherClouds_Tree.setLabelProvider(new CellLabelProvider() {
+
+         // !!! When using cell.setImage() then it is not centered !!!
+         // !!! Set dummy label provider, otherwise an error occures !!!
          @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final String windClouds = ((TVITourBookItem) element).colClouds;
-
-            if (windClouds == null) {
-               cell.setText(UI.EMPTY_STRING);
-            } else {
-               final Image img = net.tourbook.common.UI.IMAGE_REGISTRY.get(windClouds);
-               if (img != null) {
-                  cell.setImage(img);
-               } else {
-                  cell.setText(windClouds);
-               }
-            }
-
-            setCellColor(cell, element);
-         }
+         public void update(final ViewerCell cell) {}
       });
    }
 
@@ -4036,6 +4013,14 @@ class TourBook_ColumnFactory {
 
    ColumnDefinition getColDef_TimeZoneOffset_Tree() {
       return _colDef_TimeZoneOffset_Tree;
+   }
+
+   TreeColumnDefinition getColDef_TourTypeImage_Tree() {
+      return _colDef_TourTypeImage_Tree;
+   }
+
+   TreeColumnDefinition getColDef_WeatherClouds_Tree() {
+      return _colDef_WeatherClouds_Tree;
    }
 
    private float getTemperature_Average_Combined(final Object element) {
