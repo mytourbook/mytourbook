@@ -7310,19 +7310,22 @@ public class ChartComponentGraph extends Canvas {
     * @param xxDevSliderLinePos
     *           x coordinate for the slider line within the graph, this can be outside of the
     *           visible graph
+    * @return Returns <code>true</code> when the slider position has changed
     */
-   private void moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
+   private boolean moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
 
       long xxDevSliderLinePos = _xxDevViewPortLeftBorder + devXSliderLinePos;
 
       /*
-       * adjust the line position the the min/max width of the graph image
+       * Adjust the line position the the min/max width of the graph image
        */
       xxDevSliderLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevSliderLinePos));
 
       // set new slider line position
-      setXSliderValue_FromHoveredValuePoint(xSlider);
+      final boolean isSliderPositionModified = setXSliderValue_FromHoveredValuePoint(xSlider);
       xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true, false);
+
+      return isSliderPositionModified;
    }
 
    /**
@@ -7926,6 +7929,7 @@ public class ChartComponentGraph extends Canvas {
 
       boolean isRedraw = false;
       boolean canShowHoveredValueTooltip = false;
+      boolean isSliderPositionModified = false;
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -7967,7 +7971,7 @@ public class ChartComponentGraph extends Canvas {
             // autoscroll could be active, disable it
             _isAutoScroll = false;
 
-            moveXSlider(_xSliderDragged, devXMouse);
+            isSliderPositionModified = moveXSlider(_xSliderDragged, devXMouse);
 
             _isSliderDirty = true;
             isRedraw = true;
@@ -8109,7 +8113,16 @@ public class ChartComponentGraph extends Canvas {
       setHoveredLineValue();
 
       // fire event for the current hovered value point
-      if (_hoveredValuePointIndex != -1) {
+      if (_hoveredValuePointIndex != -1
+
+            /*
+             * This reduces flickering when the slider is dragged, it's not prefect but better and
+             * it depends on the zoom level in the map and chart
+             */
+            && (isSliderPositionModified || _isSliderDirty == false)
+
+      ) {
+
          _chart.fireEvent_HoveredValue(_hoveredValuePointIndex);
       }
 
@@ -9510,20 +9523,21 @@ public class ChartComponentGraph extends Canvas {
     * Set the value index in the X-slider for the hovered position.
     *
     * @param xSlider
+    * @return Returns <code>true</code> when the slider position has changed
     */
-   void setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
+   boolean setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
 
       final ChartDataXSerie xData = getXData();
 
       if (xData == null) {
-         return;
+         return false;
       }
 
       final double[][] xValueSerie = xData.getHighValuesDouble();
 
       if (xValueSerie.length == 0) {
          // data are not available
-         return;
+         return false;
       }
 
       final double[] xDataValues = xValueSerie[0];
@@ -9532,10 +9546,12 @@ public class ChartComponentGraph extends Canvas {
 
          // this happens when a new tour is displayed
 
-         return;
+         return false;
       }
 
-      xSlider.setValueIndex(_hoveredValuePointIndex);
+      final boolean isValueModified = xSlider.setValueIndex(_hoveredValuePointIndex);
+
+      return isValueModified;
    }
 
    /**
