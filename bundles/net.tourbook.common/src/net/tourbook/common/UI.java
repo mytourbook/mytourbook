@@ -2122,6 +2122,22 @@ public class UI {
       }
    }
 
+   public static void paintImageCentered(final Event event, final Image image, final int availableWidth) {
+
+      final Rectangle imageRect = image.getBounds();
+
+      // center horizontal
+      final int xOffset = (availableWidth - imageRect.width) / 2;
+
+      // center vertical
+      final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+
+      final int devX = event.x + xOffset;
+      final int devY = event.y + yOffset;
+
+      event.gc.drawImage(image, devX, devY);
+   }
+
    public static String replaceHTML_BackSlash(final String filePath) {
 
       return filePath.replace(
@@ -2623,7 +2639,6 @@ public class UI {
       IS_DARK_THEME = isDarkThemeSelected;
       IS_BRIGHT_THEME = isDarkThemeSelected == false;
    }
-
 
    /**
     * Set the themed image descriptor for a {@link UIElement} with images from the

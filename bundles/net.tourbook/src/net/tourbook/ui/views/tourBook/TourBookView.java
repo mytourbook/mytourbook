@@ -199,7 +199,6 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -2751,7 +2750,7 @@ public class TourBookView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            paintImageCentered(event, image, _columnWidth_ForColumn_TourTypeImage);
+            UI.paintImageCentered(event, image, _columnWidth_ForColumn_TourTypeImage);
          }
       }
    }
@@ -2782,7 +2781,7 @@ public class TourBookView extends ViewPart implements
 
             } else {
 
-               paintImageCentered(event, image, _columnWidth_ForColumn_WeatherClouds);
+               UI.paintImageCentered(event, image, _columnWidth_ForColumn_WeatherClouds);
             }
          }
       }
@@ -3032,21 +3031,7 @@ public class TourBookView extends ViewPart implements
       }
    }
 
-   private void paintImageCentered(final Event event, final Image image, final int columnWidth) {
 
-      final Rectangle imageRect = image.getBounds();
-
-      // center horizontal
-      final int xOffset = (columnWidth - imageRect.width) / 2;
-
-      // center vertical
-      final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
-
-      final int devX = event.x + xOffset;
-      final int devY = event.y + yOffset;
-
-      event.gc.drawImage(image, devX, devY);
-   }
 
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
