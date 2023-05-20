@@ -302,10 +302,10 @@ public class TourBookView extends ViewPart implements
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                             _columnIndex_ForColumn_TourTypeImage = -1;
-   private int                             _columnIndex_ForColumn_WeatherClouds = -1;
-   private int                             _columnWidth_ForColumn_TourTypeImage;
-   private int                             _columnWidth_ForColumn_WeatherClouds;
+   private int                             _columnIndex_TourTypeImage          = -1;
+   private int                             _columnIndex_WeatherClouds          = -1;
+   private int                             _columnWidth_TourTypeImage;
+   private int                             _columnWidth_WeatherClouds;
    //
    private NatTable                        _tourViewer_NatTable;
    private NatTable_DummyColumnViewer      _natTable_DummyColumnViewer;
@@ -1755,20 +1755,20 @@ public class TourBookView extends ViewPart implements
 
       // update column index which is needed for repainting
       final ColumnProfile activeProfile = _columnManager_Tree.getActiveProfile();
-      _columnIndex_ForColumn_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage_Tree.getColumnId());
-      _columnIndex_ForColumn_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds_Tree.getColumnId());
+      _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage_Tree.getColumnId());
+      _columnIndex_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds_Tree.getColumnId());
 
       // add column resize listener
-      if (_columnIndex_ForColumn_TourTypeImage >= 0) {
+      if (_columnIndex_TourTypeImage >= 0) {
 
          isColumnVisible = true;
-         tree.getColumn(_columnIndex_ForColumn_TourTypeImage).addControlListener(controlResizedAdapter);
+         tree.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
       }
 
-      if (_columnIndex_ForColumn_WeatherClouds >= 0) {
+      if (_columnIndex_WeatherClouds >= 0) {
 
          isColumnVisible = true;
-         tree.getColumn(_columnIndex_ForColumn_WeatherClouds).addControlListener(controlResizedAdapter);
+         tree.getColumn(_columnIndex_WeatherClouds).addControlListener(controlResizedAdapter);
       }
 
       // add tree resize listener
@@ -2727,11 +2727,11 @@ public class TourBookView extends ViewPart implements
 
       final int columnIndex = event.index;
 
-      if (columnIndex == _columnIndex_ForColumn_TourTypeImage) {
+      if (columnIndex == _columnIndex_TourTypeImage) {
 
          onPaint_TreeViewer_TourTypeImage(event);
 
-      } else if (columnIndex == _columnIndex_ForColumn_WeatherClouds) {
+      } else if (columnIndex == _columnIndex_WeatherClouds) {
 
          onPaint_TreeViewer_WeatherClouds(event);
       }
@@ -2750,7 +2750,7 @@ public class TourBookView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            UI.paintImageCentered(event, image, _columnWidth_ForColumn_TourTypeImage);
+            UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
          }
       }
    }
@@ -2781,7 +2781,7 @@ public class TourBookView extends ViewPart implements
 
             } else {
 
-               UI.paintImageCentered(event, image, _columnWidth_ForColumn_WeatherClouds);
+               UI.paintImageCentered(event, image, _columnWidth_WeatherClouds);
             }
          }
       }
@@ -2795,7 +2795,7 @@ public class TourBookView extends ViewPart implements
 
          if (treeColumn != null && treeColumn.isDisposed() == false) {
 
-            _columnWidth_ForColumn_TourTypeImage = treeColumn.getWidth();
+            _columnWidth_TourTypeImage = treeColumn.getWidth();
          }
       }
 
@@ -2805,7 +2805,7 @@ public class TourBookView extends ViewPart implements
 
          if (treeColumn != null && treeColumn.isDisposed() == false) {
 
-            _columnWidth_ForColumn_WeatherClouds = treeColumn.getWidth();
+            _columnWidth_WeatherClouds = treeColumn.getWidth();
          }
       }
    }
