@@ -160,7 +160,6 @@ import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.painter.cell.BackgroundPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
-import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.reorder.event.ColumnReorderEvent;
@@ -618,7 +617,7 @@ public class TourBookView extends ViewPart implements
       @Override
       public void configureRegistry(final IConfigRegistry configRegistry) {
 
-         final ImagePainter decoratorCellPainter = new ImagePainter() {
+         final ImagePainter imagePainter = new ImagePainter() {
 
             @Override
             protected Image getImage(final ILayerCell cell, final IConfigRegistry configRegistry) {
@@ -649,7 +648,7 @@ public class TourBookView extends ViewPart implements
          configRegistry.registerConfigAttribute(
 
                CellConfigAttributes.CELL_PAINTER,
-               new CellPainterDecorator(null, CellEdgeEnum.LEFT, decoratorCellPainter),
+               imagePainter,
                DisplayMode.NORMAL,
                TableColumnFactory.TOUR_TYPE_ID);
       }
@@ -667,7 +666,7 @@ public class TourBookView extends ViewPart implements
       @Override
       public void configureRegistry(final IConfigRegistry configRegistry) {
 
-         final ImagePainter decoratorCellPainter = new ImagePainter() {
+         final ImagePainter imagePainter = new ImagePainter() {
 
             @Override
             protected Image getImage(final ILayerCell cell, final IConfigRegistry configRegistry) {
@@ -698,8 +697,9 @@ public class TourBookView extends ViewPart implements
          };
 
          configRegistry.registerConfigAttribute(
+
                CellConfigAttributes.CELL_PAINTER,
-               new CellPainterDecorator(null, CellEdgeEnum.LEFT, decoratorCellPainter),
+               imagePainter,
                DisplayMode.NORMAL,
                TableColumnFactory.WEATHER_CLOUDS_ID);
       }
@@ -720,42 +720,28 @@ public class TourBookView extends ViewPart implements
          // loop: all displayed columns
          for (final ColumnDefinition colDef : _allSortedColumns) {
 
+            // setup style for body + header
+
+            Style style = new Style();
+            style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT,
+                  convertColumnAlignment(colDef.getColumnStyle()));
+
+            // apply style:
+
             final String columnId = colDef.getColumnId();
 
-            switch (columnId) {
+            // body style
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
+                  style,
+                  DisplayMode.NORMAL,
+                  columnId);
 
-            case TableColumnFactory.TOUR_TYPE_ID:
-            case TableColumnFactory.WEATHER_CLOUDS_ID:
-
-               // images are displayed for these columns -> do not set a style
-               break;
-
-            default:
-
-               Style style;
-
-               final HorizontalAlignmentEnum columnAlignment = natTableConvert_ColumnAlignment(colDef.getColumnStyle());
-
-               // setup style for body+header
-               style = new Style();
-               style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, columnAlignment);
-
-               // apply style:
-
-               // body style
-               configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
-                     style,
-                     DisplayMode.NORMAL,
-                     columnId);
-
-               // clone header style
-               style = new Style(style);
-               configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
-                     style,
-                     DisplayMode.NORMAL,
-                     columnId + HEADER_COLUMN_ID_POSTFIX);
-               break;
-            }
+            // clone header style
+            style = new Style(style);
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
+                  style,
+                  DisplayMode.NORMAL,
+                  columnId + HEADER_COLUMN_ID_POSTFIX);
          }
       }
 
@@ -765,7 +751,7 @@ public class TourBookView extends ViewPart implements
        * @param columnStyle
        * @return
        */
-      private HorizontalAlignmentEnum natTableConvert_ColumnAlignment(final int columnStyle) {
+      private HorizontalAlignmentEnum convertColumnAlignment(final int columnStyle) {
 
          switch (columnStyle) {
 
@@ -2782,7 +2768,7 @@ public class TourBookView extends ViewPart implements
          final String weatherClouds = tviTourBookTour.colClouds;
          if (weatherClouds == null) {
 
-            // nothing is painted
+            // paint nothing
 
          } else {
 
@@ -2790,7 +2776,9 @@ public class TourBookView extends ViewPart implements
 
             if (image == null) {
 
-               cell.setText(weatherClouds);
+               // paint text left aligned
+
+               event.gc.drawText(weatherClouds, event.x, event.y, false);
 
             } else {
 
@@ -3588,7 +3576,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3606,13 +3594,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 
