@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
+
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -39,6 +41,7 @@ import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -48,7 +51,6 @@ import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -95,6 +97,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -187,8 +190,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private int                            _lastSelectionHash;
 
-   private AtomicInteger                  _workedTours             = new AtomicInteger();
-   private AtomicInteger                  _runningId               = new AtomicInteger();
+   private AtomicInteger                  _workedTours               = new AtomicInteger();
+   private AtomicInteger                  _runningId                 = new AtomicInteger();
 
    private long                           _workerExecutorId;
 
@@ -198,7 +201,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /**
     * Comparer items from the last comparison
     */
-   private ArrayList<GeoPartComparerItem> _comparedTours           = new ArrayList<>();
+   private ArrayList<GeoPartComparerItem> _comparedTours             = new ArrayList<>();
 
    private GeoPartComparerItem            _selectedComparerItem;
 
@@ -210,7 +213,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private GeoPartItem                    _compareData_PreviousGeoPartItem;
    private long                           _compareData_RefId;
    private TourData                       _compareData_TourData;
-   private long                           _compareData_TourId      = Long.MIN_VALUE;
+   private long                           _compareData_TourId        = Long.MIN_VALUE;
    private String                         _compareData_TourTitle;
    //
    private int                            _lastCompare_DistanceInterval;
@@ -224,7 +227,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private TableViewer                    _geoPartViewer;
    private ColumnManager                  _columnManager;
-   private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
+   private CompareResultComparator        _geoPartComparator         = new CompareResultComparator();
+
+   private TableColumnDefinition          _colDef_TourTypeImage;
+   private int                            _columnIndex_TourTypeImage = -1;
+   private int                            _columnWidth_TourTypeImage;
 
    private boolean                        _isGeoRelativeDifferencesFilter;
    private int                            _distanceInterval;
@@ -232,9 +239,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private int                            _geoRelativeDifferencesFilter;
    private long                           _maxMinDiff;
 
-   private OpenDialogManager              _openDlgMgr              = new OpenDialogManager();
+   private OpenDialogManager              _openDlgMgr                = new OpenDialogManager();
    private SlideoutGeoCompareOptions      _slideoutGeoCompareOptions;
-   private GeoCompareState                _slideoutGeoCompareState = new GeoCompareState();
+   private GeoCompareState                _slideoutGeoCompareState   = new GeoCompareState();
 
    private PixelConverter                 _pc;
 
@@ -242,7 +249,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private ActionOnOff                    _actionOnOff;
    private ActionGeoCompareOptions        _actionGeoCompareOptions;
 
-   private final NumberFormat             _nf1                     = NumberFormat.getInstance();
+   private final NumberFormat             _nf1                       = NumberFormat.getInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -773,7 +780,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       updateUI_Viewer();
 
       updateUI_State_Progress(-1, -1);
-      updateUI_HideFalsePositive();
 
       _compareData_TourTitle = TourManager.getTourTitleDetailed(_compareData_TourData);
 
@@ -1025,53 +1031,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // make sure the selection is visible
       _geoPartViewer.getTable().showSelection();
-
-      updateUI_HideFalsePositive();
    }
-
-//   /**
-//    * @param tourData
-//    * @return Returns <code>true</code> when tour comparing could be started, otherwise
-//    *         <code>false</code>
-//    */
-//   private boolean compareWholeTour() {//final TourData tourData) {
-//
-//      // is currently disabled because it is slowing down
-//      return false;
-//
-//		if (tourData == null) {
-//			return false;
-//		}
-//
-//		// skip manual tours
-//		if (tourData.isManualTour()) {
-//			return false;
-//		}
-//
-//		// compare the whole tour from 0 to max time slices
-//		final int numTimeSlices = tourData.timeSerie.length - 1;
-//		if (numTimeSlices < 1) {
-//			return false;
-//		}
-//
-//		/*
-//		 * Convert real ref tour into a geo compare ref tour that the behaviour is the same, however
-//		 * this will disable features in the tour compare chart but this is already very complex.
-//		 */
-//
-//		final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
-//				tourData,
-//				0,
-//				numTimeSlices);
-//
-//		compare_10_Compare(
-//				tourData,
-//				0,
-//				numTimeSlices,
-//				geoCompareRefId);
-//
-//		return true;
-//   }
 
    private void createActions() {
 
@@ -1306,69 +1266,49 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          public void keyReleased(final KeyEvent e) {}
       });
 
-      updateUI_SetSortDirection(//
+      updateUI_SetSortDirection(
             _geoPartComparator.__sortColumnId,
             _geoPartComparator.__sortDirection);
 
+      createUI_81_ColumnImages(table);
       createUI_82_ContextMenu();
    }
 
-//	private void createUI_50_HideFalsePositive(final Composite parent) {
-//
-//		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//				onChange_HideFalsePositive();
-//			}
-//		};
-//
-//		/*
-//		 * Hide false positive tours
-//		 */
-//		{
-//			/*
-//			 * Checkbox: live update
-//			 */
-//			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
-//			_chkHideFalsePositive.setText("&Hide false positive");
-//			_chkHideFalsePositive.setToolTipText(
-//					"Hide tours which are found but do not contain the requested tour part");
-//			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
-//		}
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory
-//				.fillDefaults()
-//				.grab(true, false)
-//				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
-//				.applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		{
-//			{
-//				/*
-//				 * Scale: False positive in %
-//				 */
-//				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
-//				_scaleHideFalsePositive.setIncrement(1);
-//				_scaleHideFalsePositive.setPageIncrement(10);
-//				_scaleHideFalsePositive.setMinimum(1);
-//				_scaleHideFalsePositive.setMaximum(100);
-//				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
-//			}
-//			{
-//				/*
-//				 * Label: %
-//				 */
-//				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
-//				GridDataFactory
-//						.fillDefaults()
-//						.align(SWT.FILL, SWT.CENTER)
-//						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-//						.applyTo(_lblHideFalsePositiveValue);
-//			}
-//		}
-//	}
+   private void createUI_81_ColumnImages(final Table table) {
+
+      boolean isColumnVisible = false;
+      final ControlListener controlResizedAdapter = controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage.getColumnId());
+
+      // add column resize listener
+      if (_columnIndex_TourTypeImage >= 0) {
+
+         isColumnVisible = true;
+         table.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
+      }
+
+      // add table resize listener
+      if (isColumnVisible) {
+
+         /*
+          * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+          * critical for performance that these methods be as efficient as possible.
+          */
+         final Listener paintListener = event -> {
+
+            if (event.type == SWT.PaintItem) {
+
+               onPaintViewer(event);
+            }
+         };
+
+         table.addControlListener(controlResizedAdapter);
+         table.addListener(SWT.PaintItem, paintListener);
+      }
+   }
 
    /**
     * Create the view context menus
@@ -1399,10 +1339,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       defineColumn_Tour_Type();
       defineColumn_Tour_Title();
-
-//		defineColumn_80_StartIndex();
-//		defineColumn_82_EndIndex();
-//		defineColumn_84_IndexDiff();
    }
 
    private void defineColumn_00_SequenceNumber() {
@@ -1750,26 +1686,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Tour_Type() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+      _colDef_TourTypeImage = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+      _colDef_TourTypeImage.setIsDefaultColumn();
+      _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
 
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
+         // !!! When using cell.setImage() then it is not centered !!!
+         // !!! Set dummy label provider, otherwise an error occures !!!
          @Override
-         public void update(final ViewerCell cell) {
-
-            final TourType tourType = ((GeoPartComparerItem) cell.getElement()).tourType;
-
-            if (tourType == null) {
-               cell.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
-            } else {
-
-               final long tourTypeId = tourType.getTypeId();
-               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
-
-               cell.setImage(tourTypeImage);
-            }
-         }
+         public void update(final ViewerCell cell) {}
       });
    }
 
@@ -1787,75 +1711,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       super.dispose();
    }
-
-//	/**
-//	 * Column: Start index
-//	 */
-//	private void defineColumn_80_StartIndex() {
-//
-//		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "startIndex", SWT.TRAIL);
-//
-//		colDef.setColumnLabel("Start Idx");
-//		colDef.setColumnHeaderText("Start Idx");
-//
-//		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-//
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//
-//				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-//
-//				cell.setText(Integer.toString(item.tourFirstIndex));
-//			}
-//		});
-//	}
-//
-//	/**
-//	 * Column: End index
-//	 */
-//	private void defineColumn_82_EndIndex() {
-//
-//		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "endIndex", SWT.TRAIL);
-//
-//		colDef.setColumnLabel("End Idx");
-//		colDef.setColumnHeaderText("End Idx");
-//
-//		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-//
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//
-//				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-//
-//				cell.setText(Integer.toString(item.tourLastIndex));
-//			}
-//		});
-//	}
-//
-//	/**
-//	 * Column: End index
-//	 */
-//	private void defineColumn_84_IndexDiff() {
-//
-//		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "indexDiff", SWT.TRAIL); //$NON-NLS-1$
-//
-//		colDef.setColumnLabel(Messages.GeoCompare_View_Column_IndexDiff);
-//		colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_IndexDiff);
-//
-//		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-//
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//
-//				final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-//
-//				cell.setText(Integer.toString(item.tourLastIndex - item.tourFirstIndex));
-//			}
-//		});
-//	}
 
    private void enableControls() {
 
@@ -1876,17 +1731,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       tbm.update(true);
    }
-
-//	private void enableControls_HideFalsePositive() {
-//
-//		final boolean isHideFalsePositive = _chkHideFalsePositive.getSelection();
-//		final boolean isShowHideFalsePositive = isHideFalsePositive && _isComparingDone;
-//
-//		_chkHideFalsePositive.setEnabled(_isComparingDone);
-//
-//		_lblHideFalsePositiveValue.setEnabled(isShowHideFalsePositive);
-//		_scaleHideFalsePositive.setEnabled(isShowHideFalsePositive);
-//	}
 
    private void fireSelection(final ISelection selection) {
 
@@ -2063,16 +1907,57 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-//	private void onChange_HideFalsePositive() {
-//
-//		enableControls_HideFalsePositive();
-//		updateUI_HideFalsePositive();
-//	}
-
    private void onGeoPart_Select() {
 
       if (_isInUpdate) {
          return;
+      }
+   }
+
+   private void onPaintViewer(final Event event) {
+
+      // paint column image
+
+      final int columnIndex = event.index;
+
+      if (columnIndex == _columnIndex_TourTypeImage) {
+
+         onPaintViewer_TourTypeImage(event);
+      }
+   }
+
+   private void onPaintViewer_TourTypeImage(final Event event) {
+
+      final Object itemData = event.item.getData();
+
+      if (itemData instanceof GeoPartComparerItem) {
+
+         final GeoPartComparerItem compareItem = (GeoPartComparerItem) itemData;
+         final TourType tourType = compareItem.tourType;
+
+         if (tourType != null) {
+
+            final long tourTypeId = tourType.getTypeId();
+            final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
+
+            if (image != null) {
+
+               UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
+            }
+         }
+      }
+   }
+
+   private void onResize_SetWidthForImageColumn() {
+
+      if (_colDef_TourTypeImage != null) {
+
+         final TableColumn tableColumn = _colDef_TourTypeImage.getTableColumn();
+
+         if (tableColumn != null && tableColumn.isDisposed() == false) {
+
+            _columnWidth_TourTypeImage = tableColumn.getWidth();
+         }
       }
    }
 
@@ -2477,18 +2362,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _slideoutGeoCompareOptions.updateUI_StateValues(_slideoutGeoCompareState);
       updateUI_StateValues();
-   }
-
-   private void updateUI_HideFalsePositive() {
-
-//		enableControls_HideFalsePositive();
-//
-//		if (_isComparingDone) {
-//
-//			final int hidePosValue = _scaleHideFalsePositive.getSelection();
-//
-//			_lblHideFalsePositiveValue.setText(Integer.toString(hidePosValue));
-//		}
    }
 
    /**

@@ -1549,8 +1549,7 @@ public class TourCatalogView extends ViewPart implements
 
    private void onPaint_TreeViewer_TourTypeImage(final Event event) {
 
-      final TreeItem item = (TreeItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
 
       if (itemData instanceof TVICatalogComparedTour) {
 

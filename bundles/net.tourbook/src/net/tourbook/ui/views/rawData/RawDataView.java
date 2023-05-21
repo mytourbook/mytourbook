@@ -4931,8 +4931,7 @@ public class RawDataView extends ViewPart implements
 
    private void onPaint_TableViewer_TourTypeImage(final Event event) {
 
-      final TableItem item = (TableItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
 
       if (itemData instanceof TourData) {
 
@@ -4954,8 +4953,7 @@ public class RawDataView extends ViewPart implements
 
    private void onPaint_TableViewer_WeatherClouds(final Event event) {
 
-      final TableItem item = (TableItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
 
       if (itemData instanceof TourData) {
 

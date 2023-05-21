@@ -124,8 +124,8 @@ class TourBook_ColumnFactory {
       defineColumn_Time_WeekYear();
 
       // Tour
-      defineColumn_Tour_TypeImage();
-      defineColumn_Tour_TypeText();
+      defineColumn_Tour_Type_Image();
+      defineColumn_Tour_Type_Text();
       defineColumn_Tour_Title();
       defineColumn_Tour_Marker();
       defineColumn_Tour_Photos();
@@ -3303,7 +3303,7 @@ class TourBook_ColumnFactory {
    /**
     * Column: Tour - Tour type image
     */
-   private void defineColumn_Tour_TypeImage() {
+   private void defineColumn_Tour_Type_Image() {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
@@ -3338,7 +3338,7 @@ class TourBook_ColumnFactory {
    /**
     * Column: Tour - Tour type text
     */
-   private void defineColumn_Tour_TypeText() {
+   private void defineColumn_Tour_Type_Text() {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {

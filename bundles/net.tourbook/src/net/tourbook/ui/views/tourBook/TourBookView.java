@@ -210,7 +210,6 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -2739,8 +2738,7 @@ public class TourBookView extends ViewPart implements
 
    private void onPaint_TreeViewer_TourTypeImage(final Event event) {
 
-      final TreeItem item = (TreeItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
 
       if (itemData instanceof TVITourBookTour) {
 
@@ -2757,8 +2755,7 @@ public class TourBookView extends ViewPart implements
 
    private void onPaint_TreeViewer_WeatherClouds(final Event event) {
 
-      final TreeItem item = (TreeItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
 
       if (itemData instanceof TVITourBookTour) {
 

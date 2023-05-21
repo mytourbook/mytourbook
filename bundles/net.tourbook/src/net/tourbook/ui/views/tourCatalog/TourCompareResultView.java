@@ -110,7 +110,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -125,13 +124,13 @@ public class TourCompareResultView extends ViewPart implements
       ITreeViewer,
       IReferenceTourProvider {
 
-   public static final String                  ID                                   = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
+   public static final String                  ID                                = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
-   private String                              STATE_IS_USE_FAST_APP_TOUR_FILTER    = "STATE_IS_USE_FAST_APP_TOUR_FILTER";                //$NON-NLS-1$
+   private String                              STATE_IS_USE_FAST_APP_TOUR_FILTER = "STATE_IS_USE_FAST_APP_TOUR_FILTER";                //$NON-NLS-1$
 
-   private final IPreferenceStore              _prefStore                           = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore              _prefStore_Common                    = CommonActivator.getPrefStore();
-   private final IDialogSettings               _state                               = TourbookPlugin.getState(ID);
+   private final IPreferenceStore              _prefStore                        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore              _prefStore_Common                 = CommonActivator.getPrefStore();
+   private final IDialogSettings               _state                            = TourbookPlugin.getState(ID);
 
    private TVICompareResultRootItem            _rootItem;
 
@@ -147,7 +146,7 @@ public class TourCompareResultView extends ViewPart implements
    private boolean                             _isToolbarCreated;
    private boolean                             _isToolTipInTour;
 
-   private CompareFilter                       _compareFilter                       = CompareFilter.ALL_IS_DISPLAYED;
+   private CompareFilter                       _compareFilter                    = CompareFilter.ALL_IS_DISPLAYED;
 
    private CheckboxTreeViewer                  _tourViewer;
    private ColumnManager                       _columnManager;
@@ -157,14 +156,14 @@ public class TourCompareResultView extends ViewPart implements
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                                 _columnIndex_TourTypeImage = -1;
+   private int                                 _columnIndex_TourTypeImage        = -1;
    private int                                 _columnWidth_TourTypeImage;
 
-   private SelectionRemovedComparedTours       _oldRemoveSelection                  = null;
+   private SelectionRemovedComparedTours       _oldRemoveSelection               = null;
 
    private TagMenuManager                      _tagMenuManager;
    private MenuManager                         _viewerMenuManager;
-   private IContextMenuProvider                _viewerContextMenuProvider           = new TreeContextMenuProvider();
+   private IContextMenuProvider                _viewerContextMenuProvider        = new TreeContextMenuProvider();
 
    private ActionAppTourFilter                 _actionAppTourFilter;
    private ActionCollapseAll                   _actionCollapseAll;
@@ -1750,11 +1749,9 @@ public class TourCompareResultView extends ViewPart implements
       }
    }
 
-
    private void onPaint_TreeViewer_TourTypeImage(final Event event) {
 
-      final TreeItem item = (TreeItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
 
       if (itemData instanceof TVICompareResultComparedTour) {
 
@@ -1772,6 +1769,7 @@ public class TourCompareResultView extends ViewPart implements
          }
       }
    }
+
    private void onResize_SetWidthForImageColumn() {
 
       if (_colDef_TourTypeImage != null) {
