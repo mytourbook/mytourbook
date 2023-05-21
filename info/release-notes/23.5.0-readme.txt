@@ -74,6 +74,9 @@ Improvements
 
 * Categorized View Colors
   - Colors can be set for bright and dark theme
+  
+* Tour Type and Weather Icon
+  - Center icons horizontally in the view columns
 
 
 Changes
