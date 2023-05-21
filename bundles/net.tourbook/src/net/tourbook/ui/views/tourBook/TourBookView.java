@@ -718,7 +718,7 @@ public class TourBookView extends ViewPart implements
          // loop: all displayed columns
          for (final ColumnDefinition colDef : _allSortedColumns) {
 
-            // setup style for body + header
+            // setup style for body + header, the style also applies to images !
 
             Style style = new Style();
             style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT,
