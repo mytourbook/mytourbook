@@ -228,7 +228,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
    }
 
    /**
-    * set the configuration for a reference tour
+    * Set the configuration for a reference tour
     *
     * @param compareConfig
     * @return Returns <code>true</code> then the ref tour changed
@@ -325,10 +325,10 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
    public void updateChart() {
 
       if (_tourData == null) {
-         
+
          _activeRefId = -1;
          _pageBook.showPage(_pageNoData);
-         
+
          return;
       }
 

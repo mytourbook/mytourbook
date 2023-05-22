@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,9 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- *
- */
 package net.tourbook.ui.views.referenceTour;
 
 import java.util.HashMap;
@@ -47,8 +44,8 @@ public class ReferenceTourManager {
     * When {@link #_geoCompare_RefId} == 0 then {@link #getTourCompareConfig(long)} will return
     * <code>null</code>, this is wrong when refId == 0
     */
-   private static long                                   _geoCompare_RefId   = Long.MIN_VALUE;
-   private static TourReference                          _geoCompare_RefTour;
+   private static long                                        _geoCompare_RefId   = Long.MIN_VALUE;
+   private static TourReference                               _geoCompare_RefTour;
    private static ElevationCompareConfig                      _geoCompare_RefConfig;
 
    private ReferenceTourManager() {}
@@ -120,8 +117,8 @@ public class ReferenceTourManager {
    }
 
    /**
-    * Returns a {@link ElevationCompareConfig} or <code>null</code> when the reference tour cannot be
-    * loaded from the database
+    * Returns a {@link ElevationCompareConfig} or <code>null</code> when the reference tour cannot
+    * be loaded from the database
     *
     * @param refId
     *           Reference Id

@@ -39,6 +39,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
@@ -81,13 +82,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -98,8 +94,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -532,45 +526,40 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {}
       };
+
       getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               recompareTours();
+            recompareTours();
 
-            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+         } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
-               // map options can have be changed
-               _slideoutGeoCompareOptions.restoreState();
-            }
+            // map options can have be changed
+            _slideoutGeoCompareOptions.restoreState();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns();
+            _columnManager.saveState(_state);
+            _columnManager.clearColumns();
+            defineAllColumns();
 
-               _geoPartViewer = (TableViewer) recreateViewer(_geoPartViewer);
-            }
+            _geoPartViewer = (TableViewer) recreateViewer(_geoPartViewer);
          }
       };
 
@@ -584,38 +573,33 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (part, selection) -> {
 
-            if (isIgnorePart(part)) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (isIgnorePart(part)) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
+
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-            if (isIgnorePart(part)) {
-               return;
-            }
+         if (isIgnorePart(part)) {
+            return;
+         }
 
-            if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
+            onSelectionChanged((ISelection) eventData);
 
-            } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
-               onSelectionChanged((ISelection) eventData);
-            }
+            onSelectionChanged((ISelection) eventData);
          }
       };
 
@@ -1196,7 +1180,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void createUI_80_TableViewer(final Composite parent) {
 
       /*
-       * create table
+       * Create table
        */
       final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -1208,13 +1192,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        * It took a while that the correct listener is set and also the checked item is fired and not
        * the wrong selection.
        */
-      table.addListener(SWT.Selection, new Listener() {
+      table.addListener(SWT.Selection, event -> onGeoPart_Select());
 
-         @Override
-         public void handleEvent(final Event event) {
-            onGeoPart_Select();
-         }
-      });
       /*
        * create table viewer
        */
@@ -1226,45 +1205,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _geoPartViewer.setContentProvider(new CompareResultProvider());
       _geoPartViewer.setComparator(_geoPartComparator);
 
-      _geoPartViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_ComparerItem(event);
-         }
-      });
-
-      _geoPartViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-//				onBookmark_Rename(true);
-         }
-      });
-
-      _geoPartViewer.getTable().addKeyListener(new KeyListener() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-
-            switch (e.keyCode) {
-
-            case SWT.DEL:
-//					onBookmark_Delete();
-               break;
-
-            case SWT.F2:
-//					onBookmark_Rename(false);
-               break;
-
-            default:
-               break;
-            }
-         }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+      _geoPartViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_ComparerItem(selectionChangedEvent));
 
       updateUI_SetSortDirection(
             _geoPartComparator.__sortColumnId,
@@ -1352,7 +1293,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1365,7 +1306,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * column: average pulse
+    * Column: Average pulse
     */
    private void defineColumn_Body_AvgPulse() {
 
@@ -1377,7 +1318,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1405,7 +1346,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       colDef.setCanModifyVisibility(false);
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1440,7 +1381,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1469,7 +1410,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1495,7 +1436,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1525,7 +1466,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1547,7 +1488,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1571,7 +1512,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1595,7 +1536,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1618,7 +1559,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1632,7 +1573,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * column: Tour start date
+    * Column: Tour start date
     */
    private void defineColumn_Time_TourStartDate() {
 
@@ -1643,7 +1584,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1670,7 +1611,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setColumnId(COLUMN_TOUR_TITLE);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1688,7 +1629,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _colDef_TourTypeImage = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
       _colDef_TourTypeImage.setIsDefaultColumn();
-      _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
+      _colDef_TourTypeImage.setLabelProvider(new SelectionCellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
          // !!! Set dummy label provider, otherwise an error occures !!!
@@ -1730,12 +1671,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       tbm.add(_actionGeoCompareOptions);
 
       tbm.update(true);
-   }
-
-   private void fireSelection(final ISelection selection) {
-
-      // fire selection for the selected geo part tour
-      _postSelectionProvider.setSelection(selection);
    }
 
    @Override
@@ -1838,7 +1773,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final float relativeDiff = (float) minDiffValue / _maxMinDiff * 100;
 
-      return relativeDiff >= 0 && relativeDiff < _geoRelativeDifferencesFilter;
+      final float relativeDifference = _geoRelativeDifferencesFilter == 0
+
+            // allow values which are near 0
+            ? 0.5f
+
+            : _geoRelativeDifferencesFilter;
+
+      return relativeDiff >= 0 && relativeDiff < relativeDifference;
    }
 
    private void onAction_AppFilter(final boolean isSelected) {
@@ -1968,7 +1910,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _selectedComparerItem = (GeoPartComparerItem) firstElement;
 
-      fireSelection(selection);
+      // fire selection for the selected geo part tour
+      _postSelectionProvider.setSelection(selection);
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {

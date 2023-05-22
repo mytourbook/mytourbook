@@ -48,7 +48,7 @@ public class TourReference implements Serializable {
    private TourData            tourData;
 
    /**
-    * value index position for the reference tour in the original tour
+    * Value index position for the reference tour in the original tour
     */
    private int                 startIndex;
 
@@ -95,6 +95,10 @@ public class TourReference implements Serializable {
       return refId == other.refId;
    }
 
+   public int getEndIndex() {
+      return endIndex;
+    }
+
    public int getEndValueIndex() {
       return endIndex;
    }
@@ -111,6 +115,10 @@ public class TourReference implements Serializable {
     */
    public long getRefId() {
       return refId;
+   }
+
+   public int getStartIndex() {
+      return startIndex;
    }
 
    public int getStartValueIndex() {

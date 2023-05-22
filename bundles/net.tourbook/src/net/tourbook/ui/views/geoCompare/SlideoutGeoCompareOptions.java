@@ -356,7 +356,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
             {
                // Spinner
                _spinnerGeo_RelativeDifferences_Filter = new Spinner(container, SWT.BORDER);
-               _spinnerGeo_RelativeDifferences_Filter.setMinimum(1);
+               _spinnerGeo_RelativeDifferences_Filter.setMinimum(0);
                _spinnerGeo_RelativeDifferences_Filter.setMaximum(100);
                _spinnerGeo_RelativeDifferences_Filter.setPageIncrement(10);
                _spinnerGeo_RelativeDifferences_Filter.addSelectionListener(_compareSelectionListener);
@@ -515,7 +515,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       _compareMouseWheelListener = new MouseWheelListener() {
          @Override
          public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
+            UI.adjustSpinnerValueOnMouseScroll(event, 10);
             onChange_CompareParameter();
          }
       };

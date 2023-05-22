@@ -33,7 +33,7 @@ import net.tourbook.ui.UI;
 public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
    String      label;
-   long        refId;
+   public long refId;
 
    float[]     avgAltimeter_MinMax = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
    float[]     avgPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
