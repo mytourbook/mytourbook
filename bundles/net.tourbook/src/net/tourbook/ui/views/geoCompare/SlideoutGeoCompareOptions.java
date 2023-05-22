@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.Map2_Appearance;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -461,10 +460,10 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
             {
                // spinner
                _spinnerMapOption_TrackOpacity = new Spinner(group, SWT.BORDER);
-               _spinnerMapOption_TrackOpacity.setMinimum(Map2_Appearance.MAP_OPACITY_MINIMUM);
-               _spinnerMapOption_TrackOpacity.setMaximum(100);
+               _spinnerMapOption_TrackOpacity.setMinimum((int) (UI.TRANSFORM_OPACITY_MAX * 0.2f)); // ensure that the track is visible
+               _spinnerMapOption_TrackOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                _spinnerMapOption_TrackOpacity.setIncrement(1);
-               _spinnerMapOption_TrackOpacity.setPageIncrement(10);
+               _spinnerMapOption_TrackOpacity.setPageIncrement(2);
                _spinnerMapOption_TrackOpacity.addSelectionListener(_mapOptions_SelectionListener);
                _spinnerMapOption_TrackOpacity.addMouseWheelListener(_mapOptions_MouseWheelListener);
             }
@@ -578,10 +577,10 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       _secondColumnControls.clear();
    }
 
+// SET_FORMATTING_OFF
+
    @Override
    public void resetToDefaults() {
-
-// SET_FORMATTING_OFF
 
       _spinnerGeo_DistanceInterval                    .setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
       _spinnerGeo_Accuracy                            .setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
@@ -592,14 +591,14 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       /*
        * Map options
        */
+      final int trackOpacity = UI.transformOpacity_WhenRestored(_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+
       _chkMapOption_TrackOpacity.setSelection(        _prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
-      _spinnerMapOption_TrackOpacity.setSelection(    _prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+      _spinnerMapOption_TrackOpacity.setSelection(    trackOpacity);
       _spinnerMapOption_LineWidth.setSelection(       _prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
       _colorMapOption_RefTour.setColorValue(          PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
       _colorMapOption_ComparedTourPart.setColorValue( PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
-
-// SET_FORMATTING_ON
 
       onChange_CompareParameter();
       onChange_MapOptions();
@@ -612,8 +611,6 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
          return;
       }
 
-// SET_FORMATTING_OFF
-
       _geoAccuracy = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY, GeoCompareView.DEFAULT_GEO_ACCURACY);
 
       _spinnerGeo_Accuracy                   .setSelection(_geoAccuracy);
@@ -625,45 +622,39 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       /*
        * Map options
        */
+      final int trackOpacity = UI.transformOpacity_WhenRestored(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+
       _spinnerMapOption_LineWidth         .setSelection(_prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
       _colorMapOption_ComparedTourPart    .setColorValue(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
       _colorMapOption_RefTour             .setColorValue(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
 
       _chkMapOption_TrackOpacity          .setSelection(_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
-      _spinnerMapOption_TrackOpacity      .setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
-
-// SET_FORMATTING_ON
+      _spinnerMapOption_TrackOpacity      .setSelection(trackOpacity);
    }
 
    private void saveState_MapOption() {
 
-// SET_FORMATTING_OFF
-
       _prefStore.setValue(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,     _spinnerMapOption_LineWidth.getSelection());
       _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,   _chkMapOption_TrackOpacity.getSelection());
-      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,      _spinnerMapOption_TrackOpacity.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,      UI.transformOpacity_WhenSaved(_spinnerMapOption_TrackOpacity.getSelection()));
 
       PreferenceConverter.setValue(_prefStore,   ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,   _colorMapOption_ComparedTourPart.getColorValue());
       PreferenceConverter.setValue(_prefStore,   ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,             _colorMapOption_RefTour.getColorValue());
-
-// SET_FORMATTING_ON
    }
 
    private void saveState_Slideout() {
 
       _geoAccuracy = _spinnerGeo_Accuracy.getSelection();
 
-// SET_FORMATTING_OFF
-
       _state.put(GeoCompareView.STATE_GEO_ACCURACY,                        _geoAccuracy);
       _state.put(GeoCompareView.STATE_DISTANCE_INTERVAL,                   _spinnerGeo_DistanceInterval.getSelection());
 
       _state.put(GeoCompareView.STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER,  _chkGeo_RelativeDifferences_Filter.getSelection());
       _state.put(GeoCompareView.STATE_GEO_RELATIVE_DIFFERENCES_FILTER,     _spinnerGeo_RelativeDifferences_Filter.getSelection());
+   }
 
 // SET_FORMATTING_ON
-   }
 
    private void updateUI_GeoAccuracy() {
 
