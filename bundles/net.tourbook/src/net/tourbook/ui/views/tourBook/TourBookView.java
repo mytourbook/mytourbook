@@ -95,6 +95,7 @@ import net.tourbook.ui.views.rawData.ActionDeleteTourValues;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DummyColumnViewer;
@@ -102,7 +103,6 @@ import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
 import net.tourbook.ui.views.tourBook.natTable.SingleClickSortConfiguration_MT;
 import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
@@ -3015,9 +3015,9 @@ public class TourBookView extends ViewPart implements
 
             selectTour(comparerItem.tourId);
 
-         } else if (firstElement instanceof TVICatalogComparedTour) {
+         } else if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
+            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
 
             selectTour(comparedTour.getTourId());
          }

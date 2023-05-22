@@ -65,7 +65,7 @@ import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
-import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
+import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;

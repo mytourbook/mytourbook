@@ -53,11 +53,11 @@ import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
+import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
+import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -376,7 +376,7 @@ public class TourChartView extends ViewPart implements
 
                   && eventData instanceof ISelection) {
 
-               if (part instanceof TourCatalogView_ComparedTour) {
+               if (part instanceof RefTour_ComparedTourView) {
 
                   // ignore -> this would modify the geo compare tour
 
@@ -802,7 +802,7 @@ public class TourChartView extends ViewPart implements
 
             final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-            final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+            final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
             if (refItem != null) {
                updateChart(refItem.getTourId());
             }
@@ -810,13 +810,13 @@ public class TourChartView extends ViewPart implements
          } else if (selection instanceof StructuredSelection) {
 
             final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-            if (firstElement instanceof TVICatalogComparedTour) {
+            if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-               updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+               updateChart(((TVIRefTour_ComparedTour) firstElement).getTourId());
 
-            } else if (firstElement instanceof TVICompareResultComparedTour) {
+            } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
-               final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
+               final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) firstElement;
                final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
                updateChart(tourData);
 

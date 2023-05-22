@@ -29,7 +29,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -102,7 +102,7 @@ public class ActionCreateRefTour extends Action {
             workbench.showPerspective(PerspectiveFactoryTourCatalog.PERSPECTIVE_ID, wbWindow);
 
             // show ref tour view
-            Util.showView(TourCatalogView.ID, true);
+            Util.showView(ReferenceTourView.ID, true);
 
             // update reference tour view
             TourManager.fireEvent(TourEventId.REFERENCE_TOUR_IS_CREATED, new TourEvent(savedTourData));

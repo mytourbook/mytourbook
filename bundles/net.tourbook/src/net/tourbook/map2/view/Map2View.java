@@ -154,11 +154,11 @@ import net.tourbook.ui.ValuePoint_ToolTip_UI;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
-import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
+import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -3297,18 +3297,18 @@ public class Map2View extends ViewPart implements
          final StructuredSelection structuredSelection = (StructuredSelection) selection;
          final Object firstElement = structuredSelection.getFirstElement();
 
-         if (firstElement instanceof TVICatalogComparedTour) {
+         if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
+            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
             final long tourId = comparedTour.getTourId();
 
             final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
             paintTours_20_One(tourData, false);
 
-         } else if (firstElement instanceof TVICompareResultComparedTour) {
+         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
-            final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
+            final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) firstElement;
             final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
 
             paintTours_20_One(tourData, false);
@@ -3390,7 +3390,7 @@ public class Map2View extends ViewPart implements
 
          final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-         final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+         final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
 
             final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());

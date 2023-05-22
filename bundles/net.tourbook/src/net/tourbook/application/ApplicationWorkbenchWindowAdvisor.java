@@ -58,7 +58,7 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeManager;
 //import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
-import net.tourbook.ui.views.tourCatalog.TourCompareManager;
+import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
 import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -454,7 +454,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeManager.restoreState();
       TourTypeFilterManager.restoreState();
 
-      TourCompareManager.restoreState();
+      ElevationCompareManager.restoreState();
       TourFilterManager.restoreState();
       TourGeoFilter_Manager.restoreState();
       TourTagFilterManager.restoreState();
@@ -534,7 +534,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeMenuManager.saveState();
       TourTypeManager.saveState();
 
-      TourCompareManager.saveState();
+      ElevationCompareManager.saveState();
       TourFilterManager.saveState();
       TourGeoFilter_Manager.saveState();
       TourPhotoManager.saveState();

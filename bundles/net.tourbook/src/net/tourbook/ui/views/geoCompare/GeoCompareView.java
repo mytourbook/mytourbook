@@ -63,13 +63,13 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
-import net.tourbook.ui.views.tourCatalog.TourCompareConfig;
+import net.tourbook.ui.views.referenceTour.ElevationCompareConfig;
+import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
+import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
+import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -1818,7 +1818,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       // ignore other parts to prevent geo part comparing !!!
-      if (part instanceof TourCatalogView_ComparedTour || part instanceof TourCatalogView_ReferenceTour) {
+      if (part instanceof RefTour_ComparedTourView || part instanceof RefTour_ReferenceTourView) {
          return true;
       }
 
@@ -2157,13 +2157,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-         if (firstElement instanceof TVICatalogComparedTour) {
+         if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            showRefTour(((TVICatalogComparedTour) firstElement).getRefId());
+            showRefTour(((TVIRefTour_ComparedTour) firstElement).getRefId());
 
-         } else if (firstElement instanceof TVICompareResultComparedTour) {
+         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
-            showRefTour(((TVICompareResultComparedTour) firstElement).refTour.refId);
+            showRefTour(((TVIElevationCompareResult_ComparedTour) firstElement).refTour.refId);
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -2310,7 +2310,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void showRefTour(final long refId) {
 
-      final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+      final ElevationCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
 
       if (tourCompareConfig == null) {
          return;
