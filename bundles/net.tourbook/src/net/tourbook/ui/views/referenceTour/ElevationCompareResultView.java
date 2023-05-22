@@ -1793,7 +1793,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
          final TVIElevationCompareResult_ReferenceTour refItem = (TVIElevationCompareResult_ReferenceTour) treeItem;
 
-         _postSelectionProvider.setSelection(new SelectionTourCatalogView(refItem.refTourItem.refId));
+         _postSelectionProvider.setSelection(new SelectionReferenceTourView(refItem.refTourItem.refId));
 
       } else if (treeItem instanceof TVIElevationCompareResult_ComparedTour) {
 

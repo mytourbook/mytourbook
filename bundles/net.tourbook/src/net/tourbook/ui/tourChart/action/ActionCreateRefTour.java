@@ -50,7 +50,7 @@ public class ActionCreateRefTour extends Action {
    public ActionCreateRefTour(final TourChart tourChart) {
 
       setText(Messages.tourCatalog_view_action_create_reference_tour);
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCatalog_RefTour_New));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_New));
 
       _tourChart = tourChart;
    }

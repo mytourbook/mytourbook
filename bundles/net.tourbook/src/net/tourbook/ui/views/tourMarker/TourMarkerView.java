@@ -53,7 +53,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
-import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
@@ -1254,9 +1254,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             }
          }
 
-      } else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionReferenceTourView) {
 
-         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {

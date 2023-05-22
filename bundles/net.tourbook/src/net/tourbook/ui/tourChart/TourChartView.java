@@ -54,7 +54,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
-import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
@@ -798,9 +798,9 @@ public class TourChartView extends ViewPart implements
 
             _tourChart.selectXSliders(xSliderPosition);
 
-         } else if (selection instanceof SelectionTourCatalogView) {
+         } else if (selection instanceof SelectionReferenceTourView) {
 
-            final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+            final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
             final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
             if (refItem != null) {

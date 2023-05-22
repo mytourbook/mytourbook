@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,43 +26,41 @@ import org.eclipse.jface.viewers.ISelection;
 /**
  * Selection contains data for a compared tour from the {@link ReferenceTourView}
  */
-public class SelectionTourCatalogView implements ISelection {
+public class SelectionReferenceTourView implements ISelection {
 
-   private static final String   NL = UI.NEW_LINE;
+   private static final String    NL = UI.NEW_LINE;
 
    /**
     * Unique id for a reference tour in {@link TourReference} entity
     */
-   private Long                  _refId;
+   private Long                   _refId;
 
    /**
     * unique id for {@link TourCompared} entity or <code>-1</code> when the compared tour is not
     * saved in the database
     */
-   private Long                  _compTourId;
+   private Long                   _compTourId;
 
    private TVIRefTour_RefTourItem _catalogRefItem;
    private TVIRefTour_YearItem    _catalogYearItem;
 
-   public SelectionTourCatalogView(final long refId) {
+   public SelectionReferenceTourView(final long refId) {
 
       _refId = refId;
       _catalogRefItem = ElevationCompareManager.createCatalogRefItem(refId);
    }
 
-   public SelectionTourCatalogView(final TVIRefTour_RefTourItem refItem) {
+   public SelectionReferenceTourView(final TVIRefTour_RefTourItem refItem) {
 
       _refId = refItem.refId;
       _catalogRefItem = refItem;
    }
 
-   public SelectionTourCatalogView(final TVIRefTour_YearItem yearItem) {
+   public SelectionReferenceTourView(final TVIRefTour_YearItem yearItem) {
 
       _refId = yearItem.refId;
       _catalogYearItem = yearItem;
    }
-
-
 
    /**
     * @return Returns the tour Id of the {@link TourData} for the compared tour or
@@ -101,7 +99,7 @@ public class SelectionTourCatalogView implements ISelection {
 
       return UI.EMPTY_STRING
 
-            + "SelectionTourCatalogView" + NL //$NON-NLS-1$
+            + "SelectionReferenceTourView" + NL //$NON-NLS-1$
 
             + "[" + NL //$NON-NLS-1$
 

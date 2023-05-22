@@ -67,7 +67,7 @@ import net.tourbook.ui.views.referenceTour.ElevationCompareConfig;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
 import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
-import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 
@@ -2117,9 +2117,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             }
          }
 
-      } else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionReferenceTourView) {
 
-         showRefTour(((SelectionTourCatalogView) selection).getRefId());
+         showRefTour(((SelectionReferenceTourView) selection).getRefId());
 
       } else if (selection instanceof SelectionTourData) {
 

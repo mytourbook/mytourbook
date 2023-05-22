@@ -1049,9 +1049,9 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    private void onSelectionChanged(final ISelection selection) {
 
-      if (selection instanceof SelectionTourCatalogView) {
+      if (selection instanceof SelectionReferenceTourView) {
 
-         final SelectionTourCatalogView tourCatalogItem = (SelectionTourCatalogView) selection;
+         final SelectionReferenceTourView tourCatalogItem = (SelectionReferenceTourView) selection;
 
          final TVIRefTour_RefTourItem refItem = tourCatalogItem.getRefItem();
          if (refItem != null) {

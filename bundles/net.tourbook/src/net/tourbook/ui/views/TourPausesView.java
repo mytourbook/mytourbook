@@ -48,7 +48,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.SubMenu_SetPausesType;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
@@ -850,9 +850,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             }
          }
 
-      } else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionReferenceTourView) {
 
-         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {

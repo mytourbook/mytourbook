@@ -155,7 +155,7 @@ import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
-import net.tourbook.ui.views.referenceTour.SelectionTourCatalogView;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
@@ -3384,11 +3384,11 @@ public class Map2View extends ViewPart implements
 
          enableActions();
 
-      } else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionReferenceTourView) {
 
          // show reference tour
 
-         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {

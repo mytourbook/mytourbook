@@ -1596,7 +1596,7 @@ public class ReferenceTourView extends ViewPart implements
          _activeRefId = refItem.refId;
 
          // fire selection for the selected tour catalog item
-         _postSelectionProvider.setSelection(new SelectionTourCatalogView(refItem));
+         _postSelectionProvider.setSelection(new SelectionReferenceTourView(refItem));
 
       } else if (item instanceof TVIRefTour_YearItem) {
 
@@ -1607,7 +1607,7 @@ public class ReferenceTourView extends ViewPart implements
          _activeRefId = yearItem.refId;
 
          // fire selection for the selected tour catalog item
-         _postSelectionProvider.setSelection(new SelectionTourCatalogView(yearItem));
+         _postSelectionProvider.setSelection(new SelectionReferenceTourView(yearItem));
 
       } else if (item instanceof TVIRefTour_ComparedTour) {
 

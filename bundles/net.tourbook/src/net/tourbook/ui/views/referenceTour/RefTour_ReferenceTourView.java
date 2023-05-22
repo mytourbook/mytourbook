@@ -180,9 +180,9 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
 
    private void onSelectionChanged(final ISelection selection) {
 
-      if (selection instanceof SelectionTourCatalogView) {
+      if (selection instanceof SelectionReferenceTourView) {
 
-         showRefTour(((SelectionTourCatalogView) selection).getRefId());
+         showRefTour(((SelectionReferenceTourView) selection).getRefId());
 
       } else if (selection instanceof StructuredSelection) {
 
