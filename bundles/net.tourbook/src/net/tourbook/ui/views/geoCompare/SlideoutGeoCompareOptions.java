@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -38,14 +40,10 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -57,34 +55,34 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour tag filter
  */
-public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final String      VALUE_FORMAT_1_0              = "%1.0f %s";                   //$NON-NLS-1$
-   private static final String      VALUE_FORMAT_1_1              = "%1.1f %s";                   //$NON-NLS-1$
-   private static final String      VALUE_FORMAT_1_2              = "%1.2f %s";                   //$NON-NLS-1$
+   private static final String           VALUE_FORMAT_1_0              = "%1.0f %s";                   //$NON-NLS-1$
+   private static final String           VALUE_FORMAT_1_1              = "%1.1f %s";                   //$NON-NLS-1$
+   private static final String           VALUE_FORMAT_1_2              = "%1.2f %s";                   //$NON-NLS-1$
 
-   final static IPreferenceStore    _prefStore                    = TourbookPlugin.getPrefStore();
-   private static IDialogSettings   _state;
+   private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
+   private static IDialogSettings        _state;
 
-   private SelectionAdapter         _compareSelectionListener;
-   private MouseWheelListener       _compareMouseWheelListener;
-   private MouseWheelListener       _mapOptions_MouseWheelListener;
-   private IPropertyChangeListener  _mapOptions_PropertyListener;
-   private SelectionAdapter         _mapOptions_SelectionListener;
+   private SelectionListener             _compareSelectionListener;
+   private MouseWheelListener            _compareMouseWheelListener;
+   private MouseWheelListener            _mapOptions_MouseWheelListener;
+   private IPropertyChangeListener       _mapOptions_PropertyListener;
+   private SelectionListener             _mapOptions_SelectionListener;
 
-   private ActionResetToDefaults    _actionRestoreDefaults;
+   private ActionResetToDefaults         _actionRestoreDefaults;
 
-   private GeoCompareView           _geoCompareView;
+   private GeoCompareView                _geoCompareView;
 
-   private int                      _geoAccuracy;
+   private int                           _geoAccuracy;
 
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
-   private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
-   private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
-   private final ArrayList<Control> _secondColumnControls         = new ArrayList<>();
+   private final ArrayList<Control>      _firstColumnContainerControls = new ArrayList<>();
+   private final ArrayList<Control>      _firstColumnControls          = new ArrayList<>();
+   private final ArrayList<Control>      _secondColumnControls         = new ArrayList<>();
 
    /*
     * UI controls
@@ -121,10 +119,10 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
     * @param state
     * @param geoCompareView
     */
-   public SlideoutGeoCompareOptions(final Composite ownerControl,
-                                    final ToolBar toolbar,
-                                    final IDialogSettings state,
-                                    final GeoCompareView geoCompareView) {
+   SlideoutGeoCompareOptions(final Composite ownerControl,
+                             final ToolBar toolbar,
+                             final IDialogSettings state,
+                             final GeoCompareView geoCompareView) {
 
       super(ownerControl, toolbar);
 
@@ -452,7 +450,9 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
                // checkbox
                _chkMapOption_TrackOpacity = new Button(group, SWT.CHECK);
                _chkMapOption_TrackOpacity.setText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity);
-               _chkMapOption_TrackOpacity.setToolTipText(Messages.Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip);
+               _chkMapOption_TrackOpacity.setToolTipText(NLS.bind(
+                     Messages.Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip,
+                     UI.TRANSFORM_OPACITY_MAX));
                _chkMapOption_TrackOpacity.addSelectionListener(_mapOptions_SelectionListener);
 
                _firstColumnControls.add(_chkMapOption_TrackOpacity);
@@ -498,49 +498,23 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
    private void initUI(final Composite parent) {
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDisposeSlideout();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDisposeSlideout());
 
-      _compareSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChange_CompareParameter();
-         }
+      _compareSelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_CompareParameter());
+
+      _compareMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChange_CompareParameter();
       };
 
-      _compareMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChange_CompareParameter();
-         }
+      _mapOptions_SelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_MapOptions());
+
+      _mapOptions_MouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChange_MapOptions();
       };
 
-      _mapOptions_SelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChange_MapOptions();
-         }
-      };
-
-      _mapOptions_MouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChange_MapOptions();
-         }
-      };
-
-      _mapOptions_PropertyListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onChange_MapOptions();
-         }
-      };
+      _mapOptions_PropertyListener = propertyChangeEvent -> onChange_MapOptions();
    }
 
    private boolean isUICreated() {
