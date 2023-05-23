@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,56 +23,56 @@ import net.tourbook.data.TourReference;
 /**
  * Contains all data for a tour comparison
  */
-public class GeoPartItem {
+public class GeoPartData {
 
    /**
     * Id of the {@link TourReference}, is -1 when not available
     */
-   public long                    refId         = -1;
+   public long                refId         = -1;
 
-   long                           executorId;
+   long                       executorId;
 
    /**
     * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
     */
-   boolean                        isCanceled;
+   boolean                    isCanceled;
 
-   boolean                        isUseAppFilter;
+   boolean                    isUseAppFilter;
 
    /**
     * Geo part which should be compared
     */
-   public NormalizedGeoData       normalizedTourPart;
+   public NormalizedGeoData   normalizedTourPart;
 
    /**
     * Geo parts which are affected
     */
-   int[]                          geoParts;
+   int[]                      geoParts;
 
    /**
     * Tour id's which are having at least one of the {@link #geoParts}
     */
-   long[]                         tourIds;
+   long[]                     tourIds;
 
    /**
     * Results of the compared tours
     */
-   ArrayList<GeoPartComparerItem> comparedTours = new ArrayList<>();
+   ArrayList<GeoComparedTour> comparedTours = new ArrayList<>();
 
    /**
     * Time in ms to calculate sql data
     */
-   long                           sqlRunningTime;
+   long                       sqlRunningTime;
 
    /**
     *
     */
-   boolean                        isReselectedInUI;
+   boolean                    isReselectedInUI;
 
    @SuppressWarnings("unused")
-   private GeoPartItem() {}
+   private GeoPartData() {}
 
-   public GeoPartItem(final long executorId,
+   public GeoPartData(final long executorId,
                       final int[] geoParts,
                       final NormalizedGeoData normalizedTourPart,
                       final boolean useAppFilter) {

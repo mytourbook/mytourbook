@@ -44,8 +44,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
-import net.tourbook.ui.views.geoCompare.GeoPartItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
+import net.tourbook.ui.views.geoCompare.GeoPartData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -585,9 +585,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
             updateTourChart((TVIElevationCompareResult_ComparedTour) firstElement);
 
-         } else if (firstElement instanceof GeoPartComparerItem) {
+         } else if (firstElement instanceof GeoComparedTour) {
 
-            updateTourChart((GeoPartComparerItem) firstElement);
+            updateTourChart((GeoComparedTour) firstElement);
          }
       }
    }
@@ -772,7 +772,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    private void setRangeMarkers(final ChartDataXSerie xData) {
 
       if (_comparedTourItem instanceof TVIRefTour_ComparedTour
-            || _comparedTourItem instanceof GeoPartComparerItem) {
+            || _comparedTourItem instanceof GeoComparedTour) {
 
          xData.setRangeMarkers(new int[] { _defaultStartIndex }, new int[] { _defaultEndIndex });
 
@@ -883,7 +883,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       return false;
    }
 
-   private void updateTourChart(final GeoPartComparerItem comparerItem) {
+   private void updateTourChart(final GeoComparedTour comparerItem) {
 
       if (saveComparedTourDialog() == false) {
          return;
@@ -892,7 +892,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       final long ctTourId = comparerItem.tourId;
 
       // check if the compared tour is already displayed
-      if (_comparedTour_TourId == ctTourId && _comparedTourItem instanceof GeoPartComparerItem) {
+      if (_comparedTour_TourId == ctTourId && _comparedTourItem instanceof GeoComparedTour) {
          return;
       }
 
@@ -902,7 +902,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return;
       }
 
-      final GeoPartItem geoPartItem = comparerItem.geoPartItem;
+      final GeoPartData geoPartItem = comparerItem.geoPartData;
       //final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
 
       // set data from the selection

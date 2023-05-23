@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,14 +36,14 @@ import org.eclipse.ui.IWorkbenchPart;
 
 public class GeoCompareManager {
 
-   private static final int                                      COMPARATOR_THREADS    = Runtime.getRuntime().availableProcessors();
-   private static ThreadPoolExecutor                             _comparerExecutor;
+   private static final int                                  COMPARATOR_THREADS    = Runtime.getRuntime().availableProcessors();
+   private static ThreadPoolExecutor                         _comparerExecutor;
 
-   private static final LinkedBlockingDeque<GeoPartComparerItem> _compareWaitingQueue  = new LinkedBlockingDeque<>();
-   private static final ListenerList<IGeoCompareListener>        _geoCompareListeners  = new ListenerList<>(ListenerList.IDENTITY);
+   private static final LinkedBlockingDeque<GeoComparedTour> _compareWaitingQueue  = new LinkedBlockingDeque<>();
+   private static final ListenerList<IGeoCompareListener>    _geoCompareListeners  = new ListenerList<>(ListenerList.IDENTITY);
 
-   private static boolean                                        _isGeoComparingOn;
-   private static boolean                                        IS_LOG_TOUR_COMPARING = false;
+   private static boolean                                    _isGeoComparingOn;
+   private static boolean                                    IS_LOG_TOUR_COMPARING = false;
 
    static {
 
@@ -84,11 +84,11 @@ public class GeoCompareManager {
     * @param loaderItem
     * @param geoPartView
     */
-   static void compareGeoTours(final GeoPartItem loaderItem, final GeoCompareView geoPartView) {
+   static void compareGeoTours(final GeoPartData loaderItem, final GeoCompareView geoPartView) {
 
       for (final long tourId : loaderItem.tourIds) {
 
-         final GeoPartComparerItem comparerItem = new GeoPartComparerItem(tourId, loaderItem);
+         final GeoComparedTour comparerItem = new GeoComparedTour(tourId, loaderItem);
 
          // keep compared tour
          loaderItem.comparedTours.add(comparerItem);
@@ -100,7 +100,7 @@ public class GeoCompareManager {
             public void run() {
 
                // get last added loader item
-               final GeoPartComparerItem comparatorItem = _compareWaitingQueue.pollFirst();
+               final GeoComparedTour comparatorItem = _compareWaitingQueue.pollFirst();
 
                if (comparatorItem == null) {
                   return;
@@ -121,9 +121,9 @@ public class GeoCompareManager {
       }
    }
 
-   private static void compareTour(final GeoPartComparerItem comparerItem) {
+   private static void compareTour(final GeoComparedTour comparerItem) {
 
-      final GeoPartItem geoPartItem = comparerItem.geoPartItem;
+      final GeoPartData geoPartItem = comparerItem.geoPartData;
 
       if (geoPartItem.isCanceled) {
          return;

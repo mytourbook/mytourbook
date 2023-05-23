@@ -90,7 +90,7 @@ import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.rawData.ActionDeleteTourValues;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
@@ -3007,11 +3007,11 @@ public class TourBookView extends ViewPart implements
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-         if (firstElement instanceof GeoPartComparerItem) {
+         if (firstElement instanceof GeoComparedTour) {
 
             // show selected compared tour
 
-            final GeoPartComparerItem comparerItem = (GeoPartComparerItem) firstElement;
+            final GeoComparedTour comparerItem = (GeoComparedTour) firstElement;
 
             selectTour(comparerItem.tourId);
 

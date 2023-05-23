@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ public class GeoPartTourLoader {
    private static final char                             NL                  = UI.NEW_LINE;
 
    private static final AtomicLong                       _loaderExecuterId   = new AtomicLong();
-   private static final LinkedBlockingDeque<GeoPartItem> _loaderWaitingQueue = new LinkedBlockingDeque<>();
+   private static final LinkedBlockingDeque<GeoPartData> _loaderWaitingQueue = new LinkedBlockingDeque<>();
    private static ExecutorService                        _loadingExecutor;
 
    static {
@@ -60,7 +60,7 @@ public class GeoPartTourLoader {
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
-   private static boolean loadTourGeoPartsFromDB(final GeoPartItem loaderItem) {
+   private static boolean loadTourGeoPartsFromDB(final GeoPartData loaderItem) {
 
       if (loaderItem.isCanceled) {
          return false;
@@ -197,10 +197,10 @@ public class GeoPartTourLoader {
     * @param geoPartView
     * @return
     */
-   static GeoPartItem loadToursFromGeoParts(final int[] geoParts,
+   static GeoPartData loadToursFromGeoParts(final int[] geoParts,
                                             final NormalizedGeoData normalizedTourPart,
                                             final boolean useAppFilter,
-                                            final GeoPartItem previousLoaderItem,
+                                            final GeoPartData previousLoaderItem,
                                             final GeoCompareView geoPartView) {
 
       stopLoading(previousLoaderItem);
@@ -213,7 +213,7 @@ public class GeoPartTourLoader {
 //                 + ("\texecuterId: " + executerId));
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-      final GeoPartItem loaderItem = new GeoPartItem(
+      final GeoPartData loaderItem = new GeoPartData(
             executerId,
             geoParts,
             normalizedTourPart,
@@ -226,7 +226,7 @@ public class GeoPartTourLoader {
          public void run() {
 
             // get last added loader item
-            final GeoPartItem loaderItem = _loaderWaitingQueue.pollFirst();
+            final GeoPartData loaderItem = _loaderWaitingQueue.pollFirst();
 
             if (loaderItem == null) {
                return;
@@ -248,7 +248,7 @@ public class GeoPartTourLoader {
     *
     * @param loaderItem
     */
-   static void stopLoading(final GeoPartItem loaderItem) {
+   static void stopLoading(final GeoPartData loaderItem) {
 
       if (loaderItem != null) {
          loaderItem.isCanceled = true;

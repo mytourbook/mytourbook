@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,76 +174,76 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //      System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); //$NON-NLS-1$
 
    }
-   private IPartListener2                 _partListener;
-   private SelectionAdapter               _columnSortListener;
-   private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListener_Common;
-   private ISelectionListener             _postSelectionListener;
-   private ITourEventListener             _tourEventListener;
-   private PostSelectionProvider          _postSelectionProvider;
+   private IPartListener2             _partListener;
+   private SelectionAdapter           _columnSortListener;
+   private IPropertyChangeListener    _prefChangeListener;
+   private IPropertyChangeListener    _prefChangeListener_Common;
+   private ISelectionListener         _postSelectionListener;
+   private ITourEventListener         _tourEventListener;
+   private PostSelectionProvider      _postSelectionProvider;
 
-   private int                            _lastSelectionHash;
+   private int                        _lastSelectionHash;
 
-   private AtomicInteger                  _workedTours               = new AtomicInteger();
-   private AtomicInteger                  _runningId                 = new AtomicInteger();
+   private AtomicInteger              _workedTours               = new AtomicInteger();
+   private AtomicInteger              _runningId                 = new AtomicInteger();
 
-   private long                           _workerExecutorId;
+   private long                       _workerExecutorId;
 
-   private boolean                        _isInUpdate;
-   private long                           _lastUIUpdate;
+   private boolean                    _isInUpdate;
+   private long                       _lastUIUpdate;
 
    /**
     * Comparer items from the last comparison
     */
-   private ArrayList<GeoPartComparerItem> _comparedTours             = new ArrayList<>();
+   private ArrayList<GeoComparedTour> _comparedTours             = new ArrayList<>();
 
-   private GeoPartComparerItem            _selectedComparerItem;
+   private GeoComparedTour            _selectedComparerItem;
 
-   private int                            _compareData_FirstIndex;
-   private int[]                          _compareData_GeoGrid;
-   private boolean                        _compareData_IsUseAppFilter;
-   private int                            _compareData_LastIndex;
-   private int                            _compareData_NumGeoPartTours;
-   private GeoPartItem                    _compareData_PreviousGeoPartItem;
-   private long                           _compareData_RefId;
-   private TourData                       _compareData_TourData;
-   private long                           _compareData_TourId        = Long.MIN_VALUE;
-   private String                         _compareData_TourTitle;
+   private int                        _compareData_FirstIndex;
+   private int[]                      _compareData_GeoGrid;
+   private boolean                    _compareData_IsUseAppFilter;
+   private int                        _compareData_LastIndex;
+   private int                        _compareData_NumGeoPartTours;
+   private GeoPartData                _compareData_PreviousGeoPartItem;
+   private long                       _compareData_RefId;
+   private TourData                   _compareData_TourData;
+   private long                       _compareData_TourId        = Long.MIN_VALUE;
+   private String                     _compareData_TourTitle;
    //
-   private int                            _lastCompare_DistanceInterval;
-   private int                            _lastCompare_FirstIndex;
-   private int                            _lastCompare_LastIndex;
-   private int                            _lastCompare_GeoAccuracy;
-   private int                            _lastCompare_GeoDifferencesFilter;
-   private boolean                        _lastCompare_IsGeoRelativeDifferencesFilter;
-   private boolean                        _lastCompare_IsUseAppFilter;
-   private long                           _lastCompare_TourId;
+   private int                        _lastCompare_DistanceInterval;
+   private int                        _lastCompare_FirstIndex;
+   private int                        _lastCompare_LastIndex;
+   private int                        _lastCompare_GeoAccuracy;
+   private int                        _lastCompare_GeoDifferencesFilter;
+   private boolean                    _lastCompare_IsGeoRelativeDifferencesFilter;
+   private boolean                    _lastCompare_IsUseAppFilter;
+   private long                       _lastCompare_TourId;
 
-   private TableViewer                    _geoPartViewer;
-   private ColumnManager                  _columnManager;
-   private CompareResultComparator        _geoPartComparator         = new CompareResultComparator();
+   private TableViewer                _geoPartViewer;
+   private ColumnManager              _columnManager;
+   private CompareResultComparator    _geoPartComparator         = new CompareResultComparator();
 
-   private TableColumnDefinition          _colDef_TourTypeImage;
-   private int                            _columnIndex_TourTypeImage = -1;
-   private int                            _columnWidth_TourTypeImage;
+   private TableColumnDefinition      _colDef_TourTypeImage;
+   private int                        _columnIndex_TourTypeImage = -1;
+   private int                        _columnWidth_TourTypeImage;
 
-   private boolean                        _isGeoRelativeDifferencesFilter;
-   private int                            _distanceInterval;
-   private int                            _geoAccuracy;
-   private int                            _geoRelativeDifferencesFilter;
-   private long                           _maxMinDiff;
+   private boolean                    _isGeoRelativeDifferencesFilter;
+   private int                        _distanceInterval;
+   private int                        _geoAccuracy;
+   private int                        _geoRelativeDifferencesFilter;
+   private long                       _maxMinDiff;
 
-   private OpenDialogManager              _openDlgMgr                = new OpenDialogManager();
-   private SlideoutGeoCompareOptions      _slideoutGeoCompareOptions;
-   private GeoCompareState                _slideoutGeoCompareState   = new GeoCompareState();
+   private OpenDialogManager          _openDlgMgr                = new OpenDialogManager();
+   private SlideoutGeoCompareOptions  _slideoutGeoCompareOptions;
+   private GeoCompareState            _slideoutGeoCompareState   = new GeoCompareState();
 
-   private PixelConverter                 _pc;
+   private PixelConverter             _pc;
 
-   private ActionAppTourFilter            _actionAppTourFilter;
-   private ActionOnOff                    _actionOnOff;
-   private ActionGeoCompareOptions        _actionGeoCompareOptions;
+   private ActionAppTourFilter        _actionAppTourFilter;
+   private ActionOnOff                _actionOnOff;
+   private ActionGeoCompareOptions    _actionGeoCompareOptions;
 
-   private final NumberFormat             _nf1                       = NumberFormat.getInstance();
+   private final NumberFormat         _nf1                       = NumberFormat.getInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -343,8 +343,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-         final GeoPartComparerItem item1 = (GeoPartComparerItem) e1;
-         final GeoPartComparerItem item2 = (GeoPartComparerItem) e2;
+         final GeoComparedTour item1 = (GeoComparedTour) e1;
+         final GeoComparedTour item2 = (GeoComparedTour) e2;
 
          double rc = 0;
 
@@ -799,7 +799,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             _distanceInterval);
 
       // load tour id's in the geo parts
-      final GeoPartItem newGeoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
+      final GeoPartData newGeoPartItem = GeoPartTourLoader.loadToursFromGeoParts(
             _compareData_GeoGrid,
             normalizedGeoData,
             _compareData_IsUseAppFilter,
@@ -824,7 +824,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    }
 
-   void compare_40_CompareTours(final GeoPartItem geoPartItem) {
+   void compare_40_CompareTours(final GeoPartData geoPartItem) {
 
       _compareData_NumGeoPartTours = geoPartItem.tourIds.length;
 
@@ -882,9 +882,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    }
 
-   void compare_50_TourIsCompared(final GeoPartComparerItem comparerItem) {
+   void compare_50_TourIsCompared(final GeoComparedTour comparerItem) {
 
-      final GeoPartItem geoPartItem = comparerItem.geoPartItem;
+      final GeoPartData geoPartItem = comparerItem.geoPartData;
 
       if (geoPartItem.isCanceled || geoPartItem.executorId != _workerExecutorId) {
          return;
@@ -902,14 +902,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       // get previous selected item
-      final GeoPartComparerItem[] reselectedItem = { null };
+      final GeoComparedTour[] reselectedItem = { null };
       if (geoPartItem.isReselectedInUI == false) {
 
          geoPartItem.isReselectedInUI = true;
 
          if (_selectedComparerItem != null) {
 
-            for (final GeoPartComparerItem reselectComparerItem : _comparedTours) {
+            for (final GeoComparedTour reselectComparerItem : _comparedTours) {
 
                if (reselectComparerItem.tourId == _selectedComparerItem.tourId) {
                   reselectedItem[0] = reselectComparerItem;
@@ -934,7 +934,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             // fire geo part compare result
             GeoCompareManager.fireEvent(
                   GeoCompareEventId.COMPARE_GEO_PARTS,
-                  comparerItem.geoPartItem,
+                  comparerItem.geoPartData,
                   GeoCompareView.this);
 
             if (workedTours == _compareData_NumGeoPartTours) {
@@ -970,7 +970,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       });
    }
 
-   private void compare_60_AllIsCompared(final GeoPartItem geoPartItem) {
+   private void compare_60_AllIsCompared(final GeoPartData geoPartItem) {
 
       /*
        * Keep state after compare is done
@@ -989,7 +989,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        * Get max mindiff value
        */
       _maxMinDiff = 0;
-      for (final GeoPartComparerItem comparerItem : geoPartItem.comparedTours) {
+      for (final GeoComparedTour comparerItem : geoPartItem.comparedTours) {
 
          if (comparerItem.minDiffValue > _maxMinDiff) {
             _maxMinDiff = comparerItem.minDiffValue;
@@ -1001,7 +1001,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // this code may be compact and fast but I don't understand it
 
-         final ArrayList<GeoPartComparerItem> filteredComparedTours = new ArrayList<>(
+         final ArrayList<GeoComparedTour> filteredComparedTours = new ArrayList<>(
 
                geoPartItem.comparedTours
                      .stream()
@@ -1322,7 +1322,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             colDef.printDetailValue(cell, item.avgPulse);
          }
@@ -1350,7 +1350,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
             final long minDiffValue = item.minDiffValue;
 
             final String minDiffText = minDiffValue == -2
@@ -1385,7 +1385,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
             final long minDiffValue = item.minDiffValue;
 
             final String minDiffText = minDiffValue == -2 || _maxMinDiff == -1
@@ -1414,7 +1414,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final double value = item.avgAltimeter;
 
@@ -1440,7 +1440,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final float avgpace = item.avgPace * UI.UNIT_VALUE_DISTANCE;
 
@@ -1470,7 +1470,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final double speed = item.avgSpeed / UI.UNIT_VALUE_DISTANCE;
 
@@ -1492,7 +1492,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final double value = item.distance
                   / 1000.0
@@ -1516,7 +1516,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final long value = item.elapsedTime;
 
@@ -1540,7 +1540,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final long value = item.movingTime;
 
@@ -1563,7 +1563,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final long value = item.recordedTime;
 
@@ -1588,7 +1588,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final ZonedDateTime tourStartTime = item.tourStartTime;
             cell.setText(
@@ -1615,7 +1615,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             cell.setText(item.tourTitle);
          }
@@ -1872,9 +1872,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final Object itemData = event.item.getData();
 
-      if (itemData instanceof GeoPartComparerItem) {
+      if (itemData instanceof GeoComparedTour) {
 
-         final GeoPartComparerItem compareItem = (GeoPartComparerItem) itemData;
+         final GeoComparedTour compareItem = (GeoComparedTour) itemData;
          final TourType tourType = compareItem.tourType;
 
          if (tourType != null) {
@@ -1908,7 +1908,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       final ISelection selection = event.getSelection();
       final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-      _selectedComparerItem = (GeoPartComparerItem) firstElement;
+      _selectedComparerItem = (GeoComparedTour) firstElement;
 
       // fire selection for the selected geo part tour
       _postSelectionProvider.setSelection(selection);
@@ -2287,7 +2287,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   private void updateUI_GeoItem(final GeoPartItem geoItem) {
+   private void updateUI_GeoItem(final GeoPartData geoItem) {
 
       if (geoItem == null) {
 

@@ -52,7 +52,7 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.referenceTour.ElevationCompareConfig;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
@@ -842,9 +842,9 @@ public class TourChartView extends ViewPart implements
 
                updateChart(tourData);
 
-            } else if (firstElement instanceof GeoPartComparerItem) {
+            } else if (firstElement instanceof GeoComparedTour) {
 
-               final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
+               final GeoComparedTour geoCompareItem = (GeoComparedTour) firstElement;
 
                updateChart(
                      geoCompareItem.tourId,

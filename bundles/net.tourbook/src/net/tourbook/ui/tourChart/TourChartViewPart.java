@@ -30,7 +30,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
-import net.tourbook.ui.views.geoCompare.GeoPartItem;
+import net.tourbook.ui.views.geoCompare.GeoPartData;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
@@ -254,9 +254,9 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
       case COMPARE_GEO_PARTS:
 
-         if (eventData instanceof GeoPartItem) {
+         if (eventData instanceof GeoPartData) {
 
-            final GeoPartItem geoPartItem = (GeoPartItem) eventData;
+            final GeoPartData geoPartItem = (GeoPartData) eventData;
 
             final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
             final long tourId = normalizedTourPart.tourId;

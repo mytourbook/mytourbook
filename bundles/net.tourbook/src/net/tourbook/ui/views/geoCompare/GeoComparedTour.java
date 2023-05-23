@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,11 +23,11 @@ import net.tourbook.data.TourType;
 /**
  * Contains data for one compared tour
  */
-public class GeoPartComparerItem {
+public class GeoComparedTour {
 
    public long        tourId;
 
-   public GeoPartItem geoPartItem;
+   public GeoPartData geoPartData;
 
    /*
     * Compare results
@@ -65,17 +65,17 @@ public class GeoPartComparerItem {
    String         tourTitle    = UI.EMPTY_STRING;
    TourType       tourType;
 
-   public GeoPartComparerItem(final long tourId, final GeoPartItem geoPartItem) {
+   public GeoComparedTour(final long tourId, final GeoPartData geoPartItem) {
 
       this.tourId = tourId;
-      this.geoPartItem = geoPartItem;
+      this.geoPartData = geoPartItem;
    }
 
    @Override
    public String toString() {
       return "GeoPartComparerItem [" //$NON-NLS-1$
             + "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoPartItem=" + geoPartItem + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+            + "geoPartItem=" + geoPartData + "]"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 }

@@ -153,7 +153,7 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
@@ -3313,11 +3313,11 @@ public class Map2View extends ViewPart implements
 
             paintTours_20_One(tourData, false);
 
-         } else if (firstElement instanceof GeoPartComparerItem) {
+         } else if (firstElement instanceof GeoComparedTour) {
 
             final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour().getTourData();
 
-            final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
+            final GeoComparedTour geoCompareItem = (GeoComparedTour) firstElement;
             final long comparedTourId = geoCompareItem.tourId;
             final TourData comparedTourData = TourManager.getInstance().getTourData(comparedTourId);
 

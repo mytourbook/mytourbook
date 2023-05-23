@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,8 +36,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
-import net.tourbook.ui.views.geoCompare.GeoPartItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
+import net.tourbook.ui.views.geoCompare.GeoPartData;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -196,9 +196,9 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
 
             showRefTour(((TVIElevationCompareResult_ComparedTour) firstElement).refTour.refId);
 
-         } else if (firstElement instanceof GeoPartComparerItem) {
+         } else if (firstElement instanceof GeoComparedTour) {
 
-            final GeoPartItem geoPartItem = ((GeoPartComparerItem) firstElement).geoPartItem;
+            final GeoPartData geoPartItem = ((GeoComparedTour) firstElement).geoPartData;
 
             showRefTour(geoPartItem.refId);
          }
