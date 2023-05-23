@@ -140,19 +140,22 @@ public class SelectionChartXSliderPosition implements ISelection {
 
    @Override
    public String toString() {
+
       return UI.EMPTY_STRING
 
-            + "SelectionChartXSliderPosition [" + NL //                       //$NON-NLS-1$
+            + "SelectionChartXSliderPosition" + NL //                            //$NON-NLS-1$
 
-            + "_beforeLeftSliderIndex  =" + _beforeLeftSliderIndex + NL //    //$NON-NLS-1$
-            + "_leftSliderValueIndex   =" + _leftSliderValueIndex + NL //     //$NON-NLS-1$
-            + "_rightSliderValueIndex  =" + _rightSliderValueIndex + NL //    //$NON-NLS-1$
-            + "_isCenterSliderPosition =" + _isCenterSliderPosition + NL //   //$NON-NLS-1$
+            + "[" + NL //                                                        //$NON-NLS-1$
 
-//				+ "_chart=" + _chart + NL //
-//				+ "_customData=" + _customData+ NL //
+            + "   _beforeLeftSliderIndex  = " + _beforeLeftSliderIndex + NL //   //$NON-NLS-1$
+            + "   _leftSliderValueIndex   = " + _leftSliderValueIndex + NL //    //$NON-NLS-1$
+            + "   _rightSliderValueIndex  = " + _rightSliderValueIndex + NL //   //$NON-NLS-1$
+            + "   _isCenterSliderPosition = " + _isCenterSliderPosition + NL //  //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+//				+ "  _chart=" + _chart + NL //
+//				+ "  _customData=" + _customData+ NL //
+
+            + "]"; //                                                            //$NON-NLS-1$
    }
 
 }

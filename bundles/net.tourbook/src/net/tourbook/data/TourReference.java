@@ -97,7 +97,7 @@ public class TourReference implements Serializable {
 
    public int getEndIndex() {
       return endIndex;
-    }
+   }
 
    public int getEndValueIndex() {
       return endIndex;
@@ -164,6 +164,8 @@ public class TourReference implements Serializable {
 
       return "TourReference" + NL //                     //$NON-NLS-1$
 
+            + "[" + NL //                                //$NON-NLS-1$
+
             + "   label       = " + label + NL //        //$NON-NLS-1$
             + "   refId       = " + refId + NL //        //$NON-NLS-1$
             + "   startIndex  = " + startIndex + NL //   //$NON-NLS-1$
@@ -171,6 +173,7 @@ public class TourReference implements Serializable {
 
 //          + "   tourData    = " + tourData + NL //     //$NON-NLS-1$
 
+            + "]" + NL //                                //$NON-NLS-1$
       ;
    }
 }

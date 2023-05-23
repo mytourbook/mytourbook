@@ -54,7 +54,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
-import net.tourbook.ui.views.referenceTour.ElevationCompareConfig;
+import net.tourbook.ui.views.referenceTour.CompareConfig;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
@@ -810,7 +810,7 @@ public class TourChartView extends ViewPart implements
 
                final long refId = refItem.refId;
 
-               final ElevationCompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+               final CompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
                if (compareConfig == null) {
                   return;
                }

@@ -64,7 +64,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.referenceTour.ElevationCompareConfig;
+import net.tourbook.ui.views.referenceTour.CompareConfig;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
 import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
@@ -1269,15 +1269,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void defineAllColumns() {
 
       defineColumn_00_SequenceNumber();
+
       defineColumn_GeoDiff();
       defineColumn_GeoDiff_Relative();
+      defineColumn_Elevation_ElevationGain();
+      defineColumn_Elevation_ElevationLoss();
       defineColumn_Time_TourStartDate();
+      defineColumn_Tour_Type();
       defineColumn_Motion_AvgPace();
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_Altimeter();
       defineColumn_Motion_Distance();
-      defineColumn_Elevation_ElevationGain();
-      defineColumn_Elevation_ElevationLoss();
 
       defineColumn_Body_AvgPulse();
 
@@ -1285,7 +1287,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       defineColumn_Time_RecordedTime();
       defineColumn_Time_MovingTime();
 
-      defineColumn_Tour_Type();
       defineColumn_Tour_Title();
    }
 
@@ -1343,6 +1344,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_GAIN.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -1369,6 +1371,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_LOSS.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -1397,7 +1400,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Label);
       colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Header);
-      colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_GeoDiff_Label);
+      colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_GeoDiff_Tooltip);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -2310,7 +2313,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void showRefTour(final long refId) {
 
-      final ElevationCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
 
       if (tourCompareConfig == null) {
          return;

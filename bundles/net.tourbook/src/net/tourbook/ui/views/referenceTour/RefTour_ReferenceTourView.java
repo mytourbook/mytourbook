@@ -23,7 +23,6 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
-import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -233,60 +232,42 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
     * @param compareConfig
     * @return Returns <code>true</code> then the ref tour changed
     */
-   private void setTourCompareConfig(final ElevationCompareConfig compareConfig) {
+   private void setTourCompareConfig(final CompareConfig compareConfig) {
 
-      // save the chart slider positions for the old ref tour
-      final ElevationCompareConfig oldRefTourConfig = ReferenceTourManager.getTourCompareConfig(_activeRefId);
+      _tourChart.addDataModelListener(chartDataModel -> {
 
-      if (oldRefTourConfig != null) {
-
-         final SelectionChartXSliderPosition oldXSliderPosition = _tourChart.getXSliderPosition();
-
-         oldRefTourConfig.setXSliderPosition(
-               new SelectionChartXSliderPosition(
-                     _tourChart,
-                     oldXSliderPosition.getLeftSliderValueIndex(),
-                     oldXSliderPosition.getRightSliderValueIndex()));
-      }
-
-      _tourChart.addDataModelListener(new IDataModelListener() {
-
-         @Override
-         public void dataModelChanged(final ChartDataModel changedChartDataModel) {
-
-            if (_tourData == null) {
-               return;
-            }
-
-            final ChartDataXSerie xData = changedChartDataModel.getXData();
-            final TourReference refTour = compareConfig.getRefTour();
-
-            final int refTour_EndValueIndex = refTour.getEndValueIndex();
-            final double[] xValues = xData.getHighValuesDouble()[0];
-            if (refTour_EndValueIndex >= xValues.length) {
-
-               // an ArrayIndexOutOfBoundsException occured but cannot be reproduced
-               return;
-            }
-
-            // set marker positions
-            xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour_EndValueIndex);
-
-            // set the value difference of the synch marker
-            final double refTourXMarkerValue = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
-
-            TourManager.fireEventWithCustomData(
-                  TourEventId.REFERENCE_TOUR_CHANGED,
-                  new TourPropertyRefTourChanged(_tourChart, refTour.getRefId(), refTourXMarkerValue),
-                  RefTour_ReferenceTourView.this);
-
-            // set title
-            changedChartDataModel.setTitle(NLS.bind(
-                  Messages.tourCatalog_view_label_chart_title_reference_tour,
-                  refTour.getLabel(),
-                  TourManager.getTourTitleDetailed(_tourData)));
-
+         if (_tourData == null) {
+            return;
          }
+
+         final ChartDataXSerie xData = chartDataModel.getXData();
+         final TourReference refTour = compareConfig.getRefTour();
+
+         final int refTour_EndValueIndex = refTour.getEndValueIndex();
+         final double[] xValues = xData.getHighValuesDouble()[0];
+         if (refTour_EndValueIndex >= xValues.length) {
+
+            // an ArrayIndexOutOfBoundsException occured but cannot be reproduced
+            return;
+         }
+
+         // set marker positions
+         xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour_EndValueIndex);
+
+         // set the value difference of the synch marker
+         final double refTourXMarkerValue = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
+
+         TourManager.fireEventWithCustomData(
+               TourEventId.REFERENCE_TOUR_CHANGED,
+               new TourPropertyRefTourChanged(_tourChart, refTour.getRefId(), refTourXMarkerValue),
+               RefTour_ReferenceTourView.this);
+
+         // set title
+         chartDataModel.setTitle(NLS.bind(
+               Messages.tourCatalog_view_label_chart_title_reference_tour,
+               refTour.getLabel(),
+               TourManager.getTourTitleDetailed(_tourData)));
+
       });
    }
 
@@ -297,7 +278,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
          return;
       }
 
-      final ElevationCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
       if (tourCompareConfig == null) {
          return;
       }

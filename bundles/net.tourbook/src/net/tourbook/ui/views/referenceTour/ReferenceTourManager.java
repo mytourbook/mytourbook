@@ -30,23 +30,20 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 
-/**
- *
- */
 public class ReferenceTourManager {
 
    private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tourCatalog.ReferenceTourManager");//$NON-NLS-1$
 
    //
-   private static final HashMap<Long, ElevationCompareConfig> _compareConfigCache = new HashMap<>();
+   private static final HashMap<Long, CompareConfig> _compareConfigCache = new HashMap<>();
 
    /**
     * When {@link #_geoCompare_RefId} == 0 then {@link #getTourCompareConfig(long)} will return
     * <code>null</code>, this is wrong when refId == 0
     */
-   private static long                                        _geoCompare_RefId   = Long.MIN_VALUE;
-   private static TourReference                               _geoCompare_RefTour;
-   private static ElevationCompareConfig                      _geoCompare_RefConfig;
+   private static long                               _geoCompare_RefId   = Long.MIN_VALUE;
+   private static TourReference                      _geoCompare_RefTour;
+   private static CompareConfig                      _geoCompare_RefConfig;
 
    private ReferenceTourManager() {}
 
@@ -71,7 +68,7 @@ public class ReferenceTourManager {
             endIndex);
 
       _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
-      _geoCompare_RefConfig.isGeoCompareRefTour = true;
+      _geoCompare_RefConfig.setIsGeoCompareRefTour(true);
 
       return _geoCompare_RefId;
    }
@@ -79,7 +76,7 @@ public class ReferenceTourManager {
    /**
     * Create a new reference tour configuration
     */
-   private static ElevationCompareConfig createTourCompareConfig(final TourReference refTour) {
+   private static CompareConfig createTourCompareConfig(final TourReference refTour) {
 
       final TourData refTourData = refTour.getTourData();
 
@@ -90,7 +87,7 @@ public class ReferenceTourManager {
             refTourData,
             refTourChartConfig);
 
-      final ElevationCompareConfig compareConfig = new ElevationCompareConfig(
+      final CompareConfig compareConfig = new CompareConfig(
             refTour,
             chartDataModel,
             refTourData.getTourId(),
@@ -117,20 +114,20 @@ public class ReferenceTourManager {
    }
 
    /**
-    * Returns a {@link ElevationCompareConfig} or <code>null</code> when the reference tour cannot
+    * Returns a {@link CompareConfig} or <code>null</code> when the reference tour cannot
     * be loaded from the database
     *
     * @param refId
     *           Reference Id
     * @return
     */
-   public static ElevationCompareConfig getTourCompareConfig(final long refId) {
+   public static CompareConfig getTourCompareConfig(final long refId) {
 
       if (refId == _geoCompare_RefId) {
          return _geoCompare_RefConfig;
       }
 
-      final ElevationCompareConfig compareConfig = _compareConfigCache.get(refId);
+      final CompareConfig compareConfig = _compareConfigCache.get(refId);
 
       if (compareConfig != null) {
          return compareConfig;
@@ -145,7 +142,7 @@ public class ReferenceTourManager {
          return null;
       }
 
-      final ElevationCompareConfig newCompareConfig = createTourCompareConfig(refTour);
+      final CompareConfig newCompareConfig = createTourCompareConfig(refTour);
 
       // keep ref config in the cache
       _compareConfigCache.put(refId, newCompareConfig);

@@ -16,32 +16,32 @@
 package net.tourbook.ui.views.referenceTour;
 
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 /**
- * Contains data and configuration for the elevation compared tour
+ * Contains data and configuration for a elevation or geo compared tour
  */
-public class ElevationCompareConfig {
+public class CompareConfig {
 
-   private TourReference                 _refTour;
-   private Long                          _refTourTourId;
+   private static final char      NL = UI.NEW_LINE;
 
-   private TourChartConfiguration        _refTourChartConfig;
-   private TourChartConfiguration        _compareTourChartConfig;
+   private TourReference          _refTour;
+   private Long                   _refTourTourId;
 
-   private SelectionChartXSliderPosition _xSliderPosition;
+   private TourChartConfiguration _refTourChartConfig;
+   private TourChartConfiguration _compareTourChartConfig;
 
-   public boolean                        isGeoCompareRefTour;
+   private boolean                _isGeoCompareRefTour;
 
-   ElevationCompareConfig(final TourReference refTour,
-                          final ChartDataModel refChartDataModel,
-                          final Long refTourTourId,
-                          final TourChartConfiguration refTourChartConfig,
-                          final TourChartConfiguration compTourChartConfig) {
+   CompareConfig(final TourReference refTour,
+                 final ChartDataModel refChartDataModel,
+                 final Long refTourTourId,
+                 final TourChartConfiguration refTourChartConfig,
+                 final TourChartConfiguration compTourChartConfig) {
 
       _refTour = refTour;
       _refTourTourId = refTourTourId;
@@ -72,27 +72,30 @@ public class ElevationCompareConfig {
       return TourManager.getInstance().getTourData(_refTourTourId);
    }
 
-   SelectionChartXSliderPosition getXSliderPosition() {
-      return _xSliderPosition;
+   public boolean isGeoCompareRefTour() {
+      return _isGeoCompareRefTour;
    }
 
-   void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
-      _xSliderPosition = sliderPosition;
+   public void setIsGeoCompareRefTour(final boolean isGeoCompareRefTour) {
+      _isGeoCompareRefTour = isGeoCompareRefTour;
    }
 
    @Override
    public String toString() {
 
-      return "TourCompareConfig [" //$NON-NLS-1$
+      return "CompareConfig" + NL //                                             //$NON-NLS-1$
 
-            + "_refTour                =" + _refTour + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "_refTourTourId          =" + _refTourTourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "_refTourChartConfig     =" + _refTourChartConfig + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "_compareTourChartConfig =" + _compareTourChartConfig + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "_xSliderPosition        =" + _xSliderPosition + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "isGeoCompareRefTour     =" + isGeoCompareRefTour //$NON-NLS-1$
+            + "[" + NL //                                                        //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "  _refTourTourId          = " + _refTourTourId + NL //            //$NON-NLS-1$
+            + "  _refTourChartConfig     = " + _refTourChartConfig + NL //       //$NON-NLS-1$
+            + "  _compareTourChartConfig = " + _compareTourChartConfig + NL //   //$NON-NLS-1$
+
+            + "  _isGeoCompareRefTour    = " + _isGeoCompareRefTour + NL //      //$NON-NLS-1$
+            + "  _refTour                = " + _refTour + NL //                  //$NON-NLS-1$
+
+            + "]" + NL //                                                        //$NON-NLS-1$
+      ;
    }
 
 }
