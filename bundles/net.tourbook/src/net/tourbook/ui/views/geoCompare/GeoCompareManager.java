@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -233,6 +234,12 @@ public class GeoCompareManager {
          comparerItem.tourType = tourData.getTourType();
 
          comparerItem.avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), origStartIndex, origEndIndex);
+
+         final ElevationGainLoss elevationGainLoss = tourData.computeAltitudeUpDown(origStartIndex, origEndIndex);
+         if (elevationGainLoss != null) {
+            comparerItem.elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+            comparerItem.elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+         }
 
          final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
          final int movingTime = Math.max(0, elapsedTime - tourData.getBreakTime(origStartIndex, origEndIndex));

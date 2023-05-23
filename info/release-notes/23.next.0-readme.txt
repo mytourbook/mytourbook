@@ -35,8 +35,15 @@ New
 Improvements
 ============
 
-*
+* Reference Tour View
+  - Autoexpand/collapse when selected with mouse
+  - Expand one category item and collapse others
+  
+* Geo Compare View
+  - Elevation gain/loss columns
 
+* Tour Chart
+  - Set slider positions to a selected reference tour or geo compared tour
 
 Changes
 =======

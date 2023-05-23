@@ -57,7 +57,10 @@ public class GeoComparedTour {
    int            elapsedTime;
    long           recordedTime;
    long           movingTime;
+
    float          distance;
+   float          elevationGain;
+   float          elevationLoss;
 
    /**
     * Ensure title it is set for sorting

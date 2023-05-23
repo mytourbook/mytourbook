@@ -16,8 +16,8 @@
 package net.tourbook.ui.views.referenceTour;
 
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,8 +91,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -117,32 +120,30 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
+/**
+ * Tour map -> Tour catalog -> Reference tour
+ */
 public class ReferenceTourView extends ViewPart implements
+
       ITourViewer,
       ITourProvider,
       IReferenceTourProvider,
       ITreeViewer {
 
-   public static final String     ID                                 = "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
+   public static final String                  ID                                       = "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
 
-   public static final int        COLUMN_LABEL                       = 0;
-   public static final int        COLUMN_SPEED                       = 1;
+   public static final int                     COLUMN_LABEL                             = 0;
+   public static final int                     COLUMN_SPEED                             = 1;
 
-   private static final String    MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID = "tour.catalog.active.ref.id";                     //$NON-NLS-1$
-   private static final String    MEMENTO_TOUR_CATALOG_LINK_TOUR     = "tour.catalog.link.tour";                         //$NON-NLS-1$
-   private static final String    STATE_IS_USE_FAST_APP_TOUR_FILTER  = "STATE_IS_USE_FAST_APP_TOUR_FILTER";              //$NON-NLS-1$
+   private static final String                 MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID       = "tour.catalog.active.ref.id";                     //$NON-NLS-1$
+   private static final String                 MEMENTO_TOUR_CATALOG_LINK_TOUR           = "tour.catalog.link.tour";                         //$NON-NLS-1$
+   private static final String                 STATE_IS_ON_SELECT_EXPAND_COLLAPSE       = "STATE_IS_ON_SELECT_EXPAND_COLLAPSE";             //$NON-NLS-1$
+   private static final String                 STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS   = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";         //$NON-NLS-1$
+   private static final String                 STATE_IS_USE_FAST_APP_TOUR_FILTER        = "STATE_IS_USE_FAST_APP_TOUR_FILTER";              //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore                         = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore _prefStore_Common                  = CommonActivator.getPrefStore();
-   private final IDialogSettings  _state                             = TourbookPlugin.getState(ID);
-
-   private TVIRefTour_RootItem     _rootItem;
-
-   private final NumberFormat     _nf1                               = NumberFormat.getNumberInstance();
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
+   private static final IPreferenceStore       _prefStore                               = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore       _prefStore_Common                        = CommonActivator.getPrefStore();
+   private static final IDialogSettings        _state                                   = TourbookPlugin.getState(ID);
 
    private PostSelectionProvider               _postSelectionProvider;
 
@@ -152,10 +153,23 @@ public class ReferenceTourView extends ViewPart implements
    private IPropertyChangeListener             _prefChangeListener_Common;
    private ITourEventListener                  _tourEventListener;
 
+   private TreeViewer                          _tourViewer;
+   private ColumnManager                       _columnManager;
+   private TreeColumnDefinition                _colDef_TourTypeImage;
+
    /**
-    * tour item which is selected by the link tour action
+    * Index of the column with the image, index can be changed when the columns are reordered with
+    * the mouse or the column manager
     */
-   protected TVIRefTour_ComparedTour            _linkedTour;
+   private int                                 _columnIndex_TourTypeImage               = -1;
+   private int                                 _columnWidth_TourTypeImage;
+
+   private TVIRefTour_RootItem                 _rootItem;
+
+   /**
+    * Tour item which is selected by the link tour action
+    */
+   private TVIRefTour_ComparedTour             _linkedTour;
 
    /**
     * ref id which is currently selected in the tour viewer
@@ -167,44 +181,43 @@ public class ReferenceTourView extends ViewPart implements
     */
    private boolean                             _isToolbarCreated;
 
-   private TreeViewer                          _tourViewer;
-   private ColumnManager                       _columnManager;
-   private TreeColumnDefinition                _colDef_TourTypeImage;
-
-   /**
-    * Index of the column with the image, index can be changed when the columns are reordered with
-    * the mouse or the column manager
-    */
-   private int                                 _columnIndex_TourTypeImage = -1;
-   private int                                 _columnWidth_TourTypeImage;
-
    private boolean                             _isToolTipInRefTour;
    private boolean                             _isToolTipInTitle;
    private boolean                             _isToolTipInTags;
 
+   private boolean                             _isMouseContextMenu;
+   private boolean                             _isSelectedWithKeyboard;
+   private boolean                             _isBehaviour_SingleExpand_CollapseOthers = true;
+   private boolean                             _isBehaviour_OnSelect_ExpandCollapse     = true;
+   private boolean                             _isInCollapseAll;
+   private boolean                             _isInExpandingSelection;
+   private int                                 _expandRunnableCounter;
+
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
-   private TourDoubleClickState                _tourDoubleClickState      = new TourDoubleClickState();
+   private TourDoubleClickState                _tourDoubleClickState                    = new TourDoubleClickState();
 
    private TagMenuManager                      _tagMenuManager;
    private MenuManager                         _viewerMenuManager;
-   private IContextMenuProvider                _viewerContextMenuProvider = new TreeContextMenuProvider();
+   private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
    private ActionAppTourFilter                 _action_AppTourFilter;
    private ActionLinkTour                      _action_LinkTour;
    private ActionRefreshView                   _action_RefreshView;
    private Action_ViewLayout                   _action_ToggleRefTourLayout;
 
-   private ActionCollapseAll                   _actionContext_CollapseAll;
+   private ActionCollapseAll_WithoutSelection  _actionContext_CollapseAll;
    private ActionCollapseOthers                _actionContext_CollapseOthers;
    private ActionCompareByElevation_AllTours   _actionContext_Compare_AllTours;
+   private ActionCompareByElevation_WithWizard _actionContext_Compare_WithWizard;
    private ActionEditQuick                     _actionContext_EditQuick;
    private ActionEditTour                      _actionContext_EditTour;
    private ActionExpandSelection               _actionContext_ExpandSelection;
+   private ActionOnMouseSelect_ExpandCollapse  _actionContext_OnMouseSelect_ExpandCollapse;
    private ActionOpenTour                      _actionContext_OpenTour;
    private ActionRemoveComparedTours           _actionContext_RemoveComparedTours;
    private ActionRenameRefTour                 _actionContext_RenameRefTour;
    private ActionSetTourTypeMenu               _actionContext_SetTourType;
-   private ActionCompareByElevation_WithWizard _actionContext_Compare_WithWizard;
+   private ActionSingleExpand_CollapseOthers   _actionContext_SingleExpand_CollapseOthers;
 
    private PixelConverter                      _pc;
 
@@ -241,6 +254,51 @@ public class ReferenceTourView extends ViewPart implements
          setToolTipText(Messages.Elevation_Compare_Action_AppTourFilter_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+      }
+   }
+
+   private class ActionCollapseAll_WithoutSelection extends ActionCollapseAll {
+
+      public ActionCollapseAll_WithoutSelection(final ReferenceTourView referenceTourView) {
+         super(referenceTourView);
+      }
+
+      @Override
+      public void run() {
+
+         _isInCollapseAll = true;
+         {
+            super.run();
+         }
+         _isInCollapseAll = false;
+      }
+   }
+
+   private class ActionOnMouseSelect_ExpandCollapse extends Action {
+
+      public ActionOnMouseSelect_ExpandCollapse() {
+
+         super(Messages.Tour_Tags_Action_OnMouseSelect_ExpandCollapse, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         _isBehaviour_OnSelect_ExpandCollapse = _actionContext_OnMouseSelect_ExpandCollapse.isChecked();
+      }
+   }
+
+   private class ActionSingleExpand_CollapseOthers extends Action {
+
+      public ActionSingleExpand_CollapseOthers() {
+
+         super(Messages.Tour_Tags_Action_SingleExpand_CollapseOthers, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         _isBehaviour_SingleExpand_CollapseOthers = _actionContext_SingleExpand_CollapseOthers.isChecked();
       }
    }
 
@@ -297,7 +355,6 @@ public class ReferenceTourView extends ViewPart implements
 
          return _treeContextMenu;
       }
-
    }
 
    public ReferenceTourView() {}
@@ -595,22 +652,28 @@ public class ReferenceTourView extends ViewPart implements
 
    private void createActions() {
 
-      _action_AppTourFilter = new ActionAppTourFilter();
-      _action_LinkTour = new ActionLinkTour(this);
-      _action_RefreshView = new ActionRefreshView(this);
-      _action_ToggleRefTourLayout = new Action_ViewLayout();
+// SET_FORMATTING_OFF
 
-      _actionContext_CollapseAll = new ActionCollapseAll(this);
-      _actionContext_Compare_AllTours = new ActionCompareByElevation_AllTours(this);
-      _actionContext_Compare_WithWizard = new ActionCompareByElevation_WithWizard(this);
-      _actionContext_RemoveComparedTours = new ActionRemoveComparedTours(this);
-      _actionContext_RenameRefTour = new ActionRenameRefTour(this);
-      _actionContext_CollapseOthers = new ActionCollapseOthers(this);
-      _actionContext_ExpandSelection = new ActionExpandSelection(this);
-      _actionContext_EditQuick = new ActionEditQuick(this);
-      _actionContext_EditTour = new ActionEditTour(this);
-      _actionContext_OpenTour = new ActionOpenTour(this);
-      _actionContext_SetTourType = new ActionSetTourTypeMenu(this);
+      _action_AppTourFilter                        = new ActionAppTourFilter();
+      _action_LinkTour                             = new ActionLinkTour(this);
+      _action_RefreshView                          = new ActionRefreshView(this);
+      _action_ToggleRefTourLayout                  = new Action_ViewLayout();
+
+      _actionContext_CollapseAll                   = new ActionCollapseAll_WithoutSelection(this);
+      _actionContext_Compare_AllTours              = new ActionCompareByElevation_AllTours(this);
+      _actionContext_Compare_WithWizard            = new ActionCompareByElevation_WithWizard(this);
+      _actionContext_RemoveComparedTours           = new ActionRemoveComparedTours(this);
+      _actionContext_RenameRefTour                 = new ActionRenameRefTour(this);
+      _actionContext_CollapseOthers                = new ActionCollapseOthers(this);
+      _actionContext_ExpandSelection               = new ActionExpandSelection(this);
+      _actionContext_EditQuick                     = new ActionEditQuick(this);
+      _actionContext_EditTour                      = new ActionEditTour(this);
+      _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
+      _actionContext_OpenTour                      = new ActionOpenTour(this);
+      _actionContext_SetTourType                   = new ActionSetTourTypeMenu(this);
+      _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
+
+// SET_FORMATTING_ON
    }
 
    private void createMenuManager() {
@@ -691,14 +754,23 @@ public class ReferenceTourView extends ViewPart implements
       tree.setHeaderVisible(true);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+      tree.addListener(SWT.MouseDown, event -> {
+
+         _isMouseContextMenu = event.button == 3;
+      });
+
+      tree.addKeyListener(keyPressedAdapter(keyEvent -> {
+
+         _isSelectedWithKeyboard = true;
+      }));
+
       _tourViewer = new TreeViewer(tree);
       _columnManager.createColumns(_tourViewer);
 
       _tourViewer.setContentProvider(new TourContentProvider());
       _tourViewer.setUseHashlookup(true);
 
-      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectionChanged(
-            (IStructuredSelection) selectionChangedEvent.getSelection()));
+      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> onTourViewer_Selection(selectionChangedEvent));
 
       _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 
@@ -1222,6 +1294,18 @@ public class ReferenceTourView extends ViewPart implements
                   : TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
+   private void expandCollapseItem(final TreeViewerItem treeItem) {
+
+      if (_tourViewer.getExpandedState(treeItem)) {
+
+         _tourViewer.collapseToLevel(treeItem, 1);
+
+      } else {
+
+         _tourViewer.expandToLevel(treeItem, 1);
+      }
+   }
+
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       /*
@@ -1256,6 +1340,8 @@ public class ReferenceTourView extends ViewPart implements
       menuMgr.add(_actionContext_CollapseOthers);
       menuMgr.add(_actionContext_ExpandSelection);
       menuMgr.add(_actionContext_CollapseAll);
+      menuMgr.add(_actionContext_OnMouseSelect_ExpandCollapse);
+      menuMgr.add(_actionContext_SingleExpand_CollapseOthers);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionContext_Compare_WithWizard);
@@ -1577,15 +1663,158 @@ public class ReferenceTourView extends ViewPart implements
       }
    }
 
+   private void onSelect_CategoryItem(final TreeSelection treeSelection) {
+
+      if (_isInExpandingSelection) {
+
+         // prevent endless loops
+
+         return;
+      }
+
+      final TreePath[] selectedTreePaths = treeSelection.getPaths();
+      if (selectedTreePaths.length == 0) {
+         return;
+      }
+
+      final TreePath selectedTreePath = selectedTreePaths[0];
+      if (selectedTreePath == null) {
+         return;
+      }
+
+      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection, selectedTreePath);
+   }
+
+   /**
+    * This is not yet working thoroughly because the expanded position moves up or down and all
+    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * tree is clicked.
+    *
+    * @param treeSelection
+    * @param selectedTreePath
+    */
+   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection,
+                                                            final TreePath selectedTreePath) {
+
+      if (_isInCollapseAll) {
+
+         // prevent auto expand
+
+         return;
+      }
+
+      if (_isBehaviour_SingleExpand_CollapseOthers) {
+
+         /*
+          * run async because this is doing a reselection which cannot be done within the current
+          * selection event
+          */
+         Display.getCurrent().asyncExec(new Runnable() {
+
+            private long           __expandRunnableCounter = ++_expandRunnableCounter;
+
+            private ITreeSelection __treeSelection         = treeSelection;
+            private TreePath       __selectedTreePath      = selectedTreePath;
+
+            @Override
+            public void run() {
+
+               // check if a newer expand event occured
+               if (__expandRunnableCounter != _expandRunnableCounter) {
+                  return;
+               }
+
+               if (_tourViewer.getTree().isDisposed()) {
+                  return;
+               }
+
+               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(
+                     __treeSelection,
+                     __selectedTreePath);
+            }
+         });
+
+      } else {
+
+         if (_isBehaviour_OnSelect_ExpandCollapse) {
+
+            // expand folder with one mouse click but not with the keyboard
+            expandCollapseItem((TreeViewerItem) selectedTreePath.getLastSegment());
+         }
+      }
+   }
+
+   /**
+    * This behavior is complex and still have possible problems.
+    *
+    * @param treeSelection
+    * @param selectedTreePath
+    */
+   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection,
+                                                                     final TreePath selectedTreePath) {
+      _isInExpandingSelection = true;
+      {
+         final Tree tree = _tourViewer.getTree();
+
+         tree.setRedraw(false);
+         {
+            final TreeItem topItem = tree.getTopItem();
+
+            final boolean isExpanded = _tourViewer.getExpandedState(selectedTreePath);
+
+            /*
+             * Collapse all tree paths
+             */
+            final TreePath[] allExpandedTreePaths = _tourViewer.getExpandedTreePaths();
+            for (final TreePath treePath : allExpandedTreePaths) {
+               _tourViewer.setExpandedState(treePath, false);
+            }
+
+            /*
+             * Expand and select selected folder
+             */
+            _tourViewer.setExpandedTreePaths(selectedTreePath);
+            _tourViewer.setSelection(treeSelection, true);
+
+            if (_isBehaviour_OnSelect_ExpandCollapse && isExpanded) {
+
+               // auto collapse expanded folder
+               _tourViewer.setExpandedState(selectedTreePath, false);
+            }
+
+            /**
+             * Set top item to the previous top item, otherwise the expanded/collapse item is
+             * positioned at the bottom and the UI is jumping all the time
+             * <p>
+             * win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * expanded
+             */
+            if (topItem.isDisposed() == false) {
+               tree.setTopItem(topItem);
+            }
+         }
+         tree.setRedraw(true);
+      }
+      _isInExpandingSelection = false;
+   }
+
    /**
     * Selection changes in the tour map viewer
     *
-    * @param selection
+    * @param selectionChangedEvent
     */
-   private void onSelectionChanged(final IStructuredSelection selection) {
+   private void onTourViewer_Selection(final SelectionChangedEvent selectionChangedEvent) {
+
+      if (_isMouseContextMenu) {
+         return;
+      }
+
+      final TreeSelection treeSelection = (TreeSelection) selectionChangedEvent.getSelection();
+
+      boolean isCategorySelected = false;
 
       // show the reference tour chart
-      final Object item = selection.getFirstElement();
+      final Object item = treeSelection.getFirstElement();
 
       if (item instanceof TVIRefTour_RefTourItem) {
 
@@ -1598,6 +1827,8 @@ public class ReferenceTourView extends ViewPart implements
          // fire selection for the selected tour catalog item
          _postSelectionProvider.setSelection(new SelectionReferenceTourView(refItem));
 
+         isCategorySelected = true;
+
       } else if (item instanceof TVIRefTour_YearItem) {
 
          // year item is selected
@@ -1608,6 +1839,8 @@ public class ReferenceTourView extends ViewPart implements
 
          // fire selection for the selected tour catalog item
          _postSelectionProvider.setSelection(new SelectionReferenceTourView(yearItem));
+
+         isCategorySelected = true;
 
       } else if (item instanceof TVIRefTour_ComparedTour) {
 
@@ -1620,6 +1853,21 @@ public class ReferenceTourView extends ViewPart implements
          // fire selection for the selected tour catalog item
          _postSelectionProvider.setSelection(new StructuredSelection(compItem));
       }
+
+      // category is selected, expand/collapse category items
+
+      if (_isSelectedWithKeyboard == false) {
+
+         // do not expand/collapse when keyboard is used -> unusable
+
+         if (isCategorySelected) {
+
+            onSelect_CategoryItem(treeSelection);
+         }
+      }
+
+      // reset state
+      _isSelectedWithKeyboard = false;
    }
 
    @Override
@@ -1667,6 +1915,14 @@ public class ReferenceTourView extends ViewPart implements
       _action_LinkTour.setChecked(_state.getBoolean(MEMENTO_TOUR_CATALOG_LINK_TOUR));
       _action_AppTourFilter.setChecked(Util.getStateBoolean(_state, STATE_IS_USE_FAST_APP_TOUR_FILTER, false));
 
+      // on mouse select -> expand/collapse
+      _isBehaviour_OnSelect_ExpandCollapse = Util.getStateBoolean(_state, STATE_IS_ON_SELECT_EXPAND_COLLAPSE, true);
+      _actionContext_OnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
+
+      // single expand -> collapse others
+      _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
+      _actionContext_SingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
+
       updateToolTipState();
 
       // select ref tour in tour viewer
@@ -1680,6 +1936,8 @@ public class ReferenceTourView extends ViewPart implements
       _state.put(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(_activeRefId));
       _state.put(MEMENTO_TOUR_CATALOG_LINK_TOUR, _action_LinkTour.isChecked());
 
+      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionContext_SingleExpand_CollapseOthers.isChecked());
+      _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionContext_OnMouseSelect_ExpandCollapse.isChecked());
       _state.put(STATE_IS_USE_FAST_APP_TOUR_FILTER, _action_AppTourFilter.isChecked());
 
       _columnManager.saveState(_state);

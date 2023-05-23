@@ -172,8 +172,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        */
 
 //      System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); //$NON-NLS-1$
-
    }
+
+   private static final NumberFormat _nf0 = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf1 = NumberFormat.getNumberInstance();
+   static {
+
+      _nf0.setMinimumFractionDigits(0);
+      _nf0.setMaximumFractionDigits(0);
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
+
    private IPartListener2             _partListener;
    private SelectionAdapter           _columnSortListener;
    private IPropertyChangeListener    _prefChangeListener;
@@ -242,12 +252,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private ActionAppTourFilter        _actionAppTourFilter;
    private ActionOnOff                _actionOnOff;
    private ActionGeoCompareOptions    _actionGeoCompareOptions;
-
-   private final NumberFormat         _nf1                       = NumberFormat.getInstance();
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
 
    /*
     * UI controls
@@ -384,7 +388,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          case COLUMN_TOUR_START_DATE:
 
-            // sorting by date is already set
+            // sorting by date is computed below
+
             break;
 
          case COLUMN_AVG_PULSE:
@@ -1271,6 +1276,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_Altimeter();
       defineColumn_Motion_Distance();
+      defineColumn_Elevation_ElevationGain();
+      defineColumn_Elevation_ElevationLoss();
 
       defineColumn_Body_AvgPulse();
 
@@ -1284,7 +1291,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void defineColumn_00_SequenceNumber() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_SEQUENCE, SWT.TRAIL);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_SEQUENCE, SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.GeoCompare_View_Column_SequenceNumber_Label);
       colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_SequenceNumber_Header);
@@ -1330,11 +1337,63 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
+    * Column: Elevation gain
+    */
+   private void defineColumn_Elevation_ElevationGain() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_GAIN.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
+
+            final float value = item.elevationGain;
+            if (value == 0) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(_nf0.format(value));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation loss
+    */
+   private void defineColumn_Elevation_ElevationLoss() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_LOSS.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
+
+            final float value = item.elevationLoss;
+            if (value == 0) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(_nf0.format(value));
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Geo Diff
     */
    private void defineColumn_GeoDiff() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_GEO_DIFF, SWT.TRAIL);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_GEO_DIFF, SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Label);
       colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Header);
@@ -1369,9 +1428,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_GeoDiff_Relative() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager,
-            COLUMN_GEO_DIFF_RELATIVE,
-            SWT.TRAIL);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_GEO_DIFF_RELATIVE, SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Relative_Label);
       colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Relative_Header);
@@ -1404,7 +1461,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Motion_Altimeter() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.MOTION_ALTIMETER.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_ALTIMETER.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1484,7 +1541,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Motion_Distance() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1508,7 +1565,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1530,7 +1587,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1554,9 +1611,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Time_RecordedTime() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager, _pc);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager, _pc);
 
+      colDef.setColumnSelectionListener(_columnSortListener);
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new SelectionCellLabelProvider() {
