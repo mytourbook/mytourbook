@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import org.eclipse.jface.viewers.CellLabelProvider;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
+
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Point;
 
-public abstract class TourInfoToolTipCellLabelProvider extends CellLabelProvider implements IColumnViewerTourIdProvider {
+public abstract class TourInfoToolTipCellLabelProvider extends SelectionCellLabelProvider implements IColumnViewerTourIdProvider {
 
    @Override
    public Object getData(final ViewerCell cell) {

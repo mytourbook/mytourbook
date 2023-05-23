@@ -34,6 +34,7 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
@@ -85,7 +86,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -915,7 +915,7 @@ public class ReferenceTourView extends ViewPart implements
             ValueFormat.NUMBER_1_0,
             _columnManager);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -939,7 +939,7 @@ public class ReferenceTourView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -961,7 +961,7 @@ public class ReferenceTourView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -983,7 +983,7 @@ public class ReferenceTourView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.DATA_NUM_TOURS.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1007,7 +1007,7 @@ public class ReferenceTourView extends ViewPart implements
       final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
 
          @Override
          public void update(final ViewerCell cell) {
@@ -1064,7 +1064,7 @@ public class ReferenceTourView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1120,7 +1120,7 @@ public class ReferenceTourView extends ViewPart implements
 
       _colDef_TourTypeImage = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
       _colDef_TourTypeImage.setIsDefaultColumn();
-      _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
+      _colDef_TourTypeImage.setLabelProvider(new SelectionCellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
          // !!! Set dummy label provider, otherwise an error occures !!!
