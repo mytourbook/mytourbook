@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageGeneral;
 import net.tourbook.tour.TourManager;
 
@@ -111,8 +112,13 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
             ApplicationTools.fixClosableAttribute(getWorkbenchFolderPath());
          });
-
       }
+
+      /**
+       * Ensure the derby database is shutted down to fix
+       * https://github.com/mytourbook/mytourbook/pull/1091#issuecomment-1559732337
+       */
+      TourDatabase.getInstance().shutdownDatabaseServer();
    }
 
    @Override

@@ -280,8 +280,9 @@ public class TourDatabase {
 
    private static final String DERBY_DATABASE                             = "derby-database";                                       //$NON-NLS-1$
    private static final String DERBY_DB_TOURBOOK                          = "tourbook";                                             //$NON-NLS-1$
+   private static String       DERBY_DB_TOURBOOK_URL;
    private static String       DERBY_DRIVER_CLASS;
-   private static String       DERBY_URL;
+   private static String       DERBY_SERVER_URL;
    private static final String DERBY_URL_COMMAND_CREATE_TRUE              = ";create=true";                                         //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE            = ";shutdown=true";                                       //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE             = ";upgrade=true";                                        //$NON-NLS-1$
@@ -792,20 +793,26 @@ public class TourDatabase {
 
       _isDerbyEmbedded = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
 
+// SET_FORMATTING_OFF
+
       if (_isDerbyEmbedded) {
 
          // use embedded server
 
-         DERBY_URL = "jdbc:derby:" + DERBY_DB_TOURBOOK; //$NON-NLS-1$
-         DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver"; //$NON-NLS-1$
+         DERBY_SERVER_URL        = "jdbc:derby:"; //                                         //$NON-NLS-1$
+         DERBY_DB_TOURBOOK_URL   = "jdbc:derby:" + DERBY_DB_TOURBOOK; //                     //$NON-NLS-1$
+         DERBY_DRIVER_CLASS      = "org.apache.derby.jdbc.EmbeddedDriver"; //                //$NON-NLS-1$
 
       } else {
 
          // use network server
 
-         DERBY_URL = "jdbc:derby://localhost:1527/" + DERBY_DB_TOURBOOK; //$NON-NLS-1$
-         DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.ClientDriver"; //$NON-NLS-1$
+         DERBY_SERVER_URL        = "jdbc:derby://localhost:1527/"; //                        //$NON-NLS-1$
+         DERBY_DB_TOURBOOK_URL   = "jdbc:derby://localhost:1527/" + DERBY_DB_TOURBOOK; //    //$NON-NLS-1$
+         DERBY_DRIVER_CLASS      = "org.apache.derby.jdbc.ClientDriver"; //                  //$NON-NLS-1$
       }
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -4735,7 +4742,7 @@ public class TourDatabase {
 
                   //loads the jdbc driver
                   _pooledDataSource.setDriverClass(DERBY_DRIVER_CLASS);
-                  _pooledDataSource.setJdbcUrl(DERBY_URL);
+                  _pooledDataSource.setJdbcUrl(DERBY_DB_TOURBOOK_URL);
                   _pooledDataSource.setUser(TABLE_SCHEMA);
                   _pooledDataSource.setPassword(TABLE_SCHEMA);
 
@@ -4769,7 +4776,7 @@ public class TourDatabase {
     */
    private Connection getConnection_Simple() throws SQLException {
 
-      final String dbUrl = DERBY_URL;
+      final String dbUrl = DERBY_DB_TOURBOOK_URL;
 
       logDerbyCommand(dbUrl);
 
@@ -4855,7 +4862,7 @@ public class TourDatabase {
 
    private void logDerbyCommand(final String dbUrl) {
 
-      System.out.println(TIME_STAMP + "[Derby command executed] " + dbUrl); //$NON-NLS-1$
+      System.out.println(TIME_STAMP + "[Executing Derby command] " + dbUrl); //$NON-NLS-1$
    }
 
    private void logDerbyInfo(final String info) {
@@ -4913,7 +4920,7 @@ public class TourDatabase {
    /**
     * Shutdown database server
     */
-   private void shutdownDatabaseServer() {
+   public void shutdownDatabaseServer() {
 
       Connection conn = null;
 
@@ -4921,7 +4928,9 @@ public class TourDatabase {
 
          // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
 
-         final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
+         // DriverManager.getConnection("jdbc:derby:;shutdown=true");
+
+         final String dbUrl_ShutDown = DERBY_SERVER_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
 
          logDerbyCommand(dbUrl_ShutDown);
 
@@ -4929,14 +4938,17 @@ public class TourDatabase {
 
       } catch (final SQLException e) {
 
-         logDerbyInfo("Derby server is shutdown"); //$NON-NLS-1$
+         if ("XJ015".equals(e.getSQLState())) { //$NON-NLS-1$
 
-// DO NOT SHOW THIS EXCEPTION, IT IS ALWAYS THROWN AND IS IRRITATING
-//
-//       final String sqlExceptionText = Util.getSQLExceptionText(e);
-//
-//       // log also the stacktrace
-//       StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+            logDerbyInfo("Derby server is shutdown"); //$NON-NLS-1$
+
+         } else {
+
+            final String sqlExceptionText = Util.getSQLExceptionText(e);
+
+            // log also the stacktrace
+            StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
+         }
 
       } finally {
          Util.closeSql(conn);
@@ -5202,7 +5214,7 @@ public class TourDatabase {
        */
       try {
 
-         final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_CREATE_TRUE;
+         final String dbUrl = DERBY_DB_TOURBOOK_URL + DERBY_URL_COMMAND_CREATE_TRUE;
 
          logDerbyCommand(dbUrl);
 
@@ -5358,7 +5370,7 @@ public class TourDatabase {
 
       final Map<String, Object> configOverrides = new HashMap<>();
 
-      configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
+      configOverrides.put("hibernate.connection.url", DERBY_DB_TOURBOOK_URL); //$NON-NLS-1$
       configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
 
       splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
@@ -5528,7 +5540,7 @@ public class TourDatabase {
     */
    private void sqlStartup_UpgradeDerbyDatabase(final SplashManager splashManager) throws SQLException {
 
-      final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
+      final String dbUrl_Upgrade = DERBY_DB_TOURBOOK_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
 
       logDerbyCommand(dbUrl_Upgrade);
 
@@ -9465,7 +9477,6 @@ public class TourDatabase {
 
       return newDbVersion;
    }
-
 
    /**
     * @param conn
