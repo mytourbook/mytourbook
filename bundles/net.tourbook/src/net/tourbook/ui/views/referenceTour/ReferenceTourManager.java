@@ -32,10 +32,16 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class ReferenceTourManager {
 
-   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tourCatalog.ReferenceTourManager");//$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-   //
-   private static final HashMap<Long, CompareConfig> _compareConfigCache = new HashMap<>();
+   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tourCatalog.ReferenceTourManager"); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
+   /**
+    * Key is the reference ID
+    */
+   private static final HashMap<Long, CompareConfig> _compareConfig_Cache = new HashMap<>();
 
    /**
     * When {@link #_geoCompare_RefId} == 0 then {@link #getTourCompareConfig(long)} will return
@@ -98,6 +104,7 @@ public class ReferenceTourManager {
    }
 
    public static TourReference getGeoCompareReferenceTour() {
+
       return _geoCompare_RefTour;
    }
 
@@ -127,7 +134,7 @@ public class ReferenceTourManager {
          return _geoCompare_RefConfig;
       }
 
-      final CompareConfig compareConfig = _compareConfigCache.get(refId);
+      final CompareConfig compareConfig = _compareConfig_Cache.get(refId);
 
       if (compareConfig != null) {
          return compareConfig;
@@ -145,7 +152,7 @@ public class ReferenceTourManager {
       final CompareConfig newCompareConfig = createTourCompareConfig(refTour);
 
       // keep ref config in the cache
-      _compareConfigCache.put(refId, newCompareConfig);
+      _compareConfig_Cache.put(refId, newCompareConfig);
 
       return newCompareConfig;
    }

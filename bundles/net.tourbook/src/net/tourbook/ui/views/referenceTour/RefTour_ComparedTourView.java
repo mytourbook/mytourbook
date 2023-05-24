@@ -56,7 +56,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -194,7 +193,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       @Override
       public void run() {
 
-         saveComparedTour();
+         saveComparedTour_10_Save();
 
          _pageBook.getDisplay().asyncExec(() -> actionNavigateTour(true));
       }
@@ -217,7 +216,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       @Override
       public void run() {
 
-         saveComparedTour();
+         saveComparedTour_10_Save();
       }
    }
 
@@ -412,7 +411,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    @Override
    public void dispose() {
 
-      saveComparedTourDialog();
+      saveComparedTour();
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -614,49 +613,53 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    }
 
    /**
-    * Persist the compared tours
+    * @return Returns <code>false</code> when the save dialog was canceled
     */
-   private void persistComparedTour() {
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      if (em != null) {
-
-         final EntityTransaction ts = em.getTransaction();
-
-         try {
-
-            if (_comparedTourItem instanceof TVIElevationCompareResult_ComparedTour) {
-
-               final TVIElevationCompareResult_ComparedTour comparedTourItem = (TVIElevationCompareResult_ComparedTour) _comparedTourItem;
-
-               ElevationCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
-
-               _comparedTour_CompareId = comparedTourItem.compareId;
-               _comparedTour_TourId = comparedTourItem.tourId;
-
-               // update tour map view
-               final SelectionPersistedCompareResults persistedCompareResults =
-                     new SelectionPersistedCompareResults();
-               persistedCompareResults.persistedCompareResults.add(comparedTourItem);
-
-               _postSelectionProvider.setSelection(persistedCompareResults);
-            }
-
-         } catch (final Exception e) {
-            e.printStackTrace();
-         } finally {
-            if (ts.isActive()) {
-               ts.rollback();
-            }
-            em.close();
-         }
-      }
-   }
-
-   private void saveComparedTour() {
+   private boolean saveComparedTour() {
 
       if (_comparedTour_CompareId == -1) {
-         persistComparedTour();
+         setDataDirty(false);
+         return true;
+      }
+
+      if (_isDataDirty == false) {
+         return true;
+      }
+
+      final MessageBox msgBox = new MessageBox(_pageBook.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+
+      msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
+      msgBox.setMessage(NLS.bind(
+            Messages.tourCatalog_view_dlg_save_compared_tour_message,
+            TourManager.getTourTitleDetailed(_tourData)));
+
+      final int answer = msgBox.open();
+
+      if (answer == SWT.YES) {
+
+         saveComparedTour_10_Save();
+
+//		} else if (answer == SWT.CANCEL) {
+// disabled, pops up for every selection when multiple selections are fired
+//			return false;
+
+      } else {
+
+         fireChangeEvent(_computedStartIndex, _computedEndIndex);
+      }
+
+      setDataDirty(false);
+
+      return true;
+   }
+
+   private void saveComparedTour_10_Save() {
+
+      if (_comparedTour_CompareId == -1) {
+
+         // compared tour is not yet saved
+
+         saveComparedTour_20_SaveInitial();
       }
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -695,7 +698,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
             setDataDirty(false);
 
             /*
-             * update chart and viewer with new marker position
+             * Update chart and viewer with new marker position
              */
             _defaultStartIndex = _movedStartIndex;
             _defaultEndIndex = _movedEndIndex;
@@ -720,43 +723,41 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    }
 
    /**
-    * @return Returns <code>false</code> when the save dialog was canceled
+    * Persist the compared tours
     */
-   private boolean saveComparedTourDialog() {
+   private void saveComparedTour_20_SaveInitial() {
 
-      if (_comparedTour_CompareId == -1) {
-         setDataDirty(false);
-         return true;
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
+
+      try {
+
+         if (_comparedTourItem instanceof TVIElevationCompareResult_ComparedTour) {
+
+            final TVIElevationCompareResult_ComparedTour comparedTourItem = (TVIElevationCompareResult_ComparedTour) _comparedTourItem;
+
+            ElevationCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
+
+            _comparedTour_CompareId = comparedTourItem.compareId;
+            _comparedTour_TourId = comparedTourItem.tourId;
+
+            // update tour map view
+            final SelectionPersistedCompareResults persistedCompareResults = new SelectionPersistedCompareResults();
+            persistedCompareResults.persistedCompareResults.add(comparedTourItem);
+
+            _postSelectionProvider.setSelection(persistedCompareResults);
+         }
+
+      } catch (final Exception e) {
+
+         e.printStackTrace();
+
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         }
+         em.close();
       }
-
-      if (_isDataDirty == false) {
-         return true;
-      }
-
-      final MessageBox msgBox = new MessageBox(
-            Display.getDefault().getActiveShell(), //
-            SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-
-      msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
-      msgBox.setMessage(
-            NLS.bind(
-                  Messages.tourCatalog_view_dlg_save_compared_tour_message,
-                  TourManager.getTourTitleDetailed(_tourData)));
-
-      final int answer = msgBox.open();
-
-      if (answer == SWT.YES) {
-         saveComparedTour();
-//		} else if (answer == SWT.CANCEL) {
-// disabled, pops up for every selection when multiple selections are fired
-//			return false;
-      } else {
-         fireChangeEvent(_computedStartIndex, _computedEndIndex);
-      }
-
-      setDataDirty(false);
-
-      return true;
    }
 
    private void setDataDirty(final boolean isDirty) {
@@ -899,7 +900,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private void updateTourChart_From_ElevationCompareResult(final TVIElevationCompareResult_ComparedTour elevationComparedResultTour) {
 
-      if (saveComparedTourDialog() == false) {
+      if (saveComparedTour() == false) {
          return;
       }
 
@@ -954,7 +955,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private void updateTourChart_From_GeoComparedTour(final GeoComparedTour geoComparedTour) {
 
-      if (saveComparedTourDialog() == false) {
+      if (saveComparedTour() == false) {
          return;
       }
 
@@ -1001,7 +1002,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
     */
    private void updateTourChart_From_RefTourComparedTour(final TVIRefTour_ComparedTour refTourComparedTour) {
 
-      if (saveComparedTourDialog() == false) {
+      if (saveComparedTour() == false) {
          return;
       }
 

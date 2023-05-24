@@ -30,28 +30,28 @@ public class CompareConfig {
    private static final char      NL = UI.NEW_LINE;
 
    private TourReference          _refTour;
-   private Long                   _refTourTourId;
+   private Long                   _refTour_TourId;
 
-   private TourChartConfiguration _refTourChartConfig;
-   private TourChartConfiguration _compareTourChartConfig;
+   private TourChartConfiguration _refTour_ChartConfig;
+   private TourChartConfiguration _compareTour_ChartConfig;
 
    private boolean                _isGeoCompareRefTour;
 
    CompareConfig(final TourReference refTour,
                  final ChartDataModel refChartDataModel,
-                 final Long refTourTourId,
-                 final TourChartConfiguration refTourChartConfig,
-                 final TourChartConfiguration compTourChartConfig) {
+                 final Long refTour_TourId,
+                 final TourChartConfiguration refTour_ChartConfig,
+                 final TourChartConfiguration compTour_ChartConfig) {
 
       _refTour = refTour;
-      _refTourTourId = refTourTourId;
+      _refTour_TourId = refTour_TourId;
 
-      _refTourChartConfig = refTourChartConfig;
-      _compareTourChartConfig = compTourChartConfig;
+      _refTour_ChartConfig = refTour_ChartConfig;
+      _compareTour_ChartConfig = compTour_ChartConfig;
    }
 
    TourChartConfiguration getCompareTourChartConfig() {
-      return _compareTourChartConfig;
+      return _compareTour_ChartConfig;
    }
 
    public TourReference getRefTour() {
@@ -59,17 +59,17 @@ public class CompareConfig {
    }
 
    TourChartConfiguration getRefTourChartConfig() {
-      return _refTourChartConfig;
+      return _refTour_ChartConfig;
    }
 
    public TourData getRefTourData() {
 
       /*
-       * ensure to have the correct tour data, load tour data because tour data in the ref tour
+       * Ensure to have the correct tour data, load tour data because tour data in the ref tour
        * could be changed, this is a wrong concept which could be changed but requires additonal
        * work
        */
-      return TourManager.getInstance().getTourData(_refTourTourId);
+      return TourManager.getInstance().getTourData(_refTour_TourId);
    }
 
    public boolean isGeoCompareRefTour() {
@@ -83,18 +83,18 @@ public class CompareConfig {
    @Override
    public String toString() {
 
-      return "CompareConfig" + NL //                                             //$NON-NLS-1$
+      return "CompareConfig" + NL //                                                //$NON-NLS-1$
 
-            + "[" + NL //                                                        //$NON-NLS-1$
+            + "[" + NL //                                                           //$NON-NLS-1$
 
-            + "  _refTourTourId          = " + _refTourTourId + NL //            //$NON-NLS-1$
-            + "  _refTourChartConfig     = " + _refTourChartConfig + NL //       //$NON-NLS-1$
-            + "  _compareTourChartConfig = " + _compareTourChartConfig + NL //   //$NON-NLS-1$
+            + "  _refTour_TourId          = " + _refTour_TourId + NL //             //$NON-NLS-1$
+            + "  _refTour_ChartConfig     = " + _refTour_ChartConfig + NL //        //$NON-NLS-1$
+            + "  _compareTour_ChartConfig = " + _compareTour_ChartConfig + NL //    //$NON-NLS-1$
 
-            + "  _isGeoCompareRefTour    = " + _isGeoCompareRefTour + NL //      //$NON-NLS-1$
-            + "  _refTour                = " + _refTour + NL //                  //$NON-NLS-1$
+            + "  _isGeoCompareRefTour     = " + _isGeoCompareRefTour + NL //        //$NON-NLS-1$
+            + "  _refTour                 = " + _refTour + NL //                    //$NON-NLS-1$
 
-            + "]" + NL //                                                        //$NON-NLS-1$
+            + "]" + NL //                                                           //$NON-NLS-1$
       ;
    }
 

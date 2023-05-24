@@ -27,7 +27,7 @@ import net.tourbook.common.util.TreeViewerItem;
 /**
  * Contains tree viewer items (TVI) for reference tours
  */
-public class TVIElevationCompareResult_ReferenceTour extends TVIElevationCompareResult_ResultItem {
+public class TVIElevationCompareResult_ReferenceTour extends TVIElevationCompareResult_Item {
 
    private static Comparator<? super TreeViewerItem> _compareResultComparator;
 
@@ -126,13 +126,21 @@ public class TVIElevationCompareResult_ReferenceTour extends TVIElevationCompare
             final boolean isStoredForRefTour = _storedComparedTours.containsKey(comparedTourId);
 
             if (isStoredForRefTour) {
+
                final StoredComparedTour storedComparedTour = _storedComparedTours.get(comparedTourId);
-               compTour.compareId = storedComparedTour.comparedId;
-               compTour.dbStartIndex = storedComparedTour.startIndex;
-               compTour.dbEndIndex = storedComparedTour.endIndex;
-               compTour.dbSpeed = storedComparedTour.tourSpeed;
-               compTour.dbElapsedTime = storedComparedTour.tourElapsedTime;
+
+// SET_FORMATTING_OFF
+
+               compTour.compareId      = storedComparedTour.comparedId;
+               compTour.dbStartIndex   = storedComparedTour.startIndex;
+               compTour.dbEndIndex     = storedComparedTour.endIndex;
+               compTour.dbSpeed        = storedComparedTour.tourSpeed;
+               compTour.dbElapsedTime  = storedComparedTour.tourElapsedTime;
+
+// SET_FORMATTING_ON
+
             } else {
+
                compTour.compareId = -1;
             }
 
@@ -159,16 +167,16 @@ public class TVIElevationCompareResult_ReferenceTour extends TVIElevationCompare
 
       return UI.EMPTY_STRING
 
-            + "TVICompareResultReferenceTour" + NL //       //$NON-NLS-1$
+            + "TVIElevationCompareResult_ReferenceTour" + NL //    //$NON-NLS-1$
 
-            + "[" + NL //                                   //$NON-NLS-1$
+            + "[" + NL //                                         //$NON-NLS-1$
 
-            + "   label       =" + label + NL //            //$NON-NLS-1$
-            + "   tourId      =" + tourId + NL //           //$NON-NLS-1$
+            + "   label       =" + label + NL //                  //$NON-NLS-1$
+            + "   tourId      =" + tourId + NL //                 //$NON-NLS-1$
 
-//          + "   refTourItem =" + refTourItem + NL //      //$NON-NLS-1$
+//          + "   refTourItem =" + refTourItem + NL //            //$NON-NLS-1$
 
-            + "]" + NL //                                   //$NON-NLS-1$
+            + "]" + NL //                                         //$NON-NLS-1$
 
       ;
    }

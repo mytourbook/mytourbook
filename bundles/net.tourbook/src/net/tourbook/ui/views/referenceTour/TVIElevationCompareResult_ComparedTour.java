@@ -21,9 +21,9 @@ import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 
 /**
- * Tree view item with the compare result between the reference and the compared tour
+ * Tree view item with the elevation compare result between the reference and the compared tour
  */
-public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareResult_ResultItem {
+public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareResult_Item {
 
    /**
     * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is not
@@ -180,8 +180,7 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
 //                  ? Arrays.toString(Arrays.copyOf(altitudeDiffSerie, Math.min(altitudeDiffSerie.length, maxLen)))
 //                  : null) + NL
 
-            + NL
-      ;
+            + NL;
    }
 
 }

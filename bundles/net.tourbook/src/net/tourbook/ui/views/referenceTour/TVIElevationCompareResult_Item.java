@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,35 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import java.util.ArrayList;
-
 import net.tourbook.common.util.TreeViewerItem;
 
 /**
- * Root item for compare results, the children are reference tours
+ * Abstract class for items in the elevation compare result view
  */
-public class TVIElevationCompareResult_RootItem extends TVIElevationCompareResult_Item {
+public abstract class TVIElevationCompareResult_Item extends TreeViewerItem {
 
-   @Override
-   protected void fetchChildren() {
-
-      final ArrayList<TreeViewerItem> children = new ArrayList<>();
-      setChildren(children);
-
-      final ArrayList<RefTourItem> allSelectedRefTourItems = ElevationCompareManager.getComparedReferenceTours();
-
-      if (allSelectedRefTourItems == null) {
-         return;
-      }
-
-      for (final RefTourItem refTourItem : allSelectedRefTourItems) {
-
-         children.add(new TVIElevationCompareResult_ReferenceTour(
-               this,
-               refTourItem.label,
-               refTourItem,
-               refTourItem.tourId));
-      }
+   public TVIElevationCompareResult_Item() {
+      super();
    }
-
 }

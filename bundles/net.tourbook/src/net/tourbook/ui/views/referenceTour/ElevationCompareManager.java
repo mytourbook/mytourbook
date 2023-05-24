@@ -57,7 +57,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
- * The manages the comparison between reference and all selected tours.
+ * The manages the elevation comparison between reference and all selected tours.
  */
 public class ElevationCompareManager {
 
@@ -75,7 +75,7 @@ public class ElevationCompareManager {
    private static int                   _referenceTour_ViewLayout;
 
    //
-   private static ArrayList<RefTourItem>                        _allRefTourItems_FromLastCompare;
+   private static ArrayList<RefTourItem>                                  _allRefTourItems_FromLastCompare;
    private final static ArrayList<TVIElevationCompareResult_ComparedTour> _allComparedTourItems = new ArrayList<>();
 
    //
@@ -300,8 +300,8 @@ public class ElevationCompareManager {
     * @return returns the start index for the ref tour in the compare tour
     */
    private static TVIElevationCompareResult_ComparedTour compareTours_OneTour(final RefTourItem refTour_Item,
-                                                                    final TourData refTour_Data,
-                                                                    final TourData compareTourData) {
+                                                                              final TourData refTour_Data,
+                                                                              final TourData compareTourData) {
 
       final TVIElevationCompareResult_ComparedTour compareResult = new TVIElevationCompareResult_ComparedTour();
 
@@ -752,48 +752,37 @@ public class ElevationCompareManager {
    }
 
    /**
-    * Saves the {@link TVIElevationCompareResult_ComparedTour} item and updates the item with the saved data
+    * Saves the {@link TVIElevationCompareResult_ComparedTour} item and updates the item with the
+    * saved data
     *
-    * @param comparedTourItem
+    * @param comparedTour_UIItem
     * @param em
     * @param ts
     */
-   public static void saveComparedTourItem(final TVIElevationCompareResult_ComparedTour comparedTourItem,
+   public static void saveComparedTourItem(final TVIElevationCompareResult_ComparedTour comparedTour_UIItem,
                                            final EntityManager em,
                                            final EntityTransaction ts) {
 
-      final TourData tourData = comparedTourItem.getComparedTourData();
+// SET_FORMATTING_OFF
 
-      final float avgAltimeter = tourData.computeAvg_FromValues(
-            tourData.getAltimeterSerie(),
-            comparedTourItem.computedStartIndex,
-            comparedTourItem.computedEndIndex);
+      final TourData tourData          = comparedTour_UIItem.getComparedTourData();
+      final int startIndex             = comparedTour_UIItem.computedStartIndex;
+      final int endIndex               = comparedTour_UIItem.computedEndIndex;
 
-      final float avgPulse = tourData.computeAvg_PulseSegment(
-            comparedTourItem.computedStartIndex,
-            comparedTourItem.computedEndIndex);
+      final float avgAltimeter         = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), startIndex, endIndex);
+      final float avgPulse             = tourData.computeAvg_PulseSegment(startIndex, endIndex);
+      final float maxPulse             = tourData.computeMax_FromValues(tourData.getPulse_SmoothedSerie(), startIndex, endIndex);
+      final float speed                = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
+      final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
 
-      final float maxPulse = tourData.computeMax_FromValues(
-            tourData.getPulse_SmoothedSerie(),
-            comparedTourItem.computedStartIndex,
-            comparedTourItem.computedEndIndex);
-
-      final float speed = TourManager.computeTourSpeed(
-            tourData,
-            comparedTourItem.computedStartIndex,
-            comparedTourItem.computedEndIndex);
-
-      final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(
-            tourData,
-            comparedTourItem.computedStartIndex,
-            comparedTourItem.computedEndIndex);
+// SET_FORMATTING_ON
 
       final TourCompared comparedTour = new TourCompared();
 
-      comparedTour.setStartIndex(comparedTourItem.computedStartIndex);
-      comparedTour.setEndIndex(comparedTourItem.computedEndIndex);
+      comparedTour.setStartIndex(startIndex);
+      comparedTour.setEndIndex(endIndex);
       comparedTour.setTourId(tourData.getTourId());
-      comparedTour.setRefTourId(comparedTourItem.refTour.refId);
+      comparedTour.setRefTourId(comparedTour_UIItem.refTour.refId);
 
       comparedTour.setTourDate(tourData.getTourStartTimeMS());
       comparedTour.setStartYear(tourData.getTourStartTime().getYear());
@@ -810,12 +799,12 @@ public class ElevationCompareManager {
       ts.commit();
 
       // updata saved data
-      comparedTourItem.compareId = comparedTour.getComparedId();
-      comparedTourItem.dbStartIndex = comparedTourItem.computedStartIndex;
-      comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
+      comparedTour_UIItem.compareId = comparedTour.getComparedId();
+      comparedTour_UIItem.dbStartIndex = startIndex;
+      comparedTour_UIItem.dbEndIndex = endIndex;
 
-      comparedTourItem.dbSpeed = speed;
-      comparedTourItem.dbElapsedTime = tourDeviceTime_Elapsed;
+      comparedTour_UIItem.dbSpeed = speed;
+      comparedTour_UIItem.dbElapsedTime = tourDeviceTime_Elapsed;
    }
 
    public static void saveState() {
