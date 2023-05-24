@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -136,7 +136,7 @@ public class ChartComponents extends Composite {
     * Height of the slider bar, 0 indicates that the slider is not visible.
     * <p>
     * Use a default height that the graph title do not cover the upper graph. After the slider
-    * label is painted in the graph, this field is propably not needed any more but now it is used
+    * label is painted in the graph, this field is probably not needed any more but now it is used
     * for additional space for the graph title.
     */
    int                       devSliderBarHeight          = SLIDER_BAR_HEIGHT;
