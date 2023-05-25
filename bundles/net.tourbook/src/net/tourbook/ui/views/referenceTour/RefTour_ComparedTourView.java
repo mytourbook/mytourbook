@@ -96,7 +96,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    /**
     * Reference Id for the displayed compared tour
     */
-   private long                              _comparedTour_RefId     = -1;
+   private long                              _comparedTour_RefTourId = -1;
 
    /**
     * Reference tour chart for the displayed compared tour, chart is used for the synchronization
@@ -432,7 +432,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    private void enableSynchronization() {
 
       // check initial value
-      if (_comparedTour_RefId == -1) {
+      if (_comparedTour_RefTourId == -1) {
          _actionSynchChartsByScale.setEnabled(false);
          _actionSynchChartsBySize.setEnabled(false);
          return;
@@ -440,7 +440,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       boolean isSynchEnabled = false;
 
-      if (_comparedTour_RefId == _refTour_RefId) {
+      if (_comparedTour_RefTourId == _refTour_RefId) {
 
          // reference tour for the compared chart is displayed
 
@@ -516,7 +516,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       final TourPropertyCompareTourChanged customData = new TourPropertyCompareTourChanged(
             _comparedTour_CompareId,
             _comparedTour_TourId,
-            _comparedTour_RefId,
+            _comparedTour_RefTourId,
             startIndex,
             endIndex,
             isDataSaved,
@@ -843,7 +843,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          _refTour_RefId = -1;
 
          _comparedTour_TourId = -1;
-         _comparedTour_RefId = -1;
+         _comparedTour_RefTourId = -1;
          _comparedTour_CompareId = -1;
 
          _pageBook.showPage(_pageNoData);
@@ -864,11 +864,11 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
     */
    private boolean updateTourChart() {
 
-      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
+      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefTourId);
 
       System.out.println(UI.timeStamp()
 
-            + "RefTour_ComparedTourView.updateTourChart()" + " _comparedTour_RefId: " + _comparedTour_RefId + "\n"
+            + "RefTour_ComparedTourView.updateTourChart()  _comparedTour_RefTourId: " + _comparedTour_RefTourId + "\n"
 
             + tourCompareConfig);
 // TODO remove SYSTEM.OUT.PRINTLN
@@ -919,7 +919,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       // keep data from the selected compared tour
       _comparedTour_TourId = eleTourId;
-      _comparedTour_RefId = elevationComparedResultTour.refTour.refId;
+      _comparedTour_RefTourId = elevationComparedResultTour.refTour.refId;
       _comparedTour_CompareId = elevationComparedResultTour.compareId;
 
       _tourData = compTourData;
@@ -972,11 +972,11 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return;
       }
 
-      final GeoPartData geoPartItem = geoComparedTour.geoPartData;
+      final GeoPartData geoPartData = geoComparedTour.geoPartData;
 
       // set data from the selection
       _comparedTour_TourId = geoTourId;
-      _comparedTour_RefId = geoPartItem.refId;
+      _comparedTour_RefTourId = geoPartData.refId;
       _comparedTour_CompareId = -1;
 
       _tourData = compTourData;
@@ -1021,7 +1021,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       // set data from the selection
       _comparedTour_TourId = ctTourId;
-      _comparedTour_RefId = refTourComparedTour.getRefId();
+      _comparedTour_RefTourId = refTourComparedTour.getRefId();
       _comparedTour_CompareId = refTourComparedTour.getCompId();
 
       _tourData = compTourData;

@@ -17,13 +17,16 @@ package net.tourbook.ui.views.geoCompare;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourReference;
 
 /**
- * Contains all data for a tour comparison
+ * Contains all data for a tour geo comparison
  */
 public class GeoPartData {
+
+   private static final char  NL            = UI.NEW_LINE;
 
    /**
     * Id of the {@link TourReference}, is -1 when not available
@@ -87,14 +90,34 @@ public class GeoPartData {
 
    @Override
    public String toString() {
-      return "GeoPartItem [" //$NON-NLS-1$
-            + "executorId=" + executorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            //				+ "geoParts=" + Arrays.toString(geoParts) + ", "
-            //				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
-            //				+ "lonPartSerie5=" + Arrays.toString(lonPartSerie5) + ", tourIds=" + Arrays.toString(tourIds) + ", "
-            //				+ "isUseAppFilter=" + isUseAppFilter + ", "
-            //				+ "sqlRunningTime=" + sqlRunningTime
-            + "]"; //$NON-NLS-1$
+
+//      final int maxLen = 5;
+
+//      final String logGeoPart = geoParts != null ? Arrays.toString(Arrays.copyOf(geoParts, Math.min(geoParts.length, maxLen))) : null;
+//      final String logTourIds = tourIds != null ? Arrays.toString(Arrays.copyOf(tourIds, Math.min(tourIds.length, maxLen))) : null;
+//      final List<GeoComparedTour> logComparedTours = comparedTours != null ? comparedTours.subList(0, Math.min(comparedTours.size(), maxLen)) : null;
+
+      return UI.EMPTY_STRING
+
+            + "GeoPartData" + NL //                                  //$NON-NLS-1$
+
+            + "[" + NL //                                            //$NON-NLS-1$
+
+            + "refId                = " + refId + NL //                 //$NON-NLS-1$
+            + "executorId           = " + executorId + NL //            //$NON-NLS-1$
+            + "isUseAppFilter       = " + isUseAppFilter + NL //        //$NON-NLS-1$
+            + "isReselectedInUI     = " + isReselectedInUI + NL //      //$NON-NLS-1$k
+            + "isCanceled           = " + isCanceled + NL //            //$NON-NLS-1$
+            + "sqlRunningTime       = " + sqlRunningTime + NL //        //$NON-NLS-1$
+            + "normalizedTourPart   = " + normalizedTourPart + NL //    //$NON-NLS-1$
+
+//          + "geoParts             = " + logGeoPart + NL //            //$NON-NLS-1$
+//          + "tourIds              = " + logTourIds + NL //            //$NON-NLS-1$
+//          + "comparedTours        = " + logComparedTours + NL //      //$NON-NLS-1$
+
+            + "]" + NL //                                            //$NON-NLS-1$
+
+      ;
    }
 
 }
