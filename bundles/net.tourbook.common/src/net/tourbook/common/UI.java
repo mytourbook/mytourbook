@@ -167,6 +167,8 @@ public class UI {
    private static final String      JS_BACKSLASH_REPLACEMENT           = "\\\\";                //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                      = "\\n";                 //$NON-NLS-1$
 
+   public static final String       SYMBOL_AMPERSAND                   = "&";                   //$NON-NLS-1$
+   public static final String       SYMBOL_AMPERSAND_AMPERSAND         = "&&";                  //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_UP                    = "\u2191";              //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_DOWN                  = "\u2193";              //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_LEFT                  = "\u2190";              //$NON-NLS-1$
@@ -1520,6 +1522,21 @@ public class UI {
          subclass = superclass;
          superclass = subclass.getSuperclass();
       }
+   }
+
+   /**
+    * Escape the ampersand symbol when it's not a mnemonic but is displayed in a
+    * {@link Label#setText(String)}
+    * <p>
+    * "The mnemonic indicator character'&' can be escaped by doubling it in the string, causinga
+    * single '&' to be displayed."
+    *
+    * @param text
+    * @return
+    */
+   public static String escapeAmpersand(final String text) {
+
+      return text.replace(SYMBOL_AMPERSAND, SYMBOL_AMPERSAND_AMPERSAND);
    }
 
    public static String format_hh(final long time) {

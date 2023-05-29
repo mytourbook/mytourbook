@@ -291,7 +291,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
          lblName.setFont(_boldFont);
          lblName.setForeground(_titleColor);
-         lblName.setText(ttTitle);
+         lblName.setText(UI.escapeAmpersand(ttTitle));
 
          /*
           * Actions
