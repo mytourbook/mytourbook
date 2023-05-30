@@ -1,4 +1,4 @@
-23.5.0                                                 ?. May 2023
+23.5.0                                                 30. May 2023
 
 
 New
@@ -112,7 +112,6 @@ Translation
 - Dutch (Maarten)
 - French (Frederic)
 - German
-- Italian (Doriano)
 
  
 System   
