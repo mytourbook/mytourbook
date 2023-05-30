@@ -40,10 +40,16 @@ public class TourReference implements Serializable {
 
    public static final int     DB_LENGTH_LABEL  = 80;
 
+   /**
+    * Entity ID of the reference tour
+    */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long                refId;
 
+   /**
+    * {@link TourData} which is referenced
+    */
    @ManyToOne(optional = false)
    private TourData            tourData;
 
@@ -58,6 +64,13 @@ public class TourReference implements Serializable {
 
    public TourReference() {}
 
+   /**
+    * @param label
+    * @param tourData
+    *           Contains the tour which is referenced
+    * @param startIndex
+    * @param endIndex
+    */
    public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
 
       this.tourData = tourData;
@@ -128,7 +141,7 @@ public class TourReference implements Serializable {
    public TourData getTourData() {
 
       /*
-       * ensure to have the correct tour data, load tour data because tour data in the ref tour
+       * Ensure to have the correct tour data, load tour data because tour data in the ref tour
        * could be changed, this is a wrong concept which could be changed but requires additonal
        * work
        */
@@ -150,10 +163,6 @@ public class TourReference implements Serializable {
 
    public void setStartValueIndex(final int startIndex) {
       this.startIndex = startIndex;
-   }
-
-   public void setTourData(final TourData tourData) {
-      this.tourData = tourData;
    }
 
    /**

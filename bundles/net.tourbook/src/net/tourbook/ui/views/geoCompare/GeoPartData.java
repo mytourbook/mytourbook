@@ -29,7 +29,7 @@ public class GeoPartData {
    private static final char  NL            = UI.NEW_LINE;
 
    /**
-    * Id of the {@link TourReference}, is -1 when not available
+    * Entity ID of the {@link TourReference}, is -1 when not available
     */
    public long                refId         = -1;
 
@@ -99,14 +99,14 @@ public class GeoPartData {
 
       return UI.EMPTY_STRING
 
-            + "GeoPartData" + NL //                                  //$NON-NLS-1$
+            + "GeoPartData" + NL //                                     //$NON-NLS-1$
 
-            + "[" + NL //                                            //$NON-NLS-1$
+            + "[" + NL //                                               //$NON-NLS-1$
 
             + "refId                = " + refId + NL //                 //$NON-NLS-1$
             + "executorId           = " + executorId + NL //            //$NON-NLS-1$
             + "isUseAppFilter       = " + isUseAppFilter + NL //        //$NON-NLS-1$
-            + "isReselectedInUI     = " + isReselectedInUI + NL //      //$NON-NLS-1$k
+            + "isReselectedInUI     = " + isReselectedInUI + NL //      //$NON-NLS-1$
             + "isCanceled           = " + isCanceled + NL //            //$NON-NLS-1$
             + "sqlRunningTime       = " + sqlRunningTime + NL //        //$NON-NLS-1$
             + "normalizedTourPart   = " + normalizedTourPart + NL //    //$NON-NLS-1$
@@ -115,7 +115,7 @@ public class GeoPartData {
 //          + "tourIds              = " + logTourIds + NL //            //$NON-NLS-1$
 //          + "comparedTours        = " + logComparedTours + NL //      //$NON-NLS-1$
 
-            + "]" + NL //                                            //$NON-NLS-1$
+            + "]" + NL //                                               //$NON-NLS-1$
 
       ;
    }

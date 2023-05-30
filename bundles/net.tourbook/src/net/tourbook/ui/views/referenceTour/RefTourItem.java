@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,15 +15,28 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
+import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
+
 public class RefTourItem {
 
-   public long   refId;
-   public long   tourId;
+   private static final char NL = UI.NEW_LINE;
 
-   public String label;
+   /**
+    * Entity ID of the reference tour {@link TourReference}
+    */
+   public long               refId;
 
-   public int    startIndex;
-   public int    endIndex;
+   /**
+    * Tour ID of the {@link TourData} which is referenced
+    */
+   public long               tourId;
+
+   public String             label;
+
+   public int                startIndex;
+   public int                endIndex;
 
    @Override
    public boolean equals(final Object obj) {
@@ -58,12 +71,19 @@ public class RefTourItem {
    @Override
    public String toString() {
 
-      return "RefTourItem [" //$NON-NLS-1$
-            + "refId=" + refId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "label=" + label + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "startIndex=" + startIndex + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "endIndex=" + endIndex //$NON-NLS-1$
-            + "]"; //$NON-NLS-1$
+      return UI.EMPTY_STRING
+
+            + "RefTourItem" + NL //                      //$NON-NLS-1$
+
+            + "[" + NL //                                //$NON-NLS-1$
+
+            + "refId       =" + refId + NL //            //$NON-NLS-1$
+            + "tourId      =" + tourId + NL //           //$NON-NLS-1$
+            + "label       =" + label + NL //            //$NON-NLS-1$
+            + "startIndex  =" + startIndex + NL //       //$NON-NLS-1$
+            + "endIndex    =" + endIndex + NL //         //$NON-NLS-1$
+
+            + "]" + NL //                                //$NON-NLS-1$
+      ;
    }
 }

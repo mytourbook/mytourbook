@@ -23,13 +23,17 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 /**
- * Contains data and configuration for a elevation or geo compared tour
+ * Contains data and configuration for an elevation or geo compared tour
  */
 public class CompareConfig {
 
    private static final char      NL = UI.NEW_LINE;
 
    private TourReference          _refTour;
+
+   /**
+    * Tour ID of the reference tour
+    */
    private Long                   _refTour_TourId;
 
    private TourChartConfiguration _refTour_ChartConfig;
@@ -38,8 +42,8 @@ public class CompareConfig {
    private boolean                _isGeoCompareRefTour;
 
    CompareConfig(final TourReference refTour,
-                 final ChartDataModel refChartDataModel,
                  final Long refTour_TourId,
+                 final ChartDataModel refChartDataModel,
                  final TourChartConfiguration refTour_ChartConfig,
                  final TourChartConfiguration compTour_ChartConfig) {
 

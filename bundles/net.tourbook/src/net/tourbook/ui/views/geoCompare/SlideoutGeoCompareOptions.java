@@ -502,7 +502,7 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
 
       _compareSelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_CompareParameter());
       _compareMouseWheelListener = mouseEvent -> {
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onChange_CompareParameter();
       };
 

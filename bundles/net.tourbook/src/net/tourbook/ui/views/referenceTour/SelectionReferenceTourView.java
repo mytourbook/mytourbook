@@ -41,25 +41,25 @@ public class SelectionReferenceTourView implements ISelection {
     */
    private Long                   _compTourId;
 
-   private TVIRefTour_RefTourItem _catalogRefItem;
-   private TVIRefTour_YearItem    _catalogYearItem;
+   private TVIRefTour_RefTourItem _refTourItem;
+   private TVIRefTour_YearItem    _refTour__YearItem;
 
    public SelectionReferenceTourView(final long refId) {
 
       _refId = refId;
-      _catalogRefItem = ElevationCompareManager.createCatalogRefItem(refId);
+      _refTourItem = ElevationCompareManager.createCatalogRefItem(refId);
    }
 
-   public SelectionReferenceTourView(final TVIRefTour_RefTourItem refItem) {
+   public SelectionReferenceTourView(final TVIRefTour_RefTourItem refTourItem) {
 
-      _refId = refItem.refId;
-      _catalogRefItem = refItem;
+      _refId = refTourItem.refId;
+      _refTourItem = refTourItem;
    }
 
    public SelectionReferenceTourView(final TVIRefTour_YearItem yearItem) {
 
       _refId = yearItem.refId;
-      _catalogYearItem = yearItem;
+      _refTour__YearItem = yearItem;
    }
 
    /**
@@ -79,14 +79,14 @@ public class SelectionReferenceTourView implements ISelection {
     *         set
     */
    public TVIRefTour_RefTourItem getRefItem() {
-      return _catalogRefItem;
+      return _refTourItem;
    }
 
    /**
     * @return Returns the item {@link TVIRefTour_YearItem} or <code>null</code> when it's not set
     */
    public TVIRefTour_YearItem getYearItem() {
-      return _catalogYearItem;
+      return _refTour__YearItem;
    }
 
    @Override
@@ -99,17 +99,16 @@ public class SelectionReferenceTourView implements ISelection {
 
       return UI.EMPTY_STRING
 
-            + "SelectionReferenceTourView" + NL //$NON-NLS-1$
+            + "SelectionReferenceTourView" + NL //                   //$NON-NLS-1$
 
-            + "[" + NL //$NON-NLS-1$
+            + "[" + NL //                                            //$NON-NLS-1$
 
-            + "_refId=" + _refId + NL //$NON-NLS-1$
-            + "_compTourId=" + _compTourId + NL //$NON-NLS-1$
-            + "_catalogRefItem=" + _catalogRefItem + NL //$NON-NLS-1$
-            + "_catalogYearItem=" + _catalogYearItem + NL //$NON-NLS-1$
+            + "_refId            =" + _refId + NL //                 //$NON-NLS-1$
+            + "_compTourId       =" + _compTourId + NL //            //$NON-NLS-1$
+            + "_catalogRefItem   =" + _refTourItem + NL //           //$NON-NLS-1$
+            + "_catalogYearItem  =" + _refTour__YearItem + NL //     //$NON-NLS-1$
 
-            + "]" + NL //$NON-NLS-1$
-
+            + "]" + NL //                                            //$NON-NLS-1$
       ;
    }
 

@@ -1840,7 +1840,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             : _geoRelativeDifferencesFilter;
 
-      return relativeDiff >= 0 && relativeDiff < relativeDifference;
+      return relativeDiff >= 0 && relativeDiff <= relativeDifference;
    }
 
    private void onAction_AppFilter(final boolean isSelected) {
@@ -2331,10 +2331,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
           * complex.
           */
 
-         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(
-               tourData,
-               refTour.getStartValueIndex(),
-               refTour.getEndValueIndex());
+         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(refTour);
 
          compare_10_Compare(
                tourData,

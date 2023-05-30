@@ -25,17 +25,16 @@ import net.tourbook.data.TourType;
  */
 public class GeoComparedTour {
 
-   public long        tourId;
+   private static final char NL           = UI.NEW_LINE;
 
-   public GeoPartData geoPartData;
+   public long               tourId;
 
-   /*
-    * Compare results
-    */
-   public float[] tourLatLonDiff;
+   public GeoPartData        geoPartData;
 
-   public int     tourFirstIndex;
-   public int     tourLastIndex;
+   public float[]            tourLatLonDiff;
+
+   public int                tourFirstIndex;
+   public int                tourLastIndex;
 
    /**
     * <ul>
@@ -44,29 +43,30 @@ public class GeoComparedTour {
     * <li>0...max : A Valid value is set</li>
     * </ul>
     */
-   long           minDiffValue = -2;
+   long                      minDiffValue = -2;
 
-   float          avgPulse;
-   float          avgPace;
-   float          avgSpeed;
-   double         avgAltimeter;
+   float                     avgPulse;
+   float                     avgPace;
+   float                     avgSpeed;
+   double                    avgAltimeter;
 
-   ZonedDateTime  tourStartTime;
-   long           tourStartTimeMS;
+   ZonedDateTime             tourStartTime;
+   long                      tourStartTimeMS;
 
-   int            elapsedTime;
-   long           recordedTime;
-   long           movingTime;
+   int                       elapsedTime;
+   long                      recordedTime;
+   long                      movingTime;
 
-   float          distance;
-   float          elevationGain;
-   float          elevationLoss;
+   float                     distance;
+   float                     elevationGain;
+   float                     elevationLoss;
 
    /**
     * Ensure title it is set for sorting
     */
-   String         tourTitle    = UI.EMPTY_STRING;
-   TourType       tourType;
+   String                    tourTitle    = UI.EMPTY_STRING;
+
+   TourType                  tourType;
 
    public GeoComparedTour(final long tourId, final GeoPartData geoPartItem) {
 
@@ -76,9 +76,18 @@ public class GeoComparedTour {
 
    @Override
    public String toString() {
-      return "GeoPartComparerItem [" //$NON-NLS-1$
-            + "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "geoPartItem=" + geoPartData + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return UI.EMPTY_STRING
+
+            + "GeoComparedTour" + NL //                  //$NON-NLS-1$
+
+            + "[" + NL //                                //$NON-NLS-1$
+
+            + "tourId      =" + tourId + NL //           //$NON-NLS-1$
+            + "geoPartItem =" + geoPartData + NL //      //$NON-NLS-1$
+
+            + "]" + NL //                                //$NON-NLS-1$
+      ;
    }
 
 }

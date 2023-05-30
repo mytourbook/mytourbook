@@ -191,6 +191,7 @@ public class ReferenceTourView extends ViewPart implements
    private boolean                             _isBehaviour_OnSelect_ExpandCollapse     = true;
    private boolean                             _isInCollapseAll;
    private boolean                             _isInExpandingSelection;
+   private boolean                             _isInRestore;
    private int                                 _expandRunnableCounter;
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
@@ -1805,7 +1806,7 @@ public class ReferenceTourView extends ViewPart implements
     */
    private void onTourViewer_Selection(final SelectionChangedEvent selectionChangedEvent) {
 
-      if (_isMouseContextMenu) {
+      if (_isInRestore || _isMouseContextMenu) {
          return;
       }
 
@@ -1927,7 +1928,12 @@ public class ReferenceTourView extends ViewPart implements
 
       // select ref tour in tour viewer
       final long refId = Util.getStateLong(_state, MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, -1);
-      selectRefTour(refId);
+
+      _isInRestore = true;
+      {
+         selectRefTour(refId);
+      }
+      _isInRestore = false;
    }
 
    @PersistState

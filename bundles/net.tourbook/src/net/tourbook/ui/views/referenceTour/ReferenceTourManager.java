@@ -47,7 +47,7 @@ public class ReferenceTourManager {
     * When {@link #_geoCompare_RefId} == 0 then {@link #getTourCompareConfig(long)} will return
     * <code>null</code>, this is wrong when refId == 0
     */
-   private static long                               _geoCompare_RefId   = Long.MIN_VALUE;
+   private static long                               _geoCompare_RefId    = Long.MIN_VALUE;
    private static TourReference                      _geoCompare_RefTour;
    private static CompareConfig                      _geoCompare_RefConfig;
 
@@ -80,6 +80,23 @@ public class ReferenceTourManager {
    }
 
    /**
+    * @param refTour
+    * @return
+    */
+   public static long createGeoCompareRefTour(final TourReference refTour) {
+
+      _geoCompare_RefId = refTour.getRefId();
+
+      _geoCompare_RefTour = refTour;
+      _geoCompare_RefTour.setLabel("Selected Reference Tour");
+
+      _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
+      _geoCompare_RefConfig.setIsGeoCompareRefTour(true);
+
+      return _geoCompare_RefId;
+   }
+
+   /**
     * Create a new reference tour configuration
     */
    private static CompareConfig createTourCompareConfig(final TourReference refTour) {
@@ -95,8 +112,8 @@ public class ReferenceTourManager {
 
       final CompareConfig compareConfig = new CompareConfig(
             refTour,
-            chartDataModel,
             refTourData.getTourId(),
+            chartDataModel,
             refTourChartConfig,
             compTourchartConfig);
 
@@ -131,18 +148,23 @@ public class ReferenceTourManager {
    public static CompareConfig getTourCompareConfig(final long refId) {
 
       if (refId == _geoCompare_RefId) {
+
          return _geoCompare_RefConfig;
       }
 
       final CompareConfig compareConfig = _compareConfig_Cache.get(refId);
 
       if (compareConfig != null) {
+
          return compareConfig;
       }
 
-      // load the reference tour from the database
+      // load reference tour from the database
+      TourReference refTour;
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final TourReference refTour = em.find(TourReference.class, refId);
+      {
+         refTour = em.find(TourReference.class, refId);
+      }
       em.close();
 
       if (refTour == null) {
