@@ -231,7 +231,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 //            try {
 
 //
-// !!! "updateDb_024_To_025_DataUpdate(null <-- " fail when run, this was propably never tested
+// !!! "updateDb_024_To_025_DataUpdate(null <-- " fail when run, this was probably never tested
 //
 
 //               TourDatabase.getInstance().updateDb_024_To_025_DataUpdate(null, monitor);

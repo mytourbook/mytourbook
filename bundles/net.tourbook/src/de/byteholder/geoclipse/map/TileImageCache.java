@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,7 +75,7 @@ public class TileImageCache {
    private static final ReentrantLock                    CACHE_LOCK                 = new ReentrantLock();
 
    /**
-    * This display is used because {@link Display#getDefault()} is synchronized which propably
+    * This display is used because {@link Display#getDefault()} is synchronized which probably
     * causes the UI to be not smooth when images are loaded and the map is dragged at the same time
     */
    private Display                                       _display;

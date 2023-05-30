@@ -1,4 +1,4 @@
-23.5.0                                                 ?. May 2023
+23.5.0                                                      30. May 2023
 
 
 New
@@ -15,10 +15,13 @@ New
   - Added the ability to upload tours as workouts
 
 * Tour Pauses (Frederic)
-  - Added the ability to change pause types individually (Tour Pauses view) and in bulk (Tour Book view)
+  - Added the ability to change pause types individually (Tour Pauses 
+    view) and in bulk (Tour Book view)
 
 * Tour Weather (Frederic)
-  - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
+  - Added the ability to set or retrieve the air quality experienced 
+    during the tour. At the moment, only OpenWeatherMap supports the air 
+    quality retrieval
 
 
 Improvements
@@ -46,7 +49,8 @@ Improvements
 * Tour Info Tooltip
   - Adjust width of the tour info tooltip
     https://github.com/mytourbook/mytourbook/issues/1077
-  - Added, when available, the time and percentage of time spent in each HR zone (Frederic)
+  - Added, when available, the time and percentage of time spent in each 
+    HR zone (Frederic)
 
 * Bar Chart Selection
   - Set direction for the mouse wheel, e.g.
@@ -63,7 +67,8 @@ Improvements
   
 * Reference Tour Year Statistic
   - Show altimeter (VAM) and max pulse values
-  - New Action: Show all available compared tours without selecting last year and number of years
+  - New Action: Show all available compared tours without selecting last 
+    year and number of years
   - Fixed min/max values when selecting different years, ...
   
 * Compared Tour Chart
@@ -90,7 +95,8 @@ Changes
     https://github.com/mytourbook/mytourbook/discussions/1089  
 
 * Categorized Views Colors
-  - These colors are reset to the new default values, e.g. tag category color in the tagging view
+  - These colors are reset to the new default values, e.g. tag category 
+    color in the tagging view
 
 
 Bugfix
@@ -112,7 +118,6 @@ Translation
 - Dutch (Maarten)
 - French (Frederic)
 - German
-- Italian (Doriano)
 
  
 System   

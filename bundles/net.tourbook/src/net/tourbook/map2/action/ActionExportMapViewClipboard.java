@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
@@ -37,13 +39,14 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionExportMapViewClipboard extends Action {
+class ActionExportMapViewClipboard extends Action {
 
    private Map2View _map2View;
 
-   public ActionExportMapViewClipboard(final Map2View mapView) {
+   ActionExportMapViewClipboard(final Map2View mapView) {
 
       super(Messages.Map_Action_Export_Map_View_Clipboard, AS_PUSH_BUTTON);
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
 
       _map2View = mapView;
    }
