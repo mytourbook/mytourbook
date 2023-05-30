@@ -25,7 +25,7 @@ import utils.Utils;
 public class PrefPageStatisticsTests extends UITest {
 
    @Test
-   void PrefPageStatistics_MoveStatistics() {
+   void PrefPageStatistics_MoveAndSortStatistics() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Statistics").select(); //$NON-NLS-1$
