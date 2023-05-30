@@ -82,8 +82,6 @@ public class Messages extends NLS {
 
    public static String        action_tourbook_select_year_month_tours;
 
-   public static String        action_tourCatalog_open_compare_wizard;
-
    public static String        Action_TourType_ModifyTourTypeFilter;
    public static String        action_tourType_modify_tourTypes;
 
@@ -1853,6 +1851,48 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_Provider_None;
 
+   public static String        RefTour_Action_CreateLeftMarker;
+   public static String        RefTour_Action_CreaateMarker;
+   public static String        RefTour_Action_CreateReferenceTour;
+   public static String        RefTour_Action_CreateRightMarker;
+   public static String        RefTour_Action_DeleteTours;
+   public static String        RefTour_Action_Link;
+   public static String        RefTour_Action_NavigateNextTour;
+   public static String        RefTour_Action_NavigatePrevTour;
+   public static String        RefTour_Action_OpenCompareWizard;
+   public static String        RefTour_Action_RenameReferenceTour;
+   public static String        RefTour_Action_SaveMarker;
+   public static String        RefTour_Action_SaveAndNext;
+   public static String        RefTour_Action_SyncChartsByScale_Tooltip;
+   public static String        RefTour_Action_SyncChartsBySize_Tooltip;
+   public static String        RefTour_Action_SyncChartYears_Tooltip;
+   public static String        RefTour_Action_UndoMarkerPosition;
+   public static String        RefTour_Dialog_AddReferenceTour_Message;
+   public static String        RefTour_Dialog_AddReferenceTour_Title;
+   public static String        RefTour_Dialog_DeleteComparedTour_Message;
+   public static String        RefTour_Dialog_DeleteComparedTour_Title;
+   public static String        RefTour_Dialog_DeleteRefTour_Message;
+   public static String        RefTour_Dialog_DeleteRefTour_Title;
+   public static String        RefTour_Dialog_RenameRefTour_Message;
+   public static String        RefTour_Dialog_RenameRefTour_Title;
+   public static String        RefTour_Dialog_SaveComparedTour_Message;
+   public static String        RefTour_Dialog_SaveComparedTour_Title;
+   public static String        RefTour_Label_ReferenceTour_ChartTitle;
+   public static String        RefTour_Label_Year_ChartTitle;
+   public static String        RefTour_Label_Year_NotSelected;
+   public static String        RefTour_Wizard_Column_ElevationGain_Tooltip;
+   public static String        RefTour_Wizard_Column_Distance_Tooltip;
+   public static String        RefTour_Wizard_Column_Time;
+   public static String        RefTour_Wizard_Column_Time_Tooltip;
+   public static String        RefTour_Wizard_Column_Tour;
+   public static String        RefTour_Wizard_Error_TourMustBeSelected;
+   public static String        RefTour_Wizard_Group_SelectedTour;
+   public static String        RefTour_Wizard_Group_SelectedTour2;
+   public static String        RefTour_Wizard_Label_TourIsNotSelected;
+   public static String        RefTour_Wizard_Label_PageMessage;
+   public static String        RefTour_Wizard_Page_ComparedTours_Title;
+   public static String        RefTour_Wizard_WizardTitle;
+
    public static String        Search_Manager_CreateFTIndex;
    public static String        Search_Manager_Log_DeletingLuceneRootFolder;
    public static String        Search_Manager_Log_LuceneRootFolderIsDeleted;
@@ -2528,47 +2568,6 @@ public class Messages extends NLS {
    public static String        TourAnalyzer_Label_NoTourOrChart;
    public static String        TourAnalyzer_Label_right;
    public static String        TourAnalyzer_Label_value;
-
-   public static String        tourCatalog_view_action_create_left_marker;
-   public static String        tourCatalog_view_action_create_marker;
-   public static String        tourCatalog_view_action_create_reference_tour;
-   public static String        tourCatalog_view_action_create_right_marker;
-   public static String        tourCatalog_view_action_delete_tours;
-   public static String        tourCatalog_view_action_link;
-   public static String        TourCatalog_View_Action_NavigateNextTour;
-   public static String        TourCatalog_View_Action_NavigatePrevTour;
-   public static String        tourCatalog_view_action_rename_reference_tour;
-   public static String        tourCatalog_view_action_save_marker;
-   public static String        TourCatalog_View_Action_SaveAndNext;
-   public static String        tourCatalog_view_action_synch_charts_byScale_tooltip;
-   public static String        tourCatalog_view_action_synch_charts_bySize_tooltip;
-   public static String        tourCatalog_view_action_synch_chart_years_tooltip;
-   public static String        tourCatalog_view_action_undo_marker_position;
-   public static String        tourCatalog_view_dlg_add_reference_tour_msg;
-   public static String        tourCatalog_view_dlg_add_reference_tour_title;
-   public static String        tourCatalog_view_dlg_delete_comparedTour_msg;
-   public static String        tourCatalog_view_dlg_delete_comparedTour_title;
-   public static String        tourCatalog_view_dlg_delete_refTour_msg;
-   public static String        tourCatalog_view_dlg_delete_refTour_title;
-   public static String        tourCatalog_view_dlg_rename_reference_tour_msg;
-   public static String        tourCatalog_view_dlg_rename_reference_tour_title;
-   public static String        tourCatalog_view_dlg_save_compared_tour_message;
-   public static String        tourCatalog_view_dlg_save_compared_tour_title;
-   public static String        tourCatalog_view_label_chart_title_reference_tour;
-   public static String        tourCatalog_view_label_year_chart_title;
-   public static String        tourCatalog_view_label_year_not_selected;
-   public static String        tourCatalog_wizard_Column_altitude_up_tooltip;
-   public static String        tourCatalog_wizard_Column_distance_tooltip;
-   public static String        tourCatalog_wizard_Column_h;
-   public static String        tourCatalog_wizard_Column_h_tooltip;
-   public static String        tourCatalog_wizard_Column_tour;
-   public static String        tourCatalog_wizard_Error_tour_must_be_selected;
-   public static String        tourCatalog_wizard_Group_selected_tour;
-   public static String        tourCatalog_wizard_Group_selected_tour_2;
-   public static String        tourCatalog_wizard_Label_a_tour_is_not_selected;
-   public static String        tourCatalog_wizard_Label_page_message;
-   public static String        tourCatalog_wizard_Page_compared_tours_title;
-   public static String        tourCatalog_wizard_Wizard_title;
 
    public static String        TourChart_GraphBackgroundSource_Default;
    public static String        TourChart_GraphBackgroundSource_HrZone;

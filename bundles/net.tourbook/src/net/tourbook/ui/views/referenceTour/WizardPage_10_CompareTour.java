@@ -130,7 +130,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       _refTourProvider = refTourProvider;
 
-      setTitle(Messages.tourCatalog_wizard_Page_compared_tours_title);
+      setTitle(Messages.RefTour_Wizard_Page_ComparedTours_Title);
    }
 
    @Override
@@ -246,7 +246,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       // chart group
       _groupChart = new Group(detailContainer, SWT.NONE);
-      _groupChart.setText(Messages.tourCatalog_wizard_Group_selected_tour);
+      _groupChart.setText(Messages.RefTour_Wizard_Group_SelectedTour);
       _groupChart.setEnabled(false);
       _groupChart.setLayout(new GridLayout());
       {
@@ -267,7 +267,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
             _compareTourChart.getChartTitleSegmentConfig().isShowSegmentTitle = true;
 
             _pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
-            _pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
+            _pageTourIsNotSelected.setText(Messages.RefTour_Wizard_Label_TourIsNotSelected);
             _pageTourIsNotSelected.setEnabled(false);
          }
       }
@@ -308,7 +308,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
       });
 
       final TreeColumn tc = tvc.getColumn();
-      tc.setText(Messages.tourCatalog_wizard_Column_tour);
+      tc.setText(Messages.RefTour_Wizard_Column_Tour);
       treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(20)));
    }
 
@@ -338,7 +338,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       final TreeColumn tc = tvc.getColumn();
       tc.setText(ThemeUtil.getThemedTreeHeaderLabel(UI.UNIT_LABEL_DISTANCE));
-      tc.setToolTipText(Messages.tourCatalog_wizard_Column_distance_tooltip);
+      tc.setToolTipText(Messages.RefTour_Wizard_Column_Distance_Tooltip);
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }
 
@@ -367,7 +367,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       final TreeColumn tc = tvc.getColumn();
       tc.setText(ThemeUtil.getThemedTreeHeaderLabel(UI.UNIT_LABEL_ELEVATION));
-      tc.setToolTipText(Messages.tourCatalog_wizard_Column_altitude_up_tooltip);
+      tc.setToolTipText(Messages.RefTour_Wizard_Column_ElevationGain_Tooltip);
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }
 
@@ -400,8 +400,8 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
       final TreeColumn tc = tvc.getColumn();
 
-      tc.setText(ThemeUtil.getThemedTreeHeaderLabel(Messages.tourCatalog_wizard_Column_h));
-      tc.setToolTipText(Messages.tourCatalog_wizard_Column_h_tooltip);
+      tc.setText(ThemeUtil.getThemedTreeHeaderLabel(Messages.RefTour_Wizard_Column_Time));
+      tc.setToolTipText(Messages.RefTour_Wizard_Column_Time_Tooltip);
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }
 
@@ -463,7 +463,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
          _groupChart.setText(
                NLS.bind(
-                     Messages.tourCatalog_wizard_Group_selected_tour_2,
+                     Messages.RefTour_Wizard_Group_SelectedTour2,
                      TourManager.getTourDateShort(tourData)));
 
          _pageBook.showPage(_compareTourChart);
@@ -477,7 +477,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
    private boolean validatePage() {
 
-      setMessage(Messages.tourCatalog_wizard_Label_page_message);
+      setMessage(Messages.RefTour_Wizard_Label_PageMessage);
 
       final Object[] checkedElements = _tourViewer.getCheckedElements();
 
@@ -486,7 +486,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
          // page is invalid
 
          setPageComplete(false);
-         setErrorMessage(Messages.tourCatalog_wizard_Error_tour_must_be_selected);
+         setErrorMessage(Messages.RefTour_Wizard_Error_TourMustBeSelected);
 
          return false;
 

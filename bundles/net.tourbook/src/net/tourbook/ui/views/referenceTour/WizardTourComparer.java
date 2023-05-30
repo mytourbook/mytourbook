@@ -40,7 +40,7 @@ public class WizardTourComparer extends Wizard {
 
       _refTourProvider = refTourProvider;
 
-      setWindowTitle(Messages.tourCatalog_wizard_Wizard_title);
+      setWindowTitle(Messages.RefTour_Wizard_WizardTitle);
 
       restoreState();
 

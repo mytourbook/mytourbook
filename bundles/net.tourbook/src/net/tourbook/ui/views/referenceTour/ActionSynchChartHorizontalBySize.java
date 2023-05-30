@@ -32,7 +32,7 @@ public class ActionSynchChartHorizontalBySize extends Action {
 
       _synchChart = syncChart;
 
-      setToolTipText(Messages.tourCatalog_view_action_synch_charts_bySize_tooltip);
+      setToolTipText(Messages.RefTour_Action_SyncChartsBySize_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize));
       setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize_Disabled));

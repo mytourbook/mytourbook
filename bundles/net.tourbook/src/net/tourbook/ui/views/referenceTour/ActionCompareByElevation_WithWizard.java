@@ -40,7 +40,7 @@ public class ActionCompareByElevation_WithWizard extends Action {
 
       _refTourProvider = refTourProvider;
 
-      setText(Messages.action_tourCatalog_open_compare_wizard);
+      setText(Messages.RefTour_Action_OpenCompareWizard);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_CompareWizard));
    }

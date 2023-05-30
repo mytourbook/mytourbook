@@ -49,7 +49,7 @@ public class ActionCreateRefTour extends Action {
 
    public ActionCreateRefTour(final TourChart tourChart) {
 
-      setText(Messages.tourCatalog_view_action_create_reference_tour);
+      setText(Messages.RefTour_Action_CreateReferenceTour);
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_New));
 
       _tourChart = tourChart;
@@ -68,8 +68,8 @@ public class ActionCreateRefTour extends Action {
       // get the reference tour name
       final InputDialog dialog = new InputDialog(
             Display.getCurrent().getActiveShell(),
-            Messages.tourCatalog_view_dlg_add_reference_tour_title,
-            Messages.tourCatalog_view_dlg_add_reference_tour_msg,
+            Messages.RefTour_Dialog_AddReferenceTour_Title,
+            Messages.RefTour_Dialog_AddReferenceTour_Message,
             UI.EMPTY_STRING,
             null);
 

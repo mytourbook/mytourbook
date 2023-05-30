@@ -47,7 +47,7 @@ public class ActionRemoveComparedTours extends Action {
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
-      setText(Messages.tourCatalog_view_action_delete_tours);
+      setText(Messages.RefTour_Action_DeleteTours);
 
       setEnabled(false);
 
@@ -63,8 +63,8 @@ public class ActionRemoveComparedTours extends Action {
 
       // confirm removal
       if (MessageDialog.openConfirm(_tourView.getSite().getShell(),
-            Messages.tourCatalog_view_dlg_delete_comparedTour_title,
-            Messages.tourCatalog_view_dlg_delete_comparedTour_msg) == false) {
+            Messages.RefTour_Dialog_DeleteComparedTour_Title,
+            Messages.RefTour_Dialog_DeleteComparedTour_Message) == false) {
 
          return false;
       }
@@ -110,8 +110,8 @@ public class ActionRemoveComparedTours extends Action {
 
       // confirm deletion
       if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
-            Messages.tourCatalog_view_dlg_delete_refTour_title,
-            Messages.tourCatalog_view_dlg_delete_refTour_msg) == false) {
+            Messages.RefTour_Dialog_DeleteRefTour_Title,
+            Messages.RefTour_Dialog_DeleteRefTour_Message) == false) {
 
          return false;
       }

@@ -264,7 +264,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
 
          // set title
          chartDataModel.setTitle(NLS.bind(
-               Messages.tourCatalog_view_label_chart_title_reference_tour,
+               Messages.RefTour_Label_ReferenceTour_ChartTitle,
                refTour.getLabel(),
                TourManager.getTourTitleDetailed(_tourData)));
 

@@ -675,7 +675,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoChart = UI.createUI_PageNoData(_pageBook, Messages.tourCatalog_view_label_year_not_selected);
+      _pageNoChart = UI.createUI_PageNoData(_pageBook, Messages.RefTour_Label_Year_NotSelected);
 
       _pageChart = createUI_10_PageYearChart(_pageBook);
    }
@@ -1397,7 +1397,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          TourManager.setBarColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
          TourManager.setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
-         yDataSpeed.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
+         yDataSpeed.setYTitle(Messages.RefTour_Label_Year_ChartTitle);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
 

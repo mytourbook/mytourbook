@@ -146,7 +146,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
+         setToolTipText(Messages.RefTour_Action_NavigateNextTour);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right_Disabled));
@@ -164,7 +164,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
+         setToolTipText(Messages.RefTour_Action_NavigatePrevTour);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left_Disabled));
@@ -182,7 +182,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.TourCatalog_View_Action_SaveAndNext);
+         setToolTipText(Messages.RefTour_Action_SaveAndNext);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_SaveAndNext));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_SaveAndNext_Disabled));
@@ -205,7 +205,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.tourCatalog_view_action_save_marker);
+         setToolTipText(Messages.RefTour_Action_SaveMarker);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save_Disabled));
@@ -226,7 +226,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
+         setToolTipText(Messages.RefTour_Action_UndoMarkerPosition);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo_Disabled));
@@ -621,9 +621,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       final MessageBox msgBox = new MessageBox(_pageBook.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 
-      msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
+      msgBox.setText(Messages.RefTour_Dialog_SaveComparedTour_Title);
       msgBox.setMessage(NLS.bind(
-            Messages.tourCatalog_view_dlg_save_compared_tour_message,
+            Messages.RefTour_Dialog_SaveComparedTour_Message,
             TourManager.getTourTitleDetailed(_tourData)));
 
       final int answer = msgBox.open();

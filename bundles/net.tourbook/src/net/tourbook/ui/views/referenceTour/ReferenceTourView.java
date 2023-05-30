@@ -1332,7 +1332,7 @@ public class ReferenceTourView extends ViewPart implements
       } else {
 
          // remove compared tours - &Remove Compared Tours...
-         _actionContext_RemoveComparedTours.setText(Messages.tourCatalog_view_action_delete_tours);
+         _actionContext_RemoveComparedTours.setText(Messages.RefTour_Action_DeleteTours);
       }
 
       /*
