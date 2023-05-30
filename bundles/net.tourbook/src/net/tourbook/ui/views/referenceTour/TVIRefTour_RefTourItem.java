@@ -28,7 +28,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
 /**
- * Contains a reference tour
+ * Contains a reference tour tree item
  */
 public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 

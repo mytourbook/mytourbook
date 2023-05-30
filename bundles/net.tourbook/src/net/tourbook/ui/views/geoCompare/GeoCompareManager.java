@@ -225,6 +225,8 @@ public class GeoCompareManager {
          final int origEndIndex = norm2origIndices[normMinDiffIndex + numNormPartSlices - 1];
 
          comparerItem.avgPulse = tourData.computeAvg_PulseSegment(origStartIndex, origEndIndex);
+         comparerItem.maxPulse = tourData.computeMax_FromValues(tourData.getPulse_SmoothedSerie(), origStartIndex, origEndIndex);
+
          comparerItem.avgSpeed = TourManager.computeTourSpeed(tourData, origStartIndex, origEndIndex);
 
          comparerItem.tourFirstIndex = origStartIndex;
@@ -259,6 +261,7 @@ public class GeoCompareManager {
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();
 
       comparerItem.tourStartTime = tourStartTime;
+      comparerItem.tourYear = tourStartTime.getYear();
       comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
       comparerItem.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);

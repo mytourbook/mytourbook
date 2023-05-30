@@ -53,6 +53,11 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
+import net.tourbook.ui.views.geoCompare.GeoCompareManager;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
+import net.tourbook.ui.views.geoCompare.GeoPartData;
+import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -77,7 +82,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class RefTour_YearStatistic_View extends ViewPart {
+public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareListener {
 
    public static final String  ID                                = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
@@ -144,17 +149,17 @@ public class RefTour_YearStatistic_View extends ViewPart {
     * Statistic values for all visible years
     */
    private ArrayList<TVIRefTour_ComparedTour> _statValues_AllTours          = new ArrayList<>();
-   private ArrayList<Integer>                _statValues_DOYValues         = new ArrayList<>();
+   private ArrayList<Integer>                 _statValues_DOYValues         = new ArrayList<>();
 
-   private ArrayList<Float>                  _statValues_AvgAltimeter_High = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgAltimeter_Low  = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgSpeed_High     = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgSpeed_Low      = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgPulse_Low      = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_AvgPulse_High     = new ArrayList<>();
-   private ArrayList<Float>                  _statValues_MaxPulse          = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgAltimeter_High = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgAltimeter_Low  = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgSpeed_High     = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgSpeed_Low      = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgPulse_Low      = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgPulse_High     = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_MaxPulse          = new ArrayList<>();
 
-   private int                               _barRelativeHeight;
+   private int                                _barRelativeHeight;
 
    /**
     * Reference tour item for which the statistic is displayed. This statistic can display only
@@ -165,27 +170,27 @@ public class RefTour_YearStatistic_View extends ViewPart {
    /**
     * Selection which is thrown by the year statistic
     */
-   private StructuredSelection               _currentSelection;
+   private StructuredSelection                _currentSelection;
 
-   private ITourEventListener                _tourEventListener;
+   private ITourEventListener                 _tourEventListener;
 
-   private boolean                           _isShowAllValues;
-   private boolean                           _isSynchMinMaxValue;
+   private boolean                            _isShowAllValues;
+   private boolean                            _isSynchMinMaxValue;
 
    /**
     * Contains the index in {@link #_statValues_AllTours} for the currently selected tour.
     */
-   private int                               _selectedTourIndex;
+   private int                                _selectedTourIndex;
 
-   private ActionCopyValuesIntoClipboard     _actionCopyValuesIntoClipboard;
-   private ActionShowAllValues               _actionShowAllValues;
-   private ActionSyncMinMaxValues            _actionSyncMinMaxValues;
-   private ActionYearStatisticOptions        _actionYearStatOptions;
+   private ActionCopyValuesIntoClipboard      _actionCopyValuesIntoClipboard;
+   private ActionShowAllValues                _actionShowAllValues;
+   private ActionSyncMinMaxValues             _actionSyncMinMaxValues;
+   private ActionYearStatisticOptions         _actionYearStatOptions;
 
-   private YearStatisticTourToolTip          _tourToolTip;
-   private TourInfoIconToolTipProvider       _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
+   private YearStatisticTourToolTip           _tourToolTip;
+   private TourInfoIconToolTipProvider        _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
 
-   private PixelConverter                    _pc;
+   private PixelConverter                     _pc;
 
    /*
     * UI controls
@@ -458,6 +463,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       addSelectionListener();
       addTourEventListener();
       addPrefListener();
+      GeoCompareManager.addGeoCompareEventListener(this);
 
       createActions();
 
@@ -480,8 +486,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
     * @param firstVisibleYear
     * @param isShowLatestYear
     */
-   private void createStatisticData_1_WithYearCategories(int firstVisibleYear,
-                                                         final boolean isShowLatestYear) {
+   private void createStatisticData_10_WithYearCategories(int firstVisibleYear,
+                                                          final boolean isShowLatestYear) {
 
       final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
 
@@ -548,7 +554,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
                      final TVIRefTour_ComparedTour tourItem = (TVIRefTour_ComparedTour) tourItemObj;
 
-                     createStatisticData_5_OneTour(tourItem);
+                     createStatisticData_50_OneTour(tourItem);
                   }
                }
             }
@@ -562,8 +568,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
     * @param firstVisibleYear
     * @param isShowLatestYear
     */
-   private void createStatisticData_2_WithoutYearCategories(int firstVisibleYear,
-                                                            final boolean isShowLatestYear) {
+   private void createStatisticData_20_WithoutYearCategories(int firstVisibleYear,
+                                                             final boolean isShowLatestYear) {
 
       final Object[] allItems = _currentRefItem.getFetchedChildrenAsArray();
 
@@ -597,13 +603,65 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
             if (tourYear >= firstVisibleYear && tourYear <= _lastVisibleYear) {
 
-               createStatisticData_5_OneTour(tourItem);
+               createStatisticData_50_OneTour(tourItem);
             }
          }
       }
    }
 
-   private void createStatisticData_5_OneTour(final TVIRefTour_ComparedTour tourItem) {
+   private void createStatisticData_30_FromGeoData(int firstVisibleYear,
+                                                   final boolean isShowLatestYear,
+                                                   final GeoPartData geoPartData) {
+      // TODO Auto-generated method stub
+
+      final ArrayList<GeoComparedTour> allItems = geoPartData.comparedTours;
+
+      final ArrayList<GeoComparedTour> allSortedItems = new ArrayList<>();
+      allSortedItems.addAll(allItems);
+      allSortedItems.sort(null);
+
+      if (_isShowAllValues
+            && allSortedItems != null
+            && allSortedItems.size() > 0) {
+
+         final int lastIndex = allSortedItems.size() - 1;
+
+         final int firstYear = allSortedItems.get(0).tourYear;
+         final int lastYear = allSortedItems.get(lastIndex).tourYear;
+
+         firstVisibleYear = firstYear;
+         _lastVisibleYear = lastYear;
+
+         _numVisibleYears = lastYear - firstYear + 1;
+         _spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
+
+         // update year data
+         setYearData();
+      }
+
+      for (final GeoComparedTour geoTour : allSortedItems) {
+
+         final int tourYear = geoTour.tourYear;
+
+         final TVIRefTour_ComparedTour comparedTourItem = new TVIRefTour_ComparedTour(null);
+
+         comparedTourItem.isGeoComparedTour = true;
+
+         comparedTourItem.tourDate = geoTour.tourStartTime.toLocalDate();
+
+         comparedTourItem.avgAltimeter = geoTour.avgAltimeter;
+         comparedTourItem.avgPulse = geoTour.avgPulse;
+         comparedTourItem.avgSpeed = geoTour.avgSpeed;
+         comparedTourItem.maxPulse = geoTour.maxPulse;
+
+         if (tourYear >= firstVisibleYear && tourYear <= _lastVisibleYear) {
+
+            createStatisticData_50_OneTour(comparedTourItem);
+         }
+      }
+   }
+
+   private void createStatisticData_50_OneTour(final TVIRefTour_ComparedTour tourItem) {
 
 // SET_FORMATTING_OFF
 
@@ -798,6 +856,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      GeoCompareManager.removeGeoCompareListener(this);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
@@ -826,6 +885,28 @@ public class RefTour_YearStatistic_View extends ViewPart {
       tbm.add(_actionYearStatOptions);
 
       tbm.update(true);
+   }
+
+   @Override
+   public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
+
+      if (eventId != GeoCompareEventId.COMPARE_GEO_PARTS) {
+         return;
+      }
+
+      GeoPartData geoPartData = null;
+      if (eventData instanceof GeoPartData) {
+
+         geoPartData = (GeoPartData) eventData;
+      }
+
+      if (geoPartData == null) {
+         return;
+      }
+
+      // update year statistic with current geo part data
+
+      updateUI_YearChart(false, geoPartData);
    }
 
    private int getFirstVisibleYear() {
@@ -1234,7 +1315,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _actionShowAllValues.setChecked(_isShowAllValues);
       _actionSyncMinMaxValues.setChecked(_isSynchMinMaxValue);
 
-      final int numVisibleYears = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_VISIBLE_YEARS, 3);
+      final int numVisibleYears = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
       _numVisibleYears = numVisibleYears;
       _spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
 
@@ -1316,13 +1397,19 @@ public class RefTour_YearStatistic_View extends ViewPart {
       }
    }
 
+   void updateUI_YearChart(final boolean isShowLatestYear) {
+
+      updateUI_YearChart(isShowLatestYear, null);
+   }
+
    /**
     * Show statistic for several years
     *
     * @param isShowLatestYear
     *           Shows the latest year and the years before
+    * @param geoPartData
     */
-   void updateUI_YearChart(final boolean isShowLatestYear) {
+   void updateUI_YearChart(final boolean isShowLatestYear, final GeoPartData geoPartData) {
 
       if (_currentRefItem == null) {
 
@@ -1355,17 +1442,21 @@ public class RefTour_YearStatistic_View extends ViewPart {
             RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MIN,
             RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MAX);
 
-      if (ElevationCompareManager.getReferenceTour_ViewLayout() == ElevationCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
+      if (geoPartData != null) {
+
+         createStatisticData_30_FromGeoData(firstVisibleYear, isShowLatestYear, geoPartData);
+
+      } else if (ElevationCompareManager.getReferenceTour_ViewLayout() == ElevationCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
 
          // compared tours are displayed with year categories
 
-         createStatisticData_1_WithYearCategories(firstVisibleYear, isShowLatestYear);
+         createStatisticData_10_WithYearCategories(firstVisibleYear, isShowLatestYear);
 
       } else {
 
          // compared tours are displayed without year categories
 
-         createStatisticData_2_WithoutYearCategories(firstVisibleYear, isShowLatestYear);
+         createStatisticData_20_WithoutYearCategories(firstVisibleYear, isShowLatestYear);
       }
 
       // first visible year could be changed when all values are displayed

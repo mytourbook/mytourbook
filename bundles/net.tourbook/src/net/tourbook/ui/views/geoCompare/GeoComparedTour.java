@@ -23,7 +23,7 @@ import net.tourbook.data.TourType;
 /**
  * Contains data for one compared tour
  */
-public class GeoComparedTour {
+public class GeoComparedTour implements Comparable<Object> {
 
    private static final char NL           = UI.NEW_LINE;
 
@@ -45,13 +45,15 @@ public class GeoComparedTour {
     */
    long                      minDiffValue = -2;
 
-   float                     avgPulse;
+   public float              avgPulse;
    float                     avgPace;
-   float                     avgSpeed;
-   double                    avgAltimeter;
+   public float              avgSpeed;
+   public float              avgAltimeter;
+   public float              maxPulse;
 
-   ZonedDateTime             tourStartTime;
-   long                      tourStartTimeMS;
+   public ZonedDateTime      tourStartTime;
+   public long               tourStartTimeMS;
+   public int                tourYear;
 
    int                       elapsedTime;
    long                      recordedTime;
@@ -72,6 +74,18 @@ public class GeoComparedTour {
 
       this.tourId = tourId;
       this.geoPartData = geoPartItem;
+   }
+
+   @Override
+   public int compareTo(final Object o) {
+
+      final GeoComparedTour other = (GeoComparedTour) o;
+
+      return tourStartTimeMS < other.tourStartTimeMS
+            ? -1
+            : tourStartTimeMS > other.tourStartTimeMS
+                  ? 1
+                  : 0;
    }
 
    @Override

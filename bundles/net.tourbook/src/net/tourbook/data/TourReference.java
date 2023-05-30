@@ -73,8 +73,8 @@ public class TourReference implements Serializable {
     */
    public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
 
-      this.tourData = tourData;
       this.label = label;
+      this.tourData = tourData;
 
       this.startIndex = startIndex;
       this.endIndex = endIndex;

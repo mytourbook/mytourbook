@@ -26,51 +26,51 @@ import net.tourbook.data.TourReference;
  */
 public class GeoPartData {
 
-   private static final char  NL            = UI.NEW_LINE;
+   private static final char         NL            = UI.NEW_LINE;
 
    /**
     * Entity ID of the {@link TourReference}, is -1 when not available
     */
-   public long                refId         = -1;
+   public long                       refId         = -1;
 
-   long                       executorId;
+   long                              executorId;
 
    /**
     * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
     */
-   boolean                    isCanceled;
+   boolean                           isCanceled;
 
-   boolean                    isUseAppFilter;
+   boolean                           isUseAppFilter;
 
    /**
     * Geo part which should be compared
     */
-   public NormalizedGeoData   normalizedTourPart;
+   public NormalizedGeoData          normalizedTourPart;
 
    /**
     * Geo parts which are affected
     */
-   int[]                      geoParts;
+   int[]                             geoParts;
 
    /**
     * Tour id's which are having at least one of the {@link #geoParts}
     */
-   long[]                     tourIds;
+   long[]                            tourIds;
 
    /**
     * Results of the compared tours
     */
-   ArrayList<GeoComparedTour> comparedTours = new ArrayList<>();
+   public ArrayList<GeoComparedTour> comparedTours = new ArrayList<>();
 
    /**
     * Time in ms to calculate sql data
     */
-   long                       sqlRunningTime;
+   long                              sqlRunningTime;
 
    /**
     *
     */
-   boolean                    isReselectedInUI;
+   boolean                           isReselectedInUI;
 
    @SuppressWarnings("unused")
    private GeoPartData() {}

@@ -22,12 +22,12 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourCompared;
 
 /**
- * Represents a compared tour (tree item) in the tour map viewer
+ * Represents a compared tour (tree item) in the reference tour viewer
  */
 public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    /**
-    * unique id for the {@link TourCompared} entity
+    * Unique id for the {@link TourCompared} entity
     */
    long compareId;
 
@@ -55,6 +55,8 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
    float           maxPulse;
 
    ArrayList<Long> tagIds;
+
+   boolean         isGeoComparedTour;
 
    public TVIRefTour_ComparedTour(final TreeViewerItem parentItem) {
 
@@ -179,12 +181,16 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
       return NL
 
-            + "TVICatalogComparedTour" + NL //$NON-NLS-1$
+            + "TVIRefTour_ComparedTour" + NL //$NON-NLS-1$
 
-//            + " compareId = " + compareId + NL //$NON-NLS-1$
-//            + " refId     = " + refId + NL //$NON-NLS-1$
+            + "[" + NL //$NON-NLS-1$
+
+//          + " compareId = " + compareId + NL //$NON-NLS-1$
+//          + " refId     = " + refId + NL //$NON-NLS-1$
             + " tourDate  = " + tourDate + NL //$NON-NLS-1$
             + " tourTitle = " + tourTitle + NL //$NON-NLS-1$
+
+            + "]" + NL //$NON-NLS-1$
       ;
    }
 }

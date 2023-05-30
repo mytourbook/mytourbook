@@ -836,23 +836,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (_compareData_NumGeoPartTours == 0) {
 
          // update UI
-         Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         _parent.getDisplay().asyncExec(() -> {
 
-               if (_parent.isDisposed()) {
-                  return;
-               }
-
-               // this can happen when the tour filter is active and no tours are found -> show empty result
-
-               _comparedTours.clear();
-
-               updateUI_State_Progress(0, 0);
-               updateUI_Viewer();
-
-               updateUI_GeoItem(geoPartItem);
+            if (_parent.isDisposed()) {
+               return;
             }
+
+            // this can happen when the tour filter is active and no tours are found -> show empty result
+
+            _comparedTours.clear();
+
+            updateUI_State_Progress(0, 0);
+            updateUI_Viewer();
+
+            updateUI_GeoItem(geoPartItem);
          });
 
          return;
@@ -868,21 +865,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       GeoCompareManager.compareGeoTours(geoPartItem, this);
 
       // update UI
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _parent.getDisplay().asyncExec(() -> {
 
-            if (_parent.isDisposed()) {
-               return;
-            }
-
-            if (workerExecutorId[0] != _workerExecutorId) {
-               // skip old tasks
-               return;
-            }
-
-            updateUI_GeoItem(geoPartItem);
+         if (_parent.isDisposed()) {
+            return;
          }
+
+         if (workerExecutorId[0] != _workerExecutorId) {
+
+            // skip old tasks
+
+            return;
+         }
+
+         updateUI_GeoItem(geoPartItem);
       });
 
    }
@@ -926,33 +922,31 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       // reset paused time
       _lastUIUpdate = now;
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _parent.getDisplay().asyncExec(() -> {
 
-            if (_parent.isDisposed()) {
-               return;
-            }
+         if (_parent.isDisposed()) {
+            return;
+         }
 
-            updateUI_State_Progress(workedTours, _compareData_NumGeoPartTours);
+         updateUI_State_Progress(workedTours, _compareData_NumGeoPartTours);
 
-            // fire geo part compare result
-            GeoCompareManager.fireEvent(
-                  GeoCompareEventId.COMPARE_GEO_PARTS,
-                  comparerItem.geoPartData,
-                  GeoCompareView.this);
+         // fire geo part compare result
+         GeoCompareManager.fireEvent(
+               GeoCompareEventId.COMPARE_GEO_PARTS,
+               comparerItem.geoPartData,
+               GeoCompareView.this);
 
-            if (workedTours == _compareData_NumGeoPartTours) {
-               compare_60_AllIsCompared(geoPartItem);
-            }
+         if (workedTours == _compareData_NumGeoPartTours) {
+            compare_60_AllIsCompared(geoPartItem);
+         }
 
-            updateUI_Viewer();
+         updateUI_Viewer();
 
-            // reselect previous selection
-            if (reselectedItem[0] != null) {
+         // reselect previous selection
+         if (reselectedItem[0] != null) {
 
-               _geoPartViewer.setSelection(new StructuredSelection(reselectedItem), true);
-               _geoPartViewer.getTable().showSelection();
+            _geoPartViewer.setSelection(new StructuredSelection(reselectedItem), true);
+            _geoPartViewer.getTable().showSelection();
 
 //					// focus can have changed when resorted, set focus to the selected item
 //					int selectedIndex = 0;
@@ -969,9 +963,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //					table.setSelection(selectedIndex);
 //					table.showSelection();
 
-            }
          }
-
       });
    }
 
@@ -1476,7 +1468,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
-            final double value = item.avgAltimeter;
+            final float value = item.avgAltimeter;
 
             colDef.printDetailValue(cell, value);
          }

@@ -490,18 +490,18 @@ public class ElevationCompareManager {
    public static TVIRefTour_RefTourItem createCatalogRefItem(final Long refId) {
 
       // create "dummy" root item that the year statistic works also for ref tours from the compare result view
-      final TVIRefTour_RootItem catalogRootItem = new TVIRefTour_RootItem();
+      final TVIRefTour_RootItem refTour_RootItem = new TVIRefTour_RootItem();
 
       // get ref item which are children of the root item
-      for (final TreeViewerItem treeItem : catalogRootItem.getFetchedChildren()) {
+      for (final TreeViewerItem treeItem : refTour_RootItem.getFetchedChildren()) {
 
          if (treeItem instanceof TVIRefTour_RefTourItem) {
 
-            final TVIRefTour_RefTourItem catalogRefItem = (TVIRefTour_RefTourItem) treeItem;
+            final TVIRefTour_RefTourItem refTourItem = (TVIRefTour_RefTourItem) treeItem;
 
-            if (catalogRefItem.refId == refId) {
+            if (refTourItem.refId == refId) {
 
-               return catalogRefItem;
+               return refTourItem;
             }
          }
       }
