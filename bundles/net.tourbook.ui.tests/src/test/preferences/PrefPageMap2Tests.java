@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,23 +23,16 @@ import org.junit.jupiter.api.Test;
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageMap3Tests extends UITest {
+public class PrefPageMap2Tests extends UITest {
 
    @Test
    void openPreferencePage() {
 
       Utils.openPreferences(bot);
-      SWTBotTreeItem threeDMapTreeItem = bot.tree().getTreeItem("3D Map").select(); //$NON-NLS-1$
+      SWTBotTreeItem twoDMapTreeItem = bot.tree().getTreeItem("2D Map").select(); //$NON-NLS-1$
 
-      threeDMapTreeItem = threeDMapTreeItem.expand();
-      assertNotNull(threeDMapTreeItem);
-
-      //Test fails with the below error:
-      // java.lang.UnsatisfiedLinkError: Can't load library:
-      // D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\natives\windows-amd64\\gluegen_rt.dll
-//      threeDMapTreeItem.getNode("Layer").select(); //$NON-NLS-1$
-//
-//      bot.sleep(3000);
+      twoDMapTreeItem = twoDMapTreeItem.expand();
+      assertNotNull(twoDMapTreeItem);
 
       Utils.clickApplyAndCloseButton(bot);
    }
