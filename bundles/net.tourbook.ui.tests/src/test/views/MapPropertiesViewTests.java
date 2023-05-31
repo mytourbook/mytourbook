@@ -29,7 +29,7 @@ public class MapPropertiesViewTests extends UITest {
 
       Utils.getTour(bot);
 
-      //Open the Tour Tags view
+      //Open the Map Properties view
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.SYSTEM).expand().getNode("Map Properties").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
