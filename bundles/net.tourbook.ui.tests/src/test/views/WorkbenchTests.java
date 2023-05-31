@@ -154,6 +154,9 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$ //$NON-NLS-2$
       final SWTBotView mapBookmarkView = Utils.showView(bot, "Map Bookmark"); //$NON-NLS-1$
 
+      Utils.showViewFromMenu(bot, "Map", "Model &Player"); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotView modelPlayerView = Utils.showView(bot, "Map Player"); //$NON-NLS-1$
+
       bot.sleep(3000);
 
       //Close the opened views
@@ -174,5 +177,6 @@ public class WorkbenchTests extends UITest {
       photosAndToursView.close();
       tourPhotosView.close();
       mapBookmarkView.close();
+      modelPlayerView.close();
    }
 }
