@@ -77,7 +77,7 @@ public class WorkbenchTests extends UITest {
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
-      bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip("Show tour in 2D map").click(); //$NON-NLS-1$
       Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);

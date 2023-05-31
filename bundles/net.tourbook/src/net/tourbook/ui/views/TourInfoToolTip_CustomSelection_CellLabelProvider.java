@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2023  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,24 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package views;
+package net.tourbook.ui.views;
 
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.junit.jupiter.api.Test;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 
-import utils.UITest;
-import utils.Utils;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.graphics.Point;
 
-public class CalendarViewTests extends UITest {
+public abstract class TourInfoToolTip_CustomSelection_CellLabelProvider
 
-   @Test
-   void openCalendarView() {
+      extends SelectionCellLabelProvider
+      implements IColumnViewerTourIdProvider {
 
-      bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
-      final SWTBotView calendarView = Utils.showView(bot, "Calendar"); //$NON-NLS-1$
-
-      bot.comboBox(2).setSelection("App : Classic"); //$NON-NLS-1$
-
-      calendarView.close();
+   @Override
+   public Object getData(final ViewerCell cell) {
+      return null;
    }
+
+   @Override
+   public Point getToolTipShift(final Object object) {
+      return new Point(1, 0);
+   }
+
+   @Override
+   public abstract Long getTourId(final ViewerCell cell);
+
 }

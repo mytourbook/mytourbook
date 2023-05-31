@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -58,6 +60,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -67,6 +70,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -88,9 +92,13 @@ public class RefTour_YearStatistic_View extends ViewPart {
    static final int            STATE_RELATIVE_BAR_HEIGHT_MIN     = 1;
    static final int            STATE_RELATIVE_BAR_HEIGHT_MAX     = 100;
    static final String         STATE_SHOW_ALTIMETER_AVG          = "STATE_SHOW_ALTIMETER_AVG";                         //$NON-NLS-1$
+   static final boolean        STATE_SHOW_ALTIMETER_AVG_DEFAULT  = true;
    static final String         STATE_SHOW_PULSE_AVG              = "STATE_SHOW_PULSE_AVG";                             //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PULSE_AVG_DEFAULT      = true;
    static final String         STATE_SHOW_PULSE_AVG_MAX          = "STATE_SHOW_PULSE_AVG_MAX";                         //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PULSE_AVG_MAX_DEFAULT  = false;
    static final String         STATE_SHOW_SPEED_AVG              = "STATE_SHOW_SPEED_AVG";                             //$NON-NLS-1$
+   static final boolean        STATE_SHOW_SPEED_AVG_DEFAULT      = true;
 
 // SET_FORMATTING_OFF
 
@@ -177,7 +185,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private YearStatisticTourToolTip          _tourToolTip;
    private TourInfoIconToolTipProvider       _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
 
-   private YearSelector                      _yearSelector;
+   private PixelConverter                    _pc;
 
    /*
     * UI controls
@@ -185,11 +193,15 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private PageBook  _pageBook;
    private Composite _pageChart;
    private Composite _pageNoChart;
-   private Composite _titleContainer;
+   private Composite _headerContainer;
 
    private Chart     _yearChart;
 
+   private Combo     _comboLastVisibleYear;
+
    private Label     _lblRefTourTitle;
+
+   private Spinner   _spinnerNumberOfVisibleYears;
 
    private class ActionCopyValuesIntoClipboard extends Action {
 
@@ -439,6 +451,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
+      initUI(parent);
+
       createUI(parent);
 
       addSelectionListener();
@@ -485,7 +499,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
             _lastVisibleYear = lastYear;
 
             _numVisibleYears = lastYear - firstYear + 1;
-            _yearSelector.spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
+            _spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
 
             // update year data
             setYearData();
@@ -566,7 +580,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          _lastVisibleYear = lastYear;
 
          _numVisibleYears = lastYear - firstYear + 1;
-         _yearSelector.spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
+         _spinnerNumberOfVisibleYears.setSelection(_numVisibleYears);
 
          // update year data
          setYearData();
@@ -673,7 +687,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
-         createUI_20_Title(container);
+         createUI_20_Header(container);
          createUI_30_Chart(container);
       }
 
@@ -681,32 +695,77 @@ public class RefTour_YearStatistic_View extends ViewPart {
    }
 
    /**
-    * Title
+    * Header
     */
-   private void createUI_20_Title(final Composite parent) {
+   private void createUI_20_Header(final Composite parent) {
 
-      _titleContainer = new Composite(parent, SWT.NONE);
+      _headerContainer = new Composite(parent, SWT.NONE);
+      _headerContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.FILL, SWT.FILL)
-            .applyTo(_titleContainer);
+            .applyTo(_headerContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(1)
+            .numColumns(3)
             .margins(3, 3)
-            .applyTo(_titleContainer);
+            .applyTo(_headerContainer);
 //      container.setBackground(UI.SYS_COLOR_GREEN);
-      _titleContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
       {
          {
             /*
              * Ref tour title
              */
-            _lblRefTourTitle = new Label(_titleContainer, SWT.NONE);
+            _lblRefTourTitle = new Label(_headerContainer, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .align(SWT.CENTER, SWT.CENTER)
                   .applyTo(_lblRefTourTitle);
 //            _lblRefTourTitle.setBackground(UI.SYS_COLOR_RED);
+         }
+         {
+            /*
+             * Last visible year
+             */
+            _comboLastVisibleYear = new Combo(_headerContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboLastVisibleYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
+            _comboLastVisibleYear.setVisibleItemCount(50);
+
+            _comboLastVisibleYear.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onSelect_LastVisibleYear()));
+
+            _comboLastVisibleYear.addTraverseListener(traverseEvent -> {
+               if (traverseEvent.detail == SWT.TRAVERSE_RETURN) {
+                  onSelect_LastVisibleYear();
+               }
+            });
+
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .hint(_pc.convertWidthInCharsToPixels(UI.IS_OSX ? 12 : UI.IS_LINUX ? 12 : 5), SWT.DEFAULT)
+                  .applyTo(_comboLastVisibleYear);
+         }
+         {
+            /*
+             * Number of visible years
+             */
+            _spinnerNumberOfVisibleYears = new Spinner(_headerContainer, SWT.BORDER);
+            _spinnerNumberOfVisibleYears.setMinimum(1);
+            _spinnerNumberOfVisibleYears.setMaximum(100);
+            _spinnerNumberOfVisibleYears.setIncrement(1);
+            _spinnerNumberOfVisibleYears.setPageIncrement(5);
+            _spinnerNumberOfVisibleYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
+
+            _spinnerNumberOfVisibleYears.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onSelect_NumberOfVisibleYears()));
+
+            _spinnerNumberOfVisibleYears.addMouseWheelListener(mouseEvent -> {
+
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
+               onSelect_NumberOfVisibleYears();
+            });
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinnerNumberOfVisibleYears);
          }
       }
    }
@@ -750,8 +809,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       final boolean canSelectYears = _isShowAllValues == false;
 
-      _yearSelector.comboLastVisibleYear.setEnabled(canSelectYears);
-      _yearSelector.spinnerNumberOfVisibleYears.setEnabled(canSelectYears);
+      _comboLastVisibleYear.setEnabled(canSelectYears);
+      _spinnerNumberOfVisibleYears.setEnabled(canSelectYears);
    }
 
    private void fillActionBars() {
@@ -760,10 +819,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
        * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      _yearSelector = new YearSelector(this);
-
-      tbm.add(_yearSelector);
 
       tbm.add(_actionShowAllValues);
       tbm.add(_actionSyncMinMaxValues);
@@ -802,6 +857,11 @@ public class RefTour_YearStatistic_View extends ViewPart {
       }
 
       return yearDOYs;
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
    }
 
    TVICatalogComparedTour navigateTour(final boolean isNextTour) {
@@ -949,7 +1009,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
    void onSelect_LastVisibleYear() {
 
       // get last visible year
-      _lastVisibleYear = _allSelectableYears.get(_yearSelector.comboLastVisibleYear.getSelectionIndex());
+      _lastVisibleYear = _allSelectableYears.get(_comboLastVisibleYear.getSelectionIndex());
 
       // update year data
       setYearData();
@@ -977,7 +1037,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          selectedTourId = _statValues_AllTours.get(selectedTourIndex).getTourId();
       }
 
-      _numVisibleYears = _yearSelector.spinnerNumberOfVisibleYears.getSelection();
+      _numVisibleYears = _spinnerNumberOfVisibleYears.getSelection();
 
       setYearData();
 
@@ -1176,7 +1236,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       final int numVisibleYears = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_VISIBLE_YEARS, 3);
       _numVisibleYears = numVisibleYears;
-      _yearSelector.spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
+      _spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
 
       setYearData();
    }
@@ -1321,7 +1381,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Speed
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, STATE_SHOW_SPEED_AVG_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
@@ -1353,7 +1413,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Altimeter (VAM)
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, STATE_SHOW_ALTIMETER_AVG_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
@@ -1385,7 +1445,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Avg pulse
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG, STATE_SHOW_PULSE_AVG_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
@@ -1417,7 +1477,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /**
        * Avg/max pulse
        */
-      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, true)) {
+      if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, STATE_SHOW_PULSE_AVG_MAX_DEFAULT)) {
 
          // set the bar low/high data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
@@ -1470,7 +1530,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       /*
        * Update start year combo box
        */
-      final Combo comboLastVisibleYear = _yearSelector.comboLastVisibleYear;
+      final Combo comboLastVisibleYear = _comboLastVisibleYear;
 
       comboLastVisibleYear.removeAll();
       _allSelectableYears.clear();
@@ -1487,7 +1547,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _lblRefTourTitle.setForeground(ThemeUtil.getDefaultForegroundColor_Table());
 
       // set background again otherwise the original is displayed
-      _titleContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+      _headerContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
 
       // layout is needed otherwise the horizontal centered text is not displayed
       _lblRefTourTitle.getParent().layout(true, true);

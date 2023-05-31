@@ -1027,9 +1027,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
                if (viewItem instanceof TVITagView_Month) {
-                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
+                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY));
                } else {
-                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
+                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY));
                }
 
             } else {
@@ -2569,11 +2569,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // set color
       if (element instanceof TVITagView_Tag) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE));
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY));
       } else if (element instanceof TVITagView_Year) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY));
       } else if (element instanceof TVITagView_Month) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY));
 //      } else if (element instanceof TVITagView_Tour) {
 //         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
       }

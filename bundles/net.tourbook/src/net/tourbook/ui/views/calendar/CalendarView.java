@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2022 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Images;
@@ -110,6 +111,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private CalendarTourInfoToolTip _tourInfoToolTip;
    private OpenDialogManager       _openDlgMgr                     = new OpenDialogManager();
 
+   private ArrayList<Integer>      _allYearValues;
+
    /*
     * UI controls
     */
@@ -119,6 +122,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private Composite     _calendarContainer;
    private Composite     _headerContainer;
 
+   private Combo         _comboMonth;
+   private Combo         _comboYear;
    private Combo         _comboProfiles;
 
    private Label         _lblTitle;
@@ -346,6 +351,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       createUI(parent);
 
+      fillMonthComboBox();
+      fillYearComboBox();
+
       createActions();
       fillActionBars();
 
@@ -390,7 +398,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       _headerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_headerContainer);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_headerContainer);
+      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(_headerContainer);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          {
@@ -404,6 +412,39 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
                   .applyTo(_lblTitle);
             MTFont.setHeaderFont(_lblTitle);
 //          _lblTitle.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+         }
+         {
+            /*
+             * Month
+             */
+
+            // combo
+            _comboMonth = new Combo(_headerContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboMonth.setToolTipText(Messages.Calendar_View_Combo_Month_Tooltip);
+            _comboMonth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectDate()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_comboMonth);
+         }
+         {
+            /*
+             * Year
+             */
+
+            // combo
+            _comboYear = new Combo(_headerContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboYear.setToolTipText(Messages.Calendar_View_Combo_Year_Tooltip);
+            _comboYear.setVisibleItemCount(50);
+            _comboYear.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectDate()));
+            _comboYear.addTraverseListener(traverseEvent -> {
+               if (traverseEvent.detail == SWT.TRAVERSE_RETURN) {
+                  onSelectDate();
+               }
+            });
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .hint(_pc.convertWidthInCharsToPixels(UI.IS_OSX ? 12 : UI.IS_LINUX ? 12 : 5), SWT.DEFAULT)
+                  .applyTo(_comboYear);
          }
          {
             /*
@@ -436,21 +477,33 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private void fillActionBars() {
 
       final IActionBars bars = getViewSite().getActionBars();
-
       final IToolBarManager toolbarMrg = bars.getToolBarManager();
 
       /*
        * Toolbar
        */
-      final CalendarYearMonthContributionItem yearMonthItem = new CalendarYearMonthContributionItem(_calendarGraph);
-      _calendarGraph.setYearMonthContributor(yearMonthItem);
-
-      toolbarMrg.add(yearMonthItem);
-
       toolbarMrg.add(_actionGotoToday);
       toolbarMrg.add(_actionSetLinked);
       toolbarMrg.add(_actionTourInfo);
       toolbarMrg.add(_actionCalendarOptions);
+   }
+
+   private void fillMonthComboBox() {
+
+      LocalDate date = LocalDate.now();
+      final int thisMonth = date.getMonthValue();
+      date = date.withMonth(1);
+
+      for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
+
+         _comboMonth.add(TimeTools.Formatter_Month.format(date));
+
+         date = date.plusMonths(1);
+      }
+
+      // select this month
+      _comboMonth.select(thisMonth - 1);
+
    }
 
    void fillUI_Profiles() {
@@ -478,6 +531,25 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       }
 
       _comboProfiles.select(selectIndex);
+   }
+
+   private void fillYearComboBox() {
+
+      final int thisYear = LocalDate.now().getYear();
+
+      _allYearValues = new ArrayList<>();
+
+      final LocalDateTime firstTourDateTime = CalendarTourDataProvider.getInstance().getFirstTourDateTime();
+      final int firstYear = firstTourDateTime.getYear();
+
+      for (int year = thisYear; year >= firstYear; year--) {
+
+         _comboYear.add(Integer.toString(year));
+         _allYearValues.add(year);
+      }
+
+      // select first year
+      _comboYear.select(0);
    }
 
    void fireSelection(final long tourId) {
@@ -543,6 +615,19 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       final SlideoutCalendarOptions slideout = getConfigSlideout();
 
       slideout.close();
+   }
+
+   private void onSelectDate() {
+
+      int yearIndex = _comboYear.getSelectionIndex();
+      if (yearIndex < 0) {
+         yearIndex = 0;
+      }
+
+      final int selectedYear = _allYearValues.get(yearIndex);
+      final int selectedMonth = _comboMonth.getSelectionIndex() + 1;
+
+      _calendarGraph.gotoDate(LocalDate.of(selectedYear, selectedMonth, 1), false);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -648,6 +733,53 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       _state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
 
       CalendarProfileManager.saveState();
+   }
+
+   void setDate(final LocalDate requestedDate, final CalendarProfile calendarProfile) {
+
+      // disable month when year columns are used
+      _comboMonth.setEnabled(
+            !(calendarProfile.isShowYearColumns
+                  && calendarProfile.yearColumnsStart != ColumnStart.CONTINUOUSLY));
+
+      final int requestedYear = requestedDate.getYear();
+
+      if (requestedYear < _allYearValues.get(_allYearValues.size() - 1)) {
+
+         // year is before available years
+
+         // select first date
+         _comboMonth.select(0);
+         _comboYear.select(0);
+
+      } else if (requestedYear > _allYearValues.get(0)) {
+
+         // year is after the available years
+
+         // select last date
+         _comboMonth.select(11);
+         _comboYear.select(0);
+
+      } else {
+
+         // year is available
+
+         for (int yearIndex = 0; yearIndex < _allYearValues.size(); yearIndex++) {
+
+            final int currentYear = _allYearValues.get(yearIndex);
+
+            if (currentYear == requestedYear) {
+
+               final int requestedMonth = requestedDate.getMonthValue();
+
+               _comboMonth.select(requestedMonth - 1);
+               _comboYear.select(yearIndex);
+
+               break;
+            }
+         }
+      }
+
    }
 
    /**

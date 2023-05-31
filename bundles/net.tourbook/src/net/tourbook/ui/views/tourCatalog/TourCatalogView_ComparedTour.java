@@ -112,6 +112,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
    private ActionNavigatePreviousTour        _actionNavigatePrevTour;
    private ActionNavigateNextTour            _actionNavigateNextTour;
    private ActionSaveComparedTour            _actionSaveComparedTour;
+   private ActionSaveAndNextComparedTour     _actionSaveAndNext_ComparedTour;
    private ActionUndoChanges                 _actionUndoChanges;
 
    private boolean                           _isDataDirty;
@@ -176,6 +177,29 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
       }
    }
 
+   private class ActionSaveAndNextComparedTour extends Action {
+
+      public ActionSaveAndNextComparedTour() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.TourCatalog_View_Action_SaveAndNext);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_SaveAndNext));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_SaveAndNext_Disabled));
+
+         setEnabled(false);
+      }
+
+      @Override
+      public void run() {
+
+         saveComparedTour();
+
+         _pageBook.getDisplay().asyncExec(() -> actionNavigateTour(true));
+      }
+   }
+
    private class ActionSaveComparedTour extends Action {
 
       public ActionSaveComparedTour() {
@@ -192,6 +216,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       @Override
       public void run() {
+
          saveComparedTour();
       }
    }
@@ -287,9 +312,10 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
       _actionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
       _actionSynchChartsByScale = new ActionSynchChartHorizontalByScale(this);
 
-      _actionNavigatePrevTour = new ActionNavigatePreviousTour();
       _actionNavigateNextTour = new ActionNavigateNextTour();
+      _actionNavigatePrevTour = new ActionNavigatePreviousTour();
       _actionSaveComparedTour = new ActionSaveComparedTour();
+      _actionSaveAndNext_ComparedTour = new ActionSaveAndNextComparedTour();
       _actionUndoChanges = new ActionUndoChanges();
    }
 
@@ -397,9 +423,11 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
       final boolean isMoved = isNotMoved == false;
+      final boolean isElevationCompareTour = _isGeoCompareRefTour == false && (isMoved || _comparedTour_CompareId == -1);
 
       // geo compared with ref tour cannot be saved !
-      _actionSaveComparedTour.setEnabled(_isGeoCompareRefTour == false && (isMoved || _comparedTour_CompareId == -1));
+      _actionSaveComparedTour.setEnabled(isElevationCompareTour);
+      _actionSaveAndNext_ComparedTour.setEnabled(isElevationCompareTour);
    }
 
    private void enableSynchronization() {
@@ -444,6 +472,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       tbm.add(_actionNavigatePrevTour);
       tbm.add(_actionNavigateNextTour);
+      tbm.add(_actionSaveAndNext_ComparedTour);
       tbm.add(_actionSaveComparedTour);
       tbm.add(_actionUndoChanges);
 

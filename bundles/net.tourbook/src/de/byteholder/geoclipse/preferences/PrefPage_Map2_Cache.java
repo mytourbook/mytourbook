@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.map.TileImageCache;
 
 import java.io.File;
@@ -22,6 +24,7 @@ import java.text.NumberFormat;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,13 +40,9 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -61,7 +60,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
 
    private static final String       SIZE_MBYTE        = Messages.prefPage_cache_MByte;
 
-   private final static NumberFormat _nf               = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf               = NumberFormat.getNumberInstance();
 
    private final String              _defaultCachePath = Platform.getInstanceLocation().getURL().getPath();
 
@@ -122,12 +121,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
          _boolEditorUseOffLineCache.setPreferenceStore(prefStore);
          _boolEditorUseOffLineCache.setPage(this);
          _boolEditorUseOffLineCache.load();
-         _boolEditorUseOffLineCache.setPropertyChangeListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               enableControls();
-            }
-         });
+         _boolEditorUseOffLineCache.setPropertyChangeListener(propertyChangeEvent -> enableControls());
 
          /*
           * offline cache settings
@@ -141,7 +135,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
       }
 
       /*
-       * hide error messages, this happend when the cache path is invalid but the offline cache is
+       * hide error messages, this happened when the cache path is invalid but the offline cache is
        * disabled
        */
       if (_boolEditorUseOffLineCache.getBooleanValue() == false) {
@@ -168,12 +162,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
          _boolEditorUseDefaultLocation.setPreferenceStore(prefStore);
          _boolEditorUseDefaultLocation.setPage(this);
          _boolEditorUseDefaultLocation.load();
-         _boolEditorUseDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               enableControls();
-            }
-         });
+         _boolEditorUseDefaultLocation.setPropertyChangeListener(propertyChangeEvent -> enableControls());
          new Label(_groupOffline, SWT.NONE);
 
          _containerPath = new Composite(_groupOffline, SWT.NONE);
@@ -188,12 +177,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
             _dirEditorCachePath.setPage(this);
             _dirEditorCachePath.setEmptyStringAllowed(false);
             _dirEditorCachePath.load();
-            _dirEditorCachePath.setPropertyChangeListener(new IPropertyChangeListener() {
-               @Override
-               public void propertyChange(final PropertyChangeEvent event) {
-                  getOfflineInfo();
-               }
-            });
+            _dirEditorCachePath.setPropertyChangeListener(propertyChangeEvent -> getOfflineInfo());
          }
       }
 
@@ -234,15 +218,12 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
          _btnDeleteOfflineCache = new Button(group, SWT.PUSH);
          _btnDeleteOfflineCache.setText(Messages.pref_cache_clear_cache);
          GridDataFactory.swtDefaults().span(2, 1).applyTo(_btnDeleteOfflineCache);
-         _btnDeleteOfflineCache.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+         _btnDeleteOfflineCache.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               stopOfflineInfoJob();
+            stopOfflineInfoJob();
 
-               deleteOfflineFiles();
-            }
-         });
+            deleteOfflineFiles();
+         }));
       }
    }
 
@@ -282,17 +263,13 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
             Messages.prefPage_cache_dlg_confirmDelete_title,
             NLS.bind(Messages.prefPage_cache_dlg_confirmDelete_message, _tileCacheDir.getAbsolutePath()))) {
 
-         BusyIndicator.showWhile(display, new Runnable() {
+         BusyIndicator.showWhile(display, () -> {
 
-            @Override
-            public void run() {
+            _lblInfoWaitingValue.setText(Messages.prefPage_cache_status_deletingFiles);
+            _lblInfoWaitingValue.pack(true);
 
-               _lblInfoWaitingValue.setText(Messages.prefPage_cache_status_deletingFiles);
-               _lblInfoWaitingValue.pack(true);
-
-               deleteDir(_tileCacheDir);
-               getOfflineInfo();
-            }
+            deleteDir(_tileCacheDir);
+            getOfflineInfo();
          });
       }
    }
@@ -328,7 +305,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
    }
 
    /**
-    * !!!!! Recursive funktion to count files/size !!!!!
+    * !!!!! Recursive function to count files/size !!!!!
     *
     * @param listOfFiles
     */
@@ -490,12 +467,7 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
                Messages.pref_cache_message_box_title,
                Messages.pref_cache_message_box_text)) {
 
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  PlatformUI.getWorkbench().restart();
-               }
-            });
+            Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
          }
       }
 
@@ -514,7 +486,8 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
       try {
          _offlineInfoJob.join();
       } catch (final InterruptedException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
    }
 
@@ -539,44 +512,41 @@ public class PrefPage_Map2_Cache extends PreferencePage implements IWorkbenchPre
     */
    private void updateUIOfflineInfo(final boolean isJobFinished) {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            // check if the controls are available
-            if (_lblInfoFilesValue.isDisposed()) {
-               return;
-            }
-
-            if (_isOfflineInfoJobCanceled) {
-
-               _lblInfoFilesValue.setText(Messages.prefPage_cache_status_noValue);
-               _lblInfoSizeValue.setText(Messages.prefPage_cache_status_noValue);
-               _lblInfoWaitingValue.setText(Messages.prefPage_cache_status_infoWasCanceled);
-
-            } else {
-
-               _nf.setMinimumIntegerDigits(0);
-               _nf.setMaximumFractionDigits(0);
-               _lblInfoFilesValue.setText(_nf.format(_fileCounter));
-
-               _nf.setMinimumIntegerDigits(2);
-               _nf.setMaximumFractionDigits(2);
-               _lblInfoSizeValue.setText(_nf.format((float) _fileSize / 1024 / 1024) + SIZE_MBYTE);
-
-               if (isJobFinished) {
-                  _lblInfoWaitingValue.setText(UI.EMPTY_STRING);
-               } else {
-                  _lblInfoWaitingValue.setText(Messages.prefPage_cache_status_retrieving);
-               }
-            }
-
-            _lblInfoFilesValue.pack(true);
-            _lblInfoSizeValue.pack(true);
-            _lblInfoWaitingValue.pack(true);
-
-            _btnDeleteOfflineCache.setEnabled(true);
+         // check if the controls are available
+         if (_lblInfoFilesValue.isDisposed()) {
+            return;
          }
+
+         if (_isOfflineInfoJobCanceled) {
+
+            _lblInfoFilesValue.setText(Messages.prefPage_cache_status_noValue);
+            _lblInfoSizeValue.setText(Messages.prefPage_cache_status_noValue);
+            _lblInfoWaitingValue.setText(Messages.prefPage_cache_status_infoWasCanceled);
+
+         } else {
+
+            _nf.setMinimumIntegerDigits(0);
+            _nf.setMaximumFractionDigits(0);
+            _lblInfoFilesValue.setText(_nf.format(_fileCounter));
+
+            _nf.setMinimumIntegerDigits(2);
+            _nf.setMaximumFractionDigits(2);
+            _lblInfoSizeValue.setText(_nf.format((float) _fileSize / 1024 / 1024) + SIZE_MBYTE);
+
+            if (isJobFinished) {
+               _lblInfoWaitingValue.setText(UI.EMPTY_STRING);
+            } else {
+               _lblInfoWaitingValue.setText(Messages.prefPage_cache_status_retrieving);
+            }
+         }
+
+         _lblInfoFilesValue.pack(true);
+         _lblInfoSizeValue.pack(true);
+         _lblInfoWaitingValue.pack(true);
+
+         _btnDeleteOfflineCache.setEnabled(true);
       });
    }
 

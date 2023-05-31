@@ -6154,7 +6154,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       /*
-       * a bar is selected
+       * A bar is selected
        */
 
       // get the chart data
@@ -6167,7 +6167,7 @@ public class ChartComponentGraph extends Canvas {
       final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
       final int devYBottom = drawingData.getDevYBottom();
-//      final int devYBottom = drawingData.devGraphHeight;
+      final int devYTop = drawingData.getDevYTop();
 
       final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
@@ -6196,16 +6196,16 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * current bar is selected, draw the selected bar
+          * Current bar is selected, draw the selected bar
           */
 
-         final Rectangle barShapeSelected = new Rectangle(
+         final Rectangle barOutline_Selected = new Rectangle(
                (barRectangle.x - markerWidth2),
                (barRectangle.y - markerWidth2),
                (barRectangle.width + markerWidth),
                (barRectangle.height + markerWidth));
 
-         final Rectangle barBarSelected = new Rectangle(
+         final Rectangle barLine_Selected = new Rectangle(
                barRectangle.x - 1,
                barRectangle.y - barThickness,
                barRectangle.width + barThickness,
@@ -6220,11 +6220,8 @@ public class ChartComponentGraph extends Canvas {
          final Color colorDarkSelected = getColor(rgbDarkDef);
          final Color colorLineSelected = getColor(rgbLineDef);
 
-         // do't write into the x-axis units which also contains the
-         // selection marker
-         if (barShapeSelected.y + barShapeSelected.height > devYBottom) {
-            barShapeSelected.height = devYBottom - barShapeSelected.y;
-         }
+         // don't write above the top or below the bottom of the graph canvas
+         gc.setClipping(0, devYTop, _clientArea.width, devYBottom - devYTop);
 
          // draw the selection darker when the focus is set
          if (_isFocusActive) {
@@ -6237,48 +6234,65 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorDarkSelected);
          gc.setBackground(colorBrightSelected);
 
-         if (barShapeSelected.height < 0) {
+         if (barOutline_Selected.y > devYBottom) {
 
-            // bar is below the x-axis, just draw a simple line
+            // bar is below the x-axis, just draw a thicker line
 
-            gc.setForeground(colorLineSelected);
-            gc.drawLine(//
-                  barShapeSelected.x,
-                  devYBottom + 1,
-                  barShapeSelected.x + barShapeSelected.width,
-                  devYBottom + 1);
+            gc.setBackground(colorLineSelected);
+            gc.fillRectangle(
+                  barOutline_Selected.x,
+                  devYBottom - 4,
+                  barOutline_Selected.width,
+                  3);
+
+         } else if (barOutline_Selected.y + barOutline_Selected.height < devYTop) {
+
+            // bar is above the x-axis, just draw a thicker line
+
+            gc.setBackground(colorLineSelected);
+            gc.fillRectangle(
+                  barOutline_Selected.x,
+                  devYTop + 2,
+                  barOutline_Selected.width,
+                  3);
+
          } else {
 
+            // bar is in the visible clipping area
+
             gc.fillGradientRectangle(
-                  barShapeSelected.x + 1,
-                  barShapeSelected.y + 1,
-                  barShapeSelected.width - 1,
-                  barShapeSelected.height - 1,
+                  barOutline_Selected.x + 1,
+                  barOutline_Selected.y + 1,
+                  barOutline_Selected.width - 1,
+                  barOutline_Selected.height - 1,
                   true);
 
-            // draw bar border
+            // draw bar outline
             gc.setForeground(colorLineSelected);
             gc.drawRoundRectangle(
-                  barShapeSelected.x,
-                  barShapeSelected.y,
-                  barShapeSelected.width,
-                  barShapeSelected.height,
+                  barOutline_Selected.x,
+                  barOutline_Selected.y,
+                  barOutline_Selected.width,
+                  barOutline_Selected.height,
                   4,
                   4);
 
             // draw bar thicker
             gc.setBackground(colorDarkSelected);
-            gc.fillRoundRectangle(//
-                  barBarSelected.x,
-                  barBarSelected.y,
-                  barBarSelected.width,
-                  barBarSelected.height,
+            gc.fillRoundRectangle(
+                  barLine_Selected.x,
+                  barLine_Selected.y,
+                  barLine_Selected.width,
+                  barLine_Selected.height,
                   2,
                   2);
          }
 
+         // reset clipping
+         gc.setClipping((Rectangle) null);
+
          /*
-          * draw a marker below the x-axis to make the selection more visible
+          * Draw a marker below the x-axis to make the selection more visible
           */
          if (_isFocusActive) {
 
@@ -6333,15 +6347,18 @@ public class ChartComponentGraph extends Canvas {
          final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
          final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
-         final int devYBottom = drawingData.getDevYBottom();
-//         final int devYBottom = drawingData.devGraphHeight;
-
          final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
          if (barRectangeleSeries == null) {
             // this occurred
             continue;
          }
+
+         final int devYBottom = drawingData.getDevYBottom();
+         final int devYTop = drawingData.getDevYTop();
+
+         // do't write into the x-axis units which also contains the selection marker
+         gcOverlay.setClipping(0, devYTop, _clientArea.width, devYBottom - devYTop);
 
          final int markerWidth = BAR_MARKER_WIDTH;
          final int markerWidth2 = markerWidth / 2;
@@ -6379,12 +6396,6 @@ public class ChartComponentGraph extends Canvas {
                   (hoveredRectangle.width + markerWidth),
                   (hoveredRectangle.height + markerWidth));
 
-            // do't write into the x-axis units which also contains the
-            // selection marker
-            if (hoveredBarShape.y + hoveredBarShape.height > devYBottom) {
-               hoveredBarShape.height = devYBottom - hoveredBarShape.y;
-            }
-
             // fill bar background
             gcOverlay.setForeground(colorDark);
             gcOverlay.setBackground(colorBright);
@@ -6409,6 +6420,9 @@ public class ChartComponentGraph extends Canvas {
       }
 
       gcOverlay.setAlpha(0xff);
+
+      // reset clipping
+      gcOverlay.setClipping((Rectangle) null);
    }
 
    private void drawSync_460_HoveredLine(final GC gcOverlay) {
@@ -6964,6 +6978,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          final int serieLength = barFocusRectangles.length;
+         final int devYBottom = drawingData.getDevYBottom();
 
          // find the rectangle which is hovered by the mouse
          for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -6981,7 +6996,18 @@ public class ChartComponentGraph extends Canvas {
                   _hoveredBarSerieIndex = serieIndex;
                   _hoveredBarValueIndex = valueIndex;
 
-                  _hoveredBar_ToolTip.open(barFocusRectangle, serieIndex, valueIndex);
+                  final Rectangle barTooltipRectangle = new Rectangle(
+
+                        barFocusRectangle.x,
+                        barFocusRectangle.y,
+                        barFocusRectangle.width,
+                        barFocusRectangle.height);
+
+                  // ensure the tooltip position is not below the chart
+                  if (barFocusRectangle.y + barFocusRectangle.height > devYBottom) {
+                     barTooltipRectangle.height = devYBottom - barFocusRectangle.y;
+                  }
+                  _hoveredBar_ToolTip.open(barTooltipRectangle, serieIndex, valueIndex);
 
                   isBarHit = true;
                   break;
@@ -7284,19 +7310,22 @@ public class ChartComponentGraph extends Canvas {
     * @param xxDevSliderLinePos
     *           x coordinate for the slider line within the graph, this can be outside of the
     *           visible graph
+    * @return Returns <code>true</code> when the slider position has changed
     */
-   private void moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
+   private boolean moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
 
       long xxDevSliderLinePos = _xxDevViewPortLeftBorder + devXSliderLinePos;
 
       /*
-       * adjust the line position the the min/max width of the graph image
+       * Adjust the line position the the min/max width of the graph image
        */
       xxDevSliderLinePos = Math.min(_xxDevGraphWidth, Math.max(0, xxDevSliderLinePos));
 
       // set new slider line position
-      setXSliderValue_FromHoveredValuePoint(xSlider);
+      final boolean isSliderPositionModified = setXSliderValue_FromHoveredValuePoint(xSlider);
       xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true, false);
+
+      return isSliderPositionModified;
    }
 
    /**
@@ -7900,6 +7929,7 @@ public class ChartComponentGraph extends Canvas {
 
       boolean isRedraw = false;
       boolean canShowHoveredValueTooltip = false;
+      boolean isSliderPositionModified = false;
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
@@ -7941,7 +7971,7 @@ public class ChartComponentGraph extends Canvas {
             // autoscroll could be active, disable it
             _isAutoScroll = false;
 
-            moveXSlider(_xSliderDragged, devXMouse);
+            isSliderPositionModified = moveXSlider(_xSliderDragged, devXMouse);
 
             _isSliderDirty = true;
             isRedraw = true;
@@ -8083,7 +8113,16 @@ public class ChartComponentGraph extends Canvas {
       setHoveredLineValue();
 
       // fire event for the current hovered value point
-      if (_hoveredValuePointIndex != -1) {
+      if (_hoveredValuePointIndex != -1
+
+            /*
+             * This reduces flickering when the slider is dragged, it's not prefect but better and
+             * it depends on the zoom level in the map and chart
+             */
+            && (isSliderPositionModified || _isSliderDirty == false)
+
+      ) {
+
          _chart.fireEvent_HoveredValue(_hoveredValuePointIndex);
       }
 
@@ -9484,20 +9523,21 @@ public class ChartComponentGraph extends Canvas {
     * Set the value index in the X-slider for the hovered position.
     *
     * @param xSlider
+    * @return Returns <code>true</code> when the slider position has changed
     */
-   void setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
+   boolean setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
 
       final ChartDataXSerie xData = getXData();
 
       if (xData == null) {
-         return;
+         return false;
       }
 
       final double[][] xValueSerie = xData.getHighValuesDouble();
 
       if (xValueSerie.length == 0) {
          // data are not available
-         return;
+         return false;
       }
 
       final double[] xDataValues = xValueSerie[0];
@@ -9506,10 +9546,12 @@ public class ChartComponentGraph extends Canvas {
 
          // this happens when a new tour is displayed
 
-         return;
+         return false;
       }
 
-      xSlider.setValueIndex(_hoveredValuePointIndex);
+      final boolean isValueModified = xSlider.setValueIndex(_hoveredValuePointIndex);
+
+      return isValueModified;
    }
 
    /**
@@ -10153,6 +10195,7 @@ public class ChartComponentGraph extends Canvas {
 
          // compute only value point labels
 
+         final int numLabels = allValuePointLabels.size();
          int labelIndex = 0;
 
          if (allTopLabels != null) {
@@ -10160,7 +10203,7 @@ public class ChartComponentGraph extends Canvas {
             for (final ChartXSliderLabel topLabel : allTopLabels) {
 
                // fixed java.lang.IndexOutOfBoundsException
-               if (labelIndex >= allValuePointLabels.size()) {
+               if (labelIndex >= numLabels) {
                   break;
                }
 
@@ -10187,6 +10230,11 @@ public class ChartComponentGraph extends Canvas {
             labelIndex = 0;
 
             for (final ChartXSliderLabel topLabel : allBottomLabels) {
+
+               // fixed java.lang.IndexOutOfBoundsException
+               if (labelIndex >= numLabels) {
+                  break;
+               }
 
                final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
 

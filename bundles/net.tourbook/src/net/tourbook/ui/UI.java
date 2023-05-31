@@ -39,6 +39,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageViewColors;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
@@ -51,6 +52,7 @@ import net.tourbook.web.WEB;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -89,83 +91,96 @@ import org.eclipse.ui.menus.UIElement;
 
 public class UI {
 
-   private static final String           ICONS_PATH                    = "/icons/";                    //$NON-NLS-1$
+   private static final String           ICONS_PATH                      = "/icons/";                         //$NON-NLS-1$
 
-   public static final String            EMPTY_STRING                  = "";                           //$NON-NLS-1$
-   public static final String            SPACE                         = " ";                          //$NON-NLS-1$
-   public static final String            SPACE2                        = "  ";                         //$NON-NLS-1$
-   public static final String            SPACE4                        = "    ";                       //$NON-NLS-1$
-   public static final String            COLON_SPACE                   = ": ";                         //$NON-NLS-1$
-   public static final String            COMMA_SPACE                   = ", ";                         //$NON-NLS-1$
-   public static final String            UNDERSCORE                    = "_";                          //$NON-NLS-1$
-   public static final String            DASH                          = "-";                          //$NON-NLS-1$
-   public static final String            DASH_WITH_SPACE               = " - ";                        //$NON-NLS-1$
-   public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                    //$NON-NLS-1$
-   public static final String            SLASH_WITH_SPACE              = " / ";                        //$NON-NLS-1$
-   public static final String            EMPTY_STRING_FORMAT           = "%s";                         //$NON-NLS-1$
+   public static final String            EMPTY_STRING                    = "";                                //$NON-NLS-1$
+   public static final String            SPACE                           = " ";                               //$NON-NLS-1$
+   public static final String            SPACE2                          = "  ";                              //$NON-NLS-1$
+   public static final String            SPACE4                          = "    ";                            //$NON-NLS-1$
+   public static final String            COLON_SPACE                     = ": ";                              //$NON-NLS-1$
+   public static final String            COMMA_SPACE                     = ", ";                              //$NON-NLS-1$
+   public static final String            UNDERSCORE                      = "_";                               //$NON-NLS-1$
+   public static final String            DASH                            = "-";                               //$NON-NLS-1$
+   public static final String            DASH_WITH_SPACE                 = " - ";                             //$NON-NLS-1$
+   public static final String            DASH_WITH_DOUBLE_SPACE          = "   -   ";                         //$NON-NLS-1$
+   public static final String            SLASH_WITH_SPACE                = " / ";                             //$NON-NLS-1$
+   public static final String            EMPTY_STRING_FORMAT             = "%s";                              //$NON-NLS-1$
 
    /**
     * contains a new line
     */
-   public static final String            NEW_LINE                      = "\n";                         //$NON-NLS-1$
+   public static final String            NEW_LINE                        = "\n";                              //$NON-NLS-1$
 
    /**
     * contains 2 new lines
     */
-   public static final String            NEW_LINE2                     = "\n\n";                       //$NON-NLS-1$
+   public static final String            NEW_LINE2                       = "\n\n";                            //$NON-NLS-1$
 
-   public static final String            IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";         //$NON-NLS-1$
+   public static final String            IS_NOT_INITIALIZED              = "IS NOT INITIALIZED";              //$NON-NLS-1$
 
-   public static final String            GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";            //$NON-NLS-1$
-   public static final String            GRAPH_ALTITUDE                = "GRAPH_ALTITUDE";             //$NON-NLS-1$
-   public static final String            GRAPH_CADENCE                 = "GRAPH_CADENCE";              //$NON-NLS-1$
-   public static final String            GRAPH_GRADIENT                = "GRAPH_GRADIENT";             //$NON-NLS-1$
-   public static final String            GRAPH_PACE                    = "GRAPH_PACE";                 //$NON-NLS-1$
-   public static final String            GRAPH_POWER                   = "GRAPH_POWER";                //$NON-NLS-1$
-   public static final String            GRAPH_PULSE                   = "GRAPH_PULSE";                //$NON-NLS-1$
-   public static final String            GRAPH_SPEED                   = "GRAPH_SPEED";                //$NON-NLS-1$
-   public static final String            GRAPH_TEMPERATURE             = "GRAPH_TEMPERATURE";          //$NON-NLS-1$
+   public static final String            GRAPH_ALTIMETER                 = "GRAPH_ALTIMETER";                 //$NON-NLS-1$
+   public static final String            GRAPH_ALTITUDE                  = "GRAPH_ALTITUDE";                  //$NON-NLS-1$
+   public static final String            GRAPH_CADENCE                   = "GRAPH_CADENCE";                   //$NON-NLS-1$
+   public static final String            GRAPH_GRADIENT                  = "GRAPH_GRADIENT";                  //$NON-NLS-1$
+   public static final String            GRAPH_PACE                      = "GRAPH_PACE";                      //$NON-NLS-1$
+   public static final String            GRAPH_POWER                     = "GRAPH_POWER";                     //$NON-NLS-1$
+   public static final String            GRAPH_PULSE                     = "GRAPH_PULSE";                     //$NON-NLS-1$
+   public static final String            GRAPH_SPEED                     = "GRAPH_SPEED";                     //$NON-NLS-1$
+   public static final String            GRAPH_TEMPERATURE               = "GRAPH_TEMPERATURE";               //$NON-NLS-1$
 
-   public static final String            VIEW_COLOR_CATEGORY           = "view.color.category";        //$NON-NLS-1$
-   public static final String            VIEW_COLOR_TITLE              = "view.color.title";           //$NON-NLS-1$
-   public static final String            VIEW_COLOR_SUB                = "view.color.sub";             //$NON-NLS-1$
-   public static final String            VIEW_COLOR_SUB_SUB            = "view.color.sub-sub";         //$NON-NLS-1$
-   public static final String            VIEW_COLOR_TOUR               = "view.color.tour";            //$NON-NLS-1$
-   public static final String            VIEW_COLOR_BG_HISTORY_TOUR    = "VIEW_COLOR_BG_HISTORY_TOUR"; //$NON-NLS-1$
+   /**
+    * Content category e.g. tag category
+    */
+   public static final String            VIEW_COLOR_CONTENT_CATEGORY     = "VIEW_COLOR_CONTENT_CATEGORY";     //$NON-NLS-1$
 
-   public static final String            SYMBOL_AVERAGE                = "\u00f8";                     //$NON-NLS-1$
-   public static final String            SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";                    //$NON-NLS-1$
-   public static final String            SYMBOL_DASH                   = "-";                          //$NON-NLS-1$
-   public static final String            SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";                     //$NON-NLS-1$
-   public static final String            SYMBOL_DOUBLE_VERTICAL        = "\u2551";                     //$NON-NLS-1$
-   public static final String            SYMBOL_DEGREE                 = "\u00B0";                     //$NON-NLS-1$
-   public static final String            SYMBOL_INFINITY               = "\u221E";                     //$NON-NLS-1$
-   public static final String            SYMBOL_SUM_WITH_SPACE         = "\u2211 ";                    //$NON-NLS-1$
-   public static final String            SYMBOL_TAU                    = "\u03c4";                     //$NON-NLS-1$
+   /**
+    * Cntent subcategory e.g. tag
+    */
+   public static final String            VIEW_COLOR_CONTENT_SUB_CATEGORY = "VIEW_COLOR_CONTENT_SUB_CATEGORY"; //$NON-NLS-1$
 
-   public static final String            SYMBOL_BRACKET_LEFT           = "(";                          //$NON-NLS-1$
-   public static final String            SYMBOL_BRACKET_RIGHT          = ")";                          //$NON-NLS-1$
-   public static final String            SYMBOL_COLON                  = ":";                          //$NON-NLS-1$
-   public static final String            SYMBOL_DOT                    = ".";                          //$NON-NLS-1$
-   public static final String            SYMBOL_EQUAL                  = "=";                          //$NON-NLS-1$
-   public static final String            SYMBOL_GREATER_THAN           = ">";                          //$NON-NLS-1$
-   public static final String            SYMBOL_LESS_THAN              = "<";                          //$NON-NLS-1$
-   public static final String            SYMBOL_PERCENTAGE             = "%";                          //$NON-NLS-1$
-   public static final String            SYMBOL_WIND_WITH_SPACE        = "W ";                         //$NON-NLS-1$
-   public static final String            SYMBOL_EXCLAMATION_POINT      = "!";                          //$NON-NLS-1$
+   /**
+    * Date category e.g. year
+    */
+   public static final String            VIEW_COLOR_DATE_CATEGORY        = "VIEW_COLOR_DATE_CATEGORY";        //$NON-NLS-1$
+
+   /**
+    * Date subcategory, e.g. month
+    */
+   public static final String            VIEW_COLOR_DATE_SUB_CATEGORY    = "VIEW_COLOR_DATE_SUB_CATEGORY";    //$NON-NLS-1$
+
+   public static final String            SYMBOL_AVERAGE                  = "\u00f8";                          //$NON-NLS-1$
+   public static final String            SYMBOL_AVERAGE_WITH_SPACE       = "\u00f8 ";                         //$NON-NLS-1$
+   public static final String            SYMBOL_DASH                     = "-";                               //$NON-NLS-1$
+   public static final String            SYMBOL_DOUBLE_HORIZONTAL        = "\u2550";                          //$NON-NLS-1$
+   public static final String            SYMBOL_DOUBLE_VERTICAL          = "\u2551";                          //$NON-NLS-1$
+   public static final String            SYMBOL_DEGREE                   = "\u00B0";                          //$NON-NLS-1$
+   public static final String            SYMBOL_INFINITY                 = "\u221E";                          //$NON-NLS-1$
+   public static final String            SYMBOL_SUM_WITH_SPACE           = "\u2211 ";                         //$NON-NLS-1$
+   public static final String            SYMBOL_TAU                      = "\u03c4";                          //$NON-NLS-1$
+
+   public static final String            SYMBOL_BRACKET_LEFT             = "(";                               //$NON-NLS-1$
+   public static final String            SYMBOL_BRACKET_RIGHT            = ")";                               //$NON-NLS-1$
+   public static final String            SYMBOL_COLON                    = ":";                               //$NON-NLS-1$
+   public static final String            SYMBOL_DOT                      = ".";                               //$NON-NLS-1$
+   public static final String            SYMBOL_EQUAL                    = "=";                               //$NON-NLS-1$
+   public static final String            SYMBOL_GREATER_THAN             = ">";                               //$NON-NLS-1$
+   public static final String            SYMBOL_LESS_THAN                = "<";                               //$NON-NLS-1$
+   public static final String            SYMBOL_PERCENTAGE               = "%";                               //$NON-NLS-1$
+   public static final String            SYMBOL_WIND_WITH_SPACE          = "W ";                              //$NON-NLS-1$
+   public static final String            SYMBOL_EXCLAMATION_POINT        = "!";                               //$NON-NLS-1$
 
    public static final ImageRegistry     IMAGE_REGISTRY;
 
-   private static final String           PART_NAME_GRAPH_ID            = "graphId-";                   //$NON-NLS-1$
-   private static final String           PART_NAME_DISABLED            = "-disabled";                  //$NON-NLS-1$
+   private static final String           PART_NAME_GRAPH_ID              = "graphId-";                        //$NON-NLS-1$
+   private static final String           PART_NAME_DISABLED              = "-disabled";                       //$NON-NLS-1$
 
-   public static final String            IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";            //$NON-NLS-1$
-   public static final String            IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";     //$NON-NLS-1$
+   public static final String            IMAGE_TOUR_TYPE_FILTER          = "tourType-filter";                 //$NON-NLS-1$
+   public static final String            IMAGE_TOUR_TYPE_FILTER_SYSTEM   = "tourType-filter-system";          //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private static StringBuilder          _formatterSB                  = new StringBuilder();
-   private static Formatter              _formatter                    = new Formatter(_formatterSB);
+   private static StringBuilder          _formatterSB                    = new StringBuilder();
+   private static Formatter              _formatter                      = new Formatter(_formatterSB);
 
    private static DateFormat             _dateFormatterShort;
    private static DateFormat             _timeFormatterShort;
@@ -174,16 +189,16 @@ public class UI {
    public static Styler                  TAG_CATEGORY_STYLER;
    public static Styler                  TAG_SUB_STYLER;
 
-   private static final String           DEFAULT_MONO_FONT             = "Courier";                    //$NON-NLS-1$
+   private static final String           DEFAULT_MONO_FONT               = "Courier";                         //$NON-NLS-1$
    private static Font                   _fontForLogging;
 
    static {
 
-      setViewColorsFromPrefStore();
+      setViewColorsFromState();
       setupFonts();
 
       /*
-       * load often used images into the image registry
+       * Load often used images into the image registry
        */
       IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
@@ -214,9 +229,9 @@ public class UI {
       /*
        * set tag styler
        */
-      TAG_CATEGORY_STYLER  = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
-      TAG_STYLER           = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
-      TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
+      TAG_CATEGORY_STYLER  = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_CATEGORY,      null);
+      TAG_STYLER           = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_SUB_CATEGORY,  null);
+      TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_CATEGORY,         null);
 
 // SET_FORMATTING_ON
    }
@@ -968,36 +983,72 @@ public class UI {
    /**
     * Set tag colors in the JFace color registry from the pref store
     */
-   public static void setViewColorsFromPrefStore() {
-
-      // pref store var cannot be set from a static field because it can be null !!!
+   public static void setViewColorsFromState() {
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      final IDialogSettings state = TourbookPlugin.getState(PrefPageViewColors.ID);
 
-      colorRegistry.put(VIEW_COLOR_CATEGORY,
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
-      colorRegistry.put(VIEW_COLOR_TITLE,
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
+      final boolean isBrightTheme = net.tourbook.common.UI.IS_BRIGHT_THEME;
 
-      // year
-      colorRegistry.put(VIEW_COLOR_SUB,
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
+      // content category e.g. tag category
+      colorRegistry.put(VIEW_COLOR_CONTENT_CATEGORY,
 
-      // month
-      colorRegistry.put(VIEW_COLOR_SUB_SUB,
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
+            isBrightTheme
 
-      colorRegistry.put(VIEW_COLOR_TOUR,
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_CATEGORY_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_BRIGHT)
 
-      colorRegistry.put(VIEW_COLOR_BG_HISTORY_TOUR,
-            PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR));
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_CATEGORY_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_DARK));
+
+      // content subcategory e.g. tag
+      colorRegistry.put(VIEW_COLOR_CONTENT_SUB_CATEGORY,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK));
+
+      // date category e.g. year
+      colorRegistry.put(VIEW_COLOR_DATE_CATEGORY,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_CATEGORY_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_CATEGORY_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_DARK));
+
+      // date subcategory, e.g. month
+      colorRegistry.put(VIEW_COLOR_DATE_SUB_CATEGORY,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK));
    }
 
    public static GridData setWidth(final Control control, final int width) {
+
       final GridData gd = new GridData();
       gd.widthHint = width;
       control.setLayoutData(gd);
+
       return gd;
    }
 

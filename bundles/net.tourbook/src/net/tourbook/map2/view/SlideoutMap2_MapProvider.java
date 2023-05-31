@@ -1358,7 +1358,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
        */
       String titleText = selectedMapProvider.getName();
       // replace & with && otherwise it is displayed
-      titleText = titleText.replace("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+      titleText = UI.escapeAmpersand(titleText);
       updateTitleText(titleText);
 
       if (_isInUpdate) {

@@ -31,6 +31,10 @@ public class OtherMessages {
 
    public static final String APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP    = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
    public static final String APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP   = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;
+   public static final String APP_THEME_BRIGHT_THEME                     = net.tourbook.common.Messages.App_Theme_BrightTheme;
+   public static final String APP_THEME_BRIGHT_THEME_TOOLTIP             = net.tourbook.common.Messages.App_Theme_BrightTheme_Tooltip;
+   public static final String APP_THEME_DARK_THEME                       = net.tourbook.common.Messages.App_Theme_DarkTheme;
+   public static final String APP_THEME_DARK_THEME_TOOLTIP               = net.tourbook.common.Messages.App_Theme_DarkTheme_Tooltip;
    public static final String APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP    = net.tourbook.common.Messages.App_Theme_ForegroundColor_Dark_Tooltip;
    public static final String APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP   = net.tourbook.common.Messages.App_Theme_ForegroundColor_Light_Tooltip;
    public static final String APP_THEME_VALUE_FOR_LIGHT_TOOLTIP          = net.tourbook.common.Messages.App_Theme_ValueFor_Light_Tooltip;

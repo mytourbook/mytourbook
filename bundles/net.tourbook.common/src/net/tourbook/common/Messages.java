@@ -32,6 +32,10 @@ public class Messages extends NLS {
 
    public static String        App_Theme_BackgroundColor_Light_Tooltip;
    public static String        App_Theme_BackgroundColor_Dark_Tooltip;
+   public static String        App_Theme_BrightTheme;
+   public static String        App_Theme_BrightTheme_Tooltip;
+   public static String        App_Theme_DarkTheme;
+   public static String        App_Theme_DarkTheme_Tooltip;
    public static String        App_Theme_ForegroundColor_Light_Tooltip;
    public static String        App_Theme_ForegroundColor_Dark_Tooltip;
    public static String        App_Theme_ValueFor_Light_Tooltip;

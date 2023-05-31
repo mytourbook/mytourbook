@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,6 +39,8 @@ public class CommonImages {
    public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
    public static final String App_Save                     = "app-save.png";                              //$NON-NLS-1$
    public static final String App_Save_Disabled            = "app-save-disabled.png";                     //$NON-NLS-1$
+   public static final String App_SaveAndNext              = "app-save-and-next.png";                     //$NON-NLS-1$
+   public static final String App_SaveAndNext_Disabled     = "app-save-and-next-disabled.png";            //$NON-NLS-1$
    public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
    public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
    public static final String App_Undo                     = "app-undo.png";                              //$NON-NLS-1$

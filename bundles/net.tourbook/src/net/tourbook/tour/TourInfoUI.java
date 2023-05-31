@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import static net.tourbook.common.UI.showHideControl;
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
@@ -405,7 +406,7 @@ public class TourInfoUI {
 
 // SET_FORMATTING_ON
 
-      restoreState_BeforeUI();
+      restoreState_BeforeUI(parent);
       initUI(parent);
 
       final Composite container = createUI(parent);
@@ -1340,7 +1341,12 @@ public class TourInfoUI {
 
       final boolean hasDescription = _hasTourDescription || _hasWeatherDescription;
 
-      final int numColumns = hasDescription ? 3 : 2;
+      final boolean isShowTextWidthControl = hasDescription
+
+            // hide when embedded
+            && _isUIEmbedded == false;
+
+      final int numColumns = isShowTextWidthControl ? 3 : 2;
 
       final Composite container = new Composite(parent, SWT.NONE);
       container.setForeground(_fgColor);
@@ -1397,7 +1403,7 @@ public class TourInfoUI {
             }
          }
 
-         if (hasDescription) {
+         if (isShowTextWidthControl) {
 
             /*
              * Text width in pixel, show only when needed
@@ -1510,6 +1516,14 @@ public class TourInfoUI {
       _actionEditTour.setEnabled(true);
    }
 
+   private int getTextWidthFromParent(final Composite parent) {
+
+      return parent.getBounds().width
+
+            // needs an offset otherwise it would grow endlessly
+            - (UI.IS_4K_DISPLAY ? 60 : 30);
+   }
+
    private int getWindSpeedTextIndex(final int speed) {
 
       final int[] unitValueWindSpeed = IWeather.getAllWindSpeeds();
@@ -1535,6 +1549,16 @@ public class TourInfoUI {
       _pc = new PixelConverter(parent);
 
       _descriptionScroll_Height = _pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
+
+      if (_isUIEmbedded) {
+
+         parent.addControlListener(controlResizedAdapter(controlEvent -> {
+
+            _textWidthInPixel = getTextWidthFromParent(parent);
+
+            updateUI();
+         }));
+      }
    }
 
    private boolean isSimpleTour() {
@@ -1613,14 +1637,21 @@ public class TourInfoUI {
       }
    }
 
-   private void restoreState_BeforeUI() {
+   private void restoreState_BeforeUI(final Composite parent) {
 
-      _textWidthInPixel = Util.getStateInt(_state,
+      if (_isUIEmbedded) {
 
-            STATE_TEXT_WITH,
-            STATE_TEXT_WITH_DEFAULT,
-            STATE_TEXT_WITH_MIN,
-            STATE_TEXT_WITH_MAX);
+         _textWidthInPixel = getTextWidthFromParent(parent);
+
+      } else {
+
+         _textWidthInPixel = Util.getStateInt(_state,
+
+               STATE_TEXT_WITH,
+               STATE_TEXT_WITH_DEFAULT,
+               STATE_TEXT_WITH_MIN,
+               STATE_TEXT_WITH_MAX);
+      }
    }
 
    /**

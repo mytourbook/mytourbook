@@ -269,9 +269,15 @@ public class ChartXSlider {
     * Set position of the slider within value array.
     *
     * @param valueIndex
+    * @return Returns <code>true</code> when the value has changed
     */
-   void setValueIndex(final int valueIndex) {
+   boolean setValueIndex(final int valueIndex) {
+
+      final int oldValue = _valueIndex;
+
       _valueIndex = valueIndex;
+
+      return oldValue != _valueIndex;
    }
 
    @Override

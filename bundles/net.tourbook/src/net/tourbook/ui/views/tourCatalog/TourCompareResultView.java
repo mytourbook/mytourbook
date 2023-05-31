@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.util.ArrayList;
@@ -34,8 +35,10 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
@@ -63,7 +66,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.TourInfoToolTip_CustomSelection_CellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -95,14 +98,18 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -141,7 +148,16 @@ public class TourCompareResultView extends ViewPart implements
 
    private CompareFilter                       _compareFilter                    = CompareFilter.ALL_IS_DISPLAYED;
 
+   private CheckboxTreeViewer                  _tourViewer;
    private ColumnManager                       _columnManager;
+   private TreeColumnDefinition                _colDef_TourTypeImage;
+
+   /**
+    * Index of the column with the image, index can be changed when the columns are reordered with
+    * the mouse or the column manager
+    */
+   private int                                 _columnIndex_TourTypeImage        = -1;
+   private int                                 _columnWidth_TourTypeImage;
 
    private SelectionRemovedComparedTours       _oldRemoveSelection               = null;
 
@@ -169,6 +185,12 @@ public class TourCompareResultView extends ViewPart implements
 
    private PixelConverter                      _pc;
 
+// SET_FORMATTING_OFF
+
+   private Color    _titleColor = JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
+
+// SET_FORMATTING_ON
+
    /*
     * UI resources
     */
@@ -177,10 +199,9 @@ public class TourCompareResultView extends ViewPart implements
    /*
     * UI controls
     */
-   private Composite          _viewerContainer;
-   private CheckboxTreeViewer _tourViewer;
+   private Composite _viewerContainer;
 
-   private Menu               _treeContextMenu;
+   private Menu      _treeContextMenu;
 
    private class ActionAppTourFilter extends Action {
 
@@ -549,6 +570,8 @@ public class TourCompareResultView extends ViewPart implements
 
                _tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+               _titleColor = JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
+
                _tourViewer.refresh();
 
                /*
@@ -779,10 +802,48 @@ public class TourCompareResultView extends ViewPart implements
          }
       });
 
+      createUI_15_ColumnImages(tree);
+
       createUI_20_ContextMenu();
 
       // set tour info tooltip provider
       _tourInfoToolTip = new TreeViewerTourInfoToolTip(_tourViewer);
+   }
+
+   private void createUI_15_ColumnImages(final Tree tree) {
+
+      boolean isColumnVisible = false;
+      final ControlListener controlResizedAdapter = controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage.getColumnId());
+
+      // add column resize listener
+      if (_columnIndex_TourTypeImage >= 0) {
+
+         isColumnVisible = true;
+         tree.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
+      }
+
+      // add tree resize listener
+      if (isColumnVisible) {
+
+         /*
+          * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+          * critical for performance that these methods be as efficient as possible.
+          */
+         final Listener treePaintListener = event -> {
+
+            if (event.type == SWT.PaintItem) {
+
+               onPaint_TreeViewer(event);
+            }
+         };
+
+         tree.addControlListener(controlResizedAdapter);
+         tree.addListener(SWT.PaintItem, treePaintListener);
+      }
    }
 
    /**
@@ -824,9 +885,8 @@ public class TourCompareResultView extends ViewPart implements
    private void defineAllColumns(final Composite parent) {
 
       defineColumn_1st_ComparedTour();
-      defineColumn_Data_Diff();
-
       defineColumn_Tour_Type();
+      defineColumn_Data_Diff();
 
       defineColumn_Motion_SpeedComputed();
       defineColumn_Motion_SpeedSaved();
@@ -854,7 +914,7 @@ public class TourCompareResultView extends ViewPart implements
       colDef.setColumnHeaderText(Messages.Compare_Result_Column_tour);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25) + 16);
       colDef.setCanModifyVisibility(false);
-      colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+      colDef.setLabelProvider(new TourInfoToolTip_CustomSelection_CellLabelProvider() {
 
          @Override
          public Long getTourId(final ViewerCell cell) {
@@ -915,10 +975,12 @@ public class TourCompareResultView extends ViewPart implements
       colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_diff_tooltip);
       colDef.setColumnLabel(Messages.Compare_Result_Column_diff_label);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
+
             final Object element = cell.getElement();
+
             if (element instanceof TVICompareResultComparedTour) {
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
@@ -941,7 +1003,7 @@ public class TourCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -961,7 +1023,7 @@ public class TourCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -997,7 +1059,7 @@ public class TourCompareResultView extends ViewPart implements
             ValueFormat.NUMBER_1_1,
             _columnManager);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -1032,7 +1094,7 @@ public class TourCompareResultView extends ViewPart implements
             ValueFormat.NUMBER_1_1,
             _columnManager);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -1068,7 +1130,7 @@ public class TourCompareResultView extends ViewPart implements
             ValueFormat.NUMBER_1_1,
             _columnManager);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -1105,7 +1167,7 @@ public class TourCompareResultView extends ViewPart implements
             ValueFormat.NUMBER_1_0,
             _columnManager);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -1132,7 +1194,7 @@ public class TourCompareResultView extends ViewPart implements
 
       colDef.setIsDefaultColumn();
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1156,7 +1218,7 @@ public class TourCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1188,7 +1250,7 @@ public class TourCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
@@ -1201,26 +1263,18 @@ public class TourCompareResultView extends ViewPart implements
    }
 
    /**
-    * column: tour type
+    * Column: Tour type
     */
    private void defineColumn_Tour_Type() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+      _colDef_TourTypeImage = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+      _colDef_TourTypeImage.setIsDefaultColumn();
+      _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
 
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
+         // !!! When using cell.setImage() then it is not centered !!!
+         // !!! Set dummy label provider, otherwise an error occures !!!
          @Override
-         public void update(final ViewerCell cell) {
-            final Object element = cell.getElement();
-            if (element instanceof TVICompareResultComparedTour) {
-               final TourData comparedTourData = ((TVICompareResultComparedTour) element).getComparedTourData();
-               final TourType tourType = comparedTourData.getTourType();
-               if (tourType != null) {
-                  cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
-               }
-            }
-         }
+         public void update(final ViewerCell cell) {}
       });
    }
 
@@ -1683,6 +1737,52 @@ public class TourCompareResultView extends ViewPart implements
       return null;
    }
 
+   private void onPaint_TreeViewer(final Event event) {
+
+      // paint images at the correct column
+
+      final int columnIndex = event.index;
+
+      if (columnIndex == _columnIndex_TourTypeImage) {
+
+         onPaint_TreeViewer_TourTypeImage(event);
+      }
+   }
+
+   private void onPaint_TreeViewer_TourTypeImage(final Event event) {
+
+      final Object itemData = event.item.getData();
+
+      if (itemData instanceof TVICompareResultComparedTour) {
+
+         final TVICompareResultComparedTour tviItem = (TVICompareResultComparedTour) itemData;
+
+         final TourData comparedTourData = tviItem.getComparedTourData();
+         final TourType tourType = comparedTourData.getTourType();
+         if (tourType != null) {
+
+            final Image image = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+            if (image != null) {
+
+               UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
+            }
+         }
+      }
+   }
+
+   private void onResize_SetWidthForImageColumn() {
+
+      if (_colDef_TourTypeImage != null) {
+
+         final TreeColumn treeColumn = _colDef_TourTypeImage.getTreeColumn();
+
+         if (treeColumn != null && treeColumn.isDisposed() == false) {
+
+            _columnWidth_TourTypeImage = treeColumn.getWidth();
+         }
+      }
+   }
+
    private void onSelect(final SelectionChangedEvent event) {
 
       final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -1946,7 +2046,7 @@ public class TourCompareResultView extends ViewPart implements
 
       if (element instanceof TVICompareResultReferenceTour) {
 
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE));
+         cell.setForeground(_titleColor);
 
       } else if (element instanceof TVICompareResultComparedTour) {
 
@@ -1954,11 +2054,7 @@ public class TourCompareResultView extends ViewPart implements
 
          if (((TVICompareResultComparedTour) (element)).isSaved()) {
 
-            final Color fgColor = UI.isDarkTheme()
-                  ? Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY)
-                  : Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-
-            cell.setForeground(fgColor);
+            cell.setForeground(_titleColor);
 
          } else {
 
