@@ -29,6 +29,7 @@ public class WorkbenchTests extends UITest {
    public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
    public static final String COMPARE_TOURS   = "4. Compare Tours";   //$NON-NLS-1$
    public static final String PHOTO           = "5. Photo";           //$NON-NLS-1$
+   public static final String SYSTEM          = "99. System";         //$NON-NLS-1$
 
    @BeforeClass
    public static void beforeClass() {
