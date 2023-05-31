@@ -144,6 +144,11 @@ public class WorkbenchTests extends UITest {
       final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Year Statistic").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      final SWTBotView yearStatisticView = Utils.showView(bot, "Year Statistic"); //$NON-NLS-1$
+
+      Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
@@ -178,5 +183,6 @@ public class WorkbenchTests extends UITest {
       tourPhotosView.close();
       mapBookmarkView.close();
       modelPlayerView.close();
+      yearStatisticView.close();
    }
 }
