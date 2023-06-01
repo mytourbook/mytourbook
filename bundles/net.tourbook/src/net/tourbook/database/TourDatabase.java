@@ -463,6 +463,8 @@ public class TourDatabase {
    private boolean                               _isChecked_UpgradeDB_Before;
    private boolean                               _isChecked_UpgradeDB_After;
 
+   private boolean                               _isCustomFunctionSetup_AvgSpeedPace;
+
    /**
     * SQL utilities.
     */
@@ -4907,6 +4909,58 @@ public class TourDatabase {
 
    public void removePropertyListener(final IPropertyListener listener) {
       _propertyListeners.remove(listener);
+   }
+
+   public void setupDerbyCustomFunctions_AvgSpeedPace() {
+
+      if (_isCustomFunctionSetup_AvgSpeedPace) {
+         return;
+      }
+
+      try (Connection conn = getInstance().getConnection();
+            Statement stmt = conn.createStatement()) {
+
+         /*
+          * Found not a better and simple solution to check and then drop these functions because
+          * they are kept in the db even when the server is shutdown !!!
+          */
+         try {
+
+            exec(stmt, "DROP FUNCTION avgSpeed");
+
+         } catch (final Exception e) {}
+
+         try {
+
+            exec(stmt, "DROP FUNCTION avgPace");
+
+         } catch (final Exception e) {}
+
+         exec(stmt,
+
+               UI.EMPTY_STRING
+
+                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL
+                     + "RETURNS REAL" + NL
+                     + "PARAMETER STYLE JAVA" + NL
+                     + "NO SQL LANGUAGE JAVA" + NL
+                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL);
+
+         exec(stmt,
+
+               UI.EMPTY_STRING
+
+                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL
+                     + "RETURNS REAL" + NL
+                     + "PARAMETER STYLE JAVA" + NL
+                     + "NO SQL LANGUAGE JAVA" + NL
+                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL);
+
+         _isCustomFunctionSetup_AvgSpeedPace = true;
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
    }
 
    private void showTourSaveError(final TourData tourData) {
