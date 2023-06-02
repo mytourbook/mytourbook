@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,36 +48,45 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
 
       final String sql = UI.EMPTY_STRING
 
-            + "SELECT" + NL //                                                //$NON-NLS-1$
+            + "SELECT" + NL //                                                            //$NON-NLS-1$
 
-            + " label," + NL //                                            1  //$NON-NLS-1$
-            + " refId," + NL //                                            2  //$NON-NLS-1$
-            + " TourData_tourId," + NL //                                  3  //$NON-NLS-1$
+            + " TourReference.label," + NL //                                          1  //$NON-NLS-1$
+            + " TourReference.refId," + NL //                                          2  //$NON-NLS-1$
+            + " TourReference.TourData_tourId," + NL //                                3  //$NON-NLS-1$
+
+            + " TourData.hasGeoData," + NL //                                          4  //$NON-NLS-1$
 
             // get number of compared tours
-            + "(" + NL //                                                  4  //$NON-NLS-1$
-            + "   SELECT SUM(1)" + NL //                                      //$NON-NLS-1$
-            + "      FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //        //$NON-NLS-1$
+            + "(" + NL //                                                              5  //$NON-NLS-1$
+            + "   SELECT SUM(1)" + NL //                                                  //$NON-NLS-1$
+            + "      FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //                    //$NON-NLS-1$
             + "      WHERE " + TourDatabase.TABLE_TOUR_COMPARED + ".reftourid=" + TourDatabase.TABLE_TOUR_REFERENCE + ".refid" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ")" + NL //                                                     //$NON-NLS-1$
+            + ")" + NL //                                                                 //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + NL //            //$NON-NLS-1$
-            + " ORDER BY label" + NL; //                                      //$NON-NLS-1$
+            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " TourReference" + NL //     //$NON-NLS-1$
 
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+            // get data for a tour
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourReference.TourData_tourId = TourData.tourId" + NL //               //$NON-NLS-1$
 
-         final PreparedStatement statement = conn.prepareStatement(sql);
+            + " ORDER BY label" + NL; //                                                  //$NON-NLS-1$
+
+      try (Connection conn = TourDatabase.getInstance().getConnection();
+            PreparedStatement statement = conn.prepareStatement(sql);) {
+
          final ResultSet result = statement.executeQuery();
 
          while (result.next()) {
 
             final TVIRefTour_RefTourItem refItem = new TVIRefTour_RefTourItem(this, _viewLayout);
+
             children.add(refItem);
 
             refItem.label = result.getString(1);
             refItem.refId = result.getLong(2);
             refItem.setTourId(result.getLong(3));
-            refItem.numTours = result.getInt(4);
+            refItem.hasGeoData = result.getBoolean(4);
+            refItem.numTours = result.getInt(5);
          }
 
       } catch (final SQLException e) {

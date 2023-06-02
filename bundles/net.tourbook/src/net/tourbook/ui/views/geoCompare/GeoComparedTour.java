@@ -27,8 +27,12 @@ public class GeoComparedTour implements Comparable<Object> {
 
    private static final char NL           = UI.NEW_LINE;
 
-   public long               tourId;
+   /**
+    * When <code>true</code> then the geo comparison is performed
+    */
+   public boolean            isGeoCompared;
 
+   public long               tourId;
    public GeoPartData        geoPartData;
 
    public float[]            tourLatLonDiff;
@@ -79,13 +83,13 @@ public class GeoComparedTour implements Comparable<Object> {
    @Override
    public int compareTo(final Object o) {
 
-      final GeoComparedTour other = (GeoComparedTour) o;
+      final long otherValue = ((GeoComparedTour) o).tourStartTimeMS;
 
-      return tourStartTimeMS < other.tourStartTimeMS
+      return tourStartTimeMS < otherValue
             ? -1
-            : tourStartTimeMS > other.tourStartTimeMS
-                  ? 1
-                  : 0;
+            : tourStartTimeMS == otherValue
+                  ? 0
+                  : 1;
    }
 
    @Override

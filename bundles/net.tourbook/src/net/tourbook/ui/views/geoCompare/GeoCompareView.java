@@ -883,15 +883,15 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    }
 
-   void compare_50_TourIsCompared(final GeoComparedTour comparerItem) {
+   void compare_50_TourIsCompared(final GeoComparedTour geoComparedTour) {
 
-      final GeoPartData geoPartItem = comparerItem.geoPartData;
+      final GeoPartData geoPartData = geoComparedTour.geoPartData;
 
-      if (geoPartItem.isCanceled || geoPartItem.executorId != _workerExecutorId) {
+      if (geoPartData.isCanceled || geoPartData.executorId != _workerExecutorId) {
          return;
       }
 
-      _comparedTours = geoPartItem.comparedTours;
+      _comparedTours = geoPartData.comparedTours;
 
       final int workedTours = _workedTours.incrementAndGet();
 
@@ -904,9 +904,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // get previous selected item
       final GeoComparedTour[] reselectedItem = { null };
-      if (geoPartItem.isReselectedInUI == false) {
+      if (geoPartData.isReselectedInUI == false) {
 
-         geoPartItem.isReselectedInUI = true;
+         geoPartData.isReselectedInUI = true;
 
          if (_selectedComparerItem != null) {
 
@@ -930,15 +930,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          updateUI_State_Progress(workedTours, _compareData_NumGeoPartTours);
 
+//       if (workedTours == _compareData_NumGeoPartTours) {
+//
+         compare_60_AllIsCompared(geoPartData);
+//       }
+
          // fire geo part compare result
          GeoCompareManager.fireEvent(
                GeoCompareEventId.COMPARE_GEO_PARTS,
-               comparerItem.geoPartData,
+               geoComparedTour.geoPartData,
                GeoCompareView.this);
-
-         if (workedTours == _compareData_NumGeoPartTours) {
-            compare_60_AllIsCompared(geoPartItem);
-         }
 
          updateUI_Viewer();
 
@@ -967,26 +968,30 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       });
    }
 
-   private void compare_60_AllIsCompared(final GeoPartData geoPartItem) {
+   private void compare_60_AllIsCompared(final GeoPartData geoPartData) {
+
+// SET_FORMATTING_OFF
 
       /*
        * Keep state after compare is done
        */
-      _lastCompare_TourId = _compareData_TourId;
-      _lastCompare_FirstIndex = _compareData_FirstIndex;
-      _lastCompare_LastIndex = _compareData_LastIndex;
+      _lastCompare_TourId              = _compareData_TourId;
+      _lastCompare_FirstIndex          = _compareData_FirstIndex;
+      _lastCompare_LastIndex           = _compareData_LastIndex;
 
-      _lastCompare_DistanceInterval = _distanceInterval;
-      _lastCompare_GeoAccuracy = _geoAccuracy;
-      _lastCompare_GeoDifferencesFilter = _geoRelativeDifferencesFilter;
-      _lastCompare_IsGeoRelativeDifferencesFilter = _isGeoRelativeDifferencesFilter;
-      _lastCompare_IsUseAppFilter = _compareData_IsUseAppFilter;
+      _lastCompare_DistanceInterval                = _distanceInterval;
+      _lastCompare_GeoAccuracy                     = _geoAccuracy;
+      _lastCompare_GeoDifferencesFilter            = _geoRelativeDifferencesFilter;
+      _lastCompare_IsGeoRelativeDifferencesFilter  = _isGeoRelativeDifferencesFilter;
+      _lastCompare_IsUseAppFilter                  = _compareData_IsUseAppFilter;
+
+// SET_FORMATTING_ON
 
       /*
-       * Get max mindiff value
+       * Get max of the minDiff value
        */
       _maxMinDiff = 0;
-      for (final GeoComparedTour comparerItem : geoPartItem.comparedTours) {
+      for (final GeoComparedTour comparerItem : geoPartData.comparedTours) {
 
          if (comparerItem.minDiffValue > _maxMinDiff) {
             _maxMinDiff = comparerItem.minDiffValue;
@@ -1000,14 +1005,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          final ArrayList<GeoComparedTour> filteredComparedTours = new ArrayList<>(
 
-               geoPartItem.comparedTours
+               geoPartData.comparedTours
                      .stream()
-                     .filter(comparerItem -> isMinDiffValueWithinFilter(comparerItem.minDiffValue))
+                     .filter(geoComparedTour -> isMinDiffValueWithinFilter(geoComparedTour.minDiffValue))
                      .collect(Collectors.toList())
 
          );
 
          _comparedTours = filteredComparedTours;
+
+         geoPartData.comparedTours_Filtered = filteredComparedTours;
       }
 
       // make sure the selection is visible
@@ -1643,10 +1650,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
             final ZonedDateTime tourStartTime = item.tourStartTime;
-            cell.setText(
-                  tourStartTime == null
-                        ? UI.EMPTY_STRING
-                        : tourStartTime.format(TimeTools.Formatter_Date_S));
+
+            cell.setText(tourStartTime == null
+                  ? UI.EMPTY_STRING
+                  : tourStartTime.format(TimeTools.Formatter_Date_S));
          }
       });
    }

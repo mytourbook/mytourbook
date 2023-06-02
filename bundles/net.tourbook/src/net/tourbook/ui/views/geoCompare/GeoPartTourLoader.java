@@ -190,8 +190,7 @@ public class GeoPartTourLoader {
    /**
     * @param geoParts
     *           Requested geo parts
-    * @param lonPartNormalized
-    * @param latPartNormalized
+    * @param normalizedTourPart
     * @param useAppFilter
     * @param previousLoaderItem
     * @param geoPartView

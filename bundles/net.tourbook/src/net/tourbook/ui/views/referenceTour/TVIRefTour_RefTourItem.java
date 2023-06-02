@@ -34,6 +34,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
    String      label;
    public long refId;
+   boolean     hasGeoData;
 
    float[]     avgAltimeter_MinMax = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
    float[]     avgPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
@@ -241,7 +242,9 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
                tourItem.refId = refId;
 
-               // from TourCompared
+               /*
+                * From TourCompared
+                */
                tourItem.compareId                  = result.getLong(1);
                tourItem.setTourId(tourId);
 
@@ -256,7 +259,9 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
                tourItem.endIndex                   = result.getInt(9);
                tourItem.tourDeviceTime_Elapsed     = result.getInt(10);
 
-               // from TourData
+               /*
+                * From TourData
+                */
                tourItem.tourTitle                  = result.getString(11);
                final Object tourTypeId             = result.getObject(12);
 

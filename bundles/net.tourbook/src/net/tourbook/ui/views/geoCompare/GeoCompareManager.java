@@ -216,6 +216,11 @@ public class GeoCompareManager {
 
       }
 
+      final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+      comparerItem.tourStartTime = tourStartTime;
+      comparerItem.tourYear = tourStartTime.getYear();
+      comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
+
       final int[] norm2origIndices = normalizedTour.normalized2OriginalIndices;
 
       // a tour is available and could be compared
@@ -257,12 +262,6 @@ public class GeoCompareManager {
          final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
          comparerItem.avgPace = distance == 0 ? 0 : time * 1000 / distance;
       }
-
-      final ZonedDateTime tourStartTime = tourData.getTourStartTime();
-
-      comparerItem.tourStartTime = tourStartTime;
-      comparerItem.tourYear = tourStartTime.getYear();
-      comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
       comparerItem.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);
 
@@ -341,6 +340,9 @@ public class GeoCompareManager {
 
          ));
       }
+
+      // set flag that this comparison is done and can be displayed in the UI (year statistic view)
+      comparerItem.isGeoCompared = true;
    }
 
    public static void fireEvent(final GeoCompareEventId eventId, final Object eventData, final IWorkbenchPart part) {

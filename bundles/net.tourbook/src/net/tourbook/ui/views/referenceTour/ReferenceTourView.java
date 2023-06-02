@@ -880,6 +880,7 @@ public class ReferenceTourView extends ViewPart implements
 
       defineColumn_1stColumn();
       defineColumn_Count();
+      defineColumn_HasGeoData();
       defineColumn_TourType();
       defineColumn_Title();
       defineColumn_Tags();
@@ -1066,6 +1067,29 @@ public class ReferenceTourView extends ViewPart implements
                final int numberOfTours = ((TVIRefTour_RefTourItem) element).numTours;
                if (numberOfTours > 0) {
                   cell.setText(Integer.toString(numberOfTours));
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Has geo data
+    */
+   private void defineColumn_HasGeoData() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.DATA_HAS_GEO_DATA.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVIRefTour_RefTourItem) {
+
+               final boolean hasGeoData = ((TVIRefTour_RefTourItem) element).hasGeoData;
+               if (hasGeoData) {
+                  cell.setText(UI.SYMBOL_FULL_BLOCK);
                }
             }
          }

@@ -62,6 +62,8 @@ public class GeoPartData {
     */
    public ArrayList<GeoComparedTour> comparedTours = new ArrayList<>();
 
+   public ArrayList<GeoComparedTour> comparedTours_Filtered;
+
    /**
     * Time in ms to calculate sql data
     */

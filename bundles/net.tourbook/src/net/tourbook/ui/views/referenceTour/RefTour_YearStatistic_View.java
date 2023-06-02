@@ -612,9 +612,18 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
    private void createStatisticData_30_FromGeoData(int firstVisibleYear,
                                                    final boolean isShowLatestYear,
                                                    final GeoPartData geoPartData) {
-      // TODO Auto-generated method stub
 
-      final ArrayList<GeoComparedTour> allItems = geoPartData.comparedTours;
+      ArrayList<GeoComparedTour> allItems;
+      final ArrayList<GeoComparedTour> allItemsFiltered = geoPartData.comparedTours_Filtered;
+
+      if (allItemsFiltered != null) {
+
+         allItems = allItemsFiltered;
+
+      } else {
+
+         allItems = geoPartData.comparedTours;
+      }
 
       final ArrayList<GeoComparedTour> allSortedItems = new ArrayList<>();
       allSortedItems.addAll(allItems);
@@ -639,22 +648,31 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          setYearData();
       }
 
-      for (final GeoComparedTour geoTour : allSortedItems) {
+      for (final GeoComparedTour geoComparedTour : allSortedItems) {
 
-         final int tourYear = geoTour.tourYear;
+         if (geoComparedTour.isGeoCompared == false) {
 
-         final TVIRefTour_ComparedTour comparedTourItem = new TVIRefTour_ComparedTour(null);
+            // this tour is not yet compared in the background
 
-         comparedTourItem.isGeoComparedTour = true;
+            continue;
+         }
 
-         comparedTourItem.tourDate = geoTour.tourStartTime.toLocalDate();
-
-         comparedTourItem.avgAltimeter = geoTour.avgAltimeter;
-         comparedTourItem.avgPulse = geoTour.avgPulse;
-         comparedTourItem.avgSpeed = geoTour.avgSpeed;
-         comparedTourItem.maxPulse = geoTour.maxPulse;
+         final int tourYear = geoComparedTour.tourYear;
 
          if (tourYear >= firstVisibleYear && tourYear <= _lastVisibleYear) {
+
+            final TVIRefTour_ComparedTour comparedTourItem = new TVIRefTour_ComparedTour(null);
+
+// SET_FORMATTING_OFF
+
+            comparedTourItem.isGeoComparedTour  = true;
+            comparedTourItem.tourDate           = geoComparedTour.tourStartTime.toLocalDate();
+            comparedTourItem.avgAltimeter       = geoComparedTour.avgAltimeter;
+            comparedTourItem.avgPulse           = geoComparedTour.avgPulse;
+            comparedTourItem.avgSpeed           = geoComparedTour.avgSpeed;
+            comparedTourItem.maxPulse           = geoComparedTour.maxPulse;
+
+// SET_FORMATTING_ON
 
             createStatisticData_50_OneTour(comparedTourItem);
          }
@@ -1046,9 +1064,6 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       updateUI_YearChart(false);
 
-      // reset selectable bars otherwise some bars on the right side could not be selectable !!!
-      _yearChart.setSelectedBars(null);
-
       enableControls();
    }
 
@@ -1096,9 +1111,6 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       setYearData();
 
       updateUI_YearChart(false);
-
-      // reset selectable bars otherwise some bars on the right side could not be selectable !!!
-      _yearChart.setSelectedBars(null);
    }
 
    /**
@@ -1409,7 +1421,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
     *           Shows the latest year and the years before
     * @param geoPartData
     */
-   void updateUI_YearChart(final boolean isShowLatestYear, final GeoPartData geoPartData) {
+   private void updateUI_YearChart(final boolean isShowLatestYear, final GeoPartData geoPartData) {
 
       if (_currentRefItem == null) {
 
@@ -1617,6 +1629,9 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       // show the data in the chart
       _yearChart.updateChart(chartModel, false, false);
+
+      // reset selectable bars otherwise some bars on the right side could not be selectable !!!
+      _yearChart.setSelectedBars(null);
 
       /*
        * Update start year combo box
