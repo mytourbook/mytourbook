@@ -1592,6 +1592,15 @@ public class TourDatabase {
       cs.close();
    }
 
+   private static void dropFunction(final Statement stmt, final String functionName) {
+
+      try {
+
+         exec(stmt, "DROP FUNCTION " + functionName); //$NON-NLS-1$
+
+      } catch (final Exception e) {}
+   }
+
    /**
     * Get runtime statistics by putting this stagement before the query is executed
     *
@@ -4924,37 +4933,31 @@ public class TourDatabase {
           * Found not a better and simple solution to check and then drop these functions because
           * they are kept in the db even when the server is shutdown !!!
           */
-         try {
 
-            exec(stmt, "DROP FUNCTION avgSpeed");
-
-         } catch (final Exception e) {}
-
-         try {
-
-            exec(stmt, "DROP FUNCTION avgPace");
-
-         } catch (final Exception e) {}
+         dropFunction(stmt, "avgSpeed"); //$NON-NLS-1$
+         dropFunction(stmt, "avgPace"); //$NON-NLS-1$
 
          exec(stmt,
 
                UI.EMPTY_STRING
 
-                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL
-                     + "RETURNS REAL" + NL
-                     + "PARAMETER STYLE JAVA" + NL
-                     + "NO SQL LANGUAGE JAVA" + NL
-                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL);
+                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
+                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
+                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
+         );
 
          exec(stmt,
 
                UI.EMPTY_STRING
 
-                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL
-                     + "RETURNS REAL" + NL
-                     + "PARAMETER STYLE JAVA" + NL
-                     + "NO SQL LANGUAGE JAVA" + NL
-                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL);
+                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
+                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
+                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
+         );
 
          _isCustomFunctionSetup_AvgSpeedPace = true;
 

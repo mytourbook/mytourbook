@@ -38,7 +38,8 @@ New
 Improvements
 ============
 
-*
+* Tour Book Flat View
+  - Sort by average speed and pace
 
 
 Changes
