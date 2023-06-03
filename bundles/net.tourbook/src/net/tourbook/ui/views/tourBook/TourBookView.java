@@ -2713,7 +2713,7 @@ public class TourBookView extends ViewPart implements
 
       for (final ColumnDefinition colDef : _columnManager_NatTable.getRearrangedColumns()) {
 
-         final String sqlField = _natTable_DataLoader.getSqlField(colDef.getColumnId());
+         final String sqlField = _natTable_DataLoader.getSqlField_OrderBy(colDef.getColumnId());
 
          final boolean canSortColumn = NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false;
          colDef.setCanSortColumn(canSortColumn);
