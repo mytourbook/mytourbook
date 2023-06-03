@@ -38,12 +38,17 @@ New
 Improvements
 ============
 
+* Tour Book Flat View
+  - Sort tours also by average speed and pace
+    https://github.com/mytourbook/mytourbook/discussions/1117
+
 * Reference Tour View
-  - Autoexpand/collapse when selected with mouse
+  - New coloumn: Flag if a tour contains geo data
+  - Autoexpand/collapse when selected with the mouse
   - Expand one category item and collapse others
   
 * Geo Compare View
-  - Elevation gain/loss columns
+  - New columns: Elevation gain/loss
 
 * Tour Chart
   - Set slider positions to a selected reference tour or geo compared tour
