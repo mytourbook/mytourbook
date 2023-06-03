@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.geoCompare;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.NormalizedGeoData;
@@ -60,9 +61,9 @@ public class GeoPartData {
    /**
     * Results of the compared tours
     */
-   public ArrayList<GeoComparedTour> comparedTours = new ArrayList<>();
+   public List<GeoComparedTour> comparedTours = new ArrayList<>();
 
-   public ArrayList<GeoComparedTour> comparedTours_Filtered;
+   public List<GeoComparedTour>      comparedTours_Filtered;
 
    /**
     * Time in ms to calculate sql data

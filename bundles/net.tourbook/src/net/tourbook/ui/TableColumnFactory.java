@@ -29,7 +29,6 @@ import org.eclipse.swt.SWT;
 
 public abstract class TableColumnFactory {
 
-
    public static final TableColumnFactory ALTITUDE_ALTITUDE;
    public static final TableColumnFactory ALTITUDE_AVG_CHANGE;
    public static final String             ALTITUDE_AVG_CHANGE_ID                             = "ALTITUDE_AVG_CHANGE";                             //$NON-NLS-1$
@@ -40,7 +39,9 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_DOWN;
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_UP;
    public static final TableColumnFactory ALTITUDE_ELEVATION_TOTAL_GAIN;
+   public static final String             ALTITUDE_ELEVATION_TOTAL_GAIN_ID                   = "ALTITUDE_ELEVATION_TOTAL_GAIN_ID";                //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_TOTAL_LOSS;
+   public static final String             ALTITUDE_ELEVATION_TOTAL_LOSS_ID                   = "ALTITUDE_ELEVATION_TOTAL_LOSS_ID";                //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_GRADIENT;
    public static final String             ALTITUDE_GRADIENT_ID                               = "ALTITUDE_GRADIENT";                               //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_GRADIENT_AVG;
@@ -581,7 +582,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_ELEVATION_TOTAL_GAIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_GAIN_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
@@ -604,7 +605,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_ELEVATION_TOTAL_LOSS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_LOSS_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 

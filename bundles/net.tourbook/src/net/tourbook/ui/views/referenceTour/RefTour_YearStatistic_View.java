@@ -21,6 +21,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -613,8 +614,8 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
                                                    final boolean isShowLatestYear,
                                                    final GeoPartData geoPartData) {
 
-      ArrayList<GeoComparedTour> allItems;
-      final ArrayList<GeoComparedTour> allItemsFiltered = geoPartData.comparedTours_Filtered;
+      List<GeoComparedTour> allItems;
+      final List<GeoComparedTour> allItemsFiltered = geoPartData.comparedTours_Filtered;
 
       if (allItemsFiltered != null) {
 
