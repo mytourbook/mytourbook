@@ -82,67 +82,68 @@ public class GeoCompareManager {
    }
 
    /**
-    * @param loaderItem
+    * @param geoPartData
     * @param geoPartView
     */
-   static void compareGeoTours(final GeoPartData loaderItem, final GeoCompareView geoPartView) {
+   static void compareGeoTours(final GeoCompareData geoPartData, final GeoCompareView geoPartView) {
 
-      for (final long tourId : loaderItem.tourIds) {
+      for (final long tourId : geoPartData.tourIds) {
 
-         final GeoComparedTour comparerItem = new GeoComparedTour(tourId, loaderItem);
+         final GeoComparedTour geoComparedTour_QueueItem = new GeoComparedTour(tourId, geoPartData);
 
          // keep compared tour
-         loaderItem.comparedTours.add(comparerItem);
+         geoPartData.allGeoComparedTours.add(geoComparedTour_QueueItem);
 
-         _compareWaitingQueue.add(comparerItem);
+         _compareWaitingQueue.add(geoComparedTour_QueueItem);
 
          _comparerExecutor.submit(new Runnable() {
             @Override
             public void run() {
 
-               // get last added loader item
-               final GeoComparedTour comparatorItem = _compareWaitingQueue.pollFirst();
+               // get last added queue item
+               final GeoComparedTour geoComparedTour_FromQueue = _compareWaitingQueue.pollFirst();
 
-               if (comparatorItem == null) {
+               if (geoComparedTour_FromQueue == null) {
+                  return;
+               }
+
+               // check if this comparison is canceled
+               final GeoCompareData geoCompareData = geoComparedTour_FromQueue.geoCompareData;
+               if (geoCompareData.isCanceled) {
                   return;
                }
 
                try {
 
-                  compareTour(comparatorItem);
+                  compareGeoTours_OneTour(geoComparedTour_FromQueue);
 
                } catch (final Exception e) {
 
                   StatusUtil.log(e);
                }
 
-               geoPartView.compare_50_TourIsCompared(comparatorItem);
+               geoPartView.compare_50_OneTourIsCompared(geoComparedTour_FromQueue);
             }
          });
       }
    }
 
-   private static void compareTour(final GeoComparedTour comparerItem) {
-
-      final GeoPartData geoPartItem = comparerItem.geoPartData;
-
-      if (geoPartItem.isCanceled) {
-         return;
-      }
+   private static void compareGeoTours_OneTour(final GeoComparedTour geoComparedTour) {
 
       /*
        * Load tour data
        */
       final long startLoading = System.nanoTime();
 
-      final TourData tourData = TourManager.getInstance().getTourData(comparerItem.tourId);
+      final TourData tourData = TourManager.getInstance().getTourData(geoComparedTour.tourId);
 
       /*
        * Normalize data
        */
       final long startConvert = System.nanoTime();
 
-      final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+      final GeoCompareData geoCompareData = geoComparedTour.geoCompareData;
+      final NormalizedGeoData normalizedTourPart = geoCompareData.normalizedTourPart;
       final int[] normPartLatSerie = normalizedTourPart.normalizedLat;
       final int[] normPartLonSerie = normalizedTourPart.normalizedLon;
 
@@ -174,7 +175,7 @@ public class GeoCompareManager {
          // loop: all part slices
          for (int normPartIndex = 0; normPartIndex < numNormPartSlices; normPartIndex++) {
 
-            if (geoPartItem.isCanceled) {
+            if (geoCompareData.isCanceled) {
                return;
             }
 
@@ -217,53 +218,53 @@ public class GeoCompareManager {
       }
 
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();
-      comparerItem.tourStartTime = tourStartTime;
-      comparerItem.tourYear = tourStartTime.getYear();
-      comparerItem.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
+      geoComparedTour.tourStartTime = tourStartTime;
+      geoComparedTour.tourYear = tourStartTime.getYear();
+      geoComparedTour.tourStartTimeMS = TimeTools.toEpochMilli(tourStartTime);
 
-      final int[] norm2origIndices = normalizedTour.normalized2OriginalIndices;
+      final int[] norm2OrigIndices = normalizedTour.normalized2OriginalIndices;
 
       // a tour is available and could be compared
       if (normMinDiffIndex > -1) {
 
-         final int origStartIndex = norm2origIndices[normMinDiffIndex];
-         final int origEndIndex = norm2origIndices[normMinDiffIndex + numNormPartSlices - 1];
+         final int origStartIndex = norm2OrigIndices[normMinDiffIndex];
+         final int origEndIndex = norm2OrigIndices[normMinDiffIndex + numNormPartSlices - 1];
 
-         comparerItem.avgPulse = tourData.computeAvg_PulseSegment(origStartIndex, origEndIndex);
-         comparerItem.maxPulse = tourData.computeMax_FromValues(tourData.getPulse_SmoothedSerie(), origStartIndex, origEndIndex);
+         geoComparedTour.avgPulse = tourData.computeAvg_PulseSegment(origStartIndex, origEndIndex);
+         geoComparedTour.maxPulse = tourData.computeMax_FromValues(tourData.getPulse_SmoothedSerie(), origStartIndex, origEndIndex);
 
-         comparerItem.avgSpeed = TourManager.computeTourSpeed(tourData, origStartIndex, origEndIndex);
+         geoComparedTour.avgSpeed = TourManager.computeTourSpeed(tourData, origStartIndex, origEndIndex);
 
-         comparerItem.tourFirstIndex = origStartIndex;
-         comparerItem.tourLastIndex = origEndIndex;
+         geoComparedTour.tourFirstIndex = origStartIndex;
+         geoComparedTour.tourLastIndex = origEndIndex;
 
-         comparerItem.tourTitle = tourData.getTourTitle();
-         comparerItem.tourType = tourData.getTourType();
+         geoComparedTour.tourTitle = tourData.getTourTitle();
+         geoComparedTour.tourType = tourData.getTourType();
 
-         comparerItem.avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), origStartIndex, origEndIndex);
+         geoComparedTour.avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), origStartIndex, origEndIndex);
 
          final ElevationGainLoss elevationGainLoss = tourData.computeAltitudeUpDown(origStartIndex, origEndIndex);
          if (elevationGainLoss != null) {
-            comparerItem.elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
-            comparerItem.elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+            geoComparedTour.elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+            geoComparedTour.elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
          }
 
          final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
          final int movingTime = Math.max(0, elapsedTime - tourData.getBreakTime(origStartIndex, origEndIndex));
          final int recordedTime = Math.max(0, elapsedTime - tourData.getPausedTime(origStartIndex, origEndIndex));
-         comparerItem.elapsedTime = elapsedTime;
-         comparerItem.movingTime = movingTime;
-         comparerItem.recordedTime = recordedTime;
+         geoComparedTour.elapsedTime = elapsedTime;
+         geoComparedTour.movingTime = movingTime;
+         geoComparedTour.recordedTime = recordedTime;
 
          final float distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
-         comparerItem.distance = distance;
+         geoComparedTour.distance = distance;
 
          final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
          final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
-         comparerItem.avgPace = distance == 0 ? 0 : time * 1000 / distance;
+         geoComparedTour.avgPace = distance == 0 ? 0 : time * 1000 / distance;
       }
 
-      comparerItem.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);
+      geoComparedTour.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);
 
       /*
        * Create data serie for the chart graph from the normalized diff data serie
@@ -285,7 +286,7 @@ public class GeoCompareManager {
             nextNormIndex = numNormTourSlices - 1;
          }
 
-         final int nextSerieIndex = norm2origIndices[nextNormIndex];
+         final int nextSerieIndex = norm2OrigIndices[nextNormIndex];
 
          while (serieIndex < nextSerieIndex && serieIndex < numTourSlices) {
 
@@ -293,7 +294,7 @@ public class GeoCompareManager {
          }
       }
 
-      comparerItem.tourLatLonDiff = tourLatLonDiff;
+      geoComparedTour.tourLatLonDiff = tourLatLonDiff;
 
       if (IS_LOG_TOUR_COMPARING) {
 
@@ -323,7 +324,7 @@ public class GeoCompareManager {
                      + "   cnvrt %10.4f", //$NON-NLS-1$
 
                Thread.currentThread().getId(),
-               comparerItem.tourId,
+               geoComparedTour.tourId,
                //                     loaderItem.executorId,
 
                normMinDiffIndex < 0 ? normMinDiffIndex : normLatLonDiff[normMinDiffIndex],
@@ -342,7 +343,7 @@ public class GeoCompareManager {
       }
 
       // set flag that this comparison is done and can be displayed in the UI (year statistic view)
-      comparerItem.isGeoCompared = true;
+      geoComparedTour.isGeoCompareDone = true;
    }
 
    public static void fireEvent(final GeoCompareEventId eventId, final Object eventData, final IWorkbenchPart part) {

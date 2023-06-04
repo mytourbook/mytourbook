@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 
 /**
- * Contains data for one compared tour
+ * Contains data for ONE geo compared tour
  */
 public class GeoComparedTour implements Comparable<Object> {
 
@@ -30,13 +30,20 @@ public class GeoComparedTour implements Comparable<Object> {
    /**
     * When <code>true</code> then the geo comparison is performed
     */
-   public boolean            isGeoCompared;
+   public boolean            isGeoCompareDone;
 
    public long               tourId;
-   public GeoPartData        geoPartData;
+
+   /**
+    * Reference to the root geo compare data
+    */
+   public GeoCompareData     geoCompareData;
 
    public float[]            tourLatLonDiff;
 
+   /**
+    * Original tour index
+    */
    public int                tourFirstIndex;
    public int                tourLastIndex;
 
@@ -68,16 +75,20 @@ public class GeoComparedTour implements Comparable<Object> {
    float                     elevationLoss;
 
    /**
-    * Ensure title it is set for sorting
+    * Ensure that the title is set for sorting
     */
    String                    tourTitle    = UI.EMPTY_STRING;
 
    TourType                  tourType;
 
-   public GeoComparedTour(final long tourId, final GeoPartData geoPartItem) {
+   /**
+    * @param tourId
+    * @param geoCompareData
+    */
+   public GeoComparedTour(final long tourId, final GeoCompareData geoCompareData) {
 
       this.tourId = tourId;
-      this.geoPartData = geoPartItem;
+      this.geoCompareData = geoCompareData;
    }
 
    @Override
@@ -102,7 +113,7 @@ public class GeoComparedTour implements Comparable<Object> {
             + "[" + NL //                                //$NON-NLS-1$
 
             + "tourId      =" + tourId + NL //           //$NON-NLS-1$
-            + "geoPartItem =" + geoPartData + NL //      //$NON-NLS-1$
+            + "geoPartItem =" + geoCompareData + NL //      //$NON-NLS-1$
 
             + "]" + NL //                                //$NON-NLS-1$
       ;

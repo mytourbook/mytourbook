@@ -25,63 +25,63 @@ import net.tourbook.data.TourReference;
 /**
  * Contains all data for a tour geo comparison
  */
-public class GeoPartData {
+public class GeoCompareData {
 
-   private static final char         NL            = UI.NEW_LINE;
+   private static final char    NL                  = UI.NEW_LINE;
 
    /**
     * Entity ID of the {@link TourReference}, is -1 when not available
     */
-   public long                       refId         = -1;
+   public long                  refId               = -1;
 
-   long                              executorId;
+   long                         executorId;
 
    /**
     * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
     */
-   boolean                           isCanceled;
+   boolean                      isCanceled;
 
-   boolean                           isUseAppFilter;
+   boolean                      isUseAppFilter;
 
    /**
     * Geo part which should be compared
     */
-   public NormalizedGeoData          normalizedTourPart;
+   public NormalizedGeoData     normalizedTourPart;
 
    /**
     * Geo parts which are affected
     */
-   int[]                             geoParts;
+   int[]                        geoParts;
 
    /**
     * Tour id's which are having at least one of the {@link #geoParts}
     */
-   long[]                            tourIds;
+   long[]                       tourIds;
 
    /**
-    * Results of the compared tours
+    * All geo compared tours
     */
-   public List<GeoComparedTour> comparedTours = new ArrayList<>();
+   public List<GeoComparedTour> allGeoComparedTours = new ArrayList<>();
 
-   public List<GeoComparedTour>      comparedTours_Filtered;
+   public List<GeoComparedTour> allGeoComparedTours_Filtered;
 
    /**
     * Time in ms to calculate sql data
     */
-   long                              sqlRunningTime;
+   long                         sqlRunningTime;
 
    /**
     *
     */
-   boolean                           isReselectedInUI;
+   boolean                      isReselectedInUI;
 
    @SuppressWarnings("unused")
-   private GeoPartData() {}
+   private GeoCompareData() {}
 
-   public GeoPartData(final long executorId,
-                      final int[] geoParts,
-                      final NormalizedGeoData normalizedTourPart,
-                      final boolean useAppFilter) {
+   public GeoCompareData(final long executorId,
+                         final int[] geoParts,
+                         final NormalizedGeoData normalizedTourPart,
+                         final boolean useAppFilter) {
 
       this.executorId = executorId;
 
@@ -102,7 +102,7 @@ public class GeoPartData {
 
       return UI.EMPTY_STRING
 
-            + "GeoPartData" + NL //                                     //$NON-NLS-1$
+            + "GeoCompareData" + NL //                                  //$NON-NLS-1$
 
             + "[" + NL //                                               //$NON-NLS-1$
 

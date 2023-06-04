@@ -35,8 +35,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
+import net.tourbook.ui.views.geoCompare.GeoCompareData;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
-import net.tourbook.ui.views.geoCompare.GeoPartData;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -197,9 +197,9 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
 
          } else if (firstElement instanceof GeoComparedTour) {
 
-            final GeoPartData geoPartItem = ((GeoComparedTour) firstElement).geoPartData;
+            final GeoCompareData geoCompareData = ((GeoComparedTour) firstElement).geoCompareData;
 
-            showRefTour(geoPartItem.refId);
+            showRefTour(geoCompareData.refId);
          }
       }
    }

@@ -28,9 +28,9 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.geoCompare.GeoCompareData;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
-import net.tourbook.ui.views.geoCompare.GeoPartData;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
@@ -254,11 +254,11 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
       case COMPARE_GEO_PARTS:
 
-         if (eventData instanceof GeoPartData) {
+         if (eventData instanceof GeoCompareData) {
 
-            final GeoPartData geoPartItem = (GeoPartData) eventData;
+            final GeoCompareData geoCompareData = (GeoCompareData) eventData;
 
-            final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+            final NormalizedGeoData normalizedTourPart = geoCompareData.normalizedTourPart;
             final long tourId = normalizedTourPart.tourId;
 
             _tourData = TourManager.getInstance().getTourData(tourId);

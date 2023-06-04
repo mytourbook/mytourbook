@@ -54,10 +54,10 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.geoCompare.GeoCompareData;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
-import net.tourbook.ui.views.geoCompare.GeoPartData;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -612,19 +612,13 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
    private void createStatisticData_30_FromGeoData(int firstVisibleYear,
                                                    final boolean isShowLatestYear,
-                                                   final GeoPartData geoPartData) {
+                                                   final GeoCompareData geoCompareData) {
 
-      List<GeoComparedTour> allItems;
-      final List<GeoComparedTour> allItemsFiltered = geoPartData.comparedTours_Filtered;
+      final List<GeoComparedTour> allFilteredItems = geoCompareData.allGeoComparedTours_Filtered;
 
-      if (allItemsFiltered != null) {
-
-         allItems = allItemsFiltered;
-
-      } else {
-
-         allItems = geoPartData.comparedTours;
-      }
+      final List<GeoComparedTour> allItems = allFilteredItems != null
+            ? allFilteredItems
+            : geoCompareData.allGeoComparedTours;
 
       final ArrayList<GeoComparedTour> allSortedItems = new ArrayList<>();
       allSortedItems.addAll(allItems);
@@ -651,7 +645,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       for (final GeoComparedTour geoComparedTour : allSortedItems) {
 
-         if (geoComparedTour.isGeoCompared == false) {
+         if (geoComparedTour.isGeoCompareDone == false) {
 
             // this tour is not yet compared in the background
 
@@ -913,19 +907,19 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          return;
       }
 
-      GeoPartData geoPartData = null;
-      if (eventData instanceof GeoPartData) {
+      GeoCompareData geoCompareData = null;
+      if (eventData instanceof GeoCompareData) {
 
-         geoPartData = (GeoPartData) eventData;
+         geoCompareData = (GeoCompareData) eventData;
       }
 
-      if (geoPartData == null) {
+      if (geoCompareData == null) {
          return;
       }
 
       // update year statistic with current geo part data
 
-      updateUI_YearChart(false, geoPartData);
+      updateUI_YearChart(false, geoCompareData);
    }
 
    private int getFirstVisibleYear() {
@@ -1420,9 +1414,9 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
     *
     * @param isShowLatestYear
     *           Shows the latest year and the years before
-    * @param geoPartData
+    * @param geoCompareData
     */
-   private void updateUI_YearChart(final boolean isShowLatestYear, final GeoPartData geoPartData) {
+   private void updateUI_YearChart(final boolean isShowLatestYear, final GeoCompareData geoCompareData) {
 
       if (_currentRefItem == null) {
 
@@ -1455,9 +1449,9 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
             RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MIN,
             RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MAX);
 
-      if (geoPartData != null) {
+      if (geoCompareData != null) {
 
-         createStatisticData_30_FromGeoData(firstVisibleYear, isShowLatestYear, geoPartData);
+         createStatisticData_30_FromGeoData(firstVisibleYear, isShowLatestYear, geoCompareData);
 
       } else if (ElevationCompareManager.getReferenceTour_ViewLayout() == ElevationCompareManager.REF_TOUR_VIEW_LAYOUT_WITH_YEAR_CATEGORIES) {
 

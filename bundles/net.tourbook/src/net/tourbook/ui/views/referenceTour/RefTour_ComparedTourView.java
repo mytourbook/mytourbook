@@ -44,8 +44,8 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
+import net.tourbook.ui.views.geoCompare.GeoCompareData;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
-import net.tourbook.ui.views.geoCompare.GeoPartData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -965,11 +965,11 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return;
       }
 
-      final GeoPartData geoPartData = geoComparedTour.geoPartData;
+      final GeoCompareData geoCompareData = geoComparedTour.geoCompareData;
 
       // set data from the selection
       _comparedTour_TourId = geoTourId;
-      _comparedTour_RefId = geoPartData.refId;
+      _comparedTour_RefId = geoCompareData.refId;
       _comparedTour_CompareId = -1;
 
       _tourData = compTourData;

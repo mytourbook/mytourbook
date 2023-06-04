@@ -35,11 +35,11 @@ import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
 public class GeoPartTourLoader {
 
-   private static final char                             NL                  = UI.NEW_LINE;
+   private static final char                                NL                  = UI.NEW_LINE;
 
-   private static final AtomicLong                       _loaderExecuterId   = new AtomicLong();
-   private static final LinkedBlockingDeque<GeoPartData> _loaderWaitingQueue = new LinkedBlockingDeque<>();
-   private static ExecutorService                        _loadingExecutor;
+   private static final AtomicLong                          _loaderExecuterId   = new AtomicLong();
+   private static final LinkedBlockingDeque<GeoCompareData> _loaderWaitingQueue = new LinkedBlockingDeque<>();
+   private static ExecutorService                           _loadingExecutor;
 
    static {
 
@@ -60,27 +60,27 @@ public class GeoPartTourLoader {
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
-   private static boolean loadTourGeoPartsFromDB(final GeoPartData loaderItem) {
+   private static boolean loadTourGeoPartsFromDB(final GeoCompareData geoCompareData) {
 
-      if (loaderItem.isCanceled) {
+      if (geoCompareData.isCanceled) {
          return false;
       }
 
       final long start = System.currentTimeMillis();
 
-      final int[] requestedGeoParts = loaderItem.geoParts;
+      final int[] requestedGeoParts = geoCompareData.geoParts;
       final int numGeoParts = requestedGeoParts.length;
 
       if (numGeoParts == 0) {
 
          // there are no geoparts, set empty list to have valid data
 
-         loaderItem.tourIds = new long[] {};
+         geoCompareData.tourIds = new long[] {};
 
          return true;
       }
 
-      final boolean isAppFilter = loaderItem.isUseAppFilter;
+      final boolean isAppFilter = geoCompareData.isUseAppFilter;
 
       /*
        * Create sql parameters
@@ -162,7 +162,7 @@ public class GeoPartTourLoader {
             tourIds.add(result.getLong(1));
          }
 
-         loaderItem.tourIds = tourIds.toArray();
+         geoCompareData.tourIds = tourIds.toArray();
 
       } catch (final SQLException e) {
 
@@ -173,14 +173,14 @@ public class GeoPartTourLoader {
 
       final long timeDiff = System.currentTimeMillis() - start;
 
-      loaderItem.sqlRunningTime = timeDiff;
+      geoCompareData.sqlRunningTime = timeDiff;
 
 //      System.out.println(
 //            (UI.timeStampNano() + " [" + GeoPart_TourLoader.class.getSimpleName() + "] ")
 //                  + "loadTourGeoPartsFromDB\t" + timeDiff + " ms");
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-      if (loaderItem.isCanceled) {
+      if (geoCompareData.isCanceled) {
          return false;
       }
 
@@ -192,17 +192,17 @@ public class GeoPartTourLoader {
     *           Requested geo parts
     * @param normalizedTourPart
     * @param useAppFilter
-    * @param previousLoaderItem
+    * @param previousGeoCompareData
     * @param geoPartView
     * @return
     */
-   static GeoPartData loadToursFromGeoParts(final int[] geoParts,
-                                            final NormalizedGeoData normalizedTourPart,
-                                            final boolean useAppFilter,
-                                            final GeoPartData previousLoaderItem,
-                                            final GeoCompareView geoPartView) {
+   static GeoCompareData loadToursFromGeoParts(final int[] geoParts,
+                                               final NormalizedGeoData normalizedTourPart,
+                                               final boolean useAppFilter,
+                                               final GeoCompareData previousGeoCompareData,
+                                               final GeoCompareView geoPartView) {
 
-      stopLoading(previousLoaderItem);
+      stopLoading(previousGeoCompareData);
 
       // invalidate old requests
       final long executerId = _loaderExecuterId.incrementAndGet();
@@ -212,20 +212,20 @@ public class GeoPartTourLoader {
 //                 + ("\texecuterId: " + executerId));
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-      final GeoPartData loaderItem = new GeoPartData(
+      final GeoCompareData geoCompareData = new GeoCompareData(
             executerId,
             geoParts,
             normalizedTourPart,
             useAppFilter);
 
-      _loaderWaitingQueue.add(loaderItem);
+      _loaderWaitingQueue.add(geoCompareData);
 
       final Runnable executorTask = new Runnable() {
          @Override
          public void run() {
 
             // get last added loader item
-            final GeoPartData loaderItem = _loaderWaitingQueue.pollFirst();
+            final GeoCompareData loaderItem = _loaderWaitingQueue.pollFirst();
 
             if (loaderItem == null) {
                return;
@@ -239,18 +239,18 @@ public class GeoPartTourLoader {
 
       _loadingExecutor.submit(executorTask);
 
-      return loaderItem;
+      return geoCompareData;
    }
 
    /**
     * Stop loading and comparing of the tours in the waiting queue.
     *
-    * @param loaderItem
+    * @param geoCompareData
     */
-   static void stopLoading(final GeoPartData loaderItem) {
+   static void stopLoading(final GeoCompareData geoCompareData) {
 
-      if (loaderItem != null) {
-         loaderItem.isCanceled = true;
+      if (geoCompareData != null) {
+         geoCompareData.isCanceled = true;
       }
    }
 
