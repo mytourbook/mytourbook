@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -695,7 +695,7 @@ public abstract class GalleryMT20 extends Canvas {
    /**
     * Fires mouse down event for the current hovered item.
     *
-    * @return Returns <code>true</code> when the event is handeled and no further actions should be
+    * @return Returns <code>true</code> when the event is handled and no further actions should be
     *         done in the gallery.
     */
    private boolean fireItemMouseDownEvent() {
@@ -922,7 +922,7 @@ public abstract class GalleryMT20 extends Canvas {
     * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
     *         item is not available.
     */
-   public int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
+   private int getItemIndexFromPosition(final int viewPortX, final int viewPortY) {
 
       _itemMouseX = -1;
       _itemMouseY = -1;
@@ -2904,7 +2904,7 @@ public abstract class GalleryMT20 extends Canvas {
     * @param isKeepLocation
     *           Keeps gallery position when <code>true</code>, otherwise position will be reset.
     */
-   public void updateGallery(final boolean isKeepLocation) {
+   private void updateGallery(final boolean isKeepLocation) {
       updateGallery(isKeepLocation, null);
    }
 
