@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourCompared;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 
 /**
  * Represents a compared tour (tree item) in the reference tour viewer
@@ -56,7 +57,7 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    ArrayList<Long> tagIds;
 
-   boolean         isGeoComparedTour;
+   GeoComparedTour geoCompareTour;
 
    public TVIRefTour_ComparedTour(final TreeViewerItem parentItem) {
 

@@ -122,7 +122,7 @@ public class GeoCompareManager {
                   StatusUtil.log(e);
                }
 
-               geoPartView.compare_50_OneTourIsCompared(geoComparedTour_FromQueue);
+               geoPartView.compare_50_OneTourIsCompared(geoCompareData);
             }
          });
       }
@@ -214,7 +214,6 @@ public class GeoCompareManager {
             // keep tour index where the min diff occurred
             normMinDiffIndex = normTourIndex;
          }
-
       }
 
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();
@@ -308,20 +307,20 @@ public class GeoCompareManager {
          System.out.println(String.format(
 
                UI.EMPTY_STRING
-                     + "[%3d]" // thread //$NON-NLS-1$
-                     + " tour %-20s" //$NON-NLS-1$
+                     + "[%3d]" // thread           //$NON-NLS-1$
+                     + " tour %-20s" //            //$NON-NLS-1$
                      // + "   exec %5d"
 
-                     + "   diff %12d" //$NON-NLS-1$
-                     + "   # %5d / %5d" //$NON-NLS-1$
+                     + "   diff %12d" //           //$NON-NLS-1$
+                     + "   # %5d / %5d" //         //$NON-NLS-1$
 
-                     + "   cmp %7.0f" //$NON-NLS-1$
-                     + "   #cmp %10d" //$NON-NLS-1$
-                     + "   #cmpAvg %8.0f" //$NON-NLS-1$
+                     + "   cmp %7.0f" //           //$NON-NLS-1$
+                     + "   #cmp %10d" //           //$NON-NLS-1$
+                     + "   #cmpAvg %8.0f" //       //$NON-NLS-1$
 
-                     + "   all %7.0f ms" //$NON-NLS-1$
-                     + "   ld %10.4f" //$NON-NLS-1$
-                     + "   cnvrt %10.4f", //$NON-NLS-1$
+                     + "   all %7.0f ms" //        //$NON-NLS-1$
+                     + "   ld %10.4f" //           //$NON-NLS-1$
+                     + "   cnvrt %10.4f", //       //$NON-NLS-1$
 
                Thread.currentThread().getId(),
                geoComparedTour.tourId,

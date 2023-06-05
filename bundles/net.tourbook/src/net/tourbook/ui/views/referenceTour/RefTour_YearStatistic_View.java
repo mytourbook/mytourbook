@@ -620,18 +620,20 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
             ? allFilteredItems
             : geoCompareData.allGeoComparedTours;
 
-      final ArrayList<GeoComparedTour> allSortedItems = new ArrayList<>();
-      allSortedItems.addAll(allItems);
-      allSortedItems.sort(null);
+      final ArrayList<GeoComparedTour> allSortedTours = new ArrayList<>();
+      allSortedTours.addAll(allItems);
+
+      // sort with default comparator GeoComparedTour.compareTo() which is sorting by date/time
+      allSortedTours.sort(null);
 
       if (_isShowAllValues
-            && allSortedItems != null
-            && allSortedItems.size() > 0) {
+            && allSortedTours != null
+            && allSortedTours.size() > 0) {
 
-         final int lastIndex = allSortedItems.size() - 1;
+         final int lastIndex = allSortedTours.size() - 1;
 
-         final int firstYear = allSortedItems.get(0).tourYear;
-         final int lastYear = allSortedItems.get(lastIndex).tourYear;
+         final int firstYear = allSortedTours.get(0).tourYear;
+         final int lastYear = allSortedTours.get(lastIndex).tourYear;
 
          firstVisibleYear = firstYear;
          _lastVisibleYear = lastYear;
@@ -643,7 +645,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          setYearData();
       }
 
-      for (final GeoComparedTour geoComparedTour : allSortedItems) {
+      for (final GeoComparedTour geoComparedTour : allSortedTours) {
 
          if (geoComparedTour.isGeoCompareDone == false) {
 
@@ -660,7 +662,8 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
 // SET_FORMATTING_OFF
 
-            comparedTourItem.isGeoComparedTour  = true;
+            comparedTourItem.geoCompareTour     = geoComparedTour;
+
             comparedTourItem.tourDate           = geoComparedTour.tourStartTime.toLocalDate();
             comparedTourItem.avgAltimeter       = geoComparedTour.avgAltimeter;
             comparedTourItem.avgPulse           = geoComparedTour.avgPulse;
@@ -903,23 +906,17 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
    @Override
    public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
 
-      if (eventId != GeoCompareEventId.COMPARE_GEO_PARTS) {
+      if (eventId != GeoCompareEventId.TOUR_IS_GEO_COMPARED) {
          return;
       }
 
-      GeoCompareData geoCompareData = null;
       if (eventData instanceof GeoCompareData) {
 
-         geoCompareData = (GeoCompareData) eventData;
+         final GeoCompareData geoCompareData = (GeoCompareData) eventData;
+
+         // update year statistic with provided geo compare data
+         updateUI_YearChart(false, geoCompareData);
       }
-
-      if (geoCompareData == null) {
-         return;
-      }
-
-      // update year statistic with current geo part data
-
-      updateUI_YearChart(false, geoCompareData);
    }
 
    private int getFirstVisibleYear() {
@@ -1249,6 +1246,15 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
                   selectTourInYearChart(tourId);
                }
 
+            } else if (firstElement instanceof GeoComparedTour) {
+
+               final GeoComparedTour geoComparedTour = (GeoComparedTour) firstElement;
+
+               // update year statistic with provided geo compare data
+               updateUI_YearChart(false, geoComparedTour.geoCompareData);
+
+               selectTourInYearChart(geoComparedTour);
+
             } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
                final TVIElevationCompareResult_ComparedTour compareResult = (TVIElevationCompareResult_ComparedTour) firstElement;
@@ -1335,6 +1341,31 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       _state.put(STATE_IS_SHOW_ALL_VALUES, _isShowAllValues);
       _state.put(STATE_IS_SYNC_MIN_MAX_VALUES, _isSynchMinMaxValue);
       _state.put(STATE_NUMBER_OF_VISIBLE_YEARS, _numVisibleYears);
+   }
+
+   private void selectTourInYearChart(final GeoComparedTour geoComparedTour) {
+
+      if (_statValues_AllTours.isEmpty()) {
+
+         _tourInfoToolTipProvider.setTourId(-1);
+
+         return;
+      }
+
+      final int numTours = _statValues_AllTours.size();
+      final boolean[] selectedTours = new boolean[numTours];
+
+      for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+
+         final TVIRefTour_ComparedTour comparedItem = _statValues_AllTours.get(tourIndex);
+
+         if (comparedItem.geoCompareTour == geoComparedTour) {
+
+            selectedTours[tourIndex] = true;
+         }
+      }
+
+      _yearChart.setSelectedBars(selectedTours);
    }
 
    /**

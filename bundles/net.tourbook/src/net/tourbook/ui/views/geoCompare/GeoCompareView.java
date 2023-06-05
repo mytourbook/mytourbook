@@ -21,6 +21,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,7 +46,7 @@ import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
-import net.tourbook.common.util.EmptyContextMenuProvider;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -76,7 +77,10 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -106,6 +110,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -203,8 +208,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private int                       _lastSelectionHash;
 
-   private AtomicInteger             _workedTours               = new AtomicInteger();
-   private AtomicInteger             _runningId                 = new AtomicInteger();
+   private AtomicInteger             _workedTours                    = new AtomicInteger();
+   private AtomicInteger             _runningId                      = new AtomicInteger();
 
    private long                      _workerExecutorId;
 
@@ -214,7 +219,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /**
     * Items which are displayed in the tour viewer
     */
-   private List<GeoComparedTour>     _allGeoComparedTours       = new ArrayList<>();
+   private List<GeoComparedTour>     _allGeoComparedTours            = new ArrayList<>();
+
+   /**
+    * All tours which are sorted in the geo compare viewer
+    */
+   private GeoComparedTour[]         _allSortedGeoComparedTours;
 
    private GeoComparedTour           _selectedGeoComparedTour;
 
@@ -223,10 +233,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private boolean                   _compareData_IsUseAppFilter;
    private int                       _compareData_LastIndex;
    private int                       _compareData_NumGeoPartTours;
-   private GeoCompareData            _compareData_PreviousGeoCompareData;
+   private GeoCompareData            _compareData_CurrentGeoCompareData;
    private long                      _compareData_RefId;
    private TourData                  _compareData_TourData;
-   private long                      _compareData_TourId        = Long.MIN_VALUE;
+   private long                      _compareData_TourId             = Long.MIN_VALUE;
    private String                    _compareData_TourTitle;
    //
    private int                       _lastCompare_DistanceInterval;
@@ -240,12 +250,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private boolean                   _lastCompare_IsGeoFilter_GeoDiff;
    private boolean                   _lastCompare_IsGeoFilter_MaxResults;
 
-   private TableViewer               _geoPartViewer;
+   private GeoCompareViewer          _geoCompareViewer;
+   private GeoCompareComparator      _geoCompareComparator           = new GeoCompareComparator();
+   private IContextMenuProvider      _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ColumnManager             _columnManager;
-   private CompareResultComparator   _geoPartComparator         = new CompareResultComparator();
+   private MenuManager               _viewerMenuManager;
 
    private TableColumnDefinition     _colDef_TourTypeImage;
-   private int                       _columnIndex_TourTypeImage = -1;
+   private int                       _columnIndex_TourTypeImage      = -1;
    private int                       _columnWidth_TourTypeImage;
 
    private int                       _distanceInterval;
@@ -257,15 +269,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private int                       _geoFilter_GeoDifference;
    private int                       _geoFilter_MaxResults;
 
-   private OpenDialogManager         _openDlgMgr                = new OpenDialogManager();
+   private OpenDialogManager         _openDlgMgr                     = new OpenDialogManager();
    private SlideoutGeoCompareOptions _slideoutGeoCompareOptions;
-   private GeoCompareState           _slideoutGeoCompareState   = new GeoCompareState();
+   private GeoCompareState           _slideoutGeoCompareState        = new GeoCompareState();
 
    private PixelConverter            _pc;
 
    private ActionAppTourFilter       _actionAppTourFilter;
    private ActionOnOff               _actionOnOff;
    private ActionGeoCompareOptions   _actionGeoCompareOptions;
+   private ActionHideToursBelow      _actionHideToursBelow;
 
    /*
     * UI controls
@@ -293,6 +306,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private Spinner   _spinnerGeoFilter_GeoDifference;
    private Spinner   _spinnerGeoFilter_MaxResults;
+
+   private Menu      _tableContextMenu;
 
    private class ActionAppTourFilter extends Action {
 
@@ -328,6 +343,24 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
+   /**
+    * Rename bookmark
+    */
+   private class ActionHideToursBelow extends Action {
+
+      public ActionHideToursBelow() {
+
+         super(Messages.GeoCompare_View_Action_HideToursBelow, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.GeoCompare_View_Action_HideToursBelow_Tooltip);
+      }
+
+      @Override
+      public void run() {
+         onAction_HideToursBelow();
+      }
+   }
+
    private class ActionOnOff extends Action {
 
       private ImageDescriptor _imageDescriptor_AppOn  = CommonActivator.getThemedImageDescriptor(CommonImages.App_Turn_On);
@@ -358,7 +391,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-   private class CompareResultComparator extends ViewerComparator {
+   private class CompareResultProvider implements IStructuredContentProvider {
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return _allGeoComparedTours.toArray();
+      }
+
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   private class GeoCompareComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
       private static final int DESCENDING      = 1;
@@ -509,23 +556,63 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-   private class CompareResultProvider implements IStructuredContentProvider {
+   public class GeoCompareViewer extends TableViewer {
 
-      @Override
-      public void dispose() {}
+      public GeoCompareViewer(final Table table) {
 
-      @Override
-      public Object[] getElements(final Object inputElement) {
-         return _allGeoComparedTours.toArray();
+         super(table);
       }
 
       @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      protected Object[] getSortedChildren(final Object parent) {
+
+         // keep sorted tours
+         final Object[] allSortedGeoComparedTours = super.getSortedChildren(parent);
+
+         // cast array
+         _allSortedGeoComparedTours = Arrays.copyOf(
+
+               allSortedGeoComparedTours,
+               allSortedGeoComparedTours.length,
+
+               // this is the trick to cast an Object[]
+               GeoComparedTour[].class);
+
+         return allSortedGeoComparedTours;
+      }
+
    }
 
    public enum InvalidData {
 
       NoGeoData, MultipleTours
+   }
+
+   public class TableContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_92_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+
    }
 
    private void addPartListener() {
@@ -594,7 +681,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             _columnManager.clearColumns();
             defineAllColumns();
 
-            _geoPartViewer = (TableViewer) recreateViewer(_geoPartViewer);
+            _geoCompareViewer = (GeoCompareViewer) recreateViewer(_geoCompareViewer);
          }
       };
 
@@ -736,9 +823,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       /*
        * New data should be compared
        */
-      GeoPartTourLoader.stopLoading(_compareData_PreviousGeoCompareData);
+      GeoPartTourLoader.stopLoading(_compareData_CurrentGeoCompareData);
 
-      updateUI_GeoItem(null);
+      updateUI_GeoCompareData(null);
 
       // delay tour comparator, moving the slider can occur very often
       _display.timerExec(DELAY_BEFORE_STARTING_COMPARE, new Runnable() {
@@ -841,12 +928,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             _compareData_GeoGrid,
             normalizedGeoData,
             _compareData_IsUseAppFilter,
-            _compareData_PreviousGeoCompareData,
+            _compareData_CurrentGeoCompareData,
             this);
 
       newGeoCompareData.refId = _compareData_RefId;
 
-      _compareData_PreviousGeoCompareData = newGeoCompareData;
+      _compareData_CurrentGeoCompareData = newGeoCompareData;
 
       /*
        * Set slideout info
@@ -882,7 +969,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             updateUI_State_Progress(0, 0);
             updateUI_Viewer();
 
-            updateUI_GeoItem(geoCompareData);
+            updateUI_GeoCompareData(geoCompareData);
          });
 
          return;
@@ -911,32 +998,34 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             return;
          }
 
-         updateUI_GeoItem(geoCompareData);
+         updateUI_GeoCompareData(geoCompareData);
       });
 
    }
 
-   void compare_50_OneTourIsCompared(final GeoComparedTour geoComparedTour) {
+   void compare_50_OneTourIsCompared(final GeoCompareData geoCompareData) {
 
-      final GeoCompareData geoCompareData = geoComparedTour.geoCompareData;
+      if (geoCompareData == null
+            || geoCompareData.isCanceled
+            || geoCompareData.executorId != _workerExecutorId) {
 
-      if (geoCompareData.isCanceled || geoCompareData.executorId != _workerExecutorId) {
          return;
       }
 
-      _allGeoComparedTours = geoCompareData.allGeoComparedTours;
-
-      final int workedTours = _workedTours.incrementAndGet();
-
       final long now = System.currentTimeMillis();
+      final int numWorkedTours = _workedTours.incrementAndGet();
 
-      // update UI not too often until comparison is done
-      if (now - _lastUIUpdate < UI_UPDATE_INTERVAL && workedTours != _compareData_NumGeoPartTours) {
+      // update UI not too often
+      if (now - _lastUIUpdate < UI_UPDATE_INTERVAL && numWorkedTours != _compareData_NumGeoPartTours) {
+
          return;
       }
 
       // reset update time
       _lastUIUpdate = now;
+
+      // use a copy of the currently updated data
+      _allGeoComparedTours = new ArrayList<>(geoCompareData.allGeoComparedTours);
 
       // get previous selected item
       final GeoComparedTour[] reselectedItem = { null };
@@ -961,25 +1050,27 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             return;
          }
 
-         updateUI_State_Progress(workedTours, _compareData_NumGeoPartTours);
+         updateUI_State_Progress(numWorkedTours, _compareData_NumGeoPartTours);
 
-         if (workedTours == _compareData_NumGeoPartTours) {
+         if (numWorkedTours == _compareData_NumGeoPartTours) {
+
+            // all is compared
+
             compare_60_AllToursAreCompared(geoCompareData);
-         }
 
-         // fire geo part compare result
-         GeoCompareManager.fireEvent(
-               GeoCompareEventId.COMPARE_GEO_PARTS,
-               geoComparedTour.geoCompareData,
-               GeoCompareView.this);
+            // fire geo compare data
+            GeoCompareManager.fireEvent(
+                  GeoCompareEventId.TOUR_IS_GEO_COMPARED,
+                  geoCompareData,
+                  GeoCompareView.this);
 
-         updateUI_Viewer();
+            updateUI_Viewer();
 
-         // reselect previous selection
-         if (reselectedItem[0] != null) {
+            // reselect previous selection
+            if (reselectedItem[0] != null) {
 
-            _geoPartViewer.setSelection(new StructuredSelection(reselectedItem), true);
-            _geoPartViewer.getTable().showSelection();
+               _geoCompareViewer.setSelection(new StructuredSelection(reselectedItem), true);
+               _geoCompareViewer.getTable().showSelection();
 
 //					// focus can have changed when resorted, set focus to the selected item
 //					int selectedIndex = 0;
@@ -995,12 +1086,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //					}
 //					table.setSelection(selectedIndex);
 //					table.showSelection();
-
+            }
          }
       });
    }
 
-   private void compare_60_AllToursAreCompared(final GeoCompareData geoPartData) {
+   private void compare_60_AllToursAreCompared(final GeoCompareData geoCompareData) {
 
 // SET_FORMATTING_OFF
 
@@ -1026,62 +1117,29 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        * Get max of the minDiff value
        */
       _maxMinDiff = 0;
-      for (final GeoComparedTour comparerItem : geoPartData.allGeoComparedTours) {
+      for (final GeoComparedTour comparerItem : geoCompareData.allGeoComparedTours) {
 
          if (comparerItem.minDiffValue > _maxMinDiff) {
             _maxMinDiff = comparerItem.minDiffValue;
          }
       }
 
-      /*
-       * Filter compare result
-       */
-      if (_isGeoFilter_GeoDifference) {
-
-         // this code may be compact and fast but I don't understand it
-
-         List<GeoComparedTour> filteredComparedTours = new ArrayList<>(
-
-               geoPartData.allGeoComparedTours
-                     .stream()
-                     .filter(geoComparedTour -> isInGeoDiffFilter(geoComparedTour.minDiffValue))
-                     .collect(Collectors.toList())
-
-         );
-
-         _allGeoComparedTours = filteredComparedTours;
-         geoPartData.allGeoComparedTours_Filtered = filteredComparedTours;
-
-         if (_isGeoFilter_MaxResults) {
-
-            if (filteredComparedTours.size() > _geoFilter_MaxResults) {
-
-               // sort by geo diff
-               filteredComparedTours.sort((final GeoComparedTour tour1, final GeoComparedTour tour2) -> {
-
-                  final long value1 = tour1.minDiffValue;
-                  final long value2 = tour2.minDiffValue;
-
-                  return (value1 < value2) ? -1 : ((value1 == value2) ? 0 : 1);
-               });
-
-               filteredComparedTours = filteredComparedTours.subList(0, _geoFilter_MaxResults);
-
-               _allGeoComparedTours = filteredComparedTours;
-               geoPartData.allGeoComparedTours_Filtered = filteredComparedTours;
-            }
-         }
-      }
+      filterGeoCompareItems(geoCompareData);
 
       // make sure the selection is visible
-      _geoPartViewer.getTable().showSelection();
+      _geoCompareViewer.getTable().showSelection();
    }
 
    private void createActions() {
 
-      _actionAppTourFilter = new ActionAppTourFilter();
-      _actionOnOff = new ActionOnOff();
-      _actionGeoCompareOptions = new ActionGeoCompareOptions();
+// SET_FORMATTING_OFF
+
+      _actionAppTourFilter       = new ActionAppTourFilter();
+      _actionGeoCompareOptions   = new ActionGeoCompareOptions();
+      _actionHideToursBelow      = new ActionHideToursBelow();
+      _actionOnOff               = new ActionOnOff();
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -1269,7 +1327,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          }
          {
             /*
-             * Checkbox: Relative geographic differences filter
+             * Checkbox: Maximum results filter
              */
             {
                // Checkbox
@@ -1317,25 +1375,26 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       /*
        * create table viewer
        */
-      _geoPartViewer = new TableViewer(table);
+      _geoCompareViewer = new GeoCompareViewer(table);
 
-      _columnManager.createColumns(_geoPartViewer);
+      _columnManager.createColumns(_geoCompareViewer);
 
-      _geoPartViewer.setUseHashlookup(true);
-      _geoPartViewer.setContentProvider(new CompareResultProvider());
-      _geoPartViewer.setComparator(_geoPartComparator);
+      _geoCompareViewer.setUseHashlookup(true);
+      _geoCompareViewer.setContentProvider(new CompareResultProvider());
+      _geoCompareViewer.setComparator(_geoCompareComparator);
 
-      _geoPartViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_ComparerItem(selectionChangedEvent));
+      _geoCompareViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_ComparerItem(selectionChangedEvent));
 
       updateUI_SetSortDirection(
-            _geoPartComparator.__sortColumnId,
-            _geoPartComparator.__sortDirection);
+            _geoCompareComparator.__sortColumnId,
+            _geoCompareComparator.__sortDirection);
 
-      createUI_81_ColumnImages(table);
-      createUI_82_ContextMenu();
+      createUI_82_ColumnImages(table);
+
+      createUI_90_ContextMenu();
    }
 
-   private void createUI_81_ColumnImages(final Table table) {
+   private void createUI_82_ColumnImages(final Table table) {
 
       boolean isColumnVisible = false;
       final ControlListener controlResizedAdapter = controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
@@ -1374,11 +1433,35 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /**
     * Create the view context menus
     */
-   private void createUI_82_ContextMenu() {
+   private void createUI_90_ContextMenu() {
 
-      final Table table = _geoPartViewer.getTable();
+      _tableContextMenu = createUI_92_CreateViewerContextMenu();
 
-      _columnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
+      final Table table = _geoCompareViewer.getTable();
+
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
+
+   /**
+    * create the views context menu
+    *
+    * @return
+    */
+   private Menu createUI_92_CreateViewerContextMenu() {
+
+      _viewerMenuManager = new MenuManager();
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
+
+      final Table table = _geoCompareViewer.getTable();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+
+      return tableContextMenu;
    }
 
    private void defineAllColumns() {
@@ -1420,7 +1503,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          @Override
          public void update(final ViewerCell cell) {
 
-            final int indexOf = _geoPartViewer.getTable().indexOf((TableItem) cell.getItem());
+            final int indexOf = _geoCompareViewer.getTable().indexOf((TableItem) cell.getItem());
 
             cell.setText(Integer.toString(indexOf + 1));
          }
@@ -1832,25 +1915,39 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       super.dispose();
    }
 
+   private void enableActions() {
+
+      final boolean isTourSelected = _selectedGeoComparedTour != null;
+
+      _actionHideToursBelow.setEnabled(isTourSelected);
+   }
+
    private void enableControls() {
 
 // SET_FORMATTING_OFF
 
       final boolean isCompareEnabled      = GeoCompareManager.isGeoComparing();
-      final boolean isGeoDiffFilter       = isCompareEnabled && _isGeoFilter_GeoDifference;
+      final boolean isGeoDiffFilter       = isCompareEnabled ;
 
       _actionAppTourFilter                .setEnabled(isCompareEnabled);
 
       _chkGeoFilter_GeoDiff               .setEnabled(isCompareEnabled);
       _chkGeoFilter_MaxResults            .setEnabled(isGeoDiffFilter);
 
-      _lblGeoFilter_GeoDifference_Unit    .setEnabled(isGeoDiffFilter);
+      _lblGeoFilter_GeoDifference_Unit    .setEnabled(isGeoDiffFilter && _isGeoFilter_GeoDifference);
       _lblGeoFilter_MaxResults_Unit       .setEnabled(isGeoDiffFilter && _isGeoFilter_MaxResults);
 
-      _spinnerGeoFilter_GeoDifference     .setEnabled(isGeoDiffFilter);
+      _spinnerGeoFilter_GeoDifference     .setEnabled(isGeoDiffFilter && _isGeoFilter_GeoDifference);
       _spinnerGeoFilter_MaxResults        .setEnabled(isGeoDiffFilter && _isGeoFilter_MaxResults);
 
 // SET_FORMATTING_ON
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_actionHideToursBelow);
+
+      enableActions();
    }
 
    private void fillToolbar() {
@@ -1864,6 +1961,51 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       tbm.update(true);
    }
 
+   /**
+    * Filter compare result
+    *
+    * @param geoCompareData
+    */
+   private void filterGeoCompareItems(final GeoCompareData geoCompareData) {
+
+      // first display all tours
+      _allGeoComparedTours = geoCompareData.allGeoComparedTours;
+      geoCompareData.allGeoComparedTours_Filtered = _allGeoComparedTours;
+
+      if (_isGeoFilter_GeoDifference) {
+
+         final List<GeoComparedTour> filteredComparedTours = new ArrayList<>(
+
+               geoCompareData.allGeoComparedTours
+                     .stream()
+                     .filter(geoComparedTour -> isInGeoDiffFilter(geoComparedTour.minDiffValue))
+                     .collect(Collectors.toList())
+
+         );
+
+         _allGeoComparedTours = filteredComparedTours;
+         geoCompareData.allGeoComparedTours_Filtered = filteredComparedTours;
+      }
+
+      if (_isGeoFilter_MaxResults) {
+
+         if (_allGeoComparedTours.size() > _geoFilter_MaxResults) {
+
+            // sort by geo diff
+            _allGeoComparedTours.sort((final GeoComparedTour tour1, final GeoComparedTour tour2) -> {
+
+               final long value1 = tour1.minDiffValue;
+               final long value2 = tour2.minDiffValue;
+
+               return (value1 < value2) ? -1 : ((value1 == value2) ? 0 : 1);
+            });
+
+            _allGeoComparedTours = _allGeoComparedTours.subList(0, _geoFilter_MaxResults);
+            geoCompareData.allGeoComparedTours_Filtered = _allGeoComparedTours;
+         }
+      }
+   }
+
    @Override
    public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
 
@@ -1872,7 +2014,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       switch (eventId) {
-      case COMPARE_GEO_PARTS:
+      case TOUR_IS_GEO_COMPARED:
          break;
 
       case SET_COMPARING_ON:
@@ -1898,7 +2040,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private TableColumn getSortColumn(final String sortColumnId) {
 
-      final TableColumn[] allColumns = _geoPartViewer.getTable().getColumns();
+      final TableColumn[] allColumns = _geoCompareViewer.getTable().getColumns();
 
       for (final TableColumn column : allColumns) {
 
@@ -1914,12 +2056,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    @Override
    public ColumnViewer getViewer() {
-      return _geoPartViewer;
+      return _geoCompareViewer;
    }
 
    private StructuredSelection getViewerSelection() {
 
-      return (StructuredSelection) _geoPartViewer.getSelection();
+      return (StructuredSelection) _geoCompareViewer.getSelection();
    }
 
    private void initUI(final Composite parent) {
@@ -1981,6 +2123,42 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _compareData_IsUseAppFilter = isSelected;
 
       recompareTours();
+   }
+
+   private void onAction_HideToursBelow() {
+
+      final Table table = _geoCompareViewer.getTable();
+      final int selectionIndex = table.getSelectionIndex();
+
+      if (selectionIndex == -1) {
+         return;
+      }
+
+      // update tour max filter
+      _isGeoFilter_MaxResults = true;
+      _chkGeoFilter_MaxResults.setSelection(true);
+      _spinnerGeoFilter_MaxResults.setSelection(selectionIndex);
+
+      saveState();
+      enableControls();
+
+      // get remaining tours
+      final GeoComparedTour[] remainingTours = Arrays.copyOf(_allSortedGeoComparedTours, selectionIndex);
+      _allGeoComparedTours = new ArrayList<>();
+      _allGeoComparedTours.addAll(Arrays.asList(remainingTours));
+
+      final GeoCompareData geoCompareData = _compareData_CurrentGeoCompareData;
+
+      // update filtered data that the year statistic shows the correct values
+      geoCompareData.allGeoComparedTours_Filtered = _allGeoComparedTours;
+
+      updateUI_Viewer();
+
+      // fire geo compare data
+      GeoCompareManager.fireEvent(
+            GeoCompareEventId.TOUR_IS_GEO_COMPARED,
+            geoCompareData,
+            GeoCompareView.this);
    }
 
    /**
@@ -2094,10 +2272,24 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       enableControls();
 
-      // update compare result
-//      compare_50_OneTourIsCompared(_geoComparedTour);
+      // update UI immediately
+      _display.asyncExec(() -> {
 
-      recompareTours();
+         if (_parent.isDisposed()) {
+            return;
+         }
+
+         // update compare result
+         filterGeoCompareItems(_compareData_CurrentGeoCompareData);
+
+         updateUI_Viewer();
+
+         // fire geo compare data
+         GeoCompareManager.fireEvent(
+               GeoCompareEventId.TOUR_IS_GEO_COMPARED,
+               _compareData_CurrentGeoCompareData,
+               GeoCompareView.this);
+      });
    }
 
    private void onSelect_ComparerItem(final SelectionChangedEvent event) {
@@ -2119,8 +2311,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          final ISelection selectionBackup = getViewerSelection();
          {
             // update viewer with new sorting
-            _geoPartComparator.setSortColumn(e.widget);
-            _geoPartViewer.refresh();
+            _geoCompareComparator.setSortColumn(e.widget);
+            _geoCompareViewer.refresh();
          }
          updateUI_SelectCompareItem(selectionBackup);
       }
@@ -2327,7 +2519,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _viewerContainer.setRedraw(false);
       {
-         _geoPartViewer.getTable().dispose();
+         _geoCompareViewer.getTable().dispose();
 
          createUI_80_TableViewer(_viewerContainer);
          _viewerContainer.layout();
@@ -2337,7 +2529,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
       _viewerContainer.setRedraw(true);
 
-      return _geoPartViewer;
+      return _geoCompareViewer;
    }
 
    @Override
@@ -2356,34 +2548,32 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          _pageBook.showPage(_pageNoData);
 
          // a tour is not displayed, find a tour provider which provides a tour
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-
-               // validate widget
-               if (_pageBook.isDisposed()) {
-                  return;
-               }
-
-               /*
-                * check if tour was set from a selection provider
-                */
-               if (_compareData_TourData != null) {
-                  return;
-               }
-
-//               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-//               if (selectedTours != null && selectedTours.size() > 0) {
+//         _display.asyncExec(() -> {
 //
-//                  for (final TourData tourData : selectedTours) {
+//            // validate widget
 //
-//                     if (compareWholeTour(tourData)) {
-//                        break;
-//                     }
-//                  }
-//               }
-            }
-         });
+//            if (_parent.isDisposed()) {
+//               return;
+//            }
+//
+//            /*
+//             * check if tour was set from a selection provider
+//             */
+//            if (_compareData_TourData != null) {
+//               return;
+//            }
+//
+////               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+////               if (selectedTours != null && selectedTours.size() > 0) {
+////
+////                  for (final TourData tourData : selectedTours) {
+////
+////                     if (compareWholeTour(tourData)) {
+////                        break;
+////                     }
+////                  }
+////               }
+//         });
       }
    }
 
@@ -2417,11 +2607,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // sorting
       final String sortColumnId = Util.getStateString(_state,  STATE_SORT_COLUMN_ID,         COLUMN_GEO_DIFF);
-      final int sortDirection   = Util.getStateInt(_state,     STATE_SORT_COLUMN_DIRECTION,  CompareResultComparator.ASCENDING);
+      final int sortDirection   = Util.getStateInt(_state,     STATE_SORT_COLUMN_DIRECTION,  GeoCompareComparator.ASCENDING);
 
       // update comparator
-      _geoPartComparator.__sortColumnId = sortColumnId;
-      _geoPartComparator.__sortDirection = sortDirection;
+      _geoCompareComparator.__sortColumnId = sortColumnId;
+      _geoCompareComparator.__sortDirection = sortDirection;
    }
 
    @PersistState
@@ -2429,8 +2619,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _state.put(STATE_IS_USE_APP_FILTER,                _compareData_IsUseAppFilter);
 
-      _state.put(STATE_SORT_COLUMN_ID,                   _geoPartComparator.__sortColumnId);
-      _state.put(STATE_SORT_COLUMN_DIRECTION,            _geoPartComparator.__sortDirection);
+      _state.put(STATE_SORT_COLUMN_ID,                   _geoCompareComparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION,            _geoCompareComparator.__sortDirection);
 
       _state.put(STATE_IS_GEO_FILTER_GEO_DIFFERENCE,     _isGeoFilter_GeoDifference);
       _state.put(STATE_IS_GEO_FILTER_MAX_RESULTS,        _isGeoFilter_GeoDifference);
@@ -2445,12 +2635,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    @Override
    public void setFocus() {
 
-      _geoPartViewer.getTable().setFocus();
+      _geoCompareViewer.getTable().setFocus();
    }
 
    private void setState_StopComparing() {
 
-      GeoPartTourLoader.stopLoading(_compareData_PreviousGeoCompareData);
+      GeoPartTourLoader.stopLoading(_compareData_CurrentGeoCompareData);
 
       // reset last id that the same compare can be restarted
 //		_compareData_TourId = Long.MIN_VALUE;
@@ -2489,7 +2679,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   private void updateUI_GeoItem(final GeoCompareData geoCompareData) {
+   /**
+    * @param geoCompareData
+    *           Can be <code>null</code> to reset the UI
+    */
+   private void updateUI_GeoCompareData(final GeoCompareData geoCompareData) {
 
       if (geoCompareData == null) {
 
@@ -2502,7 +2696,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          _lblTitle.setText(_compareData_TourTitle);
 
          _slideoutGeoCompareState.numTours = geoCompareData.tourIds.length;
-
       }
 
       _slideoutGeoCompareOptions.updateUI_StateValues(_slideoutGeoCompareState);
@@ -2518,9 +2711,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _isInUpdate = true;
       {
-         _geoPartViewer.setSelection(selection, true);
+         _geoCompareViewer.setSelection(selection, true);
 
-         _geoPartViewer.getTable().showSelection();
+         _geoCompareViewer.getTable().showSelection();
       }
       _isInUpdate = false;
    }
@@ -2533,11 +2726,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
 
-      final Table table = _geoPartViewer.getTable();
+      final Table table = _geoCompareViewer.getTable();
       final TableColumn tc = getSortColumn(sortColumnId);
 
       table.setSortColumn(tc);
-      table.setSortDirection(sortDirection == CompareResultComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+      table.setSortDirection(sortDirection == GeoCompareComparator.ASCENDING ? SWT.UP : SWT.DOWN);
    }
 
    private void updateUI_State_CancelComparing() {
@@ -2580,6 +2773,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void updateUI_Viewer() {
 
-      _geoPartViewer.setInput(new Object[0]);
+      // reset current selection
+      _selectedGeoComparedTour = null;
+
+      _geoCompareViewer.setInput(new Object[0]);
    }
 }

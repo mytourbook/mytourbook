@@ -252,7 +252,7 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
 
       switch (eventId) {
 
-      case COMPARE_GEO_PARTS:
+      case TOUR_IS_GEO_COMPARED:
 
          if (eventData instanceof GeoCompareData) {
 
