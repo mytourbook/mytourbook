@@ -159,7 +159,7 @@ class OfflineLoadManager {
          }
 
       } catch (final Exception e) {
-         StatusUtil.showStatus("error occured when deleting offline image: " + tilePath.toOSString(), e); //$NON-NLS-1$
+         StatusUtil.showStatus("error occurred when deleting offline image: " + tilePath.toOSString(), e); //$NON-NLS-1$
       }
 
       return false;
@@ -199,7 +199,7 @@ class OfflineLoadManager {
          }
 
       } catch (final Exception e) {
-         StatusUtil.showStatus("error occured when checking offline image", e); //$NON-NLS-1$
+         StatusUtil.showStatus("error occurred when checking offline image", e); //$NON-NLS-1$
          return false;
       }
 
