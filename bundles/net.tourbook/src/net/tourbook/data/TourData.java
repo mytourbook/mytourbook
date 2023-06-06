@@ -4349,17 +4349,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public void computeGeo_Bounds() {
 
-      if (latitudeSerie == null || longitudeSerie == null
-            || latitudeSerie.length == 0 || longitudeSerie.length == 0
+      if (latitudeSerie == null
+            || longitudeSerie == null
+            || latitudeSerie.length == 0
+            || longitudeSerie.length == 0
+
             || _isGeoBoundsChecked) {
 
          return;
       }
 
       double minLatitude = Double.MIN_VALUE;
-      double maxLatitude = Double.MIN_VALUE;
-      double minLongitude = Double.MIN_VALUE;
-      double maxLongitude = Double.MIN_VALUE;
+      double maxLatitude = 0;
+      double minLongitude = 0;
+      double maxLongitude = 0;
 
       int serieIndex = 0;
 
@@ -4371,10 +4374,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          if (latitude != 0 || longitude != 0) {
 
-            minLatitude = latitudeSerie[serieIndex];
-            maxLatitude = latitudeSerie[serieIndex];
-            minLongitude = longitudeSerie[serieIndex];
-            maxLongitude = longitudeSerie[serieIndex];
+            minLatitude = latitude;
+            maxLatitude = latitude;
+            
+            minLongitude = longitude;
+            maxLongitude = longitude;
 
             break;
          }
@@ -4411,6 +4415,87 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             : new GeoPosition[] {
                   new GeoPosition(minLatitude, minLongitude),
                   new GeoPosition(maxLatitude, maxLongitude) };
+   }
+
+   /**
+    * Computes geo bounds between start and end index
+    *
+    * @param startIndex
+    * @param endIndex
+    * @return Returns geo min/max positions when data are available, otherwise <code>null</code>.
+    */
+   public Set<GeoPosition> computeGeo_Bounds(final int startIndex, final int endIndex) {
+
+      // ensure valid data
+      if (latitudeSerie == null
+            || longitudeSerie == null
+
+            || latitudeSerie.length == 0
+            || longitudeSerie.length == 0
+
+            || startIndex >= latitudeSerie.length
+            || endIndex >= latitudeSerie.length) {
+
+         return null;
+      }
+
+      double minLatitude = Double.MIN_VALUE;
+      double maxLatitude = 0;
+      double minLongitude = 0;
+      double maxLongitude = 0;
+
+      // find first value where lat/long != 0
+      for (int serieIndex = startIndex; serieIndex < endIndex; serieIndex++) {
+
+         final double latitude = latitudeSerie[serieIndex];
+         final double longitude = longitudeSerie[serieIndex];
+
+         if (latitude != 0 || longitude != 0) {
+
+            minLatitude = latitude;
+            maxLatitude = latitude;
+
+            minLongitude = longitude;
+            maxLongitude = longitude;
+
+            break;
+         }
+      }
+
+      for (int serieIndex = startIndex; serieIndex < endIndex; serieIndex++) {
+
+         final double latitude = latitudeSerie[serieIndex];
+         final double longitude = longitudeSerie[serieIndex];
+
+         // ignore lat/long == 0
+         if (latitude == 0 && longitude == 0) {
+            continue;
+         }
+
+         minLatitude = latitude < minLatitude ? latitude : minLatitude;
+         maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+
+         minLongitude = longitude < minLongitude ? longitude : minLongitude;
+         maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+
+         if (minLatitude == 0) {
+            minLatitude = -180.0;
+         }
+      }
+
+      if (minLatitude == Double.MIN_VALUE) {
+
+         return null;
+
+      } else {
+
+         final Set<GeoPosition> mapPositions = new HashSet<>();
+
+         mapPositions.add(new GeoPosition(minLatitude, minLongitude));
+         mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
+
+         return mapPositions;
+      }
    }
 
    /**

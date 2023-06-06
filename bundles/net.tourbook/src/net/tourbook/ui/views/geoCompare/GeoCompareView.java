@@ -1352,7 +1352,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             }
          }
       }
-
    }
 
    private void createUI_80_TableViewer(final Composite parent) {

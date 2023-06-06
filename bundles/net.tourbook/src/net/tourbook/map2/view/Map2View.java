@@ -69,6 +69,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.IMapSyncListener;
@@ -2589,10 +2590,51 @@ public class Map2View extends ViewPart implements
       return _allPhotos;
    }
 
-   private Set<GeoPosition> getTourBounds(final ArrayList<TourData> tourDataList) {
+   private Set<GeoPosition> getRefTourBounds(final ArrayList<TourData> allTourData) {
+
+      final TourReference refTour = ReferenceTourManager.getGeoCompareReferenceTour();
+
+      if (refTour == null) {
+         return null;
+      }
+
+      final TourData refTour_TourData = refTour.getTourData();
+      if (refTour_TourData == null) {
+         return null;
+      }
+
+      // find ref tour in provided tours
+      final Long refTour_TourId = refTour_TourData.getTourId();
+      TourData refTourInAllTourData = null;
+
+      for (final TourData tourData : allTourData) {
+
+         if (tourData.getTourId().equals(refTour_TourId)) {
+
+            refTourInAllTourData = tourData;
+            break;
+         }
+      }
+
+      if (refTourInAllTourData == null) {
+         return null;
+      }
+
+      // show ref/compare tour only when both are available
+      if (allTourData.size() <= 1) {
+         return null;
+      }
+
+      return refTourInAllTourData.computeGeo_Bounds(
+
+            refTour.getStartValueIndex(),
+            refTour.getEndValueIndex());
+   }
+
+   private Set<GeoPosition> getTourBounds(final ArrayList<TourData> allTourData) {
 
       /*
-       * get min/max longitude/latitude
+       * Get min/max for longitude/latitude
        */
       double allMinLatitude = Double.MIN_VALUE;
       double allMaxLatitude = 0;
@@ -2600,7 +2642,7 @@ public class Map2View extends ViewPart implements
       double allMinLongitude = 0;
       double allMaxLongitude = 0;
 
-      for (final TourData tourData : tourDataList) {
+      for (final TourData tourData : allTourData) {
 
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;
@@ -2621,8 +2663,11 @@ public class Map2View extends ViewPart implements
          final double tourMaxLatitude = geoPosition[1].latitude;
          final double tourMaxLongitude = geoPosition[1].longitude;
 
-         if (tourMinLatitude == 0 && tourMaxLatitude == 0
-               && tourMinLongitude == 0 && tourMaxLongitude == 0) {
+         if (tourMinLatitude == 0
+               && tourMaxLatitude == 0
+               && tourMinLongitude == 0
+               && tourMaxLongitude == 0) {
+
             continue;
          }
 
@@ -3317,8 +3362,8 @@ public class Map2View extends ViewPart implements
 
             final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour().getTourData();
 
-            final GeoComparedTour geoCompareItem = (GeoComparedTour) firstElement;
-            final long comparedTourId = geoCompareItem.tourId;
+            final GeoComparedTour geoCompareTour = (GeoComparedTour) firstElement;
+            final long comparedTourId = geoCompareTour.tourId;
             final TourData comparedTourData = TourManager.getInstance().getTourData(comparedTourId);
 
             _allTourData.clear();
@@ -3331,9 +3376,9 @@ public class Map2View extends ViewPart implements
 
             positionMapTo_0_TourSliders(
                   comparedTourData,
-                  geoCompareItem.tourFirstIndex,
-                  geoCompareItem.tourLastIndex,
-                  geoCompareItem.tourFirstIndex,
+                  geoCompareTour.tourFirstIndex,
+                  geoCompareTour.tourLastIndex,
+                  geoCompareTour.tourFirstIndex,
                   null);
 
          } else if (firstElement instanceof TourWayPoint) {
@@ -3526,9 +3571,14 @@ public class Map2View extends ViewPart implements
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
       _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
-      final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
+      Set<GeoPosition> refTourBounds = getRefTourBounds(_allTourData);
+      if (refTourBounds == null) {
 
-      _tourPainterConfig.setTourBounds(tourBounds);
+         // use normal tour bounds
+         refTourBounds = getTourBounds(_allTourData);
+      }
+
+      _tourPainterConfig.setTourBounds(refTourBounds);
 
       _directMappingPainter.disablePaintContext();
 
@@ -3544,7 +3594,7 @@ public class Map2View extends ViewPart implements
          _map.disposeOverlayImageCache();
       }
 
-      positionMapTo_MapPosition(tourBounds, false);
+      positionMapTo_MapPosition(refTourBounds, false);
 
       createLegendImage(_tourPainterConfig.getMapColorProvider());
 
