@@ -830,9 +830,24 @@ public class TourChartView extends ViewPart implements
          } else if (selection instanceof StructuredSelection) {
 
             final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
             if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-               updateChart(((TVIRefTour_ComparedTour) firstElement).getTourId());
+               final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
+
+               final GeoComparedTour geoComparedTour = comparedTour.getGeoCompareTour();
+
+               if (geoComparedTour != null) {
+
+                  updateChart(
+                        geoComparedTour.tourId,
+                        geoComparedTour.tourFirstIndex,
+                        geoComparedTour.tourLastIndex);
+
+               } else {
+
+                  updateChart(comparedTour.getTourId());
+               }
 
             } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
@@ -844,12 +859,12 @@ public class TourChartView extends ViewPart implements
 
             } else if (firstElement instanceof GeoComparedTour) {
 
-               final GeoComparedTour geoCompareItem = (GeoComparedTour) firstElement;
+               final GeoComparedTour geoComparedTour = (GeoComparedTour) firstElement;
 
                updateChart(
-                     geoCompareItem.tourId,
-                     geoCompareItem.tourFirstIndex,
-                     geoCompareItem.tourLastIndex);
+                     geoComparedTour.tourId,
+                     geoComparedTour.tourFirstIndex,
+                     geoComparedTour.tourLastIndex);
             }
 
          } else if (selection instanceof PhotoSelection) {

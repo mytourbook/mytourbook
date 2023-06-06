@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.geoCompare;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
@@ -97,10 +98,38 @@ public class GeoComparedTour implements Comparable<Object> {
       final long otherValue = ((GeoComparedTour) o).tourStartTimeMS;
 
       return tourStartTimeMS < otherValue
+
             ? -1
             : tourStartTimeMS == otherValue
+
                   ? 0
                   : 1;
+   }
+
+   @Override
+   public boolean equals(final Object obj) {
+
+      if (this == obj) {
+         return true;
+      }
+
+      if (obj == null) {
+         return false;
+      }
+
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+
+      final GeoComparedTour other = (GeoComparedTour) obj;
+
+      return tourId == other.tourId;
+   }
+
+   @Override
+   public int hashCode() {
+
+      return Objects.hash(tourId);
    }
 
    @Override
@@ -108,14 +137,14 @@ public class GeoComparedTour implements Comparable<Object> {
 
       return UI.EMPTY_STRING
 
-            + "GeoComparedTour" + NL //                  //$NON-NLS-1$
+            + "GeoComparedTour" + NL //                     //$NON-NLS-1$
 
-            + "[" + NL //                                //$NON-NLS-1$
+            + "[" + NL //                                   //$NON-NLS-1$
 
-            + "tourId      =" + tourId + NL //           //$NON-NLS-1$
-            + "geoPartItem =" + geoCompareData + NL //      //$NON-NLS-1$
+            + "tourId         =" + tourId + NL //           //$NON-NLS-1$
+            + "geoCompareData =" + geoCompareData + NL //   //$NON-NLS-1$
 
-            + "]" + NL //                                //$NON-NLS-1$
+            + "]" + NL //                                   //$NON-NLS-1$
       ;
    }
 

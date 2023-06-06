@@ -23,7 +23,7 @@ import net.tourbook.data.TourCompared;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 
 /**
- * Represents a compared tour (tree item) in the reference tour viewer
+ * Represents a compared tour (tree item) in the reference tour viewer or in the geo compare view
  */
 public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
@@ -105,6 +105,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    public int getEndIndex() {
       return endIndex;
+   }
+
+   public GeoComparedTour getGeoCompareTour() {
+      return geoCompareTour;
    }
 
    public float getMaxPulse() {

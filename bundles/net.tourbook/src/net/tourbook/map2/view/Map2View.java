@@ -3345,11 +3345,19 @@ public class Map2View extends ViewPart implements
          if (firstElement instanceof TVIRefTour_ComparedTour) {
 
             final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
-            final long tourId = comparedTour.getTourId();
+            final GeoComparedTour geoCompareTour = comparedTour.getGeoCompareTour();
 
-            final TourData tourData = TourManager.getInstance().getTourData(tourId);
+            if (geoCompareTour != null) {
 
-            paintTours_20_One(tourData, false);
+               onSelection_GeoComparedTour(geoCompareTour);
+
+            } else {
+
+               final long tourId = comparedTour.getTourId();
+               final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+               paintTours_20_One(tourData, false);
+            }
 
          } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
@@ -3360,26 +3368,7 @@ public class Map2View extends ViewPart implements
 
          } else if (firstElement instanceof GeoComparedTour) {
 
-            final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour().getTourData();
-
-            final GeoComparedTour geoCompareTour = (GeoComparedTour) firstElement;
-            final long comparedTourId = geoCompareTour.tourId;
-            final TourData comparedTourData = TourManager.getInstance().getTourData(comparedTourId);
-
-            _allTourData.clear();
-
-            _allTourData.add(refTourData);
-            _allTourData.add(comparedTourData);
-            _hash_AllTourData = _allTourData.hashCode();
-
-            paintTours_10_All();
-
-            positionMapTo_0_TourSliders(
-                  comparedTourData,
-                  geoCompareTour.tourFirstIndex,
-                  geoCompareTour.tourLastIndex,
-                  geoCompareTour.tourFirstIndex,
-                  null);
+            onSelection_GeoComparedTour((GeoComparedTour) firstElement);
 
          } else if (firstElement instanceof TourWayPoint) {
 
@@ -3449,6 +3438,29 @@ public class Map2View extends ViewPart implements
 
          clearView();
       }
+   }
+
+   private void onSelection_GeoComparedTour(final GeoComparedTour geoCompareTour) {
+
+      final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour().getTourData();
+
+      final long comparedTourId = geoCompareTour.tourId;
+      final TourData comparedTourData = TourManager.getInstance().getTourData(comparedTourId);
+
+      _allTourData.clear();
+
+      _allTourData.add(refTourData);
+      _allTourData.add(comparedTourData);
+      _hash_AllTourData = _allTourData.hashCode();
+
+      paintTours_10_All();
+
+      positionMapTo_0_TourSliders(
+            comparedTourData,
+            geoCompareTour.tourFirstIndex,
+            geoCompareTour.tourLastIndex,
+            geoCompareTour.tourFirstIndex,
+            null);
    }
 
    private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {

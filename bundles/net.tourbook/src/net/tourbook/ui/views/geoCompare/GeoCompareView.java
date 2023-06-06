@@ -195,18 +195,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _nf1.setMaximumFractionDigits(1);
    }
 
-   private SelectionListener         _columnSortListener;
-   private SelectionListener         _compareSelectionListener;
-   private MouseWheelListener        _compareMouseWheelListener;
-   private IPartListener2            _partListener;
-   private IPropertyChangeListener   _prefChangeListener;
-   private IPropertyChangeListener   _prefChangeListener_Common;
-   private ISelectionListener        _postSelectionListener;
-   private ITourEventListener        _tourEventListener;
+   private SelectionListener       _columnSortListener;
+   private SelectionListener       _compareSelectionListener;
+   private MouseWheelListener      _compareMouseWheelListener;
+   private IPartListener2          _partListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
+   private ISelectionListener      _postSelectionListener;
+   private ITourEventListener      _tourEventListener;
 
-   private PostSelectionProvider     _postSelectionProvider;
+   private PostSelectionProvider   _postSelectionProvider;
 
-   private int                       _lastSelectionHash;
+// private int                       _lastSelectionHash;
 
    private AtomicInteger             _workedTours                    = new AtomicInteger();
    private AtomicInteger             _runningId                      = new AtomicInteger();
@@ -215,6 +215,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private boolean                   _isInUpdate;
    private long                      _lastUIUpdate;
+   private boolean                   _isInSelection;
 
    /**
     * Items which are displayed in the tour viewer
@@ -2293,6 +2294,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void onSelect_ComparerItem(final SelectionChangedEvent event) {
 
+      if (_isInSelection) {
+         return;
+      }
+
       final ISelection selection = event.getSelection();
       final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
@@ -2324,17 +2329,19 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          return;
       }
 
-      final int selectionHash = selection.hashCode();
-      if (_lastSelectionHash == selectionHash) {
-
-         /*
-          * Last selection has not changed, this can occur when the app lost the focus and got the
-          * focus again.
-          */
-         return;
-      }
-
-      _lastSelectionHash = selectionHash;
+// !!! THIS IS NOT WORKING !!!
+//
+//      final int selectionHash = selection.hashCode();
+//      if (_lastSelectionHash == selectionHash) {
+//
+//         /*
+//          * Last selection has not changed, this can occur when the app lost the focus and got the
+//          * focus again.
+//          */
+//         return;
+//      }
+//
+//      _lastSelectionHash = selectionHash;
 
       if (selection instanceof SelectionChartInfo) {
 
@@ -2490,7 +2497,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            showRefTour(((TVIRefTour_ComparedTour) firstElement).getRefId());
+            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
+            final GeoComparedTour geoCompareTour = comparedTour.getGeoCompareTour();
+
+            if (geoCompareTour != null) {
+
+               selectGeoComparedTour(geoCompareTour);
+
+            } else {
+
+               showRefTour(comparedTour.getRefId());
+            }
 
          } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
@@ -2576,9 +2593,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-// SET_FORMATTING_OFF
-
    private void restoreState() {
+
+// SET_FORMATTING_OFF
 
       final boolean isCompareEnabled = GeoCompareManager.isGeoComparing();
 
@@ -2627,9 +2644,23 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _state.put(STATE_GEO_FILTER_SEQUENCE_FILTER,       _geoFilter_MaxResults);
 
       _columnManager.saveState(_state);
+      
+// SET_FORMATTING_ON
    }
 
-// SET_FORMATTING_ON
+   private void selectGeoComparedTour(final GeoComparedTour geoCompareTour) {
+
+      _isInSelection = true;
+      {
+         _geoCompareViewer.setSelection(new StructuredSelection(geoCompareTour));
+
+         // make the selection visible, table is scrolled when needed
+         final Table table = _geoCompareViewer.getTable();
+         table.setSelection(table.getSelectionIndex());
+
+      }
+      _isInSelection = false;
+   }
 
    @Override
    public void setFocus() {
