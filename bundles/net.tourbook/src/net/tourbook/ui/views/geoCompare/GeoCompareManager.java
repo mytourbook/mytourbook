@@ -352,7 +352,11 @@ public class GeoCompareManager {
       }
    }
 
-   public static boolean isGeoComparing() {
+   /**
+    * @return Returns <code>true</code> when geo comparing is enabled
+    */
+   public static boolean isGeoComparingOn() {
+
       return _isGeoComparingOn;
    }
 
@@ -375,9 +379,11 @@ public class GeoCompareManager {
       _isGeoComparingOn = isGeoComparingOn;
 
       fireEvent(
+
             isGeoComparingOn
                   ? GeoCompareEventId.SET_COMPARING_ON
                   : GeoCompareEventId.SET_COMPARING_OFF,
+
             null,
             part);
    }

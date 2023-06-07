@@ -18,7 +18,7 @@ package net.tourbook.application;
 import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
 import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_YearStatistic_View;
+import net.tourbook.ui.views.referenceTour.RefTour_StatisticView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 
 import org.eclipse.ui.IFolderLayout;
@@ -43,7 +43,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
       layout.addShowViewShortcut(ReferenceTourView.ID);
       layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
       layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
-      layout.addShowViewShortcut(RefTour_YearStatistic_View.ID);
+      layout.addShowViewShortcut(RefTour_StatisticView.ID);
 
 // SET_FORMATTING_OFF
 
@@ -64,7 +64,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
             IPageLayout.BOTTOM,     0.7f,    FOLDER_ID_LIST);
 
-      folderYearStat.addView(RefTour_YearStatistic_View.ID);
+      folderYearStat.addView(RefTour_StatisticView.ID);
 
       //--------------------------------------------------------------------------------
       // Right area

@@ -1394,7 +1394,7 @@
       <command
          id             ="net.tourbook.command.GeoParts"
          name           ="%Command_GeoParts"
-         defaultHandler ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoParts"
+         defaultHandler ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoCompareView"
       />
 
       <command
@@ -1859,7 +1859,7 @@
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
-            class       ="net.tourbook.ui.views.referenceTour.RefTour_YearStatistic_View"
+            class       ="net.tourbook.ui.views.referenceTour.RefTour_StatisticView"
             icon        ="icons/tour-map-statistic.png"
             name        ="%View_Name_RefTour_Statistics"/>
 

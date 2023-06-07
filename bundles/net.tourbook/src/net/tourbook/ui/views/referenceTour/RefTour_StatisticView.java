@@ -83,7 +83,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareListener {
+public class RefTour_StatisticView extends ViewPart implements IGeoCompareListener {
 
    public static final String  ID                                = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
@@ -274,11 +274,11 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutYearStatisticOptions(RefTour_YearStatistic_View.this, _pageBook, toolbar, PREF_PREFIX, _state);
+         return new SlideoutYearStatisticOptions(RefTour_StatisticView.this, _pageBook, toolbar, PREF_PREFIX, _state);
       }
    }
 
-   public RefTour_YearStatistic_View() {}
+   public RefTour_StatisticView() {}
 
    private void addPrefListener() {
 
@@ -732,7 +732,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       final String title = tourDate.format(TimeTools.Formatter_Date_F);
 
-      new RefTour_YearStatistic_TooltipUI().createContentArea(
+      new RefTour_StatisticView_TooltipUI().createContentArea(
 
             parent,
             toolTipProvider,
@@ -1328,7 +1328,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       _actionShowAllValues.setChecked(_isShowAllValues);
       _actionSyncMinMaxValues.setChecked(_isSynchMinMaxValue);
 
-      final int numVisibleYears = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
+      final int numVisibleYears = Util.getStateInt(_state, RefTour_StatisticView.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
       _numVisibleYears = numVisibleYears;
       _spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
 
@@ -1480,10 +1480,10 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       int firstVisibleYear = getFirstVisibleYear();
 
       _barRelativeHeight = Util.getStateInt(_state,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MIN,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MAX);
+            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT,
+            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
+            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_MIN,
+            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_MAX);
 
       // keep/remove current geo compare data
       _currentGeoCompareData = geoCompareData;
@@ -1652,7 +1652,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
 
-            RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, valueIndex);
+            RefTour_StatisticView.this.createToolTipUI(toolTipProvider, parent, valueIndex);
          }
       });
 

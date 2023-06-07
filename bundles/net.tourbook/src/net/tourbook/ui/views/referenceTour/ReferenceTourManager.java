@@ -138,6 +138,25 @@ public class ReferenceTourManager {
    }
 
    /**
+    * Load {@link TourReference} from the database
+    *
+    * @param refId
+    * @return Returns {@link TourReference} for the <code>refId</code>
+    */
+   public static TourReference getReferenceTour(final long refId) {
+
+      TourReference refTour;
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      {
+         refTour = em.find(TourReference.class, refId);
+      }
+      em.close();
+
+      return refTour;
+   }
+
+   /**
     * Returns a {@link CompareConfig} or <code>null</code> when the reference tour cannot
     * be loaded from the database
     *

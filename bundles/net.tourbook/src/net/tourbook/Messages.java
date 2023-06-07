@@ -1879,6 +1879,8 @@ public class Messages extends NLS {
    public static String        RefTour_Dialog_DeleteComparedTour_Title;
    public static String        RefTour_Dialog_DeleteRefTour_Message;
    public static String        RefTour_Dialog_DeleteRefTour_Title;
+   public static String        RefTour_Dialog_NoGeoInRefTour_Message;
+   public static String        RefTour_Dialog_NoGeoInRefTour_Title;
    public static String        RefTour_Dialog_RenameRefTour_Message;
    public static String        RefTour_Dialog_RenameRefTour_Title;
    public static String        RefTour_Dialog_SaveComparedTour_Message;
@@ -2659,6 +2661,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditChartPreferences;
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
+   public static String        Tour_Action_GeoCompare;
+
    public static String        Tour_Action_GeoCompare_Tooltip;
    public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
    public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;

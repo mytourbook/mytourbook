@@ -767,7 +767,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                                    final int rightIndex,
                                    final long refId) {
 
-      if (GeoCompareManager.isGeoComparing() == false) {
+      if (GeoCompareManager.isGeoComparingOn() == false) {
 
          // ignore slider position
          return;
@@ -1129,6 +1129,36 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // make sure the selection is visible
       _geoCompareViewer.getTable().showSelection();
+   }
+
+   public void compareRefTour(final long refId) {
+
+      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+
+      if (tourCompareConfig == null) {
+         return;
+      }
+
+      final TourData tourData = tourCompareConfig.getRefTourData();
+
+      if (tourData != null) {
+
+         final TourReference refTour = tourCompareConfig.getRefTour();
+
+         /*
+          * Convert real ref tour into a geo compare ref tour that the behaviour is the same,
+          * however this will disable features in the tour compare chart but this is already very
+          * complex.
+          */
+
+         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(refTour);
+
+         compare_10_Compare(
+               tourData,
+               refTour.getStartValueIndex(),
+               refTour.getEndValueIndex(),
+               geoCompareRefId);
+      }
    }
 
    private void createActions() {
@@ -1926,7 +1956,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-      final boolean isCompareEnabled      = GeoCompareManager.isGeoComparing();
+      final boolean isCompareEnabled      = GeoCompareManager.isGeoComparingOn();
       final boolean isGeoDiffFilter       = isCompareEnabled ;
 
       _actionAppTourFilter                .setEnabled(isCompareEnabled);
@@ -2347,7 +2377,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
-         if (GeoCompareManager.isGeoComparing() == false) {
+         if (GeoCompareManager.isGeoComparingOn() == false) {
             return;
          }
 
@@ -2457,7 +2487,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       } else if (selection instanceof SelectionReferenceTourView) {
 
-         showRefTour(((SelectionReferenceTourView) selection).getRefId());
+         compareRefTour(((SelectionReferenceTourView) selection).getRefId());
 
       } else if (selection instanceof SelectionTourData) {
 
@@ -2506,12 +2536,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             } else {
 
-               showRefTour(comparedTour.getRefId());
+               compareRefTour(comparedTour.getRefId());
             }
 
          } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
-            showRefTour(((TVIElevationCompareResult_ComparedTour) firstElement).refTour.refId);
+            compareRefTour(((TVIElevationCompareResult_ComparedTour) firstElement).refTour.refId);
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -2524,7 +2554,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void recompareTours() {
 
-      if (_compareData_GeoGrid != null && GeoCompareManager.isGeoComparing()) {
+      if (_compareData_GeoGrid != null && GeoCompareManager.isGeoComparingOn()) {
 
          compare_30_StartComparing();
       }
@@ -2595,9 +2625,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void restoreState() {
 
+      final boolean isCompareEnabled = GeoCompareManager.isGeoComparingOn();
+
 // SET_FORMATTING_OFF
 
-      final boolean isCompareEnabled = GeoCompareManager.isGeoComparing();
 
       _distanceInterval                = Util.getStateInt(_state,       STATE_DISTANCE_INTERVAL,               DEFAULT_DISTANCE_INTERVAL);
       _geoAccuracy                     = Util.getStateInt(_state,       STATE_GEO_ACCURACY,                    DEFAULT_GEO_ACCURACY);
@@ -2644,7 +2675,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _state.put(STATE_GEO_FILTER_SEQUENCE_FILTER,       _geoFilter_MaxResults);
 
       _columnManager.saveState(_state);
-      
+
 // SET_FORMATTING_ON
    }
 
@@ -2674,36 +2705,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // reset last id that the same compare can be restarted
 //		_compareData_TourId = Long.MIN_VALUE;
-   }
-
-   private void showRefTour(final long refId) {
-
-      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
-
-      if (tourCompareConfig == null) {
-         return;
-      }
-
-      final TourData tourData = tourCompareConfig.getRefTourData();
-
-      if (tourData != null) {
-
-         final TourReference refTour = tourCompareConfig.getRefTour();
-
-         /*
-          * Convert real ref tour into a geo compare ref tour that the behaviour is the same,
-          * however this will disable features in the tour compare chart but this is already very
-          * complex.
-          */
-
-         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour(refTour);
-
-         compare_10_Compare(
-               tourData,
-               refTour.getStartValueIndex(),
-               refTour.getEndValueIndex(),
-               geoCompareRefId);
-      }
    }
 
    @Override

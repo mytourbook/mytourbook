@@ -438,7 +438,7 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
 
    private void enableControls() {
 
-      final boolean isGeoCompareActive = GeoCompareManager.isGeoComparing();
+      final boolean isGeoCompareActive = GeoCompareManager.isGeoComparingOn();
 
       final boolean isTrackOpacity = _chkMapOption_TrackOpacity.getSelection();
 
