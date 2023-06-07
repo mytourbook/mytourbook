@@ -20,7 +20,7 @@ import java.util.Map;
 import net.tourbook.Images;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -33,7 +33,7 @@ public class ActionHandler_OpenView_ReferenceTours extends AbstractHandler imple
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      Util.showView(TourCatalogView.ID, true);
+      Util.showView(ReferenceTourView.ID, true);
 
       return null;
    }

@@ -730,11 +730,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colMaxSpeed                      = result.getFloat(startIndex + 6);
 
-      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-      final long time = isPaceAndSpeedFromRecordedTime ? colTourDeviceTime_Recorded : colTourComputedTime_Moving;
       // compute average speed/pace, prevent divide by 0
-      colAvgSpeed                      = time == 0 ? 0 : 3.6f * colTourDistance / time;
-      colAvgPace                       = colTourDistance == 0 ? 0 : time * 1000f / colTourDistance;
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long timeField = isPaceAndSpeedFromRecordedTime
+            ? colTourDeviceTime_Recorded
+            : colTourComputedTime_Moving;
+      colAvgSpeed                      = timeField       == 0 ? 0 : 3.6f * colTourDistance / timeField;
+      colAvgPace                       = colTourDistance == 0 ? 0 : timeField * 1000f / colTourDistance;
 
       colMaxAltitude                   = result.getLong(startIndex + 7);
       colMaxPulse                      = result.getLong(startIndex + 8);

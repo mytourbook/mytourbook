@@ -561,8 +561,8 @@
             <command 
                commandId   ="command.net.tourbook.views.tourCatalog.TourCatalogView"
                icon        ="icons/reference-tours.png"
-               label       ="%view_name_ReferenceTours"
-               mnemonic    ="%view_name_ReferenceTours_Mnemonic"/>
+               label       ="%View_Name_ReferenceTours"
+               mnemonic    ="%View_Name_ReferenceTours_Mnemonic"/>
 
             <!-- Collated Tours -->
             <command 
@@ -1231,7 +1231,7 @@
 
       <command
          id             ="command.net.tourbook.views.tourCatalog.TourCatalogView"
-         name           ="%view_name_ReferenceTours"
+         name           ="%View_Name_ReferenceTours"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_ReferenceTours"
       />
 
@@ -1653,9 +1653,9 @@
          <view
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.tourCatalog.TourCatalogView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTourView"
             icon        ="icons/reference-tours.png"
-            name        ="%view_name_ReferenceTours"/>
+            name        ="%View_Name_ReferenceTours"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
@@ -1838,30 +1838,30 @@
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.CompareResultView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
+            class       ="net.tourbook.ui.views.referenceTour.ElevationCompareResultView"
             icon        ="icons/tour-map-compare-result.png"
             name        ="%view_name_Compare_Result"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.referenceTourView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour"
+            class       ="net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView"
             icon        ="icons/tour-map-reftour.png"
-            name        ="%view_name_tourCatalog_referenceTour"/>
+            name        ="%View_Name_RefTour_ReferenceTour"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.comparedTourView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour"
+            class       ="net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView"
             icon        ="icons/tour-map-comparetour.png"
-            name        ="%view_name_tourCatalog_comparedTour"/>
+            name        ="%View_Name_RefTour_ComparedTour"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
-            class       ="net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View"
+            class       ="net.tourbook.ui.views.referenceTour.RefTour_YearStatistic_View"
             icon        ="icons/tour-map-statistic.png"
-            name        ="%view_name_tourCatalog_statistics"/>
+            name        ="%View_Name_RefTour_Statistics"/>
 
          <view
             category    ="net.tourbook.category.compareTours"

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,7 +65,7 @@ import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
-import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
+import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
@@ -734,11 +734,12 @@ public class TourMapPainter extends Map2Painter {
       return allLegendLabels;
    }
 
+// SET_FORMATTING_OFF
+
    private static void getTourPainterSettings() {
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
-// SET_FORMATTING_OFF
 
       _prefIsDrawLine            = drawSymbol.equals(Map2_Appearance.PLOT_TYPE_LINE);
       _prefIsDrawSquare          = drawSymbol.equals(Map2_Appearance.PLOT_TYPE_SQUARE);
@@ -752,24 +753,19 @@ public class TourMapPainter extends Map2Painter {
       _prefBorderType            = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE);
       _prefBorderWidth           = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH);
 
-// SET_FORMATTING_ON
 
       final int prefBorderDimmValue = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE);
-      _borderBrightness = (float) (1.0 - prefBorderDimmValue / 100.0);
+      _borderBrightness          = (float) (1.0 - prefBorderDimmValue / 100.0);
 
       /*
        * Geo compare
        */
-      _prefGeoCompare_LineWidth = _prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH);
-
-      _prefGeoCompare_RefTour_RGB = PreferenceConverter.getColor(
-            _prefStore,
-            ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB);
-
-      _prefGeoCompare_CompartTourPart_RGB = PreferenceConverter.getColor(
-            _prefStore,
-            ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB);
+      _prefGeoCompare_LineWidth           = _prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH);
+      _prefGeoCompare_RefTour_RGB         = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB);
+      _prefGeoCompare_CompartTourPart_RGB = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB);
    }
+
+// SET_FORMATTING_ON
 
    private static void initPainter() {
 
@@ -1624,6 +1620,7 @@ public class TourMapPainter extends Map2Painter {
             _symbolSize = _prefLineWidth;
 
          } else {
+
             break;
          }
 

@@ -17,7 +17,7 @@ package net.tourbook.ui;
 
 import java.util.ArrayList;
 
-import net.tourbook.ui.views.tourCatalog.RefTourItem;
+import net.tourbook.ui.views.referenceTour.RefTourItem;
 
 /**
  * This interface provides reference tours which are selected in a view

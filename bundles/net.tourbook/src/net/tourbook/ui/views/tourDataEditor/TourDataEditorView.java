@@ -119,10 +119,10 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.ActionSplitTour;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 import org.eclipse.core.databinding.conversion.text.StringToNumberConverter;
@@ -7939,11 +7939,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          displayTour(((SelectionTourMarker) selection).getTourData());
 
-      } else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionReferenceTourView) {
 
-         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
-         final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+         final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
             displayTour(refItem.getTourId());
          }
@@ -7982,13 +7982,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else if (selection instanceof StructuredSelection) {
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVICatalogComparedTour) {
+         if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            displayTour(((TVICatalogComparedTour) firstElement).getTourId());
+            displayTour(((TVIRefTour_ComparedTour) firstElement).getTourId());
 
-         } else if (firstElement instanceof TVICompareResultComparedTour) {
+         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
-            displayTour(((TVICompareResultComparedTour) firstElement).getTourId());
+            displayTour(((TVIElevationCompareResult_ComparedTour) firstElement).getTourId());
          }
       }
    }
@@ -8137,15 +8137,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-         if (firstElement instanceof TVICatalogComparedTour) {
-            _selectionTourId = ((TVICatalogComparedTour) firstElement).getTourId();
+         if (firstElement instanceof TVIRefTour_ComparedTour) {
+            _selectionTourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
             if (currentTourId == _selectionTourId) {
                isCurrentTourSelected = true;
             }
 
-         } else if (firstElement instanceof TVICompareResultComparedTour) {
+         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
-            final long comparedTourTourId = ((TVICompareResultComparedTour) firstElement).getTourId();
+            final long comparedTourTourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
 
             _selectionTourId = comparedTourTourId;
             if (currentTourId == _selectionTourId) {
