@@ -4,6 +4,8 @@
 TODO's
 ======               
 
+* AirQuality      - German translation https://github.com/mytourbook/mytourbook/issues/1124
+
 * Tour Chart      - Check "Grid/Units" and "Options" tab in pref page "Appearance/Tour Chart" if something is obsolete
 
 
@@ -43,7 +45,7 @@ Improvements
     https://github.com/mytourbook/mytourbook/discussions/1117
     
 * 2D Map
-  - The action "Show entire tour in the map" shows only the reference part of a tour when a reference tour is displayed
+  - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed
 
 * Reference Tour View
   - Autoexpand/collapse when selected with the mouse
