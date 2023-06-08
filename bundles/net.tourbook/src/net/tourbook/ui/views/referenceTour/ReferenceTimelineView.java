@@ -190,7 +190,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private ActionSyncMinMaxValues             _actionSyncMinMaxValues;
    private ActionYearStatisticOptions         _actionYearStatOptions;
 
-   private ReferenceTimeline_TourTooltip           _tourToolTip;
+   private ReferenceTimeline_TourTooltip      _tourToolTip;
    private TourInfoIconToolTipProvider        _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
 
    private PixelConverter                     _pc;

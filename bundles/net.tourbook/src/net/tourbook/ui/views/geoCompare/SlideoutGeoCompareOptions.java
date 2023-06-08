@@ -65,7 +65,8 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
    private static IDialogSettings        _state;
 
    private SelectionListener             _compareSelectionListener;
-   private MouseWheelListener            _compareMouseWheelListener;
+   private MouseWheelListener            _compareMouseWheelListener10;
+   private MouseWheelListener            _compareMouseWheelListener100;
    private MouseWheelListener            _mapOptions_MouseWheelListener;
    private IPropertyChangeListener       _mapOptions_PropertyListener;
    private SelectionListener             _mapOptions_SelectionListener;
@@ -167,7 +168,7 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
          {
             createUI_10_Header(container);
-            createUI_20_CompareOptions(container);
+            createUI_20_Options(container);
          }
 
 //         // compute width for all controls and equalize column width for the different sections
@@ -219,7 +220,7 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
       }
    }
 
-   private void createUI_20_CompareOptions(final Composite parent) {
+   private void createUI_20_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -227,12 +228,12 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         createUI_40_Options(container);
+         createUI_40_CompareOptions(container);
          createUI_50_MapOptions(container);
       }
    }
 
-   private void createUI_40_Options(final Composite parent) {
+   private void createUI_40_CompareOptions(final Composite parent) {
 
       final GridDataFactory gridData_Grab_FillCenter = GridDataFactory
             .fillDefaults()
@@ -295,7 +296,7 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
                _spinnerGeo_DistanceInterval.setMaximum(1_000);
                _spinnerGeo_DistanceInterval.setPageIncrement(10);
                _spinnerGeo_DistanceInterval.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_DistanceInterval.addMouseWheelListener(_compareMouseWheelListener);
+               _spinnerGeo_DistanceInterval.addMouseWheelListener(_compareMouseWheelListener10);
                gridData_EndFill.applyTo(_spinnerGeo_DistanceInterval);
 
                _secondColumnControls.add(_spinnerGeo_DistanceInterval);
@@ -325,7 +326,7 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
                _spinnerGeo_Accuracy.setMaximum(100_000);
                _spinnerGeo_Accuracy.setPageIncrement(100);
                _spinnerGeo_Accuracy.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_Accuracy.addMouseWheelListener(_compareMouseWheelListener);
+               _spinnerGeo_Accuracy.addMouseWheelListener(_compareMouseWheelListener100);
 
                _secondColumnControls.add(_spinnerGeo_Accuracy);
             }
@@ -461,8 +462,12 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
       parent.addDisposeListener(disposeEvent -> onDisposeSlideout());
 
       _compareSelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_CompareParameter());
-      _compareMouseWheelListener = mouseEvent -> {
+      _compareMouseWheelListener10 = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+         onChange_CompareParameter();
+      };
+      _compareMouseWheelListener100 = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 100);
          onChange_CompareParameter();
       };
 

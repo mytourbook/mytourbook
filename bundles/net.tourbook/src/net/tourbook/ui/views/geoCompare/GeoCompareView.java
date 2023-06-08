@@ -369,7 +369,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       public ActionOnOff() {
 
-         super(null, AS_CHECK_BOX);
+         super(null, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.GeoCompare_View_Action_OnOff_Tooltip);
 
@@ -541,13 +541,23 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          if (columnId.equals(__sortColumnId)) {
 
-            // Same column as last sort; toggle the direction
+            // Same column as last sort: Toggle the direction
 
-            __sortDirection = 1 - __sortDirection;
+            if (__sortDirection == DESCENDING) {
+
+               // reset sorting to default
+
+               __sortColumnId = COLUMN_GEO_DIFF;
+               __sortDirection = ASCENDING;
+
+            } else {
+
+               __sortDirection = 1 - __sortDirection;
+            }
 
          } else {
 
-            // New column; do an ascent sorting
+            // New column: Do an ascent sorting
 
             __sortColumnId = columnId;
             __sortDirection = ASCENDING;
@@ -811,6 +821,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             && _lastCompare_GeoAccuracy == _geoAccuracy
             && _lastCompare_DistanceInterval == _distanceInterval
             && _lastCompare_IsUseAppFilter == _compareData_IsUseAppFilter) {
+
+         /*
+          * Ensure that the compare result is displayed otherwise it would be hidden when a
+          * none geo tour was seleced before
+          */
+         _pageBook.showPage(_pageCompareResult);
 
          return;
       }
@@ -2639,7 +2655,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _compareData_IsUseAppFilter      = Util.getStateBoolean(_state,   STATE_IS_USE_APP_FILTER,               true);
 
       _actionOnOff            .setIcon(isCompareEnabled);
-      _actionOnOff            .setChecked(isCompareEnabled);
       _actionAppTourFilter    .setChecked(_compareData_IsUseAppFilter);
 
       _chkGeoFilter_GeoDiff               .setSelection(_isGeoFilter_GeoDifference);

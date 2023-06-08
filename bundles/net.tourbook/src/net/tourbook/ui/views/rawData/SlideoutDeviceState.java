@@ -59,7 +59,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Slideout for map models
+ * Slideout for the easy import device state
  */
 public class SlideoutDeviceState extends AdvancedSlideout {
 
@@ -75,7 +75,7 @@ public class SlideoutDeviceState extends AdvancedSlideout {
    /**
     * Sort files by date/time
     */
-   private static class MarkerViewerComparator extends ViewerComparator {
+   private static class OSFileViewerComparator extends ViewerComparator {
 
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
@@ -87,7 +87,7 @@ public class SlideoutDeviceState extends AdvancedSlideout {
       }
    }
 
-   private class MarkerViewerContentProvider implements IStructuredContentProvider {
+   private class OSFileViewerContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -457,8 +457,8 @@ public class SlideoutDeviceState extends AdvancedSlideout {
       /*
        * Create table viewer
        */
-      _osFileViewer.setContentProvider(new MarkerViewerContentProvider());
-      _osFileViewer.setComparator(new MarkerViewerComparator());
+      _osFileViewer.setContentProvider(new OSFileViewerContentProvider());
+      _osFileViewer.setComparator(new OSFileViewerComparator());
    }
 
    /**
