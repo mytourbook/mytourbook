@@ -700,11 +700,11 @@ public class ElevationCompareManager {
        */
       if (navigatedTour == null) {
 
-         final IViewPart yearStatView = activePage.findView(RefTour_StatisticView.ID);
+         final IViewPart yearStatView = activePage.findView(ReferenceTimelineView.ID);
 
-         if (yearStatView instanceof RefTour_StatisticView) {
+         if (yearStatView instanceof ReferenceTimelineView) {
 
-            navigatedTour = ((RefTour_StatisticView) yearStatView).navigateTour(isNextTour);
+            navigatedTour = ((ReferenceTimelineView) yearStatView).navigateTour(isNextTour);
          }
       }
 

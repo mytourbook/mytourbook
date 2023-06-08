@@ -83,7 +83,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class RefTour_StatisticView extends ViewPart implements IGeoCompareListener {
+public class ReferenceTimelineView extends ViewPart implements IGeoCompareListener {
 
    public static final String  ID                                = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
@@ -190,7 +190,7 @@ public class RefTour_StatisticView extends ViewPart implements IGeoCompareListen
    private ActionSyncMinMaxValues             _actionSyncMinMaxValues;
    private ActionYearStatisticOptions         _actionYearStatOptions;
 
-   private YearStatisticTourToolTip           _tourToolTip;
+   private ReferenceTimeline_TourTooltip           _tourToolTip;
    private TourInfoIconToolTipProvider        _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
 
    private PixelConverter                     _pc;
@@ -274,11 +274,11 @@ public class RefTour_StatisticView extends ViewPart implements IGeoCompareListen
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutYearStatisticOptions(RefTour_StatisticView.this, _pageBook, toolbar, PREF_PREFIX, _state);
+         return new SlideoutReferenceTimelineOptions(ReferenceTimelineView.this, _pageBook, toolbar, PREF_PREFIX, _state);
       }
    }
 
-   public RefTour_StatisticView() {}
+   public ReferenceTimelineView() {}
 
    private void addPrefListener() {
 
@@ -854,7 +854,7 @@ public class RefTour_StatisticView extends ViewPart implements IGeoCompareListen
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_yearChart);
 
       // set tour info icon into the left axis
-      _tourToolTip = new YearStatisticTourToolTip(_yearChart.getToolTipControl());
+      _tourToolTip = new ReferenceTimeline_TourTooltip(_yearChart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
       _tourToolTip.addHideListener(event -> {
 
@@ -1328,7 +1328,7 @@ public class RefTour_StatisticView extends ViewPart implements IGeoCompareListen
       _actionShowAllValues.setChecked(_isShowAllValues);
       _actionSyncMinMaxValues.setChecked(_isSynchMinMaxValue);
 
-      final int numVisibleYears = Util.getStateInt(_state, RefTour_StatisticView.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
+      final int numVisibleYears = Util.getStateInt(_state, ReferenceTimelineView.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
       _numVisibleYears = numVisibleYears;
       _spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
 
@@ -1480,10 +1480,10 @@ public class RefTour_StatisticView extends ViewPart implements IGeoCompareListen
       int firstVisibleYear = getFirstVisibleYear();
 
       _barRelativeHeight = Util.getStateInt(_state,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_MIN,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_MAX);
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MIN,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MAX);
 
       // keep/remove current geo compare data
       _currentGeoCompareData = geoCompareData;
@@ -1652,7 +1652,7 @@ public class RefTour_StatisticView extends ViewPart implements IGeoCompareListen
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
 
-            RefTour_StatisticView.this.createToolTipUI(toolTipProvider, parent, valueIndex);
+            ReferenceTimelineView.this.createToolTipUI(toolTipProvider, parent, valueIndex);
          }
       });
 

@@ -119,7 +119,7 @@
             name="%perspective_name_TourBook"/>
 
       <perspective
-            class="net.tourbook.application.PerspectiveFactoryTourCatalog"
+            class="net.tourbook.application.PerspectiveFactoryReferenceTimeline"
             icon="icons/reference-tours-perspective.png"
             id="net.tourbook.perspective.TourCatalog"
             name="%perspective_name_ReferenceTours"/>
@@ -1859,9 +1859,9 @@
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
-            class       ="net.tourbook.ui.views.referenceTour.RefTour_StatisticView"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTimelineView"
             icon        ="icons/tour-map-statistic.png"
-            name        ="%View_Name_RefTour_Statistics"/>
+            name        ="%View_Name_ReferenceTimeline"/>
 
          <view
             category    ="net.tourbook.category.compareTours"

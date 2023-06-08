@@ -1323,12 +1323,12 @@ public class ReferenceTourView extends ViewPart implements
       _tourDoubleClickState.canEditMarker       = isEditableTour;
       _tourDoubleClickState.canAdjustAltitude   = isEditableTour;
 
-      _actionContext_GeoCompare           .setEnabled(isRefItemSelected);
+      _actionContext_GeoCompare           .setEnabled(isOneRefTour);
       _actionContext_Compare_AllTours     .setEnabled(isRefItemSelected);
       _actionContext_Compare_WithWizard   .setEnabled(isRefItemSelected);
 
       _actionContext_RemoveComparedTours  .setEnabled(canRemoveTours);
-      _actionContext_RenameRefTour        .setEnabled(numRefItems == 1 && numTourItems == 0 && numYearItems == 0);
+      _actionContext_RenameRefTour        .setEnabled(isOneRefTour);
 
       _actionContext_EditQuick            .setEnabled(isEditableTour);
       _actionContext_EditTour             .setEnabled(isEditableTour);
@@ -1615,13 +1615,13 @@ public class ReferenceTourView extends ViewPart implements
          GeoCompareManager.setGeoComparing(true, ReferenceTourView.this);
       }
 
-      final TVIRefTour_RefTourItem firstSelectedRefTour = getFirstSelectedRefTour();
-
-      if (firstSelectedRefTour == null) {
+      final Object firstItem = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+      if ((firstItem instanceof TVIRefTour_RefTourItem) == false) {
          return;
       }
 
-      final long refId = firstSelectedRefTour.refId;
+      final TVIRefTour_RefTourItem refTourItem = (TVIRefTour_RefTourItem) firstItem;
+      final long refId = refTourItem.refId;
 
       // load reference tour from the database
       final TourReference referenceTour = ReferenceTourManager.getReferenceTour(refId);
@@ -1647,6 +1647,8 @@ public class ReferenceTourView extends ViewPart implements
       if (geoCompareViewPart instanceof GeoCompareView) {
 
          final GeoCompareView geoCompareView = (GeoCompareView) geoCompareViewPart;
+
+//issue: do not final start or show final geo compared tours
 
          geoCompareView.compareRefTour(refId);
       }

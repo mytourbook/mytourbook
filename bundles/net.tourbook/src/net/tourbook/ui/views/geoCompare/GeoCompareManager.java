@@ -52,18 +52,14 @@ public class GeoCompareManager {
        * Setup comparer executer
        */
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "Comparing geo tours");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "Comparing geo tours");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
 //      System.out.println(String.format(

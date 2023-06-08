@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_ALTIMETER_AVG;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_ALTIMETER_AVG_DEFAULT;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_PULSE_AVG;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_PULSE_AVG_DEFAULT;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_PULSE_AVG_MAX;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_PULSE_AVG_MAX_DEFAULT;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_SPEED_AVG;
-import static net.tourbook.ui.views.referenceTour.RefTour_StatisticView.STATE_SHOW_SPEED_AVG_DEFAULT;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_ALTIMETER_AVG;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_ALTIMETER_AVG_DEFAULT;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG_DEFAULT;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG_MAX;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG_MAX_DEFAULT;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_SPEED_AVG;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_SPEED_AVG_DEFAULT;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
@@ -50,9 +50,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IActionResetToDefault {
+public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private RefTour_StatisticView _refTour_StatisticView;
+   private ReferenceTimelineView _refTour_StatisticView;
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
@@ -73,7 +73,7 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 
    private Spinner _spinnerBarHeight;
 
-   public SlideoutYearStatisticOptions(final RefTour_StatisticView refTour_YearStatistic_View,
+   public SlideoutReferenceTimelineOptions(final ReferenceTimelineView refTour_YearStatistic_View,
                                        final Control ownerControl,
                                        final ToolBar toolBar,
                                        final String prefStoreGridPrefix,
@@ -144,7 +144,7 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
        */
       final Label label = new Label(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(label);
-      label.setText(Messages.Slideout_RefTour_YearStatisticOptions_Label_Title);
+      label.setText(Messages.Slideout_RefTour_Label_ReferenceTimelineOptions);
       MTFont.setBannerFont(label);
    }
 
@@ -275,7 +275,7 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 
       _chkShowSpeed_Avg       .setSelection(true);
 
-      _spinnerBarHeight       .setSelection(RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT);
+      _spinnerBarHeight       .setSelection(ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -296,10 +296,10 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
 // SET_FORMATTING_ON
 
       _spinnerBarHeight.setSelection(Util.getStateInt(_state,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_MIN,
-            RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT_MAX));
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MIN,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MAX));
    }
 
    private void saveState() {
@@ -313,7 +313,7 @@ public class SlideoutYearStatisticOptions extends ToolbarSlideout implements IAc
       _state.put(STATE_SHOW_PULSE_AVG_MAX,   _chkShowPulse_AvgMax    .getSelection());
       _state.put(STATE_SHOW_SPEED_AVG,       _chkShowSpeed_Avg       .getSelection());
 
-      _state.put(RefTour_StatisticView.STATE_RELATIVE_BAR_HEIGHT,  _spinnerBarHeight       .getSelection());
+      _state.put(ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,  _spinnerBarHeight       .getSelection());
 
 // SET_FORMATTING_ON
    }

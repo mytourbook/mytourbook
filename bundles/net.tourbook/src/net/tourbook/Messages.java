@@ -2269,9 +2269,9 @@ public class Messages extends NLS {
    public static String        Slideout_RefTour_Checkbox_Speed_Avg;
    public static String        Slideout_RefTour_Group_Graphs;
    public static String        Slideout_RefTour_Label_BarSize;
+   public static String        Slideout_RefTour_Label_ReferenceTimelineOptions;
    public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
-   public static String        Slideout_RefTour_YearStatisticOptions_Label_Title;
-
+   
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
    public static String        Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;

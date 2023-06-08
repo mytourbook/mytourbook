@@ -623,19 +623,11 @@ public class TourChartView extends ViewPart implements
          return;
       }
 
-      switch (eventId) {
-
-      case SET_COMPARING_ON:
-
-         break;
-
-      case SET_COMPARING_OFF:
-
-         break;
-
-      default:
-         break;
+      if (eventId != GeoCompareEventId.TOUR_IS_GEO_COMPARED) {
+         return;
       }
+
+      // tour is geo compared, check if
    }
 
    @Override
@@ -824,7 +816,6 @@ public class TourChartView extends ViewPart implements
                      refItem.getTourId(),
                      refTour.getStartIndex(),
                      refTour.getEndIndex());
-
             }
 
          } else if (selection instanceof StructuredSelection) {
