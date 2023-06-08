@@ -38,10 +38,10 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -115,7 +115,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -310,6 +310,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private Menu      _tableContextMenu;
 
+   private Image     _imageOptions_Enabled  = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+   private Image     _imageOptions_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+
    private class ActionAppTourFilter extends Action {
 
       public ActionAppTourFilter() {
@@ -328,19 +331,25 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-   public class ActionGeoCompareOptions extends ActionToolbarSlideout {
+   private class ActionGeoCompareOptions extends ActionToolbarSlideoutAdv {
 
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+      public ActionGeoCompareOptions() {
 
-         _slideoutGeoCompareOptions = new SlideoutGeoCompareOptions(_parent, toolbar, _state, GeoCompareView.this);
+         /*
+          * !!! Needed to create images, otherwise they are disposed sometimes and the action
+          * is not displayed in the toolbar, very strange, in other views it works without creating
+          * images !!!
+          */
 
-         return _slideoutGeoCompareOptions;
+         super(_imageOptions_Enabled, _imageOptions_Disabled);
       }
 
       @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+
+         _slideoutGeoCompareOptions = new SlideoutGeoCompareOptions(toolItem, _state, GeoCompareView.this);
+
+         return _slideoutGeoCompareOptions;
       }
    }
 
@@ -1949,6 +1958,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    @Override
    public void dispose() {
 
+      UI.disposeResource(_imageOptions_Enabled);
+      UI.disposeResource(_imageOptions_Disabled);
+
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getSite().getPage().removePartListener(_partListener);
 
@@ -1998,13 +2010,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void fillToolbar() {
 
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+      final IToolBarManager toolbarMrg = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionOnOff);
-      tbm.add(_actionAppTourFilter);
-      tbm.add(_actionGeoCompareOptions);
+      toolbarMrg.add(_actionOnOff);
+      toolbarMrg.add(_actionAppTourFilter);
+      toolbarMrg.add(_actionGeoCompareOptions);
 
-      tbm.update(true);
+      toolbarMrg.update(true);
    }
 
    /**

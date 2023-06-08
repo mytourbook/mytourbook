@@ -859,13 +859,6 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
 
-      System.out.println(UI.timeStamp()
-
-            + "RefTour_ComparedTourView.updateTourChart()  _comparedTour_RefTourId: " + _comparedTour_RefId + "\n"
-
-            + tourCompareConfig);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       if (tourCompareConfig != null) {
 
          _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
