@@ -25,7 +25,7 @@ import utils.Utils;
 public class RawDataViewTests extends UITest {
 
    @Test
-   void testTourTagsView() {
+   void testTourImportView() {
 
       Utils.getTour(bot);
 
