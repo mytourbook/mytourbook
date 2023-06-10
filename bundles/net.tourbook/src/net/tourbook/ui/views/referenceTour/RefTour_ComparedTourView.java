@@ -433,8 +433,10 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       // check initial value
       if (_comparedTour_RefId == -1) {
+
          _actionSynchChartsByScale.setEnabled(false);
          _actionSynchChartsBySize.setEnabled(false);
+
          return;
       }
 
@@ -859,29 +861,28 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
 
-      if (tourCompareConfig != null) {
-
-         _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
-
-         _tourChartConfig.setMinMaxKeeper(true);
-         _tourChartConfig.canShowTourCompareGraph = true;
-         _tourChartConfig.isGeoCompareDiff = tourCompareConfig.isGeoCompareRefTour();
-
-         _isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour();
-
-         updateChart();
-         enableSynchronization();
-         enableActions();
-
-         /*
-          * fire change event to update tour markers
-          */
-         _postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourChart.getTourData()));
-
-         return true;
+      if (tourCompareConfig == null) {
+         return false;
       }
 
-      return false;
+      _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
+
+      _tourChartConfig.setMinMaxKeeper(true);
+      _tourChartConfig.canShowTourCompareGraph = true;
+      _tourChartConfig.isGeoCompare = tourCompareConfig.isGeoCompareRefTour();
+
+      _isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour();
+
+      updateChart();
+      enableSynchronization();
+      enableActions();
+
+      /*
+       * fire change event to update tour markers
+       */
+      _postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourChart.getTourData()));
+
+      return true;
    }
 
    private void updateTourChart_From_ElevationCompareResult(final TVIElevationCompareResult_ComparedTour elevationComparedResultTour) {

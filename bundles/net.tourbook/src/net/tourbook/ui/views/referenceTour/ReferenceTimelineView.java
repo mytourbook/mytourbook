@@ -732,7 +732,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       final String title = tourDate.format(TimeTools.Formatter_Date_F);
 
-      new RefTour_StatisticView_TooltipUI().createContentArea(
+      new ReferenceTimeline_TourTooltipUI().createContentArea(
 
             parent,
             toolTipProvider,

@@ -33,16 +33,13 @@ public class ReferenceTimeline_TourTooltip extends TourToolTip {
       /*
        * Delay tooltip because first the bar must be selected which selects the tour
        */
-      _toolTipControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, new Runnable() {
-         @Override
-         public void run() {
+      _toolTipControl.getDisplay().timerExec(ChartComponents.BAR_SELECTION_DELAY_TIME + 200, () -> {
 
-            if (_toolTipControl.isDisposed()) {
-               return;
-            }
-
-            ReferenceTimeline_TourTooltip.super.show(point);
+         if (_toolTipControl.isDisposed()) {
+            return;
          }
+
+         ReferenceTimeline_TourTooltip.super.show(point);
       });
    }
 

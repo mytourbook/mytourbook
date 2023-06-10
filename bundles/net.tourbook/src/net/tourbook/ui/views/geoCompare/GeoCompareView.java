@@ -36,6 +36,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
@@ -128,9 +129,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    public static final String            ID                                 = "net.tourbook.ui.views.geoCompare.GeoCompareView"; //$NON-NLS-1$
 
-   private static final int              DELAY_BEFORE_STARTING_COMPARE      = 500;
-
-   private static final int              UI_UPDATE_INTERVAL                 = 1000;
+   private static final int              DELAY_BEFORE_STARTING_COMPARE      = 100;
+   private static final int              UI_UPDATE_INTERVAL                 = 500;
 
    static final String                   STATE_DISTANCE_INTERVAL            = "STATE_DISTANCE_INTERVAL";                         //$NON-NLS-1$
    static final String                   STATE_GEO_ACCURACY                 = "STATE_GEO_ACCURACY";                              //$NON-NLS-1$
@@ -298,6 +298,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private Button    _chkGeoFilter_MaxResults;
 
    private Label     _lblCompareStatus;
+   private Label     _lblCompareStatusMessage;
    private Label     _lblGeoFilter_GeoDifference_Unit;
    private Label     _lblGeoFilter_MaxResults_Unit;
    private Label     _lblNumTours;
@@ -915,7 +916,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _compareData_TourTitle = TourManager.getTourTitleDetailed(_compareData_TourData);
 
-      compare_30_StartComparing();
+      // update UI before starting the comparison
+      _display.asyncExec(() -> compare_30_StartComparing());
    }
 
    /**
@@ -1274,13 +1276,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          createUI_30_Col1_Info(container);
          createUI_32_Col2_GeoFilter(container);
 
-         {
-            /*
-             * Label: Status message
-             */
-            _lblCompareStatus = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_lblCompareStatus);
-         }
+         createUI_50_Status(container);
       }
 
    }
@@ -1407,6 +1403,26 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _lblGeoFilter_MaxResults_Unit.setText(UI.SYMBOL_NUMBER_SIGN);
             }
          }
+      }
+   }
+
+   private void createUI_50_Status(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         /*
+          * Status color
+          */
+         _lblCompareStatus = new Label(container, SWT.NONE);
+         _lblCompareStatus.setText(UI.SPACE3);
+
+         /*
+          * Label: Status message
+          */
+         _lblCompareStatusMessage = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblCompareStatusMessage);
       }
    }
 
@@ -2079,6 +2095,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       case SET_COMPARING_OFF:
 
          onAction_OnOff(eventId == GeoCompareEventId.SET_COMPARING_ON);
+
+         break;
       }
    }
 
@@ -2793,22 +2811,42 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void updateUI_State_CancelComparing() {
 
-      _lblCompareStatus.setText(Messages.GeoCompare_View_State_ComparingIsCanceled);
+      _lblCompareStatusMessage.setText(Messages.GeoCompare_View_State_ComparingIsCanceled);
+
+      _lblCompareStatus.setBackground(UI.IS_DARK_THEME
+            ? ThemeUtil.getDefaultBackgroundColor_Table()
+            : ThemeUtil.getDefaultBackgroundColor_Shell());
    }
 
    private void updateUI_State_Progress(final int workedTours, final int numTours) {
 
       if (workedTours == -1 && numTours == -1) {
 
-         _lblCompareStatus.setText(Messages.GeoCompare_View_State_StartComparing);
+         // start comparing
+
+         _lblCompareStatusMessage.setText(Messages.GeoCompare_View_State_StartComparing);
+
+         _lblCompareStatus.setBackground(UI.SYS_COLOR_GREEN);
 
       } else if (workedTours == numTours) {
 
-         _lblCompareStatus.setText(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
+         // comparing is done
+
+         _lblCompareStatusMessage.setText(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
+
+         _lblCompareStatus.setBackground(UI.IS_DARK_THEME
+               ? ThemeUtil.getDefaultBackgroundColor_Table()
+               : ThemeUtil.getDefaultBackgroundColor_Shell());
 
       } else {
 
-         _lblCompareStatus.setText(NLS.bind("Comparing tours: {0} / {1}", workedTours, numTours)); //$NON-NLS-1$
+         // comparing is in progress
+
+         _lblCompareStatusMessage.setText(NLS.bind("Comparing tours: {0} / {1}", workedTours, numTours));
+
+         _lblCompareStatus.setBackground(UI.IS_DARK_THEME
+               ? UI.SYS_COLOR_YELLOW
+               : UI.SYS_COLOR_RED);
       }
    }
 
