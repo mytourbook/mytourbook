@@ -26,6 +26,8 @@ package net.tourbook;
  */
 public class OtherMessages {
 
+// SET_FORMATTING_OFF
+
    public static final String APP_ACTION_CLOSE_TOOLTIP                   = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    public static final String APP_ACTION_RESTORE_DEFAULT                 = net.tourbook.common.Messages.App_Action_RestoreDefault;
 
@@ -113,13 +115,9 @@ public class OtherMessages {
 
    public static final String WEATHER_CLOUDS_SUNNY                       = net.tourbook.common.Messages.Weather_Clouds_Sunny;
 
-// SET_FORMATTING_OFF
-
    public static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_TITLE                            = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_Title;
    public static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES_TOOLTIP   = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip;
    public static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES           = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles;
-
-// SET_FORMATTING_ON
 
    public static final String COLUMN_FACTORY_CATEGORY_BODY                = net.tourbook.ui.Messages.ColumnFactory_Category_Body;
    public static final String COLUMN_FACTORY_CATEGORY_DATA                = net.tourbook.ui.Messages.ColumnFactory_Category_Data;
@@ -169,4 +167,8 @@ public class OtherMessages {
 
    public static final String APP_UNIT_SECONDS_SMALL                      = net.tourbook.Messages.App_Unit_Seconds_Small;
 
+   public static final String THEME_FONT_LOGGING_PREVIEW_TEXT             = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
+   public static final String THEME_FONT_LOGGING                          = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
+
+// SET_FORMATTING_ON
 }

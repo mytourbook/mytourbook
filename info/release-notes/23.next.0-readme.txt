@@ -63,6 +63,10 @@ Improvements
 
 * Tour Chart
   - Slider positions are set to a selected reference tour or geo compared tour
+  
+  
+* Theme
+  - Show theme selector in the app toolbar
 
 Changes
 =======

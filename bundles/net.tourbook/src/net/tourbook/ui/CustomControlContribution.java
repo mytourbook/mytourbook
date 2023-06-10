@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * !!! This is a copy of ControlContribution which will force the height for the toolbar with a
- * image in a push toolitem. this is a really hack but there was no other solution to enlarge the
+ * image in a push toolitem. This is a really hack but there was no other solution to enlarge the
  * height for a toolbar !!!
  */
 public abstract class CustomControlContribution extends ContributionItem {

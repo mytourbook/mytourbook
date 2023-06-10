@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,6 +58,11 @@ public interface ICommonPreferences {
 
    public static final String DISPLAY_FORMAT_IS_LIVE_UPDATE        = "DISPLAY_FORMAT_IS_LIVE_UPDATE";        //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_SELECTED_TAB          = "DISPLAY_FORMAT_SELECTED_TAB";          //$NON-NLS-1$
+
+   /*
+    * Theme
+    */
+   public static final String THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR = "THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR"; //$NON-NLS-1$
 
    /*
     * Timezone

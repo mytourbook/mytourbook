@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";             //$NON-NLS-1$
 
-   private static IPreferenceStore           _prefStoreCommon                = CommonActivator.getPrefStore();
+   private static final IPreferenceStore     _prefStore_Common               = CommonActivator.getPrefStore();
 
    private IWorkbenchWindow                  _window;
 
@@ -78,12 +78,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     */
 //   private IWorkbenchAction               _actionEditActionSets;
 
-   PersonContributionItem                    _personContribItem;
    private ActionTourDataFilter              _actionTour_DataFilter;
    private ActionTourGeoFilter               _actionTour_GeoFilter;
    private ActionTourTagFilter               _actionTour_TagFilter;
+   PersonContributionItem                    _personContribItem;
+   private MeasurementSystemContributionItem _measurement_ContribItem;
+   private ThemeSelectorContributionItem     _themeSelector_ContribItem;
    private TourTypeContributionItem          _tourTypeContribItem;
-   private MeasurementSystemContributionItem _measurementContribItem;
 
    private ActionOtherViews                  _actionOtherViews;
 
@@ -275,16 +276,28 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
          /*
           * Toolbar: Measurement
           */
-         final boolean isShowMeasurement = _prefStoreCommon.getBoolean(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
+         final boolean isShowMeasurement = _prefStore_Common.getBoolean(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
          if (isShowMeasurement) {
 
-            final IToolBarManager tbMgr_System = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-            tbMgr_System.add(_measurementContribItem);
+            final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            tbMgr.add(_measurement_ContribItem);
 
-            final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
-                  tbMgr_System,
-                  "measurementSystem"); //$NON-NLS-1$
+            final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(tbMgr, "measurementSystem"); //$NON-NLS-1$
             coolBar.add(tbItemMeasurement);
+         }
+      }
+      {
+         /*
+          * Toolbar: Theme selector
+          */
+         final boolean isShowThemeSelector = _prefStore_Common.getBoolean(ICommonPreferences.THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR);
+         if (isShowThemeSelector) {
+
+            final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            tbMgr.add(_themeSelector_ContribItem);
+
+            final ToolBarContributionItem tbThemeSelector = new ToolBarContributionItem(tbMgr, "themeSelector"); //$NON-NLS-1$
+            coolBar.add(tbThemeSelector);
          }
       }
 
@@ -314,12 +327,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _window = window;
 
-      _personContribItem = new PersonContributionItem();
       _actionTour_DataFilter = new ActionTourDataFilter();
       _actionTour_GeoFilter = new ActionTourGeoFilter();
       _actionTour_TagFilter = new ActionTourTagFilter();
+
+      _personContribItem = new PersonContributionItem();
+      _measurement_ContribItem = new MeasurementSystemContributionItem();
       _tourTypeContribItem = new TourTypeContributionItem();
-      _measurementContribItem = new MeasurementSystemContributionItem();
+      _themeSelector_ContribItem = new ThemeSelectorContributionItem();
 
       _actionQuit = ActionFactory.QUIT.create(window);
       register(_actionQuit);
