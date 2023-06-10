@@ -169,6 +169,7 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .align(SWT.END, SWT.BEGINNING)
+               .indent(20, 0)
                .applyTo(toolbar);
 
          final ToolBarManager tbm = new ToolBarManager(toolbar);
@@ -182,9 +183,11 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
    private Composite createUI(final Composite parent) {
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(shellContainer);
       GridLayoutFactory.swtDefaults().applyTo(shellContainer);
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
          {
             createUI_40_CompareOptions(container);
@@ -516,6 +519,9 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
 
       onChange_CompareParameter();
       onChange_MapOptions();
+
+      // resize shell to default size
+      _parent.getShell().pack(true);
    }
 
    void restoreState() {
@@ -556,14 +562,14 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
    private void saveState_MapOption() {
 
 // SET_FORMATTING_OFF
-      
+
       _prefStore.setValue(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,     _spinnerMapOption_LineWidth.getSelection());
       _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,   _chkMapOption_TrackOpacity.getSelection());
       _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,      UI.transformOpacity_WhenSaved(_spinnerMapOption_TrackOpacity.getSelection()));
 
       PreferenceConverter.setValue(_prefStore,  ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,    _colorMapOption_ComparedTourPart.getColorValue());
       PreferenceConverter.setValue(_prefStore,  ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,              _colorMapOption_RefTour.getColorValue());
-      
+
 // SET_FORMATTING_ON
    }
 
