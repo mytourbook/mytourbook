@@ -1840,7 +1840,7 @@
             id          ="net.tourbook.views.tourCatalog.CompareResultView"
             class       ="net.tourbook.ui.views.referenceTour.ElevationCompareResultView"
             icon        ="icons/tour-map-compare-result.png"
-            name        ="%view_name_Compare_Result"/>
+            name        ="%View_Name_Compare_ByElevation"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
@@ -1868,7 +1868,7 @@
             id          ="net.tourbook.ui.views.geoCompare.GeoCompareView"
             class       ="net.tourbook.ui.views.geoCompare.GeoCompareView"
             icon        ="icons/geo-parts.png"
-            name        ="%View_Name_Compare_GeoParts"/>
+            name        ="%View_Name_Compare_ByGeoParts"/>
 
 
       <!-- 5. Photo -->    

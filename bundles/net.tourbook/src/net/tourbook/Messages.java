@@ -959,6 +959,7 @@ public class Messages extends NLS {
 
    public static String        Elevation_Compare_Action_AppTourFilter_Tooltip;
    public static String        Elevation_Compare_Action_CompareAllTours;
+   public static String        Elevation_Compare_Action_CompareWithWizard;
    public static String        Elevation_Compare_Action_IsNotUsingAppFilter_Tooltip;
    public static String        Elevation_Compare_Action_IsUsingAppFilter_Tooltip;
    public static String        Elevation_Compare_Action_Layout_WithoutYearCategories_Tooltip;
@@ -1864,10 +1865,10 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateReferenceTour;
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
+
    public static String        RefTour_Action_Link;
    public static String        RefTour_Action_NavigateNextTour;
    public static String        RefTour_Action_NavigatePrevTour;
-   public static String        RefTour_Action_OpenCompareWizard;
    public static String        RefTour_Action_RenameReferenceTour;
    public static String        RefTour_Action_SaveMarker;
    public static String        RefTour_Action_SaveAndNext;
