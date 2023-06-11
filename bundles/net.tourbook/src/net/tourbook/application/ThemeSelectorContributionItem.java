@@ -33,7 +33,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -50,47 +49,45 @@ public class ThemeSelectorContributionItem extends CustomControlContribution {
 
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private IPropertyChangeListener       _prefChangeListener_Common;
+   private IPropertyChangeListener       _prefChangeListener;
 
    private ITheme                        _currentTheme;
    private String                        _defaultThemeId;
    private IThemeEngine                  _themeEngine;
 
-   private ComboViewer                   _comboThemeSelector;
+   private boolean                       _isInUpdate;
+
+   /*
+    * UI controls
+    */
+   private ComboViewer _comboThemeSelector;
 
    public ThemeSelectorContributionItem() {
-      this(ID);
-   }
 
-   protected ThemeSelectorContributionItem(final String id) {
-      super(id);
+      super(ID);
    }
 
    /**
-    * listen for changes in the person list
+    * Listen for changes in the preferences
     */
    private void addPrefListener() {
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR)) {
+         if (property.equals(ICommonPreferences.THEME_IS_THEME_MODIFIED)) {
 
-//               _isFireSelectionEvent = false;
-//               {
-//                  updateUI_MeasurementSystem();
-//               }
-//               _isFireSelectionEvent = true;
+            _isInUpdate = true;
+            {
+               updateUI();
             }
+            _isInUpdate = false;
          }
-
       };
 
       // register the listener
-      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener);
    }
 
    @Override
@@ -128,6 +125,14 @@ public class ThemeSelectorContributionItem extends CustomControlContribution {
       return container;
    }
 
+   @Override
+   public void dispose() {
+
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener);
+
+      super.dispose();
+   }
+
    private void initUI() {
 
       /*
@@ -143,6 +148,10 @@ public class ThemeSelectorContributionItem extends CustomControlContribution {
    }
 
    private void onSelectTheme() {
+
+      if (_isInUpdate) {
+         return;
+      }
 
       final ITheme selectedTheme = (ITheme) (_comboThemeSelector.getStructuredSelection().getFirstElement());
 
@@ -186,6 +195,11 @@ public class ThemeSelectorContributionItem extends CustomControlContribution {
 
       // load combo content
       _comboThemeSelector.setInput(ThemeUtil.getAllThemes());
+
+      updateUI();
+   }
+
+   private void updateUI() {
 
       _currentTheme = _themeEngine.getActiveTheme();
 

@@ -522,6 +522,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          if (isThemeChanged) {
 
+            // fire modify event to update the app toolbar
+            _prefStore_Common.setValue(ICommonPreferences.THEME_IS_THEME_MODIFIED, Math.random());
+
             // an app restart is required for the theme change to take full effect
 
             if (new MessageDialog(
