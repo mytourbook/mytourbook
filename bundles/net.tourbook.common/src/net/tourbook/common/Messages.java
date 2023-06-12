@@ -42,6 +42,7 @@ public class Messages extends NLS {
    public static String        App_Theme_ValueFor_Dark_Tooltip;
 
    public static String        Action_App_CustomizeColumnsAndProfiles;
+   public static String        Action_App_RestartApp_Tooltip;
    public static String        Action_App_SizeAllColumnsToFit;
 
    public static String        Action_ColumnManager_Column_Info;

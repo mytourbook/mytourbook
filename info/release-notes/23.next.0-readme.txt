@@ -67,6 +67,11 @@ Improvements
   
 * Theme
   - Show theme selector in the app toolbar
+    https://github.com/mytourbook/mytourbook/issues/1129
+
+* App
+  - Show a restart action in the app toolbar
+    https://github.com/mytourbook/mytourbook/issues/1130  
 
 Changes
 =======

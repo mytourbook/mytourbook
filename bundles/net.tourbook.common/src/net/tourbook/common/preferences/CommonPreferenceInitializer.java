@@ -109,8 +109,6 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME_SUMMARY,   ValueFormat.TIME_HH.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME_SUMMARY,    ValueFormat.TIME_HH.name());
 
-      store.setDefault(ICommonPreferences.THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR,    false);
-
       /*
        * Time zone
        */

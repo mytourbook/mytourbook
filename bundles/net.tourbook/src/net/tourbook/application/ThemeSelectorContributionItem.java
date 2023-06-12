@@ -114,6 +114,7 @@ public class ThemeSelectorContributionItem extends CustomControlContribution {
          _comboThemeSelector = new ComboViewer(container, SWT.READ_ONLY);
          _comboThemeSelector.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
          _comboThemeSelector.setContentProvider(ArrayContentProvider.getInstance());
+         _comboThemeSelector.getCombo().setToolTipText(Messages.Pref_Appearance_Combo_Theme_Tooltip);
          _comboThemeSelector.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
          GridDataFactory.fillDefaults()
                .grab(true, true)

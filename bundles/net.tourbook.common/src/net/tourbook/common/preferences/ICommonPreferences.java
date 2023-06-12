@@ -18,6 +18,18 @@ package net.tourbook.common.preferences;
 public interface ICommonPreferences {
 
    /*
+    * Appearance
+    */
+   public static final String APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP     = "APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP";     //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP = "APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP"; //$NON-NLS-1$
+
+   /*
+    * Theme
+    */
+   public static final String THEME_IS_THEME_MODIFIED             = "THEME_IS_THEME_MODIFIED";             //$NON-NLS-1$
+   public static final String THEME_IS_SHOW_THEME_SELECTOR_IN_APP = "THEME_IS_SHOW_THEME_SELECTOR_IN_APP"; //$NON-NLS-1$
+
+   /*
     * Measurement system
     */
    public static final String MEASUREMENT_SYSTEM            = "MEASUREMENT_SYSTEM";            //$NON-NLS-1$
@@ -58,12 +70,6 @@ public interface ICommonPreferences {
 
    public static final String DISPLAY_FORMAT_IS_LIVE_UPDATE        = "DISPLAY_FORMAT_IS_LIVE_UPDATE";        //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_SELECTED_TAB          = "DISPLAY_FORMAT_SELECTED_TAB";          //$NON-NLS-1$
-
-   /*
-    * Theme
-    */
-   public static final String THEME_IS_THEME_MODIFIED                  = "THEME_IS_THEME_MODIFIED";                  //$NON-NLS-1$
-   public static final String THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR = "THEME_SHOW_THEME_SELECTOR_IN_APP_TOOLBAR"; //$NON-NLS-1$
 
    /*
     * Timezone
