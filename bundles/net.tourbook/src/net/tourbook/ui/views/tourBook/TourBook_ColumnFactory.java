@@ -3640,7 +3640,8 @@ class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Average);
+            final double value = isTemperatureAvailable((TVITourBookItem) element) ? UI.convertTemperatureFromMetric(
+                  ((TVITourBookItem) element).colTemperature_Average) : 0;
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3653,7 +3654,8 @@ class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Average);
+            final double value = isTemperatureAvailable((TVITourBookItem) element) ? UI.convertTemperatureFromMetric(
+                  ((TVITourBookItem) element).colTemperature_Average) : 0;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3740,7 +3742,8 @@ class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Max);
+            final double value = isTemperatureAvailable((TVITourBookItem) element) ? UI.convertTemperatureFromMetric(
+                  ((TVITourBookItem) element).colTemperature_Max) : 0;
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3753,7 +3756,8 @@ class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Max);
+            final double value = isTemperatureAvailable((TVITourBookItem) element) ? UI.convertTemperatureFromMetric(
+                  ((TVITourBookItem) element).colTemperature_Max) : 0;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3840,7 +3844,8 @@ class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Min);
+            final double value = isTemperatureAvailable((TVITourBookItem) element) ? UI.convertTemperatureFromMetric(
+                  ((TVITourBookItem) element).colTemperature_Min) : 0;
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3853,7 +3858,8 @@ class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Min);
+            final double value = isTemperatureAvailable((TVITourBookItem) element) ? UI.convertTemperatureFromMetric(
+                  ((TVITourBookItem) element).colTemperature_Min) : 0;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -4076,6 +4082,17 @@ class TourBook_ColumnFactory {
          value = tourBookItem.colTemperature_Min;
       }
       return prepareTemperatureValue(value);
+   }
+
+   private boolean isTemperatureAvailable(final TVITourBookItem element) {
+
+      final var temperatureMax = element.colTemperature_Max;
+      final var temperatureMin = element.colTemperature_Min;
+      final var temperatureAvg = element.colTemperature_Average;
+
+      return temperatureAvg != 0 ||
+            temperatureMax != 0 ||
+            temperatureMin != 0;
    }
 
    /**
