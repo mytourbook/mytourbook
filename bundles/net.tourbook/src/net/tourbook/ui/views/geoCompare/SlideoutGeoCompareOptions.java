@@ -89,7 +89,6 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
     */
    private Composite             _parent;
 
-   private Button                _chkGeo_RelativeDifferences_Filter;
    private Button                _chkMapOption_TrackOpacity;
 
    private ColorSelectorExtended _colorMapOption_RefTour;
@@ -102,14 +101,12 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
    private Label                 _lblGeo_NormalizedDistance;
    private Label                 _lblGeo_NormalizedDistance_Unit;
    private Label                 _lblGeo_NormalizedDistance_Value;
-   private Label                 _lblGeo_RelativeDifferences_Filter_Value;
    private Label                 _lblMapOption_ComparedTourPart;
    private Label                 _lblMapOption_LineWidth;
    private Label                 _lblMapOption_RefTour;
 
    private Spinner               _spinnerGeo_Accuracy;
    private Spinner               _spinnerGeo_DistanceInterval;
-   private Spinner               _spinnerGeo_RelativeDifferences_Filter;
    private Spinner               _spinnerMapOption_LineWidth;
    private Spinner               _spinnerMapOption_TrackOpacity;
 
@@ -338,38 +335,6 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
                gridData_Grab_FillCenter.applyTo(_lblGeo_Accuracy_Value);
             }
          }
-         {
-            /*
-             * Relative geographic differences filter
-             */
-            {
-               // Checkbox
-               _chkGeo_RelativeDifferences_Filter = new Button(container, SWT.CHECK);
-               _chkGeo_RelativeDifferences_Filter.setText(Messages.Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter);
-               _chkGeo_RelativeDifferences_Filter.setToolTipText(Messages.Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter_Tooltip);
-               _chkGeo_RelativeDifferences_Filter.addSelectionListener(_compareSelectionListener);
-
-               _firstColumnControls.add(_chkGeo_RelativeDifferences_Filter);
-            }
-            {
-               // Spinner
-               _spinnerGeo_RelativeDifferences_Filter = new Spinner(container, SWT.BORDER);
-               _spinnerGeo_RelativeDifferences_Filter.setMinimum(1);
-               _spinnerGeo_RelativeDifferences_Filter.setMaximum(100);
-               _spinnerGeo_RelativeDifferences_Filter.setPageIncrement(10);
-               _spinnerGeo_RelativeDifferences_Filter.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_RelativeDifferences_Filter.addMouseWheelListener(_compareMouseWheelListener);
-               gridData_EndFill.applyTo(_spinnerGeo_RelativeDifferences_Filter);
-
-               _secondColumnControls.add(_spinnerGeo_RelativeDifferences_Filter);
-            }
-            {
-               // geo differences percentage value
-               _lblGeo_RelativeDifferences_Filter_Value = new Label(container, SWT.NONE);
-               _lblGeo_RelativeDifferences_Filter_Value.setText(UI.UNIT_PERCENT);
-               gridData_Grab_FillCenter.applyTo(_lblGeo_RelativeDifferences_Filter_Value);
-            }
-         }
       }
    }
 
@@ -476,24 +441,19 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
       final boolean isGeoCompareActive = GeoCompareManager.isGeoComparing();
 
       final boolean isTrackOpacity = _chkMapOption_TrackOpacity.getSelection();
-      final boolean isGeoFilter = _chkGeo_RelativeDifferences_Filter.getSelection();
 
       _spinnerMapOption_TrackOpacity.setEnabled(isTrackOpacity);
-
-      _chkGeo_RelativeDifferences_Filter.setEnabled(isGeoCompareActive);
 
       _lblGeo_DistanceInterval.setEnabled(isGeoCompareActive);
       _lblGeo_DistanceInterval_Unit.setEnabled(isGeoCompareActive);
       _lblGeo_Accuracy.setEnabled(isGeoCompareActive);
       _lblGeo_Accuracy_Value.setEnabled(isGeoCompareActive);
-      _lblGeo_RelativeDifferences_Filter_Value.setEnabled(isGeoCompareActive);
       _lblGeo_NormalizedDistance.setEnabled(isGeoCompareActive);
       _lblGeo_NormalizedDistance_Value.setEnabled(isGeoCompareActive);
       _lblGeo_NormalizedDistance_Unit.setEnabled(isGeoCompareActive);
 
       _spinnerGeo_DistanceInterval.setEnabled(isGeoCompareActive);
       _spinnerGeo_Accuracy.setEnabled(isGeoCompareActive);
-      _spinnerGeo_RelativeDifferences_Filter.setEnabled(isGeoCompareActive && isGeoFilter);
    }
 
    private void initUI(final Composite parent) {
@@ -501,14 +461,12 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
       parent.addDisposeListener(disposeEvent -> onDisposeSlideout());
 
       _compareSelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_CompareParameter());
-
       _compareMouseWheelListener = mouseEvent -> {
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onChange_CompareParameter();
       };
 
       _mapOptions_SelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_MapOptions());
-
       _mapOptions_MouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onChange_MapOptions();
@@ -559,9 +517,6 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
       _spinnerGeo_DistanceInterval                    .setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
       _spinnerGeo_Accuracy                            .setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
 
-      _chkGeo_RelativeDifferences_Filter              .setSelection(GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER);
-      _spinnerGeo_RelativeDifferences_Filter          .setSelection(GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER);
-
       /*
        * Map options
        */
@@ -587,11 +542,8 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
 
       _geoAccuracy = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY, GeoCompareView.DEFAULT_GEO_ACCURACY);
 
-      _spinnerGeo_Accuracy                   .setSelection(_geoAccuracy);
-      _spinnerGeo_DistanceInterval           .setSelection(Util.getStateInt(_state,       GeoCompareView.STATE_DISTANCE_INTERVAL,                  GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
-
-      _chkGeo_RelativeDifferences_Filter     .setSelection(Util.getStateBoolean(_state,   GeoCompareView.STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER, GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER));
-      _spinnerGeo_RelativeDifferences_Filter .setSelection(Util.getStateInt(_state,       GeoCompareView.STATE_GEO_RELATIVE_DIFFERENCES_FILTER,    GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER));
+      _spinnerGeo_Accuracy                .setSelection(_geoAccuracy);
+      _spinnerGeo_DistanceInterval        .setSelection(Util.getStateInt(_state,       GeoCompareView.STATE_DISTANCE_INTERVAL,                  GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
 
       /*
        * Map options
@@ -623,9 +575,6 @@ class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelecto
 
       _state.put(GeoCompareView.STATE_GEO_ACCURACY,                        _geoAccuracy);
       _state.put(GeoCompareView.STATE_DISTANCE_INTERVAL,                   _spinnerGeo_DistanceInterval.getSelection());
-
-      _state.put(GeoCompareView.STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER,  _chkGeo_RelativeDifferences_Filter.getSelection());
-      _state.put(GeoCompareView.STATE_GEO_RELATIVE_DIFFERENCES_FILTER,     _spinnerGeo_RelativeDifferences_Filter.getSelection());
    }
 
 // SET_FORMATTING_ON

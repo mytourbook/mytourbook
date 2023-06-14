@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.Event;
  */
 public class SelectionCellLabelProvider extends StyledCellLabelProvider {
 
-   private Color _selectionColor = new Color(111, 111, 111);
+   private Color _selectionColor = new Color(0x60, 0x60, 0x60);
 
-   private Color _hoveredColor             = new Color(177, 77, 77);
-   private Color _hoveredAndSelectionColor = new Color(54, 85, 108);
+//   private Color _hoveredColor             = new Color(177, 77, 77);
+//   private Color _hoveredAndSelectionColor = new Color(54, 85, 108);
 
    @Override
    protected void erase(final Event event, final Object element) {

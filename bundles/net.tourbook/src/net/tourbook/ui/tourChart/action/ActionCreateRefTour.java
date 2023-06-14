@@ -29,7 +29,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -49,8 +49,8 @@ public class ActionCreateRefTour extends Action {
 
    public ActionCreateRefTour(final TourChart tourChart) {
 
-      setText(Messages.tourCatalog_view_action_create_reference_tour);
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCatalog_RefTour_New));
+      setText(Messages.RefTour_Action_CreateReferenceTour);
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_New));
 
       _tourChart = tourChart;
    }
@@ -68,8 +68,8 @@ public class ActionCreateRefTour extends Action {
       // get the reference tour name
       final InputDialog dialog = new InputDialog(
             Display.getCurrent().getActiveShell(),
-            Messages.tourCatalog_view_dlg_add_reference_tour_title,
-            Messages.tourCatalog_view_dlg_add_reference_tour_msg,
+            Messages.RefTour_Dialog_AddReferenceTour_Title,
+            Messages.RefTour_Dialog_AddReferenceTour_Message,
             UI.EMPTY_STRING,
             null);
 
@@ -102,7 +102,7 @@ public class ActionCreateRefTour extends Action {
             workbench.showPerspective(PerspectiveFactoryTourCatalog.PERSPECTIVE_ID, wbWindow);
 
             // show ref tour view
-            Util.showView(TourCatalogView.ID, true);
+            Util.showView(ReferenceTourView.ID, true);
 
             // update reference tour view
             TourManager.fireEvent(TourEventId.REFERENCE_TOUR_IS_CREATED, new TourEvent(savedTourData));

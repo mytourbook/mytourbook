@@ -169,10 +169,10 @@ public final class SQL {
                + sqlStatementWithNumber + UI.NEW_LINE2
                + Util.getSQLExceptionText(exception);
 
-         SQLMessageDialog.openError(display.getActiveShell(), "SQL Error", message); //$NON-NLS-1$
-
          StatusUtil.logError(message);
          StatusUtil.log(exception);
+
+         SQLMessageDialog.openError(display.getActiveShell(), "SQL Error", message); //$NON-NLS-1$
       });
    }
 }

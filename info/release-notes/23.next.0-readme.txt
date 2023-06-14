@@ -4,6 +4,8 @@
 TODO's
 ======               
 
+* AirQuality      - German translation https://github.com/mytourbook/mytourbook/issues/1124
+
 * Tour Chart      - Check "Grid/Units" and "Options" tab in pref page "Appearance/Tour Chart" if something is obsolete
 
 
@@ -38,8 +40,29 @@ New
 Improvements
 ============
 
-*
+* Tour Book Flat View
+  - New sortable columns: Average speed and pace
+    https://github.com/mytourbook/mytourbook/discussions/1117
+    
+* 2D Map
+  - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed
 
+* Reference Tour View
+  - Autoexpand/collapse when selected with the mouse
+  - Expand one category item and collapse others
+  - New coloumn: Flag if a tour contains geo data
+  
+* Geo Compare View
+  - Display tour filter in the main view
+  - New filter: Filter compared tours by sequence number
+  - New columns: Elevation gain/loss
+
+* Year Statistic View
+  - Show geo compared tours instantly when they are modified
+  - Filter compared tours in the "Geo Compare View"
+
+* Tour Chart
+  - Slider positions are set to a selected reference tour or geo compared tour
 
 Changes
 =======

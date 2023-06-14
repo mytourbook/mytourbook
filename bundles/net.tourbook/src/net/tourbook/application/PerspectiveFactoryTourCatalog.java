@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,12 +24,12 @@ import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
+import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
+import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
+import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
+import net.tourbook.ui.views.referenceTour.RefTour_YearStatistic_View;
+import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 import net.tourbook.ui.views.tourBook.TourBookView;
-import net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
-import net.tourbook.ui.views.tourCatalog.TourCompareResultView;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -53,10 +53,11 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
       layout.setEditorAreaVisible(false);
 
-      layout.addShowViewShortcut(TourCompareResultView.ID);
-      layout.addShowViewShortcut(TourCatalogView.ID);
-      layout.addShowViewShortcut(TourCatalogView_ComparedTour.ID);
-      layout.addShowViewShortcut(TourCatalogView_ReferenceTour.ID);
+      layout.addShowViewShortcut(GeoCompareView.ID);
+      layout.addShowViewShortcut(ElevationCompareResultView.ID);
+      layout.addShowViewShortcut(ReferenceTourView.ID);
+      layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
+      layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
       layout.addShowViewShortcut(RefTour_YearStatistic_View.ID);
 
 // SET_FORMATTING_OFF
@@ -69,8 +70,8 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
             IPageLayout.LEFT, 0.4f, IPageLayout.ID_EDITOR_AREA);
 
-      folderTourDirectory.addView(TourCatalogView.ID);
-      folderTourDirectory.addPlaceholder(TourCompareResultView.ID);
+      folderTourDirectory.addView(ReferenceTourView.ID);
+      folderTourDirectory.addPlaceholder(ElevationCompareResultView.ID);
       folderTourDirectory.addPlaceholder(TourBookView.ID);
       folderTourDirectory.addPlaceholder(CalendarView.ID);
       folderTourDirectory.addPlaceholder(StatisticView.ID);
@@ -101,7 +102,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
             IPageLayout.TOP, 0.5f, IPageLayout.ID_EDITOR_AREA);
 
-      refChartFolder.addView(TourCatalogView_ReferenceTour.ID);
+      refChartFolder.addView(RefTour_ReferenceTourView.ID);
 
       //--------------------------------------------------------------------------------
 
@@ -109,7 +110,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
             IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_CHART_REF_Tour);
 
-      folderComparedTourChart.addView(TourCatalogView_ComparedTour.ID);
+      folderComparedTourChart.addView(RefTour_ComparedTourView.ID);
 
       //--------------------------------------------------------------------------------
 

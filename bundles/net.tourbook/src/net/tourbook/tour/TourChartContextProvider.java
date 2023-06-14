@@ -85,17 +85,17 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		_actionCreateRefTour = new ActionCreateRefTour(tourChart);
 
 		_actionCreateMarker = new ActionCreateMarkerFromSlider(this, //
-				Messages.tourCatalog_view_action_create_marker,
+				Messages.RefTour_Action_CreaateMarker,
 				true);
 
 		_actionCreateMarkerLeft = new ActionCreateMarkerFromSlider(
 				this,
-				Messages.tourCatalog_view_action_create_left_marker,
+				Messages.RefTour_Action_CreateLeftMarker,
 				true);
 
 		_actionCreateMarkerRight = new ActionCreateMarkerFromSlider(
 				this,
-				Messages.tourCatalog_view_action_create_right_marker,
+				Messages.RefTour_Action_CreateRightMarker,
 				false);
 
 		_actionSetTourType = new ActionSetTourTypeMenu(this);

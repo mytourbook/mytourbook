@@ -29,12 +29,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
@@ -47,33 +49,36 @@ import net.tourbook.ui.views.tourBook.TourBookView.TourCollectionFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char                              NL                             = net.tourbook.common.UI.NEW_LINE;
 
-   private static final String                            SQL_ASCENDING         = "ASC";                           //$NON-NLS-1$
-   private static final String                            SQL_DESCENDING        = "DESC";                          //$NON-NLS-1$
+   private static final IPreferenceStore                  _prefStore                     = TourbookPlugin.getPrefStore();
 
-   private static final String                            SQL_DEFAULT_FIELD     = "TourStartTime";                 //$NON-NLS-1$
+   private static final String                            SQL_ASCENDING                  = "ASC";                           //$NON-NLS-1$
+   private static final String                            SQL_DESCENDING                 = "DESC";                          //$NON-NLS-1$
+
+   private static final String                            SQL_DEFAULT_FIELD              = "TourStartTime";                 //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
-   public static final String                             FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
+   public static final String                             FIELD_WITHOUT_SORTING          = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
 
-   private static int                                     FETCH_SIZE            = 1_000;
+   private static int                                     FETCH_SIZE                     = 1_000;
 
-   private static final SQLData                           EMPTY_SQL_DATA        = new SQLData();
+   private static final SQLData                           EMPTY_SQL_DATA                 = new SQLData();
 
-   private static final ExecutorService                   _loadingExecutor      = createExecuter_TourLoading();
-   private static final ExecutorService                   _rowIndexExecutor     = createExecuter_TourId_RowIndex();
+   private static final ExecutorService                   _loadingExecutor               = createExecuter_TourLoading();
+   private static final ExecutorService                   _rowIndexExecutor              = createExecuter_TourId_RowIndex();
 
-   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched  = new ConcurrentHashMap<>();
-   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading  = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched           = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading           = new ConcurrentHashMap<>();
 
    /**
     * Relation between row position and tour item
@@ -81,7 +86,7 @@ public class NatTable_DataLoader {
     * Key: Row position<br>
     * Value: {@link TVITourBookTour}
     */
-   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems     = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems              = new ConcurrentHashMap<>();
 
    /**
     * Relation between tour id and row position
@@ -89,14 +94,15 @@ public class NatTable_DataLoader {
     * Key: Tour ID <br>
     * Value: Row position
     */
-   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex     = new ConcurrentHashMap<>();
-   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue   = new LinkedBlockingDeque<>();
+   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex              = new ConcurrentHashMap<>();
+   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue            = new LinkedBlockingDeque<>();
 
    private String[]                                       _allSortColumnIds;
    private List<SortDirectionEnum>                        _allSortDirections;
 
-   private ArrayList<String>                              _allSqlSortFields     = new ArrayList<>();
-   private ArrayList<String>                              _allSqlSortDirections = new ArrayList<>();
+   private ArrayList<String>                              _allSqlSortFields_OrderBy      = new ArrayList<>();
+   private ArrayList<String>                              _allSqlSortFields_SelectFields = new ArrayList<>();
+   private ArrayList<String>                              _allSqlSortDirections          = new ArrayList<>();
 
    /**
     * Contains all columns (also hidden columns), sorted in the order how they are displayed in the
@@ -107,7 +113,7 @@ public class NatTable_DataLoader {
    /**
     * Number of all tours for the current lazy loader
     */
-   private int                                            _numAllTourItems      = -1;
+   private int                                            _numAllTourItems               = -1;
    private int                                            _numToursWithoutCollectionFilter;
 
    private TourBookView                                   _tourBookView;
@@ -120,7 +126,7 @@ public class NatTable_DataLoader {
     */
    private long[]                                         _allTourIds;
 
-   private SQLData                                        _tourCollectionFilter = EMPTY_SQL_DATA;
+   private SQLData                                        _tourCollectionFilter          = EMPTY_SQL_DATA;
 
    public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
 
@@ -128,6 +134,8 @@ public class NatTable_DataLoader {
       _columnManager = columnManager;
 
       createColumnHeaderData();
+
+      TourDatabase.getInstance().setupDerbyCustomFunctions_AvgSpeedPace();
    }
 
    private static ExecutorService createExecuter_TourId_RowIndex() {
@@ -212,34 +220,9 @@ public class NatTable_DataLoader {
       return allRowIndices.toArray();
    }
 
-   private String createSql_Sorting_Fields() {
-
-      final int numOrderFields = _allSqlSortFields.size();
-
-      if (numOrderFields == 0) {
-         return UI.EMPTY_STRING;
-      }
-
-      final StringBuilder sb = new StringBuilder();
-
-      for (int fieldIndex = 0; fieldIndex < numOrderFields; fieldIndex++) {
-
-         final String fieldName = _allSqlSortFields.get(fieldIndex);
-
-         if (fieldIndex > 0) {
-            // separate from previous field
-            sb.append(UI.COMMA_SPACE + NL);
-         }
-
-         sb.append(fieldName);
-      }
-
-      return sb.toString();
-   }
-
    private String createSql_Sorting_OrderBy() {
 
-      final int numOrderFields = _allSqlSortFields.size();
+      final int numOrderFields = _allSqlSortFields_OrderBy.size();
 
       if (numOrderFields == 0) {
          return UI.EMPTY_STRING;
@@ -251,15 +234,42 @@ public class NatTable_DataLoader {
 
       for (int fieldIndex = 0; fieldIndex < numOrderFields; fieldIndex++) {
 
-         final String fieldName = _allSqlSortFields.get(fieldIndex);
+         final String fieldName = _allSqlSortFields_OrderBy.get(fieldIndex);
          final String sortDirection = _allSqlSortDirections.get(fieldIndex);
 
          if (fieldIndex > 0) {
+
             // separate from previous order item
             sb.append(UI.COMMA_SPACE + NL);
          }
 
          sb.append(fieldName + UI.SPACE + sortDirection);
+      }
+
+      return sb.toString();
+   }
+
+   private String createSql_Sorting_SelectFields() {
+
+      final int numSelectFields = _allSqlSortFields_SelectFields.size();
+
+      if (numSelectFields == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (int fieldIndex = 0; fieldIndex < numSelectFields; fieldIndex++) {
+
+         final String fieldName = _allSqlSortFields_SelectFields.get(fieldIndex);
+
+         if (fieldIndex > 0) {
+
+            // separate from previous field
+            sb.append(UI.COMMA_SPACE + NL);
+         }
+
+         sb.append(fieldName);
       }
 
       return sb.toString();
@@ -279,7 +289,7 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         final String sqlSortingFieldsRaw = createSql_Sorting_Fields();
+         final String sqlSelectFields_Raw = createSql_Sorting_SelectFields();
 
          if (TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr()) {
 
@@ -287,15 +297,15 @@ public class NatTable_DataLoader {
 
             final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
-            String sqlSortingFields_1 = sqlSortingFieldsRaw;
-            if (sqlSortingFields_1.length() > 0) {
-               sqlSortingFields_1 += UI.COMMA_SPACE + NL;
+            String sqlSelectFields_1 = sqlSelectFields_Raw;
+            if (sqlSelectFields_1.length() > 0) {
+               sqlSelectFields_1 += UI.COMMA_SPACE + NL;
             }
 
             sql = NL
 
                   + " SELECT DISTINCT TourId," + NL //                                                      //$NON-NLS-1$
-                  + "   " + sqlSortingFields_1 //                                                           //$NON-NLS-1$
+                  + "   " + sqlSelectFields_1 //                                                            //$NON-NLS-1$
                   + "   jTdataTtag.TourTag_tagId" + NL //                                                   //$NON-NLS-1$
 
                   + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                         //$NON-NLS-1$
@@ -323,21 +333,21 @@ public class NatTable_DataLoader {
             final SQLFilter sqlFilter = new SQLFilter();
             final SQLData sqlCombineTagsWithAnd = TourTagFilterSqlJoinBuilder.createSql_CombineTagsWithAnd();
 
-            String sqlSortingFields_2 = sqlSortingFieldsRaw;
-            if (sqlSortingFields_2.length() > 0) {
-               sqlSortingFields_2 = UI.COMMA_SPACE + sqlSortingFields_2 + NL;
+            String sqlSelectFields_2 = sqlSelectFields_Raw;
+            if (sqlSelectFields_2.length() > 0) {
+               sqlSelectFields_2 = UI.COMMA_SPACE + sqlSelectFields_2 + NL;
             }
 
             sql = NL
 
                   + " SELECT DISTINCT TourId" + NL //                                                    //$NON-NLS-1$
-                  + "   " + sqlSortingFields_2 //                                                        //$NON-NLS-1$
+                  + "   " + sqlSelectFields_2 //                                                        //$NON-NLS-1$
 
                   + " FROM" + NL //                                                                      //$NON-NLS-1$
                   + " ( SELECT" + NL //                                                                  //$NON-NLS-1$
                   + "      TourId," + NL //                                                              //$NON-NLS-1$
                   + "      jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
-                  + "      " + sqlSortingFields_2 //                                                     //$NON-NLS-1$
+                  + "      " + sqlSelectFields_2 //                                                     //$NON-NLS-1$
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
                   + "   " + sqlCombineTagsWithAnd.getSqlString() //                                      //$NON-NLS-1$
                   + "   AS jTdataTtag" + NL //                                                           //$NON-NLS-1$
@@ -820,7 +830,17 @@ public class NatTable_DataLoader {
     * @param sortColumnId
     * @return Returns database field
     */
-   public String getSqlField(final String sortColumnId) {
+   public String getSqlField_OrderBy(final String sortColumnId) {
+
+      /*
+       * Compute average speed/pace with derby custom functions
+       */
+      final String timeField = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)
+            ? "tourDeviceTime_Recorded" //$NON-NLS-1$
+            : "tourComputedTime_Moving"; //$NON-NLS-1$
+
+      final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sortByPace = "avgPace(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_OFF
 
@@ -890,8 +910,8 @@ public class NatTable_DataLoader {
       /*
        * MOTION
        */
-      case TableColumnFactory.MOTION_AVG_PACE_ID:                    return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.MOTION_AVG_PACE_ID:                    return sortByPace;
+      case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return sortByAvgSpeed;
       case TableColumnFactory.MOTION_DISTANCE_ID:                    return "tourDistance";           //$NON-NLS-1$
       case TableColumnFactory.MOTION_MAX_SPEED_ID:                   return "maxSpeed";               //$NON-NLS-1$
 
@@ -1015,6 +1035,37 @@ public class NatTable_DataLoader {
       }
 
    // SET_FORMATTING_ON
+   }
+
+   /**
+    * Maps column field -> database field
+    *
+    * @param sortColumnId
+    * @return Returns database field
+    */
+   private String getSqlField_SelectFields(final String sortColumnId) {
+
+      final String timeField = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)
+            ? "tourDeviceTime_Recorded" //$NON-NLS-1$
+            : "tourComputedTime_Moving"; //$NON-NLS-1$
+
+      final String speedPace_SelectFields = timeField + ", tourDistance"; //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+      switch (sortColumnId) {
+
+      /*
+       * MOTION
+       */
+      case TableColumnFactory.MOTION_AVG_PACE_ID:        return speedPace_SelectFields;
+      case TableColumnFactory.MOTION_AVG_SPEED_ID:       return speedPace_SelectFields;
+
+      }
+
+// SET_FORMATTING_ON
+
+      return null;
    }
 
    /**
@@ -1174,8 +1225,6 @@ public class NatTable_DataLoader {
       }
    }
 
-
-
    /**
     * Sets sort column id/direction but first cleanup the previous loaded tours.
     *
@@ -1190,17 +1239,23 @@ public class NatTable_DataLoader {
       _allSortColumnIds = allSortColumnIds;
       _allSortDirections = allSortDirections;
 
-      _allSqlSortFields.clear();
+      _allSqlSortFields_OrderBy.clear();
+      _allSqlSortFields_SelectFields.clear();
       _allSqlSortDirections.clear();
 
       final int numSortColumns = allSortDirections.size();
 
       for (int columnIndex = 0; columnIndex < numSortColumns; columnIndex++) {
 
-         final String sqlField = getSqlField(allSortColumnIds[columnIndex]);
+         final String sortColumnId = allSortColumnIds[columnIndex];
 
-         // ensure that the dummy field is not used in the sql statement, this should not happen but it did during development
-         if (FIELD_WITHOUT_SORTING.equals(sqlField) == false) {
+         final String sqlField_OrderBy = getSqlField_OrderBy(sortColumnId);
+
+         /*
+          * Ensure that the dummy field is not used in the sql statement, this should not happen but
+          * it did during development
+          */
+         if (FIELD_WITHOUT_SORTING.equals(sqlField_OrderBy) == false) {
 
             final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
 
@@ -1217,10 +1272,25 @@ public class NatTable_DataLoader {
                }
 
                /*
-                * Set sort field
+                * Set sort field(s)
                 */
-               _allSqlSortFields.add(sqlField);
+               _allSqlSortFields_OrderBy.add(sqlField_OrderBy);
+
+               final String sqlField_SelectFields = getSqlField_SelectFields(sortColumnId);
+               if (sqlField_SelectFields != null) {
+
+                  // use special "select" fields
+
+                  _allSqlSortFields_SelectFields.add(sqlField_SelectFields);
+
+               } else {
+
+                  // use "order by" fields
+
+                  _allSqlSortFields_SelectFields.add(sqlField_OrderBy);
+               }
             }
+
          }
       }
    }

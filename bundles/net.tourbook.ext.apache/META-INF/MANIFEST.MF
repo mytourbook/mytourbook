@@ -19,8 +19,10 @@ Bundle-ClassPath: derby-10.14.2.jar,
  lucene-misc-7.5.0.jar,
  lucene-queries-7.5.0.jar,
  lucene-queryparser-7.5.0.jar,
- lucene-suggest-7.5.0.jar
-Export-Package: org.apache.derby.agg,
+ lucene-suggest-7.5.0.jar,
+ mytourbook-derby-functions.jar
+Export-Package: net.tourbook.ext.apache.custom,
+ org.apache.derby.agg,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
  org.apache.derby.catalog.types,

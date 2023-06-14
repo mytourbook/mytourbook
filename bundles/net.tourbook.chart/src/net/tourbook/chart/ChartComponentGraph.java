@@ -5827,12 +5827,10 @@ public class ChartComponentGraph extends Canvas {
 
    private void drawSync_415_XSliderArea(final GC gc) {
 
-      final Display display = getDisplay();
-
-//      final int rgb = 0xa0;
-//      final Color colorXMarker = new Color(display, rgb, rgb, rgb);
-
-      final Color colorXMarker = new Color(0x91, 0xC7, 0xFF);
+      final Color fgColor = new Color(0x91, 0xC7, 0xFF);
+      final Color bgColor = UI.IS_DARK_THEME
+            ? new Color(46, 111, 178)
+            : UI.SYS_COLOR_WHITE;
 
       // draw x-marker for each graph
       for (final GraphDrawingData drawingData : _allGraphDrawingData) {
@@ -5858,17 +5856,30 @@ public class ChartComponentGraph extends Canvas {
          final int devYBottom = drawingData.getDevYBottom();
 
          // draw area
-         gc.setForeground(colorXMarker);
-         gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+         gc.setForeground(fgColor);
+         gc.setBackground(bgColor);
 
-         gc.setAlpha(0x80);
+         if (UI.IS_DARK_THEME) {
 
-         gc.fillGradientRectangle(//
-               devXStart,
-               devYBottom,
-               devXEnd - devXStart,
-               devYTop - devYBottom,
-               true);
+            gc.setAlpha(0x60);
+
+            gc.fillRectangle(
+                  devXStart,
+                  devYBottom,
+                  devXEnd - devXStart,
+                  devYTop - devYBottom);
+
+         } else {
+
+            gc.setAlpha(0x80);
+
+            gc.fillGradientRectangle(
+                  devXStart,
+                  devYBottom,
+                  devXEnd - devXStart,
+                  devYTop - devYBottom,
+                  true);
+         }
 
          gc.setAlpha(0xff);
       }
@@ -9475,13 +9486,16 @@ public class ChartComponentGraph extends Canvas {
          // set focus to first bar item
 
          if (_allGraphDrawingData.isEmpty()) {
+
             _selectedBarItems = null;
+
          } else {
 
             final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(0);
             final ChartDataXSerie xData = graphDrawingData.getXData();
+            final int numBars = xData._highValuesDouble[0].length;
 
-            _selectedBarItems = new boolean[xData._highValuesDouble[0].length];
+            _selectedBarItems = new boolean[numBars];
          }
 
       } else {

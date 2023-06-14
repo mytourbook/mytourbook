@@ -28,6 +28,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourReference;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
@@ -51,13 +52,15 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
+import net.tourbook.ui.views.referenceTour.CompareConfig;
+import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -376,7 +379,7 @@ public class TourChartView extends ViewPart implements
 
                   && eventData instanceof ISelection) {
 
-               if (part instanceof TourCatalogView_ComparedTour) {
+               if (part instanceof RefTour_ComparedTourView) {
 
                   // ignore -> this would modify the geo compare tour
 
@@ -798,37 +801,70 @@ public class TourChartView extends ViewPart implements
 
             _tourChart.selectXSliders(xSliderPosition);
 
-         } else if (selection instanceof SelectionTourCatalogView) {
+         } else if (selection instanceof SelectionReferenceTourView) {
 
-            final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+            final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
-            final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+            final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
             if (refItem != null) {
-               updateChart(refItem.getTourId());
+
+               final long refId = refItem.refId;
+
+               final CompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+               if (compareConfig == null) {
+                  return;
+               }
+
+               final TourReference refTour = compareConfig.getRefTour();
+               if (refTour == null) {
+                  return;
+               }
+
+               updateChart(
+                     refItem.getTourId(),
+                     refTour.getStartIndex(),
+                     refTour.getEndIndex());
+
             }
 
          } else if (selection instanceof StructuredSelection) {
 
             final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-            if (firstElement instanceof TVICatalogComparedTour) {
 
-               updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+            if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            } else if (firstElement instanceof TVICompareResultComparedTour) {
+               final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
 
-               final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-               final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
+               final GeoComparedTour geoComparedTour = comparedTour.getGeoCompareTour();
+
+               if (geoComparedTour != null) {
+
+                  updateChart(
+                        geoComparedTour.tourId,
+                        geoComparedTour.tourFirstIndex,
+                        geoComparedTour.tourLastIndex);
+
+               } else {
+
+                  updateChart(comparedTour.getTourId());
+               }
+
+            } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) firstElement;
+               final Long tourId = compareResultItem.getTourId();
+               final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
                updateChart(tourData);
 
-            } else if (firstElement instanceof GeoPartComparerItem) {
+            } else if (firstElement instanceof GeoComparedTour) {
 
-               final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
+               final GeoComparedTour geoComparedTour = (GeoComparedTour) firstElement;
 
                updateChart(
-                     geoCompareItem.tourId,
-                     geoCompareItem.tourFirstIndex,
-                     geoCompareItem.tourLastIndex);
-
+                     geoComparedTour.tourId,
+                     geoComparedTour.tourFirstIndex,
+                     geoComparedTour.tourLastIndex);
             }
 
          } else if (selection instanceof PhotoSelection) {

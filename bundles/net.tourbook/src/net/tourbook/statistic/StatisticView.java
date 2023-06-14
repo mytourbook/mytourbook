@@ -187,7 +187,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _statView = statView;
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
-         setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
+         setToolTipText(Messages.RefTour_Action_SyncChartYears_Tooltip);
       }
 
       @Override

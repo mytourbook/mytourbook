@@ -71,22 +71,22 @@ class DialogMarkerTourChartContextProvider implements IChartContextProvider, IMa
 
       _actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
             this,
-            Messages.tourCatalog_view_action_create_marker,
+            Messages.RefTour_Action_CreaateMarker,
             true);
 
       _actionCreateMarkerFromSliderLeft = new ActionCreateMarkerFromSlider(
             this,
-            Messages.tourCatalog_view_action_create_left_marker,
+            Messages.RefTour_Action_CreateLeftMarker,
             true);
 
       _actionCreateMarkerFromSliderRight = new ActionCreateMarkerFromSlider(
             this,
-            Messages.tourCatalog_view_action_create_right_marker,
+            Messages.RefTour_Action_CreateRightMarker,
             false);
 
       _actionCreateMarkerFromValuePoint = new ActionCreateMarkerFromValuePoint(
             this,
-            Messages.tourCatalog_view_action_create_marker);
+            Messages.RefTour_Action_CreaateMarker);
 
       _actionCreateMarkerFromSlider.setMarkerReceiver(this);
       _actionCreateMarkerFromSliderLeft.setMarkerReceiver(this);

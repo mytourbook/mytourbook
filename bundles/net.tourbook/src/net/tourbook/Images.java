@@ -218,10 +218,12 @@ public class Images {
    public static final String RawData_Device_TurnOn                      = "device-turn-on.png";                                  //$NON-NLS-1$
    public static final String RawData_Transfer                           = "device-synchronize.png";                              //$NON-NLS-1$
    public static final String RawData_TransferDirect                     = "device-synchronize-direct.png";                       //$NON-NLS-1$
+   public static final String RefTour_CompareWizard                      = "tour-map-compare-wizard.png";                         //$NON-NLS-1$
    public static final String RefTour_Layout_Flat                        = "reftour-layout-flat.png";                             //$NON-NLS-1$
    public static final String RefTour_Layout_Flat_Disabled               = "reftour-layout-flat-disabled.png";                    //$NON-NLS-1$
    public static final String RefTour_Layout_Hierarchical                = "reftour-layout-hierarchical.png";                     //$NON-NLS-1$
    public static final String RefTour_Layout_Hierarchical_Disabled       = "reftour-layout-hierarchical-disabled.png";            //$NON-NLS-1$
+   public static final String RefTour_New                                = "tour-map-reftour-new.png";                            //$NON-NLS-1$
    public static final String RefTour_Statistic_Show_All_Values          = "ref-tour-statistic-show-all-values.png";              //$NON-NLS-1$
    public static final String RestoreTags                                = "restore-tour.png";                                    //$NON-NLS-1$
    public static final String RestoreTags_Disabled                       = "restore-tour-disabled.png";                           //$NON-NLS-1$
@@ -316,8 +318,6 @@ public class Images {
    public static final String TourBook_SelectAll                         = "tourbook-select-all.png";                             //$NON-NLS-1$
    public static final String TourBook_SelectAll_Disabled                = "tourbook-select-all-disabled.png";                    //$NON-NLS-1$
    public static final String TourBook_Week                              = "tourbook-week.png";                                   //$NON-NLS-1$
-   public static final String TourCatalog_CompareWizard                  = "tour-map-compare-wizard.png";                         //$NON-NLS-1$
-   public static final String TourCatalog_RefTour_New                    = "tour-map-reftour-new.png";                            //$NON-NLS-1$
    public static final String TourChart                                  = "tour-chart.png";                                      //$NON-NLS-1$
    public static final String TourChart_Disabled                         = "tour-chart-disabled.png";                             //$NON-NLS-1$
    public static final String TourData                                   = "tour-data.png";                                       //$NON-NLS-1$
