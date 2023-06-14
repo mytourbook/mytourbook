@@ -681,9 +681,7 @@ public class ElevationCompareManager {
 
       Object navigatedTour = null;
 
-      final IWorkbench workbench = PlatformUI.getWorkbench();
-      final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-      final IWorkbenchPage activePage = window.getActivePage();
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
       /*
        * Firstly navigate in the compare result view when view is available

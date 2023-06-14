@@ -99,6 +99,7 @@ public class Images {
    public static final String EditTour_Disabled                          = "write_obj_disabled.gif";                              //$NON-NLS-1$
    public static final String GeoParts                                   = "geo-parts.png";                                       //$NON-NLS-1$
    public static final String GeoParts_Disabled                          = "geo-parts-disabled.png";                              //$NON-NLS-1$
+   public static final String GeoRefTour                                 = "geo-ref-tour.png";                                    //$NON-NLS-1$
    public static final String Graph                                      = "graph.png";                                           //$NON-NLS-1$
    public static final String GraphMinMax                                = "graph-min-max.png";                                   //$NON-NLS-1$
    public static final String GraphMinMax_Disabled                       = "graph-min-max-disabled.png";                          //$NON-NLS-1$
@@ -218,6 +219,7 @@ public class Images {
    public static final String RawData_Device_TurnOn                      = "device-turn-on.png";                                  //$NON-NLS-1$
    public static final String RawData_Transfer                           = "device-synchronize.png";                              //$NON-NLS-1$
    public static final String RawData_TransferDirect                     = "device-synchronize-direct.png";                       //$NON-NLS-1$
+   public static final String RefTour                                    = "tour-map-reftour.png";                                //$NON-NLS-1$
    public static final String RefTour_CompareWizard                      = "tour-map-compare-wizard.png";                         //$NON-NLS-1$
    public static final String RefTour_Layout_Flat                        = "reftour-layout-flat.png";                             //$NON-NLS-1$
    public static final String RefTour_Layout_Flat_Disabled               = "reftour-layout-flat-disabled.png";                    //$NON-NLS-1$

@@ -154,7 +154,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       @Override
       public void run() {
-         actionNavigateTour(true);
+         navigateTour(true);
       }
    }
 
@@ -172,7 +172,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       @Override
       public void run() {
-         actionNavigateTour(false);
+         navigateTour(false);
       }
    }
 
@@ -195,7 +195,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          saveComparedTour_10_Save();
 
-         _pageBook.getDisplay().asyncExec(() -> actionNavigateTour(true));
+         _pageBook.getDisplay().asyncExec(() -> navigateTour(true));
       }
    }
 
@@ -237,30 +237,6 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       @Override
       public void run() {
          undoChanges();
-      }
-   }
-
-   private void actionNavigateTour(final boolean isNextTour) {
-
-      boolean isNavigated = false;
-
-      final Object navigatedTour = ElevationCompareManager.navigateTour(isNextTour);
-
-      if (navigatedTour instanceof TVIRefTour_ComparedTour) {
-
-         isNavigated = true;
-         updateTourChart_From_RefTourComparedTour((TVIRefTour_ComparedTour) navigatedTour);
-
-      } else if (navigatedTour instanceof TVIElevationCompareResult_ComparedTour) {
-
-         isNavigated = true;
-         updateTourChart_From_ElevationCompareResult((TVIElevationCompareResult_ComparedTour) navigatedTour);
-      }
-
-      if (isNavigated) {
-
-         // fire selection
-         _postSelectionProvider.setSelection(new StructuredSelection(navigatedTour));
       }
    }
 
@@ -545,6 +521,42 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       return _tourChart;
    }
 
+   private void navigateTour(final boolean isNextTour) {
+
+      boolean isNavigated = false;
+
+      final Object navigatedTour = ElevationCompareManager.navigateTour(isNextTour);
+
+      if (navigatedTour instanceof TVIRefTour_ComparedTour) {
+
+         isNavigated = true;
+
+         final TVIRefTour_ComparedTour navigatedComparedTour = (TVIRefTour_ComparedTour) navigatedTour;
+
+         final GeoComparedTour geoCompareTour = navigatedComparedTour.getGeoCompareTour();
+
+         if (geoCompareTour != null) {
+
+            xupdateTourChart_From_GeoComparedTour(geoCompareTour);
+
+         } else {
+
+            updateTourChart_From_RefTourComparedTour(navigatedComparedTour);
+         }
+
+      } else if (navigatedTour instanceof TVIElevationCompareResult_ComparedTour) {
+
+         isNavigated = true;
+         updateTourChart_From_ElevationCompareResult((TVIElevationCompareResult_ComparedTour) navigatedTour);
+      }
+
+      if (isNavigated) {
+
+         // fire selection
+         _postSelectionProvider.setSelection(new StructuredSelection(navigatedTour));
+      }
+   }
+
    private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {
 
       // update the chart
@@ -580,7 +592,17 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
          if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            updateTourChart_From_RefTourComparedTour((TVIRefTour_ComparedTour) firstElement);
+            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
+            final GeoComparedTour geoCompareTour = comparedTour.getGeoCompareTour();
+
+            if (geoCompareTour != null) {
+
+               updateTourChart_From_GeoComparedTour(geoCompareTour);
+
+            } else {
+
+               updateTourChart_From_RefTourComparedTour(comparedTour);
+            }
 
          } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 

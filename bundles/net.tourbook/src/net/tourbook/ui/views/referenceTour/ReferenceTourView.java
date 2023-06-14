@@ -1915,6 +1915,17 @@ public class ReferenceTourView extends ViewPart implements
          return;
       }
 
+      /*
+       * First activate this view, otherwise the selection is not fired. This happened very
+       * often which is the reason why this workaround is implemented
+       */
+      UI.activateView(this, ID);
+
+      onTourViewer_Selection_FireSelection(selectionChangedEvent);
+   }
+
+   private void onTourViewer_Selection_FireSelection(final SelectionChangedEvent selectionChangedEvent) {
+
       final TreeSelection treeSelection = (TreeSelection) selectionChangedEvent.getSelection();
 
       boolean isCategorySelected = false;

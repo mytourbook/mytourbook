@@ -1087,11 +1087,11 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _selectedTourIndex = Math.min(valueIndex, _statValues_AllTours.size() - 1);
 
       // select tour in the tour viewer and show tour in compared tour char
-      final TVIRefTour_ComparedTour tourCatalogComparedTour = _statValues_AllTours.get(_selectedTourIndex);
-      _currentSelection = new StructuredSelection(tourCatalogComparedTour);
+      final TVIRefTour_ComparedTour comparedTour = _statValues_AllTours.get(_selectedTourIndex);
+      _currentSelection = new StructuredSelection(comparedTour);
       _postSelectionProvider.setSelection(_currentSelection);
 
-      _tourInfoToolTipProvider.setTourId(tourCatalogComparedTour.getTourId());
+      _tourInfoToolTipProvider.setTourId(comparedTour.getTourId());
    }
 
    void onSelect_LastVisibleYear() {

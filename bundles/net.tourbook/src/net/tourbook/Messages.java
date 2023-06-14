@@ -990,14 +990,18 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Column_GeoDiff_Tooltip;
    public static String        GeoCompare_View_Column_SequenceNumber_Header;
    public static String        GeoCompare_View_Column_SequenceNumber_Label;
+   public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
+   public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
    public static String        GeoCompare_View_Label_GeoParts;
    public static String        GeoCompare_View_Label_GeoParts_Tooltip;
    public static String        GeoCompare_View_Label_PossibleTours;
+   public static String        GeoCompare_View_Label_StartEndPosition;
    public static String        GeoCompare_View_Label_TimeSlices;
    public static String        GeoCompare_View_PageText_MultipleToursNotSupported;
    public static String        GeoCompare_View_PageText_NoTourWithGeoData;
    public static String        GeoCompare_View_State_CompareResult;
    public static String        GeoCompare_View_State_ComparingIsCanceled;
+   public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
 
    public static String        Geo_Compare_Label_ReferenceTour;
