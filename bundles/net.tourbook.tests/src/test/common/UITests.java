@@ -21,11 +21,23 @@ import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class UITests {
+
+   private static PeriodType _tourPeriodTemplate = PeriodType.yearMonthDayTime()
+
+         // hide these components
+         // .withMinutesRemoved()
+
+         .withSecondsRemoved()
+         .withMillisRemoved()
+//
+   ;
 
    @AfterAll
    static void cleanUp() {
@@ -225,6 +237,32 @@ public class UITests {
       setImperialSystem();
       //50F -> 10C
       assertEquals(10f, UI.convertTemperatureToMetric(50));
+   }
+
+   @Test
+   void testDurationFormatter() {
+
+      final Period elapsedPeriod = new Period(
+            1615748881000L,
+            1686847297281L,
+            _tourPeriodTemplate);
+
+      final String formattedDuration = elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER);
+
+      assertEquals("2 years, 3 months, 21 hours and 33 minutes", formattedDuration); //$NON-NLS-1$
+   }
+
+   @Test
+   void testDurationFormatterShort() {
+
+      final Period elapsedPeriod = new Period(
+            1615748881000L,
+            1686847297281L,
+            _tourPeriodTemplate);
+
+      final String formattedDuration = elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT);
+
+      assertEquals("2 Y, 3 M, 21 h and 33 m", formattedDuration); //$NON-NLS-1$
    }
 
    @Test
