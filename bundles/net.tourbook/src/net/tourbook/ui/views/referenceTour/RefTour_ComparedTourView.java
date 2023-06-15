@@ -45,6 +45,7 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
 import net.tourbook.ui.tourChart.TourChartViewPart;
 import net.tourbook.ui.views.geoCompare.GeoCompareData;
+import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 
 import org.eclipse.jface.action.Action;
@@ -435,6 +436,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          if (_comparedTour_RefTourChart != null) {
             _comparedTour_RefTourChart.synchChart(false, _tourChart, Chart.SYNCH_MODE_NO);
          }
+
          _actionSynchChartsByScale.setChecked(false);
          _actionSynchChartsBySize.setChecked(false);
       }
@@ -523,31 +525,48 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private void navigateTour(final boolean isNextTour) {
 
+      Object navigatedTour = null;
       boolean isNavigated = false;
 
-      final Object navigatedTour = ElevationCompareManager.navigateTour(isNextTour);
+      if (_isGeoCompareRefTour) {
 
-      if (navigatedTour instanceof TVIRefTour_ComparedTour) {
+         navigatedTour = GeoCompareManager.navigateTour(isNextTour);
 
-         isNavigated = true;
+         if (navigatedTour instanceof GeoComparedTour) {
 
-         final TVIRefTour_ComparedTour navigatedComparedTour = (TVIRefTour_ComparedTour) navigatedTour;
+            isNavigated = true;
 
-         final GeoComparedTour geoCompareTour = navigatedComparedTour.getGeoCompareTour();
+            final GeoComparedTour geoCompareTour = (GeoComparedTour) navigatedTour;
 
-         if (geoCompareTour != null) {
-
-            xupdateTourChart_From_GeoComparedTour(geoCompareTour);
-
-         } else {
-
-            updateTourChart_From_RefTourComparedTour(navigatedComparedTour);
+            updateTourChart_From_GeoComparedTour(geoCompareTour);
          }
 
-      } else if (navigatedTour instanceof TVIElevationCompareResult_ComparedTour) {
+      } else {
 
-         isNavigated = true;
-         updateTourChart_From_ElevationCompareResult((TVIElevationCompareResult_ComparedTour) navigatedTour);
+         navigatedTour = ElevationCompareManager.navigateTour(isNextTour);
+
+         if (navigatedTour instanceof TVIRefTour_ComparedTour) {
+
+            isNavigated = true;
+
+            final TVIRefTour_ComparedTour navigatedComparedTour = (TVIRefTour_ComparedTour) navigatedTour;
+
+            final GeoComparedTour geoCompareTour = navigatedComparedTour.getGeoCompareTour();
+
+            if (geoCompareTour != null) {
+
+               updateTourChart_From_GeoComparedTour(geoCompareTour);
+
+            } else {
+
+               updateTourChart_From_RefTourComparedTour(navigatedComparedTour);
+            }
+
+         } else if (navigatedTour instanceof TVIElevationCompareResult_ComparedTour) {
+
+            isNavigated = true;
+            updateTourChart_From_ElevationCompareResult((TVIElevationCompareResult_ComparedTour) navigatedTour);
+         }
       }
 
       if (isNavigated) {
@@ -887,13 +906,14 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return false;
       }
 
+      final boolean isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour();
+      _isGeoCompareRefTour = isGeoCompareRefTour;
+
       _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
 
       _tourChartConfig.setMinMaxKeeper(true);
       _tourChartConfig.canShowTourCompareGraph = true;
-      _tourChartConfig.isGeoCompare = tourCompareConfig.isGeoCompareRefTour();
-
-      _isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour();
+      _tourChartConfig.isGeoCompare = isGeoCompareRefTour;
 
       updateChart();
       enableSynchronization();
@@ -975,7 +995,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return;
       }
 
-      // load the tourdata of the compared tour from the database
+      // load tourdata of the compared tour from the database
       final TourData compTourData = TourManager.getInstance().getTourData(geoTourId);
       if (compTourData == null) {
          return;

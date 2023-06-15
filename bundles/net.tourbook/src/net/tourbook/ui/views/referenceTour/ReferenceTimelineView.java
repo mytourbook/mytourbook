@@ -955,7 +955,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _pc = new PixelConverter(parent);
    }
 
-   TVIRefTour_ComparedTour navigateTour(final boolean isNextTour) {
+   public TVIRefTour_ComparedTour navigateTour(final boolean isNextTour) {
 
       final int numTours = _statValues_AllTours.size();
 

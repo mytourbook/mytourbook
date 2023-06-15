@@ -30,10 +30,14 @@ import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 
 public class GeoCompareManager {
 
@@ -354,6 +358,44 @@ public class GeoCompareManager {
    public static boolean isGeoComparingOn() {
 
       return _isGeoComparingOn;
+   }
+
+   /**
+    * @param isNextTour
+    *           When <code>true</code> then navigate to the next tour, when <code>false</code>
+    *           then navigate to the previous tour.
+    * @return Returns the navigated tour or <code>null</code> when there is no next/previous tour.
+    */
+   public static Object navigateTour(final boolean isNextTour) {
+
+      Object navigatedTour = null;
+
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+      /*
+       * Firstly navigate in the compare result view when view is available
+       */
+      final IViewPart comparedTours = activePage.findView(GeoCompareView.ID);
+
+      if (comparedTours instanceof GeoCompareView) {
+
+         navigatedTour = ((GeoCompareView) comparedTours).navigateTour(isNextTour);
+      }
+
+      /*
+       * Secondly navigate in the year statistic view when view is available
+       */
+      if (navigatedTour == null) {
+
+         final IViewPart yearStatView = activePage.findView(ReferenceTimelineView.ID);
+
+         if (yearStatView instanceof ReferenceTimelineView) {
+
+            navigatedTour = ((ReferenceTimelineView) yearStatView).navigateTour(isNextTour);
+         }
+      }
+
+      return navigatedTour;
    }
 
    public static void removeGeoCompareListener(final IGeoCompareListener listener) {
