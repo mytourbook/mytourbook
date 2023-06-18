@@ -98,7 +98,7 @@ System
 ======
 
 * MyTourbook Milestone 23.3   https://github.com/mytourbook/mytourbook/milestone/6?closed=1
-* Eclipse 2022-06
-* NatTable 2.03               https://www.eclipse.org/nattable/download.php
+* Eclipse 2023-06
+* NatTable 2.10               https://www.eclipse.org/nattable/download.php
 * FIT SDK 21.105
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

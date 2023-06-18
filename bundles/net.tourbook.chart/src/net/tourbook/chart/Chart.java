@@ -98,9 +98,9 @@ public class Chart extends ViewForm {
    private Color                                     _backgroundColor;
 
    /**
-    * listener which is called when the x-marker was dragged
+    * Listener which is called when the x-value marker was dragged
     */
-   IChartListener                                    _draggingListenerXMarker;
+   XValueMarkerListener                              xValueMarker_DraggingListener;
 
    private IHoveredValueTooltipListener              _hoveredValueTooltipListener;
 
@@ -247,10 +247,6 @@ public class Chart extends ViewForm {
     */
    public void addSliderMoveListener(final ISliderMoveListener listener) {
       _sliderMoveListeners.add(listener);
-   }
-
-   public void addXMarkerDraggingListener(final IChartListener xMarkerDraggingListener) {
-      _draggingListenerXMarker = xMarkerDraggingListener;
    }
 
    /**
@@ -1319,6 +1315,14 @@ public class Chart extends ViewForm {
    }
 
    /**
+    * @param xValueMarker_DraggingListener
+    */
+   public void setXValueMarker_DraggingListener(final XValueMarkerListener xValueMarker_DraggingListener) {
+
+      this.xValueMarker_DraggingListener = xValueMarker_DraggingListener;
+   }
+
+   /**
     * Enable/disable the zoom in/out action
     *
     * @param isEnabled
@@ -1349,7 +1353,7 @@ public class Chart extends ViewForm {
          return;
       }
 
-      getDisplay().asyncExec(() -> _synchedChart.setSynchConfig(_chartComponents._synchConfigOut));
+      getDisplay().asyncExec(() -> _synchedChart.setSynchConfig(_chartComponents.synchConfigOut));
    }
 
    /**

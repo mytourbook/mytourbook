@@ -83,43 +83,44 @@ public class ChartComponents extends Composite {
    private static final int      MONTH_IN_SECONDS         = 31 * DAY_IN_SECONDS;
    private static final int      YEAR_IN_SECONDS          = 366 * DAY_IN_SECONDS;
 
-   private static final String[] _monthLabels             =
-         {
-               Messages.Month_jan,
-               Messages.Month_feb,
-               Messages.Month_mar,
-               Messages.Month_apr,
-               Messages.Month_mai,
-               Messages.Month_jun,
-               Messages.Month_jul,
-               Messages.Month_aug,
-               Messages.Month_sep,
-               Messages.Month_oct,
-               Messages.Month_nov,
-               Messages.Month_dec
-         };
+   private static final String[] _monthLabels             = {
 
-   private static final String[] _monthShortLabels        =
-         {
-               Integer.toString(1),
-               Integer.toString(2),
-               Integer.toString(3),
-               Integer.toString(4),
-               Integer.toString(5),
-               Integer.toString(6),
-               Integer.toString(7),
-               Integer.toString(8),
-               Integer.toString(9),
-               Integer.toString(10),
-               Integer.toString(11),
-               Integer.toString(12)
-         };
+         Messages.Month_jan,
+         Messages.Month_feb,
+         Messages.Month_mar,
+         Messages.Month_apr,
+         Messages.Month_mai,
+         Messages.Month_jun,
+         Messages.Month_jul,
+         Messages.Month_aug,
+         Messages.Month_sep,
+         Messages.Month_oct,
+         Messages.Month_nov,
+         Messages.Month_dec
+   };
+
+   private static final String[] _monthShortLabels        = {
+
+         Integer.toString(1),
+         Integer.toString(2),
+         Integer.toString(3),
+         Integer.toString(4),
+         Integer.toString(5),
+         Integer.toString(6),
+         Integer.toString(7),
+         Integer.toString(8),
+         Integer.toString(9),
+         Integer.toString(10),
+         Integer.toString(11),
+         Integer.toString(12)
+   };
 
    private final Chart           _chart;
 
    private int                   DIALOG_FONT_HEIGHT;
    private int                   SLIDER_BAR_HEIGHT;
    private int                   TITLE_BAR_HEIGHT;
+
    {
       DIALOG_FONT_HEIGHT = UI.getDialogFontMetrics().getHeight();
 
@@ -166,16 +167,16 @@ public class ChartComponents extends Composite {
    private final int         _graphVerticalDistance      = 15;
 
    /**
-    * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
+    * Contains the {@link SynchConfiguration} for the current chart and will be used from the chart
     * which is synchronized
     */
-   SynchConfiguration        _synchConfigOut;
+   SynchConfiguration        synchConfigOut;
 
    /**
-    * when a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
+    * When a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
     * which set's the synch config
     */
-   SynchConfiguration        _synchConfigSrc;
+   SynchConfiguration        synchConfigSrc;
 
    /**
     * visible chart rectangle
@@ -2133,13 +2134,13 @@ public class ChartComponents extends Composite {
 
       final ChartDataXSerie xData = _chartDataModel.getXData();
 
-      final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
-      final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
+      final int xValueMarker_StartIndex = xData.getXValueMarker_StartIndex();
+      final int xValueMarker_EndIndex = xData.getXValueMarker_EndIndex();
 
-      if (markerValueIndexStart == -1) {
+      if (xValueMarker_StartIndex == -1) {
 
          // disable chart synchronization
-         _synchConfigOut = null;
+         synchConfigOut = null;
          return null;
       }
 
@@ -2148,8 +2149,8 @@ public class ChartComponents extends Composite {
        */
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final double markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
-      final double markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
+      final double markerStartValue = xValues[Math.min(xValueMarker_StartIndex, xValues.length - 1)];
+      final double markerEndValue = xValues[Math.min(xValueMarker_EndIndex, xValues.length - 1)];
 
       final double valueDiff = markerEndValue - markerStartValue;
       final double lastValue = xValues[xValues.length - 1];
@@ -2425,7 +2426,7 @@ public class ChartComponents extends Composite {
     */
    void setSynchConfig(final SynchConfiguration synchConfigIn) {
 
-      _synchConfigSrc = synchConfigIn;
+      synchConfigSrc = synchConfigIn;
 
       onResize();
    }
@@ -2469,16 +2470,16 @@ public class ChartComponents extends Composite {
    private boolean setWidthToSynchedChart() {
 
       final ChartDataXSerie xData = _chartDataModel.getXData();
-      final int markerStartIndex = xData.getSynchMarkerStartIndex();
-      final int markerEndIndex = xData.getSynchMarkerEndIndex();
+      final int markerStartIndex = xData.getXValueMarker_StartIndex();
+      final int markerEndIndex = xData.getXValueMarker_EndIndex();
 
       // check if synchronization is disabled
-      if (_synchConfigSrc == null || markerStartIndex == -1) {
+      if (synchConfigSrc == null || markerStartIndex == -1) {
          return false;
       }
 
       // set min/max values from the source synched chart into this chart
-      _synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
+      synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
 
       final double[] xValues = xData.getHighValuesDouble()[0];
       final double markerValueStart = xValues[markerStartIndex];
@@ -2496,8 +2497,8 @@ public class ChartComponents extends Composite {
       case Chart.SYNCH_MODE_BY_SCALE:
 
          // get marker data from the synch source
-         final float markerWidthRatio = _synchConfigSrc.getMarkerWidthRatio();
-         final float markerOffsetRatio = _synchConfigSrc.getMarkerOffsetRatio();
+         final float markerWidthRatio = synchConfigSrc.getMarkerWidthRatio();
+         final float markerOffsetRatio = synchConfigSrc.getMarkerOffsetRatio();
 
          // virtual graph width
          final float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
@@ -2519,8 +2520,8 @@ public class ChartComponents extends Composite {
       case Chart.SYNCH_MODE_BY_SIZE:
 
          // get marker data from the synch source
-         final float synchSrcDevMarkerWidth = _synchConfigSrc.getDevMarkerWidth();
-         final float synchSrcDevMarkerOffset = _synchConfigSrc.getDevMarkerOffset();
+         final float synchSrcDevMarkerWidth = synchConfigSrc.getDevMarkerWidth();
+         final float synchSrcDevMarkerOffset = synchConfigSrc.getDevMarkerOffset();
 
          // virtual graph width
          xxDevGraphWidth = valueLast / valueDiff * synchSrcDevMarkerWidth;
@@ -2645,18 +2646,23 @@ public class ChartComponents extends Composite {
 
       boolean fireEvent = false;
 
-      if (_synchConfigOut == null) {
+      if (synchConfigOut == null) {
+
          // synch new config
+
          fireEvent = true;
-      } else if (_synchConfigOut.isEqual(newSynchConfigOut) == false) {
+
+      } else if (synchConfigOut.isEqual(newSynchConfigOut) == false) {
+
          // synch when config changed
+
          fireEvent = true;
       }
 
       if (fireEvent) {
 
          // set new synch config
-         _synchConfigOut = newSynchConfigOut;
+         synchConfigOut = newSynchConfigOut;
 
          _chart.synchronizeChart();
       }

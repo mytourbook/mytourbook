@@ -1442,7 +1442,18 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    void updateUI_YearChart(final boolean isShowLatestYear) {
 
-      updateUI_YearChart(_currentGeoCompareData, isShowLatestYear);
+      GeoCompareData geoCompareData = null;
+
+      // use current geo compare data when is has the same ref id
+      if (_currentRefItem != null
+            && _currentGeoCompareData != null
+
+            && _currentRefItem.refId == _currentGeoCompareData.refId) {
+
+         geoCompareData = _currentGeoCompareData;
+      }
+
+      updateUI_YearChart(geoCompareData, isShowLatestYear);
    }
 
    /**

@@ -185,8 +185,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //      System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); //$NON-NLS-1$
    }
 
-   private static final NumberFormat _nf0 = NumberFormat.getNumberInstance();
-   private static final NumberFormat _nf1 = NumberFormat.getNumberInstance();
+   private static final String       FORMAT_START_END = "%d…%d"; //$NON-NLS-1$
+
+   private static final NumberFormat _nf0             = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf1             = NumberFormat.getNumberInstance();
 
    static {
 
@@ -2270,8 +2272,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    public Object navigateTour(final boolean isNextTour) {
 
-      // TODO Auto-generated method stub
-
       if (_selectedGeoComparedTour == null
             || _allSortedAndFiltered_GeoComparedTours == null
             || _allSortedAndFiltered_GeoComparedTours.length == 0) {
@@ -3000,7 +3000,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          _lblNumGeoGrids.setText(Integer.toString(_slideoutGeoCompareState.numGeoGrids));
          _lblNumSlices.setText(Integer.toString(_slideoutGeoCompareState.lastIndex - _slideoutGeoCompareState.firstIndex));
          _lblNumTours.setText(Integer.toString(_slideoutGeoCompareState.numTours));
-         _lblStartEndIndex.setText(String.format("%d…%d", _slideoutGeoCompareState.firstIndex, _slideoutGeoCompareState.lastIndex));
+         _lblStartEndIndex.setText(String.format(FORMAT_START_END, _slideoutGeoCompareState.firstIndex, _slideoutGeoCompareState.lastIndex));
       }
    }
 

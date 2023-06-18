@@ -245,6 +245,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
 
          final int refTour_EndValueIndex = refTour.getEndValueIndex();
          final double[] xValues = xData.getHighValuesDouble()[0];
+
          if (refTour_EndValueIndex >= xValues.length) {
 
             // an ArrayIndexOutOfBoundsException occured but cannot be reproduced
@@ -252,14 +253,14 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
          }
 
          // set marker positions
-         xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour_EndValueIndex);
+         xData.setXValueMarker_ValueIndices(refTour.getStartValueIndex(), refTour_EndValueIndex);
 
          // set the value difference of the synch marker
-         final double refTourXMarkerValue = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
+         final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
 
          TourManager.fireEventWithCustomData(
                TourEventId.REFERENCE_TOUR_CHANGED,
-               new TourPropertyRefTourChanged(_tourChart, refTour.getRefId(), refTourXMarkerValue),
+               new RefTourChanged(_tourChart, refTour.getRefId(), refTourXValueDiff),
                RefTour_ReferenceTourView.this);
 
          // set title

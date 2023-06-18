@@ -25,9 +25,9 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.IChartListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.XValueMarkerListener;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
@@ -79,7 +79,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    private long                              _refTour_RefId          = -1;
    private TourChart                         _refTour_TourChart;
 
-   private double                            _refTour_XMarkerValueDifference;
+   private double                            _refTour_XValueDifference;
 
    private boolean                           _isGeoCompareRefTour;
 
@@ -105,6 +105,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    private TourChart                         _comparedTour_RefTourChart;
 
    private ITourEventListener                _tourEventListener;
+   private XValueMarkerListener              _xValueMarker_DraggingListener;
 
    private ActionSynchChartHorizontalByScale _actionSynchChartsByScale;
    private ActionSynchChartHorizontalBySize  _actionSynchChartsBySize;
@@ -251,17 +252,17 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
                                  final Object eventData) {
 
             if (eventId == TourEventId.REFERENCE_TOUR_CHANGED
-                  && eventData instanceof TourPropertyRefTourChanged) {
+                  && eventData instanceof RefTourChanged) {
 
                /*
                 * Reference tour changed
                 */
 
-               final TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) eventData;
+               final RefTourChanged refTourChanged = (RefTourChanged) eventData;
 
-               _refTour_RefId = tourProperty.refId;
-               _refTour_TourChart = tourProperty.refTourChart;
-               _refTour_XMarkerValueDifference = tourProperty.xMarkerValue;
+               _refTour_RefId = refTourChanged.refId;
+               _refTour_TourChart = refTourChanged.refTourChart;
+               _refTour_XValueDifference = refTourChanged.xValueDifference;
 
                _isInRefTourChanged = true;
                {
@@ -299,6 +300,8 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    public void createPartControl(final Composite parent) {
 
       super.createPartControl(parent);
+
+      initUI();
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
@@ -362,25 +365,12 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
              * set synch marker position, this method is also called when a graph is
              * displayed/removed
              */
-            xData.setSynchMarkerValueIndex(_movedStartIndex, _movedEndIndex);
+            xData.setXValueMarker_ValueIndices(_movedStartIndex, _movedEndIndex);
 
             setRangeMarkers(xData);
 
             // set chart title
             changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
-         }
-      });
-
-      _tourChart.addXMarkerDraggingListener(new IChartListener() {
-
-         @Override
-         public double getXMarkerValueDiff() {
-            return _refTour_XMarkerValueDifference;
-         }
-
-         @Override
-         public void xMarkerMoved(final int movedXMarkerStartValueIndex, final int movedXMarkerEndValueIndex) {
-            onMoveSynchedMarker(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
          }
       });
    }
@@ -397,9 +387,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private void enableActions() {
 
-      final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
-      final boolean isMoved = isNotMoved == false;
-      final boolean isElevationCompareTour = _isGeoCompareRefTour == false && (isMoved || _comparedTour_CompareId == -1);
+      final boolean isPartMarkerMoved = _defaultStartIndex != _movedStartIndex || _defaultEndIndex != _movedEndIndex;
+      final boolean isElevationCompareTour = _isGeoCompareRefTour == false
+            && (isPartMarkerMoved || _comparedTour_CompareId == -1);
 
       // geo compared with ref tour cannot be saved !
       _actionSaveComparedTour.setEnabled(isElevationCompareTour);
@@ -523,11 +513,32 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       return _tourChart;
    }
 
+   private void initUI() {
+
+      _xValueMarker_DraggingListener = new XValueMarkerListener() {
+
+         @Override
+         public double getXValueDifference() {
+
+            return _refTour_XValueDifference;
+         }
+
+         @Override
+         public void xValueMarkerIsMoved(final int movedXMarkerStartValueIndex, final int movedXMarkerEndValueIndex) {
+
+            onMoveXValueMarker(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
+         }
+      };
+   }
+
    private void navigateTour(final boolean isNextTour) {
 
       Object navigatedTour = null;
       boolean isNavigated = false;
 
+      /*
+       * Firstly check geo compared tours
+       */
       if (_isGeoCompareRefTour) {
 
          navigatedTour = GeoCompareManager.navigateTour(isNextTour);
@@ -540,8 +551,12 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
             updateTourChart_From_GeoComparedTour(geoCompareTour);
          }
+      }
 
-      } else {
+      /*
+       * Secondly check the elevation compared tours
+       */
+      if (isNavigated == false) {
 
          navigatedTour = ElevationCompareManager.navigateTour(isNextTour);
 
@@ -565,6 +580,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          } else if (navigatedTour instanceof TVIElevationCompareResult_ComparedTour) {
 
             isNavigated = true;
+
             updateTourChart_From_ElevationCompareResult((TVIElevationCompareResult_ComparedTour) navigatedTour);
          }
       }
@@ -576,13 +592,13 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       }
    }
 
-   private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {
+   private void onMoveXValueMarker(final int movedValueIndex, final int movedEndIndex) {
 
       // update the chart
       final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
       final ChartDataXSerie xData = chartDataModel.getXData();
 
-      xData.setSynchMarkerValueIndex(movedValueIndex, movedEndIndex);
+      xData.setXValueMarker_ValueIndices(movedValueIndex, movedEndIndex);
       setRangeMarkers(xData);
 
       _tourChart.updateChart(chartDataModel, true);
@@ -740,7 +756,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
             _defaultEndIndex = _movedEndIndex;
 
             final ChartDataXSerie xData = chartDataModel.getXData();
-            xData.setSynchMarkerValueIndex(_defaultStartIndex, _defaultEndIndex);
+            xData.setXValueMarker_ValueIndices(_defaultStartIndex, _defaultEndIndex);
             setRangeMarkers(xData);
 
             _tourChart.updateChart(chartDataModel, true);
@@ -818,15 +834,15 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       if (_comparedTourItem instanceof TVIRefTour_ComparedTour
             || _comparedTourItem instanceof GeoComparedTour) {
 
-         xData.setRangeMarkers(new int[] { _defaultStartIndex }, new int[] { _defaultEndIndex });
+         xData.setRangeMarkers(
+               new int[] { _defaultStartIndex },
+               new int[] { _defaultEndIndex });
 
       } else if (_comparedTourItem instanceof TVIElevationCompareResult_ComparedTour) {
 
          xData.setRangeMarkers(
                new int[] { _defaultStartIndex, _computedStartIndex },
-               new int[] {
-                     _defaultEndIndex,
-                     _computedEndIndex });
+               new int[] { _defaultEndIndex, _computedEndIndex });
       }
    }
 
@@ -862,7 +878,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       _movedStartIndex = _defaultStartIndex;
       _movedEndIndex = _defaultEndIndex;
 
-      xData.setSynchMarkerValueIndex(_defaultStartIndex, _defaultEndIndex);
+      xData.setXValueMarker_ValueIndices(_defaultStartIndex, _defaultEndIndex);
 
       _tourChart.updateChart(chartDataModel, true);
 
@@ -907,6 +923,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       }
 
       final boolean isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour();
+
       _isGeoCompareRefTour = isGeoCompareRefTour;
 
       _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
@@ -918,6 +935,14 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       updateChart();
       enableSynchronization();
       enableActions();
+
+      /*
+       * Allow dragging of the compared tour only for elevation compared tour as they are saved
+       * currently only into the db
+       */
+      _tourChart.setXValueMarker_DraggingListener(isGeoCompareRefTour
+            ? null
+            : _xValueMarker_DraggingListener);
 
       /*
        * fire change event to update tour markers
