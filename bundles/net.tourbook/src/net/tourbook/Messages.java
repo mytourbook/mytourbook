@@ -1866,8 +1866,12 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_Provider_None;
 
-   public static String        Reference_Timeline_Icon_ElevationCompare_Tooltip;
-   public static String        Reference_Timeline_Icon_GeoCompare_Tooltip;
+   public static String        Reference_Timeline_Action_ShowAllValues_Tooltip;
+   public static String        Reference_Timeline_Action_SyncMinMaxValues_Tooltip;
+   public static String        Reference_Timeline_Combo_LastYears_Tooltip;
+   public static String        Reference_Timeline_Combo_NumberOfYears_Tooltip;
+   public static String        Reference_Timeline_Image_ElevationCompare_Tooltip;
+   public static String        Reference_Timeline_Image_GeoCompare_Tooltip;
 
    public static String        RefTour_Action_CreateLeftMarker;
    public static String        RefTour_Action_CreaateMarker;
@@ -3210,11 +3214,6 @@ public class Messages extends NLS {
    public static String        UI_Label_TourIsNotSelected;
 
    public static String        ui_tour_not_defined;
-
-   public static String        Year_Statistic_Action_ShowAllValues_Tooltip;
-   public static String        Year_Statistic_Action_SyncMinMaxValues_Tooltip;
-   public static String        Year_Statistic_Combo_LastYears_Tooltip;
-   public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;
 
 //   public static String        Pref_SignImages_Dialog_ConfirmDelete_Message;
 //   public static String        Pref_SignImages_Dialog_Delete_Title;

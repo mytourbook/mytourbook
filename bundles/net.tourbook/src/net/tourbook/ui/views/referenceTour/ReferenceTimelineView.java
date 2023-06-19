@@ -244,7 +244,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Year_Statistic_Action_ShowAllValues_Tooltip);
+         setToolTipText(Messages.Reference_Timeline_Action_ShowAllValues_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_Statistic_Show_All_Values));
       }
@@ -264,7 +264,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
          // Use the same scaling for different years, people or tour types,
          // this makes it easier to compare numbers
-         setToolTipText(Messages.Year_Statistic_Action_SyncMinMaxValues_Tooltip);
+         setToolTipText(Messages.Reference_Timeline_Action_SyncMinMaxValues_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
       }
@@ -823,7 +823,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
              * Last visible year
              */
             _comboLastVisibleYear = new Combo(_headerContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboLastVisibleYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
+            _comboLastVisibleYear.setToolTipText(Messages.Reference_Timeline_Combo_LastYears_Tooltip);
             _comboLastVisibleYear.setVisibleItemCount(50);
 
             _comboLastVisibleYear.addSelectionListener(widgetSelectedAdapter(
@@ -849,7 +849,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             _spinnerNumberOfVisibleYears.setMaximum(100);
             _spinnerNumberOfVisibleYears.setIncrement(1);
             _spinnerNumberOfVisibleYears.setPageIncrement(5);
-            _spinnerNumberOfVisibleYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
+            _spinnerNumberOfVisibleYears.setToolTipText(Messages.Reference_Timeline_Combo_NumberOfYears_Tooltip);
 
             _spinnerNumberOfVisibleYears.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onSelect_NumberOfVisibleYears()));
@@ -1727,12 +1727,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       if (geoCompareData != null) {
 
          _iconCompareType.setImage(_imageCompareType_GeoCompare);
-         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Icon_GeoCompare_Tooltip);
+         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Image_GeoCompare_Tooltip);
 
       } else {
 
          _iconCompareType.setImage(_imageCompareType_ElevationCompare);
-         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Icon_ElevationCompare_Tooltip);
+         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Image_ElevationCompare_Tooltip);
       }
 
       // set background again otherwise the original is displayed
