@@ -72,6 +72,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -209,7 +211,13 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    private Label     _lblRefTourTitle;
 
+   private CLabel    _iconCompareType;
+
    private Spinner   _spinnerNumberOfVisibleYears;
+
+   private Image     _imageCompareType_GeoCompare       = TourbookPlugin.getThemedImageDescriptor(Images.GeoParts).createImage();
+   private Image     _imageCompareType_ElevationCompare = TourbookPlugin.getThemedImageDescriptor(Images.RefTour_CompareWizard).createImage();
+   private Image     _imageCompareType_PlaceHolder      = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
 
    private class ActionCopyValuesIntoClipboard extends Action {
 
@@ -780,11 +788,25 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             .align(SWT.FILL, SWT.FILL)
             .applyTo(_headerContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
+            .numColumns(4)
             .margins(3, 3)
             .applyTo(_headerContainer);
-//      container.setBackground(UI.SYS_COLOR_GREEN);
+//      _headerContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
+         {
+            /*
+             * Image: Compare type
+             */
+            _iconCompareType = new CLabel(_headerContainer, SWT.NONE);
+            _iconCompareType.setImage(_imageCompareType_PlaceHolder);
+//            _iconCompareType.setBackground(UI.SYS_COLOR_BLUE);
+            GridDataFactory.fillDefaults()
+
+                  // adjust to lower checkbox
+                  .indent(-3, 0)
+                  .applyTo(_iconCompareType);
+
+         }
          {
             /*
              * Ref tour title
@@ -792,7 +814,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             _lblRefTourTitle = new Label(_headerContainer, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .align(SWT.CENTER, SWT.CENTER)
+                  .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblRefTourTitle);
 //            _lblRefTourTitle.setBackground(UI.SYS_COLOR_RED);
          }
@@ -869,6 +891,10 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    @Override
    public void dispose() {
+
+      UI.disposeResource(_imageCompareType_GeoCompare);
+      UI.disposeResource(_imageCompareType_PlaceHolder);
+      UI.disposeResource(_imageCompareType_ElevationCompare);
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
@@ -1463,7 +1489,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
     * @param isShowLatestYear
     *           Shows the latest year and the years before
     */
-   private void updateUI_YearChart(final GeoCompareData geoCompareData, final boolean isShowLatestYear) {
+   private void updateUI_YearChart(final GeoCompareData geoCompareData,
+                                   final boolean isShowLatestYear) {
 
       if (_currentRefItem == null) {
 
@@ -1696,6 +1723,17 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       _lblRefTourTitle.setText(_currentRefItem.label);
       _lblRefTourTitle.setForeground(ThemeUtil.getDefaultForegroundColor_Table());
+
+      if (geoCompareData != null) {
+
+         _iconCompareType.setImage(_imageCompareType_GeoCompare);
+         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Icon_GeoCompare_Tooltip);
+
+      } else {
+
+         _iconCompareType.setImage(_imageCompareType_ElevationCompare);
+         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Icon_ElevationCompare_Tooltip);
+      }
 
       // set background again otherwise the original is displayed
       _headerContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());

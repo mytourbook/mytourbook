@@ -1866,6 +1866,9 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_Provider_None;
 
+   public static String        Reference_Timeline_Icon_ElevationCompare_Tooltip;
+   public static String        Reference_Timeline_Icon_GeoCompare_Tooltip;
+
    public static String        RefTour_Action_CreateLeftMarker;
    public static String        RefTour_Action_CreaateMarker;
    public static String        RefTour_Action_CreateReferenceTour;
