@@ -294,6 +294,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private PageBook  _pageBook;
    private Composite _pageCompareResult;
+   private Composite _pageGeoCompareIsOff;
    private Composite _pageMultipleTours;
    private Composite _pageNoData;
 
@@ -770,7 +771,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       case NoGeoData:
       default:
-         _pageBook.showPage(_pageNoData);
+         showInvalidPage();
          break;
       }
    }
@@ -905,7 +906,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       if (_compareData_GeoGrid == null) {
 
-         _pageBook.showPage(_pageNoData);
+         showInvalidPage();
 
          return;
       }
@@ -1241,7 +1242,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       restoreSelection();
 
-      _pageBook.showPage(_pageNoData);
+      showInvalidPage();
    }
 
    private void createUI(final Composite parent) {
@@ -1249,6 +1250,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _pageBook = new PageBook(parent, SWT.NONE);
 
       _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_NoTourWithGeoData);
+      _pageGeoCompareIsOff = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_GeoCompareIsOff);
       _pageMultipleTours = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_MultipleToursNotSupported);
 
       _pageCompareResult = new Composite(_pageBook, SWT.NONE);
@@ -2392,7 +2394,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void onAction_OnOff(final boolean isOn) {
 
+      _actionOnOff.setChecked(isOn);
       _actionOnOff.setIcon(isOn);
+
+      GeoCompareManager.setGeoComparing(isOn, this);
 
       if (isOn) {
 
@@ -2406,14 +2411,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          setState_StopComparing();
          updateUI_State_CancelComparing();
-      }
 
-      GeoCompareManager.setGeoComparing(isOn, this);
+         showInvalidPage();
+      }
 
       enableControls();
    }
 
-   void onChange_CompareParameter() {
+   void onChangeCompareParameter() {
 
 // SET_FORMATTING_OFF
 
@@ -2549,7 +2554,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void onSelectionChanged(final ISelection selection) {
 
-      if (selection == null) {
+      if (selection == null
+            || GeoCompareManager.isGeoComparingOn() == false) {
+
          return;
       }
 
@@ -2759,7 +2766,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       if (_compareData_TourData == null) {
 
-         _pageBook.showPage(_pageNoData);
+         showInvalidPage();
 
          // a tour is not displayed, find a tour provider which provides a tour
 //         _display.asyncExec(() -> {
@@ -2873,6 +2880,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // reset last id that the same compare can be restarted
 //		_compareData_TourId = Long.MIN_VALUE;
+   }
+
+   private void showInvalidPage() {
+
+      if (GeoCompareManager.isGeoComparingOn()) {
+
+         _pageBook.showPage(_pageNoData);
+
+      } else {
+
+         _pageBook.showPage(_pageGeoCompareIsOff);
+      }
    }
 
    @Override

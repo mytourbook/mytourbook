@@ -468,7 +468,7 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
 
       updateUI_GeoAccuracy();
 
-      _geoCompareView.onChange_CompareParameter();
+      _geoCompareView.onChangeCompareParameter();
 
       enableControls();
    }

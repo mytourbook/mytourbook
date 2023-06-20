@@ -963,7 +963,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
    }
 
-   private void updateSyncActions() {
+   private void updateSyncActionImages() {
 
       if (_isGeoCompareRefTour) {
 
@@ -1002,7 +1002,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       _tourChartConfig.canShowTourCompareGraph = true;
       _tourChartConfig.isGeoCompare = isGeoCompareRefTour;
 
-      updateSyncActions();
+      updateSyncActionImages();
       updateChart();
       enableSynchronization();
       enableActions();
@@ -1076,6 +1076,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       // enable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
+      updateSyncActionImages();
    }
 
    private void updateTourChart_From_GeoComparedTour(final GeoComparedTour geoComparedTour) {
@@ -1116,8 +1117,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       updateTourChart();
 
-      // disable action after the chart was created
+      // enable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
+      updateSyncActionImages();
    }
 
    /**

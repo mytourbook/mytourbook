@@ -932,17 +932,33 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    @Override
    public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
 
-      if (eventId != GeoCompareEventId.TOUR_IS_GEO_COMPARED) {
-         return;
+      switch (eventId) {
+
+      case TOUR_IS_GEO_COMPARED:
+
+         if (eventData instanceof GeoCompareData) {
+
+            final GeoCompareData geoCompareData = (GeoCompareData) eventData;
+
+            // update year statistic with provided geo compare data
+            updateUI_YearChart(geoCompareData, false);
+         }
+
+         break;
+
+      case SET_COMPARING_ON:
+         break;
+
+      case SET_COMPARING_OFF:
+
+         _currentGeoCompareData = null;
+         updateUI_YearChart();
+
+         break;
+      default:
+         break;
       }
 
-      if (eventData instanceof GeoCompareData) {
-
-         final GeoCompareData geoCompareData = (GeoCompareData) eventData;
-
-         // update year statistic with provided geo compare data
-         updateUI_YearChart(geoCompareData, false);
-      }
    }
 
    private int getFirstVisibleYear() {
