@@ -64,8 +64,6 @@ Improvements
 * Tour Chart
   - Slider positions are set to a selected reference tour or geo compared tour
 
-* Tour Book (Frederic)
-  - Hiding the temperature value when no value is detected instead of displaying 0 or 32
 
 Changes
 =======
@@ -76,7 +74,8 @@ Changes
 Bugfix
 ======
 
-* 
+* Tour Book (Frederic)
+  - Hiding the temperature value when no value is detected instead of displaying 0 or 32
 
 
 Translation    
