@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -52,6 +53,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
@@ -66,7 +68,19 @@ import org.eclipse.ui.part.PageBook;
 
 public class RefTour_ComparedTourView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
-   public static final String    ID     = "net.tourbook.views.tourCatalog.comparedTourView"; //$NON-NLS-1$
+   public static final String ID = "net.tourbook.views.tourCatalog.comparedTourView"; //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+   private static final ImageDescriptor imageDescriptor_Graph_GeoCompare               = TourbookPlugin.getThemedImageDescriptor(Images.Graph_TourCompare_ByGeo);
+   private static final ImageDescriptor imageDescriptor_Graph_ElevationCompare         = TourbookPlugin.getThemedImageDescriptor(Images.Graph_TourCompare_ByElevation);
+
+   private static final ImageDescriptor imageDescriptor_SyncByScale_ElevationCompare   = TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_ByScale);
+   private static final ImageDescriptor imageDescriptor_SyncBySize_ElevationCompare    = TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize);
+   private static final ImageDescriptor imageDescriptor_SyncByScale_GeoCompare         = TourbookPlugin.getThemedImageDescriptor(Images.SyncGeoGraph_ByScale);
+   private static final ImageDescriptor imageDescriptor_SyncBySize_GeoCompare          = TourbookPlugin.getThemedImageDescriptor(Images.SyncGeoGraph_BySize);
+
+// SET_FORMATTING_ON
 
    private final IDialogSettings _state = TourbookPlugin.getState(ID);
 
@@ -222,6 +236,44 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       }
    }
 
+   private class ActionSynchChartHorizontalByScale extends Action {
+
+      public ActionSynchChartHorizontalByScale() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.RefTour_Action_SyncChartsByScale_Tooltip);
+
+         setImageDescriptor(imageDescriptor_SyncByScale_ElevationCompare);
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_ByScale_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SCALE);
+      }
+   }
+
+   private class ActionSynchChartHorizontalBySize extends Action {
+
+      public ActionSynchChartHorizontalBySize() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.RefTour_Action_SyncChartsBySize_Tooltip);
+
+         setImageDescriptor(imageDescriptor_SyncBySize_ElevationCompare);
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SIZE);
+      }
+   }
+
    private class ActionUndoChanges extends Action {
 
       public ActionUndoChanges() {
@@ -286,8 +338,8 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private void createActions() {
 
-      _actionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
-      _actionSynchChartsByScale = new ActionSynchChartHorizontalByScale(this);
+      _actionSynchChartsBySize = new ActionSynchChartHorizontalBySize();
+      _actionSynchChartsByScale = new ActionSynchChartHorizontalByScale();
 
       _actionNavigateNextTour = new ActionNavigateNextTour();
       _actionNavigatePrevTour = new ActionNavigatePreviousTour();
@@ -387,9 +439,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private void enableActions() {
 
-      final boolean isPartMarkerMoved = _defaultStartIndex != _movedStartIndex || _defaultEndIndex != _movedEndIndex;
+      final boolean isXValueMarkerMoved = _defaultStartIndex != _movedStartIndex || _defaultEndIndex != _movedEndIndex;
       final boolean isElevationCompareTour = _isGeoCompareRefTour == false
-            && (isPartMarkerMoved || _comparedTour_CompareId == -1);
+            && (isXValueMarkerMoved || _comparedTour_CompareId == -1);
 
       // geo compared with ref tour cannot be saved !
       _actionSaveComparedTour.setEnabled(isElevationCompareTour);
@@ -404,35 +456,35 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          _actionSynchChartsByScale.setEnabled(false);
          _actionSynchChartsBySize.setEnabled(false);
 
-         return;
-      }
-
-      boolean isSynchEnabled = false;
-
-      if (_comparedTour_RefId == _refTour_RefId) {
-
-         // reference tour for the compared chart is displayed
-
-         if (_comparedTour_RefTourChart != _refTour_TourChart) {
-            _comparedTour_RefTourChart = _refTour_TourChart;
-         }
-
-         isSynchEnabled = true;
-
       } else {
 
-         // another ref tour is displayed, disable synchronization
+         boolean isSynchEnabled = false;
 
-         if (_comparedTour_RefTourChart != null) {
-            _comparedTour_RefTourChart.synchChart(false, _tourChart, Chart.SYNCH_MODE_NO);
+         if (_comparedTour_RefId == _refTour_RefId) {
+
+            // reference tour for the compared chart is displayed
+
+            if (_comparedTour_RefTourChart != _refTour_TourChart) {
+               _comparedTour_RefTourChart = _refTour_TourChart;
+            }
+
+            isSynchEnabled = true;
+
+         } else {
+
+            // another ref tour is displayed, disable synchronization
+
+            if (_comparedTour_RefTourChart != null) {
+               _comparedTour_RefTourChart.synchChart(false, _tourChart, Chart.SYNCH_MODE_NO);
+            }
+
+            _actionSynchChartsByScale.setChecked(false);
+            _actionSynchChartsBySize.setChecked(false);
          }
 
-         _actionSynchChartsByScale.setChecked(false);
-         _actionSynchChartsBySize.setChecked(false);
+         _actionSynchChartsByScale.setEnabled(isSynchEnabled);
+         _actionSynchChartsBySize.setEnabled(isSynchEnabled);
       }
-
-      _actionSynchChartsByScale.setEnabled(isSynchEnabled);
-      _actionSynchChartsBySize.setEnabled(isSynchEnabled);
    }
 
    private void fillToolbar() {
@@ -911,6 +963,24 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
    }
 
+   private void updateSyncActions() {
+
+      if (_isGeoCompareRefTour) {
+
+         _actionSynchChartsByScale.setImageDescriptor(imageDescriptor_SyncByScale_GeoCompare);
+         _actionSynchChartsBySize.setImageDescriptor(imageDescriptor_SyncBySize_GeoCompare);
+
+         _tourChart.setGraphActionImage(TourManager.GRAPH_TOUR_COMPARE, imageDescriptor_Graph_GeoCompare);
+
+      } else {
+
+         _actionSynchChartsByScale.setImageDescriptor(imageDescriptor_SyncByScale_ElevationCompare);
+         _actionSynchChartsBySize.setImageDescriptor(imageDescriptor_SyncBySize_ElevationCompare);
+
+         _tourChart.setGraphActionImage(TourManager.GRAPH_TOUR_COMPARE, imageDescriptor_Graph_ElevationCompare);
+      }
+   }
+
    /**
     * @return Returns <code>false</code> when the compared tour is not displayed
     */
@@ -932,6 +1002,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       _tourChartConfig.canShowTourCompareGraph = true;
       _tourChartConfig.isGeoCompare = isGeoCompareRefTour;
 
+      updateSyncActions();
       updateChart();
       enableSynchronization();
       enableActions();

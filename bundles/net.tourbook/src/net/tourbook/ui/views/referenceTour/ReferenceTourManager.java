@@ -69,7 +69,7 @@ public class ReferenceTourManager {
       _geoCompare_RefTour.setLabel("Selected Reference Tour");
 
       _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
-      _geoCompare_RefConfig.setIsGeoCompareRefTour(true);
+      _geoCompare_RefConfig.setIsGeoCompareRefTour();
 
       return _geoCompare_RefId;
    }
@@ -97,7 +97,7 @@ public class ReferenceTourManager {
             endIndex);
 
       _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
-      _geoCompare_RefConfig.setIsGeoCompareRefTour(true);
+      _geoCompare_RefConfig.setIsGeoCompareRefTour();
 
       return _geoCompare_RefId;
    }

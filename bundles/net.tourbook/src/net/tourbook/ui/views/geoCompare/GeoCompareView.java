@@ -185,7 +185,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //      System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); //$NON-NLS-1$
    }
 
-   private static final String       FORMAT_START_END = "%d…%d"; //$NON-NLS-1$
+   private static final String       FORMAT_START_END = "%d…%d";                         //$NON-NLS-1$
 
    private static final NumberFormat _nf0             = NumberFormat.getNumberInstance();
    private static final NumberFormat _nf1             = NumberFormat.getNumberInstance();
@@ -388,7 +388,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       public ActionOnOff() {
 
-         super(null, AS_PUSH_BUTTON);
+         super(null, AS_CHECK_BOX);
 
          setToolTipText(Messages.GeoCompare_View_Action_OnOff_Tooltip);
 
@@ -1351,6 +1351,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _spinnerGeoFilter_GeoDifference.setPageIncrement(10);
                _spinnerGeoFilter_GeoDifference.addSelectionListener(_compareSelectionListener);
                _spinnerGeoFilter_GeoDifference.addMouseWheelListener(_compareMouseWheelListener);
+               GridDataFactory.fillDefaults().applyTo(_spinnerGeoFilter_GeoDifference);
+
             }
             {
                // %
@@ -1430,6 +1432,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _lblNumTours = new Label(container, SWT.NONE);
                _lblNumTours.setText(UI.EMPTY_STRING);
                GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
+//               _lblNumTours.setBackground(UI.SYS_COLOR_CYAN);
             }
          }
          {
@@ -1476,6 +1479,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _lblStartEndIndex = new Label(container, SWT.NONE);
                _lblStartEndIndex.setText(UI.EMPTY_STRING);
                GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStartEndIndex);
+//               _lblStartEndIndex.setBackground(UI.SYS_COLOR_CYAN);
             }
          }
       }

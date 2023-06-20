@@ -1853,7 +1853,7 @@
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.comparedTourView"
             class       ="net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView"
-            icon        ="icons/tour-map-comparetour.png"
+            icon        ="icons/geo-elevation-compared-tour.png"
             name        ="%View_Name_RefTour_ComparedTour"/>
 
          <view

@@ -80,8 +80,9 @@ public class CompareConfig {
       return _isGeoCompareRefTour;
    }
 
-   public void setIsGeoCompareRefTour(final boolean isGeoCompareRefTour) {
-      _isGeoCompareRefTour = isGeoCompareRefTour;
+   public void setIsGeoCompareRefTour() {
+
+      _isGeoCompareRefTour = true;
    }
 
    @Override

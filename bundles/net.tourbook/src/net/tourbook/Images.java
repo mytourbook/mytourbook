@@ -145,7 +145,8 @@ public class Images {
    public static final String Graph_Swim_Swolf_Disabled                  = "graph-swim-swolf-disabled.png";                       //$NON-NLS-1$
    public static final String Graph_Temperature                          = "graph-temperature.png";                               //$NON-NLS-1$
    public static final String Graph_Temperature_Disabled                 = "graph-temperature-disabled.png";                      //$NON-NLS-1$
-   public static final String Graph_TourCompare                          = "tour-map-compare-result-graph.png";                   //$NON-NLS-1$
+   public static final String Graph_TourCompare_ByGeo                    = "graph-tour-compare-geo.png";                          //$NON-NLS-1$
+   public static final String Graph_TourCompare_ByElevation              = "tour-map-compare-result-graph.png";                   //$NON-NLS-1$
    public static final String Graph_TourCompare_Disabled                 = "tour-map-compare-result-graph-disabled.png";          //$NON-NLS-1$
    public static final String GroupValues                                = "app-group-values.png";                                //$NON-NLS-1$
    public static final String GroupValues_Disabled                       = "app-group-values-disabled.png";                       //$NON-NLS-1$
@@ -280,6 +281,8 @@ public class Images {
    public static final String State_TourMarker                           = "state-tour-marker.png";                               //$NON-NLS-1$
    public static final String Statistic                                  = "statistics.png";                                      //$NON-NLS-1$
    public static final String StatisticValues                            = "statistic-values.png";                                //$NON-NLS-1$
+   public static final String SyncGeoGraph_ByScale                       = "synch-geo-graph-byScale.png";                         //$NON-NLS-1$
+   public static final String SyncGeoGraph_BySize                        = "synch-geo-graph-bySize.png";                          //$NON-NLS-1$
    public static final String SyncGraph_ByScale                          = "synch-graph-byScale.png";                             //$NON-NLS-1$
    public static final String SyncGraph_ByScale_Disabled                 = "synch-graph-byScale-disabled.png";                    //$NON-NLS-1$
    public static final String SyncGraph_BySize                           = "synch-graph-bySize.png";                              //$NON-NLS-1$

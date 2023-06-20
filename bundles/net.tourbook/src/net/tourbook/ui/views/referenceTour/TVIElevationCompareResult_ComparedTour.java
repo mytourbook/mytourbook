@@ -66,6 +66,9 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
    float              compareSpeed;
    int                timeInterval;
 
+   float              elevationGain;
+   float              elevationLoss;
+
    /**
     * Metric or imperial altimeter (VAM)
     */

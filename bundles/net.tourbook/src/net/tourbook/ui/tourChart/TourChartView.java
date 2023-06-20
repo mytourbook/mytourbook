@@ -621,11 +621,25 @@ public class TourChartView extends ViewPart implements
          return;
       }
 
-      if (eventId != GeoCompareEventId.TOUR_IS_GEO_COMPARED) {
-         return;
-      }
+      switch (eventId) {
 
-      // tour is geo compared, check if
+      case TOUR_IS_GEO_COMPARED:
+
+         break;
+
+      case SET_COMPARING_ON:
+
+         _tourChart.onGeoCompareOnOff(true);
+         break;
+
+      case SET_COMPARING_OFF:
+
+         _tourChart.onGeoCompareOnOff(false);
+         break;
+
+      default:
+         break;
+      }
    }
 
    @Override

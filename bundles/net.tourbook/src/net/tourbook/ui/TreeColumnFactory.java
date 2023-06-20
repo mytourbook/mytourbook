@@ -31,6 +31,10 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory ALTITUDE_DOWN;
    public static final TreeColumnFactory ALTITUDE_UP;
    public static final TreeColumnFactory ALTITUDE_MAX;
+   public static final TreeColumnFactory ALTITUDE_ELEVATION_TOTAL_GAIN;
+   public static final String            ALTITUDE_ELEVATION_TOTAL_GAIN_ID = "ALTITUDE_ELEVATION_TOTAL_GAIN_ID"; //$NON-NLS-1$
+   public static final TreeColumnFactory ALTITUDE_ELEVATION_TOTAL_LOSS;
+   public static final String            ALTITUDE_ELEVATION_TOTAL_LOSS_ID = "ALTITUDE_ELEVATION_TOTAL_LOSS_ID"; //$NON-NLS-1$
 
    public static final TreeColumnFactory BODY_CALORIES;
    public static final TreeColumnFactory BODY_PERSON;
@@ -49,9 +53,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DATA_TOUR_ID;
 
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_END;
-   public static final String            DEVICE_BATTERY_SOC_END_ID      = "DEVICE_BATTERY_SOC_END_ID";   //$NON-NLS-1$
+   public static final String            DEVICE_BATTERY_SOC_END_ID        = "DEVICE_BATTERY_SOC_END_ID";        //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_START;
-   public static final String            DEVICE_BATTERY_SOC_START_ID    = "DEVICE_BATTERY_SOC_START_ID"; //$NON-NLS-1$
+   public static final String            DEVICE_BATTERY_SOC_START_ID      = "DEVICE_BATTERY_SOC_START_ID";      //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
 
@@ -123,11 +127,11 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
-   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID = "TOUR_TAG_AND_CATEGORY_NOTES"; //$NON-NLS-1$
+   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID   = "TOUR_TAG_AND_CATEGORY_NOTES";      //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAG_ID;
    public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
-   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID    = "TOUR_TAG_IMAGE_FILE_PATH";    //$NON-NLS-1$
+   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID      = "TOUR_TAG_IMAGE_FILE_PATH";         //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAGS;
    public static final TreeColumnFactory TOUR_TITLE;
    public static final TreeColumnFactory TOUR_TYPE;
@@ -245,6 +249,52 @@ public abstract class TreeColumnFactory {
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      ALTITUDE_ELEVATION_TOTAL_GAIN = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_GAIN_ID, SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_Gain_Tooltip);
+            colDef.setColumnHeaderText(         unitLabel);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_Gain_Tooltip);
+            colDef.setColumnUnit(               unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      ALTITUDE_ELEVATION_TOTAL_LOSS = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_LOSS_ID, SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_Loss_Tooltip);
+            colDef.setColumnHeaderText(         unitLabel);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_Loss_Tooltip);
+            colDef.setColumnUnit(               unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
          }

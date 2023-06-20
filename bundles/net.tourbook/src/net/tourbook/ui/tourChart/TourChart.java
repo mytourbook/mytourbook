@@ -1421,7 +1421,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_TOUR_COMPARE,
             OtherMessages.GRAPH_LABEL_TOUR_COMPARE,
             Messages.Tour_Action_graph_tour_compare_tooltip,
-            ThemeUtil.getThemedImageName(Images.Graph_TourCompare),
+            ThemeUtil.getThemedImageName(Images.Graph_TourCompare_ByElevation),
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE);
 
@@ -2917,7 +2917,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       if (action != null) {
          action.setEnabled(isEnabled);
       }
-
    }
 
    private void enableZoomOptions() {
@@ -3632,6 +3631,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       _valuePointTooltipUI.hide();
+   }
+
+   void onGeoCompareOnOff(final boolean isGeoCompareOn) {
+
+      if (_tcc != null && _tcc.canUseGeoCompareTool) {
+
+         // show geo compare area in the chart
+         setShowXSliderArea(isGeoCompareOn);
+
+         _actionGeoCompare.setChecked(isGeoCompareOn);
+      }
    }
 
    private void onMarker_ChartResized() {
@@ -4805,6 +4815,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          _customBackgroundPainter = new GraphBackgroundPainter();
       } else {
          _customBackgroundPainter = null;
+      }
+   }
+
+   public void setGraphActionImage(final int graphId, final ImageDescriptor imageDescriptor) {
+
+      if (_allTourChartActions == null) {
+         return;
+      }
+
+      final Action action = _allTourChartActions.get(getGraphActionId(graphId));
+      if (action != null) {
+         action.setImageDescriptor(imageDescriptor);
       }
    }
 

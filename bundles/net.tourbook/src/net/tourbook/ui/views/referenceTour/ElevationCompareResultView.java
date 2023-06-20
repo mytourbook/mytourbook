@@ -18,6 +18,7 @@ package net.tourbook.ui.views.referenceTour;
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -124,15 +125,23 @@ public class ElevationCompareResultView extends ViewPart implements
       ITreeViewer,
       IReferenceTourProvider {
 
-   public static final String                  ID                                = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
+   public static final String            ID                                = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
-   private String                              STATE_IS_USE_FAST_APP_TOUR_FILTER = "STATE_IS_USE_FAST_APP_TOUR_FILTER";                //$NON-NLS-1$
+   private static String                 STATE_IS_USE_FAST_APP_TOUR_FILTER = "STATE_IS_USE_FAST_APP_TOUR_FILTER";                //$NON-NLS-1$
 
-   private final IPreferenceStore              _prefStore                        = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore              _prefStore_Common                 = CommonActivator.getPrefStore();
-   private final IDialogSettings               _state                            = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                 = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                            = TourbookPlugin.getState(ID);
 
-   private TVIElevationCompareResult_RootItem            _rootItem;
+   private static final NumberFormat     _nf0                              = NumberFormat.getNumberInstance();
+
+   static {
+
+      _nf0.setMinimumFractionDigits(0);
+      _nf0.setMaximumFractionDigits(0);
+   }
+
+   private TVIElevationCompareResult_RootItem  _rootItem;
 
    private PostSelectionProvider               _postSelectionProvider;
 
@@ -146,7 +155,7 @@ public class ElevationCompareResultView extends ViewPart implements
    private boolean                             _isToolbarCreated;
    private boolean                             _isToolTipInTour;
 
-   private CompareFilter                       _compareFilter                    = CompareFilter.ALL_IS_DISPLAYED;
+   private CompareFilter                       _compareFilter             = CompareFilter.ALL_IS_DISPLAYED;
 
    private CheckboxTreeViewer                  _tourViewer;
    private ColumnManager                       _columnManager;
@@ -156,14 +165,14 @@ public class ElevationCompareResultView extends ViewPart implements
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                                 _columnIndex_TourTypeImage        = -1;
+   private int                                 _columnIndex_TourTypeImage = -1;
    private int                                 _columnWidth_TourTypeImage;
 
-   private SelectionRemovedComparedTours       _oldRemoveSelection               = null;
+   private SelectionRemovedComparedTours       _oldRemoveSelection        = null;
 
    private TagMenuManager                      _tagMenuManager;
    private MenuManager                         _viewerMenuManager;
-   private IContextMenuProvider                _viewerContextMenuProvider        = new TreeContextMenuProvider();
+   private IContextMenuProvider                _viewerContextMenuProvider = new TreeContextMenuProvider();
 
    private ActionAppTourFilter                 _actionAppTourFilter;
    private ActionCollapseAll                   _actionCollapseAll;
@@ -888,6 +897,9 @@ public class ElevationCompareResultView extends ViewPart implements
       defineColumn_Tour_Type();
       defineColumn_Data_Diff();
 
+      defineColumn_Elevation_ElevationGain();
+      defineColumn_Elevation_ElevationLoss();
+
       defineColumn_Motion_SpeedComputed();
       defineColumn_Motion_SpeedSaved();
       defineColumn_Motion_SpeedMoved();
@@ -1011,6 +1023,71 @@ public class ElevationCompareResultView extends ViewPart implements
 
                cell.setText(Integer.toString(((TVIElevationCompareResult_ComparedTour) element).timeInterval));
                setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation gain
+    */
+   private void defineColumn_Elevation_ElevationGain() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.ALTITUDE_ELEVATION_TOTAL_GAIN.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour item = (TVIElevationCompareResult_ComparedTour) element;
+
+               final float value = item.elevationGain;
+               if (value == 0) {
+
+                  cell.setText(UI.EMPTY_STRING);
+
+               } else {
+
+                  cell.setText(_nf0.format(value));
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation loss
+    */
+   private void defineColumn_Elevation_ElevationLoss() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.ALTITUDE_ELEVATION_TOTAL_LOSS.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour item = (TVIElevationCompareResult_ComparedTour) element;
+
+               final float value = item.elevationLoss;
+               if (value == 0) {
+
+                  cell.setText(UI.EMPTY_STRING);
+
+               } else {
+
+                  cell.setText(_nf0.format(value));
+               }
             }
          }
       });

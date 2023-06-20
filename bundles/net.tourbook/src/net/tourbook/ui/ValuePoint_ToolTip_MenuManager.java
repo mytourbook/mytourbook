@@ -475,7 +475,7 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_TourCompareResult = new ActionValueItem(
             VALUE_ID_TOUR_COMPARE_RESULT,
             Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
-            Images.Graph_TourCompare,
+            Images.Graph_TourCompare_ByElevation,
             Images.Graph_TourCompare_Disabled);
 
       _actionValue_RunDyn_StanceTime = new ActionValueItem(

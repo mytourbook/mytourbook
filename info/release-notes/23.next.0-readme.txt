@@ -56,6 +56,9 @@ Improvements
   - Display tour filter in the main view
   - New filter: Filter compared tours by sequence number
   - New columns: Elevation gain/loss
+  
+* Elevation Compare View
+  - New columns: Elevation gain/loss
 
 * Year Statistic View
   - Show geo compared tours instantly when they are modified
