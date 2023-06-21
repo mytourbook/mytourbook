@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -264,16 +264,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          updateSqlState();
 
          // mark image area as needed to be redrawn
-         Display.getDefault().syncExec(new Runnable() {
+         Display.getDefault().syncExec(() -> {
 
-            @Override
-            public void run() {
+            if (_imageGallery.isDisposed()) {
+               return;
+            }
 
-               if (_imageGallery.isDisposed()) {
-                  return;
-               }
-
-               _imageGallery.refreshUI();
+            _imageGallery.refreshUI();
 
 //               /*
 //                * Visibility check must be done in the UI thread because scrolling the gallery can
@@ -288,7 +285,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 //                  // redraw gallery item WITH background
 //                  _imageGallery.redrawItem(_galleryItem);
 //               }
-            }
          });
 //
 //         _imageGallery.jobUILoading_20_Schedule();
@@ -775,7 +771,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
          } catch (final Exception e) {
 
-            System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
+            System.out.println("SWT exception occurred when painting valid image " //$NON-NLS-1$
                   + photo.imageFilePathName
                   + " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 
@@ -1170,7 +1166,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       gc.setBackground(_fullsizeBgColor);
 
       /*
-       * With a dark theme, the background is painted not with a black color -> force black background
+       * With a dark theme, the background is painted not with a black color -> force black
+       * background
        */
       gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
 
