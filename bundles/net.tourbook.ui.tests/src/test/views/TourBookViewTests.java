@@ -225,19 +225,9 @@ public class TourBookViewTests extends UITest {
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
       assertEquals(10, botNatTable.rowCount());
 
-      int rowIndex = 1;
-      int columnIndex = 1;
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
-      botNatTable.click(rowIndex++, columnIndex++);
+      for (int columnIndex = 1; columnIndex < 92; ++columnIndex) {
+         botNatTable.click(1, columnIndex);
+      }
 
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
