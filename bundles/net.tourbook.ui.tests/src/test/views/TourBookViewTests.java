@@ -229,7 +229,8 @@ public class TourBookViewTests extends UITest {
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       final int numberVisibleColumns = botNatTable.columnCount();
-      for (int columnIndex = 1, visibleColumnIndex = 1; columnIndex < 92; ++columnIndex, ++visibleColumnIndex) {
+      int visibleColumnIndex = 1;
+      for (int columnIndex = 1; columnIndex < 92; ++columnIndex, ++visibleColumnIndex) {
 
          if (visibleColumnIndex == numberVisibleColumns) {
 
