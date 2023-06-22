@@ -234,6 +234,7 @@ public class TourBookViewTests extends UITest {
 
          if (visibleColumnIndex == numberVisibleColumns) {
 
+            // Scrolling the NatTable horizontally
             botNatTable.widget.doCommand(new ShowColumnInViewportCommand(columnIndex + numberVisibleColumns));
             visibleColumnIndex = 1;
          }
