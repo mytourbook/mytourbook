@@ -226,7 +226,7 @@ public class TourBookViewTests extends UITest {
       assertEquals(10, botNatTable.rowCount());
       assertEquals(5, botNatTable.columnCount());
 
-      for (int columnIndex = 1; columnIndex < 6; ++columnIndex) {
+      for (int columnIndex = 1; columnIndex < 5; ++columnIndex) {
          botNatTable.click(1, columnIndex);
       }
 
