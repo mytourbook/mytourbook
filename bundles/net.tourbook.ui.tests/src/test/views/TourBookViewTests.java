@@ -32,6 +32,7 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.viewport.command.ShowColumnInViewportCommand;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.BeforeEach;
@@ -224,13 +225,20 @@ public class TourBookViewTests extends UITest {
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
       assertEquals(10, botNatTable.rowCount());
-      assertEquals(5, botNatTable.columnCount());
-
-      for (int columnIndex = 1; columnIndex < 5; ++columnIndex) {
-         botNatTable.click(1, columnIndex);
-      }
 
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+
+      final int numberVisibleColumns = botNatTable.columnCount();
+      for (int columnIndex = 1, visibleColumnIndex = 1; columnIndex < 92; ++columnIndex, ++visibleColumnIndex) {
+
+         if (visibleColumnIndex == numberVisibleColumns) {
+
+            botNatTable.widget.doCommand(new ShowColumnInViewportCommand(columnIndex + numberVisibleColumns));
+            visibleColumnIndex = 1;
+         }
+
+         botNatTable.click(1, visibleColumnIndex);
+      }
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
