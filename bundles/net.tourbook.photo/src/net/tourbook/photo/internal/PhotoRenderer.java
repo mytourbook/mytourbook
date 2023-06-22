@@ -440,7 +440,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
           */
 
          /*
-          * an exception can occure because the image could be disposed before it is drawn
+          * an exception can occur because the image could be disposed before it is drawn
           */
          try {
 
@@ -463,7 +463,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                isSelected);
 
          if (isPainted == false) {
-            // error occured painting the image, invalidate canvas
+            // error occurred painting the image, invalidate canvas
          }
 
 //         // debug box for the image area
@@ -1178,7 +1178,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
        */
       if (isImageAvailable) {
 
-         //an exception can occure because the image could be disposed before it is drawn
+         //an exception can occur because the image could be disposed before it is drawn
          try {
             final Rectangle imageBounds = paintedImage.getBounds();
             _paintedImageWidth = imageBounds.width;

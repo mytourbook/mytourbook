@@ -123,7 +123,7 @@ public class PhotoUI {
 
       } else {
 
-         // default is vertical/horizontal centerd
+         // default is vertical/horizontal centered
 
          paintedDest_DevX += centerOffsetX;
          paintedDest_DevY += centerOffsetY;
