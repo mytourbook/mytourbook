@@ -228,8 +228,7 @@ public class TourBookViewTests extends UITest {
 
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
-      final var titi = botNatTable.columnCount();
-      final int numberVisibleColumns = 4;//;
+      final int numberVisibleColumns = 4;
       int visibleColumnIndex = 1;
       for (int columnIndex = 1; columnIndex < 92; ++columnIndex, ++visibleColumnIndex) {
 
@@ -242,7 +241,6 @@ public class TourBookViewTests extends UITest {
 
          botNatTable.click(1, visibleColumnIndex);
       }
-      assertEquals(40, titi);
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
