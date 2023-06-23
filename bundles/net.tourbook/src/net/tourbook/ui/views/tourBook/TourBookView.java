@@ -1757,14 +1757,16 @@ public class TourBookView extends ViewPart implements
       _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage_Tree.getColumnId());
       _columnIndex_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds_Tree.getColumnId());
 
+      final int numColumns = tree.getColumns().length;
+
       // add column resize listener
-      if (_columnIndex_TourTypeImage >= 0) {
+      if (_columnIndex_TourTypeImage >= 0 && _columnIndex_TourTypeImage < numColumns) {
 
          isColumnVisible = true;
          tree.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
       }
 
-      if (_columnIndex_WeatherClouds >= 0) {
+      if (_columnIndex_WeatherClouds >= 0 && _columnIndex_WeatherClouds < numColumns) {
 
          isColumnVisible = true;
          tree.getColumn(_columnIndex_WeatherClouds).addControlListener(controlResizedAdapter);

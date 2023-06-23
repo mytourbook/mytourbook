@@ -819,8 +819,10 @@ public class TourCompareResultView extends ViewPart implements
       final ColumnProfile activeProfile = _columnManager.getActiveProfile();
       _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage.getColumnId());
 
+      final int numColumns = tree.getColumns().length;
+
       // add column resize listener
-      if (_columnIndex_TourTypeImage >= 0) {
+      if (_columnIndex_TourTypeImage >= 0 && _columnIndex_TourTypeImage < numColumns) {
 
          isColumnVisible = true;
          tree.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
