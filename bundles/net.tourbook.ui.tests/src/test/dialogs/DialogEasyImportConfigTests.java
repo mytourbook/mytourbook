@@ -25,6 +25,28 @@ import utils.Utils;
 public class DialogEasyImportConfigTests extends UITest {
 
    @Test
+   void configureEasyImport() {
+
+      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
+
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_SetupEasyImport_Tooltip).click();
+
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
+
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_TourType).select();
+      bot.comboBox(0).setSelection(Messages.Import_Data_TourTypeConfig_BySpeed);
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_LastMarker).select();
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_AdjustTemperature).select();
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation).select();
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM).select();
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData).select();
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_SaveTour).select();
+
+      Utils.clickOkButton(bot);
+   }
+
+   @Test
    void openEasyImportConfig() {
 
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
@@ -33,7 +55,6 @@ public class DialogEasyImportConfigTests extends UITest {
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_SetupEasyImport_Tooltip).click();
 
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Configuration).activate();
-      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Options).activate();
 
       Utils.clickOkButton(bot);

@@ -987,7 +987,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   final Table filterTable = _icViewer.getTable();
 
                   /*
-                   * check if drag was startet from this filter, remove the filter item before
+                   * check if drag was started from this filter, remove the filter item before
                    * the new filter is inserted
                    */
                   if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStart) {
@@ -1632,7 +1632,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   final Table filterTable = _ilViewer.getTable();
 
                   /*
-                   * check if drag was startet from this filter, remove the filter item before
+                   * check if drag was started from this filter, remove the filter item before
                    * the new filter is inserted
                    */
                   if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStart) {
