@@ -15,26 +15,22 @@
  *******************************************************************************/
 package preferences;
 
-import net.tourbook.Messages;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageStatisticsTests extends UITest {
+public class PrefPageProxyTests extends UITest {
 
    @Test
-   void PrefPageStatistics_MoveAndSortStatistics() {
+   void openPreferencePage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Statistics").select(); //$NON-NLS-1$
-
-      bot.table().select(Messages.Pref_Statistic_Group_YearSummary);
-      bot.button(Messages.app_action_button_down).click();
-      bot.button(Messages.app_action_button_up).click();
-      bot.button(Messages.Pref_Statistic_Action_SortByData).click();
-      bot.button(Messages.Pref_Statistic_Action_SortByTime).click();
+      final SWTBotTreeItem proxyTreeItem = bot.tree().getTreeItem("Proxy").select(); //$NON-NLS-1$
+      assertNotNull(proxyTreeItem);
 
       Utils.clickApplyAndCloseButton(bot);
    }

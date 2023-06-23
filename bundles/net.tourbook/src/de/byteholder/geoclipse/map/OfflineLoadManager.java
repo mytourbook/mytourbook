@@ -33,7 +33,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 /**
  * This is managing the loading for offline images
  */
-public class OfflineLoadManager {
+class OfflineLoadManager {
 
    private static OfflineLoadManager                _instance;
 
@@ -52,7 +52,7 @@ public class OfflineLoadManager {
    /**
     * This callback is called when a tile image was loaded and is set into the tile
     */
-   final class TileImageLoaderCallback_ForOfflineImages implements TileImageLoaderCallback {
+   private final class TileImageLoaderCallback_ForOfflineImages implements TileImageLoaderCallback {
 
       @Override
       public void update(final Tile tile) {
@@ -140,7 +140,7 @@ public class OfflineLoadManager {
       return true;
    }
 
-   public boolean deleteOfflineImage(final MP offlineMp, final Tile offlineTile) {
+   boolean deleteOfflineImage(final MP offlineMp, final Tile offlineTile) {
 
       final IPath tilePath = offlineMp.getTileOSPath(_osTileCachePath, offlineTile);
 
@@ -159,7 +159,7 @@ public class OfflineLoadManager {
          }
 
       } catch (final Exception e) {
-         StatusUtil.showStatus("error occured when deleding offline image: " + tilePath.toOSString(), e); //$NON-NLS-1$
+         StatusUtil.showStatus("error occurred when deleting offline image: " + tilePath.toOSString(), e); //$NON-NLS-1$
       }
 
       return false;
@@ -199,7 +199,7 @@ public class OfflineLoadManager {
          }
 
       } catch (final Exception e) {
-         StatusUtil.showStatus("error occured when checking offline image", e); //$NON-NLS-1$
+         StatusUtil.showStatus("error occurred when checking offline image", e); //$NON-NLS-1$
          return false;
       }
 

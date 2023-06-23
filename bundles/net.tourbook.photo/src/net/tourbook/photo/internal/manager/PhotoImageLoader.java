@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,7 +82,7 @@ public class PhotoImageLoader {
 
    private ILoadCallBack            _loadCallBack;
 
-   Display                          _display;
+   private Display                  _display;
 
    /**
     * Contains AWT images which are disposed after loading
@@ -405,7 +405,7 @@ public class PhotoImageLoader {
          if (storeImage == null) {
 
             String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n" //$NON-NLS-1$
-                  + "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occured"; //$NON-NLS-1$
+                  + "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occurred"; //$NON-NLS-1$
 
             System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
 

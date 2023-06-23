@@ -13,29 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package preferences;
+package views;
 
-import net.tourbook.Messages;
+import net.tourbook.map2.Messages;
 
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageStatisticsTests extends UITest {
+public class MapPropertiesViewTests extends UITest {
 
    @Test
-   void PrefPageStatistics_MoveAndSortStatistics() {
+   void testTourTagsView() {
 
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Statistics").select(); //$NON-NLS-1$
+      Utils.getTour(bot);
 
-      bot.table().select(Messages.Pref_Statistic_Group_YearSummary);
-      bot.button(Messages.app_action_button_down).click();
-      bot.button(Messages.app_action_button_up).click();
-      bot.button(Messages.Pref_Statistic_Action_SortByData).click();
-      bot.button(Messages.Pref_Statistic_Action_SortByTime).click();
+      //Open the Map Properties view
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.SYSTEM).expand().getNode("Map Properties").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Map Properties"); //$NON-NLS-1$
 
-      Utils.clickApplyAndCloseButton(bot);
+      bot.checkBox(Messages.Map_Properties_ShowTileInfo).select();
+      bot.checkBox(Messages.Map_Properties_ShowTileBorder).select();
+      bot.checkBox(Messages.Map_Properties_ShowGeoGrid).select();
    }
 }
