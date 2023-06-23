@@ -7,9 +7,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.XmlUtils;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -39,7 +39,7 @@ public class GpxTrackDistanceTest extends DefaultHandler {
          final DefaultHandler handler = new GpxTrackDistanceTest();
 
          // Parse the input with the default (non-validating) parser
-         final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+         final SAXParser saxParser = XmlUtils.initializeParser();
          saxParser.parse(f, handler);
       } catch (final Exception t) {
          t.printStackTrace();

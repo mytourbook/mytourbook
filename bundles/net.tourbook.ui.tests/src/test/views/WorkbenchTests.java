@@ -29,6 +29,7 @@ public class WorkbenchTests extends UITest {
    public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
    public static final String COMPARE_TOURS   = "4. Compare Tours";   //$NON-NLS-1$
    public static final String PHOTO           = "5. Photo";           //$NON-NLS-1$
+   public static final String SYSTEM          = "99. System";         //$NON-NLS-1$
 
    @BeforeClass
    public static void beforeClass() {
@@ -73,9 +74,6 @@ public class WorkbenchTests extends UITest {
       Utils.showTourBookView(bot);
 
       Utils.getTourWithSRTM(bot);
-
-      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
       bot.toolbarButtonWithTooltip("Show tour in 2D map").click(); //$NON-NLS-1$
       Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
@@ -144,6 +142,11 @@ public class WorkbenchTests extends UITest {
       final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Year Statistic").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      final SWTBotView yearStatisticView = Utils.showView(bot, "Year Statistic"); //$NON-NLS-1$
+
+      Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
@@ -153,6 +156,9 @@ public class WorkbenchTests extends UITest {
 
       Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$ //$NON-NLS-2$
       final SWTBotView mapBookmarkView = Utils.showView(bot, "Map Bookmark"); //$NON-NLS-1$
+
+      Utils.showViewFromMenu(bot, "Map", "Model &Player"); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotView modelPlayerView = Utils.showView(bot, "Model Player"); //$NON-NLS-1$
 
       bot.sleep(3000);
 
@@ -174,5 +180,7 @@ public class WorkbenchTests extends UITest {
       photosAndToursView.close();
       tourPhotosView.close();
       mapBookmarkView.close();
+      modelPlayerView.close();
+      yearStatisticView.close();
    }
 }

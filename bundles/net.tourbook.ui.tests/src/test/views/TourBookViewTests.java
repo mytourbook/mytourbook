@@ -32,6 +32,7 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.viewport.command.ShowColumnInViewportCommand;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.BeforeEach;
@@ -218,14 +219,28 @@ public class TourBookViewTests extends UITest {
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
 
+      // NatTable is slow to appear so we wait a bit otherwise the test will fail
+      bot.sleep(3000);
+
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
       assertEquals(10, botNatTable.rowCount());
 
-      botNatTable.click(1, 0);
-      botNatTable.click(2, 0);
-      //FIXME org.opentest4j.AssertionFailedError: expected: <0:10> but was: <>
-      //assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+
+      final int numberVisibleColumns = 4;
+      int visibleColumnIndex = 1;
+      for (int columnIndex = 1; columnIndex < 92; ++columnIndex, ++visibleColumnIndex) {
+
+         if (visibleColumnIndex == numberVisibleColumns) {
+
+            // Scrolling the NatTable horizontally
+            botNatTable.widget.doCommand(new ShowColumnInViewportCommand(columnIndex + numberVisibleColumns));
+            visibleColumnIndex = 1;
+         }
+
+         botNatTable.click(1, visibleColumnIndex);
+      }
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();

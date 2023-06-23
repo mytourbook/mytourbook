@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package preferences;
+package views;
 
 import net.tourbook.Messages;
 
@@ -22,20 +22,20 @@ import org.junit.jupiter.api.Test;
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageStatisticsTests extends UITest {
+public class RawDataViewTests extends UITest {
 
    @Test
-   void PrefPageStatistics_MoveAndSortStatistics() {
+   void testTourImportView() {
 
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Statistics").select(); //$NON-NLS-1$
+      Utils.getTour(bot);
 
-      bot.table().select(Messages.Pref_Statistic_Group_YearSummary);
-      bot.button(Messages.app_action_button_down).click();
-      bot.button(Messages.app_action_button_up).click();
-      bot.button(Messages.Pref_Statistic_Action_SortByData).click();
-      bot.button(Messages.Pref_Statistic_Action_SortByTime).click();
+      //Open the view
+      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
-      Utils.clickApplyAndCloseButton(bot);
+      //Switch between UIs
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
    }
 }

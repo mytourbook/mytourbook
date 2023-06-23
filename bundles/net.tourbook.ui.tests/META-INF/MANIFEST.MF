@@ -16,7 +16,9 @@ Require-Bundle: net.tourbook,
  net.tourbook.cloud,
  net.tourbook.device,
  net.tourbook.device.garmin,
- org.opentest4j
+ org.opentest4j,
+ org.slf4j.api,
+ org.eclipse.nebula.widgets.nattable.core
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook

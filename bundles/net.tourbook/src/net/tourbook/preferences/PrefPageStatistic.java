@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,10 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 
 import net.tourbook.Messages;
@@ -33,10 +34,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -44,8 +43,6 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -243,12 +240,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
        * create table viewer
        */
       _statViewer.setContentProvider(new StatContentProvider());
-      _statViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            enableActions();
-         }
-      });
+      _statViewer.addSelectionChangedListener(selectionChangedEvent -> enableActions());
    }
 
    private void createUI_20_Actions(final Composite parent) {
@@ -262,12 +254,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
             _btnMoveUp = new Button(container, SWT.NONE);
             _btnMoveUp.setText(Messages.app_action_button_up);
             setButtonLayoutData(_btnMoveUp);
-            _btnMoveUp.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onMoveUp();
-               }
-            });
+            _btnMoveUp.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onMoveUp()));
          }
 
          {
@@ -275,12 +262,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
             _btnMoveDown = new Button(container, SWT.NONE);
             _btnMoveDown.setText(Messages.app_action_button_down);
             setButtonLayoutData(_btnMoveDown);
-            _btnMoveDown.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onMoveDown();
-               }
-            });
+            _btnMoveDown.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onMoveDown()));
          }
 
          {
@@ -288,12 +270,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
             _btnSortByData = new Button(container, SWT.NONE);
             _btnSortByData.setText(Messages.Pref_Statistic_Action_SortByData);
             setButtonLayoutData(_btnSortByData);
-            _btnSortByData.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSortByData();
-               }
-            });
+            _btnSortByData.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSortByData()));
          }
 
          {
@@ -301,12 +278,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
             _btnSortByTime = new Button(container, SWT.NONE);
             _btnSortByTime.setText(Messages.Pref_Statistic_Action_SortByTime);
             setButtonLayoutData(_btnSortByTime);
-            _btnSortByTime.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSortByTime();
-               }
-            });
+            _btnSortByTime.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSortByTime()));
          }
       }
    }
@@ -383,16 +355,12 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
    private void onSortByData() {
 
-      Collections.sort(_visibleStatistics, new Comparator<TourbookStatistic>() {
+      Collections.sort(_visibleStatistics, (stat1, stat2) -> {
 
-         @Override
-         public int compare(final TourbookStatistic stat1, final TourbookStatistic stat2) {
+         final int stat1Sorting = _sortingByCategoryData.get(stat1.plugin_Category_Data);
+         final int stat2Sorting = _sortingByCategoryData.get(stat2.plugin_Category_Data);
 
-            final int stat1Sorting = _sortingByCategoryData.get(stat1.plugin_Category_Data);
-            final int stat2Sorting = _sortingByCategoryData.get(stat2.plugin_Category_Data);
-
-            return stat1Sorting - stat2Sorting;
-         }
+         return stat1Sorting - stat2Sorting;
       });
 
       updateUI_WithReselection();
@@ -400,16 +368,12 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
    private void onSortByTime() {
 
-      Collections.sort(_visibleStatistics, new Comparator<TourbookStatistic>() {
+      Collections.sort(_visibleStatistics, (stat1, stat2) -> {
 
-         @Override
-         public int compare(final TourbookStatistic stat1, final TourbookStatistic stat2) {
+         final int stat1Sorting = _sortingByCategoryTime.get(stat1.plugin_Category_Time);
+         final int stat2Sorting = _sortingByCategoryTime.get(stat2.plugin_Category_Time);
 
-            final int stat1Sorting = _sortingByCategoryTime.get(stat1.plugin_Category_Time);
-            final int stat2Sorting = _sortingByCategoryTime.get(stat2.plugin_Category_Time);
-
-            return stat1Sorting - stat2Sorting;
-         }
+         return stat1Sorting - stat2Sorting;
       });
 
       updateUI_WithReselection();
