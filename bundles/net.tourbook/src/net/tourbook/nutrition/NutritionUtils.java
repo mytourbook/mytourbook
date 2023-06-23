@@ -32,6 +32,9 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
+import pl.coderion.model.ProductResponse;
+import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
+
 public class NutritionUtils {
 
    private static final String OPENFOODFACTS_SEARCH_URL =
@@ -41,6 +44,9 @@ public class NutritionUtils {
 
    public static List<Product> searchProduct(final String productName)
    {
+      final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
+      final ProductResponse productResponse = wrapper.fetchProductByCode("737628064502");
+
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(OPENFOODFACTS_SEARCH_URL + productName.replace(" ", "+")))
