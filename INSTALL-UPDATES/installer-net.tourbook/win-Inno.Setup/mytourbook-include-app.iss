@@ -1,6 +1,6 @@
 
 #define AppYear         "2023"
-#define AppVersion      "23.5.0"
+#define AppVersion      "23.5.1"
 
 #define AppSubVersion   ""
 ;#define AppSubVersion   "_BETA_1"
