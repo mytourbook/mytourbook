@@ -3718,7 +3718,7 @@
          id="stop4402-6" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(0,-20)"
+       gradientTransform="translate(0,-25)"
        gradientUnits="userSpaceOnUse"
        y2="40.338295"
        x2="110.05691"
@@ -3748,7 +3748,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(100,-20)"
+       gradientTransform="translate(100,-25)"
        gradientUnits="userSpaceOnUse"
        y2="42.798241"
        x2="130.0569"
@@ -3778,7 +3778,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(-20,-20)"
+       gradientTransform="translate(-20,-25)"
        inkscape:collect="always"
        xlink:href="#linearGradient4513-8"
        id="linearGradient4555"
@@ -3808,7 +3808,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(-19.999998,-20)"
+       gradientTransform="translate(-19.999998,-25)"
        inkscape:collect="always"
        xlink:href="#linearGradient4513-8-4"
        id="linearGradient4600"
@@ -3839,7 +3839,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(-20.000005,-20)"
+       gradientTransform="translate(-20.000005,-25)"
        inkscape:collect="always"
        xlink:href="#linearGradient4513-8-4-5"
        id="linearGradient4645"
@@ -3870,7 +3870,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(-19.999994,-20)"
+       gradientTransform="translate(-19.999994,-25)"
        inkscape:collect="always"
        xlink:href="#linearGradient4513-8-4-5-3"
        id="linearGradient4690"
@@ -3901,7 +3901,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(-20.000001,-20)"
+       gradientTransform="translate(-20.000001,-25)"
        inkscape:collect="always"
        xlink:href="#linearGradient4513-8-4-5-3-6"
        id="linearGradient4735"
@@ -3932,7 +3932,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(0,-20)"
+       gradientTransform="translate(0,-25)"
        inkscape:collect="always"
        xlink:href="#linearGradient4513-8-4-5-3-6-2"
        id="linearGradient4780"
@@ -3962,7 +3962,7 @@
          style="stop-color:#ffffff;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(20.000003,-20)"
+       gradientTransform="translate(20.000003,-25)"
        inkscape:collect="always"
        xlink:href="#4513"
        id="linearGradient4825"
@@ -4104,7 +4104,7 @@
          style="stop-color:#369df7;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
-       gradientTransform="translate(20,-20)"
+       gradientTransform="translate(20,-25)"
        y2="38.751965"
        x2="304.85889"
        y1="51.787136"
@@ -4114,7 +4114,7 @@
        xlink:href="#linearGradient4988"
        inkscape:collect="always" />
     <linearGradient
-       gradientTransform="translate(20,-20)"
+       gradientTransform="translate(20,-25)"
        gradientUnits="userSpaceOnUse"
        y2="38.353222"
        x2="306.875"
@@ -4698,9 +4698,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="235.74997"
-     inkscape:cx="277.74996"
-     inkscape:zoom="2.0000003"
+     inkscape:cy="679.35274"
+     inkscape:cx="161.22032"
+     inkscape:zoom="2.8284276"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -5152,7 +5152,7 @@
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9-3-7-7-2-26-0"
        d="M 328.00014,50.0031 V 34.440601 l 8,15.562499"
-       style="fill:#ffee91;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#ffd95c;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="ccc"
        inkscape:export-ydpi="96.000732"
@@ -5382,7 +5382,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-altitude.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0"
-       d="m 100.50025,29.5031 h 14.99998 l -7.49998,-15 z"
+       d="m 100.50025,24.5031 h 14.99998 l -7.49998,-15 z"
        style="fill:url(#linearGradient4466);fill-opacity:1;stroke:#25e224;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5391,7 +5391,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gradient.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0"
-       d="m 220.50019,29.5031 h 14.99998 l -7.49999,-15 z"
+       d="m 220.50019,24.5031 h 14.99998 l -7.49999,-15 z"
        style="fill:url(#linearGradient4519);fill-opacity:1;stroke:#eede00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5400,7 +5400,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-pulse.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2"
-       d="m 120.50024,29.5031 h 14.99998 l -7.49998,-15 z"
+       d="m 120.50024,24.5031 h 14.99998 l -7.49998,-15 z"
        style="fill:url(#linearGradient4555);fill-opacity:1;stroke:#ff1f1e;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5409,7 +5409,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-speed.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2"
-       d="m 140.50023,29.5031 h 14.99998 l -7.49998,-15 z"
+       d="m 140.50023,24.5031 h 14.99998 l -7.49998,-15 z"
        style="fill:url(#linearGradient4600);fill-opacity:1;stroke:#6eacfb;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5418,7 +5418,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-pace.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9"
-       d="m 160.50022,29.5031 h 14.99998 l -7.49998,-15 z"
+       d="m 160.50022,24.5031 h 14.99998 l -7.49998,-15 z"
        style="fill:url(#linearGradient4645);fill-opacity:1;stroke:#9e77f8;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5427,7 +5427,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-power.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9"
-       d="m 180.50021,29.5031 h 14.99998 l -7.49998,-15 z"
+       d="m 180.50021,24.5031 h 14.99998 l -7.49998,-15 z"
        style="fill:url(#linearGradient4690);fill-opacity:1;stroke:#ff13a6;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5436,7 +5436,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-temperature.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9-3"
-       d="m 200.5002,29.5031 h 14.99998 l -7.49998,-15 z"
+       d="m 200.5002,24.5031 h 14.99998 l -7.49998,-15 z"
        style="fill:url(#linearGradient4735);fill-opacity:1;stroke:#0fe1ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5445,7 +5445,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-altimeter.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9-3-7"
-       d="m 240.50018,29.5031 h 14.99998 l -7.49999,-15 z"
+       d="m 240.50018,24.5031 h 14.99998 l -7.49999,-15 z"
        style="fill:url(#linearGradient4780);fill-opacity:1;stroke:#ffab00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
@@ -5454,11 +5454,11 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-cadence.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9-3-7-7"
-       d="m 280.50017,29.5031 h 14.99998 l -7.49999,-15 z"
+       d="m 280.50017,24.5031 h 14.99998 l -7.49999,-15 z"
        style="fill:url(#linearGradient4825);fill-opacity:1;stroke:#9e541d;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        style="fill:url(#linearGradient4966);fill-opacity:1;stroke:url(#linearGradient5004);stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
-       d="m 300.50013,29.5031 h 14.99998 l -7.49999,-15 z"
+       d="m 300.50013,24.5031 h 14.99998 l -7.49999,-15 z"
        id="path6328-0"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
@@ -6827,7 +6827,7 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-overlapped.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-96-7"
-       d="m 482.67842,21.696343 -3.58881,-7.177625 -3.58881,7.177625"
+       d="m 482.67842,16.696343 -3.58881,-7.177625 -3.58881,7.177625"
        style="fill:#6eacfb;fill-opacity:1;stroke:#054ca7;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="ccc"
@@ -6836,7 +6836,7 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-overlapped.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-0-2"
-       d="m 487.93156,29.503108 -6.00001,-12.000064 -6.00004,12.000064"
+       d="m 487.93156,24.503108 -6.00001,-12.000064 -6.00004,12.000064"
        style="fill:#ff1f1e;fill-opacity:1;stroke:#9b0100;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="ccc"
@@ -6845,13 +6845,13 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-overlapped.png"
        inkscape:connector-curvature="0"
        id="path4660-1-0-9-7"
-       d="m 490.45788,25.530821 -4.50062,-9.00129 -4.50061,9.00129"
+       d="m 490.45788,20.530821 -4.50062,-9.00129 -4.50061,9.00129"
        style="fill:#25e224;fill-opacity:1;stroke:#128712;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-overlapped.png"
-       y="14.003101"
+       y="9.0031013"
        x="475.00082"
        height="15.999999"
        width="15.999991"
@@ -7751,7 +7751,7 @@
        inkscape:connector-curvature="0"
        id="path5150-9-29-2-8-7-2-3-1-80-2-3"
        d="m 240.49999,639.97436 c -0.03,-3.73953 -2.86217,-8.28783 -7.50004,-8.30232 2.3e-4,3.25356 0.0412,4.61541 -4e-5,8.30232"
-       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#ffd95c;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
@@ -7789,7 +7789,7 @@
        inkscape:connector-curvature="0"
        id="path5150-9-29-2-8-7-2-3-1-8-3-0-4"
        d="m 240.65019,639.99982 c -0.0306,-3.8145 -2.91181,-8.43919 -7.64783,-8.46875"
-       style="fill:none;fill-opacity:1;stroke:#435800;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:none;fill-opacity:1;stroke:#7d6000;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
@@ -8073,7 +8073,7 @@
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAA90lEQVQo kZWSIU4EQRBF34cRhADHwHABHAKHxSJwnAKHxqBAIbAIDGhISDgAGEJCAp5kh2xVm6UQM73TycwS plV3Vb1f/yetiGDMWRo1vRiIn5GA1zNmg51qoPb1AZFWlwPWWP8H4DWEsaIhoGfp7ZE0wb8TZtgn 739ueL6DABEYG0LAKy+bbC0AfJJvSlgg9fwWwMNFHgbkeLsNnrjfZqcHpAnRuABwpnQC3W/IwM1x 0QZh2PwhuOV6j/0C8Dq3otmTsMJ5l6UCuDwkQMqeBThGDiEIdMX5AUdVlhdqxxvDjs1D5xwCKk53 QUW91TWmKsw0emec/AL+7lYzcs287AAAAABJRU5ErkJggg== "
        id="image2106"
        x="320.00015"
-       y="14.003098" />
+       y="9.0030975" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:export-ydpi="96.000732"
@@ -8091,7 +8091,7 @@
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9-3-7-7-2-2-5"
        d="M 335.7753,49.894397 327.87819,34.114061"
-       style="fill:none;fill-opacity:1;stroke:#787200;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:none;fill-opacity:1;stroke:#7d6000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <image
        width="15.999991"
        height="15.999999"
@@ -8624,7 +8624,7 @@
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
-       y="13.983208"
+       y="8.9832077"
        x="374.12527"
        height="15.999999"
        width="15.99999"
@@ -8637,7 +8637,7 @@
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="path3774-1-0"
-       d="m 375.00014,30.0031 h 14.36341 l -2.19596,-5 h -9.95615 z"
+       d="m 375.00014,25.0031 h 14.36341 l -2.19596,-5 h -9.95615 z"
        style="display:inline;fill:#aae44d;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -8646,7 +8646,7 @@
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="path3778-4-75"
-       d="m 377.49388,25.00311 h 9.24796 l -2.44645,-5.01942 -4.36938,-4.5e-4 z"
+       d="m 377.49388,20.00311 h 9.24796 l -2.44645,-5.01942 -4.36938,-4.5e-4 z"
        style="display:inline;fill:#ffbd47;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -8655,7 +8655,7 @@
        sodipodi:nodetypes="cccc"
        inkscape:connector-curvature="0"
        id="path3774-1-5-4"
-       d="m 389.41146,29.72311 -2.55566,-5.05117 m -9.44227,0.0343 -2.60528,5.0683"
+       d="m 389.41146,24.72311 -2.55566,-5.05117 m -9.44227,0.0343 -2.60528,5.0683"
        style="display:inline;fill:#8cd020;fill-opacity:1;stroke:#4a6d11;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -8664,7 +8664,7 @@
        sodipodi:nodetypes="cccc"
        inkscape:connector-curvature="0"
        id="path3778-4-7-8"
-       d="m 380.18295,19.24893 -2.77471,5.46224 m 9.4535,-4e-5 -2.80616,-5.3933"
+       d="m 380.18295,14.24893 -2.77471,5.46224 m 9.4535,-4e-5 -2.80616,-5.3933"
        style="display:inline;fill:#ffa32d;fill-opacity:1;stroke:#7e4800;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:export-ydpi="96"
@@ -8673,7 +8673,7 @@
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0"
        id="path3780-8-5-5"
-       d="m 384.39912,20.00743 -2.27206,-4.538639 -2.31587,4.521509"
+       d="m 384.39912,15.00743 -2.27206,-4.538639 -2.31587,4.521509"
        style="display:inline;fill:#ff3e3e;fill-opacity:1;stroke:#8d1300;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <rect
        inkscape:export-ydpi="96"
@@ -12335,7 +12335,7 @@
        inkscape:connector-curvature="0"
        id="path4660-1-0-0-2-2-9-9-3-7-7-2-26-0-8"
        d="m 327.99932,75.003099 v -16.0031 l 8,16.0031"
-       style="fill:#ffee91;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#ffd95c;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="ccc"
        inkscape:export-ydpi="96.000732"

@@ -233,26 +233,24 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private GeoComparedTour           _selectedGeoComparedTour;
 
    private int                       _compareData_FirstIndex;
+   private int                       _compareData_LastIndex;
    private int[]                     _compareData_GeoGrid;
    private boolean                   _compareData_IsUseAppFilter;
-   private int                       _compareData_LastIndex;
    private int                       _compareData_NumGeoPartTours;
    private GeoCompareData            _compareData_CurrentGeoCompareData;
    private long                      _compareData_RefId;
    private TourData                  _compareData_TourData;
-   private long                      _compareData_TourId             = Long.MIN_VALUE;
+   private long                      _compareData_TourId             = -1;
    private String                    _compareData_TourTitle;
-   //
+
+   private int                       _compareData_DistanceInterval;
+   private int                       _compareData_GeoAccuracy;
+
+   private long                      _maxMinDiff;
+
    private int                       _lastCompare_DistanceInterval;
-   private int                       _lastCompare_FirstIndex;
-   private int                       _lastCompare_LastIndex;
    private int                       _lastCompare_GeoAccuracy;
-   private int                       _lastCompare_GeoFilter_GeoDifference;
-   private int                       _lastCompare_GeoFilter_MaxResults;
    private boolean                   _lastCompare_IsUseAppFilter;
-   private long                      _lastCompare_TourId;
-   private boolean                   _lastCompare_IsGeoFilter_GeoDiff;
-   private boolean                   _lastCompare_IsGeoFilter_MaxResults;
 
    private GeoCompareViewer          _geoCompareViewer;
    private GeoCompareComparator      _geoCompareComparator           = new GeoCompareComparator();
@@ -263,10 +261,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private TableColumnDefinition     _colDef_TourTypeImage;
    private int                       _columnIndex_TourTypeImage      = -1;
    private int                       _columnWidth_TourTypeImage;
-
-   private int                       _distanceInterval;
-   private int                       _geoAccuracy;
-   private long                      _maxMinDiff;
 
    private boolean                   _isGeoFilter_GeoDifference;
    private boolean                   _isGeoFilter_MaxResults;
@@ -296,7 +290,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private Composite _pageCompareResult;
    private Composite _pageGeoCompareIsOff;
    private Composite _pageMultipleTours;
-   private Composite _pageNoData;
+   private Composite _pageSelectTourWithGeoData;
+   private Composite _pageTourWithoutGeoData;
 
    private Button    _chkGeoFilter_GeoDiff;
    private Button    _chkGeoFilter_MaxResults;
@@ -839,8 +834,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (_compareData_TourId == tourId
             && _compareData_FirstIndex == leftIndex
             && _compareData_LastIndex == rightIndex
-            && _lastCompare_GeoAccuracy == _geoAccuracy
-            && _lastCompare_DistanceInterval == _distanceInterval
+
+            && _lastCompare_GeoAccuracy == _compareData_GeoAccuracy
+            && _lastCompare_DistanceInterval == _compareData_DistanceInterval
             && _lastCompare_IsUseAppFilter == _compareData_IsUseAppFilter) {
 
          /*
@@ -938,31 +934,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void compare_30_StartComparing() {
 
-      // check if comparing is already finished
-      if (_lastCompare_TourId == _compareData_TourId
-            && _lastCompare_FirstIndex == _compareData_FirstIndex
-            && _lastCompare_LastIndex == _compareData_LastIndex
-            && _lastCompare_GeoAccuracy == _geoAccuracy
-            && _lastCompare_DistanceInterval == _distanceInterval
-
-            && _lastCompare_IsGeoFilter_GeoDiff == _isGeoFilter_GeoDifference
-            && _lastCompare_IsGeoFilter_MaxResults == _isGeoFilter_MaxResults
-            && _lastCompare_GeoFilter_GeoDifference == _geoFilter_GeoDifference
-            && _lastCompare_GeoFilter_MaxResults == _geoFilter_MaxResults) {
-
-         // comparing is finished for the requested data
-
-         return;
-      }
-
       /*
        * Create geo data which should be compared
        */
       final NormalizedGeoData normalizedGeoData = _compareData_TourData.computeGeo_NormalizeLatLon(
             _compareData_FirstIndex,
             _compareData_LastIndex,
-            _geoAccuracy,
-            _distanceInterval);
+            _compareData_GeoAccuracy,
+            _compareData_DistanceInterval);
 
       // load tour id's in the geo parts
       final GeoCompareData newGeoCompareData = GeoPartTourLoader.loadToursFromGeoParts(
@@ -1140,18 +1119,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       /*
        * Keep state after compare is done
        */
-      _lastCompare_TourId                    = _compareData_TourId;
-      _lastCompare_FirstIndex                = _compareData_FirstIndex;
-      _lastCompare_LastIndex                 = _compareData_LastIndex;
-
-      _lastCompare_DistanceInterval          = _distanceInterval;
-      _lastCompare_GeoAccuracy               = _geoAccuracy;
+      _lastCompare_DistanceInterval          = _compareData_DistanceInterval;
+      _lastCompare_GeoAccuracy               = _compareData_GeoAccuracy;
       _lastCompare_IsUseAppFilter            = _compareData_IsUseAppFilter;
-
-      _lastCompare_IsGeoFilter_GeoDiff       = _isGeoFilter_GeoDifference;
-      _lastCompare_IsGeoFilter_MaxResults    = _isGeoFilter_MaxResults;
-      _lastCompare_GeoFilter_GeoDifference   = _geoFilter_GeoDifference;
-      _lastCompare_GeoFilter_MaxResults      = _geoFilter_MaxResults;
 
 // SET_FORMATTING_ON
 
@@ -1249,9 +1219,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_NoTourWithGeoData);
-      _pageGeoCompareIsOff = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_GeoCompareIsOff);
-      _pageMultipleTours = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_MultipleToursNotSupported);
+// SET_FORMATTING_OFF
+
+      _pageGeoCompareIsOff       = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_GeoCompareIsOff);
+      _pageMultipleTours         = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_MultipleToursNotSupported);
+      _pageSelectTourWithGeoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_SelectTourWithGeoData);
+      _pageTourWithoutGeoData    = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_NoTourWithGeoData);
+
+// SET_FORMATTING_ON
 
       _pageCompareResult = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_pageCompareResult);
@@ -2422,13 +2397,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-      _geoAccuracy      = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY,      GeoCompareView.DEFAULT_GEO_ACCURACY);
-      _distanceInterval = Util.getStateInt(_state, GeoCompareView.STATE_DISTANCE_INTERVAL, GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
+      _compareData_GeoAccuracy      = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY,      GeoCompareView.DEFAULT_GEO_ACCURACY);
+      _compareData_DistanceInterval = Util.getStateInt(_state, GeoCompareView.STATE_DISTANCE_INTERVAL, GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
 
 // SET_FORMATTING_ON
 
-      if (_lastCompare_GeoAccuracy != _geoAccuracy
-            || _lastCompare_DistanceInterval != _distanceInterval) {
+      if (_lastCompare_GeoAccuracy != _compareData_GeoAccuracy
+            || _lastCompare_DistanceInterval != _compareData_DistanceInterval) {
 
          // geo compare options are modified
 
@@ -2729,9 +2704,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void recompareTours() {
 
-      if (_compareData_GeoGrid != null && GeoCompareManager.isGeoComparingOn()) {
+      if (_compareData_GeoGrid == null) {
 
-         compare_30_StartComparing();
+         _pageBook.showPage(_pageSelectTourWithGeoData);
+
+      } else if (GeoCompareManager.isGeoComparingOn()) {
+
+         compare_20_SetupComparing();
       }
    }
 
@@ -2767,34 +2746,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (_compareData_TourData == null) {
 
          showInvalidPage();
-
-         // a tour is not displayed, find a tour provider which provides a tour
-//         _display.asyncExec(() -> {
-//
-//            // validate widget
-//
-//            if (_parent.isDisposed()) {
-//               return;
-//            }
-//
-//            /*
-//             * check if tour was set from a selection provider
-//             */
-//            if (_compareData_TourData != null) {
-//               return;
-//            }
-//
-////               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-////               if (selectedTours != null && selectedTours.size() > 0) {
-////
-////                  for (final TourData tourData : selectedTours) {
-////
-////                     if (compareWholeTour(tourData)) {
-////                        break;
-////                     }
-////                  }
-////               }
-//         });
       }
    }
 
@@ -2804,9 +2755,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-
-      _distanceInterval                = Util.getStateInt(_state,       STATE_DISTANCE_INTERVAL,               DEFAULT_DISTANCE_INTERVAL);
-      _geoAccuracy                     = Util.getStateInt(_state,       STATE_GEO_ACCURACY,                    DEFAULT_GEO_ACCURACY);
+      _compareData_DistanceInterval    = Util.getStateInt(_state,       STATE_DISTANCE_INTERVAL,               DEFAULT_DISTANCE_INTERVAL);
+      _compareData_GeoAccuracy         = Util.getStateInt(_state,       STATE_GEO_ACCURACY,                    DEFAULT_GEO_ACCURACY);
       _geoFilter_GeoDifference         = Util.getStateInt(_state,       STATE_GEO_FILTER_GEO_DIFFERENCE,       50);
       _geoFilter_MaxResults            = Util.getStateInt(_state,       STATE_GEO_FILTER_SEQUENCE_FILTER,      100);
       _isGeoFilter_GeoDifference       = Util.getStateBoolean(_state,   STATE_IS_GEO_FILTER_GEO_DIFFERENCE,    false);
@@ -2877,16 +2827,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void setState_StopComparing() {
 
       GeoPartTourLoader.stopLoading(_compareData_CurrentGeoCompareData);
-
-      // reset last id that the same compare can be restarted
-//		_compareData_TourId = Long.MIN_VALUE;
    }
 
    private void showInvalidPage() {
 
       if (GeoCompareManager.isGeoComparingOn()) {
 
-         _pageBook.showPage(_pageNoData);
+         _pageBook.showPage(_pageTourWithoutGeoData);
 
       } else {
 

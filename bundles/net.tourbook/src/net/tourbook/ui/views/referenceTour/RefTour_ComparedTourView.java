@@ -318,7 +318,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
                _isInRefTourChanged = true;
                {
-                  if (updateTourChart() == false) {
+                  if (updateTourChart(null) == false) {
                      enableSynchronization();
                   }
                }
@@ -982,9 +982,10 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    }
 
    /**
+    * @param isGeoCompareRefTourChecked
     * @return Returns <code>false</code> when the compared tour is not displayed
     */
-   private boolean updateTourChart() {
+   private boolean updateTourChart(final Boolean isGeoCompareRefTourChecked) {
 
       final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
 
@@ -992,7 +993,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return false;
       }
 
-      final boolean isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour();
+      final boolean isGeoCompareRefTour = isGeoCompareRefTourChecked != null
+            ? isGeoCompareRefTourChecked
+            : tourCompareConfig.isGeoCompareRefTour();
 
       _isGeoCompareRefTour = isGeoCompareRefTour;
 
@@ -1072,7 +1075,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       _comparedTourItem = elevationComparedResultTour;
 
-      updateTourChart();
+      updateTourChart(false);
 
       // enable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
@@ -1115,7 +1118,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       _comparedTourItem = geoComparedTour;
 
-      updateTourChart();
+      updateTourChart(true);
 
       // enable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
@@ -1164,7 +1167,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       _comparedTourItem = refTourComparedTour;
 
-      updateTourChart();
+      updateTourChart(false);
 
       // disable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);

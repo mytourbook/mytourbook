@@ -175,6 +175,10 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
     */
    private StructuredSelection                _currentSelection;
 
+   /**
+    * When <code>null</code> then the elevation compare type icon in {@link #_iconCompareType} is
+    * displayed
+    */
    private GeoCompareData                     _currentGeoCompareData;
 
    private ITourEventListener                 _tourEventListener;
@@ -1178,14 +1182,18 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       if (selection instanceof SelectionReferenceTourView) {
 
-         final SelectionReferenceTourView tourCatalogItem = (SelectionReferenceTourView) selection;
+         final SelectionReferenceTourView refTourItem = (SelectionReferenceTourView) selection;
 
-         final TVIRefTour_RefTourItem refItem = tourCatalogItem.getRefItem();
+         final TVIRefTour_RefTourItem refItem = refTourItem.getRefItem();
          if (refItem != null) {
 
             // reference tour is selected
 
             _currentRefItem = refItem;
+
+            if (refTourItem.isFromElevationCompare()) {
+               _currentGeoCompareData = null;
+            }
 
             updateUI_YearChart(true);
 
@@ -1193,7 +1201,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
             // show statistic for a specific year
 
-            final TVIRefTour_YearItem yearItem = tourCatalogItem.getYearItem();
+            final TVIRefTour_YearItem yearItem = refTourItem.getYearItem();
             if (yearItem != null) {
 
                _currentRefItem = yearItem.getRefItem();
@@ -1209,7 +1217,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          }
 
          // select tour in the statistic
-         final Long compTourId = tourCatalogItem.getCompTourId();
+         final Long compTourId = refTourItem.getCompTourId();
          if (compTourId != null) {
 
             selectTourInYearChart(compTourId);
@@ -1246,6 +1254,15 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
                final TVIRefTour_ComparedTour compareItem = (TVIRefTour_ComparedTour) firstElement;
 
+               boolean isUpdateYearChart = false;
+
+               if (compareItem.geoCompareTour == null && _currentGeoCompareData != null) {
+
+                  _currentGeoCompareData = null;
+
+                  isUpdateYearChart = true;
+               }
+
                // get year item
                final TreeViewerItem compareParentItem = compareItem.getParentItem();
                if (compareParentItem instanceof TVIRefTour_YearItem) {
@@ -1265,7 +1282,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                         // create new ref item for the ref tour
                         _currentRefItem = ElevationCompareManager.createCatalogRefItem(refId);
 
-                        updateUI_YearChart();
+                        isUpdateYearChart = true;
 
                      } else {
 
@@ -1276,10 +1293,15 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
                            _currentRefItem = refTourItem;
 
-                           updateUI_YearChart();
+                           isUpdateYearChart = true;
                         }
                      }
                   }
+               }
+
+               if (isUpdateYearChart) {
+
+                  updateUI_YearChart();
                }
 
                // select tour in the year chart
@@ -1305,15 +1327,20 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                if (tourId != null) {
 
                   final RefTourItem refTour = compareResult.refTour;
-
                   final long refId = refTour.refId;
-                  if (_currentRefItem == null || _currentRefItem.refId != refId) {
+
+                  if (_currentRefItem == null || _currentRefItem.refId != refId
+
+                  // ensure that geo compare is not displayed
+                        || _currentGeoCompareData != null) {
 
                      // the current statistic do not show the ref tour for the compared tour
                      // -> first show the ref tour
 
                      // create new ref item for the ref tour
                      _currentRefItem = ElevationCompareManager.createCatalogRefItem(refId);
+
+                     _currentGeoCompareData = null;
 
                      updateUI_YearChart();
                   }
