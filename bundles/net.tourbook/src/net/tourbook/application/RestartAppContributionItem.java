@@ -42,7 +42,7 @@ public class RestartAppContributionItem extends ContributionItem {
 
    private void createActionImage() {
 
-      _actionImage = CommonActivator.getThemedImageDescriptor(CommonImages.App_ResetToDefault).createImage();
+      _actionImage = CommonActivator.getThemedImageDescriptor(CommonImages.App_ReStart).createImage();
    }
 
    @Override
