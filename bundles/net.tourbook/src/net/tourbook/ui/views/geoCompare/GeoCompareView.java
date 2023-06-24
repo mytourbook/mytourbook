@@ -58,6 +58,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourType;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -748,6 +749,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
 
             onSelectionChanged((ISelection) eventData);
+
+         } else if (eventId == TourEventId.MAP_SELECTION && eventData instanceof SelectionMapSelection) {
+
+            onSelection_MapSelection((SelectionMapSelection) eventData);
          }
       };
 
@@ -2527,6 +2532,28 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _viewerContainer.setRedraw(true);
    }
 
+   private void onSelection_MapSelection(final SelectionMapSelection mapSelection) {
+
+      final TourData tourData = TourManager.getTour(mapSelection.getTourId());
+
+      if (tourData != null) {
+
+         final int valueIndex1 = mapSelection.getValueIndex1();
+         final int valueIndex2 = mapSelection.getValueIndex2();
+
+         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
+               tourData,
+               valueIndex1,
+               valueIndex2);
+
+         compare_10_Compare(
+               tourData,
+               valueIndex1,
+               valueIndex2,
+               geoCompareRefId);
+      }
+   }
+
    private void onSelectionChanged(final ISelection selection) {
 
       if (selection == null
@@ -2602,15 +2629,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             } else {
 
+               final int leftSliderValuesIndex = chartInfo.leftSliderValuesIndex;
+               final int rightSliderValuesIndex = chartInfo.rightSliderValuesIndex;
+
                final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
                      tourData,
-                     chartInfo.leftSliderValuesIndex,
-                     chartInfo.rightSliderValuesIndex);
+                     leftSliderValuesIndex,
+                     rightSliderValuesIndex);
 
                compare_10_Compare(
                      tourData,
-                     chartInfo.leftSliderValuesIndex,
-                     chartInfo.rightSliderValuesIndex,
+                     leftSliderValuesIndex,
+                     rightSliderValuesIndex,
                      geoCompareRefId);
             }
          }
