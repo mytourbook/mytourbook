@@ -4698,9 +4698,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="679.35274"
-     inkscape:cx="161.22032"
-     inkscape:zoom="2.8284276"
+     inkscape:cy="370.17034"
+     inkscape:cx="276.4787"
+     inkscape:zoom="1.4142138"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -4972,7 +4972,7 @@
        height="15.999999"
        width="4.9999976"
        id="rect5678"
-       style="fill:#ff5757;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+       style="fill:#91c7ff;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
@@ -7521,7 +7521,7 @@
        inkscape:connector-curvature="0"
        id="rect12620-6-6-6-0-6-3-9-4"
        d="m 213.50019,344.50282 h -4 m 0,-15.00001 h 4"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#8d1800;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#496d80;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
@@ -12803,7 +12803,7 @@
        height="15.999999"
        width="4.9999976"
        id="rect5678-0"
-       style="fill:#ff5757;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+       style="fill:#91c7ff;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
@@ -19041,5 +19041,66 @@
        id="rect12620-6-6-6-0-6-3-6-1-93-7-1-9"
        d="m 417.5,633 -2e-5,-6.99905"
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#6c1e0e;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <rect
+       transform="scale(1,-1)"
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="..\icons\tour-map-statistic-dark.png"
+       y="-664.99994"
+       x="405.00003"
+       height="16.000015"
+       width="15.999985"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-3-6-8-3-8-9-6"
+       style="display:inline;opacity:0.99;fill:none;stroke:none" />
+    <rect
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-map-statistic.png"
+       y="648.99994"
+       x="405"
+       height="15.999999"
+       width="15.999969"
+       id="rect4471-81-5-8-1-8-9-4-6-0-9-2"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <rect
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-map-statistic.png"
+       y="648.99994"
+       x="405"
+       height="15.999999"
+       width="15.999969"
+       id="rect4471-81-5-8-1-8-9-4-0-6-8-6-9"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <rect
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\synch-statistics.png"
+       y="654.99939"
+       x="410.99997"
+       height="7.0006714"
+       width="4.0000305"
+       id="rect5678-9-0-5-0-0"
+       style="display:inline;fill:#ff5757;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+    <rect
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\synch-statistics.png"
+       y="653.00104"
+       x="404.99994"
+       height="6.9993892"
+       width="4.0000305"
+       id="rect5678-9-0-5-0-4-3"
+       style="display:inline;fill:#ff5757;fill-opacity:1;stroke:none;stroke-width:0.999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+    <rect
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\synch-statistics.png"
+       y="650.99982"
+       x="416.99997"
+       height="7"
+       width="4"
+       id="rect5678-9-0-5-0-6-7"
+       style="display:inline;fill:#ff5757;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
   </g>
 </svg>
