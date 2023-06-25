@@ -999,7 +999,6 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Label_TimeSlices;
    public static String        GeoCompare_View_PageText_GeoCompareIsOff;
    public static String        GeoCompare_View_PageText_MultipleToursNotSupported;
-   public static String        GeoCompare_View_PageText_NoTourWithGeoData;
    public static String        GeoCompare_View_PageText_SelectTourWithGeoData;
    public static String        GeoCompare_View_State_CompareResult;
    public static String        GeoCompare_View_State_ComparingIsCanceled;

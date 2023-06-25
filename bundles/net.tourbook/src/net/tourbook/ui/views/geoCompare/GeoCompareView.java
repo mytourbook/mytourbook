@@ -292,7 +292,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private Composite _pageGeoCompareIsOff;
    private Composite _pageMultipleTours;
    private Composite _pageSelectTourWithGeoData;
-   private Composite _pageTourWithoutGeoData;
 
    private Button    _chkGeoFilter_GeoDiff;
    private Button    _chkGeoFilter_MaxResults;
@@ -1229,7 +1228,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _pageGeoCompareIsOff       = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_GeoCompareIsOff);
       _pageMultipleTours         = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_MultipleToursNotSupported);
       _pageSelectTourWithGeoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_SelectTourWithGeoData);
-      _pageTourWithoutGeoData    = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_NoTourWithGeoData);
 
 // SET_FORMATTING_ON
 
@@ -2781,7 +2779,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void restoreState() {
 
-      final boolean isCompareEnabled = GeoCompareManager.isGeoComparingOn();
+      final boolean isGeoCompareOn = GeoCompareManager.isGeoComparingOn();
 
 // SET_FORMATTING_OFF
 
@@ -2793,7 +2791,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _isGeoFilter_MaxResults          = Util.getStateBoolean(_state,   STATE_IS_GEO_FILTER_MAX_RESULTS,       false);
       _compareData_IsUseAppFilter      = Util.getStateBoolean(_state,   STATE_IS_USE_APP_FILTER,               true);
 
-      _actionOnOff            .setIcon(isCompareEnabled);
+      _actionOnOff            .setChecked(isGeoCompareOn);
+      _actionOnOff            .setIcon(isGeoCompareOn);
+
       _actionAppTourFilter    .setChecked(_compareData_IsUseAppFilter);
 
       _chkGeoFilter_GeoDiff               .setSelection(_isGeoFilter_GeoDifference);
@@ -2863,7 +2863,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       if (GeoCompareManager.isGeoComparingOn()) {
 
-         _pageBook.showPage(_pageTourWithoutGeoData);
+         _pageBook.showPage(_pageSelectTourWithGeoData);
 
       } else {
 
