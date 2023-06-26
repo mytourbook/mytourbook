@@ -188,6 +188,10 @@ public class GeoPartTourLoader {
    }
 
    /**
+    * @param tourId
+    *           Tour ID which is compared
+    * @param tourTitle
+    *           Tour title which is compared
     * @param geoParts
     *           Requested geo parts
     * @param normalizedTourPart
@@ -196,7 +200,9 @@ public class GeoPartTourLoader {
     * @param geoPartView
     * @return
     */
-   static GeoCompareData loadToursFromGeoParts(final int[] geoParts,
+   static GeoCompareData loadToursFromGeoParts(final long tourId,
+                                               final String tourTitle,
+                                               final int[] geoParts,
                                                final NormalizedGeoData normalizedTourPart,
                                                final boolean useAppFilter,
                                                final GeoCompareData previousGeoCompareData,
@@ -216,7 +222,9 @@ public class GeoPartTourLoader {
             executerId,
             geoParts,
             normalizedTourPart,
-            useAppFilter);
+            useAppFilter,
+            tourTitle,
+            tourId);
 
       _loaderWaitingQueue.add(geoCompareData);
 

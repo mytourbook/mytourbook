@@ -1535,6 +1535,14 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private void updateUI_YearChart(final GeoCompareData geoCompareData,
                                    final boolean isShowLatestYear) {
 
+      if (geoCompareData != null && _currentRefItem == null) {
+
+         _currentRefItem = new TVIRefTour_RefTourItem();
+
+         _currentRefItem.numTours = geoCompareData.allGeoComparedTours_Filtered.size();
+         _currentRefItem.label = geoCompareData.tourTitle;
+      }
+
       if (_currentRefItem == null) {
 
          _pageBook.showPage(_pageNoChart);

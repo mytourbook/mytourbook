@@ -34,6 +34,10 @@ public class GeoCompareData {
     */
    public long                  refId               = -1;
 
+   public long                  tourId              = -1;
+
+   public String                tourTitle;
+
    long                         executorId;
 
    /**
@@ -81,7 +85,9 @@ public class GeoCompareData {
    public GeoCompareData(final long executorId,
                          final int[] geoParts,
                          final NormalizedGeoData normalizedTourPart,
-                         final boolean useAppFilter) {
+                         final boolean useAppFilter,
+                         final String tourTitle,
+                         final long tourId) {
 
       this.executorId = executorId;
 
@@ -89,6 +95,9 @@ public class GeoCompareData {
       this.normalizedTourPart = normalizedTourPart;
 
       this.isUseAppFilter = useAppFilter;
+
+      this.tourId = tourId;
+      this.tourTitle = tourTitle;
    }
 
    @Override

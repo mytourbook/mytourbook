@@ -34,6 +34,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
    String      label;
    public long refId;
+
    boolean     hasGeoData;
 
    float[]     avgAltimeter_MinMax = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
@@ -47,6 +48,8 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
    int         numTours;
 
    private int _viewLayout;
+
+   public TVIRefTour_RefTourItem() {}
 
    public TVIRefTour_RefTourItem(final TVIRefTour_RootItem parentItem, final int viewLayout) {
 

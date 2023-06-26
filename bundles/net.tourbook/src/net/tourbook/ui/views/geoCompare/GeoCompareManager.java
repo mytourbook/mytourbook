@@ -82,17 +82,17 @@ public class GeoCompareManager {
    }
 
    /**
-    * @param geoPartData
+    * @param geoCompareData
     * @param geoPartView
     */
-   static void compareGeoTours(final GeoCompareData geoPartData, final GeoCompareView geoPartView) {
+   static void compareGeoTours(final GeoCompareData geoCompareData, final GeoCompareView geoPartView) {
 
-      for (final long tourId : geoPartData.tourIds) {
+      for (final long tourId : geoCompareData.tourIds) {
 
-         final GeoComparedTour geoComparedTour_QueueItem = new GeoComparedTour(tourId, geoPartData);
+         final GeoComparedTour geoComparedTour_QueueItem = new GeoComparedTour(tourId, geoCompareData);
 
          // keep compared tour
-         geoPartData.allGeoComparedTours.add(geoComparedTour_QueueItem);
+         geoCompareData.allGeoComparedTours.add(geoComparedTour_QueueItem);
 
          _compareWaitingQueue.add(geoComparedTour_QueueItem);
 

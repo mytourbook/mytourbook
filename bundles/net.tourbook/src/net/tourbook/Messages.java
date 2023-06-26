@@ -978,6 +978,7 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Action_HideToursBelow;
    public static String        GeoCompare_View_Action_HideToursBelow_Tooltip;
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
+   public static String        GeoCompare_View_Action_SelectTourWhichIsCompared_Tooltip;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter;
