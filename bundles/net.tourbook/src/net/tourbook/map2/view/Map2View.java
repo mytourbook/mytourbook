@@ -451,7 +451,8 @@ public class Map2View extends ViewPart implements
    /**
     * Keep map sync mode when map sync action get's unchecked
     */
-   private MapSyncMode                       _currentMapSyncMode   = MapSyncMode.IsSyncWith_NONE;
+   private MapSyncMode                       _currentMapSyncMode   = MapSyncMode.IsSyncWith_Tour;
+   private boolean                           _isMapSyncActive;
    private boolean                           _isInMapSync;
    private long                              _lastFiredMapSyncEventTime;
    //
@@ -732,7 +733,9 @@ public class Map2View extends ViewPart implements
 
          super.onSelect();
 
-         syncMap_OnSelectSyncAction(getSelection());
+         _isMapSyncActive = getSelection();
+
+         syncMap_OnSelectSyncAction();
       }
    }
 
@@ -766,9 +769,7 @@ public class Map2View extends ViewPart implements
       /**
        * Image: 5
        */
-      IsSyncWith_Photo,
-
-      IsSyncWith_NONE,
+      IsSyncWith_Photo
    }
 
    public Map2View() {}
@@ -834,7 +835,7 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Slider_One);
+      syncMap_ShowCurrentSyncModeImage();
    }
 
    public void action_SyncWith_OtherMap(final boolean isSelected) {
@@ -850,7 +851,7 @@ public class Map2View extends ViewPart implements
          deactivateSyncWith_ValuePoint();
       }
 
-      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_OtherMap);
+      syncMap_ShowCurrentSyncModeImage();
    }
 
    /**
@@ -873,7 +874,7 @@ public class Map2View extends ViewPart implements
          _map.paint();
       }
 
-      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Photo);
+      syncMap_ShowCurrentSyncModeImage();
 
       enableActions(true);
    }
@@ -903,7 +904,7 @@ public class Map2View extends ViewPart implements
          paintTours_20_One(_allTourData.get(0), true);
       }
 
-      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Tour);
+      syncMap_ShowCurrentSyncModeImage();
    }
 
    public void action_SyncWith_ValuePoint() {
@@ -935,7 +936,7 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_ValuePoint);
+      syncMap_ShowCurrentSyncModeImage();
    }
 
    private void actionCopyLocationToClipboard() {
@@ -2122,7 +2123,7 @@ public class Map2View extends ViewPart implements
       _actionSyncMapWith_Tour             .setEnabled(isTourAvailable);
       _actionSyncMapWith_ValuePoint       .setEnabled(isTourAvailable);
 
-      syncMap_ShowCurrentSyncModeImage(isMapSynched());
+      syncMap_ShowCurrentSyncModeImage();
 
       if (numTours == 0) {
 
@@ -2750,20 +2751,6 @@ public class Map2View extends ViewPart implements
       final float dimLevelPercent = mapDimValue / MAX_DIM_STEPS * 100;
 
       return isMapDimmed && dimLevelPercent >= 30;
-   }
-
-   private boolean isMapSynched() {
-
-      return false
-
-            || _isMapSyncWith_OtherMap
-            || _isMapSyncWith_Photo
-            || _isMapSyncWith_Slider_Centered
-            || _isMapSyncWith_Slider_One
-            || _isMapSyncWith_Tour
-            || _isMapSyncWith_ValuePoint
-
-      ;
    }
 
    private boolean isShowTrackColor_InContextMenu() {
@@ -4237,8 +4224,8 @@ public class Map2View extends ViewPart implements
 
       // synch map with ...
       _currentMapSyncMode = (MapSyncMode) Util.getStateEnum(_state, STATE_MAP_SYNC_MODE, MapSyncMode.IsSyncWith_Tour);
-      final boolean isSyncModeActive = _state.getBoolean(STATE_MAP_SYNC_MODE_IS_ACTIVE);
-      syncMap_OnSelectSyncAction(isSyncModeActive);
+      _isMapSyncActive = _state.getBoolean(STATE_MAP_SYNC_MODE_IS_ACTIVE);
+      syncMap_OnSelectSyncAction();
 
       // zoom level adjustment
       _actionZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, STATE_ZOOM_LEVEL_ADJUSTMENT, 0));
@@ -4586,7 +4573,7 @@ public class Map2View extends ViewPart implements
 
       Util.setStateEnum(_state, STATE_CENTER_MAP_BY,              _map.getCenterMapBy());
 
-      _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
+      _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   _isMapSyncActive);
       Util.setStateEnum(_state, STATE_MAP_SYNC_MODE,              _currentMapSyncMode);
 
       _state.put(STATE_ZOOM_LEVEL_ADJUSTMENT,                     _actionZoomLevelAdjustment.getZoomLevel());
@@ -4978,9 +4965,9 @@ public class Map2View extends ViewPart implements
       });
    }
 
-   private void syncMap_OnSelectSyncAction(final boolean isActionSelected) {
+   private void syncMap_OnSelectSyncAction() {
 
-      if (isActionSelected) {
+      if (_isMapSyncActive) {
 
          switch (_currentMapSyncMode) {
 
@@ -5014,11 +5001,7 @@ public class Map2View extends ViewPart implements
             action_SyncWith_Photo();
             break;
 
-         case IsSyncWith_NONE:
          default:
-
-            // sync action is selected but no sync subaction -> uncheck map sync
-            _actionMap2Slideout_SyncMap.setSelection(false);
             break;
          }
 
@@ -5039,7 +5022,7 @@ public class Map2View extends ViewPart implements
     *
     * @param isSelectSyncMap
     */
-   private void syncMap_ShowCurrentSyncModeImage(final boolean isSelectSyncMap) {
+   private void syncMap_ShowCurrentSyncModeImage() {
 
       switch (_currentMapSyncMode) {
 
@@ -5067,13 +5050,9 @@ public class Map2View extends ViewPart implements
          _actionMap2Slideout_SyncMap.showOtherEnabledImage(5);
          break;
 
-      case IsSyncWith_NONE:
       default:
-         _actionMap2Slideout_SyncMap.showDefaultEnabledImage();
          break;
       }
-
-      _actionMap2Slideout_SyncMap.setSelection(isSelectSyncMap);
    }
 
    @Override
