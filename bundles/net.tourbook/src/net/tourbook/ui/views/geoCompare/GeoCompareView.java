@@ -1324,11 +1324,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //            _lblTitle.setBackground(UI.SYS_COLOR_MAGENTA);
          }
          {
+            /*
+             * Action: Select tour which is compared
+             */
             final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults()
-//                  .grab(true, false)
-//                  .align(SWT.END, SWT.BEGINNING)
-                  .applyTo(toolbar);
 
             final ToolBarManager tbm = new ToolBarManager(toolbar);
 
@@ -2835,18 +2834,19 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-      _compareData_DistanceInterval    = Util.getStateInt(_state,       STATE_DISTANCE_INTERVAL,               DEFAULT_DISTANCE_INTERVAL);
-      _compareData_GeoAccuracy         = Util.getStateInt(_state,       STATE_GEO_ACCURACY,                    DEFAULT_GEO_ACCURACY);
-      _geoFilter_GeoDifference         = Util.getStateInt(_state,       STATE_GEO_FILTER_GEO_DIFFERENCE,       50);
-      _geoFilter_MaxResults            = Util.getStateInt(_state,       STATE_GEO_FILTER_SEQUENCE_FILTER,      100);
-      _isGeoFilter_GeoDifference       = Util.getStateBoolean(_state,   STATE_IS_GEO_FILTER_GEO_DIFFERENCE,    false);
-      _isGeoFilter_MaxResults          = Util.getStateBoolean(_state,   STATE_IS_GEO_FILTER_MAX_RESULTS,       false);
       _compareData_IsUseAppFilter      = Util.getStateBoolean(_state,   STATE_IS_USE_APP_FILTER,               true);
 
-      _actionOnOff            .setChecked(isGeoCompareOn);
-      _actionOnOff            .setIcon(isGeoCompareOn);
+      _compareData_DistanceInterval    = Util.getStateInt(_state,       STATE_DISTANCE_INTERVAL,               DEFAULT_DISTANCE_INTERVAL);
+      _compareData_GeoAccuracy         = Util.getStateInt(_state,       STATE_GEO_ACCURACY,                    DEFAULT_GEO_ACCURACY);
 
-      _actionAppTourFilter    .setChecked(_compareData_IsUseAppFilter);
+      _isGeoFilter_GeoDifference       = Util.getStateBoolean(_state,   STATE_IS_GEO_FILTER_GEO_DIFFERENCE,    false);
+      _isGeoFilter_MaxResults          = Util.getStateBoolean(_state,   STATE_IS_GEO_FILTER_MAX_RESULTS,       false);
+      _geoFilter_GeoDifference         = Util.getStateInt(_state,       STATE_GEO_FILTER_GEO_DIFFERENCE,       50);
+      _geoFilter_MaxResults            = Util.getStateInt(_state,       STATE_GEO_FILTER_SEQUENCE_FILTER,      100);
+
+      _actionOnOff                        .setChecked(isGeoCompareOn);
+      _actionOnOff                        .setIcon(isGeoCompareOn);
+      _actionAppTourFilter                .setChecked(_compareData_IsUseAppFilter);
 
       _chkGeoFilter_GeoDiff               .setSelection(_isGeoFilter_GeoDifference);
       _chkGeoFilter_MaxResults            .setSelection(_isGeoFilter_MaxResults);
@@ -2872,13 +2872,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _state.put(STATE_IS_USE_APP_FILTER,                _compareData_IsUseAppFilter);
 
-      _state.put(STATE_SORT_COLUMN_ID,                   _geoCompareComparator.__sortColumnId);
-      _state.put(STATE_SORT_COLUMN_DIRECTION,            _geoCompareComparator.__sortDirection);
-
       _state.put(STATE_IS_GEO_FILTER_GEO_DIFFERENCE,     _isGeoFilter_GeoDifference);
-      _state.put(STATE_IS_GEO_FILTER_MAX_RESULTS,        _isGeoFilter_GeoDifference);
+      _state.put(STATE_IS_GEO_FILTER_MAX_RESULTS,        _isGeoFilter_MaxResults);
       _state.put(STATE_GEO_FILTER_GEO_DIFFERENCE,        _geoFilter_GeoDifference);
       _state.put(STATE_GEO_FILTER_SEQUENCE_FILTER,       _geoFilter_MaxResults);
+
+      _state.put(STATE_SORT_COLUMN_ID,                   _geoCompareComparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION,            _geoCompareComparator.__sortDirection);
 
       _columnManager.saveState(_state);
 
