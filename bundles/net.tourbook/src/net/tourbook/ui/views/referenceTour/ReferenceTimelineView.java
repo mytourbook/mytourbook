@@ -1148,7 +1148,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       // update year data
       setYearData();
 
-      updateUI_YearChart();
+      updateUI_YearChart_WithCurrentGeoData();
    }
 
    /**
@@ -1172,7 +1172,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       setYearData();
 
-      updateUI_YearChart();
+      updateUI_YearChart_WithCurrentGeoData();
 
       // reselect last selected tour
       selectTourInYearChart(selectedTourId);
