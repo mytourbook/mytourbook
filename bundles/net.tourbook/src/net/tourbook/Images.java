@@ -98,6 +98,7 @@ public class Images {
    public static final String EditRow_Disabled                           = "edit-row-disabled.png";                               //$NON-NLS-1$
    public static final String EditTour                                   = "tour-editor.png";                                     //$NON-NLS-1$
    public static final String EditTour_Disabled                          = "write_obj_disabled.gif";                              //$NON-NLS-1$
+   public static final String GeoCompare_PinComparedTour                 = "geo-compare-pin-compared-tour.png";                   //$NON-NLS-1$
    public static final String GeoCompare_SelectComparedTour              = "geo-compare-select-compared-tour.png";                //$NON-NLS-1$
    public static final String GeoParts                                   = "geo-parts.png";                                       //$NON-NLS-1$
    public static final String GeoParts_Disabled                          = "geo-parts-disabled.png";                              //$NON-NLS-1$

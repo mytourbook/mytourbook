@@ -222,6 +222,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private boolean                         _isInUpdate;
    private long                            _lastUIUpdate;
    private boolean                         _isInSelection;
+   private boolean                         _isComparedTourPinned;
 
    /**
     * Items which are displayed in the tour viewer
@@ -280,6 +281,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private ActionGeoCompareOptions         _actionGeoCompareOptions;
    private ActionHideToursBelow            _actionHideToursBelow;
    private ActionOnOff                     _actionOnOff;
+   private ActionPinTourWhichIsCompared    _actionPinTourWhichIsCompared;
    private ActionSelectTourWhichIsCompared _actionSelectTourWhichIsCompared;
 
    /*
@@ -407,6 +409,26 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          } else {
             setImageDescriptor(_imageDescriptor_AppOff);
          }
+      }
+   }
+
+   /**
+    * Action: Pin tour which is compared
+    */
+   private class ActionPinTourWhichIsCompared extends Action {
+
+      public ActionPinTourWhichIsCompared() {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_PinComparedTour));
+
+         setToolTipText(Messages.GeoCompare_View_Action_PinTourWhichIsCompared_Tooltip);
+      }
+
+      @Override
+      public void run() {
+         onAction_PinTourWhichIsCompared(isChecked());
       }
    }
 
@@ -1208,6 +1230,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _actionGeoCompareOptions         = new ActionGeoCompareOptions();
       _actionHideToursBelow            = new ActionHideToursBelow();
       _actionOnOff                     = new ActionOnOff();
+      _actionPinTourWhichIsCompared    = new ActionPinTourWhichIsCompared();
       _actionSelectTourWhichIsCompared = new ActionSelectTourWhichIsCompared();
 
 // SET_FORMATTING_ON
@@ -1332,6 +1355,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             final ToolBarManager tbm = new ToolBarManager(toolbar);
 
             tbm.add(_actionSelectTourWhichIsCompared);
+            tbm.add(_actionPinTourWhichIsCompared);
 
             tbm.update(true);
          }
@@ -2433,6 +2457,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       enableControls();
    }
 
+   private void onAction_PinTourWhichIsCompared(final boolean isChecked) {
+
+      _isComparedTourPinned = isChecked;
+   }
+
    private void onAction_SelectTourWhichIsCompared() {
 
       for (final GeoComparedTour comparedTour : _allGeoComparedTours) {
@@ -2678,19 +2707,29 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             } else {
 
-               final int leftSliderValuesIndex = chartInfo.leftSliderValuesIndex;
-               final int rightSliderValuesIndex = chartInfo.rightSliderValuesIndex;
+               if (_isComparedTourPinned
 
-               final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
-                     tourData,
-                     leftSliderValuesIndex,
-                     rightSliderValuesIndex);
+                     // allow modifications of the same tour
+                     && tourData != _compareData_TourData) {
+                  
+                  // ignore tour
 
-               compare_10_Compare(
-                     tourData,
-                     leftSliderValuesIndex,
-                     rightSliderValuesIndex,
-                     geoCompareRefId);
+               } else {
+
+                  final int leftSliderValuesIndex = chartInfo.leftSliderValuesIndex;
+                  final int rightSliderValuesIndex = chartInfo.rightSliderValuesIndex;
+
+                  final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
+                        tourData,
+                        leftSliderValuesIndex,
+                        rightSliderValuesIndex);
+
+                  compare_10_Compare(
+                        tourData,
+                        leftSliderValuesIndex,
+                        rightSliderValuesIndex,
+                        geoCompareRefId);
+               }
             }
          }
 

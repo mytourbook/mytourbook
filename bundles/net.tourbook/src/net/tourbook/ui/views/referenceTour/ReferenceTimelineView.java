@@ -1509,7 +1509,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       updateUI_YearChart(false);
    }
 
-   void updateUI_YearChart(final boolean isShowLatestYear) {
+   private void updateUI_YearChart(final boolean isShowLatestYear) {
 
       GeoCompareData geoCompareData = null;
 
@@ -1791,5 +1791,10 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       // layout is needed otherwise the horizontal centered text is not displayed
       _lblRefTourTitle.getParent().layout(true, true);
+   }
+
+   void updateUI_YearChart_WithCurrentGeoData() {
+
+      updateUI_YearChart(_currentGeoCompareData, false);
    }
 }
