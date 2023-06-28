@@ -205,8 +205,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
     * UI controls
     */
    private PageBook  _pageBook;
-   private Composite _pageChart;
-   private Composite _pageNoChart;
+   private Composite _pageSelectRefTour;
+   private Composite _pageYearChart;
    private Composite _headerContainer;
 
    private Chart     _yearChart;
@@ -318,9 +318,9 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             // measurement system has changed -> recreate the chart
 
             _yearChart.dispose();
-            createUI_30_Chart(_pageChart);
+            createUI_30_Chart(_pageYearChart);
 
-            _pageChart.layout();
+            _pageYearChart.layout();
 
             updateUI_YearChart();
          }
@@ -485,7 +485,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       // set selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-      _pageBook.showPage(_pageNoChart);
+      _pageBook.showPage(_pageSelectRefTour);
 
       restoreState();
 
@@ -761,9 +761,9 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoChart = UI.createUI_PageNoData(_pageBook, Messages.RefTour_Label_Year_NotSelected);
+      _pageSelectRefTour = UI.createUI_PageNoData(_pageBook, Messages.Reference_Timeline_Page_SelectReferenceTour);
 
-      _pageChart = createUI_10_PageYearChart(_pageBook);
+      _pageYearChart = createUI_10_PageYearChart(_pageBook);
    }
 
    private Composite createUI_10_PageYearChart(final Composite parent) {
@@ -1549,12 +1549,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       if (_currentRefItem == null) {
 
-         _pageBook.showPage(_pageNoChart);
+         _pageBook.showPage(_pageSelectRefTour);
 
          return;
       }
 
-      _pageBook.showPage(_pageChart);
+      _pageBook.showPage(_pageYearChart);
 
       /*
        * Reset statistic values
@@ -1627,7 +1627,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          TourManager.setBarColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
          TourManager.setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
-         yDataSpeed.setYTitle(Messages.RefTour_Label_Year_ChartTitle);
+         yDataSpeed.setYTitle(OtherMessages.GRAPH_LABEL_SPEED);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
 

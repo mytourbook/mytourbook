@@ -1875,6 +1875,7 @@ public class Messages extends NLS {
    public static String        Reference_Timeline_Combo_NumberOfYears_Tooltip;
    public static String        Reference_Timeline_Image_ElevationCompare_Tooltip;
    public static String        Reference_Timeline_Image_GeoCompare_Tooltip;
+   public static String        Reference_Timeline_Page_SelectReferenceTour;
 
    public static String        RefTour_Action_CreateLeftMarker;
    public static String        RefTour_Action_CreaateMarker;
@@ -1904,9 +1905,6 @@ public class Messages extends NLS {
    public static String        RefTour_Dialog_RenameRefTour_Title;
    public static String        RefTour_Dialog_SaveComparedTour_Message;
    public static String        RefTour_Dialog_SaveComparedTour_Title;
-   public static String        RefTour_Label_ReferenceTour_ChartTitle;
-   public static String        RefTour_Label_Year_ChartTitle;
-   public static String        RefTour_Label_Year_NotSelected;
    public static String        RefTour_Wizard_Column_ElevationGain_Tooltip;
    public static String        RefTour_Wizard_Column_Distance_Tooltip;
    public static String        RefTour_Wizard_Column_Time;

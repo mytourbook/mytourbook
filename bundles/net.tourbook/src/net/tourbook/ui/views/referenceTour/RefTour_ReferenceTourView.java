@@ -52,15 +52,17 @@ import org.eclipse.ui.part.PageBook;
 
 public class RefTour_ReferenceTourView extends TourChartViewPart implements ITourChartViewer {
 
-   public static final String    ID           = "net.tourbook.views.tourCatalog.referenceTourView"; //$NON-NLS-1$
+   public static final String           ID           = "net.tourbook.views.tourCatalog.referenceTourView"; //$NON-NLS-1$
 
-   private final IDialogSettings _state       = TourbookPlugin.getState(ID);
+   private static final String          CHART_TITLE  = "{0} - {1}";                                        //$NON-NLS-1$
 
-   private long                  _activeRefId = -1;
+   private static final IDialogSettings _state       = TourbookPlugin.getState(ID);
 
-   private boolean               _isInSelectionChanged;
+   private long                         _activeRefId = -1;
 
-   private ITourEventListener    _tourEventListener;
+   private boolean                      _isInSelectionChanged;
+
+   private ITourEventListener           _tourEventListener;
 
    /*
     * UI controls
@@ -265,7 +267,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
 
          // set title
          chartDataModel.setTitle(NLS.bind(
-               Messages.RefTour_Label_ReferenceTour_ChartTitle,
+               CHART_TITLE,
                refTour.getLabel(),
                TourManager.getTourTitleDetailed(_tourData)));
 
