@@ -294,7 +294,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private PageBook  _pageBook;
    private Composite _pageCompareResult;
-   private Composite _pageGeoCompareIsOff;
    private Composite _pageMultipleTours;
    private Composite _pageSelectTourWithGeoData;
 
@@ -305,10 +304,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private Label     _lblCompareStatus_Message;
    private Label     _lblGeoFilter_GeoDifference_Unit;
    private Label     _lblGeoFilter_MaxResults_Unit;
-   private Label     _lblNumTours;
    private Label     _lblNumGeoGrids;
+   private Label     _lblNumGeoGrids_Value;
    private Label     _lblNumSlices;
+   private Label     _lblNumSlices_Value;
+   private Label     _lblNumTours;
+   private Label     _lblNumTours_Value;
    private Label     _lblStartEndIndex;
+   private Label     _lblStartEndIndex_Value;
    private Label     _lblTitle;
 
    private Spinner   _spinnerGeoFilter_GeoDifference;
@@ -422,6 +425,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_PinComparedTour));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_PinComparedTour_Disabled));
 
          setToolTipText(Messages.GeoCompare_View_Action_PinTourWhichIsCompared_Tooltip);
       }
@@ -442,6 +446,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_SelectComparedTour));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_SelectComparedTour_Disabled));
+
          setToolTipText(Messages.GeoCompare_View_Action_SelectTourWhichIsCompared_Tooltip);
       }
 
@@ -647,6 +653,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                // this is the trick to cast an Object[]
                GeoComparedTour[].class);
+
+         final int numFilterVisible = _allSortedAndFiltered_GeoComparedTours.length;
+
+         _lblCompareStatus_Message.setText(String.format(
+               Messages.GeoCompare_View_State_TourFilter,
+               numFilterVisible,
+               _slideoutGeoCompareState.numTours - numFilterVisible));
+
+         _lblCompareStatus_Icon.setText(UI.SPACE4);
+         _lblCompareStatus_Icon.setBackground(UI.IS_DARK_THEME
+               ? ThemeUtil.getDefaultBackgroundColor_Table()
+               : ThemeUtil.getDefaultBackgroundColor_Shell());
 
          return allSortedAndFiltered_GeoComparedTours;
       }
@@ -1261,10 +1279,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
       restoreState();
-
       restoreSelection();
-
-      showInvalidPage();
    }
 
    private void createUI(final Composite parent) {
@@ -1273,7 +1288,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-      _pageGeoCompareIsOff       = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_GeoCompareIsOff);
       _pageMultipleTours         = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_MultipleToursNotSupported);
       _pageSelectTourWithGeoData = UI.createUI_PageNoData(_pageBook, Messages.GeoCompare_View_PageText_SelectTourWithGeoData);
 
@@ -1465,14 +1479,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              * Number of tours
              */
             {
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.GeoCompare_View_Label_PossibleTours);
+               _lblNumTours = new Label(container, SWT.NONE);
+               _lblNumTours.setText(Messages.GeoCompare_View_Label_PossibleTours);
 
             }
             {
-               _lblNumTours = new Label(container, SWT.NONE);
-               _lblNumTours.setText(UI.EMPTY_STRING);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours);
+               _lblNumTours_Value = new Label(container, SWT.NONE);
+               _lblNumTours_Value.setText(UI.EMPTY_STRING);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumTours_Value);
 //               _lblNumTours.setBackground(UI.SYS_COLOR_CYAN);
             }
          }
@@ -1481,15 +1495,15 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              * Number of geo parts
              */
             {
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.GeoCompare_View_Label_GeoParts);
-               label.setToolTipText(Messages.GeoCompare_View_Label_GeoParts_Tooltip);
+               _lblNumGeoGrids = new Label(container, SWT.NONE);
+               _lblNumGeoGrids.setText(Messages.GeoCompare_View_Label_GeoParts);
+               _lblNumGeoGrids.setToolTipText(Messages.GeoCompare_View_Label_GeoParts_Tooltip);
 
             }
             {
-               _lblNumGeoGrids = new Label(container, SWT.NONE);
-               _lblNumGeoGrids.setText(UI.EMPTY_STRING);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrids);
+               _lblNumGeoGrids_Value = new Label(container, SWT.NONE);
+               _lblNumGeoGrids_Value.setText(UI.EMPTY_STRING);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumGeoGrids_Value);
             }
          }
          {
@@ -1497,14 +1511,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              * Number of time slices
              */
             {
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.GeoCompare_View_Label_TimeSlices);
+               _lblNumSlices = new Label(container, SWT.NONE);
+               _lblNumSlices.setText(Messages.GeoCompare_View_Label_TimeSlices);
 
             }
             {
-               _lblNumSlices = new Label(container, SWT.NONE);
-               _lblNumSlices.setText(UI.EMPTY_STRING);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices);
+               _lblNumSlices_Value = new Label(container, SWT.NONE);
+               _lblNumSlices_Value.setText(UI.EMPTY_STRING);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNumSlices_Value);
             }
          }
          {
@@ -1512,14 +1526,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              * Start/end index
              */
             {
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.GeoCompare_View_Label_StartEndPosition);
+               _lblStartEndIndex = new Label(container, SWT.NONE);
+               _lblStartEndIndex.setText(Messages.GeoCompare_View_Label_StartEndPosition);
 
             }
             {
-               _lblStartEndIndex = new Label(container, SWT.NONE);
-               _lblStartEndIndex.setText(UI.EMPTY_STRING);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStartEndIndex);
+               _lblStartEndIndex_Value = new Label(container, SWT.NONE);
+               _lblStartEndIndex_Value.setText(UI.EMPTY_STRING);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblStartEndIndex_Value);
 //               _lblStartEndIndex.setBackground(UI.SYS_COLOR_CYAN);
             }
          }
@@ -2103,19 +2117,32 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
 // SET_FORMATTING_OFF
 
-      final boolean isCompareEnabled      = GeoCompareManager.isGeoComparingOn();
-      final boolean isGeoDiffFilter       = isCompareEnabled ;
+      final boolean isGeoCompareON     = GeoCompareManager.isGeoComparingOn();
 
-      _actionAppTourFilter                .setEnabled(isCompareEnabled);
+      _actionAppTourFilter                .setEnabled(isGeoCompareON);
+      _actionPinTourWhichIsCompared       .setEnabled(isGeoCompareON);
+      _actionSelectTourWhichIsCompared    .setEnabled(isGeoCompareON);
 
-      _chkGeoFilter_GeoDiff               .setEnabled(isCompareEnabled);
-      _chkGeoFilter_MaxResults            .setEnabled(isGeoDiffFilter);
+      _chkGeoFilter_GeoDiff               .setEnabled(isGeoCompareON);
+      _chkGeoFilter_MaxResults            .setEnabled(isGeoCompareON);
 
-      _lblGeoFilter_GeoDifference_Unit    .setEnabled(isGeoDiffFilter && _isGeoFilter_GeoDifference);
-      _lblGeoFilter_MaxResults_Unit       .setEnabled(isGeoDiffFilter && _isGeoFilter_MaxResults);
+      _lblCompareStatus_Message           .setEnabled(isGeoCompareON);
+      _lblGeoFilter_GeoDifference_Unit    .setEnabled(isGeoCompareON && _isGeoFilter_GeoDifference);
+      _lblGeoFilter_MaxResults_Unit       .setEnabled(isGeoCompareON && _isGeoFilter_MaxResults);
+      _lblNumGeoGrids                     .setEnabled(isGeoCompareON);
+      _lblNumGeoGrids_Value               .setEnabled(isGeoCompareON);
+      _lblNumSlices                       .setEnabled(isGeoCompareON);
+      _lblNumSlices_Value                 .setEnabled(isGeoCompareON);
+      _lblNumTours                        .setEnabled(isGeoCompareON);
+      _lblNumTours_Value                  .setEnabled(isGeoCompareON);
+      _lblStartEndIndex                   .setEnabled(isGeoCompareON);
+      _lblStartEndIndex_Value             .setEnabled(isGeoCompareON);
+      _lblTitle                           .setEnabled(isGeoCompareON);
 
-      _spinnerGeoFilter_GeoDifference     .setEnabled(isGeoDiffFilter && _isGeoFilter_GeoDifference);
-      _spinnerGeoFilter_MaxResults        .setEnabled(isGeoDiffFilter && _isGeoFilter_MaxResults);
+      _spinnerGeoFilter_GeoDifference     .setEnabled(isGeoCompareON && _isGeoFilter_GeoDifference);
+      _spinnerGeoFilter_MaxResults        .setEnabled(isGeoCompareON && _isGeoFilter_MaxResults);
+
+      _geoCompareViewer.getTable()        .setEnabled(isGeoCompareON);
 
 // SET_FORMATTING_ON
    }
@@ -2442,7 +2469,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // enable comparing
 
-         recompareTours();
+//         recompareTours();
 
       } else {
 
@@ -2450,8 +2477,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          setState_StopComparing();
          updateUI_State_CancelComparing();
-
-         showInvalidPage();
       }
 
       enableControls();
@@ -2711,7 +2736,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                      // allow modifications of the same tour
                      && tourData != _compareData_TourData) {
-                  
+
                   // ignore tour
 
                } else {
@@ -2781,7 +2806,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       } else if (selection instanceof SelectionReferenceTourView) {
 
-         compareRefTour(((SelectionReferenceTourView) selection).getRefId());
+         final SelectionReferenceTourView selectionReferenceTourView = (SelectionReferenceTourView) selection;
+         final Long refId = selectionReferenceTourView.getRefId();
+
+         if (_isComparedTourPinned
+
+               // allow modifications of the same tour
+               && refId != _compareData_RefId) {
+
+            // ignore tour
+
+         } else {
+
+            compareRefTour(refId);
+         }
 
       } else if (selection instanceof StructuredSelection) {
 
@@ -2952,14 +2990,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void showInvalidPage() {
 
-      if (GeoCompareManager.isGeoComparingOn()) {
-
-         _pageBook.showPage(_pageSelectTourWithGeoData);
-
-      } else {
-
-         _pageBook.showPage(_pageGeoCompareIsOff);
-      }
+      _pageBook.showPage(_pageSelectTourWithGeoData);
    }
 
    @Override
@@ -3081,17 +3112,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       if (_slideoutGeoCompareState.isReset) {
 
-         _lblNumGeoGrids.setText(UI.EMPTY_STRING);
-         _lblNumSlices.setText(UI.EMPTY_STRING);
-         _lblNumTours.setText(UI.EMPTY_STRING);
-         _lblStartEndIndex.setText(UI.EMPTY_STRING);
+         _lblNumGeoGrids_Value.setText(UI.EMPTY_STRING);
+         _lblNumSlices_Value.setText(UI.EMPTY_STRING);
+         _lblNumTours_Value.setText(UI.EMPTY_STRING);
+         _lblStartEndIndex_Value.setText(UI.EMPTY_STRING);
 
       } else {
 
-         _lblNumGeoGrids.setText(Integer.toString(_slideoutGeoCompareState.numGeoGrids));
-         _lblNumSlices.setText(Integer.toString(_slideoutGeoCompareState.lastIndex - _slideoutGeoCompareState.firstIndex));
-         _lblNumTours.setText(Integer.toString(_slideoutGeoCompareState.numTours));
-         _lblStartEndIndex.setText(String.format(FORMAT_START_END, _slideoutGeoCompareState.firstIndex, _slideoutGeoCompareState.lastIndex));
+         _lblNumGeoGrids_Value.setText(Integer.toString(_slideoutGeoCompareState.numGeoGrids));
+         _lblNumSlices_Value.setText(Integer.toString(_slideoutGeoCompareState.lastIndex - _slideoutGeoCompareState.firstIndex));
+         _lblNumTours_Value.setText(Integer.toString(_slideoutGeoCompareState.numTours));
+         _lblStartEndIndex_Value.setText(String.format(FORMAT_START_END, _slideoutGeoCompareState.firstIndex, _slideoutGeoCompareState.lastIndex));
       }
    }
 

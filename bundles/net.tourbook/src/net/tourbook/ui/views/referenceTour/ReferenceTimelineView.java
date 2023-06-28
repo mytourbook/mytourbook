@@ -1137,7 +1137,11 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _currentSelection = new StructuredSelection(comparedTour);
       _postSelectionProvider.setSelection(_currentSelection);
 
-      _tourInfoToolTipProvider.setTourId(comparedTour.getTourId());
+      final long tourId = comparedTour.geoCompareTour != null
+            ? comparedTour.geoCompareTour.tourId
+            : comparedTour.getTourId();
+
+      _tourInfoToolTipProvider.setTourId(tourId);
    }
 
    void onSelect_LastVisibleYear() {
