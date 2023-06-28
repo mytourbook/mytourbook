@@ -2471,7 +2471,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // enable comparing
 
-//         recompareTours();
+         // fire currently selected tour that other views can recognize it
+
+         final StructuredSelection viewerSelection = getViewerSelection();
+
+         if (viewerSelection.isEmpty()) {
+
+            onAction_SelectTourWhichIsCompared();
+
+         } else {
+
+            _postSelectionProvider.setSelection(viewerSelection);
+         }
 
       } else {
 
