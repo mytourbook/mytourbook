@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools Jars
 Bundle-SymbolicName: net.tourbook.ext.geoclipse
-Bundle-Version: 23.5.0.qualifier
+Bundle-Version: 23.5.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: lib/gt-main-28-RC.jar,

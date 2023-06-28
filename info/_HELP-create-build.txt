@@ -182,8 +182,9 @@ Build Product
       - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
 
 
+#################
 Build Update Site
-------------------
+#################
 
    !!! BEFORE !!!
    
