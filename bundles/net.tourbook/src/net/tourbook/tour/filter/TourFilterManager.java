@@ -305,7 +305,7 @@ public class TourFilterManager {
    /**
     * Must be in sync with {@link #MOST_RECENT_UNITS}
     */
-   static final String                    MOST_RECENT_LABELS[] = {
+   static final String[]                  MOST_RECENT_LABELS = {
 
          Messages.Tour_Filter_MostRecent_Days,
          Messages.Tour_Filter_MostRecent_Weeks,
@@ -316,7 +316,7 @@ public class TourFilterManager {
    /**
     * Must be in sync with {@link #MOST_RECENT_LABELS}
     */
-   static final MostRecent                MOST_RECENT_UNITS[]  = {
+   static final MostRecent[]              MOST_RECENT_UNITS    = {
 
          MostRecent.DAYS,
          MostRecent.WEEKS,
@@ -694,6 +694,7 @@ public class TourFilterManager {
 //
       allConfigs.add(new TourFilterFieldConfig(OtherMessages.COLUMN_FACTORY_CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
 
+      //todo fb, it might be a new thing to add an enum
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_AirQuality)
