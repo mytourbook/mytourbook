@@ -142,9 +142,9 @@ public class WorkbenchTests extends UITest {
       final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Year Statistic").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Reference Timeline").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView yearStatisticView = Utils.showView(bot, "Year Statistic"); //$NON-NLS-1$
+      final SWTBotView yearStatisticView = Utils.showView(bot, "Reference Timeline"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
