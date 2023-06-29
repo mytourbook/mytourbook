@@ -137,9 +137,9 @@ public class WorkbenchTests extends UITest {
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Comparison Results").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Elevation Compare").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
+      final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Year Statistic").select(); //$NON-NLS-1$
