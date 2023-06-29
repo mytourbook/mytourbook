@@ -124,7 +124,7 @@ public class TourFilterManager {
 
 // SET_FORMATTING_OFF
 
-   public static final TourFilterFieldOperatorConfig[]   TOUR_FILTER_OPERATORS = {
+   private static final TourFilterFieldOperatorConfig[]   TOUR_FILTER_OPERATORS = {
 
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.STARTS_WITH,                          Messages.Tour_Filter_Operator_StartsWith),
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.ENDS_WITH,                            Messages.Tour_Filter_Operator_EndsWith),
@@ -223,7 +223,7 @@ public class TourFilterManager {
    /**
     * This is also the sequence how the fields are displayed in the UI
     */
-   public static final TourFilterFieldConfig[]    FILTER_FIELD_CONFIG;
+   static final TourFilterFieldConfig[]           FILTER_FIELD_CONFIG;
 
    static {
 
@@ -874,7 +874,7 @@ public class TourFilterManager {
    /**
     * @return Returns the selected profile or <code>null</code> when a profile is not selected.
     */
-   public static TourFilterProfile getSelectedProfile() {
+   static TourFilterProfile getSelectedProfile() {
       return _selectedProfile;
    }
 

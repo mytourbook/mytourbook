@@ -93,7 +93,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private static final String                HIDE_ALLOWED_DATE_TIME = "DateTime";                     //$NON-NLS-1$
 
-   static final String                        FIELD_NO               = "fieldNo";                      //$NON-NLS-1$
+   private static final String                FIELD_NO               = "fieldNo";                      //$NON-NLS-1$
 
    private static final String                STATE_IS_LIVE_UPDATE   = "STATE_IS_LIVE_UPDATE";         //$NON-NLS-1$
    private static final String                STATE_SASH_WIDTH       = "STATE_SASH_WIDTH";             //$NON-NLS-1$
