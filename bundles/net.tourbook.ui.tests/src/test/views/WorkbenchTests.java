@@ -26,10 +26,11 @@ import utils.Utils;
 
 public class WorkbenchTests extends UITest {
 
-   public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
-   public static final String COMPARE_TOURS   = "4. Compare Tours";   //$NON-NLS-1$
-   public static final String PHOTO           = "5. Photo";           //$NON-NLS-1$
-   public static final String SYSTEM          = "99. System";         //$NON-NLS-1$
+   public static final String TOUR_DIRECTORIES = "1. Tour Directories"; //$NON-NLS-1$
+   public static final String TOUR_PROPERTIES  = "2. Tour Properties";  //$NON-NLS-1$
+   public static final String COMPARE_TOURS    = "4. Compare Tours";    //$NON-NLS-1$
+   public static final String PHOTO            = "5. Photo";            //$NON-NLS-1$
+   public static final String SYSTEM           = "99. System";          //$NON-NLS-1$
 
    @BeforeClass
    public static void beforeClass() {
@@ -137,14 +138,14 @@ public class WorkbenchTests extends UITest {
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Comparison Results").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Elevation Compare").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
+      final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Year Statistic").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode("Reference Timeline").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView yearStatisticView = Utils.showView(bot, "Year Statistic"); //$NON-NLS-1$
+      final SWTBotView yearStatisticView = Utils.showView(bot, "Reference Timeline"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
