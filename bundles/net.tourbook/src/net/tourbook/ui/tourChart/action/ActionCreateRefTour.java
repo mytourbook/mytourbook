@@ -17,7 +17,7 @@ package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.PerspectiveFactoryTourCatalog;
+import net.tourbook.application.PerspectiveFactoryReferenceTimeline;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.util.StatusUtil;
@@ -99,7 +99,7 @@ public class ActionCreateRefTour extends Action {
             final IWorkbenchWindow wbWindow = workbench.getActiveWorkbenchWindow();
 
             // show compare result perspective
-            workbench.showPerspective(PerspectiveFactoryTourCatalog.PERSPECTIVE_ID, wbWindow);
+            workbench.showPerspective(PerspectiveFactoryReferenceTimeline.PERSPECTIVE_ID, wbWindow);
 
             // show ref tour view
             Util.showView(ReferenceTourView.ID, true);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,22 +52,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";             //$NON-NLS-1$
 
-   private static IPreferenceStore           _prefStoreCommon                = CommonActivator.getPrefStore();
+   private static final IPreferenceStore     _prefStore_Common               = CommonActivator.getPrefStore();
 
    private IWorkbenchWindow                  _window;
 
-   private IWorkbenchAction                  _actionPreferences;
-
    private IWorkbenchAction                  _actionAbout;
+   private IWorkbenchAction                  _actionPerspective_Save;
+   private IWorkbenchAction                  _actionPerspective_Reset;
+   private IWorkbenchAction                  _actionPerspective_Close;
+   private IWorkbenchAction                  _actionPerspective_CloseAll;
+   private IWorkbenchAction                  _actionPreferences;
    private IWorkbenchAction                  _actionQuit;
 
-   private IWorkbenchAction                  _actionSavePerspective;
-   private IWorkbenchAction                  _actionResetPerspective;
-   private IWorkbenchAction                  _actionClosePerspective;
-   private IWorkbenchAction                  _actionCloseAllPerspective;
-
-   private ActionContributionItem            _quitItem;
-   private ActionContributionItem            _prefItem;
+   private ActionContributionItem            _actionContribItem_Preferences;
+   private ActionContributionItem            _actionContribItem_Quit;
 
    /**
     * Customize perspective is disabled, because when the dialog is closed, the tour type UI
@@ -76,14 +74,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     * This action cannot be removed from the perspective context menu (it's created internally),
     * only from the app menu.
     */
-//   private IWorkbenchAction               _actionEditActionSets;
+// private IWorkbenchAction                  _actionEditActionSets;
 
-   PersonContributionItem                    _personContribItem;
-   private ActionTourDataFilter              _actionTour_DataFilter;
-   private ActionTourGeoFilter               _actionTour_GeoFilter;
-   private ActionTourTagFilter               _actionTour_TagFilter;
-   private TourTypeContributionItem          _tourTypeContribItem;
-   private MeasurementSystemContributionItem _measurementContribItem;
+   private ActionTourDataFilter              _actionTourFilter_Data;
+   private ActionTourGeoFilter               _actionTourFilter_Geo;
+   private ActionTourTagFilter               _actionTourFilter_Tag;
+
+   private MeasurementSystemContributionItem _contribItem_MeasurementSystem;
+   private PersonContributionItem            _contribItem_PersonSelector;
+   private RestartAppContributionItem        _contribItem_RestartApp;
+   private ThemeSelectorContributionItem     _contribItem_ThemeSelector;
+   private TourTypeContributionItem          _contribItem_TourType;
 
    private ActionOtherViews                  _actionOtherViews;
 
@@ -108,10 +109,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
          menu.add(perspectiveMenuMgr);
       }
 
-      menu.add(_actionSavePerspective);
-      menu.add(_actionResetPerspective);
-      menu.add(_actionClosePerspective);
-      menu.add(_actionCloseAllPerspective);
+      menu.add(_actionPerspective_Save);
+      menu.add(_actionPerspective_Reset);
+      menu.add(_actionPerspective_Close);
+      menu.add(_actionPerspective_CloseAll);
    }
 
    private MenuManager createMenu_10_New() {
@@ -119,7 +120,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       final MenuManager newMenu = new MenuManager(Messages.App_Action_Menu_New, "m_New"); //$NON-NLS-1$
 
       newMenu.add(new GroupMarker("ci_New")); //$NON-NLS-1$
-      newMenu.add(_quitItem);
+      newMenu.add(_actionContribItem_Quit);
 
       return newMenu;
    }
@@ -165,7 +166,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       addPerspectiveActions(toolMenu);
 
       toolMenu.add(new Separator());
-      toolMenu.add(_prefItem);
+      toolMenu.add(_actionContribItem_Preferences);
 
       return toolMenu;
    }
@@ -181,17 +182,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
    }
 
    @Override
-   protected void fillCoolBar(final ICoolBarManager coolBar) {
+   protected void fillCoolBar(final ICoolBarManager coolBarMgr) {
 
       {
          /*
           * Toolbar: People
           */
          final IToolBarManager tbMgr_People = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-         tbMgr_People.add(_personContribItem);
+         tbMgr_People.add(_contribItem_PersonSelector);
 
          final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgr_People, "people"); //$NON-NLS-1$
-         coolBar.add(tbItemPeople);
+         coolBarMgr.add(tbItemPeople);
       }
 
       {
@@ -201,8 +202,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
          final IToolBarManager tbMgr_TourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
          final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgr_TourType, "tourtype"); //$NON-NLS-1$
 
-         coolBar.add(tbItemTourType);
-         tbMgr_TourType.add(_tourTypeContribItem);
+         coolBarMgr.add(tbItemTourType);
+         tbMgr_TourType.add(_contribItem_TourType);
       }
 
       {
@@ -215,40 +216,40 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             /*
              * Tour data filter
              */
-            final ToolBarContributionItem tbItemTourDataFilter = new ToolBarContributionItem(
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(
                   tbMgr_TourFilter,
                   MENU_CONTRIB_TOOLBAR_APP_FILTER);
 
-            coolBar.add(tbItemTourDataFilter);
-            tbMgr_TourFilter.add(_actionTour_DataFilter);
+            coolBarMgr.add(tbContribItem);
+            tbMgr_TourFilter.add(_actionTourFilter_Data);
 
-            TourFilterManager.setTourFilterAction(_actionTour_DataFilter);
+            TourFilterManager.setTourFilterAction(_actionTourFilter_Data);
          }
          {
             /*
              * Tour geo filter
              */
-            final ToolBarContributionItem tbItemContribItem = new ToolBarContributionItem(
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(
                   tbMgr_TourFilter,
                   MENU_CONTRIB_TOOLBAR_APP_FILTER);
 
-            coolBar.add(tbItemContribItem);
-            tbMgr_TourFilter.add(_actionTour_GeoFilter);
+            coolBarMgr.add(tbContribItem);
+            tbMgr_TourFilter.add(_actionTourFilter_Geo);
 
-            TourGeoFilter_Manager.setAction_TourGeoFilter(_actionTour_GeoFilter);
+            TourGeoFilter_Manager.setAction_TourGeoFilter(_actionTourFilter_Geo);
          }
          {
             /*
              * Tour tag filter
              */
-            final ToolBarContributionItem tbItemTourTagFilter = new ToolBarContributionItem(
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(
                   tbMgr_TourFilter,
                   MENU_CONTRIB_TOOLBAR_APP_FILTER);
 
-            coolBar.add(tbItemTourTagFilter);
-            tbMgr_TourFilter.add(_actionTour_TagFilter);
+            coolBarMgr.add(tbContribItem);
+            tbMgr_TourFilter.add(_actionTourFilter_Tag);
 
-            TourTagFilterManager.setTourTagFilterAction(_actionTour_TagFilter);
+            TourTagFilterManager.setTourTagFilterAction(_actionTourFilter_Tag);
          }
       }
 
@@ -268,28 +269,54 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                tbm_TourEditor,
                "mc_tb_TourEditor"); //$NON-NLS-1$
 
-         coolBar.add(tbContribItem);
+         coolBarMgr.add(tbContribItem);
       }
 
       {
          /*
           * Toolbar: Measurement
           */
-         final boolean isShowMeasurement = _prefStoreCommon.getBoolean(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
+         final boolean isShowMeasurement = _prefStore_Common.getBoolean(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
          if (isShowMeasurement) {
 
-            final IToolBarManager tbMgr_System = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-            tbMgr_System.add(_measurementContribItem);
+            final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            tbMgr.add(_contribItem_MeasurementSystem);
 
-            final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
-                  tbMgr_System,
-                  "measurementSystem"); //$NON-NLS-1$
-            coolBar.add(tbItemMeasurement);
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "measurementSystem"); //$NON-NLS-1$
+            coolBarMgr.add(tbContribItem);
+         }
+      }
+      {
+         /*
+          * Toolbar: Theme selector
+          */
+         final boolean isShowThemeSelector = _prefStore_Common.getBoolean(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP);
+         if (isShowThemeSelector) {
+
+            final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            tbMgr.add(_contribItem_ThemeSelector);
+
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "themeSelector"); //$NON-NLS-1$
+            coolBarMgr.add(tbContribItem);
+         }
+      }
+      {
+         /*
+          * Toolbar: Restart app
+          */
+         final boolean isShowRestartApp = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
+         if (isShowRestartApp) {
+
+            final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+            tbMgr.add(_contribItem_RestartApp);
+
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
+            coolBarMgr.add(tbContribItem);
          }
       }
 
       // this must be set after the coolbar is created, otherwise it stops populating the coolbar
-      TourTypeFilterManager.setToolBarContribItem(_tourTypeContribItem);
+      TourTypeFilterManager.setToolBarContribItem(_contribItem_TourType);
    }
 
    @Override
@@ -307,6 +334,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       menuBar.add(createMenu_50_Help());
    }
 
+   public PersonContributionItem getPersonSelector() {
+
+      return _contribItem_PersonSelector;
+   }
+
    @Override
    protected void makeActions(final IWorkbenchWindow window) {
 
@@ -314,12 +346,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _window = window;
 
-      _personContribItem = new PersonContributionItem();
-      _actionTour_DataFilter = new ActionTourDataFilter();
-      _actionTour_GeoFilter = new ActionTourGeoFilter();
-      _actionTour_TagFilter = new ActionTourTagFilter();
-      _tourTypeContribItem = new TourTypeContributionItem();
-      _measurementContribItem = new MeasurementSystemContributionItem();
+// SET_FORMATTING_OFF
+
+      _actionTourFilter_Data           = new ActionTourDataFilter();
+      _actionTourFilter_Geo            = new ActionTourGeoFilter();
+      _actionTourFilter_Tag            = new ActionTourTagFilter();
+
+      _contribItem_MeasurementSystem   = new MeasurementSystemContributionItem();
+      _contribItem_PersonSelector      = new PersonContributionItem();
+      _contribItem_RestartApp          = new RestartAppContributionItem();
+      _contribItem_ThemeSelector       = new ThemeSelectorContributionItem();
+      _contribItem_TourType            = new TourTypeContributionItem();
 
       _actionQuit = ActionFactory.QUIT.create(window);
       register(_actionQuit);
@@ -335,15 +372,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _actionOtherViews = new ActionOtherViews(window);
 
-      _actionSavePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
-      _actionResetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
-      _actionClosePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
-      _actionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+      _actionPerspective_Save     = ActionFactory.SAVE_PERSPECTIVE.create(window);
+      _actionPerspective_Reset    = ActionFactory.RESET_PERSPECTIVE.create(window);
+      _actionPerspective_Close    = ActionFactory.CLOSE_PERSPECTIVE.create(window);
+      _actionPerspective_CloseAll = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
 
-      register(_actionSavePerspective);
-      register(_actionResetPerspective);
-      register(_actionClosePerspective);
-      register(_actionCloseAllPerspective);
+// SET_FORMATTING_ON
+
+      register(_actionPerspective_Save);
+      register(_actionPerspective_Reset);
+      register(_actionPerspective_Close);
+      register(_actionPerspective_CloseAll);
 
       /*
        * If we're on OS X we shouldn't show this command in the File menu. It should be invisible to
@@ -351,11 +390,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
        * our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from the
        * application menu.
        */
-      _quitItem = new ActionContributionItem(_actionQuit);
-      _quitItem.setVisible(!isOSX);
+      _actionContribItem_Quit = new ActionContributionItem(_actionQuit);
+      _actionContribItem_Quit.setVisible(isOSX == false);
 
-      _prefItem = new ActionContributionItem(_actionPreferences);
-      _prefItem.setVisible(!isOSX);
+      _actionContribItem_Preferences = new ActionContributionItem(_actionPreferences);
+      _actionContribItem_Preferences.setVisible(isOSX == false);
    }
 
 }

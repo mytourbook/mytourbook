@@ -106,8 +106,10 @@ public class ColumnProfile implements Cloneable {
     */
    public int getColumnIndex(final String columnId) {
 
-      for (int columnIndex = 0; columnIndex < getVisibleColumnIds().length; columnIndex++) {
-         final String visibleColumnId = getVisibleColumnIds()[columnIndex];
+      for (int columnIndex = 0; columnIndex < _visibleColumnIds.length; columnIndex++) {
+
+         final String visibleColumnId = _visibleColumnIds[columnIndex];
+
          if (visibleColumnId.equals(columnId)) {
             return columnIndex;
          }

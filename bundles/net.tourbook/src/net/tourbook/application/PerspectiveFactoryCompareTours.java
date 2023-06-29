@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.application;
 import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
 import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_YearStatistic_View;
+import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 
 import org.eclipse.ui.IFolderLayout;
@@ -27,12 +27,12 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
-   public static final String  PERSPECTIVE_ID            = "net.tourbook.perspective.CompareTours"; //$NON-NLS-1$
+   public static final String  PERSPECTIVE_ID               = "net.tourbook.perspective.CompareTours"; //$NON-NLS-1$
 
-   private static final String FOLDER_ID_COMPARE         = "comp";                                  //$NON-NLS-1$
-   private static final String FOLDER_ID_LIST            = "list";                                  //$NON-NLS-1$
-   private static final String FOLDER_ID_REF             = "ref";                                   //$NON-NLS-1$
-   private static final String FOLDER_ID_YEAR_STATISTICS = "folderYearStatistics";                  //$NON-NLS-1$
+   private static final String FOLDER_ID_COMPARE            = "comp";                                  //$NON-NLS-1$
+   private static final String FOLDER_ID_LIST               = "list";                                  //$NON-NLS-1$
+   private static final String FOLDER_ID_REF                = "ref";                                   //$NON-NLS-1$
+   private static final String FOLDER_ID_REFERENCE_TIMELINE = "folderReferenceTimeline";               //$NON-NLS-1$
 
    @Override
    public void createInitialLayout(final IPageLayout layout) {
@@ -43,7 +43,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
       layout.addShowViewShortcut(ReferenceTourView.ID);
       layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
       layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
-      layout.addShowViewShortcut(RefTour_YearStatistic_View.ID);
+      layout.addShowViewShortcut(ReferenceTimelineView.ID);
 
 // SET_FORMATTING_OFF
 
@@ -60,11 +60,11 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_YEAR_STATISTICS,
+      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_REFERENCE_TIMELINE,
 
             IPageLayout.BOTTOM,     0.7f,    FOLDER_ID_LIST);
 
-      folderYearStat.addView(RefTour_YearStatistic_View.ID);
+      folderYearStat.addView(ReferenceTimelineView.ID);
 
       //--------------------------------------------------------------------------------
       // Right area

@@ -30,10 +30,14 @@ import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 
 public class GeoCompareManager {
 
@@ -52,18 +56,14 @@ public class GeoCompareManager {
        * Setup comparer executer
        */
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "Comparing geo tours");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "Comparing geo tours");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
 //      System.out.println(String.format(
@@ -82,17 +82,17 @@ public class GeoCompareManager {
    }
 
    /**
-    * @param geoPartData
+    * @param geoCompareData
     * @param geoPartView
     */
-   static void compareGeoTours(final GeoCompareData geoPartData, final GeoCompareView geoPartView) {
+   static void compareGeoTours(final GeoCompareData geoCompareData, final GeoCompareView geoPartView) {
 
-      for (final long tourId : geoPartData.tourIds) {
+      for (final long tourId : geoCompareData.tourIds) {
 
-         final GeoComparedTour geoComparedTour_QueueItem = new GeoComparedTour(tourId, geoPartData);
+         final GeoComparedTour geoComparedTour_QueueItem = new GeoComparedTour(tourId, geoCompareData);
 
          // keep compared tour
-         geoPartData.allGeoComparedTours.add(geoComparedTour_QueueItem);
+         geoCompareData.allGeoComparedTours.add(geoComparedTour_QueueItem);
 
          _compareWaitingQueue.add(geoComparedTour_QueueItem);
 
@@ -352,8 +352,50 @@ public class GeoCompareManager {
       }
    }
 
-   public static boolean isGeoComparing() {
+   /**
+    * @return Returns <code>true</code> when geo comparing is enabled
+    */
+   public static boolean isGeoComparingOn() {
+
       return _isGeoComparingOn;
+   }
+
+   /**
+    * @param isNextTour
+    *           When <code>true</code> then navigate to the next tour, when <code>false</code>
+    *           then navigate to the previous tour.
+    * @return Returns the navigated tour or <code>null</code> when there is no next/previous tour.
+    */
+   public static Object navigateTour(final boolean isNextTour) {
+
+      Object navigatedTour = null;
+
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+      /*
+       * Firstly navigate in the compare result view when view is available
+       */
+      final IViewPart comparedTours = activePage.findView(GeoCompareView.ID);
+
+      if (comparedTours instanceof GeoCompareView) {
+
+         navigatedTour = ((GeoCompareView) comparedTours).navigateTour(isNextTour);
+      }
+
+      /*
+       * Secondly navigate in the year statistic view when view is available
+       */
+      if (navigatedTour == null) {
+
+         final IViewPart yearStatView = activePage.findView(ReferenceTimelineView.ID);
+
+         if (yearStatView instanceof ReferenceTimelineView) {
+
+            navigatedTour = ((ReferenceTimelineView) yearStatView).navigateTour(isNextTour);
+         }
+      }
+
+      return navigatedTour;
    }
 
    public static void removeGeoCompareListener(final IGeoCompareListener listener) {
@@ -375,9 +417,11 @@ public class GeoCompareManager {
       _isGeoComparingOn = isGeoComparingOn;
 
       fireEvent(
+
             isGeoComparingOn
                   ? GeoCompareEventId.SET_COMPARING_ON
                   : GeoCompareEventId.SET_COMPARING_OFF,
+
             null,
             part);
    }

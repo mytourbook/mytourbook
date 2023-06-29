@@ -34,14 +34,15 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -61,7 +62,7 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class ElevationCompareManager {
 
-   private static final String          NL                                           = UI.NEW_LINE;
+   private static final char            NL                                           = UI.NEW_LINE;
 
    private static final String          NUMBER_FORMAT_1F                             = "%.1f";                                        //$NON-NLS-1$
 
@@ -436,7 +437,7 @@ public class ElevationCompareManager {
       compareEndIndex = Math.min(compareEndIndex, numTourSlices - 1);
 
       /*
-       * create data serie for altitude difference
+       * Create data serie for altitude difference
        */
       final float[] normDistanceSerie = compareTourNormalizer.getNormalizedDistance();
       final float[] compAltiDif = new float[numTourSlices];
@@ -471,11 +472,24 @@ public class ElevationCompareManager {
       final int elapsedTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
       final int movingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
 
+      float elevationGain = 0;
+      float elevationLoss = 0;
+
+      final ElevationGainLoss elevationGainLoss = compareTourData.computeAltitudeUpDown(compareStartIndex, compareEndIndex);
+      if (elevationGainLoss != null) {
+
+         elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+         elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+      }
+
       compareResult.compareMovingTime = movingTime;
       compareResult.compareElapsedTime = elapsedTime;
       compareResult.compareDistance = compareDistance;
       compareResult.compareSpeed = compareDistance / movingTime * 3.6f;
       compareResult.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
+
+      compareResult.elevationGain = elevationGain;
+      compareResult.elevationLoss = elevationLoss;
 
       compareResult.timeInterval = compareTourData.getDeviceTimeInterval();
 
@@ -661,7 +675,7 @@ public class ElevationCompareManager {
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
 
       return storedComparedTours;
@@ -681,9 +695,7 @@ public class ElevationCompareManager {
 
       Object navigatedTour = null;
 
-      final IWorkbench workbench = PlatformUI.getWorkbench();
-      final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-      final IWorkbenchPage activePage = window.getActivePage();
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
       /*
        * Firstly navigate in the compare result view when view is available
@@ -700,11 +712,11 @@ public class ElevationCompareManager {
        */
       if (navigatedTour == null) {
 
-         final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
+         final IViewPart yearStatView = activePage.findView(ReferenceTimelineView.ID);
 
-         if (yearStatView instanceof RefTour_YearStatistic_View) {
+         if (yearStatView instanceof ReferenceTimelineView) {
 
-            navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
+            navigatedTour = ((ReferenceTimelineView) yearStatView).navigateTour(isNextTour);
          }
       }
 

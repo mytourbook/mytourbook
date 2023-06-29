@@ -57,8 +57,8 @@ public class NormalizedGeoData {
    public int                distanceAccuracy = 100;
 
    public int[]              normalizedLat;
-
    public int[]              normalizedLon;
+
    /**
     * Contains the index of the original data
     */

@@ -72,6 +72,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -83,7 +85,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareListener {
+public class ReferenceTimelineView extends ViewPart implements IGeoCompareListener {
 
    public static final String  ID                                = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
@@ -173,6 +175,10 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
     */
    private StructuredSelection                _currentSelection;
 
+   /**
+    * When <code>null</code> then the elevation compare type icon in {@link #_iconCompareType} is
+    * displayed
+    */
    private GeoCompareData                     _currentGeoCompareData;
 
    private ITourEventListener                 _tourEventListener;
@@ -190,7 +196,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
    private ActionSyncMinMaxValues             _actionSyncMinMaxValues;
    private ActionYearStatisticOptions         _actionYearStatOptions;
 
-   private YearStatisticTourToolTip           _tourToolTip;
+   private ReferenceTimeline_TourTooltip      _tourToolTip;
    private TourInfoIconToolTipProvider        _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
 
    private PixelConverter                     _pc;
@@ -199,8 +205,8 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
     * UI controls
     */
    private PageBook  _pageBook;
-   private Composite _pageChart;
-   private Composite _pageNoChart;
+   private Composite _pageSelectRefTour;
+   private Composite _pageYearChart;
    private Composite _headerContainer;
 
    private Chart     _yearChart;
@@ -209,7 +215,13 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
    private Label     _lblRefTourTitle;
 
+   private CLabel    _iconCompareType;
+
    private Spinner   _spinnerNumberOfVisibleYears;
+
+   private Image     _imageCompareType_GeoCompare       = TourbookPlugin.getThemedImageDescriptor(Images.GeoParts).createImage();
+   private Image     _imageCompareType_ElevationCompare = TourbookPlugin.getThemedImageDescriptor(Images.RefTour_CompareWizard).createImage();
+   private Image     _imageCompareType_PlaceHolder      = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
 
    private class ActionCopyValuesIntoClipboard extends Action {
 
@@ -236,7 +248,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Year_Statistic_Action_ShowAllValues_Tooltip);
+         setToolTipText(Messages.Reference_Timeline_Action_ShowAllValues_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_Statistic_Show_All_Values));
       }
@@ -256,7 +268,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
          // Use the same scaling for different years, people or tour types,
          // this makes it easier to compare numbers
-         setToolTipText(Messages.Year_Statistic_Action_SyncMinMaxValues_Tooltip);
+         setToolTipText(Messages.Reference_Timeline_Action_SyncMinMaxValues_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
       }
@@ -274,11 +286,11 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutYearStatisticOptions(RefTour_YearStatistic_View.this, _pageBook, toolbar, PREF_PREFIX, _state);
+         return new SlideoutReferenceTimelineOptions(ReferenceTimelineView.this, _pageBook, toolbar, PREF_PREFIX, _state);
       }
    }
 
-   public RefTour_YearStatistic_View() {}
+   public ReferenceTimelineView() {}
 
    private void addPrefListener() {
 
@@ -306,9 +318,9 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
             // measurement system has changed -> recreate the chart
 
             _yearChart.dispose();
-            createUI_30_Chart(_pageChart);
+            createUI_30_Chart(_pageYearChart);
 
-            _pageChart.layout();
+            _pageYearChart.layout();
 
             updateUI_YearChart();
          }
@@ -473,7 +485,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       // set selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-      _pageBook.showPage(_pageNoChart);
+      _pageBook.showPage(_pageSelectRefTour);
 
       restoreState();
 
@@ -732,7 +744,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       final String title = tourDate.format(TimeTools.Formatter_Date_F);
 
-      new RefTour_YearStatistic_TooltipUI().createContentArea(
+      new ReferenceTimeline_TourTooltipUI().createContentArea(
 
             parent,
             toolTipProvider,
@@ -749,9 +761,9 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoChart = UI.createUI_PageNoData(_pageBook, Messages.RefTour_Label_Year_NotSelected);
+      _pageSelectRefTour = UI.createUI_PageNoData(_pageBook, Messages.Reference_Timeline_Page_SelectReferenceTour);
 
-      _pageChart = createUI_10_PageYearChart(_pageBook);
+      _pageYearChart = createUI_10_PageYearChart(_pageBook);
    }
 
    private Composite createUI_10_PageYearChart(final Composite parent) {
@@ -780,11 +792,25 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
             .align(SWT.FILL, SWT.FILL)
             .applyTo(_headerContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
+            .numColumns(4)
             .margins(3, 3)
             .applyTo(_headerContainer);
-//      container.setBackground(UI.SYS_COLOR_GREEN);
+//      _headerContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
+         {
+            /*
+             * Image: Compare type
+             */
+            _iconCompareType = new CLabel(_headerContainer, SWT.NONE);
+            _iconCompareType.setImage(_imageCompareType_PlaceHolder);
+//            _iconCompareType.setBackground(UI.SYS_COLOR_BLUE);
+            GridDataFactory.fillDefaults()
+
+                  // adjust to lower checkbox
+                  .indent(-3, 0)
+                  .applyTo(_iconCompareType);
+
+         }
          {
             /*
              * Ref tour title
@@ -792,7 +818,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
             _lblRefTourTitle = new Label(_headerContainer, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .align(SWT.CENTER, SWT.CENTER)
+                  .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblRefTourTitle);
 //            _lblRefTourTitle.setBackground(UI.SYS_COLOR_RED);
          }
@@ -801,7 +827,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
              * Last visible year
              */
             _comboLastVisibleYear = new Combo(_headerContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboLastVisibleYear.setToolTipText(Messages.Year_Statistic_Combo_LastYears_Tooltip);
+            _comboLastVisibleYear.setToolTipText(Messages.Reference_Timeline_Combo_LastYears_Tooltip);
             _comboLastVisibleYear.setVisibleItemCount(50);
 
             _comboLastVisibleYear.addSelectionListener(widgetSelectedAdapter(
@@ -827,7 +853,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
             _spinnerNumberOfVisibleYears.setMaximum(100);
             _spinnerNumberOfVisibleYears.setIncrement(1);
             _spinnerNumberOfVisibleYears.setPageIncrement(5);
-            _spinnerNumberOfVisibleYears.setToolTipText(Messages.Year_Statistic_Combo_NumberOfYears_Tooltip);
+            _spinnerNumberOfVisibleYears.setToolTipText(Messages.Reference_Timeline_Combo_NumberOfYears_Tooltip);
 
             _spinnerNumberOfVisibleYears.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onSelect_NumberOfVisibleYears()));
@@ -854,7 +880,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_yearChart);
 
       // set tour info icon into the left axis
-      _tourToolTip = new YearStatisticTourToolTip(_yearChart.getToolTipControl());
+      _tourToolTip = new ReferenceTimeline_TourTooltip(_yearChart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
       _tourToolTip.addHideListener(event -> {
 
@@ -869,6 +895,10 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
    @Override
    public void dispose() {
+
+      UI.disposeResource(_imageCompareType_GeoCompare);
+      UI.disposeResource(_imageCompareType_PlaceHolder);
+      UI.disposeResource(_imageCompareType_ElevationCompare);
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
@@ -906,17 +936,33 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
    @Override
    public void geoCompareEvent(final IWorkbenchPart part, final GeoCompareEventId eventId, final Object eventData) {
 
-      if (eventId != GeoCompareEventId.TOUR_IS_GEO_COMPARED) {
-         return;
+      switch (eventId) {
+
+      case TOUR_IS_GEO_COMPARED:
+
+         if (eventData instanceof GeoCompareData) {
+
+            final GeoCompareData geoCompareData = (GeoCompareData) eventData;
+
+            // update year statistic with provided geo compare data
+            updateUI_YearChart(geoCompareData, false);
+         }
+
+         break;
+
+      case SET_COMPARING_ON:
+         break;
+
+      case SET_COMPARING_OFF:
+
+         _currentGeoCompareData = null;
+         updateUI_YearChart();
+
+         break;
+      default:
+         break;
       }
 
-      if (eventData instanceof GeoCompareData) {
-
-         final GeoCompareData geoCompareData = (GeoCompareData) eventData;
-
-         // update year statistic with provided geo compare data
-         updateUI_YearChart(geoCompareData, false);
-      }
    }
 
    private int getFirstVisibleYear() {
@@ -955,7 +1001,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       _pc = new PixelConverter(parent);
    }
 
-   TVIRefTour_ComparedTour navigateTour(final boolean isNextTour) {
+   public TVIRefTour_ComparedTour navigateTour(final boolean isNextTour) {
 
       final int numTours = _statValues_AllTours.size();
 
@@ -1087,11 +1133,15 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       _selectedTourIndex = Math.min(valueIndex, _statValues_AllTours.size() - 1);
 
       // select tour in the tour viewer and show tour in compared tour char
-      final TVIRefTour_ComparedTour tourCatalogComparedTour = _statValues_AllTours.get(_selectedTourIndex);
-      _currentSelection = new StructuredSelection(tourCatalogComparedTour);
+      final TVIRefTour_ComparedTour comparedTour = _statValues_AllTours.get(_selectedTourIndex);
+      _currentSelection = new StructuredSelection(comparedTour);
       _postSelectionProvider.setSelection(_currentSelection);
 
-      _tourInfoToolTipProvider.setTourId(tourCatalogComparedTour.getTourId());
+      final long tourId = comparedTour.geoCompareTour != null
+            ? comparedTour.geoCompareTour.tourId
+            : comparedTour.getTourId();
+
+      _tourInfoToolTipProvider.setTourId(tourId);
    }
 
    void onSelect_LastVisibleYear() {
@@ -1102,7 +1152,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       // update year data
       setYearData();
 
-      updateUI_YearChart();
+      updateUI_YearChart_WithCurrentGeoData();
    }
 
    /**
@@ -1126,7 +1176,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       setYearData();
 
-      updateUI_YearChart();
+      updateUI_YearChart_WithCurrentGeoData();
 
       // reselect last selected tour
       selectTourInYearChart(selectedTourId);
@@ -1136,14 +1186,18 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
       if (selection instanceof SelectionReferenceTourView) {
 
-         final SelectionReferenceTourView tourCatalogItem = (SelectionReferenceTourView) selection;
+         final SelectionReferenceTourView refTourItem = (SelectionReferenceTourView) selection;
 
-         final TVIRefTour_RefTourItem refItem = tourCatalogItem.getRefItem();
+         final TVIRefTour_RefTourItem refItem = refTourItem.getRefItem();
          if (refItem != null) {
 
             // reference tour is selected
 
             _currentRefItem = refItem;
+
+            if (refTourItem.isFromElevationCompare()) {
+               _currentGeoCompareData = null;
+            }
 
             updateUI_YearChart(true);
 
@@ -1151,7 +1205,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
             // show statistic for a specific year
 
-            final TVIRefTour_YearItem yearItem = tourCatalogItem.getYearItem();
+            final TVIRefTour_YearItem yearItem = refTourItem.getYearItem();
             if (yearItem != null) {
 
                _currentRefItem = yearItem.getRefItem();
@@ -1167,7 +1221,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          }
 
          // select tour in the statistic
-         final Long compTourId = tourCatalogItem.getCompTourId();
+         final Long compTourId = refTourItem.getCompTourId();
          if (compTourId != null) {
 
             selectTourInYearChart(compTourId);
@@ -1204,6 +1258,15 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
                final TVIRefTour_ComparedTour compareItem = (TVIRefTour_ComparedTour) firstElement;
 
+               boolean isUpdateYearChart = false;
+
+               if (compareItem.geoCompareTour == null && _currentGeoCompareData != null) {
+
+                  _currentGeoCompareData = null;
+
+                  isUpdateYearChart = true;
+               }
+
                // get year item
                final TreeViewerItem compareParentItem = compareItem.getParentItem();
                if (compareParentItem instanceof TVIRefTour_YearItem) {
@@ -1223,7 +1286,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
                         // create new ref item for the ref tour
                         _currentRefItem = ElevationCompareManager.createCatalogRefItem(refId);
 
-                        updateUI_YearChart();
+                        isUpdateYearChart = true;
 
                      } else {
 
@@ -1234,10 +1297,15 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
 
                            _currentRefItem = refTourItem;
 
-                           updateUI_YearChart();
+                           isUpdateYearChart = true;
                         }
                      }
                   }
+               }
+
+               if (isUpdateYearChart) {
+
+                  updateUI_YearChart();
                }
 
                // select tour in the year chart
@@ -1263,15 +1331,20 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
                if (tourId != null) {
 
                   final RefTourItem refTour = compareResult.refTour;
-
                   final long refId = refTour.refId;
-                  if (_currentRefItem == null || _currentRefItem.refId != refId) {
+
+                  if (_currentRefItem == null || _currentRefItem.refId != refId
+
+                  // ensure that geo compare is not displayed
+                        || _currentGeoCompareData != null) {
 
                      // the current statistic do not show the ref tour for the compared tour
                      // -> first show the ref tour
 
                      // create new ref item for the ref tour
                      _currentRefItem = ElevationCompareManager.createCatalogRefItem(refId);
+
+                     _currentGeoCompareData = null;
 
                      updateUI_YearChart();
                   }
@@ -1328,7 +1401,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       _actionShowAllValues.setChecked(_isShowAllValues);
       _actionSyncMinMaxValues.setChecked(_isSynchMinMaxValue);
 
-      final int numVisibleYears = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
+      final int numVisibleYears = Util.getStateInt(_state, ReferenceTimelineView.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
       _numVisibleYears = numVisibleYears;
       _spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
 
@@ -1440,9 +1513,20 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       updateUI_YearChart(false);
    }
 
-   void updateUI_YearChart(final boolean isShowLatestYear) {
+   private void updateUI_YearChart(final boolean isShowLatestYear) {
 
-      updateUI_YearChart(_currentGeoCompareData, isShowLatestYear);
+      GeoCompareData geoCompareData = null;
+
+      // use current geo compare data when is has the same ref id
+      if (_currentRefItem != null
+            && _currentGeoCompareData != null
+
+            && _currentRefItem.refId == _currentGeoCompareData.refId) {
+
+         geoCompareData = _currentGeoCompareData;
+      }
+
+      updateUI_YearChart(geoCompareData, isShowLatestYear);
    }
 
    /**
@@ -1452,16 +1536,25 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
     * @param isShowLatestYear
     *           Shows the latest year and the years before
     */
-   private void updateUI_YearChart(final GeoCompareData geoCompareData, final boolean isShowLatestYear) {
+   private void updateUI_YearChart(final GeoCompareData geoCompareData,
+                                   final boolean isShowLatestYear) {
+
+      if (geoCompareData != null && _currentRefItem == null) {
+
+         _currentRefItem = new TVIRefTour_RefTourItem();
+
+         _currentRefItem.numTours = geoCompareData.allGeoComparedTours_Filtered.size();
+         _currentRefItem.label = geoCompareData.tourTitle;
+      }
 
       if (_currentRefItem == null) {
 
-         _pageBook.showPage(_pageNoChart);
+         _pageBook.showPage(_pageSelectRefTour);
 
          return;
       }
 
-      _pageBook.showPage(_pageChart);
+      _pageBook.showPage(_pageYearChart);
 
       /*
        * Reset statistic values
@@ -1480,10 +1573,10 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       int firstVisibleYear = getFirstVisibleYear();
 
       _barRelativeHeight = Util.getStateInt(_state,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MIN,
-            RefTour_YearStatistic_View.STATE_RELATIVE_BAR_HEIGHT_MAX);
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MIN,
+            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MAX);
 
       // keep/remove current geo compare data
       _currentGeoCompareData = geoCompareData;
@@ -1534,7 +1627,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          TourManager.setBarColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
          TourManager.setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
 
-         yDataSpeed.setYTitle(Messages.RefTour_Label_Year_ChartTitle);
+         yDataSpeed.setYTitle(OtherMessages.GRAPH_LABEL_SPEED);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
 
@@ -1652,7 +1745,7 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
 
-            RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, valueIndex);
+            ReferenceTimelineView.this.createToolTipUI(toolTipProvider, parent, valueIndex);
          }
       });
 
@@ -1686,10 +1779,26 @@ public class RefTour_YearStatistic_View extends ViewPart implements IGeoCompareL
       _lblRefTourTitle.setText(_currentRefItem.label);
       _lblRefTourTitle.setForeground(ThemeUtil.getDefaultForegroundColor_Table());
 
+      if (geoCompareData != null) {
+
+         _iconCompareType.setImage(_imageCompareType_GeoCompare);
+         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Image_GeoCompare_Tooltip);
+
+      } else {
+
+         _iconCompareType.setImage(_imageCompareType_ElevationCompare);
+         _iconCompareType.setToolTipText(Messages.Reference_Timeline_Image_ElevationCompare_Tooltip);
+      }
+
       // set background again otherwise the original is displayed
       _headerContainer.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
 
       // layout is needed otherwise the horizontal centered text is not displayed
       _lblRefTourTitle.getParent().layout(true, true);
+   }
+
+   void updateUI_YearChart_WithCurrentGeoData() {
+
+      updateUI_YearChart(_currentGeoCompareData, false);
    }
 }

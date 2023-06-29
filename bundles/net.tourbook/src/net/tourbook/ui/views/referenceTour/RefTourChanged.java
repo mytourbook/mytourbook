@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,31 +15,30 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import net.tourbook.Images;
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
+import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.jface.action.Action;
+public class RefTourChanged {
 
-public class ActionSynchChartHorizontalBySize extends Action {
+   long      refId;
 
-   private ISynchedChart _synchChart;
+   double    xValueDifference;
 
-   public ActionSynchChartHorizontalBySize(final ISynchedChart syncChart) {
+   TourChart refTourChart;
 
-      super(null, AS_CHECK_BOX);
+   /**
+    * @param refTourChart
+    *           reference tour chart
+    * @param refId
+    *           reference id
+    * @param xValueDiff
+    *           value difference in the reference tour
+    */
+   public RefTourChanged(final TourChart refTourChart, final long refId, final double xValueDiff) {
 
-      _synchChart = syncChart;
+      this.refTourChart = refTourChart;
+      this.refId = refId;
 
-      setToolTipText(Messages.RefTour_Action_SyncChartsBySize_Tooltip);
-
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize_Disabled));
+      this.xValueDifference = xValueDiff;
    }
 
-   @Override
-   public void run() {
-      _synchChart.synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SIZE);
-   }
 }

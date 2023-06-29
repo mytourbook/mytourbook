@@ -1144,7 +1144,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                });
             }
          }
-
       }
 
       return isOK;

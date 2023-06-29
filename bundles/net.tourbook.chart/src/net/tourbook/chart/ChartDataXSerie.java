@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,12 +49,12 @@ public class ChartDataXSerie extends ChartDataSerie {
     * Index in the x-data at which the graph is painted in the marker color, <code>-1</code>
     * disables the synch marker
     */
-   private int                    _synchMarkerStartIndex = -1;
+   private int                    _xValueMarker_StartIndex = -1;
 
    /**
     * Index in the x-data at which the graph is stoped to painted in the marker color
     */
-   private int                    _synchMarkerEndIndex   = -1;
+   private int                    _xValueMarker_EndIndex   = -1;
 
    /**
     * Range marker shows an area with a different color in the graph
@@ -163,20 +163,6 @@ public class ChartDataXSerie extends ChartDataSerie {
    }
 
    /**
-    * @return Returns the xMarkerEndIndex.
-    */
-   public int getSynchMarkerEndIndex() {
-      return _synchMarkerEndIndex;
-   }
-
-   /**
-    * @return Returns the xMarkerStartIndex or <code>-1</code> when the x-marker is not displayed
-    */
-   public int getSynchMarkerStartIndex() {
-      return _synchMarkerStartIndex;
-   }
-
-   /**
     * @return Returns the startValue.
     */
    public double getUnitStartValue() {
@@ -197,6 +183,20 @@ public class ChartDataXSerie extends ChartDataSerie {
       return _xAxisMinValueForced;
    }
 
+   /**
+    * @return Returns the xMarkerEndIndex.
+    */
+   public int getXValueMarker_EndIndex() {
+      return _xValueMarker_EndIndex;
+   }
+
+   /**
+    * @return Returns the xMarkerStartIndex or <code>-1</code> when the x-marker is not displayed
+    */
+   public int getXValueMarker_StartIndex() {
+      return _xValueMarker_StartIndex;
+   }
+
    public boolean isTimeSerieWithTimeZoneAdjustment() {
       return _timeSerieWithTimeZoneAdjustment;
    }
@@ -209,7 +209,7 @@ public class ChartDataXSerie extends ChartDataSerie {
     * Set history start time on the x-axis. this is used when
     * <p>
     * <code>xData.setAxisUnit({@link ChartDataSerie#X_AXIS_UNIT_HISTORY})</code>
-    * 
+    *
     * @param dateTime
     */
    public void setHistoryStartDateTime(final ZonedDateTime dateTime) {
@@ -296,18 +296,6 @@ public class ChartDataXSerie extends ChartDataSerie {
    }
 
    /**
-    * set the start/end value index for the marker which is displayed in a different color, by
-    * default the synch marker is disabled
-    *
-    * @param startIndex
-    * @param endIndex
-    */
-   public void setSynchMarkerValueIndex(final int startIndex, final int endIndex) {
-      _synchMarkerStartIndex = startIndex;
-      _synchMarkerEndIndex = endIndex;
-   }
-
-   /**
     * @param startValue
     *           The startValue to set.
     */
@@ -315,8 +303,22 @@ public class ChartDataXSerie extends ChartDataSerie {
       _unitStartValue = startValue;
    }
 
+   /**
+    * set the start/end value index for the marker which is displayed in a different color, by
+    * default the synch marker is disabled
+    *
+    * @param startIndex
+    * @param endIndex
+    */
+   public void setXValueMarker_ValueIndices(final int startIndex, final int endIndex) {
+
+      _xValueMarker_StartIndex = startIndex;
+      _xValueMarker_EndIndex = endIndex;
+   }
+
    @Override
    public String toString() {
+
       return "[ChartDataXSerie]";//$NON-NLS-1$
    }
 

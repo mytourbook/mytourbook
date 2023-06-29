@@ -48,10 +48,31 @@ public class ReferenceTourManager {
     * <code>null</code>, this is wrong when refId == 0
     */
    private static long                               _geoCompare_RefId    = Long.MIN_VALUE;
+
+   private static boolean                            _geoCompare_IsNativeRefTour;
    private static TourReference                      _geoCompare_RefTour;
    private static CompareConfig                      _geoCompare_RefConfig;
 
    private ReferenceTourManager() {}
+
+   /**
+    * @param refTour
+    * @return
+    */
+   public static long createGeoCompareRefTour_FromNative(final TourReference refTour) {
+
+      _geoCompare_RefId = refTour.getRefId();
+
+      _geoCompare_IsNativeRefTour = true;
+
+      _geoCompare_RefTour = refTour;
+      _geoCompare_RefTour.setLabel("Selected Reference Tour");
+
+      _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
+      _geoCompare_RefConfig.setIsGeoCompareRefTour();
+
+      return _geoCompare_RefId;
+   }
 
    /**
     * Creates a special {@link TourReference} which is NOT saved in the db
@@ -61,11 +82,13 @@ public class ReferenceTourManager {
     * @param endIndex
     * @return Returns the special ref id
     */
-   public static long createGeoCompareRefTour(final TourData tourData, final int startIndex, final int endIndex) {
+   public static long createGeoCompareRefTour_Virtual(final TourData tourData, final int startIndex, final int endIndex) {
 
       final String refTourLabel = Messages.Geo_Compare_Label_ReferenceTour;
 
       _geoCompare_RefId = System.nanoTime();
+
+      _geoCompare_IsNativeRefTour = false;
 
       _geoCompare_RefTour = new TourReference(
             refTourLabel,
@@ -74,24 +97,7 @@ public class ReferenceTourManager {
             endIndex);
 
       _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
-      _geoCompare_RefConfig.setIsGeoCompareRefTour(true);
-
-      return _geoCompare_RefId;
-   }
-
-   /**
-    * @param refTour
-    * @return
-    */
-   public static long createGeoCompareRefTour(final TourReference refTour) {
-
-      _geoCompare_RefId = refTour.getRefId();
-
-      _geoCompare_RefTour = refTour;
-      _geoCompare_RefTour.setLabel("Selected Reference Tour");
-
-      _geoCompare_RefConfig = createTourCompareConfig(_geoCompare_RefTour);
-      _geoCompare_RefConfig.setIsGeoCompareRefTour(true);
+      _geoCompare_RefConfig.setIsGeoCompareRefTour();
 
       return _geoCompare_RefId;
    }
@@ -138,6 +144,25 @@ public class ReferenceTourManager {
    }
 
    /**
+    * Load {@link TourReference} from the database
+    *
+    * @param refId
+    * @return Returns {@link TourReference} for the <code>refId</code>
+    */
+   public static TourReference getReferenceTour(final long refId) {
+
+      TourReference refTour;
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      {
+         refTour = em.find(TourReference.class, refId);
+      }
+      em.close();
+
+      return refTour;
+   }
+
+   /**
     * Returns a {@link CompareConfig} or <code>null</code> when the reference tour cannot
     * be loaded from the database
     *
@@ -177,6 +202,10 @@ public class ReferenceTourManager {
       _compareConfig_Cache.put(refId, newCompareConfig);
 
       return newCompareConfig;
+   }
+
+   public static boolean isFromNativeRefTour() {
+      return _geoCompare_IsNativeRefTour;
    }
 
 }

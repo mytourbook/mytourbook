@@ -1,0 +1,8 @@
+23.5.1                                                      23. June 2023
+
+
+Bugfix
+======
+
+* Fixed bug where the newly centered tour type and weather icons in a view caused an exception
+  https://github.com/mytourbook/mytourbook/issues/1133

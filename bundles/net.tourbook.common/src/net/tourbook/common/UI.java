@@ -41,6 +41,7 @@ import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.common.measurement_system.Unit_Temperature;
 import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -117,6 +118,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
@@ -190,6 +192,7 @@ public class UI {
    public static final String       SYMBOL_FIGURE_DASH                 = "\u2012";              //$NON-NLS-1$
    public static final String       SYMBOL_FOOT_NOTE                   = "\u20F0";              //$NON-NLS-1$
    public static final String       SYMBOL_FULL_BLOCK                  = "\u2588";              //$NON-NLS-1$
+   public static final String       SYMBOL_HEAVY_CHECK_MARK            = "\u2714";              //$NON-NLS-1$
    public static final String       SYMBOL_HOURGLASS_WITH_FLOWING_SAND = "\u231B";              //$NON-NLS-1$
    public static final String       SYMBOL_IDENTICAL_TO                = "\u2261";              //$NON-NLS-1$
    public static final String       SYMBOL_INFINITY_MAX                = "\u221E";              //$NON-NLS-1$
@@ -847,6 +850,32 @@ public class UI {
          Util.logSystemProperty_IsEnabled(UI.class,
                SYS_PROP__SCRAMBLE_DATA,
                "Visible data are scrambled"); //$NON-NLS-1$
+      }
+   }
+
+   /**
+    * Activate provided view when it is not yet active
+    *
+    * @param viewPart
+    * @param viewPartID
+    */
+   public static void activateView(final IViewPart viewPart, final String viewPartID) {
+
+      final IWorkbenchPart activePart = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage()
+            .getActivePart();
+
+      if (activePart != viewPart) {
+
+         try {
+
+            viewPart.getSite().getPage().showView(viewPartID, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+         } catch (final PartInitException e) {
+
+            StatusUtil.log(e);
+         }
       }
    }
 

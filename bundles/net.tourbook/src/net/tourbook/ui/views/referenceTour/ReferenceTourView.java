@@ -73,6 +73,8 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
+import net.tourbook.ui.views.geoCompare.GeoCompareManager;
+import net.tourbook.ui.views.geoCompare.GeoCompareView;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -81,6 +83,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -99,6 +102,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MenuAdapter;
@@ -116,6 +120,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -213,6 +218,7 @@ public class ReferenceTourView extends ViewPart implements
    private ActionEditQuick                     _actionContext_EditQuick;
    private ActionEditTour                      _actionContext_EditTour;
    private ActionExpandSelection               _actionContext_ExpandSelection;
+   private ActionGeoCompare                    _actionContext_GeoCompare;
    private ActionOnMouseSelect_ExpandCollapse  _actionContext_OnMouseSelect_ExpandCollapse;
    private ActionOpenTour                      _actionContext_OpenTour;
    private ActionRemoveComparedTours           _actionContext_RemoveComparedTours;
@@ -272,6 +278,25 @@ public class ReferenceTourView extends ViewPart implements
             super.run();
          }
          _isInCollapseAll = false;
+      }
+   }
+
+   private class ActionGeoCompare extends Action {
+
+      public ActionGeoCompare() {
+
+         super(Messages.Tour_Action_GeoCompare, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Tour_Action_GeoCompare_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoParts));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoParts_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         onAction_GeoCompare();
       }
    }
 
@@ -661,16 +686,17 @@ public class ReferenceTourView extends ViewPart implements
       _action_ToggleRefTourLayout                  = new Action_ViewLayout();
 
       _actionContext_CollapseAll                   = new ActionCollapseAll_WithoutSelection(this);
+      _actionContext_CollapseOthers                = new ActionCollapseOthers(this);
       _actionContext_Compare_AllTours              = new ActionCompareByElevation_AllTours(this);
       _actionContext_Compare_WithWizard            = new ActionCompareByElevation_WithWizard(this);
-      _actionContext_RemoveComparedTours           = new ActionRemoveComparedTours(this);
-      _actionContext_RenameRefTour                 = new ActionRenameRefTour(this);
-      _actionContext_CollapseOthers                = new ActionCollapseOthers(this);
-      _actionContext_ExpandSelection               = new ActionExpandSelection(this);
       _actionContext_EditQuick                     = new ActionEditQuick(this);
       _actionContext_EditTour                      = new ActionEditTour(this);
+      _actionContext_ExpandSelection               = new ActionExpandSelection(this);
+      _actionContext_GeoCompare                    = new ActionGeoCompare();
       _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
       _actionContext_OpenTour                      = new ActionOpenTour(this);
+      _actionContext_RemoveComparedTours           = new ActionRemoveComparedTours(this);
+      _actionContext_RenameRefTour                 = new ActionRenameRefTour(this);
       _actionContext_SetTourType                   = new ActionSetTourTypeMenu(this);
       _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
 
@@ -1289,28 +1315,33 @@ public class ReferenceTourView extends ViewPart implements
                   ? firstElementHasChildren
                   : true;
 
-      _tourDoubleClickState.canEditTour = isEditableTour;
-      _tourDoubleClickState.canOpenTour = isEditableTour;
-      _tourDoubleClickState.canQuickEditTour = isEditableTour;
-      _tourDoubleClickState.canEditMarker = isEditableTour;
-      _tourDoubleClickState.canAdjustAltitude = isEditableTour;
+// SET_FORMATTING_OFF
 
-      _actionContext_Compare_AllTours.setEnabled(isRefItemSelected);
-      _actionContext_Compare_WithWizard.setEnabled(isRefItemSelected);
+      _tourDoubleClickState.canEditTour         = isEditableTour;
+      _tourDoubleClickState.canOpenTour         = isEditableTour;
+      _tourDoubleClickState.canQuickEditTour    = isEditableTour;
+      _tourDoubleClickState.canEditMarker       = isEditableTour;
+      _tourDoubleClickState.canAdjustAltitude   = isEditableTour;
 
-      _actionContext_RemoveComparedTours.setEnabled(canRemoveTours);
-      _actionContext_RenameRefTour.setEnabled(numRefItems == 1 && numTourItems == 0 && numYearItems == 0);
+      _actionContext_GeoCompare           .setEnabled(isOneRefTour);
+      _actionContext_Compare_AllTours     .setEnabled(isRefItemSelected);
+      _actionContext_Compare_WithWizard   .setEnabled(isRefItemSelected);
 
-      _actionContext_EditQuick.setEnabled(isEditableTour);
-      _actionContext_EditTour.setEnabled(isEditableTour);
-      _actionContext_OpenTour.setEnabled(isEditableTour);
+      _actionContext_RemoveComparedTours  .setEnabled(canRemoveTours);
+      _actionContext_RenameRefTour        .setEnabled(isOneRefTour);
 
-      _actionContext_SetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      _actionContext_EditQuick            .setEnabled(isEditableTour);
+      _actionContext_EditTour             .setEnabled(isEditableTour);
+      _actionContext_OpenTour             .setEnabled(isEditableTour);
 
-      _actionContext_CollapseOthers.setEnabled(isOnly1SelectedItem && firstElementHasChildren);
-      _actionContext_ExpandSelection.setEnabled(canExpandSelection);
+      _actionContext_SetTourType          .setEnabled(isTourSelected && tourTypes.size() > 0);
+
+      _actionContext_CollapseOthers       .setEnabled(isOnly1SelectedItem && firstElementHasChildren);
+      _actionContext_ExpandSelection      .setEnabled(canExpandSelection);
 
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.tagIds);
+
+// SET_FORMATTING_ON
 
       TourTypeMenuManager.enableRecentTourTypeActions(
             isTourSelected,
@@ -1369,6 +1400,7 @@ public class ReferenceTourView extends ViewPart implements
       menuMgr.add(_actionContext_SingleExpand_CollapseOthers);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionContext_GeoCompare);
       menuMgr.add(_actionContext_Compare_WithWizard);
       menuMgr.add(_actionContext_Compare_AllTours);
       menuMgr.add(_actionContext_RenameRefTour);
@@ -1571,6 +1603,55 @@ public class ReferenceTourView extends ViewPart implements
    public boolean isUseFastAppFilter() {
 
       return _action_AppTourFilter.isChecked();
+   }
+
+   private void onAction_GeoCompare() {
+      // TODO Auto-generated method stub
+
+      if (GeoCompareManager.isGeoComparingOn() == false) {
+
+         // turn it on
+
+         GeoCompareManager.setGeoComparing(true, ReferenceTourView.this);
+      }
+
+      final Object firstItem = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
+      if ((firstItem instanceof TVIRefTour_RefTourItem) == false) {
+         return;
+      }
+
+      final TVIRefTour_RefTourItem refTourItem = (TVIRefTour_RefTourItem) firstItem;
+      final long refId = refTourItem.refId;
+
+      // load reference tour from the database
+      final TourReference referenceTour = ReferenceTourManager.getReferenceTour(refId);
+      if (referenceTour == null) {
+         return;
+      }
+
+      final TourData refTour_TourData = referenceTour.getTourData();
+
+      if (refTour_TourData.hasGeoData() == false) {
+
+         MessageDialog.openInformation(
+               _viewerContainer.getShell(),
+               Messages.RefTour_Dialog_NoGeoInRefTour_Title,
+               NLS.bind(Messages.RefTour_Dialog_NoGeoInRefTour_Message, referenceTour.getLabel()));
+
+         return;
+      }
+
+      // show and get geo compare view
+      final IViewPart geoCompareViewPart = Util.showView(GeoCompareView.ID, true);
+
+      if (geoCompareViewPart instanceof GeoCompareView) {
+
+         final GeoCompareView geoCompareView = (GeoCompareView) geoCompareViewPart;
+
+//issue: do not final start or show final geo compared tours
+
+         geoCompareView.compareRefTour(refId);
+      }
    }
 
    private void onAction_ToggleViewLayout() {
@@ -1833,6 +1914,17 @@ public class ReferenceTourView extends ViewPart implements
       if (_isInRestore || _isMouseContextMenu) {
          return;
       }
+
+      /*
+       * First activate this view, otherwise the selection is not fired. This happened very
+       * often which is the reason why this workaround is implemented
+       */
+      UI.activateView(this, ID);
+
+      onTourViewer_Selection_FireSelection(selectionChangedEvent);
+   }
+
+   private void onTourViewer_Selection_FireSelection(final SelectionChangedEvent selectionChangedEvent) {
 
       final TreeSelection treeSelection = (TreeSelection) selectionChangedEvent.getSelection();
 

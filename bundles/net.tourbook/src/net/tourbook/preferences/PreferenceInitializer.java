@@ -403,19 +403,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,  new RGB(0xff, 0x00, 0x80));
 
       /*
-       * general appearance
+       * General appearance
        */
-      store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES, 3);
-      store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
-      store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU, true);
+      store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES,          3);
+      store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS,                3);
+      store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU,          true);
 
-      // heap is not displayed by default since version 11.7
-      store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, false);
-
-      store.setDefault(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
-      store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, true);
-      store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, true);
-      store.setDefault(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, 500);
+      store.setDefault(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME,   false);
+      store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN,                 true);
+      store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION,                 true);
+      store.setDefault(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,              500);
 
       /*
        * merge tour dialog

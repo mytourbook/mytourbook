@@ -27,7 +27,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
 import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
 import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_YearStatistic_View;
+import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
@@ -36,7 +36,7 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPlaceholderFolderLayout;
 
-public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
+public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory {
 
    public static final String  PERSPECTIVE_ID                     = "net.tourbook.perspective.TourCatalog"; //$NON-NLS-1$
 
@@ -46,7 +46,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
    private static final String FOLDER_ID_TOUR_CHART_REF_Tour      = "folderTourChart_RefTour";              //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_DIRECTORIES         = "folderTourDirectories";                //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_MAPS                = "folderTourMaps";                       //$NON-NLS-1$
-   private static final String FOLDER_ID_YEAR_STATISTICS          = "folderYearStatistics";                 //$NON-NLS-1$
+   private static final String FOLDER_ID_REFERENCE_TIMELINE       = "folderReferenceTimeline";              //$NON-NLS-1$
 
    @Override
    public void createInitialLayout(final IPageLayout layout) {
@@ -58,7 +58,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
       layout.addShowViewShortcut(ReferenceTourView.ID);
       layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
       layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
-      layout.addShowViewShortcut(RefTour_YearStatistic_View.ID);
+      layout.addShowViewShortcut(ReferenceTimelineView.ID);
 
 // SET_FORMATTING_OFF
 
@@ -80,11 +80,11 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_YEAR_STATISTICS,
+      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_REFERENCE_TIMELINE,
 
             IPageLayout.BOTTOM, 0.7f, FOLDER_ID_TOUR_DIRECTORIES);
 
-      folderYearStat.addView(RefTour_YearStatistic_View.ID);
+      folderYearStat.addView(ReferenceTimelineView.ID);
 
       //--------------------------------------------------------------------------------
 

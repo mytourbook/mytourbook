@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class RefTour_YearStatistic_TooltipUI {
+public class ReferenceTimeline_TourTooltipUI {
 
    private static final int VERTICAL_LINE_SPACE = 8;
    private static final int SHELL_MARGIN        = 5;

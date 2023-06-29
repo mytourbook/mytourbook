@@ -44,10 +44,14 @@ public class SelectionReferenceTourView implements ISelection {
    private TVIRefTour_RefTourItem _refTourItem;
    private TVIRefTour_YearItem    _refTour__YearItem;
 
+   private boolean                _isFromElevationCompare;
+
    public SelectionReferenceTourView(final long refId) {
 
       _refId = refId;
       _refTourItem = ElevationCompareManager.createCatalogRefItem(refId);
+
+      _isFromElevationCompare = true;
    }
 
    public SelectionReferenceTourView(final TVIRefTour_RefTourItem refTourItem) {
@@ -60,6 +64,8 @@ public class SelectionReferenceTourView implements ISelection {
 
       _refId = yearItem.refId;
       _refTour__YearItem = yearItem;
+
+      _isFromElevationCompare = true;
    }
 
    /**
@@ -92,6 +98,10 @@ public class SelectionReferenceTourView implements ISelection {
    @Override
    public boolean isEmpty() {
       return false;
+   }
+
+   public boolean isFromElevationCompare() {
+      return _isFromElevationCompare;
    }
 
    @Override

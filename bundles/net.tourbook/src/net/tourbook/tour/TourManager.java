@@ -5600,7 +5600,7 @@ public class TourManager {
          yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 
          yDataTourCompare.setYTitle(OtherMessages.GRAPH_LABEL_TOUR_COMPARE);
-         yDataTourCompare.setUnitLabel(tcc.isGeoCompareDiff
+         yDataTourCompare.setUnitLabel(tcc.isGeoCompare
                ? OtherMessages.GRAPH_LABEL_GEO_COMPARE_UNIT
                : OtherMessages.GRAPH_LABEL_TOUR_COMPARE_UNIT);
          yDataTourCompare.setShowYSlider(true);

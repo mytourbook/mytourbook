@@ -2897,22 +2897,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      ElevationGainLoss altiUpDown;
+      ElevationGainLoss elevationGainLoss;
       if (distanceSerie != null) {
 
          // DP needs distance
 
-         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(altitudeSerie, prefDPTolerance, startIndex, endIndex);
+         elevationGainLoss = computeAltitudeUpDown_20_Algorithm_DP(altitudeSerie, prefDPTolerance, startIndex, endIndex);
 
          // keep this value to see in the UI (tour segmenter) the value and how it is computed
          dpTolerance = (short) (prefDPTolerance * 10);
 
       } else {
 
-         altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
+         elevationGainLoss = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
       }
 
-      return altiUpDown;
+      return elevationGainLoss;
    }
 
    /**
@@ -4376,7 +4376,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             minLatitude = latitude;
             maxLatitude = latitude;
-            
+
             minLongitude = longitude;
             maxLongitude = longitude;
 

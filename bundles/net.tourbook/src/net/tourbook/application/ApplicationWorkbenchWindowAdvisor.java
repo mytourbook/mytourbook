@@ -25,11 +25,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.DialogSelectMeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -99,14 +101,15 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 @SuppressWarnings("restriction")
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-   private static IPreferenceStore           _prefStore     = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore           _prefStore_Common = CommonActivator.getPrefStore();
 
    private ApplicationActionBarAdvisor       _applicationActionBarAdvisor;
    private IPerspectiveDescriptor            _lastPerspective;
 
    private IWorkbenchPage                    _lastActivePage;
    private IWorkbenchPart                    _lastActivePart;
-   private String                            _lastPartTitle = UI.EMPTY_STRING;
+   private String                            _lastPartTitle    = UI.EMPTY_STRING;
 
    private String                            _appTitle;
 
@@ -382,7 +385,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          }
 
          // select new person
-         _applicationActionBarAdvisor._personContribItem.selectFirstPerson();
+         _applicationActionBarAdvisor.getPersonSelector().selectFirstPerson();
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
@@ -496,8 +499,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
       // show memory monitor
-      final boolean isMemoryMonitorVisible = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
-      uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isMemoryMonitorVisible);
+      final boolean isShowMemoryMonitor = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP);
+      uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, isShowMemoryMonitor);
 
       hookTitleUpdateListeners(configurer);
 
@@ -525,7 +528,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    public boolean preWindowShellClose() {
 
       MeasurementSystem_Manager.saveState();
-      _applicationActionBarAdvisor._personContribItem.saveState();
+      _applicationActionBarAdvisor.getPersonSelector().saveState();
 
       TagMenuManager.saveTagState();
       TourTagFilterManager.saveState();

@@ -275,9 +275,16 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
       updateUI_Tooltip();
 
-      if (_toolbarSlideout.isToolTipVisible() == false) {
+      // toggle slideout visibility
+      if (_toolbarSlideout.isToolTipVisible()) {
+         
+         // tooltip is visible -> hide
 
-         // tooltip is hidden, open it
+         _toolbarSlideout.close();
+
+      } else {
+
+         // tooltip is hidden -> open it
 
          final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -287,10 +294,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
          itemBounds.y = itemDisplayPosition.y;
 
          openSlideout(itemBounds, false);
-
-      } else {
-
-         _toolbarSlideout.close();
       }
    }
 
