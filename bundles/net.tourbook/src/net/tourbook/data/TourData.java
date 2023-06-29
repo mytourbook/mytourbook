@@ -1255,11 +1255,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float[]               speedSerie_Summarized_NauticalMile;
 
    /**
+    * Average speed in km/h within an interval of {@link #speedSerie_IntervalDistance} km
+    */
+   @Transient
+   private float[]               speedSerie_Interval;
+
+   /**
+    * Interval distance in m for {@link #speedSerie_Interval}
+    */
+   @Transient
+   private float                 speedSerie_IntervalDistance   = 1000;
+
+   /**
     * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
     * computed. Speed data are normally available from an ergometer and not from a bike computer
     */
    @Transient
-   private boolean               isSpeedSerieFromDevice               = false;
+   private boolean               isSpeedSerieFromDevice        = false;
 
    /**
     * Pace in sec/km
@@ -4076,6 +4088,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
          distance_Float[serieIndex] = (float) distance[serieIndex];
       }
+
+      computeSpeedSeries_Interval(numTimeSlices, distance_Float);
       computeSpeedSeries_Summarized(numTimeSlices, distance_Float);
    }
 
@@ -4339,6 +4353,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
          distance_Float[serieIndex] = (float) distance[serieIndex];
       }
+
+      computeSpeedSeries_Interval(numTimeSlices, distance_Float);
       computeSpeedSeries_Summarized(numTimeSlices, distance_Float);
    }
 
@@ -4579,14 +4595,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 //         final int lon = (latLonPart % 100_000) - 18_000;
 //
 //         System.out.println(
-//               (net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//               (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                     + ("\t: " + latLonPart)
 //                     + ("\tlat: " + lat)
 //                     + ("\tlon: " + lon));
 //      }
 //      System.out.println();
 //      System.out.println(
-//            (net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                  + ("\tsize: " + allGeoParts.toArray().length));
 
       return allGeoParts.toArray();
@@ -5136,13 +5152,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
 //      final long start = System.nanoTime();
 
-      if (speedSerie != null
+      if (true
+
+            && speedSerie != null
             && speedSerie_Mile != null
             && speedSerie_NauticalMile != null
+
+            && speedSerie_Interval != null
+
             && paceSerie_Seconds != null
             && paceSerie_Seconds_Imperial != null
+
             && paceSerie_Minute != null
-            && paceSerie_Minute_Imperial != null) {
+            && paceSerie_Minute_Imperial != null
+
+      ) {
 
          return;
       }
@@ -5220,6 +5244,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       //Convert the max speed to max pace
       maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);
 
+      computeSpeedSeries_Interval(numTimeSlices, distanceSerie);
       computeSpeedSeries_Summarized(numTimeSlices, distanceSerie);
    }
 
@@ -5347,6 +5372,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       //Convert the max speed to max pace
       maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);
 
+      computeSpeedSeries_Interval(numTimeSlices, distanceSerie);
       computeSpeedSeries_Summarized(numTimeSlices, distanceSerie);
    }
 
@@ -5554,7 +5580,85 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                speed_NauticalMile);
       }
 
+      computeSpeedSeries_Interval(numTimeSlices, distanceSerie);
       computeSpeedSeries_Summarized(numTimeSlices, distanceSerie);
+   }
+
+   private void computeSpeedSeries_Interval(final int numTimeSlices, final float[] distance) {
+      // TODO Auto-generated method stub
+
+      // distance is required
+      if (distance == null) {
+         return;
+      }
+
+      // check if already computed
+      if (speedSerie_Interval != null) {
+         return;
+      }
+
+      speedSerie_Interval = new float[numTimeSlices];
+
+      final boolean[] breakTimeSerie = getBreakTimeSerie();
+      int prevTime = 0;
+      int sumBreakTime = 0;
+
+      int sumSkipTime = 0;
+      boolean isAfterSkipTime_Plus1 = true;
+      float skipTourDistance = 0;
+
+      final float nextIntervalDistance = 0;
+
+      // skip 1st value to prevent div by 0
+      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int currentTime = timeSerie[serieIndex];
+         final float tourDistance = distance[serieIndex];
+         final boolean isBreak = breakTimeSerie[serieIndex];
+
+         final int timeDiff = currentTime - prevTime;
+
+         if (tourDistance < 0.01) {
+
+            /*
+             * Ignore start distances when they are 0, this can occur when there is no GPS
+             * signal at the tour start
+             */
+            sumSkipTime += timeDiff;
+
+         } else if (isAfterSkipTime_Plus1) {
+
+            /*
+             * The distance of the first value could be too high -> subsequent time slices
+             * will have a too high average value -> ignore this value
+             */
+
+            isAfterSkipTime_Plus1 = false;
+
+            skipTourDistance = tourDistance;
+
+         } else if (isBreak) {
+
+            sumBreakTime += timeDiff;
+         }
+
+         prevTime = currentTime;
+
+         final double travelTime = currentTime - sumBreakTime - sumSkipTime;
+         final float travelDistance = tourDistance - skipTourDistance;
+
+         final float speed_Metric = travelTime == 0
+               ? 0
+               : (float) ((travelDistance / travelTime) * 3.6f);
+
+         final float speed_Mile = speed_Metric / UI.UNIT_MILE;
+         final float speed_NauticalMile = speed_Metric / UI.UNIT_NAUTICAL_MILE;
+
+         final float paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
+         final float paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+
+         speedSerie_Interval[serieIndex] = speed_Metric;
+      }
    }
 
    /**
@@ -8254,7 +8358,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       double[] serie = null;
 
-      if (net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
          // use mile
 
@@ -8269,7 +8373,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          serie = distanceSerieDouble_Mile;
 
-      } else if (net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          // use nautical mile
 
@@ -8810,7 +8914,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[] getPaceSerie() {
 
-      if (net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_MILE) {
+      if (UI.UNIT_IS_PACE_MIN_PER_MILE) {
 
          // use imperial system
 
@@ -8834,7 +8938,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public float[] getPaceSerie_Summarized_Seconds() {
 
-      if (net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_MILE) {
+      if (UI.UNIT_IS_PACE_MIN_PER_MILE) {
 
          // use imperial system
 
@@ -8858,7 +8962,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public float[] getPaceSerieSeconds() {
 
-      if (net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_MILE) {
+      if (UI.UNIT_IS_PACE_MIN_PER_MILE) {
 
          // use imperial system
 
@@ -9575,7 +9679,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[] getRunDyn_StepLength() {
 
-      if (net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH) {
+      if (UI.UNIT_IS_LENGTH_SMALL_INCH) {
 
          // use imperial system
 
@@ -9632,7 +9736,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[] getRunDyn_VerticalOscillation() {
 
-      if (net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH) {
+      if (UI.UNIT_IS_LENGTH_SMALL_INCH) {
 
          // use imperial system
 
@@ -9743,6 +9847,45 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return getSpeedSerieInternal();
    }
 
+   public float[] getSpeedSerie_Interval() {
+
+      if (isSpeedSerieFromDevice) {
+         return getSpeedSerie_Interval_Internal();
+      }
+      if (distanceSerie == null) {
+         return null;
+      }
+
+      return getSpeedSerie_Interval_Internal();
+   }
+
+   private float[] getSpeedSerie_Interval_Internal() {
+      // TODO Auto-generated method stub
+
+      computeSpeedSeries();
+
+      /*
+       * when the speed series are not computed, the internal algorithm will be used to create the
+       * speed data serie
+       */
+//      if (UI.UNIT_IS_DISTANCE_MILE) {
+//
+//         return speedSerie_Summarized_Mile;
+//
+//      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+//
+//         // use imperial system
+//
+//         return speedSerie_Summarized_NauticalMile;
+//
+//      } else {
+//
+//         // use metric system
+//
+      return speedSerie_Interval;
+//      }
+   }
+
    /**
     * @return the speed data in the current measurement system, which is defined in
     *         {@link UI#UNIT_VALUE_DISTANCE}
@@ -9752,6 +9895,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       if (isSpeedSerieFromDevice) {
          return getSpeedSerie_Summarized_Internal();
       }
+
       if (distanceSerie == null) {
          return null;
       }
@@ -9767,11 +9911,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
        * when the speed series are not computed, the internal algorithm will be used to create the
        * speed data serie
        */
-      if (net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
          return speedSerie_Summarized_Mile;
 
-      } else if (net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          // use imperial system
 
@@ -9802,11 +9946,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
        * when the speed series are not computed, the internal algorithm will be used to create the
        * speed data serie
        */
-      if (net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
          return speedSerie_Mile;
 
-      } else if (net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          // use imperial system
 
@@ -10124,9 +10268,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
 
-         final long beforeCET = net.tourbook.common.UI.beforeCET;
+         final long beforeCET = UI.beforeCET;
 
-         if (tourStartUTC < beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
+         if (tourStartUTC < beforeCET && tourEnd > UI.afterCETBegin) {
 
             // tour overlaps CET begin
 
@@ -10149,7 +10293,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   final long absoluteUTCTime = tourStartUTC + historyTimeSlice * 1000;
 
                   if (absoluteUTCTime > beforeCET) {
-                     historyTimeSlice += net.tourbook.common.UI.BERLIN_HISTORY_ADJUSTMENT;
+                     historyTimeSlice += UI.BERLIN_HISTORY_ADJUSTMENT;
                   }
 
                   timeSerieWithTimeZoneAdjustment[serieIndex] = historyTimeSlice;

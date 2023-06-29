@@ -75,6 +75,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION   = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
    public static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO         = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
    public static final String GRAPH_LABEL_SPEED                          = net.tourbook.common.Messages.Graph_Label_Speed;
+   public static final String GRAPH_LABEL_SPEED_INTERVAL                 = net.tourbook.common.Messages.Graph_Label_Speed_Interval;
    public static final String GRAPH_LABEL_SPEED_SUMMARIZED               = net.tourbook.common.Messages.Graph_Label_Speed_Summarized;
    public static final String GRAPH_LABEL_SWIM_STROKES                   = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
    public static final String GRAPH_LABEL_SWIM_SWOLF                     = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;

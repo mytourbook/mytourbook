@@ -210,6 +210,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String GRAPH_CONTRIBUTION_ID_POWER                          = "GRAPH_CONTRIBUTION_ID_POWER";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PULSE                          = "GRAPH_CONTRIBUTION_ID_PULSE";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED                          = "GRAPH_CONTRIBUTION_ID_SPEED";                         //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL                 = "GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL";              //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED               = "GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED";              //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE                    = "GRAPH_CONTRIBUTION_ID_TEMPERATURE";                   //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE                   = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";                  //$NON-NLS-1$
@@ -235,6 +236,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_POWER,
       GRAPH_CONTRIBUTION_ID_PULSE,
       GRAPH_CONTRIBUTION_ID_SPEED,
+      GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL,
       GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED,
       GRAPH_CONTRIBUTION_ID_TEMPERATURE,
 
@@ -1336,6 +1338,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ThemeUtil.getThemedImageName(Images.Graph_Speed),
             ThemeUtil.getThemedImageName(Images.Graph_Speed_Disabled),
             GRAPH_CONTRIBUTION_ID_SPEED);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_SPEED_INTERVAL,
+            OtherMessages.GRAPH_LABEL_SPEED,
+            Messages.Tour_Action_Graph_SpeedInterval_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized),
+            ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized_Disabled),
+            GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_SPEED_SUMMARIZED,

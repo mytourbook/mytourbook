@@ -84,6 +84,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    private Button    _chkShowInChartToolbar_Tempterature_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Speed;
    private Button    _chkShowInChartToolbar_Speed_DefaultWhenOpened;
+   private Button    _chkShowInChartToolbar_Speed_Interval;
+   private Button    _chkShowInChartToolbar_Speed_Interval_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Speed_Summarized;
    private Button    _chkShowInChartToolbar_Speed_Summarized_DefaultWhenOpened;
 
