@@ -2983,6 +2983,7 @@ public class Messages extends NLS {
    public static String        Tour_Filter_Field_ManualTour;
    public static String        Tour_Filter_Field_Photos;
    public static String        Tour_Filter_Field_Season;
+   public static String        Tour_Filter_Field_AirQuality;
    public static String        Tour_Filter_Field_Temperature;
    public static String        Tour_Filter_Field_Temperature_FromDevice;
    public static String        Tour_Filter_Field_TourDate;

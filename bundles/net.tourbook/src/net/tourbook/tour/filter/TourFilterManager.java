@@ -69,6 +69,7 @@ public class TourFilterManager {
    private static final String TOUR_DATA_POWERTRAIN_FRONT_SHIFT = "TourData.frontShiftCount";                    //$NON-NLS-1$
    private static final String TOUR_DATA_POWERTRAIN_REAR_SHIFT  = "TourData.rearShiftCount";                     //$NON-NLS-1$
    private static final String TOUR_DATA_TRAINING_FTP           = "TourData.power_FTP";                          //$NON-NLS-1$
+   private static final String TOUR_DATA_WEATHER_AIRQUALITY     = "TourData.weather_AirQuality";                 //$NON-NLS-1$
 
    private static final String TOUR_DATA_TOUR_LOCATION_START    = "TourData.tourStartPlace";                     //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_LOCATION_END      = "TourData.tourEndPlace";                       //$NON-NLS-1$
@@ -695,6 +696,14 @@ public class TourFilterManager {
 
       allConfigs.add(
             TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_AirQuality)
+                  .fieldId(TourFilterFieldId.WEATHER_AIRQUALITY)
+                  .fieldType(TourFilterFieldType.TEXT)
+                  .defaultFieldOperator(TourFilterFieldOperator.EQUALS)
+                  .fieldValueProvider(_fieldValueProvider_Temperature));
+
+      allConfigs.add(
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Temperature)
                   .fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
                   .fieldType(TourFilterFieldType.NUMBER_FLOAT)
@@ -1002,6 +1011,11 @@ public class TourFilterManager {
 
          case TOUR_MANUAL_TOUR:
             getSQL_ManualTour(sqlWhere, fieldOperator);
+            break;
+
+         case WEATHER_AIRQUALITY:
+            sql = TOUR_DATA_WEATHER_AIRQUALITY;
+            getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, double1, double2);
             break;
 
          case WEATHER_TEMPERATURE:
