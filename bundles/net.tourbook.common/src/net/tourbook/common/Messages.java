@@ -163,6 +163,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_History;
    public static String        Graph_Label_HrZone;
    public static String        Graph_Label_Pace;
+   public static String        Graph_Label_Pace_Interval;
    public static String        Graph_Label_Pace_Summarized;
    public static String        Graph_Label_Power;
    public static String        Graph_Label_Power_Unit;

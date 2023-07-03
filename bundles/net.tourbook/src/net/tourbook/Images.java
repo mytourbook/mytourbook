@@ -126,6 +126,8 @@ public class Images {
    public static final String Graph_Overlapped                           = "graph-overlapped.png";                                //$NON-NLS-1$
    public static final String Graph_Pace                                 = "graph-pace.png";                                      //$NON-NLS-1$
    public static final String Graph_Pace_Disabled                        = "graph-pace-disabled.png";                             //$NON-NLS-1$
+   public static final String Graph_Pace_Interval                        = "graph-pace-interval.png";                             //$NON-NLS-1$
+   public static final String Graph_Pace_Interval_Disabled               = "graph-pace-interval-disabled.png";                    //$NON-NLS-1$
    public static final String Graph_Pace_Summarized                      = "graph-pace-summarized.png";                           //$NON-NLS-1$
    public static final String Graph_Pace_Summarized_Disabled             = "graph-pace-summarized-disabled.png";                  //$NON-NLS-1$
    public static final String Graph_Power                                = "graph-power.png";                                     //$NON-NLS-1$
@@ -142,6 +144,8 @@ public class Images {
    public static final String Graph_RunDyn_VerticalRatio_Disabled        = "graph-run-dyn-vertical-ratio-disabled.png";           //$NON-NLS-1$
    public static final String Graph_Speed                                = "graph-speed.png";                                     //$NON-NLS-1$
    public static final String Graph_Speed_Disabled                       = "graph-speed-disabled.png";                            //$NON-NLS-1$
+   public static final String Graph_Speed_Interval                       = "graph-speed-interval.png";                            //$NON-NLS-1$
+   public static final String Graph_Speed_Interval_Disabled              = "graph-speed-interval-disabled.png";                   //$NON-NLS-1$
    public static final String Graph_Speed_Summarized                     = "graph-speed-summarized.png";                          //$NON-NLS-1$
    public static final String Graph_Speed_Summarized_Disabled            = "graph-speed-summarized-disabled.png";                 //$NON-NLS-1$
    public static final String Graph_Swim_Strokes                         = "graph-swim-strokes.png";                              //$NON-NLS-1$

@@ -63,6 +63,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT    = net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
    public static final String GRAPH_LABEL_HR_ZONE                        = net.tourbook.common.Messages.Graph_Label_HrZone;
    public static final String GRAPH_LABEL_PACE                           = net.tourbook.common.Messages.Graph_Label_Pace;
+   public static final String GRAPH_LABEL_PACE_INTERVAL                  = net.tourbook.common.Messages.Graph_Label_Pace_Interval;
    public static final String GRAPH_LABEL_PACE_SUMMARIZED                = net.tourbook.common.Messages.Graph_Label_Pace_Summarized;
    public static final String GRAPH_LABEL_POWER                          = net.tourbook.common.Messages.Graph_Label_Power;
    public static final String GRAPH_LABEL_POWER_UNIT                     = net.tourbook.common.Messages.Graph_Label_Power_Unit;

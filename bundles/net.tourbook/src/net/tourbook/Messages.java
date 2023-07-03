@@ -2679,8 +2679,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare;
-
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceInterval_Tooltip;
    public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
    public static String        Tour_Action_Graph_SpeedInterval_Tooltip;
    public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
