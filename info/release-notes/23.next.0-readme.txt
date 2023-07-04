@@ -65,6 +65,8 @@ Improvements
   - Filter compared tours in the "Geo Compare View"
 
 * Tour Chart
+  - New speed/pace graph which shows the average speed for distance intervals
+    https://github.com/mytourbook/mytourbook/issues/829 
   - Slider positions are set to a selected reference tour or geo compared tour
   
   
