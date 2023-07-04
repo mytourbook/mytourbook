@@ -258,6 +258,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
+      // speed/pace interval graph, unit is meters
+      store.setDefault(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL, 1000);
+
       /*
        * Min/Max values
        */

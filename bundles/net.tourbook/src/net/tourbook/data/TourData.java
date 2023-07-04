@@ -1255,7 +1255,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float[]               speedSerie_Summarized_NauticalMile;
 
    /**
-    * Average speed in km/h within an interval of {@link #speedIntervalDistance} km
+    * Average speed in km/h within an interval of {@link TourChart#speedIntervalDistance} km
     */
    @Transient
    private float[]               speedSerie_Interval;
@@ -1266,11 +1266,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Transient
    private float[]               speedSerie_Interval_NauticalMile;
 
-   /**
-    * Interval distance in m for {@link #speedSerie_Interval}
-    */
-   @Transient
-   private float                 speedIntervalDistance         = 1000;
 
    /**
     * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
@@ -5173,6 +5168,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       int intervalBreakTime = 0;
       int intervalStartTime = 0;
+
+      final float speedIntervalDistance = _prefStore.getFloat(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL);
 
       float intervalStartDistance = 0;
       float intervalEndDistance = speedIntervalDistance;
@@ -9892,13 +9889,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
        */
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         return speedSerie_Summarized_Mile;
+         return speedSerie_Interval_Mile;
 
       } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          // use imperial system
 
-         return speedSerie_Summarized_NauticalMile;
+         return speedSerie_Interval_NauticalMile;
 
       } else {
 
