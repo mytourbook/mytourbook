@@ -2359,6 +2359,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity;
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
+   public static String        Slideout_TourChartOptions_Label_SpeedAndPaceDistanceInterval;
    public static String        Slideout_TourChartOptions_Label_Title;
    public static String        Slideout_TourChartOptions_Radio_SRTM1;
    public static String        Slideout_TourChartOptions_Radio_SRTM1_Tooltip;
@@ -2679,9 +2680,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare;
-
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceInterval_Tooltip;
    public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
+   public static String        Tour_Action_Graph_SpeedInterval_Tooltip;
    public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;

@@ -1269,6 +1269,25 @@ public class UI {
    }
 
    /**
+    * @param speed
+    * @return Returns the speed value from the current measurement system into metric
+    */
+   public static float convertSpeed_ToMetric(final float speed) {
+
+      if (UNIT_IS_DISTANCE_MILE) {
+
+         return speed * UI.UNIT_MILE;
+
+      } else if (UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         return speed * UI.UNIT_NAUTICAL_MILE;
+
+      }
+
+      return speed;
+   }
+
+   /**
     * @param temperature
     * @return Returns the temperature in the current measurement system.
     */
@@ -1375,11 +1394,13 @@ public class UI {
       return label;
    }
 
-   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+   public static Label createSpacer_Horizontal(final Composite parent, final int columns) {
 
       final Label label = new Label(parent, SWT.NONE);
 
       GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+
+      return label;
    }
 
    public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {

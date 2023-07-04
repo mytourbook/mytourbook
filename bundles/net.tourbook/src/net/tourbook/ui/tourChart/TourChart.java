@@ -164,10 +164,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT";                      //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE                                  = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE";                          //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL                         = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL";               //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED                       = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED";               //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED";                         //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL                        = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED                      = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED";              //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE                           = "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";                   //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
@@ -184,10 +186,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT                         = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT                      = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT                          = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL_DEFAULT                 = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED_DEFAULT               = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT                         = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT                         = true;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_DEFAULT                         = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL_DEFAULT                = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT              = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT                   = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT           = false;
@@ -206,10 +210,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String GRAPH_CONTRIBUTION_ID_GEARS                          = "GRAPH_CONTRIBUTION_ID_GEARS";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_GRADIENT                       = "GRAPH_CONTRIBUTION_ID_GRADIENT";                      //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PACE                           = "GRAPH_CONTRIBUTION_ID_PACE";                          //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_PACE_INTERVAL                  = "GRAPH_CONTRIBUTION_ID_PACE_INTERVAL";               //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED                = "GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED";               //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_POWER                          = "GRAPH_CONTRIBUTION_ID_POWER";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PULSE                          = "GRAPH_CONTRIBUTION_ID_PULSE";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED                          = "GRAPH_CONTRIBUTION_ID_SPEED";                         //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL                 = "GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL";              //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED               = "GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED";              //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE                    = "GRAPH_CONTRIBUTION_ID_TEMPERATURE";                   //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE                   = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";                  //$NON-NLS-1$
@@ -231,10 +237,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_GEARS,
       GRAPH_CONTRIBUTION_ID_GRADIENT,
       GRAPH_CONTRIBUTION_ID_PACE,
+      GRAPH_CONTRIBUTION_ID_PACE_INTERVAL,
       GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED,
       GRAPH_CONTRIBUTION_ID_POWER,
       GRAPH_CONTRIBUTION_ID_PULSE,
       GRAPH_CONTRIBUTION_ID_SPEED,
+      GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL,
       GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED,
       GRAPH_CONTRIBUTION_ID_TEMPERATURE,
 
@@ -1338,6 +1346,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             GRAPH_CONTRIBUTION_ID_SPEED);
 
       createActions_12_GraphAction(
+            TourManager.GRAPH_SPEED_INTERVAL,
+            OtherMessages.GRAPH_LABEL_SPEED,
+            Messages.Tour_Action_Graph_SpeedInterval_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Speed_Interval),
+            ThemeUtil.getThemedImageName(Images.Graph_Speed_Interval_Disabled),
+            GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL);
+
+      createActions_12_GraphAction(
             TourManager.GRAPH_SPEED_SUMMARIZED,
             OtherMessages.GRAPH_LABEL_SPEED,
             Messages.Tour_Action_Graph_SpeedSummarized_Tooltip,
@@ -1352,6 +1368,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ThemeUtil.getThemedImageName(Images.Graph_Pace),
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Disabled),
             GRAPH_CONTRIBUTION_ID_PACE);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_PACE_INTERVAL,
+            OtherMessages.GRAPH_LABEL_PACE,
+            Messages.Tour_Action_Graph_PaceInterval_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Pace_Interval),
+            ThemeUtil.getThemedImageName(Images.Graph_Pace_Interval_Disabled),
+            GRAPH_CONTRIBUTION_ID_PACE_INTERVAL);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_PACE_SUMMARIZED,
@@ -3025,6 +3049,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       fillToolbar_Graphs_Graph(
             tbm,
+            TourManager.GRAPH_SPEED_INTERVAL,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
             TourManager.GRAPH_SPEED_SUMMARIZED,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT);
@@ -3034,6 +3064,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_PACE,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
+            TourManager.GRAPH_PACE_INTERVAL,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL_DEFAULT);
 
       fillToolbar_Graphs_Graph(
             tbm,

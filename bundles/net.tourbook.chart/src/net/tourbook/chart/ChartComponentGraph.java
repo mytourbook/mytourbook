@@ -2726,6 +2726,7 @@ public class ChartComponentGraph extends Canvas {
 
       final int numYValues = yValues.length;
 
+      final boolean isBottom2Top = yData.isYAxisDirection();
       final int graphFillMethod = yData.getGraphFillMethod();
       final boolean[] noFill = xData.getNoLine();
       final boolean[] lineGaps = yData.getLineGaps();
@@ -2982,7 +2983,7 @@ public class ChartComponentGraph extends Canvas {
             } else if (noFill != null && noFill[valueIndex]) {
 
                /*
-                * draw NO line, but draw a line at the bottom or the x-axis with y=0
+                * Draw a NO line, but draw a line at the bottom or the x-axis with y=0
                 */
 
                if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
@@ -3024,13 +3025,16 @@ public class ChartComponentGraph extends Canvas {
                isNoLine = true;
                devXPrevNoLine = devX;
 
-               // keep correct position that the hovered line dev position is painted at the correct position
-               devY = devY0Inverse - devY1;
+               // set hovered line dev position to be painted at the correct position
+               devY = isBottom2Top
+
+                     ? devY0Inverse - devY1
+                     : devY1 - devY_XAxisLine;
 
             } else {
 
                /*
-                * draw line to the current point
+                * Draw line to the current point
                 */
 
                if (isLineGap) {
@@ -3048,14 +3052,18 @@ public class ChartComponentGraph extends Canvas {
 
                      isNoLine = false;
 
-                     path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
+                     final int devY_NoLine = isBottom2Top
+
+                           ? (int) (devY0Inverse - devY1Prev)
+                           : (int) (devY1Prev - devY_XAxisLine);
+
+                     path.lineTo((int) devXPrevNoLine, devY_NoLine);
                   }
 
-                  if (yData.isYAxisDirection()) {
-                     devY = devY0Inverse - devY1;
-                  } else {
-                     devY = devY1 - devY_XAxisLine;
-                  }
+                  devY = isBottom2Top
+
+                        ? devY0Inverse - devY1
+                        : devY1 - devY_XAxisLine;
 
                   path.lineTo(devXf, devY);
 
@@ -3066,7 +3074,7 @@ public class ChartComponentGraph extends Canvas {
             }
 
             /*
-             * set line hover positions
+             * Set line graph hover positions
              */
             final double devXDiff = (devX - devXPrev) / 2;
             final double devXDiffWidth = devXDiff < 1 ? 1 : (devXDiff + 0.5);
@@ -3086,6 +3094,7 @@ public class ChartComponentGraph extends Canvas {
                   0,
                   (long) (devXDiffWidth + 1),
                   devChartHeight);
+
             final PointLong currentPoint = new PointLong(devX_long, (long) (devYTop + devY));
 
             lineDevPositions[valueIndex] = currentPoint;
@@ -3496,7 +3505,7 @@ public class ChartComponentGraph extends Canvas {
             final float valueYHigh = yHighValues[valueIndex];
 
             final float barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
-            
+
 // DISABLED, that these bars are not totally hidden
 //            if (barHeight == 0) {
 //               continue;
