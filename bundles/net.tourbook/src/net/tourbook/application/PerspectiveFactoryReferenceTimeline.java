@@ -34,7 +34,6 @@ import net.tourbook.ui.views.tourBook.TourBookView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory {
 
@@ -44,9 +43,9 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
    private static final String FOLDER_ID_TOUR_CHART               = "folderTourChart";                      //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART_COMPARED_TOUR = "folderTourChart_ComparedTour";         //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART_REF_Tour      = "folderTourChart_RefTour";              //$NON-NLS-1$
+   private static final String FOLDER_ID_TOUR_COMPARISON_TIMELINE = "folderTourComparisonTimeline";         //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_DIRECTORIES         = "folderTourDirectories";                //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_MAPS                = "folderTourMaps";                       //$NON-NLS-1$
-   private static final String FOLDER_ID_REFERENCE_TIMELINE       = "folderReferenceTimeline";              //$NON-NLS-1$
 
    @Override
    public void createInitialLayout(final IPageLayout layout) {
@@ -80,7 +79,7 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_REFERENCE_TIMELINE,
+      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_TOUR_COMPARISON_TIMELINE,
 
             IPageLayout.BOTTOM, 0.7f, FOLDER_ID_TOUR_DIRECTORIES);
 
@@ -88,11 +87,12 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
       //--------------------------------------------------------------------------------
 
-      final IPlaceholderFolderLayout folderGeoCompareTool = layout.createPlaceholderFolder(FOLDER_ID_GEO_COMPARE_TOOL,
+      final IFolderLayout folderGeoCompareTool = layout.createFolder(FOLDER_ID_GEO_COMPARE_TOOL,
 
             IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_DIRECTORIES);
 
-      folderGeoCompareTool.addPlaceholder(GeoCompareView.ID);
+      folderGeoCompareTool.addView(GeoCompareView.ID);
+
 
       //--------------------------------------------------------------------------------
       // Right area

@@ -475,8 +475,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          super(Messages.Tour_Action_GeoCompare_Tooltip, AS_CHECK_BOX);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoParts));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoParts_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_Tool));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_Tool_Disabled));
       }
 
       @Override

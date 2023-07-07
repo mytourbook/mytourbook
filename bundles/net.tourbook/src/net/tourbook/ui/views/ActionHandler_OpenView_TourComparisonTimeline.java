@@ -28,7 +28,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandler_OpenView_ReferenceTimeline extends AbstractHandler implements IElementUpdater {
+public class ActionHandler_OpenView_TourComparisonTimeline extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -42,6 +42,6 @@ public class ActionHandler_OpenView_ReferenceTimeline extends AbstractHandler im
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.App_Directory_ReferenceTimeline);
+      UI.setThemedIcon(uiElement, Images.App_Directory_TourComparisonTimeline);
    }
 }

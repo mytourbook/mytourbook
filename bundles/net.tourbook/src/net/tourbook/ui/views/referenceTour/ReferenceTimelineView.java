@@ -219,8 +219,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    private Spinner   _spinnerNumberOfVisibleYears;
 
-   private Image     _imageCompareType_GeoCompare       = TourbookPlugin.getThemedImageDescriptor(Images.GeoParts).createImage();
-   private Image     _imageCompareType_ElevationCompare = TourbookPlugin.getThemedImageDescriptor(Images.RefTour_CompareWizard).createImage();
+   private Image     _imageCompareType_GeoCompare       = TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_Tour).createImage();
+   private Image     _imageCompareType_ElevationCompare = TourbookPlugin.getThemedImageDescriptor(Images.ElevationCompare_Tour).createImage();
    private Image     _imageCompareType_PlaceHolder      = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
 
    private class ActionCopyValuesIntoClipboard extends Action {

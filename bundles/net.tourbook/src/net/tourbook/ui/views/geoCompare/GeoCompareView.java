@@ -129,9 +129,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompareListener {
 
-   private static final Color            COLOR_COMPARING_TOURS              = new Color(255, 87, 87);
-
    public static final String            ID                                 = "net.tourbook.ui.views.geoCompare.GeoCompareView"; //$NON-NLS-1$
+
+   private static final Color            COLOR_COMPARING_TOURS              = new Color(255, 87, 87);
 
    private static final int              DELAY_BEFORE_STARTING_COMPARE      = 100;
    private static final int              UI_UPDATE_INTERVAL                 = 500;
@@ -319,7 +319,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private Menu      _tableContextMenu;
 
-   private Image     _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.GeoRefTour).createImage();
+   private Image     _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.GeoCompare_RefTour).createImage();
    private Image     _imageCompareType_RefTour     = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
    private Image     _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
    private Image     _imageOptions_Enabled         = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
