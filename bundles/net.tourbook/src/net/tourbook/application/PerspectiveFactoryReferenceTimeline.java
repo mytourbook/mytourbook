@@ -25,8 +25,8 @@ import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
-import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
+import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 import net.tourbook.ui.views.tourBook.TourBookView;
@@ -55,8 +55,8 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
       layout.addShowViewShortcut(GeoCompareView.ID);
       layout.addShowViewShortcut(ElevationCompareResultView.ID);
       layout.addShowViewShortcut(ReferenceTourView.ID);
-      layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
-      layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
+      layout.addShowViewShortcut(ComparedTourChartView.ID);
+      layout.addShowViewShortcut(ReferenceTourChartView.ID);
       layout.addShowViewShortcut(ReferenceTimelineView.ID);
 
 // SET_FORMATTING_OFF
@@ -102,7 +102,7 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
             IPageLayout.TOP, 0.5f, IPageLayout.ID_EDITOR_AREA);
 
-      refChartFolder.addView(RefTour_ReferenceTourView.ID);
+      refChartFolder.addView(ReferenceTourChartView.ID);
 
       //--------------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
             IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_CHART_REF_Tour);
 
-      folderComparedTourChart.addView(RefTour_ComparedTourView.ID);
+      folderComparedTourChart.addView(ComparedTourChartView.ID);
 
       //--------------------------------------------------------------------------------
 

@@ -1878,14 +1878,14 @@
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.referenceTourView"
-            class       ="net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTourChartView"
             icon        ="icons/tour-map-reftour.png"
             name        ="%View_Name_RefTour_ReferenceTour"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.comparedTourView"
-            class       ="net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView"
+            class       ="net.tourbook.ui.views.referenceTour.ComparedTourChartView"
             icon        ="icons/tour-map-comparetour.png"
             name        ="%View_Name_RefTour_ComparedTour"/>
 

@@ -68,8 +68,8 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.referenceTour.CompareConfig;
-import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
+import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
@@ -319,7 +319,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private Menu      _tableContextMenu;
 
-   private Image     _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.GeoCompare_RefTour).createImage();
+   private Image     _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.TourCompare_GeoCompare_RefTour).createImage();
    private Image     _imageCompareType_RefTour     = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
    private Image     _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
    private Image     _imageOptions_Enabled         = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
@@ -2296,7 +2296,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       // ignore other parts to prevent geo part comparing !!!
-      if (part instanceof RefTour_ReferenceTourView) {
+      if (part instanceof ReferenceTourChartView) {
          return true;
       }
 
@@ -2304,7 +2304,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        * Allow selection of GeoComparedTour which is used to navigate compared tours in the
        * "Compared Tour" view
        */
-      if (part instanceof RefTour_ComparedTourView) {
+      if (part instanceof ComparedTourChartView) {
 
          if (selection instanceof StructuredSelection) {
 

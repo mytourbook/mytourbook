@@ -58,6 +58,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
@@ -81,7 +82,7 @@ import org.eclipse.ui.part.PageBook;
  *                                              tour-map-comparetour.png       ->    tour-compare-compared-tour.png
  * </pre>
  */
-public class RefTour_ComparedTourView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
+public class ComparedTourChartView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
    public static final String ID = "net.tourbook.views.tourCatalog.comparedTourView"; //$NON-NLS-1$
 
@@ -170,6 +171,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private PageBook  _pageBook;
    private Composite _pageNoData;
+
+   private Image     _imageGeoCompare       = TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_GeoCompare_Tour).createImage();
+   private Image     _imageElevationCompare = TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_ElevationCompare_Tour).createImage();
 
    private class ActionNavigateNextTour extends Action {
 
@@ -414,7 +418,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
             TourManager.fireEventWithCustomData(//
                   TourEventId.SLIDER_POSITION_CHANGED,
                   chartInfoSelection,
-                  RefTour_ComparedTourView.this);
+                  ComparedTourChartView.this);
          }
       });
 
@@ -444,6 +448,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    @Override
    public void dispose() {
+
+      UI.disposeResource(_imageGeoCompare);
+      UI.disposeResource(_imageElevationCompare);
 
       saveComparedTour();
 
@@ -720,7 +727,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    @Override
    protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-      if (part == RefTour_ComparedTourView.this) {
+      if (part == ComparedTourChartView.this) {
          return;
       }
 
@@ -982,8 +989,8 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       if (_isGeoCompareTour) {
 
-         setPartName("Geo Compared Tour");
-//         setTitleImage();
+         setTitleImage(_imageGeoCompare);
+         setPartName(Messages.Tour_Compare_ViewName_GeoComparedTour);
 
          _actionSynchChartsByScale.setImageDescriptor(imageDescriptor_SyncByScale_GeoCompare);
          _actionSynchChartsBySize.setImageDescriptor(imageDescriptor_SyncBySize_GeoCompare);
@@ -992,8 +999,8 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       } else {
 
-         setPartName("Elevation Compared Tour");
-//         setTitleImage("tour-compare-geo-compared-tour.png");
+         setTitleImage(_imageElevationCompare);
+         setPartName(Messages.Tour_Compare_ViewName_ElevationComparedTour);
 
          _actionSynchChartsByScale.setImageDescriptor(imageDescriptor_SyncByScale_ElevationCompare);
          _actionSynchChartsBySize.setImageDescriptor(imageDescriptor_SyncBySize_ElevationCompare);

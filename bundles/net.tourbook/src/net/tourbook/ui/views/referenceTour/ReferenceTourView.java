@@ -289,8 +289,8 @@ public class ReferenceTourView extends ViewPart implements
 
          setToolTipText(Messages.Tour_Action_GeoCompare_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_Tool));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_Tool_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_GeoCompare_Tool));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_GeoCompare_Tool_Disabled));
       }
 
       @Override
