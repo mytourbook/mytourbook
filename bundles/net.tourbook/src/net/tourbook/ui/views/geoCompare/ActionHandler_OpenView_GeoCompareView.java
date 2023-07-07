@@ -41,6 +41,6 @@ public class ActionHandler_OpenView_GeoCompareView extends AbstractHandler imple
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.GeoParts);
+      UI.setThemedIcon(uiElement, Images.TourCompare_GeoCompare_Tool);
    }
 }

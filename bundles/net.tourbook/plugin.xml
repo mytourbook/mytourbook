@@ -132,7 +132,7 @@
 
       <perspective
             class="net.tourbook.application.PerspectiveFactoryCompareTours"
-            icon="icons/tour-map-compare-result-perspective.png"
+            icon="icons/tour-compare-perspective.png"
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
 
@@ -593,12 +593,12 @@
                   label       ="%View_Name_ReferenceTours"
                   mnemonic    ="%View_Name_ReferenceTours_Mnemonic"/>
 
-               <!-- Reference Timeline -->
+               <!-- Tour Comparison Timeline -->
                <command 
                   commandId   ="command.net.tourbook.views.tourCatalog.yearStatisticView"
                   icon        ="icons/tour-map-statistic.png"
-                  label       ="%View_Name_ReferenceTimeline"
-                  mnemonic    ="%View_Name_ReferenceTimeline_Mnemonic"/>
+                  label       ="%View_Name_TourComparisonTimeline"
+                  mnemonic    ="%View_Name_TourComparisonTimeline_Mnemonic"/>
 
 
             <!-- GROUP: Other Directories -->
@@ -1257,8 +1257,8 @@
 
       <command
          id             ="command.net.tourbook.views.tourCatalog.yearStatisticView"
-         name           ="%View_Name_ReferenceTimeline"
-         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_ReferenceTimeline"
+         name           ="%View_Name_TourComparisonTimeline"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourComparisonTimeline"
       />
 
       <command
@@ -1688,7 +1688,7 @@
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
             class       ="net.tourbook.ui.views.referenceTour.ReferenceTimelineView"
             icon        ="icons/tour-map-statistic.png"
-            name        ="%View_Name_ReferenceTimeline"/>
+            name        ="%View_Name_TourComparisonTimeline"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
@@ -1878,15 +1878,15 @@
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.referenceTourView"
-            class       ="net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTourChartView"
             icon        ="icons/tour-map-reftour.png"
             name        ="%View_Name_RefTour_ReferenceTour"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.comparedTourView"
-            class       ="net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView"
-            icon        ="icons/geo-elevation-compared-tour.png"
+            class       ="net.tourbook.ui.views.referenceTour.ComparedTourChartView"
+            icon        ="icons/tour-map-comparetour.png"
             name        ="%View_Name_RefTour_ComparedTour"/>
 
          <view

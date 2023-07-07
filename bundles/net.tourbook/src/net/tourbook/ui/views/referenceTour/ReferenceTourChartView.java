@@ -50,7 +50,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class RefTour_ReferenceTourView extends TourChartViewPart implements ITourChartViewer {
+public class ReferenceTourChartView extends TourChartViewPart implements ITourChartViewer {
 
    public static final String           ID           = "net.tourbook.views.tourCatalog.referenceTourView"; //$NON-NLS-1$
 
@@ -148,7 +148,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
             TourManager.fireEventWithCustomData(
                   TourEventId.SLIDER_POSITION_CHANGED,
                   chartInfo,
-                  RefTour_ReferenceTourView.this);
+                  ReferenceTourChartView.this);
          }
       });
    }
@@ -209,7 +209,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
    @Override
    protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-      if (part == RefTour_ReferenceTourView.this) {
+      if (part == ReferenceTourChartView.this) {
          return;
       }
 
@@ -263,7 +263,7 @@ public class RefTour_ReferenceTourView extends TourChartViewPart implements ITou
          TourManager.fireEventWithCustomData(
                TourEventId.REFERENCE_TOUR_CHANGED,
                new RefTourChanged(_tourChart, refTour.getRefId(), refTourXValueDiff),
-               RefTour_ReferenceTourView.this);
+               ReferenceTourChartView.this);
 
          // set title
          chartDataModel.setTitle(NLS.bind(

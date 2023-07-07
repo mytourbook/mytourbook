@@ -76,7 +76,7 @@ public class PositionedWizardDialog extends WizardDialog {
    protected void configureShell(final Shell shell) {
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.RefTour_CompareWizard).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourCompare_ElevationCompare_Tool).createImage());
 
       super.configureShell(shell);
 
