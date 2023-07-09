@@ -15,6 +15,8 @@
  *******************************************************************************/
 package views;
 
+import net.tourbook.application.PluginProperties;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.BeforeClass;
@@ -70,6 +72,8 @@ public class WorkbenchTests extends UITest {
 
    @Test
    void testOpenViews() {
+
+      String viewName;
 
       //Select a tour so that the selected views contain information
       Utils.showTourBookView(bot);
@@ -130,8 +134,9 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
       final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Reference Tours"); //$NON-NLS-1$
-      final SWTBotView referenceToursView = Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
+      viewName = PluginProperties.getText("View_Name_ReferenceTours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, viewName);
+      final SWTBotView referenceToursView = Utils.showView(bot, viewName);
 
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
@@ -142,10 +147,11 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
 
+      viewName = PluginProperties.getText("View_Name_TourComparisonTimeline"); //$NON-NLS-1$
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode("Reference Timeline").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(viewName).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView yearStatisticView = Utils.showView(bot, "Reference Timeline"); //$NON-NLS-1$
+      final SWTBotView yearStatisticView = Utils.showView(bot, viewName);
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
