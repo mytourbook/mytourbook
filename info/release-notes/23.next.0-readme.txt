@@ -4,6 +4,7 @@
 TODO's
 ======               
 
+
 * AirQuality      - German translation https://github.com/mytourbook/mytourbook/issues/1124
 
 * Tour Chart      - Check "Grid/Units" and "Options" tab in pref page "Appearance/Tour Chart" if something is obsolete
@@ -65,6 +66,8 @@ Improvements
   - Filter compared tours in the "Geo Compare View"
 
 * Tour Chart
+  - New speed/pace graph which shows the average speed for distance intervals
+    https://github.com/mytourbook/mytourbook/issues/829 
   - Slider positions are set to a selected reference tour or geo compared tour
   
   
@@ -80,7 +83,7 @@ Improvements
 Changes
 =======
 
-* Renamed "Year Statistic" -> "Reference Timeline"
+* Renamed "Year Statistic" -> "Tour Comparison Timeline"
   https://github.com/mytourbook/mytourbook/discussions/1128
 
 

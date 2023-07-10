@@ -55,7 +55,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
 import net.tourbook.ui.views.referenceTour.CompareConfig;
-import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
+import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
@@ -377,7 +377,7 @@ public class TourChartView extends ViewPart implements
 
                   && eventData instanceof ISelection) {
 
-               if (part instanceof RefTour_ComparedTourView) {
+               if (part instanceof ComparedTourChartView) {
 
                   // ignore -> this would modify the geo compare tour
 

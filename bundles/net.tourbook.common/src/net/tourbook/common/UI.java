@@ -289,28 +289,28 @@ public class UI {
    /**
     * Is <code>true</code> when a 4k display is used
     */
-   public static boolean       IS_4K_DISPLAY                  = DPIUtil.getDeviceZoom() >= 140;
+   public static boolean       IS_4K_DISPLAY;
 
    /**
     * On Linux an async selection event is fired since e4
     */
-   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";     //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";     //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";   //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";   //$NON-NLS-1$
 
-   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                     //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                   //$NON-NLS-1$
 
-   public static final String  TIME_ZONE_UTC                  = "UTC";                         //$NON-NLS-1$
+   public static final String  TIME_ZONE_UTC                  = "UTC";                       //$NON-NLS-1$
 
-   public static final String  UTF_8                          = "UTF-8";                       //$NON-NLS-1$
-   public static final String  UTF_16                         = "UTF-16";                      //$NON-NLS-1$
-   public static final String  ISO_8859_1                     = "ISO-8859-1";                  //$NON-NLS-1$
+   public static final String  UTF_8                          = "UTF-8";                     //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                    //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";                //$NON-NLS-1$
 
    public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                   //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                 //$NON-NLS-1$
 
-   private static final String NUMBER_FORMAT_1F               = "%.1f";                        //$NON-NLS-1$
-   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ";   //$NON-NLS-1$
+   private static final String NUMBER_FORMAT_1F               = "%.1f";                      //$NON-NLS-1$
+   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ"; //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
@@ -698,6 +698,7 @@ public class UI {
 
       updateUnits();
 
+      IS_4K_DISPLAY = DPIUtil.getDeviceZoom() >= 140;
       setupUI_FontMetrics();
       setupUI_AWTFonts();
 
@@ -1268,6 +1269,25 @@ public class UI {
    }
 
    /**
+    * @param speed
+    * @return Returns the speed value from the current measurement system into metric
+    */
+   public static float convertSpeed_ToMetric(final float speed) {
+
+      if (UNIT_IS_DISTANCE_MILE) {
+
+         return speed * UI.UNIT_MILE;
+
+      } else if (UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         return speed * UI.UNIT_NAUTICAL_MILE;
+
+      }
+
+      return speed;
+   }
+
+   /**
     * @param temperature
     * @return Returns the temperature in the current measurement system.
     */
@@ -1374,11 +1394,13 @@ public class UI {
       return label;
    }
 
-   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+   public static Label createSpacer_Horizontal(final Composite parent, final int columns) {
 
       final Label label = new Label(parent, SWT.NONE);
 
       GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+
+      return label;
    }
 
    public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {

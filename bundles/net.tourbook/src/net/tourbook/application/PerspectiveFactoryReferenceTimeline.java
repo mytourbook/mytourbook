@@ -25,8 +25,8 @@ import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
-import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
+import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 import net.tourbook.ui.views.tourBook.TourBookView;
@@ -34,7 +34,6 @@ import net.tourbook.ui.views.tourBook.TourBookView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory {
 
@@ -44,9 +43,9 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
    private static final String FOLDER_ID_TOUR_CHART               = "folderTourChart";                      //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART_COMPARED_TOUR = "folderTourChart_ComparedTour";         //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART_REF_Tour      = "folderTourChart_RefTour";              //$NON-NLS-1$
+   private static final String FOLDER_ID_TOUR_COMPARISON_TIMELINE = "folderTourComparisonTimeline";         //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_DIRECTORIES         = "folderTourDirectories";                //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_MAPS                = "folderTourMaps";                       //$NON-NLS-1$
-   private static final String FOLDER_ID_REFERENCE_TIMELINE       = "folderReferenceTimeline";              //$NON-NLS-1$
 
    @Override
    public void createInitialLayout(final IPageLayout layout) {
@@ -56,8 +55,8 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
       layout.addShowViewShortcut(GeoCompareView.ID);
       layout.addShowViewShortcut(ElevationCompareResultView.ID);
       layout.addShowViewShortcut(ReferenceTourView.ID);
-      layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
-      layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
+      layout.addShowViewShortcut(ComparedTourChartView.ID);
+      layout.addShowViewShortcut(ReferenceTourChartView.ID);
       layout.addShowViewShortcut(ReferenceTimelineView.ID);
 
 // SET_FORMATTING_OFF
@@ -80,7 +79,7 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
       //--------------------------------------------------------------------------------
 
-      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_REFERENCE_TIMELINE,
+      final IFolderLayout folderYearStat = layout.createFolder(FOLDER_ID_TOUR_COMPARISON_TIMELINE,
 
             IPageLayout.BOTTOM, 0.7f, FOLDER_ID_TOUR_DIRECTORIES);
 
@@ -88,11 +87,12 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
       //--------------------------------------------------------------------------------
 
-      final IPlaceholderFolderLayout folderGeoCompareTool = layout.createPlaceholderFolder(FOLDER_ID_GEO_COMPARE_TOOL,
+      final IFolderLayout folderGeoCompareTool = layout.createFolder(FOLDER_ID_GEO_COMPARE_TOOL,
 
             IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_DIRECTORIES);
 
-      folderGeoCompareTool.addPlaceholder(GeoCompareView.ID);
+      folderGeoCompareTool.addView(GeoCompareView.ID);
+
 
       //--------------------------------------------------------------------------------
       // Right area
@@ -102,7 +102,7 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
             IPageLayout.TOP, 0.5f, IPageLayout.ID_EDITOR_AREA);
 
-      refChartFolder.addView(RefTour_ReferenceTourView.ID);
+      refChartFolder.addView(ReferenceTourChartView.ID);
 
       //--------------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ public class PerspectiveFactoryReferenceTimeline implements IPerspectiveFactory 
 
             IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_CHART_REF_Tour);
 
-      folderComparedTourChart.addView(RefTour_ComparedTourView.ID);
+      folderComparedTourChart.addView(ComparedTourChartView.ID);
 
       //--------------------------------------------------------------------------------
 

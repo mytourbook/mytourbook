@@ -15,6 +15,9 @@
  *******************************************************************************/
 package utils;
 
+import net.tourbook.application.PluginProperties;
+import net.tourbook.application.TourbookPlugin;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.AfterAll;
@@ -41,6 +44,9 @@ public abstract class UITest {
 
    @BeforeAll
    static void Initialize() {
+
+      // read texts from plugin.properties
+      PluginProperties.getInstance().populate(TourbookPlugin.getBundleContext().getBundle());
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
       tourBookView = Utils.showTourBookView(bot);

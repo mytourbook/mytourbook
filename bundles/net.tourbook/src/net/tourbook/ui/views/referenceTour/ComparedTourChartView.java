@@ -58,6 +58,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
@@ -66,7 +67,22 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 06.09.2007
 
-public class RefTour_ComparedTourView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
+/**
+ * Mapping for old image names to names in tour.svg
+ * <p>
+ * These images names are not used because of heavy trouble with workbench.xmi.
+ * <p>
+ * Reset UI settings <a href=
+ * "https://dbeaver.com/docs/wiki/Reset-UI-settings/21.3/">https://dbeaver.com/docs/wiki/Reset-UI-settings/21.3/<a/>
+ *
+ * <pre>
+ *
+ * net.tourbook.Images.GeoCompare_Tool          geo-parts.png                  ->    tour-compare-geo-compare-tool.png
+ * net.tourbook.Images.ElevationCompare_Tool    tour-map-compare-result.png    ->    tour-compare-elevation-compare-tool.png
+ *                                              tour-map-comparetour.png       ->    tour-compare-compared-tour.png
+ * </pre>
+ */
+public class ComparedTourChartView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
    public static final String ID = "net.tourbook.views.tourCatalog.comparedTourView"; //$NON-NLS-1$
 
@@ -95,7 +111,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private double                            _refTour_XValueDifference;
 
-   private boolean                           _isGeoCompareRefTour;
+   private boolean                           _isGeoCompareTour;
 
    /**
     * Entity ID for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
@@ -155,6 +171,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
    private PageBook  _pageBook;
    private Composite _pageNoData;
+
+   private Image     _imageGeoCompare       = TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_GeoCompare_Tour).createImage();
+   private Image     _imageElevationCompare = TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_ElevationCompare_Tour).createImage();
 
    private class ActionNavigateNextTour extends Action {
 
@@ -399,7 +418,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
             TourManager.fireEventWithCustomData(//
                   TourEventId.SLIDER_POSITION_CHANGED,
                   chartInfoSelection,
-                  RefTour_ComparedTourView.this);
+                  ComparedTourChartView.this);
          }
       });
 
@@ -430,6 +449,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    @Override
    public void dispose() {
 
+      UI.disposeResource(_imageGeoCompare);
+      UI.disposeResource(_imageElevationCompare);
+
       saveComparedTour();
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
@@ -440,7 +462,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    private void enableActions() {
 
       final boolean isXValueMarkerMoved = _defaultStartIndex != _movedStartIndex || _defaultEndIndex != _movedEndIndex;
-      final boolean isElevationCompareTour = _isGeoCompareRefTour == false
+      final boolean isElevationCompareTour = _isGeoCompareTour == false
             && (isXValueMarkerMoved || _comparedTour_CompareId == -1);
 
       // geo compared with ref tour cannot be saved !
@@ -591,7 +613,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
       /*
        * Firstly check geo compared tours
        */
-      if (_isGeoCompareRefTour) {
+      if (_isGeoCompareTour) {
 
          navigatedTour = GeoCompareManager.navigateTour(isNextTour);
 
@@ -705,7 +727,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    @Override
    protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-      if (part == RefTour_ComparedTourView.this) {
+      if (part == ComparedTourChartView.this) {
          return;
       }
 
@@ -959,13 +981,16 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       _pageBook.showPage(_tourChart);
 
-      // set application window title
+      // set part tooltip
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
    }
 
-   private void updateSyncActionImages() {
+   private void updateSyncActions() {
 
-      if (_isGeoCompareRefTour) {
+      if (_isGeoCompareTour) {
+
+         setTitleImage(_imageGeoCompare);
+         setPartName(Messages.Tour_Compare_ViewName_GeoComparedTour);
 
          _actionSynchChartsByScale.setImageDescriptor(imageDescriptor_SyncByScale_GeoCompare);
          _actionSynchChartsBySize.setImageDescriptor(imageDescriptor_SyncBySize_GeoCompare);
@@ -973,6 +998,9 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          _tourChart.setGraphActionImage(TourManager.GRAPH_TOUR_COMPARE, imageDescriptor_Graph_GeoCompare);
 
       } else {
+
+         setTitleImage(_imageElevationCompare);
+         setPartName(Messages.Tour_Compare_ViewName_ElevationComparedTour);
 
          _actionSynchChartsByScale.setImageDescriptor(imageDescriptor_SyncByScale_ElevationCompare);
          _actionSynchChartsBySize.setImageDescriptor(imageDescriptor_SyncBySize_ElevationCompare);
@@ -982,10 +1010,10 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
    }
 
    /**
-    * @param isGeoCompareRefTourChecked
+    * @param isGeoComparedTourChecked
     * @return Returns <code>false</code> when the compared tour is not displayed
     */
-   private boolean updateTourChart(final Boolean isGeoCompareRefTourChecked) {
+   private boolean updateTourChart(final Boolean isGeoComparedTourChecked) {
 
       final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
 
@@ -993,19 +1021,19 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
          return false;
       }
 
-      final boolean isGeoCompareRefTour = isGeoCompareRefTourChecked != null
-            ? isGeoCompareRefTourChecked
+      final boolean isGeoCompareTour = isGeoComparedTourChecked != null
+            ? isGeoComparedTourChecked
             : tourCompareConfig.isGeoCompareRefTour();
 
-      _isGeoCompareRefTour = isGeoCompareRefTour;
+      _isGeoCompareTour = isGeoCompareTour;
 
       _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
 
       _tourChartConfig.setMinMaxKeeper(true);
       _tourChartConfig.canShowTourCompareGraph = true;
-      _tourChartConfig.isGeoCompare = isGeoCompareRefTour;
+      _tourChartConfig.isGeoCompare = isGeoCompareTour;
 
-      updateSyncActionImages();
+      updateSyncActions();
       updateChart();
       enableSynchronization();
       enableActions();
@@ -1014,7 +1042,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
        * Allow dragging of the compared tour only for elevation compared tour as they are saved
        * currently only into the db
        */
-      _tourChart.setXValueMarker_DraggingListener(isGeoCompareRefTour
+      _tourChart.setXValueMarker_DraggingListener(isGeoCompareTour
             ? null
             : _xValueMarker_DraggingListener);
 
@@ -1079,7 +1107,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       // enable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
-      updateSyncActionImages();
+      updateSyncActions();
    }
 
    private void updateTourChart_From_GeoComparedTour(final GeoComparedTour geoComparedTour) {
@@ -1122,7 +1150,7 @@ public class RefTour_ComparedTourView extends TourChartViewPart implements ISync
 
       // enable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
-      updateSyncActionImages();
+      updateSyncActions();
    }
 
    /**

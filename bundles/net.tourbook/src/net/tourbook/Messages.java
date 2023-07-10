@@ -1873,8 +1873,6 @@ public class Messages extends NLS {
    public static String        Reference_Timeline_Action_SyncMinMaxValues_Tooltip;
    public static String        Reference_Timeline_Combo_LastYears_Tooltip;
    public static String        Reference_Timeline_Combo_NumberOfYears_Tooltip;
-   public static String        Reference_Timeline_Image_ElevationCompare_Tooltip;
-   public static String        Reference_Timeline_Image_GeoCompare_Tooltip;
    public static String        Reference_Timeline_Page_SelectReferenceTour;
 
    public static String        RefTour_Action_CreateLeftMarker;
@@ -1882,7 +1880,6 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateReferenceTour;
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
-
    public static String        RefTour_Action_Link;
    public static String        RefTour_Action_NavigateNextTour;
    public static String        RefTour_Action_NavigatePrevTour;
@@ -2359,6 +2356,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity;
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
+   public static String        Slideout_TourChartOptions_Label_SpeedAndPaceDistanceInterval;
    public static String        Slideout_TourChartOptions_Label_Title;
    public static String        Slideout_TourChartOptions_Radio_SRTM1;
    public static String        Slideout_TourChartOptions_Radio_SRTM1_Tooltip;
@@ -2679,9 +2677,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare;
-
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceInterval_Tooltip;
    public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
+   public static String        Tour_Action_Graph_SpeedInterval_Tooltip;
    public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;
@@ -2768,6 +2767,11 @@ public class Messages extends NLS {
    public static String        Tour_Book_SortColumnTooltip;
 
    public static String        Tour_Chart_Label_ValuePoint_Title;
+
+   public static String        Tour_Compare_ViewName_ElevationComparedTour;
+   public static String        Tour_Compare_ViewName_ElevationCompareTimeline;
+   public static String        Tour_Compare_ViewName_GeoComparedTour;
+   public static String        Tour_Compare_ViewName_GeoCompareTimeline;
 
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;

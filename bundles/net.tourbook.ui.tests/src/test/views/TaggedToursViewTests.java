@@ -34,7 +34,7 @@ public class TaggedToursViewTests extends UITest {
 
       //Open the Tagged Tours view
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem("1. Tour Directories").expand().getNode("Tagged Tours").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode("Tagged Tours").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
 
       Utils.getTour(bot);
