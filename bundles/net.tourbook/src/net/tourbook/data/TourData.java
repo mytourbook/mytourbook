@@ -1340,6 +1340,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Transient
    public float[]                tourCompareSerie;
 
+   @Transient
+   public float[]                tourCompareReferenceSerie;
+
    /*
     * GPS data
     */
@@ -4634,7 +4637,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return null;
       }
 
-      // create normalized data, the distance will be normalized to 100m
+      // create normalized data, the distance will be normalized to x meter, e.g 100 m
       final float measureStartDistance = measureAllDistance[measureStartIndex];
       final float measureEndDistance = measureAllDistance[measureEndIndex];
 

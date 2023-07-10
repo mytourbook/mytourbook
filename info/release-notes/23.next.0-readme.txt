@@ -58,6 +58,9 @@ Improvements
   - New filter: Filter compared tours by sequence number
   - New columns: Elevation gain/loss
   
+* Compared Tour Chart View
+  - Show reference tour graph which can overlap the compared tour
+  
 * Elevation Compare View
   - New columns: Elevation gain/loss
 

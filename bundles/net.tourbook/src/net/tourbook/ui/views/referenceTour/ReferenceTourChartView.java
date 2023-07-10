@@ -245,6 +245,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
          final ChartDataXSerie xData = chartDataModel.getXData();
          final TourReference refTour = compareConfig.getRefTour();
 
+         final int refTour_StartValueIndex = refTour.getStartValueIndex();
          final int refTour_EndValueIndex = refTour.getEndValueIndex();
          final double[] xValues = xData.getHighValuesDouble()[0];
 
@@ -254,11 +255,11 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
             return;
          }
 
-         // set marker positions
-         xData.setXValueMarker_ValueIndices(refTour.getStartValueIndex(), refTour_EndValueIndex);
+         // set x-value marker positions
+         xData.setXValueMarker_ValueIndices(refTour_StartValueIndex, refTour_EndValueIndex);
 
          // set the value difference of the synch marker
-         final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
+         final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour_StartValueIndex];
 
          TourManager.fireEventWithCustomData(
                TourEventId.REFERENCE_TOUR_CHANGED,

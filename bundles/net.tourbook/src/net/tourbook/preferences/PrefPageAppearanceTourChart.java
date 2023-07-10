@@ -633,7 +633,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private Enum<MouseWheel2KeyTranslation> getPrefMouseKeyTranslation(final boolean isDefault) {
 
       final String prefMouseKey = isDefault
-            
+
             ? _prefStore_Chart.getDefaultString(IChartPreferences.GRAPH_MOUSE_KEY_TRANSLATION)
             : _prefStore_Chart.getString(IChartPreferences.GRAPH_MOUSE_KEY_TRANSLATION);
 
@@ -692,6 +692,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       final Graph graph_Training_Performance          = new Graph(TourManager.GRAPH_TRAINING_PERFORMANCE,         OtherMessages.GRAPH_LABEL_TRAINING_PERFORMANCE,             OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
 
       final Graph graph_TourCompareResult             = new Graph(TourManager.GRAPH_TOUR_COMPARE,                 OtherMessages.GRAPH_LABEL_TOUR_COMPARE);
+      final Graph graph_TourCompareReferenceTour      = new Graph(TourManager.GRAPH_TOUR_COMPARE_REF_TOUR,        OtherMessages.GRAPH_LABEL_TOUR_COMPARE_REFERENCE_TOUR);
 
       _graphMap = new HashMap<>();
 
@@ -720,6 +721,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       _graphMap.put(TourManager.GRAPH_TRAINING_PERFORMANCE,          graph_Training_Performance);
 
       _graphMap.put(TourManager.GRAPH_TOUR_COMPARE,                  graph_TourCompareResult);
+      _graphMap.put(TourManager.GRAPH_TOUR_COMPARE_REF_TOUR,         graph_TourCompareReferenceTour);
 
 // SET_FORMATTING_ON
 
@@ -750,6 +752,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       _graphList.add(graph_Training_Performance);
 
       _graphList.add(graph_TourCompareResult);
+      _graphList.add(graph_TourCompareReferenceTour);
    }
 
    /**

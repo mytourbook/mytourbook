@@ -87,6 +87,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_TIME_START                     = net.tourbook.common.Messages.Graph_Label_TimeStart;
    public static final String GRAPH_LABEL_TIME_END                       = net.tourbook.common.Messages.Graph_Label_TimeEnd;
    public static final String GRAPH_LABEL_TOUR_COMPARE                   = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+   public static final String GRAPH_LABEL_TOUR_COMPARE_REFERENCE_TOUR    = net.tourbook.common.Messages.Graph_Label_Tour_Compare_ReferenceTour;
    public static final String GRAPH_LABEL_TOUR_COMPARE_UNIT              = net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
    public static final String GRAPH_LABEL_TRAINING_EFFECT_AEROB          = net.tourbook.common.Messages.Graph_Label_Training_Effect_Aerob;
    public static final String GRAPH_LABEL_TRAINING_EFFECT_ANAEROB        = net.tourbook.common.Messages.Graph_Label_Training_Effect_Anaerob;

@@ -210,15 +210,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String GRAPH_CONTRIBUTION_ID_GEARS                          = "GRAPH_CONTRIBUTION_ID_GEARS";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_GRADIENT                       = "GRAPH_CONTRIBUTION_ID_GRADIENT";                      //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PACE                           = "GRAPH_CONTRIBUTION_ID_PACE";                          //$NON-NLS-1$
-   private static final String GRAPH_CONTRIBUTION_ID_PACE_INTERVAL                  = "GRAPH_CONTRIBUTION_ID_PACE_INTERVAL";               //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_PACE_INTERVAL                  = "GRAPH_CONTRIBUTION_ID_PACE_INTERVAL";                 //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED                = "GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED";               //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_POWER                          = "GRAPH_CONTRIBUTION_ID_POWER";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PULSE                          = "GRAPH_CONTRIBUTION_ID_PULSE";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED                          = "GRAPH_CONTRIBUTION_ID_SPEED";                         //$NON-NLS-1$
-   private static final String GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL                 = "GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL";              //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL                 = "GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL";                //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED               = "GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED";              //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE                    = "GRAPH_CONTRIBUTION_ID_TEMPERATURE";                   //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE                   = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";                  //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR          = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR";         //$NON-NLS-1$
 
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME            = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED   = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED";  //$NON-NLS-1$
@@ -1448,6 +1449,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare_ByElevation),
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_TOUR_COMPARE_REF_TOUR,
+            OtherMessages.GRAPH_LABEL_TOUR_COMPARE_REFERENCE_TOUR,
+            Messages.Tour_Action_Graph_TourCompareReferenceTour_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_TourCompare_ByElevation),
+            ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
+            GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR);
 
       /*
        * Running dynamics
@@ -2977,6 +2986,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        */
       if (_tcc.canShowTourCompareGraph) {
          tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_TOUR_COMPARE)));
+         tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_TOUR_COMPARE_REF_TOUR)));
       }
 
       tbm.add(new Separator());
@@ -5903,7 +5913,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          synchedChart.setCanAutoZoomToSlider(true);
 
          // hide the x-sliders
-//         fBackupIsXSliderVisible = synchedChart.isXSliderVisible();
          synchedChart.setShowSlider(false);
 
          synchronizeChart();
@@ -5913,7 +5922,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          // disable chart synchronization
 
          // enable zoom action
-//         actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(synchedChart.getCanScrollZoomedChart());
          synchChartActions.get(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(synchedChart.getCanAutoZoomToSlider());
 
          synchedChart.setZoomActionsEnabled(true);
@@ -5926,7 +5934,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          // show whole chart
          synchedChart.getChartDataModel().resetMinMaxValues();
-//         synchedChart.onExecuteZoomOut(true);
          synchedChart.onExecuteZoomFitGraph();
       }
    }

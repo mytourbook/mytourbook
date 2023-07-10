@@ -243,8 +243,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private int                             _compareData_NumGeoPartTours;
    private GeoCompareData                  _compareData_CurrentGeoCompareData;
    private long                            _compareData_RefId;
+   private long                            _compareData_RefTour_TourId     = -1;
    private TourData                        _compareData_TourData;
-   private long                            _compareData_TourId             = -1;
    private String                          _compareData_TourTitle;
 
    private int                             _compareData_DistanceInterval;
@@ -847,13 +847,14 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * @param tourData
+    * @param refTourData
+    *           "Ref" tour which is compared
     * @param leftIndex
     * @param rightIndex
     * @param refId
     *           Reference tour id or <code>-1</code> when not available
     */
-   private void compare_10_Compare(final TourData tourData,
+   private void compare_10_Compare(final TourData refTourData,
                                    final int leftIndex,
                                    final int rightIndex,
                                    final long refId) {
@@ -874,7 +875,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       /*
        * Show no data page
        */
-      final double[] latSerie = tourData.latitudeSerie;
+      final double[] latSerie = refTourData.latitudeSerie;
       if (latSerie == null) {
 
          clearView(InvalidData.NoGeoData);
@@ -894,10 +895,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          lastIndex = latSerie.length;
       }
 
-      final long tourId = tourData.getTourId();
+      final long refTour_TourId = refTourData.getTourId();
 
       // skip same data and continue current comparison
-      if (_compareData_TourId == tourId
+      if (_compareData_RefTour_TourId == refTour_TourId
             && _compareData_FirstIndex == leftIndex
             && _compareData_LastIndex == rightIndex
 
@@ -948,8 +949,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                return;
             }
 
-            _compareData_TourId = tourId;
-            _compareData_TourData = tourData;
+            _compareData_RefTour_TourId = refTour_TourId;
+            _compareData_TourData = refTourData;
             _compareData_RefId = refId;
             _compareData_FirstIndex = compareFirstIndex;
             _compareData_LastIndex = compareLastIndex;
@@ -1011,7 +1012,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // load tour id's in the geo parts
       final GeoCompareData newGeoCompareData = GeoPartTourLoader.loadToursFromGeoParts(
-            _compareData_TourId,
+            _compareData_RefTour_TourId,
             _compareData_TourTitle,
             _compareData_GeoGrid,
             normalizedGeoData,
@@ -1020,6 +1021,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             this);
 
       newGeoCompareData.refId = _compareData_RefId;
+      newGeoCompareData.refTour_FirstIndex = _compareData_FirstIndex;
+      newGeoCompareData.refTour_LastIndex = _compareData_LastIndex;
 
       _compareData_CurrentGeoCompareData = newGeoCompareData;
 
@@ -1218,9 +1221,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          return;
       }
 
-      final TourData tourData = tourCompareConfig.getRefTourData();
+      final TourData refTourData = tourCompareConfig.getRefTourData();
 
-      if (tourData != null) {
+      if (refTourData != null) {
 
          final TourReference refTour = tourCompareConfig.getRefTour();
 
@@ -1233,7 +1236,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_FromNative(refTour);
 
          compare_10_Compare(
-               tourData,
+               refTourData,
                refTour.getStartValueIndex(),
                refTour.getEndValueIndex(),
                geoCompareRefId);
@@ -2504,7 +2507,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       for (final GeoComparedTour comparedTour : _allGeoComparedTours) {
 
-         if (comparedTour.tourId == _compareData_TourId) {
+         if (comparedTour.tourId == _compareData_RefTour_TourId) {
 
             _geoCompareViewer.setSelection(new StructuredSelection(comparedTour), true);
             _geoCompareViewer.getTable().showSelection();

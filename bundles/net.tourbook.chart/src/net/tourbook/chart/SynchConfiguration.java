@@ -57,7 +57,7 @@ public class SynchConfiguration {
       _markerWidthRatio = markerWidthRatio;
       _markerOffsetRatio = markerOffsetRatio;
 
-      getYDataMinMaxKeeper().saveMinMaxValues(chartDataModel);
+      _yDataMinMaxKeeper.saveMinMaxValues(chartDataModel);
    }
 
    float getDevMarkerOffset() {

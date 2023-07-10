@@ -220,6 +220,7 @@ public class TourManager {
    public static final int     GRAPH_TRAINING_PERFORMANCE                      = 1302;
 
    public static final int     GRAPH_TOUR_COMPARE                              = 2000;
+   public static final int     GRAPH_TOUR_COMPARE_REF_TOUR                     = 2001;
    //
    //
    /**
@@ -252,7 +253,8 @@ public class TourManager {
          GRAPH_SWIM_STROKES,
          GRAPH_SWIM_SWOLF,
 
-         GRAPH_TOUR_COMPARE
+         GRAPH_TOUR_COMPARE,
+         GRAPH_TOUR_COMPARE_REF_TOUR
    };
 
    private static final IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
@@ -4118,7 +4120,8 @@ public class TourManager {
       final ChartDataYSerie yDataGears             = createModelData_Gears(            tourData, chartDataModel);
       final ChartDataYSerie yDataTemperature       = createModelData_Temperature(      tourData, chartDataModel, chartType, useCustomBackground);
 
-      final ChartDataYSerie yDataTourCompare       = createModelData_TourCompare(tourData, chartDataModel, chartType, tcc);
+      final ChartDataYSerie yDataTourCompare                   = createModelData_TourCompare(               tourData, chartDataModel, chartType, tcc);
+      final ChartDataYSerie yDataTourCompareRefTour            = createModelData_TourCompareRefTour(        tourData, chartDataModel, chartType, tcc);
 
       final ChartDataYSerie yData_RunDyn_StanceTime            = createModelData_RunDyn_StanceTime(         tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yData_RunDyn_StanceTimeBalance     = createModelData_RunDyn_StanceTimeBalance(  tourData, chartDataModel, chartType, useCustomBackground);
@@ -4239,6 +4242,12 @@ public class TourManager {
          case GRAPH_TOUR_COMPARE:
             if (yDataTourCompare != null) {
                chartDataModel.addYData(yDataTourCompare);
+            }
+            break;
+
+         case GRAPH_TOUR_COMPARE_REF_TOUR:
+            if (yDataTourCompareRefTour != null) {
+               chartDataModel.addYData(yDataTourCompareRefTour);
             }
             break;
 
@@ -5704,7 +5713,7 @@ public class TourManager {
    }
 
    /**
-    * Tour compare altitude or lat/lon difference
+    * Tour compare elevation or lat/lon difference
     */
    private ChartDataYSerie createModelData_TourCompare(final TourData tourData,
                                                        final ChartDataModel chartDataModel,
@@ -5724,6 +5733,35 @@ public class TourManager {
          yDataTourCompare.setShowYSlider(true);
          yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
+
+         setGraphColors(yDataTourCompare, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
+         chartDataModel.addXyData(yDataTourCompare);
+      }
+
+      return yDataTourCompare;
+   }
+
+   /**
+    * Elevation of the tour compare reference tour
+    */
+   private ChartDataYSerie createModelData_TourCompareRefTour(final TourData tourData,
+                                                                    final ChartDataModel chartDataModel,
+                                                                    final ChartType chartType,
+                                                                    final TourChartConfiguration tcc) {
+
+      final float[] tourCompareSerie = tourData.tourCompareReferenceSerie;
+      ChartDataYSerie yDataTourCompare = null;
+      if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
+
+         yDataTourCompare = createChartDataSerieNoZero(tourCompareSerie, chartType);
+
+         yDataTourCompare.setYTitle(OtherMessages.GRAPH_LABEL_TOUR_COMPARE_REFERENCE_TOUR);
+         yDataTourCompare.setUnitLabel(tcc.isGeoCompare
+               ? OtherMessages.GRAPH_LABEL_GEO_COMPARE_UNIT
+               : OtherMessages.GRAPH_LABEL_TOUR_COMPARE_UNIT);
+         yDataTourCompare.setShowYSlider(true);
+         yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE_REF_TOUR);
 
          setGraphColors(yDataTourCompare, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
          chartDataModel.addXyData(yDataTourCompare);
