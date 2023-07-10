@@ -33,4 +33,6 @@ public enum TourFilterFieldType {
 
 	SEASON, //
 
+   ENUMERATION, //
+
 }

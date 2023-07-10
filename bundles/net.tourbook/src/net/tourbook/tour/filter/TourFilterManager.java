@@ -204,6 +204,16 @@ public class TourFilterManager {
          TourFilterFieldOperator.NOT_BETWEEN,
    };
 
+   private static final String[]                  VALUES_AIRQUALITY               = {
+
+         net.tourbook.common.Messages.Weather_AirQuality_Good,
+         net.tourbook.common.Messages.Weather_AirQuality_Fair,
+         net.tourbook.common.Messages.Weather_AirQuality_IsNotDefined,
+         net.tourbook.common.Messages.Weather_AirQuality_Moderate,
+         net.tourbook.common.Messages.Weather_AirQuality_Poor,
+         net.tourbook.common.Messages.Weather_AirQuality_VeryPoor
+   };
+
    private static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {
 
          TourFilterFieldOperator.IS_EMPTY,
@@ -316,7 +326,7 @@ public class TourFilterManager {
    /**
     * Must be in sync with {@link #MOST_RECENT_LABELS}
     */
-   static final MostRecent[]              MOST_RECENT_UNITS    = {
+   static final MostRecent[]              MOST_RECENT_UNITS  = {
 
          MostRecent.DAYS,
          MostRecent.WEEKS,
@@ -324,11 +334,11 @@ public class TourFilterManager {
          MostRecent.YEARS
    };
 
-   private static final Bundle            _bundle              = TourbookPlugin.getDefault().getBundle();
-   private static final IPath             _stateLocation       = Platform.getStateLocation(_bundle);
+   private static final Bundle            _bundle            = TourbookPlugin.getDefault().getBundle();
+   private static final IPath             _stateLocation     = Platform.getStateLocation(_bundle);
 
-   private static final IPreferenceStore  _prefStore           = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore  _prefStore_Common    = CommonActivator.getPrefStore();
+   private static final IPreferenceStore  _prefStore         = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common  = CommonActivator.getPrefStore();
 
    private static IPropertyChangeListener _prefChangeListener_Common;
 
@@ -699,9 +709,8 @@ public class TourFilterManager {
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_AirQuality)
                   .fieldId(TourFilterFieldId.WEATHER_AIRQUALITY)
-                  .fieldType(TourFilterFieldType.TEXT)
-                  .defaultFieldOperator(TourFilterFieldOperator.EQUALS)
-                  .fieldValueProvider(_fieldValueProvider_Temperature));
+                  .fieldType(TourFilterFieldType.ENUMERATION)
+                  .values(VALUES_AIRQUALITY));
 
       allConfigs.add(
             TourFilterFieldConfig
@@ -810,13 +819,15 @@ public class TourFilterManager {
    static TourFilterFieldOperator[] getFieldOperators(final TourFilterFieldId filterField) {
 
       for (final TourFilterFieldConfig fieldConfig : FILTER_FIELD_CONFIG) {
+
          if (filterField == fieldConfig.fieldId) {
+
             return fieldConfig.fieldOperators;
          }
       }
 
       // this should not happen
-      return null;
+      return new TourFilterFieldOperator[0];
    }
 
    /**

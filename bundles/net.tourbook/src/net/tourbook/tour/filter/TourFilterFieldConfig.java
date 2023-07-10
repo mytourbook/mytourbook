@@ -57,6 +57,7 @@ public class TourFilterFieldConfig {
 
    int                             minValue;
    int                             maxValue              = Integer.MAX_VALUE;
+   String[]                        values;
 
    int                             pageIncrement         = 10;
 
@@ -258,6 +259,11 @@ public class TourFilterFieldConfig {
     */
    TourFilterFieldConfig unitLabel(final String unitLabel) {
       this.unitLabel = unitLabel;
+      return this;
+   }
+
+   TourFilterFieldConfig values(final String[] values) {
+      this.values = values;
       return this;
    }
 
