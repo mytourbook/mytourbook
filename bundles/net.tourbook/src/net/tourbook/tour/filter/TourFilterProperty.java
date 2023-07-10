@@ -91,6 +91,8 @@ public class TourFilterProperty implements Cloneable {
    Combo        uiCombo_SeasonMonth1;
    Combo        uiCombo_SeasonMonth2;
 
+   Combo        uiCombo_Enumeration;
+
    Spinner      uiSpinner_Number1;
    Spinner      uiSpinner_Number2;
    Spinner      uiSpinner_SeasonDay1;

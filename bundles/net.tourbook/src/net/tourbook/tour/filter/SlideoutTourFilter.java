@@ -820,7 +820,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case NUMBER_FLOAT:
-            numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
+         case ENUMERATION:
+            numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
             break;
 
          case TEXT:
@@ -1071,6 +1072,35 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       } else {
          filterProperty.uiDuration2 = duration;
       }
+
+      return 1;
+   }
+
+   private int createUI_Field_Enumeration(final Composite parent,
+                                          final TourFilterProperty filterProperty,
+                                          final TourFilterFieldConfig fieldConfig,
+                                          final int fieldNo,
+                                          final boolean isShowUnitLabel) {
+
+      final Combo dtTourTime = new Combo(parent, SWT.NONE);
+      dtTourTime.setItems("ddd", "dddddddewfewg");
+
+      dtTourTime.setData(filterProperty);
+      dtTourTime.setData(FIELD_NO, fieldNo);
+
+      dtTourTime.addFocusListener(_keepOpenListener);
+      dtTourTime.addSelectionListener(_fieldSelectionListener_DateTime);
+
+      GridDataFactory.fillDefaults()
+            .align(SWT.END, SWT.CENTER)
+            .applyTo(dtTourTime);
+
+      if (fieldNo == 1) {
+         filterProperty.uiCombo_Enumeration = dtTourTime;
+      } else {
+         filterProperty.uiCombo_Enumeration = dtTourTime;
+      }
+      filterProperty.uiCombo_Enumeration.select(0);
 
       return 1;
    }
