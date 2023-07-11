@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
@@ -33,6 +34,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -41,14 +43,19 @@ import org.eclipse.ui.PlatformUI;
 
 public class GeoCompareManager {
 
-   private static final int                                  COMPARATOR_THREADS    = Runtime.getRuntime().availableProcessors();
+   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.geoCompare.GeoCompareManager"); //$NON-NLS-1$
+   //
+   //
+   private static final String                               STATE_IS_GEO_COMPARE_ON = "STATE_IS_GEO_COMPARE_ON";                 //$NON-NLS-1$
+
+   private static final int                                  COMPARATOR_THREADS      = Runtime.getRuntime().availableProcessors();
    private static ThreadPoolExecutor                         _comparerExecutor;
 
-   private static final LinkedBlockingDeque<GeoComparedTour> _compareWaitingQueue  = new LinkedBlockingDeque<>();
-   private static final ListenerList<IGeoCompareListener>    _geoCompareListeners  = new ListenerList<>(ListenerList.IDENTITY);
+   private static final LinkedBlockingDeque<GeoComparedTour> _compareWaitingQueue    = new LinkedBlockingDeque<>();
+   private static final ListenerList<IGeoCompareListener>    _geoCompareListeners    = new ListenerList<>(ListenerList.IDENTITY);
 
    private static boolean                                    _isGeoComparingOn;
-   private static boolean                                    IS_LOG_TOUR_COMPARING = false;
+   private static boolean                                    IS_LOG_TOUR_COMPARING   = false;
 
    static {
 
@@ -403,6 +410,16 @@ public class GeoCompareManager {
       if (listener != null) {
          _geoCompareListeners.remove(listener);
       }
+   }
+
+   public static void restoreState() {
+
+      _isGeoComparingOn = Util.getStateBoolean(_state, STATE_IS_GEO_COMPARE_ON, true);
+   }
+
+   public static void saveState() {
+
+      _state.put(STATE_IS_GEO_COMPARE_ON, _isGeoComparingOn);
    }
 
    /**

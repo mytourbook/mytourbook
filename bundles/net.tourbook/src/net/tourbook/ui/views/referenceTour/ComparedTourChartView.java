@@ -1067,7 +1067,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
 
-      _tourChartConfig.setMinMaxKeeper(true);
+      _tourChartConfig.setMinMaxKeeper();
       _tourChartConfig.canShowTourCompareGraph = true;
       _tourChartConfig.isGeoCompare = isGeoCompareTour;
 

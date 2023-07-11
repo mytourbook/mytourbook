@@ -825,7 +825,7 @@ public class ChartComponentGraph extends Canvas {
          final ChartYDataMinMaxKeeper synchedChartMinMaxKeeper = synchedChartConfig.getYDataMinMaxKeeper();
 
          // get the id for the changed y-slider
-         final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+         final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_GRAPH_ID);
 
          // adjust min value for the changed y-slider
          final HashMap<Integer, Double> minKeeper = synchedChartMinMaxKeeper.getMinValues();

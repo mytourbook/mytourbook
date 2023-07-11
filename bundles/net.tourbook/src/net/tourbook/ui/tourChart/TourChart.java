@@ -3517,7 +3517,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       for (final ChartDataYSerie yData : allYData) {
 
-         final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+         final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_GRAPH_ID);
 
          if (yDataInfo != null && yDataInfo == yDataInfoId) {
 
@@ -6102,7 +6102,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          if (xyDataIterator instanceof ChartDataYSerie) {
 
             final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
-            final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+            final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_GRAPH_ID);
 
             enabledGraphIds.add(graphId);
          }
@@ -6285,11 +6285,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       hideLayer_Photo();
       resetSegmenterSelection();
 
-      final ChartDataModel newChartDataModel = TourManager.getInstance()
-            .createChartDataModel(
-                  _tourData,
-                  _tcc,
-                  isPropertyChanged);
+      final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
+            _tourData,
+            _tcc,
+            isPropertyChanged);
 
       // set the model BEFORE actions are created/enabled/checked
       setDataModel(newChartDataModel);

@@ -14,9 +14,6 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart,
  net.tourbook.chart.preferences
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Import-Package: net.tourbook.common,
- net.tourbook.common.form,
- net.tourbook.common.util,
- org.eclipse.e4.ui.css.swt.theme,
+Import-Package: org.eclipse.e4.ui.css.swt.theme,
  org.eclipse.e4.ui.services
 Automatic-Module-Name: net.tourbook.chart

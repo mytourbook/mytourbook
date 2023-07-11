@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,8 @@ public class ChartDataYSerie extends ChartDataSerie {
     */
    public static final int        BAR_LAYOUT_BESIDE                 = 3;
 
-   public static final String     YDATA_INFO                        = "yDataInfo";                //$NON-NLS-1$
+   public static final String     YDATA_GRAPH_ID                    = "yDataGraphID";             //$NON-NLS-1$
+   public static final String     CLONE_MIN_MAX_VALUES_GRAPH_ID     = "cloneMinMaxValuesGraphID"; //$NON-NLS-1$
 
    public static final int        FILL_METHOD_NO                    = 0;
    public static final int        FILL_METHOD_FILL_BOTTOM           = 1;
@@ -112,7 +113,7 @@ public class ChartDataYSerie extends ChartDataSerie {
     * Mostly the top slider
     */
    private ChartYSlider           _ySlider1;
-   
+
    /**
     * Mostly the bottom Slider
     */

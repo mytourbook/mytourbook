@@ -2145,7 +2145,7 @@ public class ChartComponents extends Composite {
       }
 
       /*
-       * create synch configuration data
+       * Create synch configuration data
        */
 
       final double[] xValues = xData.getHighValuesDouble()[0];
@@ -2421,7 +2421,7 @@ public class ChartComponents extends Composite {
     * Set's a {@link SynchConfiguration}, this chart will then be sychronized with the chart which
     * sets the synch config
     *
-    * @param fSynchConfigSrc
+    * @param synchConfigIn
     *           the xMarkerPosition to set
     */
    void setSynchConfig(final SynchConfiguration synchConfigIn) {
