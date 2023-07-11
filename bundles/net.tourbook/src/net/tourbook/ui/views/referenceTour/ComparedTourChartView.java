@@ -394,12 +394,10 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
    }
 
    private float[] createRefTourDataSerie(final TourData tourData, final GeoComparedTour geoComparedTour) {
-      // TODO Auto-generated method stub
 
       final GeoCompareData geoCompareData = geoComparedTour.geoCompareData;
       final TourData refTourData = TourManager.getInstance().getTourData(geoCompareData.refTour_TourId);
 
-      final float[] compTour_ElevationSerie = tourData.altitudeSerie;
       final float[] compTour_DistanceSerie = tourData.distanceSerie;
       final float[] refTour_ElevationSerie = refTourData.altitudeSerie;
       final float[] refTour_DistanceSerie = refTourData.distanceSerie;
@@ -407,9 +405,8 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       final int compTour_FirstIndex = geoComparedTour.tourFirstIndex;
       final int compTour_LastIndex = geoComparedTour.tourLastIndex;
       final int refTour_FirstIndex = geoCompareData.refTour_FirstIndex;
-      final int refTour_LastIndex = geoCompareData.refTour_LastIndex;
 
-      final float refTour_DistanceDiff = refTour_DistanceSerie[refTour_LastIndex] - refTour_DistanceSerie[refTour_FirstIndex];
+      final int numRefTourSlices = refTour_DistanceSerie.length;
 
       final int compTour_NumSlices = compTour_DistanceSerie.length;
 
@@ -418,23 +415,37 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       int compTour_SerieIndex = compTour_FirstIndex;
       int refTour_SerieIndex = refTour_FirstIndex;
 
-      float compTour_Elevation = compTour_ElevationSerie[compTour_SerieIndex];
       float compTour_Distance = compTour_DistanceSerie[compTour_SerieIndex];
 
       float refTour_Elevation = refTour_ElevationSerie[refTour_SerieIndex];
       float refTour_Distance = refTour_DistanceSerie[refTour_SerieIndex];
 
+      final float compTour_Distance_Start = compTour_Distance;
+      final float refTour_Distance_Start = refTour_Distance;
+
+      float refTour_Distance_Diff = 0;
+
       for (; compTour_SerieIndex <= compTour_LastIndex; compTour_SerieIndex++) {
 
-         compTour_Elevation = compTour_ElevationSerie[compTour_SerieIndex];
          compTour_Distance = compTour_DistanceSerie[compTour_SerieIndex];
 
-         refTour_Elevation = refTour_ElevationSerie[refTour_SerieIndex];
-         refTour_Distance = refTour_DistanceSerie[refTour_SerieIndex];
+         final float compTour_Distance_Diff = compTour_Distance - compTour_Distance_Start;
+
+         while (refTour_Distance_Diff < compTour_Distance_Diff) {
+
+            refTour_SerieIndex++;
+
+            if (refTour_SerieIndex >= numRefTourSlices) {
+               break;
+            }
+
+            refTour_Elevation = refTour_ElevationSerie[refTour_SerieIndex];
+            refTour_Distance = refTour_DistanceSerie[refTour_SerieIndex];
+
+            refTour_Distance_Diff = refTour_Distance - refTour_Distance_Start;
+         }
 
          compTour_RefElevationSerie[compTour_SerieIndex] = refTour_Elevation;
-
-         refTour_SerieIndex++;
       }
 
       return compTour_RefElevationSerie;
