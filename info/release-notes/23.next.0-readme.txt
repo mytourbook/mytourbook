@@ -79,6 +79,11 @@ Improvements
   - Show a restart action in the app toolbar
     https://github.com/mytourbook/mytourbook/issues/1130  
 
+ * Tour Import (Frederic)
+  - Setting the cadence type only if the tour contains cadence data
+
+ * Tour Concatenation (Frederic)
+  - Concatenating TSS values
 
 Changes
 =======
