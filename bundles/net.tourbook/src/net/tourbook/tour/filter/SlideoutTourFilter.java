@@ -820,6 +820,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case NUMBER_FLOAT:
+            numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
+
          case ENUMERATION:
             numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
             break;
