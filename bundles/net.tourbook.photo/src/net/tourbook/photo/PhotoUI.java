@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -123,7 +123,7 @@ public class PhotoUI {
 
       } else {
 
-         // default is vertical/horizontal centerd
+         // default is vertical/horizontal centered
 
          paintedDest_DevX += centerOffsetX;
          paintedDest_DevY += centerOffsetY;
@@ -168,7 +168,7 @@ public class PhotoUI {
 
          } catch (final Exception e) {
 
-            System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
+            System.out.println("SWT exception occurred when painting valid image " //$NON-NLS-1$
                   + photo.imageFilePathName
                   + " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 

@@ -40,15 +40,21 @@ public class TourReference implements Serializable {
 
    public static final int     DB_LENGTH_LABEL  = 80;
 
+   /**
+    * Entity ID of the reference tour
+    */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long                refId;
 
+   /**
+    * {@link TourData} which is referenced
+    */
    @ManyToOne(optional = false)
    private TourData            tourData;
 
    /**
-    * value index position for the reference tour in the original tour
+    * Value index position for the reference tour in the original tour
     */
    private int                 startIndex;
 
@@ -58,10 +64,17 @@ public class TourReference implements Serializable {
 
    public TourReference() {}
 
+   /**
+    * @param label
+    * @param tourData
+    *           Contains the tour which is referenced
+    * @param startIndex
+    * @param endIndex
+    */
    public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
 
-      this.tourData = tourData;
       this.label = label;
+      this.tourData = tourData;
 
       this.startIndex = startIndex;
       this.endIndex = endIndex;
@@ -95,6 +108,10 @@ public class TourReference implements Serializable {
       return refId == other.refId;
    }
 
+   public int getEndIndex() {
+      return endIndex;
+   }
+
    public int getEndValueIndex() {
       return endIndex;
    }
@@ -113,6 +130,10 @@ public class TourReference implements Serializable {
       return refId;
    }
 
+   public int getStartIndex() {
+      return startIndex;
+   }
+
    public int getStartValueIndex() {
       return startIndex;
    }
@@ -120,7 +141,7 @@ public class TourReference implements Serializable {
    public TourData getTourData() {
 
       /*
-       * ensure to have the correct tour data, load tour data because tour data in the ref tour
+       * Ensure to have the correct tour data, load tour data because tour data in the ref tour
        * could be changed, this is a wrong concept which could be changed but requires additonal
        * work
        */
@@ -144,10 +165,6 @@ public class TourReference implements Serializable {
       this.startIndex = startIndex;
    }
 
-   public void setTourData(final TourData tourData) {
-      this.tourData = tourData;
-   }
-
    /**
     * This method is called in the MT UI in the "Tour Data" view
     */
@@ -156,6 +173,8 @@ public class TourReference implements Serializable {
 
       return "TourReference" + NL //                     //$NON-NLS-1$
 
+            + "[" + NL //                                //$NON-NLS-1$
+
             + "   label       = " + label + NL //        //$NON-NLS-1$
             + "   refId       = " + refId + NL //        //$NON-NLS-1$
             + "   startIndex  = " + startIndex + NL //   //$NON-NLS-1$
@@ -163,6 +182,7 @@ public class TourReference implements Serializable {
 
 //          + "   tourData    = " + tourData + NL //     //$NON-NLS-1$
 
+            + "]" + NL //                                //$NON-NLS-1$
       ;
    }
 }

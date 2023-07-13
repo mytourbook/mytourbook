@@ -22,6 +22,6 @@
 	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"/> <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
 	<classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/> <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
-	<classpathentry exported="true" kind="lib" path="fit-21.105.00.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://developer.garmin.com/fit/download/ https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/fit-sdk-21-105-00-release -->
+	<classpathentry exported="true" kind="lib" path="fit-21.115.00.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://developer.garmin.com/fit/download/ https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/fit-sdk-21-105-00-release -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

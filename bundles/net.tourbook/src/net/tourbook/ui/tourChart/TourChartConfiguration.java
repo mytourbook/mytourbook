@@ -305,9 +305,9 @@ public class TourChartConfiguration {
    public boolean    canUseGeoCompareTool;
 
    /**
-    * Is <code>true</code> to show geo diff unit in compared tour chart
+    * Is <code>true</code> to show geo diff unit in the "Compared Tour" chart
     */
-   public boolean    isGeoCompareDiff;
+   public boolean    isGeoCompare;
 
    /**
     * Show/hide value point value label when mouse is hovering a graph

@@ -162,10 +162,12 @@ public class TourManager {
    public static final String  CUSTOM_DATA_GRADIENT                            = "gradient";                                                    //$NON-NLS-1$
    public static final String  CUSTOM_DATA_HISTORY                             = "history";                                                     //$NON-NLS-1$
    public static final String  CUSTOM_DATA_PACE                                = "pace";                                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PACE_INTERVAL                       = "pace-interval";                                               //$NON-NLS-1$
    public static final String  CUSTOM_DATA_PACE_SUMMARIZED                     = "pace-summarized";                                             //$NON-NLS-1$
    public static final String  CUSTOM_DATA_POWER                               = "power";                                                       //$NON-NLS-1$
    public static final String  CUSTOM_DATA_PULSE                               = "pulse";                                                       //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                       //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SPEED_INTERVAL                      = "speed-interval";                                              //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SPEED_SUMMARIZED                    = "speed-summarized";                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                 //$NON-NLS-1$
    private static final String CUSTOM_DATA_TIME                                = "time";                                                        //$NON-NLS-1$
@@ -201,6 +203,8 @@ public class TourManager {
    public static final int     GRAPH_GEARS                                     = 1009;
    public static final int     GRAPH_SPEED_SUMMARIZED                          = 1010;
    public static final int     GRAPH_PACE_SUMMARIZED                           = 1011;
+   public static final int     GRAPH_SPEED_INTERVAL                            = 1012;
+   public static final int     GRAPH_PACE_INTERVAL                             = 1013;
 
    public static final int     GRAPH_RUN_DYN_STANCE_TIME                       = 1100;
    public static final int     GRAPH_RUN_DYN_STANCE_TIME_BALANCED              = 1101;
@@ -226,6 +230,7 @@ public class TourManager {
 
          GRAPH_ALTITUDE,
          GRAPH_SPEED,
+         GRAPH_SPEED_INTERVAL,
          GRAPH_SPEED_SUMMARIZED,
          GRAPH_ALTIMETER,
          GRAPH_PULSE,
@@ -234,6 +239,7 @@ public class TourManager {
          GRAPH_GRADIENT,
          GRAPH_POWER,
          GRAPH_PACE,
+         GRAPH_PACE_INTERVAL,
          GRAPH_PACE_SUMMARIZED,
          GRAPH_GEARS,
 
@@ -4100,8 +4106,10 @@ public class TourManager {
       final ChartDataYSerie yDataElevation         = createModelData_Elevation(        tourData, chartDataModel, chartType, useCustomBackground, tcc);
       final ChartDataYSerie yDataPulse             = createModelData_Heartbeat(        tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
       final ChartDataYSerie yDataSpeed             = createModelData_Speed(            tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataSpeed_Interval    = createModelData_Speed_Interval(   tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataSpeed_Summarized  = createModelData_Speed_Summarized( tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPace              = createModelData_Pace(             tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataPace_Interval     = createModelData_Pace_Interval(    tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPace_Summarized   = createModelData_Pace_Summarized(  tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPower             = createModelData_Power(            tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataAltimeter         = createModelData_Altimeter(        tourData, chartDataModel, chartType, useCustomBackground);
@@ -4151,8 +4159,15 @@ public class TourManager {
             }
             break;
 
+         case GRAPH_SPEED_INTERVAL:
+            if (yDataSpeed_Interval != null) {
+               chartDataModel.addYData(yDataSpeed_Interval);
+               chartDataModel.setCustomData(CUSTOM_DATA_SPEED_INTERVAL, yDataSpeed_Interval);
+            }
+            break;
+
          case GRAPH_SPEED_SUMMARIZED:
-            if (yDataSpeed != null) {
+            if (yDataSpeed_Summarized != null) {
                chartDataModel.addYData(yDataSpeed_Summarized);
                chartDataModel.setCustomData(CUSTOM_DATA_SPEED_SUMMARIZED, yDataSpeed_Summarized);
             }
@@ -4165,8 +4180,15 @@ public class TourManager {
             }
             break;
 
+         case GRAPH_PACE_INTERVAL:
+            if (yDataPace_Interval != null) {
+               chartDataModel.addYData(yDataPace_Interval);
+               chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace_Interval);
+            }
+            break;
+
          case GRAPH_PACE_SUMMARIZED:
-            if (yDataPace != null) {
+            if (yDataPace_Summarized != null) {
                chartDataModel.addYData(yDataPace_Summarized);
                chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace_Summarized);
             }
@@ -5046,6 +5068,55 @@ public class TourManager {
    }
 
    /**
+    * Pace interval average
+    */
+   private ChartDataYSerie createModelData_Pace_Interval(final TourData tourData,
+                                                         final ChartDataModel chartDataModel,
+                                                         final ChartType chartType,
+                                                         final boolean useGraphBgStyle) {
+
+      ChartDataYSerie yDataPace = null;
+
+      final float[] paceSerie = tourData.getPaceSerie_Interval_Seconds();
+      if (paceSerie != null) {
+
+         final TourChartAnalyzerInfo analyzerInfo = new TourChartAnalyzerInfo(true, false, null, 1);
+
+         yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
+
+         yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE_INTERVAL);
+         yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+         yDataPace.setShowYSlider(true);
+         yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
+         yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
+         yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE_INTERVAL);
+         yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, analyzerInfo);
+         yDataPace.setYAxisDirection(!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
+
+         if (useGraphBgStyle) {
+            yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+         } else {
+            yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         }
+
+         setGraphColors(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
+         chartDataModel.addXyData(yDataPace);
+
+         // adjust min/max values when it's defined in the pref store
+         setVisibleForcedValues(
+               yDataPace,
+               60,
+               0,
+               ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+               ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+               ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+               ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      }
+
+      return yDataPace;
+   }
+
+   /**
     * Pace summarized average
     */
    private ChartDataYSerie createModelData_Pace_Summarized(final TourData tourData,
@@ -5407,6 +5478,53 @@ public class TourManager {
    }
 
    /**
+    * Interval average speed
+    */
+   private ChartDataYSerie createModelData_Speed_Interval(final TourData tourData,
+                                                          final ChartDataModel chartDataModel,
+                                                          final ChartType chartType,
+                                                          final boolean useGraphBgStyle) {
+
+      ChartDataYSerie yDataSpeed = null;
+
+      final float[] speedSerie = tourData.getSpeedSerie_Interval();
+      if (speedSerie != null) {
+
+         final TourChartAnalyzerInfo analyzerInfo = new TourChartAnalyzerInfo(true, true, null, 2);
+
+         yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
+
+         yDataSpeed.setYTitle(OtherMessages.GRAPH_LABEL_SPEED_INTERVAL);
+         yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
+         yDataSpeed.setShowYSlider(true);
+         yDataSpeed.setDisplayedFractionalDigits(2);
+         yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED_INTERVAL);
+         yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, analyzerInfo);
+
+         if (useGraphBgStyle) {
+            yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+         } else {
+            yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         }
+
+         setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+         chartDataModel.addXyData(yDataSpeed);
+
+         // adjust  min/max values when it's defined in the pref store
+         setVisibleForcedValues(
+               yDataSpeed,
+               1,
+               0,
+               ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+               ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+               ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+               ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
+      }
+
+      return yDataSpeed;
+   }
+
+   /**
     * Speed summarized average
     */
    private ChartDataYSerie createModelData_Speed_Summarized(final TourData tourData,
@@ -5600,7 +5718,7 @@ public class TourManager {
          yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 
          yDataTourCompare.setYTitle(OtherMessages.GRAPH_LABEL_TOUR_COMPARE);
-         yDataTourCompare.setUnitLabel(tcc.isGeoCompareDiff
+         yDataTourCompare.setUnitLabel(tcc.isGeoCompare
                ? OtherMessages.GRAPH_LABEL_GEO_COMPARE_UNIT
                : OtherMessages.GRAPH_LABEL_TOUR_COMPARE_UNIT);
          yDataTourCompare.setShowYSlider(true);

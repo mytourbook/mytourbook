@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: External jar's
 Bundle-SymbolicName: net.tourbook.ext.jars;singleton:=true
-Bundle-Version: 23.5.0.qualifier
+Bundle-Version: 23.5.1.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
@@ -20,7 +20,7 @@ Bundle-ClassPath:
  jackson-core-2.15.0.jar,
  jackson-databind-2.15.0.jar,
  jackson-annotations-2.15.0.jar,
- fit-21.105.00.jar,
+ fit-21.115.00.jar,
  commons-suncalc-3.4.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,

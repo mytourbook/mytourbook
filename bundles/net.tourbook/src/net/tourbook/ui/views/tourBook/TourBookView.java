@@ -90,11 +90,12 @@ import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.rawData.ActionDeleteTourValues;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DummyColumnViewer;
@@ -102,7 +103,6 @@ import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
 import net.tourbook.ui.views.tourBook.natTable.SingleClickSortConfiguration_MT;
 import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
@@ -1757,14 +1757,16 @@ public class TourBookView extends ViewPart implements
       _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage_Tree.getColumnId());
       _columnIndex_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds_Tree.getColumnId());
 
+      final int numColumns = tree.getColumns().length;
+
       // add column resize listener
-      if (_columnIndex_TourTypeImage >= 0) {
+      if (_columnIndex_TourTypeImage >= 0 && _columnIndex_TourTypeImage < numColumns) {
 
          isColumnVisible = true;
          tree.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
       }
 
-      if (_columnIndex_WeatherClouds >= 0) {
+      if (_columnIndex_WeatherClouds >= 0 && _columnIndex_WeatherClouds < numColumns) {
 
          isColumnVisible = true;
          tree.getColumn(_columnIndex_WeatherClouds).addControlListener(controlResizedAdapter);
@@ -2713,7 +2715,7 @@ public class TourBookView extends ViewPart implements
 
       for (final ColumnDefinition colDef : _columnManager_NatTable.getRearrangedColumns()) {
 
-         final String sqlField = _natTable_DataLoader.getSqlField(colDef.getColumnId());
+         final String sqlField = _natTable_DataLoader.getSqlField_OrderBy(colDef.getColumnId());
 
          final boolean canSortColumn = NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false;
          colDef.setCanSortColumn(canSortColumn);
@@ -3007,17 +3009,17 @@ public class TourBookView extends ViewPart implements
 
          final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-         if (firstElement instanceof GeoPartComparerItem) {
+         if (firstElement instanceof GeoComparedTour) {
 
             // show selected compared tour
 
-            final GeoPartComparerItem comparerItem = (GeoPartComparerItem) firstElement;
+            final GeoComparedTour comparerItem = (GeoComparedTour) firstElement;
 
             selectTour(comparerItem.tourId);
 
-         } else if (firstElement instanceof TVICatalogComparedTour) {
+         } else if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
+            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
 
             selectTour(comparedTour.getTourId());
          }

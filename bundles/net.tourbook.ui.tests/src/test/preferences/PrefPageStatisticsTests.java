@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -23,10 +25,16 @@ import utils.Utils;
 public class PrefPageStatisticsTests extends UITest {
 
    @Test
-   void PrefPageStatistics_OpenAndClose() {
+   void PrefPageStatistics_MoveAndSortStatistics() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Statistics").select(); //$NON-NLS-1$
+
+      bot.table().select(Messages.Pref_Statistic_Group_YearSummary);
+      bot.button(Messages.app_action_button_down).click();
+      bot.button(Messages.app_action_button_up).click();
+      bot.button(Messages.Pref_Statistic_Action_SortByData).click();
+      bot.button(Messages.Pref_Statistic_Action_SortByTime).click();
 
       Utils.clickApplyAndCloseButton(bot);
    }

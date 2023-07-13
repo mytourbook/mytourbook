@@ -222,6 +222,7 @@ public interface ITourbookPreferences {
    public static final String GRAPH_IS_SHOW_VALUE_POINT_VALUE       = "GRAPH_IS_SHOW_VALUE_POINT_VALUE";       //$NON-NLS-1$
    public static final String GRAPH_MOUSE_MODE                      = "graph.toggle-mouse";                    //$NON-NLS-1$
    public static final String GRAPH_MOVE_SLIDERS_WHEN_ZOOMED        = "graphs.move-sliders-when-zoomed";       //$NON-NLS-1$
+   public static final String GRAPH_SPEED_PACE_DISTANCE_INTERVAL    = "GRAPH_SPEED_PACE_DISTANCE_INTERVAL";    //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_FILLING            = "Graph_Transparency_Filling";            //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_FILLING_DARK       = "GRAPH_TRANSPARENCY_FILLING_DARK";       //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_LINE               = "Graph_Transparency_Line";               //$NON-NLS-1$
@@ -463,11 +464,10 @@ public interface ITourbookPreferences {
    public static final String TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR = "tourdata.editor.confirmation.revert-tour"; //$NON-NLS-1$
 
    /*
-    * common appearance
+    * Common appearance
     */
    public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES        = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
    public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS              = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
-   public static final String APPEARANCE_SHOW_MEMORY_MONITOR                = "appearance.show-memory-monitor";                    //$NON-NLS-1$
    public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU        = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
 
    public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
@@ -632,4 +632,5 @@ public interface ITourbookPreferences {
    public static final String TOURMARKERVIEW_USE_ELAPSED_TIME  = "TOURMARKERVIEW_USE_ELAPSED_TIME";  //$NON-NLS-1$
    public static final String TOURMARKERVIEW_USE_MOVING_TIME   = "TOURMARKERVIEW_USE_MOVING_TIME";   //$NON-NLS-1$
    public static final String TOURMARKERVIEW_USE_RECORDED_TIME = "TOURMARKERVIEW_USE_RECORDED_TIME"; //$NON-NLS-1$
+
 }

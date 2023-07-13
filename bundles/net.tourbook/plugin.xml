@@ -119,7 +119,7 @@
             name="%perspective_name_TourBook"/>
 
       <perspective
-            class="net.tourbook.application.PerspectiveFactoryTourCatalog"
+            class="net.tourbook.application.PerspectiveFactoryReferenceTimeline"
             icon="icons/reference-tours-perspective.png"
             id="net.tourbook.perspective.TourCatalog"
             name="%perspective_name_ReferenceTours"/>
@@ -132,7 +132,7 @@
 
       <perspective
             class="net.tourbook.application.PerspectiveFactoryCompareTours"
-            icon="icons/tour-map-compare-result-perspective.png"
+            icon="icons/tour-compare-perspective.png"
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
 
@@ -531,9 +531,9 @@
 
          <!-- Directories -->
 
-            <separator
-               name        ="net.tourbook.separator.TourDirectories"
-               visible     ="true"/>
+         <separator
+            name        ="net.tourbook.separator.TourDirectories"
+            visible     ="true"/>
 
             <!-- Tour Import -->
             <command 
@@ -557,13 +557,6 @@
                mnemonic    ="%command_tagging_name_Mnemonic"
                tooltip     ="%command_tagging_name_tooltip"/>
 
-            <!-- Reference Tours -->
-            <command 
-               commandId   ="command.net.tourbook.views.tourCatalog.TourCatalogView"
-               icon        ="icons/reference-tours.png"
-               label       ="%view_name_ReferenceTours"
-               mnemonic    ="%view_name_ReferenceTours_Mnemonic"/>
-
             <!-- Collated Tours -->
             <command 
                commandId   ="command.net.tourbook.views.collatedToursViewID"
@@ -586,34 +579,61 @@
                label       ="%view_name_Statistics"
                mnemonic    ="%view_name_Statistics_Mnemonic"/>
 
+
+            <!-- GROUP: Reference Tours -->
+            
+            <separator
+               name        ="net.tourbook.separator.ReferenceTours"
+               visible     ="true"/>
+   
+               <!-- Reference Tours -->
+               <command 
+                  commandId   ="command.net.tourbook.views.tourCatalog.TourCatalogView"
+                  icon        ="icons/reference-tours.png"
+                  label       ="%View_Name_ReferenceTours"
+                  mnemonic    ="%View_Name_ReferenceTours_Mnemonic"/>
+
+               <!-- Tour Comparison Timeline -->
+               <command 
+                  commandId   ="command.net.tourbook.views.tourCatalog.yearStatisticView"
+                  icon        ="icons/tour-map-statistic.png"
+                  label       ="%View_Name_TourComparisonTimeline"
+                  mnemonic    ="%View_Name_TourComparisonTimeline_Mnemonic"/>
+
+
+            <!-- GROUP: Other Directories -->
+            
             <separator
                name        ="net.tourbook.separator.OtherDirectories"
                visible     ="true"/>
 
-            <!-- All Tour Marker -->
-            <command
-               commandId   ="command.net.tourbook.ui.views.TourMarkerAllView"
-               icon        ="icons/tour-marker-all.png"
-               label       ="%View_Name_TourMarkerAll"
-               mnemonic    ="%View_Name_TourMarkerAll_Mnemonic"/>
+               <!-- All Tour Marker -->
+               <command
+                  commandId   ="command.net.tourbook.ui.views.TourMarkerAllView"
+                  icon        ="icons/tour-marker-all.png"
+                  label       ="%View_Name_TourMarkerAll"
+                  mnemonic    ="%View_Name_TourMarkerAll_Mnemonic"/>
 
+               
+            <!-- GROUP: Sensors -->
+            
             <separator
                name        ="net.tourbook.separator.Sensor"
                visible     ="true"/>
                
-            <!-- Sensors -->
-            <command
-               commandId   ="command.net.tourbook.ui.views.sensors.SensorView"
-               icon        ="icons/sensor.png"
-               label       ="%View_Name_Sensor"
-               mnemonic    ="%View_Name_Sensor_Mnemonic"/>
-
-            <!-- Sensor Chart -->
-            <command
-               commandId   ="command.net.tourbook.ui.views.sensors.SensorChartView"
-               icon        ="icons/sensor-chart.png"
-               label       ="%View_Name_SensorChart"
-               mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
+               <!-- Sensors -->
+               <command
+                  commandId   ="command.net.tourbook.ui.views.sensors.SensorView"
+                  icon        ="icons/sensor.png"
+                  label       ="%View_Name_Sensor"
+                  mnemonic    ="%View_Name_Sensor_Mnemonic"/>
+   
+               <!-- Sensor Chart -->
+               <command
+                  commandId   ="command.net.tourbook.ui.views.sensors.SensorChartView"
+                  icon        ="icons/sensor-chart.png"
+                  label       ="%View_Name_SensorChart"
+                  mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
 
 
             <!-- Sign Images 
@@ -1231,8 +1251,14 @@
 
       <command
          id             ="command.net.tourbook.views.tourCatalog.TourCatalogView"
-         name           ="%view_name_ReferenceTours"
+         name           ="%View_Name_ReferenceTours"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_ReferenceTours"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.tourCatalog.yearStatisticView"
+         name           ="%View_Name_TourComparisonTimeline"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourComparisonTimeline"
       />
 
       <command
@@ -1394,7 +1420,7 @@
       <command
          id             ="net.tourbook.command.GeoParts"
          name           ="%Command_GeoParts"
-         defaultHandler ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoParts"
+         defaultHandler ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoCompareView"
       />
 
       <command
@@ -1653,9 +1679,16 @@
          <view
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.tourCatalog.TourCatalogView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTourView"
             icon        ="icons/reference-tours.png"
-            name        ="%view_name_ReferenceTours"/>
+            name        ="%View_Name_ReferenceTours"/>
+
+         <view
+            category    ="net.tourbook.category.Tour_Directory"
+            id          ="net.tourbook.views.tourCatalog.yearStatisticView"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTimelineView"
+            icon        ="icons/tour-map-statistic.png"
+            name        ="%View_Name_TourComparisonTimeline"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
@@ -1838,37 +1871,30 @@
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.CompareResultView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
+            class       ="net.tourbook.ui.views.referenceTour.ElevationCompareResultView"
             icon        ="icons/tour-map-compare-result.png"
-            name        ="%view_name_Compare_Result"/>
+            name        ="%View_Name_Compare_ByElevation"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.referenceTourView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour"
+            class       ="net.tourbook.ui.views.referenceTour.ReferenceTourChartView"
             icon        ="icons/tour-map-reftour.png"
-            name        ="%view_name_tourCatalog_referenceTour"/>
+            name        ="%View_Name_RefTour_ReferenceTour"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.comparedTourView"
-            class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour"
+            class       ="net.tourbook.ui.views.referenceTour.ComparedTourChartView"
             icon        ="icons/tour-map-comparetour.png"
-            name        ="%view_name_tourCatalog_comparedTour"/>
-
-         <view
-            category    ="net.tourbook.category.compareTours"
-            id          ="net.tourbook.views.tourCatalog.yearStatisticView"
-            class       ="net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View"
-            icon        ="icons/tour-map-statistic.png"
-            name        ="%view_name_tourCatalog_statistics"/>
+            name        ="%View_Name_RefTour_ComparedTour"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.ui.views.geoCompare.GeoCompareView"
             class       ="net.tourbook.ui.views.geoCompare.GeoCompareView"
             icon        ="icons/geo-parts.png"
-            name        ="%View_Name_Compare_GeoParts"/>
+            name        ="%View_Name_Compare_ByGeoParts"/>
 
 
       <!-- 5. Photo -->    
@@ -2005,6 +2031,12 @@
       <key
          commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
          sequence="%Shortcut_Key_App_ReferenceTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tourCatalog.yearStatisticView"
+         sequence="%Shortcut_Key_App_ReferenceTimeline"
          contextId="org.eclipse.ui.contexts.window"
          schemeId="net.tourbook.scheme"/>
 

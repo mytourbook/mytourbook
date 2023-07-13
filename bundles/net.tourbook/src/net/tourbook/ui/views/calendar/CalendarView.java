@@ -476,8 +476,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void fillActionBars() {
 
-      final IActionBars bars = getViewSite().getActionBars();
-      final IToolBarManager toolbarMrg = bars.getToolBarManager();
+      final IToolBarManager toolbarMrg = getViewSite().getActionBars().getToolBarManager();
 
       /*
        * Toolbar

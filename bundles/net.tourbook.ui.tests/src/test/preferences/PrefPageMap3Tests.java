@@ -25,9 +25,6 @@ import utils.Utils;
 
 public class PrefPageMap3Tests extends UITest {
 
-   /**
-    *
-    */
    @Test
    void openPreferencePage() {
 

@@ -989,9 +989,11 @@ public class Util {
 
             + "SQLException" + NL //$NON-NLS-1$
             + NL
-            + "SQLState: " + e.getSQLState() + NL //$NON-NLS-1$
-            + "ErrorCode: " + e.getErrorCode() + NL //$NON-NLS-1$
-            + "Message: " + e.getMessage() + NL; //$NON-NLS-1$
+            + "SQLState:   " + e.getSQLState() + NL //$NON-NLS-1$
+            + "ErrorCode:  " + e.getErrorCode() + NL //$NON-NLS-1$
+            + "Message:    " + e.getMessage() + NL //$NON-NLS-1$
+            + "Cause:      " + e.getCause() + NL //$NON-NLS-1$
+      ;
 
       return text;
    }

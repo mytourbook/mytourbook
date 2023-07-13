@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -769,7 +769,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
                if (selection.getFirstElement() instanceof MP) {
 
-                  // prevent selection, this occured and mapprovider was null
+                  // prevent selection, this occurred and mapprovider was null
                   _isInUpdate = true;
                   {
                      final MP droppedMapProvider = (MP) selection.getFirstElement();
@@ -778,7 +778,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
                      final Table mpTable = _mpViewer.getTable();
 
                      /*
-                      * Check if drag was startet from this item, remove the item before the new
+                      * Check if drag was started from this item, remove the item before the new
                       * item is inserted
                       */
                      if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dndDragStartViewerLeft) {

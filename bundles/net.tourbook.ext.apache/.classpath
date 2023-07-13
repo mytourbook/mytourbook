@@ -20,5 +20,6 @@
 	<classpathentry exported="true" kind="lib" path="lucene-queries-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queries -->
 	<classpathentry exported="true" kind="lib" path="lucene-queryparser-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->
 	<classpathentry exported="true" kind="lib" path="lucene-suggest-7.5.0.jar" sourcepath="jar-src/lucene-7.5.0-src.zip"/> <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-suggest -->
+	<classpathentry exported="true" kind="lib" path="mytourbook-derby-functions.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

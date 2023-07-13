@@ -26,6 +26,8 @@ package net.tourbook;
  */
 public class OtherMessages {
 
+// SET_FORMATTING_OFF
+
    public static final String APP_ACTION_CLOSE_TOOLTIP                   = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    public static final String APP_ACTION_RESTORE_DEFAULT                 = net.tourbook.common.Messages.App_Action_RestoreDefault;
 
@@ -61,6 +63,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT    = net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
    public static final String GRAPH_LABEL_HR_ZONE                        = net.tourbook.common.Messages.Graph_Label_HrZone;
    public static final String GRAPH_LABEL_PACE                           = net.tourbook.common.Messages.Graph_Label_Pace;
+   public static final String GRAPH_LABEL_PACE_INTERVAL                  = net.tourbook.common.Messages.Graph_Label_Pace_Interval;
    public static final String GRAPH_LABEL_PACE_SUMMARIZED                = net.tourbook.common.Messages.Graph_Label_Pace_Summarized;
    public static final String GRAPH_LABEL_POWER                          = net.tourbook.common.Messages.Graph_Label_Power;
    public static final String GRAPH_LABEL_POWER_UNIT                     = net.tourbook.common.Messages.Graph_Label_Power_Unit;
@@ -73,6 +76,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION   = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
    public static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO         = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
    public static final String GRAPH_LABEL_SPEED                          = net.tourbook.common.Messages.Graph_Label_Speed;
+   public static final String GRAPH_LABEL_SPEED_INTERVAL                 = net.tourbook.common.Messages.Graph_Label_Speed_Interval;
    public static final String GRAPH_LABEL_SPEED_SUMMARIZED               = net.tourbook.common.Messages.Graph_Label_Speed_Summarized;
    public static final String GRAPH_LABEL_SWIM_STROKES                   = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
    public static final String GRAPH_LABEL_SWIM_SWOLF                     = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
@@ -113,13 +117,9 @@ public class OtherMessages {
 
    public static final String WEATHER_CLOUDS_SUNNY                       = net.tourbook.common.Messages.Weather_Clouds_Sunny;
 
-// SET_FORMATTING_OFF
-
    public static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_TITLE                            = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_Title;
    public static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES_TOOLTIP   = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip;
    public static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES           = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles;
-
-// SET_FORMATTING_ON
 
    public static final String COLUMN_FACTORY_CATEGORY_BODY                = net.tourbook.ui.Messages.ColumnFactory_Category_Body;
    public static final String COLUMN_FACTORY_CATEGORY_DATA                = net.tourbook.ui.Messages.ColumnFactory_Category_Data;
@@ -167,4 +167,10 @@ public class OtherMessages {
    public static final String VALUE_UNIT_K_CALORIES                       = net.tourbook.ui.Messages.Value_Unit_KCalories;
    public static final String VALUE_UNIT_PULSE                            = net.tourbook.ui.Messages.Value_Unit_Pulse;
 
+   public static final String APP_UNIT_SECONDS_SMALL                      = net.tourbook.Messages.App_Unit_Seconds_Small;
+
+   public static final String THEME_FONT_LOGGING_PREVIEW_TEXT             = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
+   public static final String THEME_FONT_LOGGING                          = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
+
+// SET_FORMATTING_ON
 }

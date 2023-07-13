@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,8 +54,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
     */
    public String            notSelectedTooltip = UI.EMPTY_STRING;
 
-   private boolean          _isCreatedImage_EnabledDisabled;
-   private boolean          _isCreatedImage_Selected;
+   private boolean          _isImageCreated_EnabledDisabled;
+   private boolean          _isImageCreated_Selected;
 
    /*
     * UI controls
@@ -69,7 +69,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _imageEnabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
       _imageDisabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
 
-      _isCreatedImage_EnabledDisabled = true;
+      _isImageCreated_EnabledDisabled = true;
    }
 
    public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {
@@ -83,7 +83,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _imageEnabled = actionImage.createImage();
       _imageDisabled = actionImageDisabled.createImage();
 
-      _isCreatedImage_EnabledDisabled = true;
+      _isImageCreated_EnabledDisabled = true;
    }
 
    public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage_Enabled,
@@ -94,8 +94,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _imageDisabled = actionImage_Disabled.createImage();
       _imageSelected = actionImage_Selected.createImage();
 
-      _isCreatedImage_EnabledDisabled = true;
-      _isCreatedImage_Selected = true;
+      _isImageCreated_EnabledDisabled = true;
+      _isImageCreated_Selected = true;
    }
 
    protected abstract AdvancedSlideout createSlideout(ToolItem toolItem);
@@ -186,14 +186,18 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
        * Found finally a solution for this very old leak.
        */
 
-      if (_isCreatedImage_EnabledDisabled && _imageEnabled != null && _imageEnabled.isDisposed() == false) {
+      if (_isImageCreated_EnabledDisabled && _imageEnabled != null && _imageEnabled.isDisposed() == false) {
+         
          _imageEnabled.dispose();
       }
 
-      if (_isCreatedImage_EnabledDisabled && _imageDisabled != null && _imageDisabled.isDisposed() == false) {
+      if (_isImageCreated_EnabledDisabled && _imageDisabled != null && _imageDisabled.isDisposed() == false) {
+         
          _imageDisabled.dispose();
       }
-      if (_isCreatedImage_Selected && _imageSelected != null && _imageSelected.isDisposed() == false) {
+
+      if (_isImageCreated_Selected && _imageSelected != null && _imageSelected.isDisposed() == false) {
+
          _imageSelected.dispose();
       }
    }

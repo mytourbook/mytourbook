@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,11 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import java.util.Arrays;
+import net.tourbook.common.UI;
 
 public class NormalizedGeoData {
+
+   private static final char NL               = UI.NEW_LINE;
 
    /**
     * <pre>
@@ -47,59 +49,65 @@ public class NormalizedGeoData {
     * -
     * </pre>
     */
-   public int   geoAccuracy      = 100_000;
+   public int                geoAccuracy      = 100_000;
 
    /**
     * Distance interval in meters
     */
-   public int   distanceAccuracy = 100;
+   public int                distanceAccuracy = 100;
 
-   public int[] normalizedLat;
+   public int[]              normalizedLat;
+   public int[]              normalizedLon;
 
-   public int[] normalizedLon;
    /**
     * Contains the index of the original data
     */
-   public int[] normalized2OriginalIndices;
+   public int[]              normalized2OriginalIndices;
 
    /**
     * Normalized distance in meters
     */
-   public float normalizedDistance;
+   public float              normalizedDistance;
 
    /**
     * Normalized tour
     */
-   public long  tourId;
+   public long               tourId;
 
    /**
     * First index of the original (not normalized) data
     */
-   public int   originalFirstIndex;
+   public int                originalFirstIndex;
 
    /**
     * Last index of the original (not normalized) data
     */
-   public int   originalLastIndex;
+   public int                originalLastIndex;
 
    @Override
    public String toString() {
 
-      return "NormalizedGeoData [" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + "tourId=" + tourId + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "NormalizedGeoData" + NL //                                           //$NON-NLS-1$
 
-            + "geoAccuracy=" + geoAccuracy + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "distanceAccuracy=" + distanceAccuracy + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "[" + NL //                                                           //$NON-NLS-1$
 
-            + "normalizedLat=" + Arrays.toString(normalizedLat) + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "normalizedLon=" + Arrays.toString(normalizedLon) + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "normalized2OriginalIndices=" + Arrays.toString(normalized2OriginalIndices) + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "tourId               = " + tourId + NL //                            //$NON-NLS-1$
 
-            + "originalFirstIndex=" + originalFirstIndex + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "originalLastIndex=" + originalLastIndex //$NON-NLS-1$
+            + "geoAccuracy          = " + geoAccuracy + NL //                       //$NON-NLS-1$
+            + "distanceAccuracy     = " + distanceAccuracy + NL //                  //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "originalFirstIndex   = " + originalFirstIndex + NL //                //$NON-NLS-1$
+            + "originalLastIndex    = " + originalLastIndex + NL //                 //$NON-NLS-1$
+
+//          + "normalizedLat        = " + Arrays.toString(normalizedLat) + NL //    //$NON-NLS-1$
+//          + "normalizedLon        = " + Arrays.toString(normalizedLon) + NL //    //$NON-NLS-1$
+//          + "normalized2OriginalIndices=" + Arrays.toString(normalized2OriginalIndices) + NL //$NON-NLS-1$
+
+            + "]" + NL //                                                           //$NON-NLS-1$
+
+      ;
    }
 
 }

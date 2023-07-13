@@ -28,6 +28,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourReference;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
@@ -51,13 +52,15 @@ import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
-import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
+import net.tourbook.ui.views.referenceTour.CompareConfig;
+import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -239,21 +242,19 @@ public class TourChartView extends ViewPart implements
    }
 
    /**
-    * listen for events when a tour is selected
+    * Listen for events when a tour is selected
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (part, selection) -> {
 
-            if (part == TourChartView.this) {
-               return;
-            }
-
-            onSelection(selection);
+         if (part == TourChartView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
+
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
@@ -290,7 +291,7 @@ public class TourChartView extends ViewPart implements
                       * tourchart, it occurred for multiple tours in tourdata.
                       */
 
-                     onSelection(new SelectionTourData(eventTourData));
+                     onSelectionChanged(new SelectionTourData(eventTourData));
 
 //                     StatusUtil.log(new Exception("Event contained wrong tourdata."));
                   }
@@ -376,14 +377,14 @@ public class TourChartView extends ViewPart implements
 
                   && eventData instanceof ISelection) {
 
-               if (part instanceof TourCatalogView_ComparedTour) {
+               if (part instanceof ComparedTourChartView) {
 
                   // ignore -> this would modify the geo compare tour
 
                   return;
                }
 
-               onSelection((ISelection) eventData);
+               onSelectionChanged((ISelection) eventData);
 
             } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
@@ -622,12 +623,18 @@ public class TourChartView extends ViewPart implements
 
       switch (eventId) {
 
+      case TOUR_IS_GEO_COMPARED:
+
+         break;
+
       case SET_COMPARING_ON:
 
+         _tourChart.onGeoCompareOnOff(true);
          break;
 
       case SET_COMPARING_OFF:
 
+         _tourChart.onGeoCompareOnOff(false);
          break;
 
       default:
@@ -658,7 +665,141 @@ public class TourChartView extends ViewPart implements
       _tk = new FormToolkit(parent.getDisplay());
    }
 
-   private void onSelection(final ISelection selection) {
+   private void onSelection_HoveredValue(final HoveredValueData eventData) {
+
+      if (_tourData == null) {
+         return;
+      }
+
+      final Long eventTourId = eventData.tourId;
+
+      if (eventTourId == null) {
+         return;
+      }
+
+      int hoveredTourSerieIndex = -1;
+
+      if (_tourData.isMultipleTours()) {
+
+         // adjust hovered value index
+
+         hoveredTourSerieIndex = eventData.hoveredTourSerieIndex;
+
+         final Long[] multipleTourIds = _tourData.multipleTourIds;
+         final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
+
+         int valueIndexOffset = 0;
+
+         for (int tourIndex = 0; tourIndex < multipleTourIds.length; tourIndex++) {
+            final Long tourId = multipleTourIds[tourIndex];
+            if (tourId.equals(eventTourId)) {
+               valueIndexOffset = multipleTourStartIndex[tourIndex];
+               break;
+            }
+         }
+
+         hoveredTourSerieIndex += valueIndexOffset;
+
+      } else if (_tourData.getTourId().equals(eventTourId)) {
+
+         // the current tour is hovered
+
+         hoveredTourSerieIndex = eventData.hoveredTourSerieIndex;
+
+      }
+
+      if (hoveredTourSerieIndex != -1) {
+
+         _isInSelectionChanged = true;
+         {
+            _tourChart.setHovered_ValuePoint_Index(hoveredTourSerieIndex);
+         }
+         _isInSelectionChanged = false;
+      }
+   }
+
+   private void onSelection_MapSelection(final SelectionMapSelection mapSelection) {
+
+      final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+            _tourChart,
+            SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+            mapSelection.getValueIndex1(),
+            mapSelection.getValueIndex2());
+
+      xSliderPosition.setCenterSliderPosition(true);
+
+      _isInSelectionChanged = true;
+      {
+         _tourChart.selectXSliders(xSliderPosition);
+      }
+      _isInSelectionChanged = false;
+   }
+
+   private void onSelection_TourMarker(final SelectionTourMarker markerSelection) {
+
+      _isInSelectionChanged = true;
+      {
+         final TourData tourData = markerSelection.getTourData();
+         final Long markerTourId = tourData.getTourId();
+
+         /*
+          * Check if the marker tour is displayed
+          */
+         if (_tourData == null || _tourData.getTourId().equals(markerTourId) == false) {
+
+            // show tour
+
+            updateChart(tourData);
+         }
+
+         /*
+          * set slider position
+          */
+         final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
+         final int numTourMarkers = tourMarker.size();
+         if (numTourMarkers > 0) {
+
+            final TourMarker firstTourMarker = tourMarker.get(0);
+
+            int leftSliderValueIndex;
+            if (tourData.isMultipleTours()) {
+               leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
+            } else {
+               leftSliderValueIndex = firstTourMarker.getSerieIndex();
+            }
+
+            int rightSliderValueIndex = 0;
+
+            if (numTourMarkers == 1) {
+
+               rightSliderValueIndex = leftSliderValueIndex;
+
+            } else if (numTourMarkers > 1) {
+
+               final TourMarker lastTourMarker = tourMarker.get(numTourMarkers - 1);
+
+               if (tourData.isMultipleTours()) {
+                  rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
+               } else {
+                  rightSliderValueIndex = lastTourMarker.getSerieIndex();
+               }
+            }
+
+            final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+                  _tourChart,
+                  SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+                  leftSliderValueIndex,
+                  rightSliderValueIndex);
+
+            xSliderPosition.setCenterSliderPosition(true);
+
+            _tourChart.selectXSliders(xSliderPosition);
+         }
+      }
+      _isInSelectionChanged = false;
+   }
+
+   private void onSelectionChanged(final ISelection selection) {
 
       // prevent to listen to own events
       if (_isInSliderPositionFired) {
@@ -798,37 +939,69 @@ public class TourChartView extends ViewPart implements
 
             _tourChart.selectXSliders(xSliderPosition);
 
-         } else if (selection instanceof SelectionTourCatalogView) {
+         } else if (selection instanceof SelectionReferenceTourView) {
 
-            final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+            final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
-            final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+            final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
             if (refItem != null) {
-               updateChart(refItem.getTourId());
+
+               final long refId = refItem.refId;
+
+               final CompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+               if (compareConfig == null) {
+                  return;
+               }
+
+               final TourReference refTour = compareConfig.getRefTour();
+               if (refTour == null) {
+                  return;
+               }
+
+               updateChart(
+                     refItem.getTourId(),
+                     refTour.getStartIndex(),
+                     refTour.getEndIndex());
             }
 
          } else if (selection instanceof StructuredSelection) {
 
             final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-            if (firstElement instanceof TVICatalogComparedTour) {
 
-               updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+            if (firstElement instanceof TVIRefTour_ComparedTour) {
 
-            } else if (firstElement instanceof TVICompareResultComparedTour) {
+               final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
 
-               final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-               final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
+               final GeoComparedTour geoComparedTour = comparedTour.getGeoCompareTour();
+
+               if (geoComparedTour != null) {
+
+                  updateChart(
+                        geoComparedTour.tourId,
+                        geoComparedTour.tourFirstIndex,
+                        geoComparedTour.tourLastIndex);
+
+               } else {
+
+                  updateChart(comparedTour.getTourId());
+               }
+
+            } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) firstElement;
+               final Long tourId = compareResultItem.getTourId();
+               final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
                updateChart(tourData);
 
-            } else if (firstElement instanceof GeoPartComparerItem) {
+            } else if (firstElement instanceof GeoComparedTour) {
 
-               final GeoPartComparerItem geoCompareItem = (GeoPartComparerItem) firstElement;
+               final GeoComparedTour geoComparedTour = (GeoComparedTour) firstElement;
 
                updateChart(
-                     geoCompareItem.tourId,
-                     geoCompareItem.tourFirstIndex,
-                     geoCompareItem.tourLastIndex);
-
+                     geoComparedTour.tourId,
+                     geoComparedTour.tourFirstIndex,
+                     geoComparedTour.tourLastIndex);
             }
 
          } else if (selection instanceof PhotoSelection) {
@@ -864,140 +1037,6 @@ public class TourChartView extends ViewPart implements
       _isInSelectionChanged = false;
    }
 
-   private void onSelection_HoveredValue(final HoveredValueData eventData) {
-
-      if (_tourData == null) {
-         return;
-      }
-
-      final Long eventTourId = eventData.tourId;
-
-      if (eventTourId == null) {
-         return;
-      }
-
-      int hoveredTourSerieIndex = -1;
-
-      if (_tourData.isMultipleTours()) {
-
-         // adjust hovered value index
-
-         hoveredTourSerieIndex = eventData.hoveredTourSerieIndex;
-
-         final Long[] multipleTourIds = _tourData.multipleTourIds;
-         final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
-
-         int valueIndexOffset = 0;
-
-         for (int tourIndex = 0; tourIndex < multipleTourIds.length; tourIndex++) {
-            final Long tourId = multipleTourIds[tourIndex];
-            if (tourId.equals(eventTourId)) {
-               valueIndexOffset = multipleTourStartIndex[tourIndex];
-               break;
-            }
-         }
-
-         hoveredTourSerieIndex += valueIndexOffset;
-
-      } else if (_tourData.getTourId().equals(eventTourId)) {
-
-         // the current tour is hovered
-
-         hoveredTourSerieIndex = eventData.hoveredTourSerieIndex;
-
-      }
-
-      if (hoveredTourSerieIndex != -1) {
-
-         _isInSelectionChanged = true;
-         {
-            _tourChart.setHovered_ValuePoint_Index(hoveredTourSerieIndex);
-         }
-         _isInSelectionChanged = false;
-      }
-   }
-
-   private void onSelection_MapSelection(final SelectionMapSelection mapSelection) {
-
-      final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-            _tourChart,
-            SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-            mapSelection.getValueIndex1(),
-            mapSelection.getValueIndex2());
-
-      xSliderPosition.setCenterSliderPosition(true);
-
-      _isInSelectionChanged = true;
-      {
-         _tourChart.selectXSliders(xSliderPosition);
-      }
-      _isInSelectionChanged = false;
-   }
-
-   private void onSelection_TourMarker(final SelectionTourMarker markerSelection) {
-
-      _isInSelectionChanged = true;
-      {
-         final TourData tourData = markerSelection.getTourData();
-         final Long markerTourId = tourData.getTourId();
-
-         /*
-          * Check if the marker tour is displayed
-          */
-         if (_tourData == null || _tourData.getTourId().equals(markerTourId) == false) {
-
-            // show tour
-
-            updateChart(tourData);
-         }
-
-         /*
-          * set slider position
-          */
-         final ArrayList<TourMarker> tourMarker = markerSelection.getSelectedTourMarker();
-         final int numTourMarkers = tourMarker.size();
-         if (numTourMarkers > 0) {
-
-            final TourMarker firstTourMarker = tourMarker.get(0);
-
-            int leftSliderValueIndex;
-            if (tourData.isMultipleTours()) {
-               leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
-            } else {
-               leftSliderValueIndex = firstTourMarker.getSerieIndex();
-            }
-
-            int rightSliderValueIndex = 0;
-
-            if (numTourMarkers == 1) {
-
-               rightSliderValueIndex = leftSliderValueIndex;
-
-            } else if (numTourMarkers > 1) {
-
-               final TourMarker lastTourMarker = tourMarker.get(numTourMarkers - 1);
-
-               if (tourData.isMultipleTours()) {
-                  rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
-               } else {
-                  rightSliderValueIndex = lastTourMarker.getSerieIndex();
-               }
-            }
-
-            final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-                  _tourChart,
-                  SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-                  leftSliderValueIndex,
-                  rightSliderValueIndex);
-
-            xSliderPosition.setCenterSliderPosition(true);
-
-            _tourChart.selectXSliders(xSliderPosition);
-         }
-      }
-      _isInSelectionChanged = false;
-   }
-
    @Override
    public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
@@ -1005,7 +1044,7 @@ public class TourChartView extends ViewPart implements
 
          final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
 
-         onSelection(linkSelection);
+         onSelectionChanged(linkSelection);
       }
    }
 
@@ -1049,7 +1088,7 @@ public class TourChartView extends ViewPart implements
    private void showTour() {
 
       final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-      onSelection(selection);
+      onSelectionChanged(selection);
 
       if (_tourData == null) {
 

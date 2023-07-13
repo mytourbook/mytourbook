@@ -372,12 +372,12 @@ public class RawDataView extends ViewPart implements
       _saveTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
    }
    //
-   private final IPreferenceStore           _prefStore                           = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore           _prefStore_Common                    = CommonActivator.getPrefStore();
-   private final IDialogSettings            _state                               = TourbookPlugin.getState(ID);
-   private final IDialogSettings            _stateSimpleUI                       = TourbookPlugin.getState(ID + "_SimpleUI"); //$NON-NLS-1$
+   private final IPreferenceStore           _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore           _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings            _state                          = TourbookPlugin.getState(ID);
+   private final IDialogSettings            _stateSimpleUI                  = TourbookPlugin.getState(ID + "_SimpleUI"); //$NON-NLS-1$
    //
-   private RawDataManager                   _rawDataMgr                          = RawDataManager.getInstance();
+   private RawDataManager                   _rawDataMgr                     = RawDataManager.getInstance();
 
    private TableViewer                      _tourViewer;
    private TableViewerTourInfoToolTip       _tourInfoToolTip;
@@ -388,8 +388,8 @@ public class RawDataView extends ViewPart implements
    //
    private TableColumnDefinition            _colDef_TourTypeImage;
    private TableColumnDefinition            _colDef_WeatherClouds;
-   private int                              _columnIndex_TourTypeImage = -1;
-   private int                              _columnIndex_WeatherClouds = -1;
+   private int                              _columnIndex_TourTypeImage      = -1;
+   private int                              _columnIndex_WeatherClouds      = -1;
    private int                              _columnWidth_TourTypeImage;
    private int                              _columnWidth_WeatherClouds;
    //
@@ -409,7 +409,7 @@ public class RawDataView extends ViewPart implements
    //
    private TagMenuManager                   _tagMenuManager;
    private MenuManager                      _tourViewer_MenuManager;
-   private IContextMenuProvider             _tourViewer_ContextMenuProvider      = new TourViewer_ContextMenuProvider();
+   private IContextMenuProvider             _tourViewer_ContextMenuProvider = new TourViewer_ContextMenuProvider();
    //
    private ActionClearView                  _actionClearView;
    private ActionOpenTourLogView            _actionOpenTourLogView;
@@ -440,8 +440,8 @@ public class RawDataView extends ViewPart implements
    private TourPerson                       _activePerson;
    private TourPerson                       _newActivePerson;
    //
-   private boolean                          _isPartVisible                       = false;
-   private boolean                          _isViewerPersonDataDirty             = false;
+   private boolean                          _isPartVisible                  = false;
+   private boolean                          _isViewerPersonDataDirty        = false;
    //
    private final NumberFormat               _nf1;
    private final NumberFormat               _nf3;
@@ -3221,14 +3221,16 @@ public class RawDataView extends ViewPart implements
       _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage.getColumnId());
       _columnIndex_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds.getColumnId());
 
+      final int numColumns = table.getColumns().length;
+
       // add column resize listener
-      if (_columnIndex_TourTypeImage >= 0) {
+      if (_columnIndex_TourTypeImage >= 0 && _columnIndex_TourTypeImage < numColumns) {
 
          isColumnVisible = true;
          table.getColumn(_columnIndex_TourTypeImage).addControlListener(controlResizedAdapter);
       }
 
-      if (_columnIndex_WeatherClouds >= 0) {
+      if (_columnIndex_WeatherClouds >= 0 && _columnIndex_WeatherClouds < numColumns) {
 
          isColumnVisible = true;
          table.getColumn(_columnIndex_WeatherClouds).addControlListener(controlResizedAdapter);

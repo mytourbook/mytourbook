@@ -435,6 +435,7 @@ public class TourDatabase {
 
    private boolean                               _isDbInitialized;
    private boolean                               _isDbInDataUpdate;
+   private boolean                               _isInDesignUpdate;
    private boolean                               _isTableChecked;
    private boolean                               _isDataVersionChecked;
    private boolean                               _isDesignVersionChecked;
@@ -462,6 +463,8 @@ public class TourDatabase {
    private boolean                               _isChecked_DbCreated;
    private boolean                               _isChecked_UpgradeDB_Before;
    private boolean                               _isChecked_UpgradeDB_After;
+
+   private boolean                               _isCustomFunctionSetup_AvgSpeedPace;
 
    /**
     * SQL utilities.
@@ -1588,6 +1591,15 @@ public class TourDatabase {
       cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_SET_STATISTICS_TIMING(0)"); //$NON-NLS-1$
       cs.execute();
       cs.close();
+   }
+
+   private static void dropFunction(final Statement stmt, final String functionName) {
+
+      try {
+
+         exec(stmt, "DROP FUNCTION " + functionName); //$NON-NLS-1$
+
+      } catch (final Exception e) {}
    }
 
    /**
@@ -4909,6 +4921,52 @@ public class TourDatabase {
       _propertyListeners.remove(listener);
    }
 
+   public void setupDerbyCustomFunctions_AvgSpeedPace() {
+
+      if (_isCustomFunctionSetup_AvgSpeedPace) {
+         return;
+      }
+
+      try (Connection conn = getInstance().getConnection();
+            Statement stmt = conn.createStatement()) {
+
+         /*
+          * Found not a better and simple solution to check and then drop these functions because
+          * they are kept in the db even when the server is shutdown !!!
+          */
+
+         dropFunction(stmt, "avgSpeed"); //$NON-NLS-1$
+         dropFunction(stmt, "avgPace"); //$NON-NLS-1$
+
+         exec(stmt,
+
+               UI.EMPTY_STRING
+
+                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
+                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
+                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
+         );
+
+         exec(stmt,
+
+               UI.EMPTY_STRING
+
+                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
+                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
+                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
+         );
+
+         _isCustomFunctionSetup_AvgSpeedPace = true;
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+   }
+
    private void showTourSaveError(final TourData tourData) {
 
       MessageDialog.openError(
@@ -4963,7 +5021,7 @@ public class TourDatabase {
     */
    private boolean sqlStartup_10_IsSqlServerUpAndRunning() {
 
-      if (_isDbInitialized || _isDbInDataUpdate) {
+      if (_isDbInitialized || _isDbInDataUpdate || _isInDesignUpdate) {
          return true;
       }
 
@@ -5556,7 +5614,8 @@ public class TourDatabase {
     */
    private boolean updateDb__1_Design(int currentDbVersion, final SplashManager splashManager) {
 
-      if (!_isSilentDatabaseUpdate) {
+      if (_isSilentDatabaseUpdate == false) {
+
          /*
           * Confirm update
           */
@@ -5582,11 +5641,14 @@ public class TourDatabase {
                1).open()) != Window.OK) {
 
             // the user will not update -> close application
+
             PlatformUI.getWorkbench().close();
 
             return false;
          }
       }
+
+      _isInDesignUpdate = true;
 
       /*
        * Do an additional check because version 20 is restructuring the data series
@@ -5880,6 +5942,11 @@ public class TourDatabase {
          _isSQLDesignUpdateError = true;
 
          return false;
+
+      } finally {
+
+         _isInDesignUpdate = false;
+
       }
 
       return true;

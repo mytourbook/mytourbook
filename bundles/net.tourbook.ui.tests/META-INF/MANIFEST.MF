@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GUI tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
-Bundle-Version: 23.5.0.qualifier
+Bundle-Version: 23.5.1.qualifier
 Import-Package: org.eclipse.nebula.widgets.nattable
 Require-Bundle: net.tourbook,
  net.tourbook.common,
@@ -16,7 +16,9 @@ Require-Bundle: net.tourbook,
  net.tourbook.cloud,
  net.tourbook.device,
  net.tourbook.device.garmin,
- org.opentest4j
+ org.opentest4j,
+ org.slf4j.api,
+ org.eclipse.nebula.widgets.nattable.core
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook

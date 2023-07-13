@@ -15,6 +15,8 @@
  *******************************************************************************/
 package views;
 
+import net.tourbook.application.PluginProperties;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.BeforeClass;
@@ -26,9 +28,11 @@ import utils.Utils;
 
 public class WorkbenchTests extends UITest {
 
-   public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
-   public static final String COMPARE_TOURS   = "4. Compare Tours";   //$NON-NLS-1$
-   public static final String PHOTO           = "5. Photo";           //$NON-NLS-1$
+   public static final String TOUR_DIRECTORIES = "1. Tour Directories"; //$NON-NLS-1$
+   public static final String TOUR_PROPERTIES  = "2. Tour Properties";  //$NON-NLS-1$
+   public static final String COMPARE_TOURS    = "4. Compare Tours";    //$NON-NLS-1$
+   public static final String PHOTO            = "5. Photo";            //$NON-NLS-1$
+   public static final String SYSTEM           = "99. System";          //$NON-NLS-1$
 
    @BeforeClass
    public static void beforeClass() {
@@ -69,13 +73,12 @@ public class WorkbenchTests extends UITest {
    @Test
    void testOpenViews() {
 
+      String viewName;
+
       //Select a tour so that the selected views contain information
       Utils.showTourBookView(bot);
 
       Utils.getTourWithSRTM(bot);
-
-      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
       bot.toolbarButtonWithTooltip("Show tour in 2D map").click(); //$NON-NLS-1$
       Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
@@ -131,17 +134,24 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
       final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Reference Tours"); //$NON-NLS-1$
-      final SWTBotView referenceToursView = Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
+      viewName = PluginProperties.getText("View_Name_ReferenceTours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, viewName);
+      final SWTBotView referenceToursView = Utils.showView(bot, viewName);
 
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Comparison Results").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Elevation Compare").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
+      final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
+
+      viewName = PluginProperties.getText("View_Name_TourComparisonTimeline"); //$NON-NLS-1$
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(viewName).select();
+      bot.button("Open").click(); //$NON-NLS-1$
+      final SWTBotView yearStatisticView = Utils.showView(bot, viewName);
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
@@ -153,6 +163,9 @@ public class WorkbenchTests extends UITest {
 
       Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$ //$NON-NLS-2$
       final SWTBotView mapBookmarkView = Utils.showView(bot, "Map Bookmark"); //$NON-NLS-1$
+
+      Utils.showViewFromMenu(bot, "Map", "Model &Player"); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotView modelPlayerView = Utils.showView(bot, "Model Player"); //$NON-NLS-1$
 
       bot.sleep(3000);
 
@@ -174,5 +187,7 @@ public class WorkbenchTests extends UITest {
       photosAndToursView.close();
       tourPhotosView.close();
       mapBookmarkView.close();
+      modelPlayerView.close();
+      yearStatisticView.close();
    }
 }

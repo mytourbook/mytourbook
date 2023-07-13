@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2008, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,10 +21,13 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.FontFieldEditorExtended;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.statistic.StatisticValuesView;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -48,6 +51,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -60,30 +64,28 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String     THEME_FONT_LOGGING_PREVIEW_TEXT = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
-   private static final String     THEME_FONT_LOGGING              = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
+   public static final String            ID                = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
 
-   public static final String      ID                              = "net.tourbook.preferences.PrefPageAppearance";                               //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private final boolean           _isOSX                          = net.tourbook.common.UI.IS_OSX;
-   private final boolean           _isLinux                        = net.tourbook.common.UI.IS_LINUX;
+   private boolean                       _isShowInApp_MemoryMonitor;
+   private boolean                       _isShowInApp_RestartApp;
+   private boolean                       _isShowInApp_ThemeSelector;
 
-   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private int                           _hintDefaultSpinnerWidth;
+   private PixelConverter                _pc;
+   private SelectionListener             _defaultSelectionListener;
+   private MouseWheelListener            _defaultMouseWheelListener;
 
-   private boolean                 _isModified                     = false;
+   private ITheme                        _currentTheme;
+   private String                        _defaultThemeId;
+   private IThemeEngine                  _themeEngine;
 
-   private int                     _hintDefaultSpinnerWidth;
-   private PixelConverter          _pc;
-   private SelectionListener       _defaultSelectionListener;
-   private MouseWheelListener      _defaultMouseWheelListener;
+   private ComboViewer                   _comboViewerTheme;
+   private ControlDecoration             _comboDecorator_Theme;
 
-   private ITheme                  _currentTheme;
-   private String                  _defaultThemeId;
-   private IThemeEngine            _themeEngine;
-
-   private ComboViewer             _comboThemeId;
-   private ControlDecoration       _comboDecorator_Theme;
-   private FontFieldEditorExtended _valueFontEditor;
+   private FontFieldEditorExtended       _logMessageFontEditor;
 
    /*
     * UI controls
@@ -91,7 +93,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Button  _btnResetAllToggleDialogs;
 
    private Button  _chkAutoOpenTagging;
-   private Button  _chkMemMonitor;
+   private Button  _chkShowInApp_MemoryMonitor;
+   private Button  _chkShowInApp_RestartApp;
+   private Button  _chkShowInApp_ThemeSelector;
    private Button  _chkTaggingAnimation;
 
    private Label   _lblAutoOpenMS;
@@ -113,7 +117,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          // set focus to log font
 
-         _valueFontEditor.setFocus();
+         _logMessageFontEditor.setFocus();
       }
    }
 
@@ -160,16 +164,28 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       {
          UI.createLabel(group, Messages.Pref_Appearance_Label_Theme);
 
-         _comboThemeId = new ComboViewer(group, SWT.READ_ONLY);
-         _comboThemeId.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
-         _comboThemeId.setContentProvider(ArrayContentProvider.getInstance());
-         _comboThemeId.setInput(ThemeUtil.getAllThemes());
-         _comboThemeId.getCombo().setEnabled(true);
-         _comboThemeId.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
-//         _themeIdCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         _comboViewerTheme = new ComboViewer(group, SWT.READ_ONLY);
 
-         _comboDecorator_Theme = new ControlDecoration(_comboThemeId.getCombo(), SWT.TOP | SWT.LEFT);
+         final Combo combo = _comboViewerTheme.getCombo();
+         combo.setToolTipText(Messages.Pref_Appearance_Combo_Theme_Tooltip);
 
+         _comboViewerTheme.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
+         _comboViewerTheme.setContentProvider(ArrayContentProvider.getInstance());
+         _comboViewerTheme.setInput(ThemeUtil.getAllThemes());
+         _comboViewerTheme.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
+
+         _comboDecorator_Theme = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
+      }
+
+      {
+         /*
+          * Checkbox: Show theme selector in app toolbar
+          */
+         _chkShowInApp_ThemeSelector = new Button(group, SWT.CHECK);
+         _chkShowInApp_ThemeSelector.setText(Messages.Pref_Appearance_Check_ShowThemeSelectorInAppToolbar);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .applyTo(_chkShowInApp_ThemeSelector);
       }
    }
 
@@ -202,7 +218,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
           * autoopen tagging
           */
 //				eclipse 3.7 supports this feature
-//				if (_isOSX) {
+//				if (UI.IS_OSX) {
 //					// label: OSX is not supported, feature is not working
 //					final Label label = new Label(container, SWT.WRAP);
 //					GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
@@ -249,7 +265,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private void createUI_30_LogFont(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(THEME_FONT_LOGGING);
+      group.setText(OtherMessages.THEME_FONT_LOGGING);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
@@ -262,12 +278,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
 //            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
             {
-               _valueFontEditor = new FontFieldEditorExtended(IMappingPreferences.THEME_FONT_LOGGING,
+               _logMessageFontEditor = new FontFieldEditorExtended(IMappingPreferences.THEME_FONT_LOGGING,
                      UI.EMPTY_STRING,
-                     THEME_FONT_LOGGING_PREVIEW_TEXT,
+                     OtherMessages.THEME_FONT_LOGGING_PREVIEW_TEXT,
                      fontContainer);
 
-               _valueFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor());
+               _logMessageFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor());
             }
          }
       }
@@ -277,10 +293,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       {
          /*
+          * Checkbox: Show restart app action in app toolbar
+          */
+         _chkShowInApp_RestartApp = new Button(parent, SWT.CHECK);
+         _chkShowInApp_RestartApp.setText(Messages.Pref_Appearance_Check_RestartAppInAppToolbar);
+      }
+      {
+         /*
           * Memory monitor
           */
-         _chkMemMonitor = new Button(parent, SWT.CHECK);
-         _chkMemMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
+         _chkShowInApp_MemoryMonitor = new Button(parent, SWT.CHECK);
+         _chkShowInApp_MemoryMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
 //         GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
       }
       {
@@ -312,9 +335,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
    }
 
-   /** @return the currently selected theme or null if there are no themes */
+   /**
+    * @return the currently selected theme or null if there are no themes
+    */
    private ITheme getSelectedTheme() {
-      return (ITheme) (_comboThemeId.getStructuredSelection().getFirstElement());
+      return (ITheme) (_comboViewerTheme.getStructuredSelection().getFirstElement());
    }
 
    @Override
@@ -336,30 +361,21 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
-      _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> {
-         onChangeProperty();
          enableControls();
       });
 
       _defaultMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         onChangeProperty();
       };
    }
 
    private void onChangeFontInEditor() {
 
       // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
-      _valueFontEditor.store();
-   }
-
-   /**
-    * Property was changed, fire a property change event
-    */
-   private void onChangeProperty() {
-      _isModified = true;
+      _logMessageFontEditor.store();
    }
 
    private void onResetAllToggleDialogs() {
@@ -447,26 +463,31 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          // update UI
          final ITheme activeTheme = _themeEngine.getActiveTheme();
          if (activeTheme != null) {
-            _comboThemeId.setSelection(new StructuredSelection(activeTheme));
+            _comboViewerTheme.setSelection(new StructuredSelection(activeTheme));
          }
       }
 
       /*
        * Other
        */
-      _isModified = true;
 
-      _spinnerRecentTags.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+// SET_FORMATTING_OFF
 
-      _chkAutoOpenTagging.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-      _chkTaggingAnimation.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-      _spinnerAutoOpenDelay.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _spinnerRecentTags            .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
-      _chkMemMonitor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
+      _chkAutoOpenTagging           .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation          .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay         .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+
+      _chkShowInApp_MemoryMonitor   .setSelection(false);
+      _chkShowInApp_RestartApp      .setSelection(false);
+      _chkShowInApp_ThemeSelector   .setSelection(false);
+
+// SET_FORMATTING_ON
 
       // set font editor default values
-      _valueFontEditor.loadDefault();
-      _valueFontEditor.store();
+      _logMessageFontEditor.loadDefault();
+      _logMessageFontEditor.store();
 
       super.performDefaults();
 
@@ -479,7 +500,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    @Override
    public boolean performOk() {
 
-      boolean isDoRestartNow = false;
+      boolean isRestartNow = false;
 
       /*
        * Theme
@@ -501,62 +522,76 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          if (isThemeChanged) {
 
+            // fire modify event to update the app toolbar
+            _prefStore_Common.setValue(ICommonPreferences.THEME_IS_THEME_MODIFIED, Math.random());
+
             // an app restart is required for the theme change to take full effect
 
-            if (new MessageDialog(
-
-                  getShell(),
-
-                  Messages.App_Dialog_RestartApp_Title,
-                  null,
-
-                  Messages.Pref_Appearance_Dialog_RestartAfterThemeChange_Message,
-                  MessageDialog.QUESTION,
-
-                  // default index
-                  0,
-
-                  Messages.App_Action_RestartApp,
-                  Messages.App_Action_Cancel
-
-            ).open() == IDialogConstants.OK_ID) {
-
-               isDoRestartNow = true;
-            }
+            isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterThemeChange_Message);
          }
       }
 
       /*
-       * Others
+       * Theme
        */
+      if (isRestartNow == false && _chkShowInApp_RestartApp.getSelection() != _isShowInApp_ThemeSelector) {
+
+         // field is modified, ask for restart
+
+         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterRestartApp_Message);
+      }
+
+      /*
+       * Restart app
+       */
+      if (isRestartNow == false && _chkShowInApp_ThemeSelector.getSelection() != _isShowInApp_RestartApp) {
+
+         // field is modified, ask for restart
+
+         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message);
+      }
+
+      /*
+       * Memory monitor
+       */
+      if (isRestartNow == false && _chkShowInApp_MemoryMonitor.getSelection() != _isShowInApp_MemoryMonitor) {
+
+         isRestartNow = requestForRestart(Messages.pref_appearance_showMemoryMonitor_message);
+      }
+
       saveState();
 
-      final boolean isShowMemoryOld = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
-
-      final boolean isOK = super.performOk();
-
-      final boolean isShowMemoryNew = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
-
-      if (isOK && _isModified) {
-         _isModified = false;
-      }
-
-      if (isShowMemoryNew != isShowMemoryOld) {
-
-         if (MessageDialog.openQuestion(getShell(),
-               Messages.pref_appearance_showMemoryMonitor_title,
-               Messages.pref_appearance_showMemoryMonitor_message)) {
-
-            isDoRestartNow = true;
-         }
-      }
-
-      if (isDoRestartNow) {
-
+      if (isRestartNow) {
          Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
       }
 
-      return isOK;
+      return true;
+   }
+
+   private boolean requestForRestart(final String message) {
+
+      if (new MessageDialog(
+
+            getShell(),
+
+            Messages.App_Dialog_RestartApp_Title,
+            null,
+
+            message,
+            MessageDialog.QUESTION,
+
+            // default index
+            0,
+
+            Messages.App_Action_RestartApp,
+            Messages.App_Action_Cancel
+
+      ).open() == IDialogConstants.OK_ID) {
+
+         return true;
+      }
+
+      return false;
    }
 
    private void restoreState() {
@@ -566,32 +601,43 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
        */
       _currentTheme = _themeEngine.getActiveTheme();
       if (_currentTheme != null) {
-         _comboThemeId.setSelection(new StructuredSelection(_currentTheme));
+         _comboViewerTheme.setSelection(new StructuredSelection(_currentTheme));
       }
 
       /*
        * Other
        */
-      _spinnerRecentTags.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+// SET_FORMATTING_OFF
 
-      _chkAutoOpenTagging.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-      _chkTaggingAnimation.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-      _spinnerAutoOpenDelay.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _isShowInApp_MemoryMonitor = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP);
+      _isShowInApp_RestartApp    = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
+      _isShowInApp_ThemeSelector = _prefStore_Common.getBoolean(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP);
 
-      _chkMemMonitor.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR));
+      _chkShowInApp_MemoryMonitor.setSelection(_isShowInApp_MemoryMonitor);
+      _chkShowInApp_RestartApp   .setSelection(_isShowInApp_RestartApp);
+      _chkShowInApp_ThemeSelector.setSelection(_isShowInApp_ThemeSelector);
 
-      _valueFontEditor.setPreferenceStore(_prefStore);
-      _valueFontEditor.load();
+      _chkAutoOpenTagging        .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation       .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay      .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _spinnerRecentTags         .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+
+      _logMessageFontEditor.setPreferenceStore(_prefStore);
+      _logMessageFontEditor.load();
    }
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, _spinnerRecentTags.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS,    _spinnerRecentTags.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, _chkAutoOpenTagging.getSelection());
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, _chkTaggingAnimation.getSelection());
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, _spinnerAutoOpenDelay.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN,     _chkAutoOpenTagging.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION,     _chkTaggingAnimation.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,  _spinnerAutoOpenDelay.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,      _chkShowInApp_MemoryMonitor.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP,  _chkShowInApp_RestartApp.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,           _chkShowInApp_ThemeSelector.getSelection());
+
+// SET_FORMATTING_ON
    }
 }

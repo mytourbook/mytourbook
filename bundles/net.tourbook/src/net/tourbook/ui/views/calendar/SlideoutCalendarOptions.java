@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
+
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 
@@ -51,15 +54,10 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -77,18 +75,13 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -110,7 +103,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Properties slideout for the calendar view.
  */
-public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfileListener,
+class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfileListener,
       IColorSelectorListener {
 
    private static final String                     STATE_SELECTED_TAB   = "STATE_SELECTED_TAB";                               //$NON-NLS-1$
@@ -123,22 +116,22 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
    /**
     * Contains the app default id's and the user default id's
     */
-   ArrayList<ProfileDefaultId_ComboData> _allDefaultComboData = new ArrayList<>();
+   private ArrayList<ProfileDefaultId_ComboData> _allDefaultComboData = new ArrayList<>();
    //
-   private IFontEditorListener           _defaultFontEditorListener;
-   private MouseWheelListener            _defaultMouseWheelListener;
-   private IPropertyChangeListener       _defaultPropertyChangeListener;
-   private SelectionAdapter              _defaultSelectionListener;
-   private FocusListener                 _keepOpenListener;
-   private SelectionAdapter              _tourValueListener;
-   private SelectionAdapter              _weekValueListener;
+   private IFontEditorListener                   _defaultFontEditorListener;
+   private MouseWheelListener                    _defaultMouseWheelListener;
+   private IPropertyChangeListener               _defaultPropertyChangeListener;
+   private SelectionListener                     _defaultSelectionListener;
+   private FocusListener                         _keepOpenListener;
+   private SelectionListener                     _tourValueListener;
+   private SelectionListener                     _weekValueListener;
    //
-   private long                          _dragStartViewerLeft;
+   private long                                  _dragStartViewerLeft;
    //
-   private boolean                       _isUpdateUI;
+   private boolean                               _isUpdateUI;
    //
-   private PixelConverter                _pc;
-   private int                           _subItemIndent;
+   private PixelConverter                        _pc;
+   private int                                   _subItemIndent;
 
    /*
     * This is a hack to vertical center the font label, otherwise it will be complicated to set it
@@ -306,9 +299,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
     * @param calendarView
     * @param gridPrefPrefix
     */
-   public SlideoutCalendarOptions(final ToolItem toolItem,
-                                  final IDialogSettings state,
-                                  final CalendarView calendarView) {
+   SlideoutCalendarOptions(final ToolItem toolItem,
+                           final IDialogSettings state,
+                           final CalendarView calendarView) {
 
       super(toolItem.getParent(), state, null);
 
@@ -378,12 +371,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
          _comboProfiles = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _comboProfiles.setVisibleItemCount(50);
          _comboProfiles.addFocusListener(_keepOpenListener);
-         _comboProfiles.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectProfile();
-            }
-         });
+         _comboProfiles.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectProfile()));
          GridDataFactory
                .fillDefaults()
                .grab(true, false)
@@ -634,38 +622,21 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 // viewer is not sorted, with drag&drop the sequence can be set
 //      _profileViewer.setComparator(new ProfileComparator());
 
-      _profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      _profileViewer.addSelectionChangedListener(selectionChangedEvent -> onProfile_Select());
 
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onProfile_Select();
-         }
+      _profileViewer.addDoubleClickListener(doubleClickEvent -> {
+
+         // set focus to  profile name
+         _txtProfileName.setFocus();
+         _txtProfileName.selectAll();
       });
 
-      _profileViewer.addDoubleClickListener(new IDoubleClickListener() {
+      _profileViewer.getTable().addKeyListener(keyPressedAdapter(keyEvent -> {
 
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-
-            // set focus to  profile name
-            _txtProfileName.setFocus();
-            _txtProfileName.selectAll();
+         if (keyEvent.keyCode == SWT.DEL && _btnProfile_Delete.isEnabled()) {
+            onProfile_Delete();
          }
-      });
-
-      _profileViewer.getTable().addKeyListener(new KeyListener() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-
-            if (e.keyCode == SWT.DEL && _btnProfile_Delete.isEnabled()) {
-               onProfile_Delete();
-            }
-         }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+      }));
    }
 
    private void createUI_122_DragDrop() {
@@ -739,7 +710,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
                   final Table profileTable = _profileViewer.getTable();
 
                   /*
-                   * check if drag was startet from this profile, remove the profile item
+                   * check if drag was started from this profile, remove the profile item
                    * before the moved profile is inserted
                    */
                   if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
@@ -842,12 +813,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
             final Button button = new Button(container, SWT.PUSH);
             button.setText(Messages.App_Action_New);
             button.setToolTipText(Messages.Slideout_CalendarOptions_Action_AddProfile_Tooltip);
-            button.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onProfile_Add();
-               }
-            });
+            button.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_Add()));
 
             // set button default width
             UI.setButtonLayoutData(button);
@@ -859,13 +825,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
             _btnProfile_Copy = new Button(container, SWT.PUSH);
             _btnProfile_Copy.setText(Messages.App_Action_Copy);
             _btnProfile_Copy.setToolTipText(Messages.Slideout_CalendarOptions_Action_CopyProfile_Tooltip);
-            _btnProfile_Copy.addSelectionListener(new SelectionAdapter() {
-
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onProfile_Copy();
-               }
-            });
+            _btnProfile_Copy.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_Copy()));
 
             // set button default width
             UI.setButtonLayoutData(_btnProfile_Copy);
@@ -877,12 +837,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
             _btnProfile_Delete = new Button(container, SWT.PUSH);
             _btnProfile_Delete.setText(Messages.App_Action_Delete_WithConfirm);
             _btnProfile_Delete.setToolTipText(Messages.Slideout_CalendarOptions_Action_DeleteProfile_Tooltip);
-            _btnProfile_Delete.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onProfile_Delete();
-               }
-            });
+            _btnProfile_Delete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_Delete()));
 
             // set button default width
             UI.setButtonLayoutData(_btnProfile_Delete);
@@ -901,12 +856,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
          }
       };
 
-      final ModifyListener modifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onModify_ProfileProperties();
-         }
-      };
+      final ModifyListener modifyListener = modifyEvent -> onModify_ProfileProperties();
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -960,12 +910,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
                _btnApplyAppDefaults = new Button(containerDefaultId, SWT.PUSH);
                _btnApplyAppDefaults.setText(Messages.App_Action_ApplyDefaults);
                _btnApplyAppDefaults.setToolTipText(Messages.App_Action_ApplyDefaults_Tooltip);
-               _btnApplyAppDefaults.addSelectionListener(new SelectionAdapter() {
-                  @Override
-                  public void widgetSelected(final SelectionEvent e) {
-                     onProfile_ApplyDefaults();
-                  }
-               });
+               _btnApplyAppDefaults.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProfile_ApplyDefaults()));
                GridDataFactory.fillDefaults().indent(10, 0).applyTo(_btnApplyAppDefaults);
 
                // set button default width
@@ -3354,41 +3299,18 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
       _pc = new PixelConverter(parent);
       _subItemIndent = _pc.convertHorizontalDLUsToPixels(12);
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onModify_Profile();
-         }
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onModify_Profile());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModify_Profile();
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onModify_Profile();
-         }
-      };
+      _defaultPropertyChangeListener = propertyChangeEvent -> onModify_Profile();
 
-      _defaultPropertyChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onModify_Profile();
-         }
-      };
+      _tourValueListener = widgetSelectedAdapter(selectionEvent -> onModify_TourValue(selectionEvent.widget));
 
-      _tourValueListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onModify_TourValue(e.widget);
-         }
-      };
-
-      _weekValueListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onModify_WeekValue(e.widget);
-         }
-      };
+      _weekValueListener = widgetSelectedAdapter(selectionEvent -> onModify_WeekValue(selectionEvent.widget));
 
       _keepOpenListener = new FocusListener() {
 
@@ -3423,14 +3345,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
       CalendarProfileManager.addProfileListener(this);
 
-      parent.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-
-            onDisposeSlideout();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDisposeSlideout());
    }
 
    private boolean isOnlyOneFormatter(final DataFormatter dataFormatter) {
