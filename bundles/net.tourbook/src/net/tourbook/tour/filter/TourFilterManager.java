@@ -206,9 +206,9 @@ public class TourFilterManager {
 
    private static final String[]                  VALUES_AIRQUALITY               = {
 
+         net.tourbook.common.Messages.Weather_AirQuality_IsNotDefined,
          net.tourbook.common.Messages.Weather_AirQuality_Good,
          net.tourbook.common.Messages.Weather_AirQuality_Fair,
-         net.tourbook.common.Messages.Weather_AirQuality_IsNotDefined,
          net.tourbook.common.Messages.Weather_AirQuality_Moderate,
          net.tourbook.common.Messages.Weather_AirQuality_Poor,
          net.tourbook.common.Messages.Weather_AirQuality_VeryPoor
@@ -964,7 +964,7 @@ public class TourFilterManager {
 
             if (fieldOperator.equals(TourFilterFieldOperator.MOST_RECENT)) {
 
-               getSQL__FieldOperators_MostRecent(sqlWhere, sqlParameters, fieldOperator, sql, filterProperty);
+               getSQL__FieldOperators_MostRecent(sqlWhere, sqlParameters, sql, filterProperty);
 
             } else {
 
@@ -1027,7 +1027,7 @@ public class TourFilterManager {
 
          case WEATHER_AIRQUALITY:
             sql = TOUR_DATA_WEATHER_AIRQUALITY;
-            getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, double1, double2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
          case WEATHER_TEMPERATURE:
@@ -1093,17 +1093,17 @@ public class TourFilterManager {
 
          case TOUR_TITLE:
             sql = TOUR_DATA_TOUR_TITLE;
-            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
          case TOUR_LOCATION_START:
             sql = TOUR_DATA_TOUR_LOCATION_START;
-            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
          case TOUR_LOCATION_END:
             sql = TOUR_DATA_TOUR_LOCATION_END;
-            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
          case TRAINING_INTENSITY_FACTOR:
@@ -1163,7 +1163,6 @@ public class TourFilterManager {
 
    private static void getSQL__FieldOperators_MostRecent(final StringBuilder sqlWhere,
                                                          final ArrayList<Object> sqlParameters,
-                                                         final TourFilterFieldOperator fieldOperator,
                                                          final String sqlField,
                                                          final TourFilterProperty filterProperty) {
 
@@ -1377,11 +1376,8 @@ public class TourFilterManager {
 
    @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_Text(final StringBuilder sqlWhere,
-                                                   final ArrayList<Object> sqlParameters,
                                                    final TourFilterFieldOperator fieldOperator,
-                                                   final String sqlField,
-                                                   final String value1,
-                                                   final String value2) {
+                                                   final String sqlField) {
 
       switch (fieldOperator) {
 

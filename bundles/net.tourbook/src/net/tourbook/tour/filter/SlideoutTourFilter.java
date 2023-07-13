@@ -823,7 +823,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
 
          case ENUMERATION:
-            numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
+            numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig, 1);
             break;
 
          case TEXT:
@@ -1082,11 +1082,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
    private int createUI_Field_Enumeration(final Composite parent,
                                           final TourFilterProperty filterProperty,
                                           final TourFilterFieldConfig fieldConfig,
-                                          final int fieldNo,
-                                          final boolean isShowUnitLabel) {
+                                          final int fieldNo) {
 
       final Combo dtTourTime = new Combo(parent, SWT.NONE);
-      dtTourTime.setItems("ddd", "dddddddewfewg");
+      dtTourTime.setItems(fieldConfig.values);
 
       dtTourTime.setData(filterProperty);
       dtTourTime.setData(FIELD_NO, fieldNo);
