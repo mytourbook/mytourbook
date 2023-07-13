@@ -876,6 +876,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          case TEXT:
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -911,13 +912,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          case NUMBER_FLOAT:
          case DATE:
          case DURATION:
+         case ENUMERATION:
             break;
          }
 
          break;
 
       case LIKE:
-         break;
       case NOT_LIKE:
          break;
 
@@ -1095,11 +1096,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             .align(SWT.END, SWT.CENTER)
             .applyTo(dtTourTime);
 
-      if (fieldNo == 1) {
-         filterProperty.uiCombo_Enumeration = dtTourTime;
-      } else {
-         filterProperty.uiCombo_Enumeration = dtTourTime;
-      }
+      filterProperty.uiCombo_Enumeration = dtTourTime;
       filterProperty.uiCombo_Enumeration.select(0);
 
       return 1;
@@ -2174,6 +2171,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          case TEXT:
          case SEASON:
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -2217,6 +2215,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
