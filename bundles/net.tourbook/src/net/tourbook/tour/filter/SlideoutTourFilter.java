@@ -1084,20 +1084,20 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                                           final TourFilterFieldConfig fieldConfig,
                                           final int fieldNo) {
 
-      final Combo dtTourTime = new Combo(parent, SWT.NONE);
-      dtTourTime.setItems(fieldConfig.values);
+      final Combo combo = new Combo(parent, SWT.NONE);
+      combo.setItems(fieldConfig.values);
 
-      dtTourTime.setData(filterProperty);
-      dtTourTime.setData(FIELD_NO, fieldNo);
+      combo.setData(filterProperty);
+      //combo.setData(FIELD_NO, fieldNo);
 
-      dtTourTime.addFocusListener(_keepOpenListener);
-      dtTourTime.addSelectionListener(_fieldSelectionListener_DateTime);
+      combo.addFocusListener(_keepOpenListener);
+      //combo.addSelectionListener(_fieldSelectionListener_DateTime);
 
       GridDataFactory.fillDefaults()
             .align(SWT.END, SWT.CENTER)
-            .applyTo(dtTourTime);
+            .applyTo(combo);
 
-      filterProperty.uiCombo_Enumeration = dtTourTime;
+      filterProperty.uiCombo_Enumeration = combo;
       filterProperty.uiCombo_Enumeration.select(0);
 
       return 1;

@@ -704,7 +704,6 @@ public class TourFilterManager {
 //
       allConfigs.add(new TourFilterFieldConfig(OtherMessages.COLUMN_FACTORY_CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
 
-      //todo fb, it might be a new thing to add an enum
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_AirQuality)
