@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -249,7 +246,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private GeoCompareData                  _compareData_CurrentGeoCompareData;
    private long                            _compareData_RefId;
    private long                            _compareData_RefTour_TourId     = -1;
-   private TourData                        _compareData_TourData;
+   private TourData                        _compareData_RefTourData;
    private String                          _compareData_TourTitle;
 
    private int                             _compareData_DistanceInterval;
@@ -275,6 +272,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private boolean                         _isGeoFilter_MaxResults;
    private float                           _geoFilter_GeoDifference;
    private int                             _geoFilter_MaxResults;
+
+   private float                           _refTourTotalElevationLoss;
+   private float                           _refTourTotalElevationGain;
 
    private OpenDialogManager               _openDlgMgr                     = new OpenDialogManager();
    private SlideoutGeoCompareOptions       _slideoutGeoCompareOptions;
@@ -556,8 +556,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = geoTour1.elevationGain - geoTour2.elevationGain;
             break;
 
+         case TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF_ID:
+            rc = Math.abs(_refTourTotalElevationGain - geoTour1.elevationGain)
+                  - Math.abs(_refTourTotalElevationGain - geoTour2.elevationGain);
+            break;
+
          case TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_LOSS_ID:
             rc = geoTour1.elevationLoss - geoTour2.elevationLoss;
+            break;
+
+         case TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF_ID:
+            rc = Math.abs(_refTourTotalElevationLoss - geoTour1.elevationLoss)
+                  - Math.abs(_refTourTotalElevationLoss - geoTour2.elevationLoss);
             break;
 
          case TableColumnFactory.MOTION_ALTIMETER_ID:
@@ -958,8 +968,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                return;
             }
 
+            // setup comparing data
             _compareData_RefTour_TourId = refTour_TourId;
-            _compareData_TourData = refTourData;
+            _compareData_RefTourData = refTourData;
             _compareData_RefId = geoCompareRefId;
             _compareData_FirstIndex = compareFirstIndex;
             _compareData_LastIndex = compareLastIndex;
@@ -972,7 +983,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void compare_20_SetupComparing() {
 
       // 1. get geo grid from lat/lon first/last index
-      _compareData_GeoGrid = _compareData_TourData.computeGeo_Grid(
+      _compareData_GeoGrid = _compareData_RefTourData.computeGeo_Grid(
             _compareData_FirstIndex,
             _compareData_LastIndex);
 
@@ -997,7 +1008,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       updateUI_State_Progress(-1, -1);
 
-      _compareData_TourTitle = TourManager.getTourTitleDetailed(_compareData_TourData);
+      _compareData_TourTitle = TourManager.getTourTitleDetailed(_compareData_RefTourData);
 
       _iconCompareType.setImage(_imageCompareType_PlaceHolder);
 
@@ -1013,7 +1024,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       /*
        * Create geo data which should be compared
        */
-      final NormalizedGeoData normalizedGeoData = _compareData_TourData.computeGeo_NormalizeLatLon(
+      final NormalizedGeoData normalizedGeoData = _compareData_RefTourData.computeGeo_NormalizeLatLon(
             _compareData_FirstIndex,
             _compareData_LastIndex,
             _compareData_GeoAccuracy,
@@ -1206,13 +1217,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 // SET_FORMATTING_ON
 
       /*
-       * Get max of the minDiff value
+       * Get various values from the compared tours
        */
       _maxMinDiff = 0;
-      for (final GeoComparedTour comparerItem : geoCompareData.allGeoComparedTours) {
+      _refTourTotalElevationGain = 0;
+      _refTourTotalElevationLoss = 0;
+      for (final GeoComparedTour geoComparedTour : geoCompareData.allGeoComparedTours) {
 
-         if (comparerItem.minDiffValue > _maxMinDiff) {
-            _maxMinDiff = comparerItem.minDiffValue;
+         if (geoComparedTour.minDiffValue > _maxMinDiff) {
+            _maxMinDiff = geoComparedTour.minDiffValue;
+         }
+
+         if (geoComparedTour.tourId == _compareData_RefTour_TourId) {
+            _refTourTotalElevationGain = geoComparedTour.elevationGain;
+            _refTourTotalElevationLoss = geoComparedTour.elevationLoss;
          }
       }
 
@@ -1437,7 +1455,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _comboGeoDiff_MouseWheelIncrementer.setVisibleItemCount(10);
                _comboGeoDiff_MouseWheelIncrementer.setToolTipText(Messages.GeoCompare_View_Combo_GeoDiff_MouseWheelIncrementer_Tooltip);
 
-               _comboGeoDiff_MouseWheelIncrementer.addSelectionListener(widgetSelectedAdapter(
+               _comboGeoDiff_MouseWheelIncrementer.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                      selectionEvent -> onSelect_GeoDiff_MouseWheelIncrementer()));
 
                GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboGeoDiff_MouseWheelIncrementer);
@@ -1614,7 +1632,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private void createUI_82_ColumnImages(final Table table) {
 
       boolean isColumnVisible = false;
-      final ControlListener controlResizedAdapter = controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
+      final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
 
       // update column index which is needed for repainting
       final ColumnProfile activeProfile = _columnManager.getActiveProfile();
@@ -1691,6 +1709,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       defineColumn_GeoDiff_Relative();
       defineColumn_Elevation_ElevationGain();
       defineColumn_Elevation_ElevationLoss();
+      defineColumn_Elevation_ElevationGainDiff();
+      defineColumn_Elevation_ElevationLossDiff();
       defineColumn_Time_TourStartDate();
       defineColumn_Tour_Type();
       defineColumn_Motion_AvgPace();
@@ -1784,6 +1804,35 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
+    * Column: Elevation gain difference
+    */
+   private void defineColumn_Elevation_ElevationGainDiff() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
+
+            final float value = item.elevationGain;
+            if (value == 0) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(_nf0.format(Math.abs(_refTourTotalElevationGain - value)));
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Elevation loss
     */
    private void defineColumn_Elevation_ElevationLoss() {
@@ -1807,6 +1856,35 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             } else {
 
                cell.setText(_nf0.format(value));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation loss differencce
+    */
+   private void defineColumn_Elevation_ElevationLossDiff() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoComparedTour item = (GeoComparedTour) cell.getElement();
+
+            final float value = item.elevationLoss;
+            if (value == 0) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(_nf0.format(Math.abs(_refTourTotalElevationLoss - value)));
             }
          }
       });
@@ -2343,9 +2421,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _pc = new PixelConverter(parent);
 
-      _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
 
-      _compareSelectionListener = widgetSelectedAdapter(selectionEvent -> onSelect_CompareParameter());
+      _compareSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CompareParameter());
    }
 
    private boolean isIgnorePart(final IWorkbenchPart part, final ISelection selection) {
@@ -2821,7 +2899,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                if (_isComparedTourPinned
 
                      // allow modifications of the same tour
-                     && tourData != _compareData_TourData) {
+                     && tourData != _compareData_RefTourData) {
 
                   // ignore tour
 
@@ -2985,7 +3063,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       // try to use selection from selection service
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-      if (_compareData_TourData == null) {
+      if (_compareData_RefTourData == null) {
 
          showInvalidPage();
       }
