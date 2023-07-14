@@ -611,11 +611,11 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF_ID, SWT.TRAIL);
 
-            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_GainDiff);
+            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_GainDiff_Tooltip);
             colDef.setColumnHeaderText(         unitLabel);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_GainDiff_Tooltip);
             colDef.setColumnUnit(               unitLabel);
@@ -657,11 +657,11 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF_ID, SWT.TRAIL);
 
-            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_LossDiff);
+            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_LossDiff_Tooltip);
             colDef.setColumnHeaderText(         unitLabel);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_LossDiff_Tooltip);
             colDef.setColumnUnit(               unitLabel);

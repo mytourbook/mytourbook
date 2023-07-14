@@ -146,7 +146,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private static final String           STATE_SORT_COLUMN_DIRECTION            = "STATE_SORT_COLUMN_DIRECTION";                     //$NON-NLS-1$
    private static final String           STATE_SORT_COLUMN_ID                   = "STATE_SORT_COLUMN_ID";                            //$NON-NLS-1$
 
-   static final int                      DEFAULT_DISTANCE_INTERVAL              = 100;
+   static final int                      DEFAULT_DISTANCE_INTERVAL              = 20;
    static final int                      DEFAULT_GEO_ACCURACY                   = 10_000;
 
    private static final String           INCREMENTER_0_1                        = "0.1";                                             //$NON-NLS-1$
