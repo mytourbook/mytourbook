@@ -25,30 +25,33 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 /**
  * Contains data and configuration for an elevation or geo compared tour
  */
-public class CompareConfig {
+public class TourCompareConfig {
 
    private static final char      NL = UI.NEW_LINE;
 
    private TourReference          _refTour;
 
    /**
-    * Tour ID of the reference tour
+    * ID of a compared tour according to the {@link #_tourCompareType}
     */
-   private Long                   _refTour_TourId;
+   private Long                   _tourCompareId;
+
+   /**
+    * Type of the {@link #_tourCompareId}
+    */
+   private TourCompareType        _tourCompareType;
 
    private TourChartConfiguration _refTour_ChartConfig;
    private TourChartConfiguration _compareTour_ChartConfig;
 
-   private boolean                _isGeoCompareRefTour;
-
-   CompareConfig(final TourReference refTour,
-                 final Long refTour_TourId,
+   TourCompareConfig(final TourReference refTour,
+                 final Long tourCompareId,
                  final ChartDataModel refChartDataModel,
                  final TourChartConfiguration refTour_ChartConfig,
                  final TourChartConfiguration compTour_ChartConfig) {
 
       _refTour = refTour;
-      _refTour_TourId = refTour_TourId;
+      _tourCompareId = tourCompareId;
 
       _refTour_ChartConfig = refTour_ChartConfig;
       _compareTour_ChartConfig = compTour_ChartConfig;
@@ -73,16 +76,15 @@ public class CompareConfig {
        * could be changed, this is a wrong concept which could be changed but requires additonal
        * work
        */
-      return TourManager.getInstance().getTourData(_refTour_TourId);
+      return TourManager.getInstance().getTourData(_tourCompareId);
    }
 
-   public boolean isGeoCompareRefTour() {
-      return _isGeoCompareRefTour;
+   public TourCompareType getTourCompareType() {
+      return _tourCompareType;
    }
 
-   public void setIsGeoCompareRefTour() {
-
-      _isGeoCompareRefTour = true;
+   public void setTourCompareType(final TourCompareType tourCompareType) {
+      _tourCompareType = tourCompareType;
    }
 
    @Override
@@ -92,11 +94,12 @@ public class CompareConfig {
 
             + "[" + NL //                                                           //$NON-NLS-1$
 
-            + "  _refTour_TourId          = " + _refTour_TourId + NL //             //$NON-NLS-1$
+            + "  _tourCompareType         = " + _tourCompareType + NL //            //$NON-NLS-1$
+            + "  _tourCompareId           = " + _tourCompareId + NL //              //$NON-NLS-1$
+
             + "  _refTour_ChartConfig     = " + _refTour_ChartConfig + NL //        //$NON-NLS-1$
             + "  _compareTour_ChartConfig = " + _compareTour_ChartConfig + NL //    //$NON-NLS-1$
 
-            + "  _isGeoCompareRefTour     = " + _isGeoCompareRefTour + NL //        //$NON-NLS-1$
             + "  _refTour                 = " + _refTour + NL //                    //$NON-NLS-1$
 
             + "]" + NL //                                                           //$NON-NLS-1$

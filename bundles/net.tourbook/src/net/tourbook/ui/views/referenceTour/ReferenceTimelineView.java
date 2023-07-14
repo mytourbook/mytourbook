@@ -1507,7 +1507,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       if (_currentRefItem != null
             && _currentGeoCompareData != null
 
-            && _currentRefItem.refId == _currentGeoCompareData.refId) {
+            && _currentRefItem.refId == _currentGeoCompareData.refTour_RefId) {
 
          geoCompareData = _currentGeoCompareData;
       }

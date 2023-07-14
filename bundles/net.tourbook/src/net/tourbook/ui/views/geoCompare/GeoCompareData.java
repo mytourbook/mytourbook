@@ -32,7 +32,7 @@ public class GeoCompareData {
    /**
     * Entity ID of the {@link TourReference}, is -1 when not available
     */
-   public long                  refId               = -1;
+   public long                  refTour_RefId               = -1;
 
    /**
     * Reference tour ID which is compared
@@ -121,7 +121,7 @@ public class GeoCompareData {
 
             + "[" + NL //                                               //$NON-NLS-1$
 
-            + "refId                = " + refId + NL //                 //$NON-NLS-1$
+            + "refId                = " + refTour_RefId + NL //                 //$NON-NLS-1$
             + "executorId           = " + executorId + NL //            //$NON-NLS-1$
             + "isUseAppFilter       = " + isUseAppFilter + NL //        //$NON-NLS-1$
             + "isReselectedInUI     = " + isReselectedInUI + NL //      //$NON-NLS-1$

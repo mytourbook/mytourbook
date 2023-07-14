@@ -8645,6 +8645,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       _isSelectionDirty = true;
+
       redraw();
    }
 

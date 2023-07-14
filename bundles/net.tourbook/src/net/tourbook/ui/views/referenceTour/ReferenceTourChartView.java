@@ -201,7 +201,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
             final GeoCompareData geoCompareData = ((GeoComparedTour) firstElement).geoCompareData;
 
-            showRefTour(geoCompareData.refId);
+            showRefTour(geoCompareData.refTour_RefId);
          }
       }
    }
@@ -234,7 +234,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
     * @param compareConfig
     * @return Returns <code>true</code> then the ref tour changed
     */
-   private void setTourCompareConfig(final CompareConfig compareConfig) {
+   private void setTourCompareConfig(final TourCompareConfig compareConfig) {
 
       _tourChart.addDataModelListener(chartDataModel -> {
 
@@ -261,9 +261,11 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
          // set the value difference of the synch marker
          final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour_StartValueIndex];
 
+         final RefTourChartChanged changeData = new RefTourChartChanged(_tourChart, refTour.getRefId(), refTourXValueDiff);
+
          TourManager.fireEventWithCustomData(
                TourEventId.REFERENCE_TOUR_CHANGED,
-               new RefTourChanged(_tourChart, refTour.getRefId(), refTourXValueDiff),
+               changeData,
                ReferenceTourChartView.this);
 
          // set title
@@ -282,8 +284,8 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
          return;
       }
 
-      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
-      if (tourCompareConfig == null) {
+      final TourCompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+      if (compareConfig == null) {
          return;
       }
 
@@ -291,10 +293,10 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
        * show new ref tour
        */
 
-      _tourData = tourCompareConfig.getRefTourData();
-      _tourChartConfig = tourCompareConfig.getRefTourChartConfig();
+      _tourData = compareConfig.getRefTourData();
+      _tourChartConfig = compareConfig.getRefTourChartConfig();
 
-      setTourCompareConfig(tourCompareConfig);
+      setTourCompareConfig(compareConfig);
 
       // set active ref id after the configuration is set
       _activeRefId = refId;

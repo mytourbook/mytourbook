@@ -2412,7 +2412,9 @@ public class ChartComponents extends Composite {
     */
    void setSliderVisible(final boolean isSliderVisible) {
 
-      devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
+// !!! This causes the chart title and graph label to overlap
+//
+//    devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
 
       componentGraph.setXSliderVisible(isSliderVisible);
    }
@@ -2493,8 +2495,8 @@ public class ChartComponents extends Composite {
       final int xxDevViewPortOffset;
       final double graphZoomRatio;
 
-      switch (_chart._synchMode) {
-      case Chart.SYNCH_MODE_BY_SCALE:
+      switch (_chart.chartSynchMode) {
+      case BY_SCALE:
 
          // get marker data from the synch source
          final float markerWidthRatio = synchConfigSrc.getMarkerWidthRatio();
@@ -2517,7 +2519,7 @@ public class ChartComponents extends Composite {
 
          return true;
 
-      case Chart.SYNCH_MODE_BY_SIZE:
+      case BY_SIZE:
 
          // get marker data from the synch source
          final float synchSrcDevMarkerWidth = synchConfigSrc.getDevMarkerWidth();

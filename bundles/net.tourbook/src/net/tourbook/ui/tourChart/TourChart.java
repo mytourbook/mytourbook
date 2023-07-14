@@ -36,6 +36,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartDrawingData;
 import net.tourbook.chart.ChartKeyEvent;
 import net.tourbook.chart.ChartMouseEvent;
+import net.tourbook.chart.ChartSyncMode;
 import net.tourbook.chart.ChartTitleSegment;
 import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.chart.ChartType;
@@ -1124,11 +1125,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * add a data model listener which is fired when the data model has changed
+    * Set a data model listener which is fired when the data model has changed
     *
     * @param dataModelListener
     */
    public void addDataModelListener(final IDataModelListener dataModelListener) {
+
       _chartDataModelListener = dataModelListener;
    }
 
@@ -5883,9 +5885,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *           <code>true</code> to enable synch, <code>false</code> to disable synch
     * @param synchedChart
     *           contains the {@link Chart} which is synched with this chart
-    * @param synchMode
+    * @param chartSyncMode
     */
-   public void synchChart(final boolean isSynchEnabled, final TourChart synchedChart, final int synchMode) {
+   public void synchChart(final boolean isSynchEnabled,
+                          final TourChart synchedChart,
+                          final ChartSyncMode chartSyncMode) {
 
       // enable/disable synched chart
       super.setSynchedChart(isSynchEnabled ? synchedChart : null);
@@ -5896,7 +5900,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
-      synchedChart.setSynchMode(synchMode);
+      synchedChart.setSynchMode(chartSyncMode);
 
       /*
        * when the position listener is set, the zoom actions will be deactivated
@@ -6195,7 +6199,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * Update the tour chart with the previous data, configuration and min/max values.
     */
    public void updateTourChart() {
-      updateTourChartInternal(_tourData, _tcc, true, false);
+      updateTourChart_Internal(_tourData, _tcc, true, false);
    }
 
    /**
@@ -6205,7 +6209,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *           <code>true</code> keeps the min/max values from the previous chart
     */
    public void updateTourChart(final boolean keepMinMaxValues) {
-      updateTourChartInternal(_tourData, _tcc, keepMinMaxValues, false);
+      updateTourChart_Internal(_tourData, _tcc, keepMinMaxValues, false);
    }
 
    /**
@@ -6217,11 +6221,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *           when <code>true</code> the properties for the tour chart have changed
     */
    public void updateTourChart(final boolean keepMinMaxValues, final boolean isPropertyChanged) {
-      updateTourChartInternal(_tourData, _tcc, keepMinMaxValues, isPropertyChanged);
+      updateTourChart_Internal(_tourData, _tcc, keepMinMaxValues, isPropertyChanged);
    }
 
    public void updateTourChart(final TourData tourData, final boolean keepMinMaxValues) {
-      updateTourChartInternal(tourData, _tcc, keepMinMaxValues, false);
+      updateTourChart_Internal(tourData, _tcc, keepMinMaxValues, false);
 
    }
 
@@ -6237,11 +6241,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                final TourChartConfiguration tourChartConfig,
                                final boolean keepMinMaxValues) {
 
-      updateTourChartInternal(tourData, tourChartConfig, keepMinMaxValues, false);
+      updateTourChart_Internal(tourData, tourChartConfig, keepMinMaxValues, false);
    }
 
    /**
-    * This is the entry point for new tours.
+    * This is THE entry point for new tours.
     * <p>
     * This method is synchronized because when SRTM data are retrieved and the import view is
     * open, the error occurred that the chart config was deleted with {@link #updateChart(null)}
@@ -6251,16 +6255,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param keepMinMaxValues
     * @param isPropertyChanged
     */
-   private synchronized void updateTourChartInternal(final TourData newTourData,
-                                                     final TourChartConfiguration newTCC,
-                                                     final boolean keepMinMaxValues,
-                                                     final boolean isPropertyChanged) {
+   private synchronized void updateTourChart_Internal(final TourData newTourData,
+                                                      final TourChartConfiguration newTCC,
+                                                      final boolean keepMinMaxValues,
+                                                      final boolean isPropertyChanged) {
 
       if (newTourData == null || newTCC == null) {
 
          // there are no new tour data
 
          _valuePointTooltipUI.setTourData(null);
+
          return;
       }
 
@@ -6298,7 +6303,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       fillToolbar();
       updateTourActions();
 
-      // restore min/max values from the chart config
+      // restore min/max values from the tour chart config
       final ChartYDataMinMaxKeeper newMinMaxKeeper = _tcc.getMinMaxKeeper();
       final boolean isMinMaxKeeper = (newMinMaxKeeper != null) && keepMinMaxValues;
       if (isMinMaxKeeper) {
@@ -6322,6 +6327,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setupChartSegmentTitle();
 
       updateChart(newChartDataModel, !isMinMaxKeeper);
+
+      // enable/disable geo compare action
+      onGeoCompareOnOff(GeoCompareManager.isGeoComparingOn());
 
       /*
        * This must be done after the chart is created because is sets an action, set it only once

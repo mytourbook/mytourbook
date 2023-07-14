@@ -23,9 +23,9 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartSyncMode;
 import net.tourbook.chart.XValueMarkerListener;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -105,7 +105,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
     */
    private long                              _refTour_RefId          = -1;
    private TourChart                         _refTour_TourChart;
-
    private double                            _refTour_XValueDifference;
 
    private boolean                           _isGeoCompareTour;
@@ -267,7 +266,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       @Override
       public void run() {
 
-         synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SCALE);
+         synchCharts(isChecked(), ChartSyncMode.BY_SCALE);
       }
    }
 
@@ -286,7 +285,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       @Override
       public void run() {
 
-         synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SIZE);
+         synchCharts(isChecked(), ChartSyncMode.BY_SIZE);
       }
    }
 
@@ -320,13 +319,13 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
                                  final Object eventData) {
 
             if (eventId == TourEventId.REFERENCE_TOUR_CHANGED
-                  && eventData instanceof RefTourChanged) {
+                  && eventData instanceof RefTourChartChanged) {
 
                /*
                 * Reference tour changed
                 */
 
-               final RefTourChanged refTourChanged = (RefTourChanged) eventData;
+               final RefTourChartChanged refTourChanged = (RefTourChartChanged) eventData;
 
                _refTour_RefId = refTourChanged.refId;
                _refTour_TourChart = refTourChanged.refTourChart;
@@ -546,7 +545,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             // another ref tour is displayed, disable synchronization
 
             if (_comparedTour_RefTourChart != null) {
-               _comparedTour_RefTourChart.synchChart(false, _tourChart, Chart.SYNCH_MODE_NO);
+               _comparedTour_RefTourChart.synchChart(false, _tourChart, ChartSyncMode.NO);
             }
 
             _actionSynchChartsByScale.setChecked(false);
@@ -970,17 +969,19 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
    }
 
    @Override
-   public void synchCharts(final boolean isSynched, final int synchMode) {
+   public void synchCharts(final boolean isSynched, final ChartSyncMode chartSyncMode) {
 
       if (_comparedTour_RefTourChart != null) {
 
          // uncheck other synch mode
-         switch (synchMode) {
-         case Chart.SYNCH_MODE_BY_SCALE:
+         switch (chartSyncMode) {
+         case BY_SCALE:
+
             _actionSynchChartsBySize.setChecked(false);
             break;
 
-         case Chart.SYNCH_MODE_BY_SIZE:
+         case BY_SIZE:
+
             _actionSynchChartsByScale.setChecked(false);
             break;
 
@@ -988,7 +989,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             break;
          }
 
-         _comparedTour_RefTourChart.synchChart(isSynched, _tourChart, synchMode);
+         _comparedTour_RefTourChart.synchChart(isSynched, _tourChart, chartSyncMode);
       }
    }
 
@@ -1064,15 +1065,20 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
     */
    private boolean updateTourChart(final Boolean isGeoComparedTourChecked) {
 
-      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
+      final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_comparedTour_RefId);
 
       if (tourCompareConfig == null) {
          return false;
       }
 
+      final TourCompareType tourCompareType = tourCompareConfig.getTourCompareType();
+
       final boolean isGeoCompareTour = isGeoComparedTourChecked != null
+
             ? isGeoComparedTourChecked
-            : tourCompareConfig.isGeoCompareRefTour();
+
+            : (tourCompareType.equals(TourCompareType.GEO_COMPARE_ANY_TOUR)
+                  || tourCompareType.equals(TourCompareType.GEO_COMPARE_REFERENCE_TOUR));
 
       _isGeoCompareTour = isGeoCompareTour;
 
@@ -1183,7 +1189,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       // set data from the selection
       _comparedTour_TourId = geoTourId;
-      _comparedTour_RefId = geoCompareData.refId;
+      _comparedTour_RefId = geoCompareData.refTour_RefId;
       _comparedTour_CompareId = -1;
 
       _tourData = compTourData;

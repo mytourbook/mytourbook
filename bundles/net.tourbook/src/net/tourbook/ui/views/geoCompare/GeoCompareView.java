@@ -67,13 +67,14 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.referenceTour.CompareConfig;
 import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TourCompareConfig;
+import net.tourbook.ui.views.referenceTour.TourCompareType;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -859,13 +860,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     *           "Ref" tour which is compared
     * @param leftIndex
     * @param rightIndex
-    * @param refId
-    *           Reference tour id or <code>-1</code> when not available
+    * @param geoCompareRefId
+    *           Reference id of the compared reference tour
     */
    private void compare_10_Compare(final TourData refTourData,
                                    final int leftIndex,
                                    final int rightIndex,
-                                   final long refId) {
+                                   final long geoCompareRefId) {
 
       if (GeoCompareManager.isGeoComparingOn() == false) {
 
@@ -959,7 +960,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             _compareData_RefTour_TourId = refTour_TourId;
             _compareData_TourData = refTourData;
-            _compareData_RefId = refId;
+            _compareData_RefId = geoCompareRefId;
             _compareData_FirstIndex = compareFirstIndex;
             _compareData_LastIndex = compareLastIndex;
 
@@ -1028,7 +1029,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             _compareData_CurrentGeoCompareData,
             this);
 
-      newGeoCompareData.refId = _compareData_RefId;
+      newGeoCompareData.refTour_RefId = _compareData_RefId;
       newGeoCompareData.refTour_FirstIndex = _compareData_FirstIndex;
       newGeoCompareData.refTour_LastIndex = _compareData_LastIndex;
 
@@ -1223,7 +1224,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    public void compareRefTour(final long refId) {
 
-      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+      final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
 
       if (tourCompareConfig == null) {
          return;
@@ -1439,9 +1440,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _comboGeoDiff_MouseWheelIncrementer.addSelectionListener(widgetSelectedAdapter(
                      selectionEvent -> onSelect_GeoDiff_MouseWheelIncrementer()));
 
-               GridDataFactory.fillDefaults()
-//                     .grab(true, false)
-                     .align(SWT.END, SWT.CENTER).applyTo(_comboGeoDiff_MouseWheelIncrementer);
+               GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboGeoDiff_MouseWheelIncrementer);
             }
          }
          {
@@ -2204,9 +2203,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void fillUI() {
 
-      _comboGeoDiff_MouseWheelIncrementer.add(INCREMENTER_0_1);
-      _comboGeoDiff_MouseWheelIncrementer.add(INCREMENTER_1_0);
+      /*
+       * Fill in the same order as the mouse wheel is increasing/decreasing the spinner value,
+       * otherwise it is in the opposite direction which is confusing !!!
+       */
       _comboGeoDiff_MouseWheelIncrementer.add(INCREMENTER_10_0);
+      _comboGeoDiff_MouseWheelIncrementer.add(INCREMENTER_1_0);
+      _comboGeoDiff_MouseWheelIncrementer.add(INCREMENTER_0_1);
    }
 
    /**
@@ -2285,7 +2288,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // 1 -> 0.1
 
-         return 0;
+         return 2;
 
       } else if (_geoDiff_MouseWheelIncrementer == 10) {
 
@@ -2295,7 +2298,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       // 100 -> 10.0
-      return 2;
+      return 0;
    }
 
    GeoCompareState getSlideoutState() {
@@ -2391,14 +2394,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final float relativeDiff = (float) minDiffValue / _maxMinDiff * 100;
 
-      final float relativeDifference = _geoFilter_GeoDifference == 0
-
-            // allow values which are near 0
-            ? 0.5f
-
-            : _geoFilter_GeoDifference;
-
-      return relativeDiff >= 0 && relativeDiff <= relativeDifference;
+      return relativeDiff >= 0 && relativeDiff <= _geoFilter_GeoDifference;
    }
 
    public Object navigateTour(final boolean isNextTour) {
@@ -2693,17 +2689,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final int selectionIndex = _comboGeoDiff_MouseWheelIncrementer.getSelectionIndex();
 
-      if (selectionIndex == 0) { // 0.1
+      if (selectionIndex == 0) { // 10
 
-         _geoDiff_MouseWheelIncrementer = 1;
+         _geoDiff_MouseWheelIncrementer = 100;
 
       } else if (selectionIndex == 1) { // 1.0
 
          _geoDiff_MouseWheelIncrementer = 10;
 
-      } else { // 10.0
+      } else { // 0.1
 
-         _geoDiff_MouseWheelIncrementer = 100;
+         _geoDiff_MouseWheelIncrementer = 1;
       }
 
       _spinnerGeoFilter_GeoDifference.setPageIncrement(_geoDiff_MouseWheelIncrementer);
@@ -3020,7 +3016,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _chkGeoFilter_MaxResults            .setSelection(_isGeoFilter_MaxResults);
 
       _spinnerGeoFilter_GeoDifference     .setPageIncrement(_geoDiff_MouseWheelIncrementer);
-      _spinnerGeoFilter_GeoDifference     .setSelection((int) (_geoFilter_GeoDifference*10));
+      _spinnerGeoFilter_GeoDifference     .setSelection((int) (_geoFilter_GeoDifference * 10));
       _spinnerGeoFilter_MaxResults        .setSelection(_geoFilter_MaxResults);
 
       _comboGeoDiff_MouseWheelIncrementer .select(getGeoDiffMouseWheelIncrementerIndex());
@@ -3111,7 +3107,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          _lblTitle.setText(_compareData_TourTitle);
 
-         if (ReferenceTourManager.isFromNativeRefTour()) {
+         final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(geoCompareData.refTour_RefId);
+
+         if (tourCompareConfig != null
+               && tourCompareConfig.getTourCompareType() != null
+               && tourCompareConfig.getTourCompareType().equals(TourCompareType.GEO_COMPARE_REFERENCE_TOUR)) {
+
+            // an unmodified ref tour is compared
 
             _iconCompareType.setImage(_imageCompareType_RefTour);
             _iconCompareType.setToolTipText(Messages.GeoCompare_View_Icon_CompareType_RefTour_Tooltip);

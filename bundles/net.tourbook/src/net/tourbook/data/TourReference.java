@@ -17,13 +17,16 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
@@ -34,33 +37,41 @@ import net.tourbook.ui.UI;
 @Entity
 public class TourReference implements Serializable {
 
-   private static final long   serialVersionUID = 1L;
+   private static final long          serialVersionUID = 1L;
 
-   private static final String NL               = UI.NEW_LINE;
+   private static final String        NL               = UI.NEW_LINE;
 
-   public static final int     DB_LENGTH_LABEL  = 80;
+   public static final int            DB_LENGTH_LABEL  = 80;
+
+   private static final AtomicInteger _createIDCounter = new AtomicInteger();
 
    /**
     * Entity ID of the reference tour
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                refId;
+   private long                       refId            = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * {@link TourData} which is referenced
     */
    @ManyToOne(optional = false)
-   private TourData            tourData;
+   private TourData                   tourData;
 
    /**
     * Value index position for the reference tour in the original tour
     */
-   private int                 startIndex;
+   private int                        startIndex;
 
-   private int                 endIndex;
+   private int                        endIndex;
 
-   private String              label            = UI.EMPTY_STRING;
+   private String                     label            = UI.EMPTY_STRING;
+
+   /**
+    * Unique id for created entities because the {@link #refId} is -1 when it's not persisted
+    */
+   @Transient
+   private long                       _createId        = 0;
 
    public TourReference() {}
 
@@ -78,6 +89,8 @@ public class TourReference implements Serializable {
 
       this.startIndex = startIndex;
       this.endIndex = endIndex;
+
+      _createId = _createIDCounter.incrementAndGet();
    }
 
    /**
@@ -88,6 +101,8 @@ public class TourReference implements Serializable {
    public TourReference(final TourData tourData) {
 
       this.tourData = tourData;
+
+      _createId = _createIDCounter.incrementAndGet();
    }
 
    @Override
@@ -96,16 +111,35 @@ public class TourReference implements Serializable {
       if (this == obj) {
          return true;
       }
+
       if (obj == null) {
          return false;
       }
+
       if (getClass() != obj.getClass()) {
          return false;
       }
 
       final TourReference other = (TourReference) obj;
 
-      return refId == other.refId;
+      if (_createId == 0) {
+
+         // entity is from the database
+
+         if (refId != other.refId) {
+            return false;
+         }
+
+      } else {
+
+         // entity was created
+
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
+
+      return true;
    }
 
    public int getEndIndex() {
@@ -150,7 +184,7 @@ public class TourReference implements Serializable {
 
    @Override
    public int hashCode() {
-      return Objects.hash(refId);
+      return Objects.hash(_createId, refId);
    }
 
    public void setEndValueIndex(final int endIndex) {
