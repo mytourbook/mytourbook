@@ -1153,7 +1153,7 @@ public class TourChartView extends ViewPart implements
          return;
       }
 
-      if (_tourData.equals(tourData) == false) {
+      if (_tourData == null || _tourData.equals(tourData) == false) {
          updateChart(tourData);
       }
 
