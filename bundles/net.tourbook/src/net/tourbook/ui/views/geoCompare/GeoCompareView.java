@@ -570,7 +570,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             break;
 
          case TableColumnFactory.ALTITUDE_ELEVATION_GAIN_ID:
-            rc = geoTour1.elevationGain - geoTour2.elevationGain;
+            rc = geoTour1.elevationGainAbsolute - geoTour2.elevationGainAbsolute;
             break;
 
          case TableColumnFactory.ALTITUDE_ELEVATION_GAIN_DIFF_ID:
@@ -578,7 +578,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             break;
 
          case TableColumnFactory.ALTITUDE_ELEVATION_LOSS_ID:
-            rc = geoTour1.elevationLoss - geoTour2.elevationLoss;
+            rc = geoTour1.elevationLossAbsolute - geoTour2.elevationLossAbsolute;
             break;
 
          case TableColumnFactory.ALTITUDE_ELEVATION_LOSS_DIFF_ID:
@@ -1249,16 +1249,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          if (geoComparedTour.tourId == _compareData_RefTour_TourId) {
 
-            _refTourElevationGain = geoComparedTour.elevationGain;
-            _refTourElevationLoss = geoComparedTour.elevationLoss;
+            _refTourElevationGain = geoComparedTour.elevationGainAbsolute;
+            _refTourElevationLoss = geoComparedTour.elevationLossAbsolute;
          }
       }
 
       // set computed values
       for (final GeoComparedTour geoComparedTour : geoCompareData.allGeoComparedTours) {
 
-         geoComparedTour.elevationGainDiff = Math.abs(_refTourElevationGain - geoComparedTour.elevationGain);
-         geoComparedTour.elevationLossDiff = Math.abs(_refTourElevationLoss - geoComparedTour.elevationLoss);
+         geoComparedTour.elevationGainDiff = Math.abs(_refTourElevationGain - geoComparedTour.elevationGainAbsolute);
+         geoComparedTour.elevationLossDiff = Math.abs(_refTourElevationLoss - geoComparedTour.elevationLossAbsolute);
       }
 
       filterGeoCompareItems(geoCompareData);
@@ -1891,7 +1891,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
-            final float value = item.elevationGain;
+            final float value = item.elevationGainAbsolute;
             if (value == 0) {
 
                cell.setText(UI.EMPTY_STRING);
@@ -1949,7 +1949,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
-            final float value = item.elevationLoss;
+            final float value = item.elevationLossAbsolute;
             if (value == 0) {
 
                cell.setText(UI.EMPTY_STRING);

@@ -73,9 +73,9 @@ public class GeoComparedTour implements Comparable<Object> {
 
    float                     distance;
 
-   float                     elevationGain;
-   float                     elevationLoss;
+   float                     elevationGainAbsolute;
    float                     elevationGainDiff;
+   float                     elevationLossAbsolute;
    float                     elevationLossDiff;
 
    /**
