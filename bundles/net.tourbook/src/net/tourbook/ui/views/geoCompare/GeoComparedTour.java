@@ -72,8 +72,11 @@ public class GeoComparedTour implements Comparable<Object> {
    long                      movingTime;
 
    float                     distance;
+
    float                     elevationGain;
    float                     elevationLoss;
+   float                     elevationGainDiff;
+   float                     elevationLossDiff;
 
    /**
     * Ensure that the title is set for sorting

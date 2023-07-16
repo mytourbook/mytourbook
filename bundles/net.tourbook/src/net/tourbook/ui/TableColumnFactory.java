@@ -34,18 +34,20 @@ public abstract class TableColumnFactory {
    public static final String             ALTITUDE_AVG_CHANGE_ID                             = "ALTITUDE_AVG_CHANGE";                             //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_BORDER;
    public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_COMPUTED;
-   public static final TableColumnFactory ALTITUDE_ELEVATION_DOWN;
    public static final TableColumnFactory ALTITUDE_ELEVATION_UP;
-   public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_DOWN;
+   public static final TableColumnFactory ALTITUDE_ELEVATION_DOWN;
+   public static final TableColumnFactory ALTITUDE_ELEVATION_DIFF;
+   public static final String             ALTITUDE_ELEVATION_DIFF_ID                         = "ALTITUDE_ELEVATION_DIFF_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory ALTITUDE_ELEVATION_GAIN;
+   public static final String             ALTITUDE_ELEVATION_GAIN_ID                         = "ALTITUDE_ELEVATION_GAIN_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory ALTITUDE_ELEVATION_GAIN_DIFF;
+   public static final String             ALTITUDE_ELEVATION_GAIN_DIFF_ID                    = "ALTITUDE_ELEVATION_GAIN_DIFF_ID";                 //$NON-NLS-1$
+   public static final TableColumnFactory ALTITUDE_ELEVATION_LOSS;
+   public static final String             ALTITUDE_ELEVATION_LOSS_ID                         = "ALTITUDE_ELEVATION_LOSS_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory ALTITUDE_ELEVATION_LOSS_DIFF;
+   public static final String             ALTITUDE_ELEVATION_LOSS_DIFF_ID                    = "ALTITUDE_ELEVATION_LOSS_DIFF_ID";                 //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_UP;
-   public static final TableColumnFactory ALTITUDE_ELEVATION_TOTAL_GAIN;
-   public static final String             ALTITUDE_ELEVATION_TOTAL_GAIN_ID                   = "ALTITUDE_ELEVATION_TOTAL_GAIN_ID";                //$NON-NLS-1$
-   public static final TableColumnFactory ALTITUDE_ELEVATION_TOTAL_LOSS;
-   public static final String             ALTITUDE_ELEVATION_TOTAL_LOSS_ID                   = "ALTITUDE_ELEVATION_TOTAL_LOSS_ID";                //$NON-NLS-1$
-   public static final TableColumnFactory ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF;
-   public static final String             ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF_ID              = "ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF_ID";           //$NON-NLS-1$
-   public static final TableColumnFactory ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF;
-   public static final String             ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF_ID              = "ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF_ID";           //$NON-NLS-1$
+   public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_DOWN;
    public static final TableColumnFactory ALTITUDE_GRADIENT;
    public static final String             ALTITUDE_GRADIENT_ID                               = "ALTITUDE_GRADIENT";                               //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_GRADIENT_AVG;
@@ -580,21 +582,44 @@ public abstract class TableColumnFactory {
          }
       };
 
-      ALTITUDE_ELEVATION_TOTAL_GAIN = new TableColumnFactory() {
+      ALTITUDE_ELEVATION_DIFF = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_GAIN_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_DIFF_ID, SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP_DOWN_II;
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_Diff_Tooltip);
+            colDef.setColumnHeaderText(         unitLabel);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_Diff_Tooltip);
+            colDef.setColumnUnit(               unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      ALTITUDE_ELEVATION_GAIN = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_GAIN_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_Gain_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_Gain_Tooltip);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_Gain_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_Gain_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
@@ -603,21 +628,21 @@ public abstract class TableColumnFactory {
          }
       };
 
-      ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF = new TableColumnFactory() {
+      ALTITUDE_ELEVATION_GAIN_DIFF = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_GAIN_DIFF_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_GAIN_DIFF_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_GainDiff_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_GainDiff_Tooltip);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_GainDiff_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_GainDiff_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
@@ -626,21 +651,21 @@ public abstract class TableColumnFactory {
          }
       };
 
-      ALTITUDE_ELEVATION_TOTAL_LOSS = new TableColumnFactory() {
+      ALTITUDE_ELEVATION_LOSS = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_LOSS_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_LOSS_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_Loss_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_Loss_Tooltip);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_Loss_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_Loss_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
@@ -649,21 +674,21 @@ public abstract class TableColumnFactory {
          }
       };
 
-      ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF = new TableColumnFactory() {
+      ALTITUDE_ELEVATION_LOSS_DIFF = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_TOTAL_LOSS_DIFF_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_LOSS_DIFF_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationTotal_LossDiff_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_LossDiff_Tooltip);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationTotal_LossDiff_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_LossDiff_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));

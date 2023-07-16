@@ -980,6 +980,8 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
    public static String        GeoCompare_View_Action_PinTourWhichIsCompared_Tooltip;
    public static String        GeoCompare_View_Action_SelectTourWhichIsCompared_Tooltip;
+   public static String        GeoCompare_View_Checkbox_ElevationDifferenceFilter;
+   public static String        GeoCompare_View_Checkbox_ElevationDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter;
@@ -992,7 +994,8 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Column_GeoDiff_Tooltip;
    public static String        GeoCompare_View_Column_SequenceNumber_Header;
    public static String        GeoCompare_View_Column_SequenceNumber_Label;
-   public static String        GeoCompare_View_Combo_GeoDiff_MouseWheelIncrementer_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_ElevationDiff_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_GeoDiff_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
    public static String        GeoCompare_View_Label_GeoParts;
