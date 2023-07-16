@@ -1414,9 +1414,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationGainDelta_Label);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_GainDelta_Label);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationGainDelta_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_GainDelta_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
@@ -1437,9 +1437,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_ElevationLossDelta_Label);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_LossDelta_Label);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_ElevationLossDelta_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_LossDelta_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
