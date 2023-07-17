@@ -698,6 +698,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+
+      private void updateUI_BreakTime() {
+
+         _lblTourBreakTime.setText(Long.toString(_tourBreakTime)
+               + UI.SPACE
+               + Messages.App_Unit_Seconds_Small
+               + UI.SPACE4
+               + UI.format_hh_mm_ss(_tourBreakTime));
+
+         _containerBreakTime.layout();
+      }
+
+      private void updateUI_SegmenterInfo(final Object[] tourSegments) {
+
+         final String numSegments = Integer.toString(tourSegments.length - 1);
+
+         _lblNumSegments.setText(numSegments);
+      }
    }
 
    private class SegmenterFilter extends ViewerFilter {
@@ -942,7 +960,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              */
             final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? _spinnerMinAltitude.getSelection() * UI.UNIT_FOOT
                   : _spinnerMinAltitude
-                  .getSelection() / UI.UNIT_FOOT;
+                        .getSelection() / UI.UNIT_FOOT;
             _spinnerMinAltitude.setSelection(Math.round(convertedSelectedMinAltiDiff));
             _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
 
@@ -5843,17 +5861,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }));
    }
 
-   private void updateUI_BreakTime() {
-
-      _lblTourBreakTime.setText(Long.toString(_tourBreakTime)
-            + UI.SPACE
-            + Messages.App_Unit_Seconds_Small
-            + UI.SPACE4
-            + UI.format_hh_mm_ss(_tourBreakTime));
-
-      _containerBreakTime.layout();
-   }
-
    private void updateUI_Distance() {
 
       float spinnerDistance = getDistance() / UI.UNIT_VALUE_DISTANCE;
@@ -5932,13 +5939,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          segmenterTable.setHeaderBackground(ThemeUtil.getDefaultBackgroundColor_TableHeader());
       }
 
-   }
-
-   private void updateUI_SegmenterInfo(final Object[] tourSegments) {
-
-      final String numSegments = Integer.toString(tourSegments.length - 1);
-
-      _lblNumSegments.setText(numSegments);
    }
 
    private void updateUI_SegmenterSelector() {
