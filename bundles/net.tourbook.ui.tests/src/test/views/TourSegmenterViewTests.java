@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,6 +78,15 @@ public class TourSegmenterViewTests extends UITest {
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
+
+      //Change the measurement system to imperial
+      bot.comboBox(net.tourbook.common.Messages.Measurement_System_Tooltip)
+            .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
+
+      //Change back the measurement system to metric
+      bot.comboBox(net.tourbook.common.Messages.Measurement_System_Tooltip)
+            .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+
       tourSegmenterView.close();
    }
 
