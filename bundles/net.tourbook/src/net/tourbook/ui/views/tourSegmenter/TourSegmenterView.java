@@ -676,6 +676,47 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       public SegmenterContentProvider() {}
 
+      private Object[] createSegmenterContent() {
+
+         final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+         if (selectedSegmenter == null) {
+            return new Object[0];
+         }
+
+         /*
+          * get break time values: time/distance & speed
+          */
+         final BreakTimeTool btConfig;
+
+         if (selectedSegmenter.segmenterType == SegmenterType.ByBreakTime) {
+
+            // use segmenter values
+
+            btConfig = new BreakTimeTool(
+                  getSelectedBreakMethod().methodId,
+                  _breakUIShortestBreakTime,
+                  _breakUIMaxDistance,
+                  _breakUIMinSliceSpeed,
+                  _breakUIMinAvgSpeed,
+                  _breakUISliceDiff,
+                  _breakUIMinAvgSpeedAS,
+                  _breakUIMinSliceSpeedAS,
+                  _breakUIMinSliceTimeAS);
+
+         } else {
+
+            // use pref values for time/distance & speed
+
+            btConfig = BreakTimeTool.getPrefValues();
+         }
+
+         _allTourSegments = _tourData.createSegmenterSegments(btConfig);
+
+         return _allTourSegments == null //
+               ? new Object[0]
+               : _allTourSegments.toArray();
+      }
+
       @Override
       public void dispose() {}
 
@@ -1221,47 +1262,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       enableActions();
 
       showTour();
-   }
-
-   private Object[] createSegmenterContent() {
-
-      final TourSegmenter selectedSegmenter = getSelectedSegmenter();
-      if (selectedSegmenter == null) {
-         return new Object[0];
-      }
-
-      /*
-       * get break time values: time/distance & speed
-       */
-      final BreakTimeTool btConfig;
-
-      if (selectedSegmenter.segmenterType == SegmenterType.ByBreakTime) {
-
-         // use segmenter values
-
-         btConfig = new BreakTimeTool(
-               getSelectedBreakMethod().methodId,
-               _breakUIShortestBreakTime,
-               _breakUIMaxDistance,
-               _breakUIMinSliceSpeed,
-               _breakUIMinAvgSpeed,
-               _breakUISliceDiff,
-               _breakUIMinAvgSpeedAS,
-               _breakUIMinSliceSpeedAS,
-               _breakUIMinSliceTimeAS);
-
-      } else {
-
-         // use pref values for time/distance & speed
-
-         btConfig = BreakTimeTool.getPrefValues();
-      }
-
-      _allTourSegments = _tourData.createSegmenterSegments(btConfig);
-
-      return _allTourSegments == null //
-            ? new Object[0]
-            : _allTourSegments.toArray();
    }
 
    /**
