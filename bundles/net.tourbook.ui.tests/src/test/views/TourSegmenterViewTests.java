@@ -80,11 +80,11 @@ public class TourSegmenterViewTests extends UITest {
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       //Change the measurement system to imperial
-      bot.comboBoxWithTooltip(net.tourbook.common.Messages.Measurement_System_Tooltip)
+      bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Metric)
             .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
 
       //Change back the measurement system to metric
-      bot.comboBoxWithTooltip(net.tourbook.common.Messages.Measurement_System_Tooltip)
+      bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
             .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
       tourSegmenterView.close();
