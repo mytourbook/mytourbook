@@ -97,6 +97,10 @@ Bugfix
 
 * Tour Book (Frederic)
   - Hiding the temperature value when no value is detected instead of displaying 0 or 32
+  
+* Marker Editor
+  - Fixed height of the marker viewer. This issue exists since ever and was annoying since ever.
+    Until now the marker viewer height decreased every time when this dialog was reopened.
 
 
 Translation    
