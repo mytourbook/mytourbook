@@ -940,8 +940,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             /*
              * update min altitude
              */
-            final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
-            final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? selectedMinAltiDiff : selectedMinAltiDiff / UI.UNIT_FOOT;
+            final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? _spinnerMinAltitude.getSelection() * UI.UNIT_FOOT
+                  : _spinnerMinAltitude
+                  .getSelection() / UI.UNIT_FOOT;
             _spinnerMinAltitude.setSelection(Math.round(convertedSelectedMinAltiDiff));
             _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
 
@@ -1505,7 +1506,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createSegmentsBy_AltiUpDown() {
 
       final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
-      final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? selectedMinAltiDiff : selectedMinAltiDiff / UI.UNIT_FOOT;
+      final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? selectedMinAltiDiff : selectedMinAltiDiff * UI.UNIT_FOOT;
 
       final ArrayList<AltitudeUpDownSegment> tourSegments = new ArrayList<>();
 
