@@ -940,6 +940,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             /*
              * update min altitude
              */
+            final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
+            final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? selectedMinAltiDiff : selectedMinAltiDiff / UI.UNIT_FOOT;
+            _spinnerMinAltitude.setSelection(Math.round(convertedSelectedMinAltiDiff));
             _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
 
             updateUI_Surfing_MeasurementValues();
@@ -1502,11 +1505,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createSegmentsBy_AltiUpDown() {
 
       final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
+      final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? selectedMinAltiDiff : selectedMinAltiDiff / UI.UNIT_FOOT;
 
       final ArrayList<AltitudeUpDownSegment> tourSegments = new ArrayList<>();
 
       // create segment when the altitude up/down is changing
-      _tourData.computeAltitudeUpDown(tourSegments, selectedMinAltiDiff);
+      _tourData.computeAltitudeUpDown(tourSegments, convertedSelectedMinAltiDiff);
 
       // convert segment list into array
       int serieIndex = 0;
@@ -5057,7 +5061,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       updateUI_Distance();
 
-      _spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, 50));
+      final int defaultAltitudeValue = UI.UNIT_IS_ELEVATION_METER ? 50 : Math.round(50 / UI.UNIT_FOOT);
+      _spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, defaultAltitudeValue));
 
       /*
        * DP tolerance
