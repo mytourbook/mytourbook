@@ -940,8 +940,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             /*
              * update min altitude
              */
-            _lblMinAltitude.setText(UI.UNIT_LABEL_DISTANCE);
-            _lblMinAltitude.pack(true);
+            _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
 
             updateUI_Surfing_MeasurementValues();
 
