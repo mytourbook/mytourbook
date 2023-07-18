@@ -76,9 +76,6 @@ public class TourSegmenterViewTests extends UITest {
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byComputedAltiUpDown);
       assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
-      segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
-      assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
-
       //Change the measurement system to imperial
       bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Metric)
             .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
@@ -86,6 +83,9 @@ public class TourSegmenterViewTests extends UITest {
       //Change back the measurement system to metric
       bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
             .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+
+      segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
+      assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       tourSegmenterView.close();
    }
