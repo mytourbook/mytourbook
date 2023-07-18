@@ -80,6 +80,8 @@ public class TourSegmenterViewTests extends UITest {
       bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Metric)
             .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
 
+      bot.sleep(2000);
+
       //Change back the measurement system to metric
       bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
             .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
