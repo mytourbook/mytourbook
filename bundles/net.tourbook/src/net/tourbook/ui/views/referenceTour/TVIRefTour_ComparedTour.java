@@ -99,7 +99,7 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
    /**
     * @return Returns the Id for {@link TourCompared} entity
     */
-   public long getCompId() {
+   public long getCompareId() {
       return compareId;
    }
 

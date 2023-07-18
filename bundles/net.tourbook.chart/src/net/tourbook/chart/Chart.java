@@ -1331,7 +1331,7 @@ public class Chart extends ViewForm {
       final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
 
       _action_ZoomIn.setEnabled(canZoomIn && isEnabled);
-      _action_ZoomOut.setEnabled(canZoomOut);
+      _action_ZoomOut.setEnabled(canZoomOut && isEnabled);
 
       _allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(isEnabled);
    }
@@ -1349,7 +1349,15 @@ public class Chart extends ViewForm {
          return;
       }
 
-      getDisplay().asyncExec(() -> _synchedChart.setSynchConfig(_chartComponents.synchConfigOut));
+      getDisplay().asyncExec(() -> {
+
+         // it needs another check to fix a NPE
+
+         if (_synchedChart != null) {
+
+            _synchedChart.setSynchConfig(_chartComponents.synchConfigOut);
+         }
+      });
    }
 
    /**

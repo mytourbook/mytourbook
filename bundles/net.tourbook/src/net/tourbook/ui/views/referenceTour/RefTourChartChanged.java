@@ -19,24 +19,24 @@ import net.tourbook.ui.tourChart.TourChart;
 
 public class RefTourChartChanged {
 
-   long      refId;
+   TourCompareConfig compareConfig;
 
-   double    xValueDifference;
+   double            xValueDifference;
 
-   TourChart refTourChart;
+   TourChart         refTourChart;
 
    /**
     * @param refTourChart
     *           reference tour chart
-    * @param refId
+    * @param compareConfig
     *           reference id
     * @param xValueDiff
     *           value difference in the reference tour
     */
-   public RefTourChartChanged(final TourChart refTourChart, final long refId, final double xValueDiff) {
+   public RefTourChartChanged(final TourChart refTourChart, final TourCompareConfig compareConfig, final double xValueDiff) {
 
       this.refTourChart = refTourChart;
-      this.refId = refId;
+      this.compareConfig = compareConfig;
 
       this.xValueDifference = xValueDiff;
    }

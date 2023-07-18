@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import net.tourbook.chart.ChartDataModel;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -32,41 +31,53 @@ public class TourCompareConfig {
    private TourReference          _refTour;
 
    /**
-    * ID of a compared tour according to the {@link #_tourCompareType}
+    * Tour ID of the compared reference tour
     */
-   private Long                   _tourCompareId;
+   private Long                   _refTour_TourId;
 
    /**
-    * Type of the {@link #_tourCompareId}
+    * Type of the {@link #_refTour_TourId}
     */
    private TourCompareType        _tourCompareType;
 
-   private TourChartConfiguration _refTour_ChartConfig;
-   private TourChartConfiguration _compareTour_ChartConfig;
+   private TourChartConfiguration _chartConfig_RefTour;
+   private TourChartConfiguration _chartConfig_ComparedTour;
 
    TourCompareConfig(final TourReference refTour,
-                 final Long tourCompareId,
-                 final ChartDataModel refChartDataModel,
-                 final TourChartConfiguration refTour_ChartConfig,
-                 final TourChartConfiguration compTour_ChartConfig) {
+                     final Long refTour_TourId,
+                     final TourChartConfiguration chartConfig_RefTour,
+                     final TourChartConfiguration chartConfig_ComparedTour) {
 
       _refTour = refTour;
-      _tourCompareId = tourCompareId;
+      _refTour_TourId = refTour_TourId;
 
-      _refTour_ChartConfig = refTour_ChartConfig;
-      _compareTour_ChartConfig = compTour_ChartConfig;
+      _chartConfig_RefTour = chartConfig_RefTour;
+      _chartConfig_ComparedTour = chartConfig_ComparedTour;
    }
 
    TourChartConfiguration getCompareTourChartConfig() {
-      return _compareTour_ChartConfig;
+      return _chartConfig_ComparedTour;
    }
 
    public TourReference getRefTour() {
       return _refTour;
    }
 
+   public long getRefTour_RefId() {
+
+      if (_refTour != null) {
+         return _refTour.getRefId();
+      }
+
+      return -1;
+   }
+
+   public Long getRefTour_TourId() {
+      return _refTour_TourId;
+   }
+
    TourChartConfiguration getRefTourChartConfig() {
-      return _refTour_ChartConfig;
+      return _chartConfig_RefTour;
    }
 
    public TourData getRefTourData() {
@@ -76,7 +87,7 @@ public class TourCompareConfig {
        * could be changed, this is a wrong concept which could be changed but requires additonal
        * work
        */
-      return TourManager.getInstance().getTourData(_tourCompareId);
+      return TourManager.getInstance().getTourData(_refTour_TourId);
    }
 
    public TourCompareType getTourCompareType() {
@@ -90,19 +101,19 @@ public class TourCompareConfig {
    @Override
    public String toString() {
 
-      return "CompareConfig" + NL //                                                //$NON-NLS-1$
+      return "CompareConfig" + NL //                                                   //$NON-NLS-1$
 
-            + "[" + NL //                                                           //$NON-NLS-1$
+            + "[" + NL //                                                              //$NON-NLS-1$
 
-            + "  _tourCompareType         = " + _tourCompareType + NL //            //$NON-NLS-1$
-            + "  _tourCompareId           = " + _tourCompareId + NL //              //$NON-NLS-1$
+            + "  _tourCompareType          = " + _tourCompareType + NL //              //$NON-NLS-1$
+            + "  _refTour_TourId           = " + _refTour_TourId + NL //                //$NON-NLS-1$
 
-            + "  _refTour_ChartConfig     = " + _refTour_ChartConfig + NL //        //$NON-NLS-1$
-            + "  _compareTour_ChartConfig = " + _compareTour_ChartConfig + NL //    //$NON-NLS-1$
+            + "  _chartConfig_RefTour      = " + _chartConfig_RefTour + NL //          //$NON-NLS-1$
+            + "  _chartConfig_ComparedTour = " + _chartConfig_ComparedTour + NL //     //$NON-NLS-1$
 
-            + "  _refTour                 = " + _refTour + NL //                    //$NON-NLS-1$
+            + "  _refTour                  = " + _refTour + NL //                      //$NON-NLS-1$
 
-            + "]" + NL //                                                           //$NON-NLS-1$
+            + "]" + NL //                                                              //$NON-NLS-1$
       ;
    }
 

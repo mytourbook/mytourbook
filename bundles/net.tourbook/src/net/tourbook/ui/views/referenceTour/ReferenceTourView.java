@@ -412,7 +412,7 @@ public class ReferenceTourView extends ViewPart implements
             if (tourTreeItem instanceof TVIRefTour_ComparedTour) {
 
                final TVIRefTour_ComparedTour ttiCompResult = (TVIRefTour_ComparedTour) tourTreeItem;
-               final long ttiCompId = ttiCompResult.getCompId();
+               final long ttiCompId = ttiCompResult.getCompareId();
 
                for (final ElevationCompareResult compareResultItem : removedComparedTours) {
 

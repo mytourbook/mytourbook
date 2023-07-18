@@ -77,7 +77,7 @@ public class ActionRemoveComparedTours extends Action {
          if (element instanceof TVIRefTour_ComparedTour) {
 
             final TVIRefTour_ComparedTour compTourItem = (TVIRefTour_ComparedTour) element;
-            final long compId = compTourItem.getCompId();
+            final long compId = compTourItem.getCompareId();
 
             if (ElevationCompareManager.removeComparedTourFromDb(compId)) {
 

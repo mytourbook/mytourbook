@@ -251,22 +251,13 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
          if (refTour_EndValueIndex >= xValues.length) {
 
-            // an ArrayIndexOutOfBoundsException occured but cannot be reproduced
+            // an ArrayIndexOutOfBoundsException occurred but cannot be reproduced
+
             return;
          }
 
          // set x-value marker positions
          xData.setXValueMarker_ValueIndices(refTour_StartValueIndex, refTour_EndValueIndex);
-
-         // set the value difference of the synch marker
-         final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour_StartValueIndex];
-
-         final RefTourChartChanged changeData = new RefTourChartChanged(_tourChart, refTour.getRefId(), refTourXValueDiff);
-
-         TourManager.fireEventWithCustomData(
-               TourEventId.REFERENCE_TOUR_CHANGED,
-               changeData,
-               ReferenceTourChartView.this);
 
          // set title
          chartDataModel.setTitle(NLS.bind(
@@ -274,6 +265,22 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
                refTour.getLabel(),
                TourManager.getTourTitleDetailed(_tourData)));
 
+         _tourChart.getDisplay().asyncExec(() -> {
+
+            if (_tourChart.isDisposed()) {
+               return;
+            }
+
+            // set the value difference of the synch marker
+            final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour_StartValueIndex];
+
+            final RefTourChartChanged changeData = new RefTourChartChanged(_tourChart, compareConfig, refTourXValueDiff);
+
+            TourManager.fireEventWithCustomData(
+                  TourEventId.REFERENCE_TOUR_CHANGED,
+                  changeData,
+                  ReferenceTourChartView.this);
+         });
       });
    }
 

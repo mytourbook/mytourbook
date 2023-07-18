@@ -103,7 +103,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
    /*
     * Keep data from the reference tour view
     */
-   private long                              _refTour_RefId          = -1;
+   private TourCompareConfig                 _refTour_CompareConfig;
    private TourChart                         _refTour_TourChart;
    private double                            _refTour_XValueDifference;
 
@@ -113,17 +113,17 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
     * Entity ID for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
     * database
     */
-   private long                              _comparedTour_CompareId = -1;
+   private long                              _comparedTour_ComparedItemId = -1;
 
    /**
     * Tour Id for the displayed compared tour
     */
-   private long                              _comparedTour_TourId    = -1;
+   private long                              _comparedTour_TourId         = -1;
 
    /**
     * Entity ID for the reference tour of the displayed compared tour
     */
-   private long                              _comparedTour_RefId     = -1;
+   private long                              _comparedTour_RefId          = -1;
 
    /**
     * Reference tour chart for the displayed compared tour, chart is used for the synchronization
@@ -327,7 +327,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
                final RefTourChartChanged refTourChanged = (RefTourChartChanged) eventData;
 
-               _refTour_RefId = refTourChanged.refId;
+               _refTour_CompareConfig = refTourChanged.compareConfig;
                _refTour_TourChart = refTourChanged.refTourChart;
                _refTour_XValueDifference = refTourChanged.xValueDifference;
 
@@ -511,7 +511,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       final boolean isXValueMarkerMoved = _defaultStartIndex != _movedStartIndex || _defaultEndIndex != _movedEndIndex;
       final boolean isElevationCompareTour = _isGeoCompareTour == false
-            && (isXValueMarkerMoved || _comparedTour_CompareId == -1);
+            && (isXValueMarkerMoved || _comparedTour_ComparedItemId == -1);
 
       // geo compared with ref tour cannot be saved !
       _actionSaveComparedTour.setEnabled(isElevationCompareTour);
@@ -530,7 +530,10 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
          boolean isSynchEnabled = false;
 
-         if (_comparedTour_RefId == _refTour_RefId) {
+         final long geoRefId = ReferenceTourManager.getGeoCompare_RefId();
+
+         if (_comparedTour_RefId == _refTour_CompareConfig.getRefTour_RefId()
+               || _comparedTour_RefId == geoRefId) {
 
             // reference tour for the compared chart is displayed
 
@@ -606,7 +609,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
                                 final boolean isDataSaved) {
 
       final TourPropertyCompareTourChanged customData = new TourPropertyCompareTourChanged(
-            _comparedTour_CompareId,
+            _comparedTour_ComparedItemId,
             _comparedTour_TourId,
             _comparedTour_RefId,
             startIndex,
@@ -791,7 +794,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
     */
    private boolean saveComparedTour() {
 
-      if (_comparedTour_CompareId == -1) {
+      if (_comparedTour_ComparedItemId == -1) {
          setDataDirty(false);
          return true;
       }
@@ -829,7 +832,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
    private void saveComparedTour_10_Save() {
 
-      if (_comparedTour_CompareId == -1) {
+      if (_comparedTour_ComparedItemId == -1) {
 
          // compared tour is not yet saved
 
@@ -841,7 +844,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       try {
 
-         final TourCompared comparedTour = em.find(TourCompared.class, _comparedTour_CompareId);
+         final TourCompared comparedTour = em.find(TourCompared.class, _comparedTour_ComparedItemId);
 
          if (comparedTour != null) {
 
@@ -866,7 +869,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             em.merge(comparedTour);
             ts.commit();
 
-            _comparedTour_CompareId = comparedTour.getComparedId();
+            _comparedTour_ComparedItemId = comparedTour.getComparedId();
             _comparedTour_TourId = comparedTour.getTourId();
 
             setDataDirty(false);
@@ -912,7 +915,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
             ElevationCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
 
-            _comparedTour_CompareId = comparedTourItem.compareId;
+            _comparedTour_ComparedItemId = comparedTourItem.compareId;
             _comparedTour_TourId = comparedTourItem.tourId;
 
             // update tour map view
@@ -973,7 +976,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       if (_comparedTour_RefTourChart != null) {
 
-         // uncheck other synch mode
+         // uncheck the other synch mode
          switch (chartSyncMode) {
          case BY_SCALE:
 
@@ -1016,11 +1019,11 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       if (_tourData == null) {
 
-         _refTour_RefId = -1;
+         _refTour_CompareConfig = null;
 
          _comparedTour_TourId = -1;
          _comparedTour_RefId = -1;
-         _comparedTour_CompareId = -1;
+         _comparedTour_ComparedItemId = -1;
 
          _pageBook.showPage(_pageNoData);
 
@@ -1131,14 +1134,14 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       // keep data from the selected compared tour
       _comparedTour_TourId = eleTourId;
       _comparedTour_RefId = elevationComparedResultTour.refTour.refId;
-      _comparedTour_CompareId = elevationComparedResultTour.compareId;
+      _comparedTour_ComparedItemId = elevationComparedResultTour.compareId;
 
       _tourData = compTourData;
 
       // set tour compare data, this will show the action button to see the graph for this data
       _tourData.tourCompareSerie = elevationComparedResultTour.altitudeDiffSerie;
 
-      if (_comparedTour_CompareId == -1) {
+      if (_comparedTour_ComparedItemId == -1) {
 
          // compared tour is not saved
 
@@ -1190,7 +1193,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       // set data from the selection
       _comparedTour_TourId = geoTourId;
       _comparedTour_RefId = geoCompareData.refTour_RefId;
-      _comparedTour_CompareId = -1;
+      _comparedTour_ComparedItemId = -1;
 
       _tourData = compTourData;
 
@@ -1238,7 +1241,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       // set data from the selection
       _comparedTour_TourId = ctTourId;
       _comparedTour_RefId = refTourComparedTour.getRefId();
-      _comparedTour_CompareId = refTourComparedTour.getCompId();
+      _comparedTour_ComparedItemId = refTourComparedTour.getCompareId();
 
       _tourData = compTourData;
 
