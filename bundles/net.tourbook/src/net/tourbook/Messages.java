@@ -996,6 +996,7 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Column_SequenceNumber_Label;
    public static String        GeoCompare_View_Combo_MouseWheelIncrementer_ElevationDiff_Tooltip;
    public static String        GeoCompare_View_Combo_MouseWheelIncrementer_GeoDiff_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
    public static String        GeoCompare_View_Label_GeoParts;

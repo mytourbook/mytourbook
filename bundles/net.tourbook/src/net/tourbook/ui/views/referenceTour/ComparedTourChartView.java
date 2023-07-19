@@ -530,10 +530,9 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
          boolean isSynchEnabled = false;
 
-         final long geoRefId = ReferenceTourManager.getGeoCompare_RefId();
 
          if (_comparedTour_RefId == _refTour_CompareConfig.getRefTour_RefId()
-               || _comparedTour_RefId == geoRefId) {
+               || _comparedTour_RefId == ReferenceTourManager.getGeoCompare_RefId()) {
 
             // reference tour for the compared chart is displayed
 

@@ -142,6 +142,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private static final String           STATE_IS_USE_APP_FILTER                      = "STATE_IS_USE_APP_FILTER";                         //$NON-NLS-1$
    static final String                   STATE_MOUSE_WHEEL_INCREMENTER_ELEVATION_DIFF = "STATE_MOUSE_WHEEL_INCREMENTER_ELEVATION_DIFF";    //$NON-NLS-1$
    static final String                   STATE_MOUSE_WHEEL_INCREMENTER_GEO_DIFF       = "STATE_MOUSE_WHEEL_INCREMENTER_GEO_DIFF";          //$NON-NLS-1$
+   static final String                   STATE_MOUSE_WHEEL_INCREMENTER_MAX_RESULTS    = "STATE_MOUSE_WHEEL_INCREMENTER_MAX_RESULTS";       //$NON-NLS-1$
    private static final String           STATE_TOUR_FILTER_ELEVATION_DIFF             = "STATE_TOUR_FILTER_ELEVATION_DIFF";                //$NON-NLS-1$
    private static final String           STATE_TOUR_FILTER_GEO_DIFF                   = "STATE_TOUR_FILTER_GEO_DIFF";                      //$NON-NLS-1$
    private static final String           STATE_TOUR_FILTER_SEQUENCE_FILTER            = "STATE_TOUR_FILTER_SEQUENCE_FILTER";               //$NON-NLS-1$
@@ -298,6 +299,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private int                             _mouseWheelIncrementer_ElevationDiff;
    private int                             _mouseWheelIncrementer_GeoDiff;
+   private int                             _mouseWheelIncrementer_MaxResults;
 
    /*
     * UI controls
@@ -318,6 +320,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private Combo     _comboMouseWheelIncrementer_ElevationDiff;
    private Combo     _comboMouseWheelIncrementer_GeoDiff;
+   private Combo     _comboMouseWheelIncrementer_MaxResults;
 
    private Label     _lblCompareStatus_Icon;
    private Label     _lblCompareStatus_Message;
@@ -1483,7 +1486,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _comboMouseWheelIncrementer_GeoDiff.setToolTipText(Messages.GeoCompare_View_Combo_MouseWheelIncrementer_GeoDiff_Tooltip);
 
                _comboMouseWheelIncrementer_GeoDiff.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                     selectionEvent -> onSelect_GeoDiff_MouseWheelIncrementer()));
+                     selectionEvent -> onSelect_MouseWheelIncrementer_GeoDiff()));
 
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer_GeoDiff);
             }
@@ -1525,7 +1528,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _comboMouseWheelIncrementer_ElevationDiff.setToolTipText(Messages.GeoCompare_View_Combo_MouseWheelIncrementer_ElevationDiff_Tooltip);
 
                _comboMouseWheelIncrementer_ElevationDiff.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                     selectionEvent -> onSelect_ElevationDiff_MouseWheelIncrementer()));
+                     selectionEvent -> onSelect_MouseWheelIncrementer_ElevationDiff()));
 
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer_ElevationDiff);
             }
@@ -1549,7 +1552,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _spinnerTourFilter_MaxResults.setPageIncrement(10);
                _spinnerTourFilter_MaxResults.addSelectionListener(_compareSelectionListener);
                _spinnerTourFilter_MaxResults.addMouseWheelListener(mouseEvent -> {
-                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, _mouseWheelIncrementer_MaxResults);
                   onSelect_CompareValues();
                });
             }
@@ -1558,8 +1561,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _lblTourFilter_MaxResults_Unit = new Label(container, SWT.NONE);
                _lblTourFilter_MaxResults_Unit.setText(UI.SYMBOL_NUMBER_SIGN);
             }
+            {
+               // Combo: Mouse wheel incrementer
+               _comboMouseWheelIncrementer_MaxResults = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+               _comboMouseWheelIncrementer_MaxResults.setVisibleItemCount(10);
+               _comboMouseWheelIncrementer_MaxResults.setToolTipText(Messages.GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip);
 
-            UI.createSpacer_Horizontal(container, 1);
+               _comboMouseWheelIncrementer_MaxResults.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_MouseWheelIncrementer_MaxResults()));
+
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer_MaxResults);
+            }
          }
          final Composite stateContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).span(4, 1).align(SWT.FILL, SWT.END).applyTo(stateContainer);
@@ -2360,6 +2372,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _comboMouseWheelIncrementer_ElevationDiff .setEnabled(isGeoCompareON && _isTourFilter_ElevationDiff);
       _comboMouseWheelIncrementer_GeoDiff       .setEnabled(isGeoCompareON && _isTourFilter_GeoDiff);
+      _comboMouseWheelIncrementer_MaxResults    .setEnabled(isGeoCompareON && _isTourFilter_MaxResults);
 
       _geoCompareViewer.getTable()              .setEnabled(isGeoCompareON);
 
@@ -2397,6 +2410,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _comboMouseWheelIncrementer_ElevationDiff.add(INCREMENTER_100);
       _comboMouseWheelIncrementer_ElevationDiff.add(INCREMENTER_10);
       _comboMouseWheelIncrementer_ElevationDiff.add(INCREMENTER_1);
+
+      _comboMouseWheelIncrementer_MaxResults.add(INCREMENTER_100);
+      _comboMouseWheelIncrementer_MaxResults.add(INCREMENTER_10);
+      _comboMouseWheelIncrementer_MaxResults.add(INCREMENTER_1);
    }
 
    /**
@@ -2484,7 +2501,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       return _columnManager;
    }
 
-   private int getElevationDiffMouseWheelIncrementerIndex() {
+   private int getMouseWheelIncrementerIndex_ElevationDiff() {
 
       if (_mouseWheelIncrementer_ElevationDiff == 1) {
 
@@ -2503,22 +2520,37 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       return 0;
    }
 
-   private int getGeoDiffMouseWheelIncrementerIndex() {
+   private int getMouseWheelIncrementerIndex_GeoDiff() {
 
       if (_mouseWheelIncrementer_GeoDiff == 1) {
 
-         // 1 -> 0.1
-
+         // 1
          return 2;
 
       } else if (_mouseWheelIncrementer_GeoDiff == 10) {
 
-         // 10 -> 1.0
-
+         // 10
          return 1;
       }
 
-      // 100 -> 10.0
+      // 100
+      return 0;
+   }
+
+   private int getMouseWheelIncrementerIndex_MaxResults() {
+
+      if (_mouseWheelIncrementer_MaxResults == 1) {
+
+         // 1
+         return 2;
+
+      } else if (_mouseWheelIncrementer_MaxResults == 10) {
+
+         // 10
+         return 1;
+      }
+
+      // 100
       return 0;
    }
 
@@ -2916,19 +2948,19 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       });
    }
 
-   private void onSelect_ElevationDiff_MouseWheelIncrementer() {
+   private void onSelect_MouseWheelIncrementer_ElevationDiff() {
 
       final int selectionIndex = _comboMouseWheelIncrementer_ElevationDiff.getSelectionIndex();
 
-      if (selectionIndex == 0) { // 10
+      if (selectionIndex == 0) {
 
          _mouseWheelIncrementer_ElevationDiff = 100;
 
-      } else if (selectionIndex == 1) { // 1.0
+      } else if (selectionIndex == 1) {
 
          _mouseWheelIncrementer_ElevationDiff = 10;
 
-      } else { // 0.1
+      } else {
 
          _mouseWheelIncrementer_ElevationDiff = 1;
       }
@@ -2936,7 +2968,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _spinnerTourFilter_ElevationDiff.setPageIncrement(_mouseWheelIncrementer_ElevationDiff);
    }
 
-   private void onSelect_GeoDiff_MouseWheelIncrementer() {
+   private void onSelect_MouseWheelIncrementer_GeoDiff() {
 
       final int selectionIndex = _comboMouseWheelIncrementer_GeoDiff.getSelectionIndex();
 
@@ -2954,6 +2986,26 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       _spinnerTourFilter_GeoDiff.setPageIncrement(_mouseWheelIncrementer_GeoDiff);
+   }
+
+   private void onSelect_MouseWheelIncrementer_MaxResults() {
+
+      final int selectionIndex = _comboMouseWheelIncrementer_MaxResults.getSelectionIndex();
+
+      if (selectionIndex == 0) {
+
+         _mouseWheelIncrementer_MaxResults = 100;
+
+      } else if (selectionIndex == 1) {
+
+         _mouseWheelIncrementer_MaxResults = 10;
+
+      } else {
+
+         _mouseWheelIncrementer_MaxResults = 1;
+      }
+
+      _spinnerTourFilter_MaxResults.setPageIncrement(_mouseWheelIncrementer_MaxResults);
    }
 
    private void onSelect_SortColumn(final SelectionEvent selectionEvent) {
@@ -3258,6 +3310,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _isTourFilter_MaxResults               = Util.getStateBoolean(_state,   STATE_IS_TOUR_FILTER_MAX_RESULTS,               false);
       _mouseWheelIncrementer_ElevationDiff   = Util.getStateInt(_state,       STATE_MOUSE_WHEEL_INCREMENTER_ELEVATION_DIFF,   10);
       _mouseWheelIncrementer_GeoDiff         = Util.getStateInt(_state,       STATE_MOUSE_WHEEL_INCREMENTER_GEO_DIFF,         100);
+      _mouseWheelIncrementer_MaxResults      = Util.getStateInt(_state,       STATE_MOUSE_WHEEL_INCREMENTER_MAX_RESULTS,      10);
       _tourFilter_ElevationDiff              = Util.getStateFloat(_state,     STATE_TOUR_FILTER_ELEVATION_DIFF,               10);
       _tourFilter_GeoDiff                    = Util.getStateFloat(_state,     STATE_TOUR_FILTER_GEO_DIFF,                     50.0f);
       _tourFilter_MaxResults                 = Util.getStateInt(_state,       STATE_TOUR_FILTER_SEQUENCE_FILTER,              100);
@@ -3271,13 +3324,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _chkTourFilter_MaxResults                 .setSelection(_isTourFilter_MaxResults);
 
       _spinnerTourFilter_ElevationDiff          .setPageIncrement(_mouseWheelIncrementer_ElevationDiff);
-      _spinnerTourFilter_ElevationDiff          .setSelection((int) (_tourFilter_ElevationDiff / UI.UNIT_VALUE_ELEVATION));
       _spinnerTourFilter_GeoDiff                .setPageIncrement(_mouseWheelIncrementer_GeoDiff);
+      _spinnerTourFilter_MaxResults             .setPageIncrement(_mouseWheelIncrementer_MaxResults);
+
+      _spinnerTourFilter_ElevationDiff          .setSelection((int) (_tourFilter_ElevationDiff / UI.UNIT_VALUE_ELEVATION));
       _spinnerTourFilter_GeoDiff                .setSelection((int) (_tourFilter_GeoDiff * 10));
       _spinnerTourFilter_MaxResults             .setSelection(_tourFilter_MaxResults);
 
-      _comboMouseWheelIncrementer_ElevationDiff .select(getElevationDiffMouseWheelIncrementerIndex());
-      _comboMouseWheelIncrementer_GeoDiff       .select(getGeoDiffMouseWheelIncrementerIndex());
+      _comboMouseWheelIncrementer_ElevationDiff .select(getMouseWheelIncrementerIndex_ElevationDiff());
+      _comboMouseWheelIncrementer_GeoDiff       .select(getMouseWheelIncrementerIndex_GeoDiff());
+      _comboMouseWheelIncrementer_MaxResults    .select(getMouseWheelIncrementerIndex_MaxResults());
 
       enableControls();
    }
@@ -3303,6 +3359,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _state.put(STATE_IS_TOUR_FILTER_MAX_RESULTS,             _isTourFilter_MaxResults);
       _state.put(STATE_MOUSE_WHEEL_INCREMENTER_ELEVATION_DIFF, _mouseWheelIncrementer_ElevationDiff);
       _state.put(STATE_MOUSE_WHEEL_INCREMENTER_GEO_DIFF,       _mouseWheelIncrementer_GeoDiff);
+      _state.put(STATE_MOUSE_WHEEL_INCREMENTER_MAX_RESULTS,    _mouseWheelIncrementer_MaxResults);
       _state.put(STATE_TOUR_FILTER_GEO_DIFF,                   _tourFilter_GeoDiff);
       _state.put(STATE_TOUR_FILTER_SEQUENCE_FILTER,            _tourFilter_MaxResults);
 
