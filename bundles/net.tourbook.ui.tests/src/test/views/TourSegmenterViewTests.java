@@ -79,12 +79,12 @@ public class TourSegmenterViewTests extends UITest {
       //Change the measurement system to imperial
       final SWTBotCombo measurementSystemComboBox = bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
       assertNotNull(measurementSystemComboBox);
-      measurementSystemComboBox.setSelection(1);
+      measurementSystemComboBox.setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      measurementSystemComboBox.setSelection(0);
+      measurementSystemComboBox.setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
