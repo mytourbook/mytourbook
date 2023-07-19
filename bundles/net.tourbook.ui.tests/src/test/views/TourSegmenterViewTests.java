@@ -77,16 +77,21 @@ public class TourSegmenterViewTests extends UITest {
       assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       //Change the measurement system to imperial
-      final SWTBotCombo measurementSystemComboBox = bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
-      assertNotNull(measurementSystemComboBox);
-      measurementSystemComboBox.setSelection(1);
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").select();
+      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+      bot.comboBox(0).setSelection(1);
+      Utils.clickApplyAndCloseButton(bot);
 
-      bot.sleep(5000);
+//      final SWTBotCombo measurementSystemComboBox = bot.comboBox(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+//      assertNotNull(measurementSystemComboBox);
+//      measurementSystemComboBox.setSelection(1);
+
+      bot.sleep(10000);
 
       //Change back the measurement system to metric
-      measurementSystemComboBox.setSelection(0);
-      //  bot.comboBox("333")//net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
-      //      .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+      bot.comboBox("333")//net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
+            .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
