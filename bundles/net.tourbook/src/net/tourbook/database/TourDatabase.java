@@ -112,10 +112,11 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 50;
+   private static final int TOURBOOK_DB_VERSION = 51;
 
-//   private static final int TOURBOOK_DB_VERSION = 50; // 23.x ??????
+//   private static final int TOURBOOK_DB_VERSION = 51; // 23.8 ??????
 
+//   private static final int TOURBOOK_DB_VERSION = 50; // 23.5
 //   private static final int TOURBOOK_DB_VERSION = 49; // 23.3
 //   private static final int TOURBOOK_DB_VERSION = 48; // 22.6
 //   private static final int TOURBOOK_DB_VERSION = 47; // 22.3
@@ -4449,15 +4450,28 @@ public class TourDatabase {
       /*
        * CREATE TABLE TourReference
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_REFERENCE + "   (                        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_REFERENCE + "   (                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_REF, true)
 
-            + "   " + KEY_TOUR + "     BIGINT,                                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "           BIGINT,                                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   startIndex           INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
-            + "   endIndex             INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
-            + "   label                VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   startIndex                 INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   endIndex                   INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   label                      VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 51 start
+
+            + "   isTourFilter_ElevationDiff BOOLEAN DEFAULT FALSE,                          " + NL //$NON-NLS-1$
+            + "   isTourFilter_GeoDiff       BOOLEAN DEFAULT FALSE,                          " + NL //$NON-NLS-1$
+            + "   isTourFilter_MaxResults    BOOLEAN DEFAULT FALSE,                          " + NL //$NON-NLS-1$
+
+            + "   tourFilter_ElevationDiff   FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
+            + "   tourFilter_GeoDiff         FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
+            + "   tourFilter_MaxResults      INT   DEFAULT 0,                                " + NL //$NON-NLS-1$
+
+            // version 51 end ---------
+
             + ")"); //$NON-NLS-1$
    }
 
@@ -5927,9 +5941,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_048_To_049(conn, splashManager);
          }
 
-         // 49 -> 50    23.X
+         // 49 -> 50    23.5
          if (currentDbVersion == 49) {
             currentDbVersion = _dbDesignVersion_New = updateDb_049_To_050(conn, splashManager);
+         }
+
+         // 50 -> 51    23.8
+         if (currentDbVersion == 50) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_050_To_051(conn, splashManager);
          }
 
          // update db design version number
@@ -9668,6 +9687,40 @@ public class TourDatabase {
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   private int updateDb_050_To_051(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 51;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         /*
+          * Table: TABLE_TOUR_REFERENCE
+          */
+
+         // add new columns
+
+// SET_FORMATTING_OFF
+
+         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE, "isTourFilter_ElevationDiff",   DEFAULT_FALSE); //$NON-NLS-1$
+         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE, "isTourFilter_GeoDiff",         DEFAULT_FALSE); //$NON-NLS-1$
+         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE, "isTourFilter_MaxResults",      DEFAULT_FALSE); //$NON-NLS-1$
+
+         SQL.AddColumn_Float(stmt,     TABLE_TOUR_REFERENCE, "tourFilter_ElevationDiff",     DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float(stmt,     TABLE_TOUR_REFERENCE, "tourFilter_GeoDiff",           DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Int  (stmt,     TABLE_TOUR_REFERENCE, "tourFilter_MaxResults",        DEFAULT_0); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

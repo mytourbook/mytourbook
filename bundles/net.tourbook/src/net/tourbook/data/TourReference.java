@@ -67,6 +67,25 @@ public class TourReference implements Serializable {
 
    private String                     label            = UI.EMPTY_STRING;
 
+   private boolean                    isTourFilter_ElevationDiff;
+   private boolean                    isTourFilter_GeoDiff;
+   private boolean                    isTourFilter_MaxResults;
+
+   /**
+    * Tour filter for the elevation differences in the compare result
+    */
+   private float                      tourFilter_ElevationDiff;
+
+   /**
+    * Tour filter for the geo differences in the compare result
+    */
+   private float                      tourFilter_GeoDiff;
+
+   /**
+    * Tour filter for the max results in the compare result
+    */
+   private int                        tourFilter_MaxResults;
+
    /**
     * Unique id for created entities because the {@link #refId} is -1 when it's not persisted
     */
@@ -182,9 +201,33 @@ public class TourReference implements Serializable {
       return TourManager.getInstance().getTourData(tourData.getTourId());
    }
 
+   public float getTourFilter_ElevationDiff() {
+      return tourFilter_ElevationDiff;
+   }
+
+   public float getTourFilter_GeoDiff() {
+      return tourFilter_GeoDiff;
+   }
+
+   public int getTourFilter_MaxResults() {
+      return tourFilter_MaxResults;
+   }
+
    @Override
    public int hashCode() {
       return Objects.hash(_createId, refId);
+   }
+
+   public boolean isTourFilter_ElevationDiff() {
+      return isTourFilter_ElevationDiff;
+   }
+
+   public boolean isTourFilter_GeoDiff() {
+      return isTourFilter_GeoDiff;
+   }
+
+   public boolean isTourFilter_MaxResults() {
+      return isTourFilter_MaxResults;
    }
 
    public void setEndValueIndex(final int endIndex) {
@@ -197,6 +240,30 @@ public class TourReference implements Serializable {
 
    public void setStartValueIndex(final int startIndex) {
       this.startIndex = startIndex;
+   }
+
+   public void setTourFilter_ElevationDiff(final float tourFilter_ElevationDiff) {
+      this.tourFilter_ElevationDiff = tourFilter_ElevationDiff;
+   }
+
+   public void setTourFilter_GeoDiff(final float tourFilter_GeoDiff) {
+      this.tourFilter_GeoDiff = tourFilter_GeoDiff;
+   }
+
+   public void setTourFilter_IsElevationDiff(final boolean isTourFilter_ElevationDiff) {
+      this.isTourFilter_ElevationDiff = isTourFilter_ElevationDiff;
+   }
+
+   public void setTourFilter_IsGeoDiff(final boolean isTourFilter_GeoDiff) {
+      this.isTourFilter_GeoDiff = isTourFilter_GeoDiff;
+   }
+
+   public void setTourFilter_IsMaxResults(final boolean isTourFilter_MaxResults) {
+      this.isTourFilter_MaxResults = isTourFilter_MaxResults;
+   }
+
+   public void setTourFilter_MaxResults(final int tourFilter_MaxResults) {
+      this.tourFilter_MaxResults = tourFilter_MaxResults;
    }
 
    /**

@@ -1606,7 +1606,6 @@ public class ReferenceTourView extends ViewPart implements
    }
 
    private void onAction_GeoCompare() {
-      // TODO Auto-generated method stub
 
       if (GeoCompareManager.isGeoComparingOn() == false) {
 
@@ -1650,7 +1649,7 @@ public class ReferenceTourView extends ViewPart implements
 
 //issue: do not final start or show final geo compared tours
 
-         geoCompareView.compareRefTour(refId);
+         geoCompareView.compareNativeRefTour(refId);
       }
    }
 

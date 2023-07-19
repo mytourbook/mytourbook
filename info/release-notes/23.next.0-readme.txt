@@ -55,6 +55,7 @@ Improvements
   
 * Geo Compare View
   - Display tour filter in the main view
+  - Save filter settings in the reference tour
   - New filters: 
     - Filter compared tours by elevation gain/loss difference
     - Filter compared tours by sequence number
