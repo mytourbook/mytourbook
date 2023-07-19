@@ -24,6 +24,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
+import net.tourbook.Messages;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -37,17 +38,26 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   public static final String DIRECTORY               = "Directory";                                                          //$NON-NLS-1$
-   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                                        //$NON-NLS-1$
-   public static final String STATISTICS_VIEW_NAME    = "Statistics";                                                         //$NON-NLS-1$
-   public static final String TOOLS                   = "Tools ";                                                             //$NON-NLS-1$
-   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                                                          //$NON-NLS-1$
-   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                                        //$NON-NLS-1$
-   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                                                       //$NON-NLS-1$
-   public static final String TOURPAUSES_VIEW_NAME    = "Tour Pauses";                                                        //$NON-NLS-1$
-   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";                                                     //$NON-NLS-1$
+   public static final String DIRECTORY               = "Directory";                    //$NON-NLS-1$
+   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
+   public static final String STATISTICS_VIEW_NAME    = "Statistics";                   //$NON-NLS-1$
+   public static final String TOOLS                   = "Tools ";                       //$NON-NLS-1$
+   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                    //$NON-NLS-1$
+   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                  //$NON-NLS-1$
+   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                 //$NON-NLS-1$
+   public static final String TOURPAUSES_VIEW_NAME    = "Tour Pauses";                  //$NON-NLS-1$
+   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";               //$NON-NLS-1$
 
-   public static final String workingDirectory        = System.getProperty("user.dir");                                       //$NON-NLS-1$
+   public static final String workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
+
+   public static void changeMeasurementSystem(final SWTWorkbenchBot bot, final String measurementSystem) {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
+      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+      bot.comboBox(0).setSelection(measurementSystem);
+      Utils.clickApplyAndCloseButton(bot);
+   }
 
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
 

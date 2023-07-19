@@ -32,6 +32,12 @@ import utils.Utils;
 
 public class TourSegmenterViewTests extends UITest {
 
+   private SWTBotView getTourSegmenterView() {
+
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
+      return Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+   }
+
    @Test
    void testSegmenterAlgorithms_All() {
 
@@ -41,12 +47,8 @@ public class TourSegmenterViewTests extends UITest {
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      SWTBotView tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
-      SWTBot tourSegmenterViewBot = tourSegmenterView.bot();
-
+      SWTBot tourSegmenterViewBot = getTourSegmenterView().bot();
       SWTBotTable tableSegments = tourSegmenterViewBot.table();
-
       SWTBotCombo segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byAltitude);
@@ -77,31 +79,17 @@ public class TourSegmenterViewTests extends UITest {
       assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       //Change the measurement system to imperial
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").select();
-      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
-      Utils.clickApplyAndCloseButton(bot);
+      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").select();
-      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
-      Utils.clickApplyAndCloseButton(bot);
+      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
       bot.sleep(5000);
 
-
-//      bot.comboBox("333")//net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
-//            .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
-
-      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+      final SWTBotView tourSegmenterView = getTourSegmenterView();
       tourSegmenterViewBot = tourSegmenterView.bot();
-
       tableSegments = tourSegmenterViewBot.table();
 
       segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
