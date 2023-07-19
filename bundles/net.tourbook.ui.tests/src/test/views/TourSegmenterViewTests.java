@@ -92,6 +92,8 @@ public class TourSegmenterViewTests extends UITest {
       bot.comboBox(0).setSelection(0);
       Utils.clickApplyAndCloseButton(bot);
 
+      bot.sleep(5000);
+
 
 //      bot.comboBox("333")//net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
 //            .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
