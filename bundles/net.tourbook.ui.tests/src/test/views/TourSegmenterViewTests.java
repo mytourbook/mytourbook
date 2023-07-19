@@ -42,12 +42,12 @@ public class TourSegmenterViewTests extends UITest {
       assertNotNull(tour);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      final SWTBotView tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
-      final SWTBot tourSegmenterViewBot = tourSegmenterView.bot();
+      SWTBotView tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+      SWTBot tourSegmenterViewBot = tourSegmenterView.bot();
 
-      final SWTBotTable tableSegments = tourSegmenterViewBot.table();
+      SWTBotTable tableSegments = tourSegmenterViewBot.table();
 
-      final SWTBotCombo segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
+      SWTBotCombo segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byAltitude);
       assertEquals("0:06", tableSegments.cell(0, 0)); //$NON-NLS-1$
@@ -98,6 +98,13 @@ public class TourSegmenterViewTests extends UITest {
 //      bot.comboBox("333")//net.tourbook.common.Messages.Measurement_System_Profile_Imperial)
 //            .setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
+      tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+      tourSegmenterViewBot = tourSegmenterView.bot();
+
+      tableSegments = tourSegmenterViewBot.table();
+
+      segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
