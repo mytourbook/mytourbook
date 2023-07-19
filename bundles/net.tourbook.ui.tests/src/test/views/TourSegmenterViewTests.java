@@ -80,7 +80,7 @@ public class TourSegmenterViewTests extends UITest {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").select();
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(1);
+      bot.comboBox(0).setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
       Utils.clickApplyAndCloseButton(bot);
 
       bot.sleep(5000);
@@ -89,7 +89,7 @@ public class TourSegmenterViewTests extends UITest {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").select();
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(0);
+      bot.comboBox(0).setSelection(net.tourbook.common.Messages.Measurement_System_Profile_Metric);
       Utils.clickApplyAndCloseButton(bot);
 
       bot.sleep(5000);
