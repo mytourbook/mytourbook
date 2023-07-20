@@ -111,6 +111,9 @@ Bugfix
   - Fixed height of the marker viewer. This issue exists since ever and was annoying since ever.
     Until now the marker viewer height decreased every time when this dialog was reopened.
 
+* Tour Segmenter (Frederic)
+  - Fixed an issue where the segment creation was erroneous when using the "Minimum Elevation Difference" after changing the measurement system.
+
 
 Translation    
 ===========

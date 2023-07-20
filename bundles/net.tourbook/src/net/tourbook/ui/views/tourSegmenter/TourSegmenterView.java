@@ -676,6 +676,47 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       public SegmenterContentProvider() {}
 
+      private Object[] createSegmenterContent() {
+
+         final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+         if (selectedSegmenter == null) {
+            return new Object[0];
+         }
+
+         /*
+          * get break time values: time/distance & speed
+          */
+         final BreakTimeTool btConfig;
+
+         if (selectedSegmenter.segmenterType == SegmenterType.ByBreakTime) {
+
+            // use segmenter values
+
+            btConfig = new BreakTimeTool(
+                  getSelectedBreakMethod().methodId,
+                  _breakUIShortestBreakTime,
+                  _breakUIMaxDistance,
+                  _breakUIMinSliceSpeed,
+                  _breakUIMinAvgSpeed,
+                  _breakUISliceDiff,
+                  _breakUIMinAvgSpeedAS,
+                  _breakUIMinSliceSpeedAS,
+                  _breakUIMinSliceTimeAS);
+
+         } else {
+
+            // use pref values for time/distance & speed
+
+            btConfig = BreakTimeTool.getPrefValues();
+         }
+
+         _allTourSegments = _tourData.createSegmenterSegments(btConfig);
+
+         return _allTourSegments == null //
+               ? new Object[0]
+               : _allTourSegments.toArray();
+      }
+
       @Override
       public void dispose() {}
 
@@ -698,6 +739,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+
+      private void updateUI_BreakTime() {
+
+         _lblTourBreakTime.setText(Long.toString(_tourBreakTime)
+               + UI.SPACE
+               + Messages.App_Unit_Seconds_Small
+               + UI.SPACE4
+               + UI.format_hh_mm_ss(_tourBreakTime));
+
+         _containerBreakTime.layout();
+      }
+
+      private void updateUI_SegmenterInfo(final Object[] tourSegments) {
+
+         final String numSegments = Integer.toString(tourSegments.length - 1);
+
+         _lblNumSegments.setText(numSegments);
+      }
    }
 
    private class SegmenterFilter extends ViewerFilter {
@@ -940,8 +999,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             /*
              * update min altitude
              */
-            _lblMinAltitude.setText(UI.UNIT_LABEL_DISTANCE);
-            _lblMinAltitude.pack(true);
+            final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? _spinnerMinAltitude.getSelection() * UI.UNIT_FOOT
+                  : _spinnerMinAltitude
+                        .getSelection() / UI.UNIT_FOOT;
+            _spinnerMinAltitude.setSelection(Math.round(convertedSelectedMinAltiDiff));
+            _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
 
             updateUI_Surfing_MeasurementValues();
 
@@ -1200,47 +1262,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       enableActions();
 
       showTour();
-   }
-
-   private Object[] createSegmenterContent() {
-
-      final TourSegmenter selectedSegmenter = getSelectedSegmenter();
-      if (selectedSegmenter == null) {
-         return new Object[0];
-      }
-
-      /*
-       * get break time values: time/distance & speed
-       */
-      final BreakTimeTool btConfig;
-
-      if (selectedSegmenter.segmenterType == SegmenterType.ByBreakTime) {
-
-         // use segmenter values
-
-         btConfig = new BreakTimeTool(
-               getSelectedBreakMethod().methodId,
-               _breakUIShortestBreakTime,
-               _breakUIMaxDistance,
-               _breakUIMinSliceSpeed,
-               _breakUIMinAvgSpeed,
-               _breakUISliceDiff,
-               _breakUIMinAvgSpeedAS,
-               _breakUIMinSliceSpeedAS,
-               _breakUIMinSliceTimeAS);
-
-      } else {
-
-         // use pref values for time/distance & speed
-
-         btConfig = BreakTimeTool.getPrefValues();
-      }
-
-      _allTourSegments = _tourData.createSegmenterSegments(btConfig);
-
-      return _allTourSegments == null //
-            ? new Object[0]
-            : _allTourSegments.toArray();
    }
 
    /**
@@ -1503,11 +1524,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createSegmentsBy_AltiUpDown() {
 
       final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
+      final float convertedSelectedMinAltiDiff = UI.UNIT_IS_ELEVATION_METER ? selectedMinAltiDiff : selectedMinAltiDiff * UI.UNIT_FOOT;
 
       final ArrayList<AltitudeUpDownSegment> tourSegments = new ArrayList<>();
 
       // create segment when the altitude up/down is changing
-      _tourData.computeAltitudeUpDown(tourSegments, selectedMinAltiDiff);
+      _tourData.computeAltitudeUpDown(tourSegments, convertedSelectedMinAltiDiff);
 
       // convert segment list into array
       int serieIndex = 0;
@@ -5058,7 +5080,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       updateUI_Distance();
 
-      _spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, 50));
+      final int defaultAltitudeValue = UI.UNIT_IS_ELEVATION_METER ? 50 : Math.round(50 / UI.UNIT_FOOT);
+      _spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, defaultAltitudeValue));
 
       /*
        * DP tolerance
@@ -5838,17 +5861,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }));
    }
 
-   private void updateUI_BreakTime() {
-
-      _lblTourBreakTime.setText(Long.toString(_tourBreakTime)
-            + UI.SPACE
-            + Messages.App_Unit_Seconds_Small
-            + UI.SPACE4
-            + UI.format_hh_mm_ss(_tourBreakTime));
-
-      _containerBreakTime.layout();
-   }
-
    private void updateUI_Distance() {
 
       float spinnerDistance = getDistance() / UI.UNIT_VALUE_DISTANCE;
@@ -5927,13 +5939,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          segmenterTable.setHeaderBackground(ThemeUtil.getDefaultBackgroundColor_TableHeader());
       }
 
-   }
-
-   private void updateUI_SegmenterInfo(final Object[] tourSegments) {
-
-      final String numSegments = Integer.toString(tourSegments.length - 1);
-
-      _lblNumSegments.setText(numSegments);
    }
 
    private void updateUI_SegmenterSelector() {
