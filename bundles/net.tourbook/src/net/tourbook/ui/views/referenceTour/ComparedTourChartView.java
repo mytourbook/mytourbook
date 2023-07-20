@@ -32,6 +32,7 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourChart;
@@ -334,7 +335,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
                _isInRefTourChanged = true;
                {
                   if (updateTourChart(null) == false) {
-                     enableSynchronization();
+                     enableSyncActions();
                   }
                }
                _isInRefTourChanged = false;
@@ -389,21 +390,19 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          onSelectionChanged(selection);
       }
 
-      enableSynchronization();
+      enableSyncActions();
    }
 
-   private float[] createRefTourDataSerie(final TourData tourData, final GeoComparedTour geoComparedTour) {
+   private float[] createRefTourDataSerie(final TourData comparedTourData,
+                                          final int comparedTour_FirstIndex,
+                                          final int comparedTour_LastIndex,
 
-      final GeoCompareData geoCompareData = geoComparedTour.geoCompareData;
-      final TourData refTourData = TourManager.getInstance().getTourData(geoCompareData.refTour_TourId);
+                                          final TourData refTourData,
+                                          final int refTour_FirstIndex) {
 
-      final float[] compTour_DistanceSerie = tourData.distanceSerie;
+      final float[] compTour_DistanceSerie = comparedTourData.distanceSerie;
       final float[] refTour_ElevationSerie = refTourData.altitudeSerie;
       final float[] refTour_DistanceSerie = refTourData.distanceSerie;
-
-      final int compTour_FirstIndex = geoComparedTour.tourFirstIndex;
-      final int compTour_LastIndex = geoComparedTour.tourLastIndex;
-      final int refTour_FirstIndex = geoCompareData.refTour_FirstIndex;
 
       final int numRefTourSlices = refTour_DistanceSerie.length;
 
@@ -411,7 +410,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       final float[] compTour_RefElevationSerie = new float[compTour_NumSlices];
 
-      int compTour_SerieIndex = compTour_FirstIndex;
+      int compTour_SerieIndex = comparedTour_FirstIndex;
       int refTour_SerieIndex = refTour_FirstIndex;
 
       float compTour_Distance = compTour_DistanceSerie[compTour_SerieIndex];
@@ -424,7 +423,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       float refTour_Distance_Diff = 0;
 
-      for (; compTour_SerieIndex <= compTour_LastIndex; compTour_SerieIndex++) {
+      for (; compTour_SerieIndex <= comparedTour_LastIndex; compTour_SerieIndex++) {
 
          compTour_Distance = compTour_DistanceSerie[compTour_SerieIndex];
 
@@ -518,7 +517,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       _actionSaveAndNext_ComparedTour.setEnabled(isElevationCompareTour);
    }
 
-   private void enableSynchronization() {
+   private void enableSyncActions() {
 
       // check initial value
       if (_comparedTour_RefId == -1) {
@@ -529,7 +528,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       } else {
 
          boolean isSynchEnabled = false;
-
 
          if (_comparedTour_RefId == _refTour_CompareConfig.getRefTour_RefId()
                || _comparedTour_RefId == ReferenceTourManager.getGeoCompare_RefId()) {
@@ -1092,7 +1090,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       updateSyncActions();
       updateChart();
-      enableSynchronization();
+      enableSyncActions();
       enableActions();
 
       /*
@@ -1124,21 +1122,21 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          return;
       }
 
-      // load the tourdata of the compared tour from the database
+      // load tour data of the compared tour from the database
       final TourData compTourData = TourManager.getInstance().getTourData(eleTourId);
       if (compTourData == null) {
          return;
       }
 
+      final RefTourItem refTourItem = elevationComparedResultTour.refTour;
+
       // keep data from the selected compared tour
       _comparedTour_TourId = eleTourId;
-      _comparedTour_RefId = elevationComparedResultTour.refTour.refId;
+      _comparedTour_RefId = refTourItem.refId;
       _comparedTour_ComparedItemId = elevationComparedResultTour.compareId;
 
       _tourData = compTourData;
 
-      // set tour compare data, this will show the action button to see the graph for this data
-      _tourData.tourCompareSerie = elevationComparedResultTour.altitudeDiffSerie;
 
       if (_comparedTour_ComparedItemId == -1) {
 
@@ -1159,6 +1157,23 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       }
 
       _comparedTourItem = elevationComparedResultTour;
+
+      final int compTour_FirstIndex = _defaultStartIndex;
+      final int compTour_LastIndex = _defaultEndIndex;
+
+      final TourData refTourData = TourManager.getInstance().getTourData(refTourItem.tourId);
+      final int refTour_FirstIndex = refTourItem.startIndex;
+
+      // set tour compare data, this will show the action button to see the graph for this data
+      _tourData.tourCompare_DiffSerie = elevationComparedResultTour.altitudeDiffSerie;
+      _tourData.tourCompare_ReferenceSerie = createRefTourDataSerie(
+
+            compTourData,
+            compTour_FirstIndex,
+            compTour_LastIndex,
+
+            refTourData,
+            refTour_FirstIndex);
 
       updateTourChart(false);
 
@@ -1196,9 +1211,22 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       _tourData = compTourData;
 
+      final int compTour_FirstIndex = geoComparedTour.tourFirstIndex;
+      final int compTour_LastIndex = geoComparedTour.tourLastIndex;
+
+      final TourData refTourData = TourManager.getInstance().getTourData(geoCompareData.refTour_TourId);
+      final int refTour_FirstIndex = geoCompareData.refTour_FirstIndex;
+
       // set tour compare data, this will enable the action button to see the graph for this data
-      _tourData.tourCompareSerie = geoComparedTour.tourLatLonDiff;
-      _tourData.tourCompareReferenceSerie = createRefTourDataSerie(_tourData, geoComparedTour);
+      _tourData.tourCompare_DiffSerie = geoComparedTour.tourLatLonDiff;
+      _tourData.tourCompare_ReferenceSerie = createRefTourDataSerie(
+
+            compTourData,
+            compTour_FirstIndex,
+            compTour_LastIndex,
+
+            refTourData,
+            refTour_FirstIndex);
 
       _defaultStartIndex = _movedStartIndex = _computedStartIndex = geoComparedTour.tourFirstIndex;
       _defaultEndIndex = _movedEndIndex = _computedEndIndex = geoComparedTour.tourLastIndex;
@@ -1248,18 +1276,38 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
        * Remove tour compare data (when there are any), but set dummy object to display the action
        * button
        */
-      _tourData.tourCompareSerie = new float[0];
+      _tourData.tourCompare_DiffSerie = new float[0];
 
       _defaultStartIndex = _movedStartIndex = _computedStartIndex = refTourComparedTour.getStartIndex();
       _defaultEndIndex = _movedEndIndex = _computedEndIndex = refTourComparedTour.getEndIndex();
 
       _comparedTourItem = refTourComparedTour;
 
+      /*
+       * Load reference tour data serie
+       */
+      final int compTour_FirstIndex = _defaultStartIndex;
+      final int compTour_LastIndex = _defaultEndIndex;
+
+      final TourReference refTour = ReferenceTourManager.getReferenceTour(_comparedTour_RefId);
+      final TourData refTourData = refTour.getTourData();
+      final int refTour_FirstIndex = refTour.getStartIndex();
+
+      // set tour compare data, this will show the action button to see the graph for this data
+      _tourData.tourCompare_ReferenceSerie = createRefTourDataSerie(
+
+            compTourData,
+            compTour_FirstIndex,
+            compTour_LastIndex,
+
+            refTourData,
+            refTour_FirstIndex);
+
       updateTourChart(false);
 
       // disable action after the chart was created
       _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);
-      _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE_REF_TOUR, false);
+      _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE_REF_TOUR, true);
    }
 
 }

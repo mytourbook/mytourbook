@@ -582,8 +582,8 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
       _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
       _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
-      _actionValue_TourCompare_RefTour          .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareReferenceSerie   != null && _tourData.tourCompareReferenceSerie.length > 0);
-      _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareSerie            != null && _tourData.tourCompareSerie.length > 0);
+      _actionValue_TourCompare_RefTour          .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_ReferenceSerie   != null && _tourData.tourCompare_ReferenceSerie.length > 0);
+      _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_DiffSerie        != null && _tourData.tourCompare_DiffSerie.length > 0);
 
       _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
       _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance()   != null);

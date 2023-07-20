@@ -5720,7 +5720,7 @@ public class TourManager {
                                                        final ChartType chartType,
                                                        final TourChartConfiguration tcc) {
 
-      final float[] tourCompareSerie = tourData.tourCompareSerie;
+      final float[] tourCompareSerie = tourData.tourCompare_DiffSerie;
       ChartDataYSerie yDataTourCompare = null;
       if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
 
@@ -5749,7 +5749,7 @@ public class TourManager {
                                                               final ChartType chartType,
                                                               final TourChartConfiguration tcc) {
 
-      final float[] tourCompareSerie = tourData.tourCompareReferenceSerie;
+      final float[] tourCompareSerie = tourData.tourCompare_ReferenceSerie;
       ChartDataYSerie yDataTourCompare = null;
       if (tourCompareSerie != null && tourCompareSerie.length > 0 && tcc.canShowTourCompareGraph) {
 

@@ -1538,7 +1538,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final boolean isAvailable_TimeMoving            = _tourData.getMovingTimeSerie()                != null;
       final boolean isAvailable_TimeRecorded          = _tourData.getRecordedTimeSerie()              != null;
       final boolean isAvailable_TimeSlice             = true;
-      final boolean isAvailable_TourCompare_Result    = _tourData.tourCompareSerie                    != null && _tourData.tourCompareSerie.length > 0;
+      final boolean isAvailable_TourCompare_Result    = _tourData.tourCompare_DiffSerie               != null && _tourData.tourCompare_DiffSerie.length > 0;
 
       final boolean isAvailable_RunDyn_StanceTime           = _tourData.getRunDyn_StanceTime()           != null;
       final boolean isAvailable_RunDyn_StanceTimeBalance    = _tourData.getRunDyn_StanceTimeBalance()    != null;
@@ -1932,7 +1932,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TourCompare_Result) {
-         _lblTourCompareResult.setText(_nf0.format(_tourData.tourCompareSerie[valueIndex]));
+         _lblTourCompareResult.setText(_nf0.format(_tourData.tourCompare_DiffSerie[valueIndex]));
       }
 
       if (_isVisible_And_Available_RunDyn_StanceTime) {
