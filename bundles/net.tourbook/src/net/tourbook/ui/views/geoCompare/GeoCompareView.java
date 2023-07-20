@@ -1399,13 +1399,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(2).spacing(20, 5).applyTo(container);
+      GridLayoutFactory.swtDefaults().applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          createUI_20_Title(container);
 
-         createUI_30_Col1_TourFilter(container);
-         createUI_32_Col2_Info(container);
+         final Composite columnContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(columnContainer);
+         GridLayoutFactory.fillDefaults()
+               .numColumns(2)
+               .spacing(20, 5)
+               .applyTo(columnContainer);
+         {
+            createUI_30_Col1_TourFilter(columnContainer);
+            createUI_32_Col2_Info(columnContainer);
+         }
 
          createUI_40_State(container);
       }
@@ -2999,6 +3007,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          net.tourbook.ui.UI.showSQLException(e);
       }
+
+      UI.showStatusLineMessage(Messages.GeoCompare_View_Info_FilterSettingsAreSaved);
    }
 
    private void onSelect_ComparerItem(final SelectionChangedEvent event) {

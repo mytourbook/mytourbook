@@ -1000,6 +1000,7 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
+   public static String        GeoCompare_View_Info_FilterSettingsAreSaved;
    public static String        GeoCompare_View_Label_GeoParts;
    public static String        GeoCompare_View_Label_GeoParts_Tooltip;
    public static String        GeoCompare_View_Label_PossibleTours;
@@ -1948,7 +1949,10 @@ public class Messages extends NLS {
 
    public static String        Sensor_Type_GearShifting;
    public static String        Sensor_Type_Other;
+   public static String        Sensor_Type_PowerMeter;
+   public static String        Sensor_Type_Radar;
    public static String        Sensor_Type_RecordingDevice;
+   public static String        Sensor_Type_Wind;
 
    public static String        Sensor_View_Action_EditSensor;
    public static String        Sensor_View_Action_OpenSensorChart;

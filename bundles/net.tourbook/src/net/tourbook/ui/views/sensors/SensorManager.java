@@ -42,6 +42,9 @@ public class SensorManager {
             new ComboEnumEntry<>(OtherMessages.GRAPH_LABEL_PACE,        DeviceSensorType.PACE),
             new ComboEnumEntry<>(OtherMessages.GRAPH_LABEL_HEARTBEAT,   DeviceSensorType.HEARTBEAT),
             new ComboEnumEntry<>(Messages.Sensor_Type_GearShifting,     DeviceSensorType.GEAR_SHIFTING),
+            new ComboEnumEntry<>(Messages.Sensor_Type_PowerMeter,       DeviceSensorType.POWER_METER),
+            new ComboEnumEntry<>(Messages.Sensor_Type_Wind,             DeviceSensorType.WIND),
+            new ComboEnumEntry<>(Messages.Sensor_Type_Radar,            DeviceSensorType.RADAR),
 
             new ComboEnumEntry<>(Messages.Sensor_Type_Other,            DeviceSensorType.OTHER),
       };
