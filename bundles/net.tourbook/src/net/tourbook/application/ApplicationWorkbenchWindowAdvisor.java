@@ -518,6 +518,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       FormatManager.updateDisplayFormats();
 
+      // read texts from plugin.properties
+      PluginProperties.getInstance().populate(TourbookPlugin.getBundleContext().getBundle());
+
       ThemeUtil.setupTheme();
 
       // this MUST be called AFTER the theme is set, otherwise static images are not from a theme !!!

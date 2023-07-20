@@ -1014,8 +1014,6 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_StartComparing;
    public static String        GeoCompare_View_State_TourFilter;
 
-   public static String        Geo_Compare_Label_ReferenceTour;
-
    public static String        Graph_Label_Time_Break;
    public static String        Graph_Label_Time_Elapsed;
    public static String        Graph_Label_Time_Moving;
@@ -2783,6 +2781,7 @@ public class Messages extends NLS {
    public static String        Tour_Compare_ViewName_ElevationCompareTimeline;
    public static String        Tour_Compare_ViewName_GeoComparedTour;
    public static String        Tour_Compare_ViewName_GeoCompareTimeline;
+   public static String        Tour_Compare_ViewName_VirtualReferenceTour;
 
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;

@@ -100,6 +100,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlListener;
@@ -260,10 +261,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private boolean                         _compareData_IsUseAppFilter;
    private int                             _compareData_NumGeoPartTours;
    private GeoCompareData                  _compareData_CurrentGeoCompareData;
-   private long                            _compareData_RefId;
+   private long                            _compareData_NativeOrVirtual_RefId;
    private long                            _compareData_RefTour_TourId     = -1;
    private TourData                        _compareData_RefTourData;
    private String                          _compareData_TourTitle;
+   private String                          _compareData_OriginalRefTourTitle;
 
    private boolean                         _isNativeRefTour;
 
@@ -899,19 +901,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * @param isNativeRefTour
     * @param refTourData
     *           "Ref" tour which is compared
     * @param leftIndex
     * @param rightIndex
-    * @param geoCompareRefId
+    * @param isNativeRefTour
+    * @param originalRefTourTitle
+    * @param nativeOrVirtual_RefId
     *           Reference id of the compared reference tour
     */
-   private void compare_10_Compare(final boolean isNativeRefTour,
-                                   final TourData refTourData,
+   private void compare_10_Compare(final TourData refTourData,
                                    final int leftIndex,
                                    final int rightIndex,
-                                   final long geoCompareRefId) {
+                                   final boolean isNativeRefTour,
+                                   final String originalRefTourTitle,
+                                   final long nativeOrVirtual_RefId) {
 
       if (GeoCompareManager.isGeoComparingOn() == false) {
 
@@ -1007,9 +1011,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             _compareData_RefTour_TourId = refTour_TourId;
             _compareData_RefTourData = refTourData;
-            _compareData_RefId = geoCompareRefId;
+            _compareData_NativeOrVirtual_RefId = nativeOrVirtual_RefId;
             _compareData_FirstIndex = compareFirstIndex;
             _compareData_LastIndex = compareLastIndex;
+            _compareData_OriginalRefTourTitle = originalRefTourTitle;
 
             if (isNativeRefTour) {
                restoreRefTourFilter(refTourData);
@@ -1081,9 +1086,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             _compareData_CurrentGeoCompareData,
             this);
 
-      newGeoCompareData.refTour_RefId = _compareData_RefId;
+      newGeoCompareData.refTour_RefId = _compareData_NativeOrVirtual_RefId;
       newGeoCompareData.refTour_FirstIndex = _compareData_FirstIndex;
       newGeoCompareData.refTour_LastIndex = _compareData_LastIndex;
+      newGeoCompareData.refTour_OriginalTitle = _compareData_OriginalRefTourTitle;
 
       _compareData_CurrentGeoCompareData = newGeoCompareData;
 
@@ -1311,14 +1317,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
           * complex.
           */
 
-         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_FromNative(refTour);
+         final String originalRefTourLabel = refTour.getLabel();
+
+         final long nativeRefId = ReferenceTourManager.setupGeoCompareRefTour_FromNative(refTour);
 
          compare_10_Compare(
-               true,
                refTourData,
                refTour.getStartValueIndex(),
                refTour.getEndValueIndex(),
-               geoCompareRefId);
+               true,
+               originalRefTourLabel,
+               nativeRefId);
       }
    }
 
@@ -2960,7 +2969,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void onSaveFilterSettings() {
 
-      final TourReference referenceTour = ReferenceTourManager.getReferenceTour(_compareData_RefId);
+      final TourReference referenceTour = ReferenceTourManager.getReferenceTour(_compareData_NativeOrVirtual_RefId);
 
       // update compare settings
       referenceTour.setTourFilter_IsElevationDiff(_isTourFilter_ElevationDiff);
@@ -3145,17 +3154,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          final int valueIndex1 = mapSelection.getValueIndex1();
          final int valueIndex2 = mapSelection.getValueIndex2();
 
-         final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
+         final long virtualRefId = ReferenceTourManager.setupGeoCompareRefTour_Virtual(
                tourData,
                valueIndex1,
                valueIndex2);
 
          compare_10_Compare(
-               false,
                tourData,
                valueIndex1,
                valueIndex2,
-               geoCompareRefId);
+               false,
+               null,
+               virtualRefId);
       }
    }
 
@@ -3246,17 +3256,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                   final int leftSliderValuesIndex = chartInfo.leftSliderValuesIndex;
                   final int rightSliderValuesIndex = chartInfo.rightSliderValuesIndex;
 
-                  final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
+                  final long virtualRefId = ReferenceTourManager.setupGeoCompareRefTour_Virtual(
                         tourData,
                         leftSliderValuesIndex,
                         rightSliderValuesIndex);
 
                   compare_10_Compare(
-                        false,
                         tourData,
                         leftSliderValuesIndex,
                         rightSliderValuesIndex,
-                        geoCompareRefId);
+                        false,
+                        null,
+                        virtualRefId);
                }
             }
          }
@@ -3293,17 +3304,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                               ? leftSliderValueIndex
                               : rightSliderValueIndex;
 
-                  final long geoCompareRefId = ReferenceTourManager.createGeoCompareRefTour_Virtual(
+                  final long virtualRefId = ReferenceTourManager.setupGeoCompareRefTour_Virtual(
                         tourData,
                         leftSliderValueIndex,
                         rightSliderValueIndex);
 
                   compare_10_Compare(
-                        false,
                         tourData,
                         leftSliderValueIndex,
                         rightSliderValueIndex,
-                        geoCompareRefId);
+                        false,
+                        null,
+                        virtualRefId);
                }
             }
          }
@@ -3316,7 +3328,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          if (_isComparedTourPinned
 
                // allow modifications of the same tour
-               && refId != _compareData_RefId) {
+               && refId != _compareData_NativeOrVirtual_RefId) {
 
             // ignore tour
 
@@ -3400,7 +3412,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void restoreRefTourFilter(final TourData refTourData) {
 
-      final TourReference refTour = ReferenceTourManager.getReferenceTour(_compareData_RefId);
+      final TourReference refTour = ReferenceTourManager.getReferenceTour(_compareData_NativeOrVirtual_RefId);
 
       final float tourFilter_ElevationDiff = refTour.getTourFilter_ElevationDiff();
       final float tourFilter_GeoDiff = refTour.getTourFilter_GeoDiff();
@@ -3591,7 +3603,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             // an unmodified ref tour is compared
 
             _iconCompareType.setImage(_imageCompareType_RefTour);
-            _iconCompareType.setToolTipText(Messages.GeoCompare_View_Icon_CompareType_RefTour_Tooltip);
+            _iconCompareType.setToolTipText(NLS.bind(
+                  Messages.GeoCompare_View_Icon_CompareType_RefTour_Tooltip,
+                  geoCompareData.refTour_OriginalTitle));
 
          } else {
 

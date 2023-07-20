@@ -17,7 +17,10 @@ package net.tourbook.ui.views.referenceTour;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.PluginProperties;
+import net.tourbook.application.PluginProperties_TextKeys;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -43,6 +46,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -64,11 +68,16 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
    private ITourEventListener           _tourEventListener;
 
+   private TourCompareConfig            _compareConfig;
+
    /*
     * UI controls
     */
    private PageBook  _pageBook;
    private Composite _pageNoData;
+
+   private Image     _imageRefTour        = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
+   private Image     _imageVirtualRefTour = TourbookPlugin.getImageDescriptor(Images.TourCompare_GeoCompare_RefTour).createImage();
 
    private void addTourEventListener() {
 
@@ -155,6 +164,9 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
    @Override
    public void dispose() {
+
+      UI.disposeResource(_imageRefTour);
+      UI.disposeResource(_imageVirtualRefTour);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -260,10 +272,12 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
          xData.setXValueMarker_ValueIndices(refTour_StartValueIndex, refTour_EndValueIndex);
 
          // set title
-         chartDataModel.setTitle(NLS.bind(
-               CHART_TITLE,
-               refTour.getLabel(),
-               TourManager.getTourTitleDetailed(_tourData)));
+         final String tourTitleDetailed = TourManager.getTourTitleDetailed(_tourData);
+         final String refTourLabel = refTour.getLabel();
+
+         chartDataModel.setTitle(refTourLabel.length() == 0
+               ? tourTitleDetailed
+               : NLS.bind(CHART_TITLE, refTourLabel, tourTitleDetailed));
 
          _tourChart.getDisplay().asyncExec(() -> {
 
@@ -297,9 +311,10 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
       }
 
       /*
-       * show new ref tour
+       * Show new ref tour
        */
 
+      _compareConfig = compareConfig;
       _tourData = compareConfig.getRefTourData();
       _tourChartConfig = compareConfig.getRefTourChartConfig();
 
@@ -313,6 +328,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
       updateChart();
 
+      updateUI_PartImageAndTitle();
    }
 
    @Override
@@ -332,6 +348,24 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
       // set application window title
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
+   }
+
+   private void updateUI_PartImageAndTitle() {
+
+      final TourReference refTour = _compareConfig.getRefTour();
+
+      if (refTour.isVirtualRefTour()) {
+
+         setTitleImage(_imageVirtualRefTour);
+         setPartName(Messages.Tour_Compare_ViewName_VirtualReferenceTour);
+
+      } else {
+
+         final String refTourViewName = PluginProperties.getText(PluginProperties_TextKeys.View_Name_RefTour_ReferenceTour);
+
+         setTitleImage(_imageRefTour);
+         setPartName(refTourViewName);
+      }
    }
 
 }

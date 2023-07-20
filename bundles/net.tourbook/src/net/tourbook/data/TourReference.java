@@ -92,6 +92,12 @@ public class TourReference implements Serializable {
    @Transient
    private long                       _createId        = 0;
 
+   /**
+    * When <code>true</code> then this reference tour is never saved
+    */
+   @Transient
+   private boolean                    _isVirtualRefTour;
+
    public TourReference() {}
 
    /**
@@ -230,8 +236,16 @@ public class TourReference implements Serializable {
       return isTourFilter_MaxResults;
    }
 
+   public boolean isVirtualRefTour() {
+      return _isVirtualRefTour;
+   }
+
    public void setEndValueIndex(final int endIndex) {
       this.endIndex = endIndex;
+   }
+
+   public void setIsVirtualRefTour() {
+      _isVirtualRefTour = true;
    }
 
    public void setLabel(final String label) {

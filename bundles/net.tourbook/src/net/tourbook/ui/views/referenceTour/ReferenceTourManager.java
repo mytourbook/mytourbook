@@ -19,8 +19,8 @@ import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
@@ -49,44 +49,6 @@ public class ReferenceTourManager {
    private static TourCompareConfig                      _geoCompare_RefTour_Config;
 
    private ReferenceTourManager() {}
-
-   /**
-    * @param refTour
-    * @return
-    */
-   public static long createGeoCompareRefTour_FromNative(final TourReference refTour) {
-
-      _geoCompare_RefTour = refTour;
-      _geoCompare_RefTour.setLabel("Selected Reference Tour");
-
-      _geoCompare_RefId = refTour.getRefId();
-      _geoCompare_RefTour_Config = createTourCompareConfig(_geoCompare_RefTour, TourCompareType.GEO_COMPARE_REFERENCE_TOUR);
-
-      return _geoCompare_RefId;
-   }
-
-   /**
-    * Creates a special {@link TourReference} which is NOT saved in the db
-    *
-    * @param tourData
-    * @param startIndex
-    * @param endIndex
-    * @return Returns the special ref id
-    */
-   public static long createGeoCompareRefTour_Virtual(final TourData tourData, final int startIndex, final int endIndex) {
-
-      // create a virtual reference tour
-      _geoCompare_RefTour = new TourReference(
-            Messages.Geo_Compare_Label_ReferenceTour,
-            tourData,
-            startIndex,
-            endIndex);
-
-      _geoCompare_RefId = System.nanoTime();
-      _geoCompare_RefTour_Config = createTourCompareConfig(_geoCompare_RefTour, TourCompareType.GEO_COMPARE_ANY_TOUR);
-
-      return _geoCompare_RefId;
-   }
 
    /**
     * Create a new reference tour configuration
@@ -192,5 +154,44 @@ public class ReferenceTourManager {
       _compareConfig_Cache.put(refTour_RefId, newCompareConfig);
 
       return newCompareConfig;
+   }
+
+   /**
+    * @param refTour
+    * @return
+    */ 
+   public static long setupGeoCompareRefTour_FromNative(final TourReference refTour) {
+
+      _geoCompare_RefTour = refTour;
+
+      _geoCompare_RefId = refTour.getRefId();
+      _geoCompare_RefTour_Config = createTourCompareConfig(_geoCompare_RefTour, TourCompareType.GEO_COMPARE_REFERENCE_TOUR);
+
+      return _geoCompare_RefId;
+   }
+
+   /**
+    * Creates a special {@link TourReference} which is NOT saved in the db
+    *
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
+    * @return Returns the special ref id
+    */
+   public static long setupGeoCompareRefTour_Virtual(final TourData tourData, final int startIndex, final int endIndex) {
+
+      // create a virtual reference tour
+      _geoCompare_RefTour = new TourReference(
+            UI.EMPTY_STRING,
+            tourData,
+            startIndex,
+            endIndex);
+
+      _geoCompare_RefTour.setIsVirtualRefTour();
+
+      _geoCompare_RefId = System.nanoTime();
+      _geoCompare_RefTour_Config = createTourCompareConfig(_geoCompare_RefTour, TourCompareType.GEO_COMPARE_ANY_TOUR);
+
+      return _geoCompare_RefId;
    }
 }

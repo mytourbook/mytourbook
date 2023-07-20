@@ -32,7 +32,7 @@ public class GeoCompareData {
    /**
     * Entity ID of the {@link TourReference}, is -1 when not available
     */
-   public long                  refTour_RefId               = -1;
+   public long                  refTour_RefId       = -1;
 
    /**
     * Reference tour ID which is compared
@@ -42,7 +42,12 @@ public class GeoCompareData {
    public int                   refTour_FirstIndex;
    public int                   refTour_LastIndex;
 
-   public String                tourTitle;
+   /**
+    * Title of the original reference tour
+    */
+   String                       refTour_OriginalTitle;
+
+   public String                comparedTour_TourTitle;
 
    long                         executorId;
 
@@ -92,7 +97,7 @@ public class GeoCompareData {
                          final int[] geoParts,
                          final NormalizedGeoData normalizedTourPart,
                          final boolean useAppFilter,
-                         final String tourTitle,
+                         final String comparedTour_TourTitle,
                          final long refTour_TourId) {
 
       this.executorId = executorId;
@@ -103,7 +108,7 @@ public class GeoCompareData {
       this.isUseAppFilter = useAppFilter;
 
       this.refTour_TourId = refTour_TourId;
-      this.tourTitle = tourTitle;
+      this.comparedTour_TourTitle = comparedTour_TourTitle;
    }
 
    @Override
