@@ -4458,7 +4458,7 @@ public class TourDatabase {
 
             + "   startIndex                 INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
             + "   endIndex                   INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
-            + "   label                      VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   label                      VARCHAR(" + TourReference.DB_LENGTH_LABEL + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 51 start
 
@@ -4468,7 +4468,7 @@ public class TourDatabase {
 
             + "   tourFilter_ElevationDiff   FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
             + "   tourFilter_GeoDiff         FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
-            + "   tourFilter_MaxResults      INT   DEFAULT 0,                                " + NL //$NON-NLS-1$
+            + "   tourFilter_MaxResults      INT   DEFAULT 0                                 " + NL //$NON-NLS-1$
 
             // version 51 end ---------
 
