@@ -1952,8 +1952,12 @@ public class Messages extends NLS {
    public static String        Sensor_Type_RecordingDevice;
    public static String        Sensor_Type_Wind;
 
+   public static String        Sensor_View_Action_DeleteSensor;
    public static String        Sensor_View_Action_EditSensor;
    public static String        Sensor_View_Action_OpenSensorChart;
+   public static String        Sensor_View_Dialog_CannotDeleteSensor_Message;
+   public static String        Sensor_View_Dialog_DeleteSensor_Message;
+   public static String        Sensor_View_Dialog_DeleteSensor_Title;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;

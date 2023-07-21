@@ -177,25 +177,6 @@ public class DeviceSensor implements Cloneable, Serializable {
       return true;
    }
 
-   public boolean equals1(final Object obj) {
-
-      if (this == obj) {
-         return true;
-      }
-
-      if (obj == null) {
-         return false;
-      }
-
-      if (getClass() != obj.getClass()) {
-         return false;
-      }
-
-      final DeviceSensor other = (DeviceSensor) obj;
-
-      return sensorId == other.sensorId;
-   }
-
    public String getDescription() {
 
       if (description == null) {

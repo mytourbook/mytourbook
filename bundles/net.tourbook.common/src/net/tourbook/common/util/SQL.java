@@ -160,6 +160,7 @@ public final class SQL {
       System.out.println();
       System.out.println(sqlStatement);
 
+      // add line numbers
       final String sqlStatementWithNumber = Util.addLineNumbers(sqlStatement);
 
       final Display display = Display.getDefault();
