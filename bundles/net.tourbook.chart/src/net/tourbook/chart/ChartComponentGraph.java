@@ -5855,14 +5855,24 @@ public class ChartComponentGraph extends Canvas {
          // get left/right slider position
          final int valueIndexA = _xSliderA.getValuesIndex();
          final int valueIndexB = _xSliderB.getValuesIndex();
-         final int startIndex = valueIndexA < valueIndexB ? valueIndexA : valueIndexB;
-         final int endIndex = valueIndexA > valueIndexB ? valueIndexA : valueIndexB;
+         int startIndex = valueIndexA < valueIndexB ? valueIndexA : valueIndexB;
+         int endIndex = valueIndexA > valueIndexB ? valueIndexA : valueIndexB;
 
          final ChartDataXSerie xData = drawingData.getXData();
 
          final double scaleX = drawingData.getScaleX();
 
          final double[] xValues = xData.getHighValuesDouble()[0];
+         final int numXValues = xValues.length;
+
+         // fix ArrayIndexOutOfBoundsException
+         if (startIndex >= numXValues) {
+            startIndex = numXValues - 1;
+         }
+         if (endIndex >= numXValues) {
+            endIndex = numXValues - 1;
+         }
+
          final double valueXStart = xValues[startIndex];
          final double valueXEnd = xValues[endIndex];
 

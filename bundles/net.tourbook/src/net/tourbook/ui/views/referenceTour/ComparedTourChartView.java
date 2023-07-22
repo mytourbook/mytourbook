@@ -519,6 +519,13 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
    private void enableSyncActions() {
 
+      if (_refTour_CompareConfig == null) {
+
+         // a NPE happened when this view was opened in another perspective
+
+         return;
+      }
+
       // check initial value
       if (_comparedTour_RefId == -1) {
 
@@ -1136,7 +1143,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       _comparedTour_ComparedItemId = elevationComparedResultTour.compareId;
 
       _tourData = compTourData;
-
 
       if (_comparedTour_ComparedItemId == -1) {
 
