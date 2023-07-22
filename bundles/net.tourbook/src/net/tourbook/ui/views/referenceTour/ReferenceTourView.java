@@ -197,6 +197,7 @@ public class ReferenceTourView extends ViewPart implements
    private boolean                             _isInCollapseAll;
    private boolean                             _isInExpandingSelection;
    private boolean                             _isInRestore;
+   private boolean                             _isPartVisible;
    private int                                 _expandRunnableCounter;
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
@@ -433,7 +434,10 @@ public class ReferenceTourView extends ViewPart implements
 
       _partListener = new IPartListener2() {
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            _isPartVisible = true;
+         }
 
          @Override
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -445,7 +449,10 @@ public class ReferenceTourView extends ViewPart implements
          public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
+         public void partHidden(final IWorkbenchPartReference partRef) {
+
+            _isPartVisible = false;
+         }
 
          @Override
          public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -474,6 +481,13 @@ public class ReferenceTourView extends ViewPart implements
 
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+            if (_isPartVisible == false) {
+               
+               // prevent to open this view with a selection event
+               
+               return;
+            }
 
             // update the view when a new tour reference was created
             if (selection instanceof SelectionPersistedCompareResults) {
