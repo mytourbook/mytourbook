@@ -266,12 +266,6 @@ public abstract class TourChartViewPart extends ViewPart implements IGeoCompareL
             if (_tourChartConfig == null) {
                _tourChartConfig = TourManager.createDefaultTourChartConfig(_state);
             }
-
-//            TourManager.fireEventWithCustomData(
-//                  TourEventId.GEO_PART_COMPARE,
-//                  comparerItem,
-//                  GeoPartView.this);
-
          }
 
       case SET_COMPARING_ON:

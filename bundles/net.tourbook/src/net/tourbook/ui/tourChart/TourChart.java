@@ -324,7 +324,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * it.
     */
    private TourMarker                                       _selectedTourMarker;
-
+   //
    //
    private IFillPainter                  _customBackgroundPainter;
 

@@ -41,17 +41,26 @@ New
 Improvements
 ============
 
+ * Tour Import (Frederic)
+  - Setting the cadence type only if the tour contains cadence data
+
 * Tour Book Flat View
   - New sortable columns: Average speed and pace
     https://github.com/mytourbook/mytourbook/discussions/1117
     
-* 2D Map
-  - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed
+* Sensor View
+  - Delete sensor when it is contained in 0 tours
+  - Added sensor types: "Power Meter", "Wind", and "Radar"
+    https://github.com/mytourbook/mytourbook/issues/1144
 
 * Reference Tour View
   - Autoexpand/collapse when selected with the mouse
   - Expand one category item and collapse others
   - New coloumn: Flag if a tour contains geo data
+
+* Tour Comparison Timeline
+  - Show geo compared tours instantly when they are modified
+  - Compared tours can be filtered in the "Geo Compare View"
   
 * Geo Compare View
   - Display tour filter in the main view
@@ -64,21 +73,22 @@ Improvements
     - Elevation gain/loss total
     - Elevation gain/loss difference 
   
-* Compared Tour Chart View
-  - Show reference tour graph which can overlap the compared tour
-  
 * Elevation Compare View
   - New columns: Elevation gain/loss
-
-* Year Statistic View
-  - Show geo compared tours instantly when they are modified
-  - Filter compared tours in the "Geo Compare View"
+  
+* Compared Tour Chart View
+  - Show the reference tour graph which can overlap the compared tour graphs to see the differences more easily
 
 * Tour Chart
   - New speed/pace graph which shows the average speed for distance intervals
     https://github.com/mytourbook/mytourbook/issues/829 
   - Slider positions are set to a selected reference tour or geo compared tour
   
+* 2D Map
+  - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed
+
+ * Tour Concatenation (Frederic)
+  - Concatenating TSS values
   
 * Theme
   - Show theme selector in the app toolbar
@@ -88,16 +98,11 @@ Improvements
   - Show a restart action in the app toolbar
     https://github.com/mytourbook/mytourbook/issues/1130  
 
- * Tour Import (Frederic)
-  - Setting the cadence type only if the tour contains cadence data
-
- * Tour Concatenation (Frederic)
-  - Concatenating TSS values
 
 Changes
 =======
 
-* Renamed "Year Statistic" -> "Tour Comparison Timeline"
+* Renamed view "Year Statistic" -> "Tour Comparison Timeline"
   https://github.com/mytourbook/mytourbook/discussions/1128
 
 
