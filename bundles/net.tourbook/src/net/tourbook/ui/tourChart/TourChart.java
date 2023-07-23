@@ -1456,7 +1456,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_TOUR_COMPARE_REF_TOUR,
             OtherMessages.GRAPH_LABEL_TOUR_COMPARE_REFERENCE_TOUR,
             Messages.Tour_Action_Graph_TourCompareReferenceTour_Tooltip,
-            ThemeUtil.getThemedImageName(Images.Graph_TourCompare_ByElevation),
+            ThemeUtil.getThemedImageName(Images.Graph_TourCompare),
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR);
 

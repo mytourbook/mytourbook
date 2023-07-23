@@ -3086,8 +3086,8 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="36.25"
-     inkscape:cx="336.6875"
+     inkscape:cy="33.9375"
+     inkscape:cx="334.15625"
      inkscape:zoom="16"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -9196,8 +9196,8 @@
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0"
        id="rect17705-1-1-8-5-9-3-0-3"
-       d="m 347.99786,9.3444309 7.27549,7.6560361 -7.27549,7.656034"
-       style="display:inline;fill:#63ff67;fill-opacity:1;stroke:#38913a;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><rect
+       d="m 350.01115,11.331953 5.30645,5.667829 -5.30645,5.667827"
+       style="display:inline;fill:#63ff67;fill-opacity:1;stroke:#3b993d;stroke-width:0.999996;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
        inkscape:export-filename="..\..\net.tourbook.common\icons\app-restart-dark.png"
@@ -9215,8 +9215,8 @@
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0"
        id="rect17705-1-1-8-5-9-3-0-4-5"
-       d="m 347.99998,38.999999 8,8 -8,8"
-       style="display:inline;fill:#63ff67;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><path
+       d="m 350,41 5.99998,6.000001 L 350,53"
+       style="display:inline;fill:#63ff67;fill-opacity:1;stroke:none;stroke-width:0.999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" /><path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.common\icons\app-undo-dark.png"
@@ -10953,12 +10953,12 @@
        id="path3499-1-4"
        d="M 208.49999,193.99169 V 200.5 h 4.5"
        style="display:inline;fill:none;stroke:#2c2c2c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter98684)" /><rect
-       style="display:inline;fill:#ff5c5b;fill-opacity:1;stroke:none;stroke-width:0.999994;stroke-miterlimit:3.9;stroke-opacity:1;paint-order:stroke fill markers"
+       style="display:inline;fill:#ff5c5b;fill-opacity:1;stroke:none;stroke-width:0.999997;stroke-miterlimit:3.9;stroke-opacity:1;paint-order:stroke fill markers"
        id="rect24855-0-7"
        width="8"
-       height="7"
+       height="8"
        x="-21"
-       y="341"
+       y="340"
        transform="rotate(-90)" /><rect
        style="display:inline;fill:#9b1e1e;fill-opacity:1;stroke:none;stroke-width:0.999996;stroke-miterlimit:3.9;stroke-opacity:1;paint-order:stroke fill markers"
        id="rect24855-35-6-0-1"
@@ -10966,7 +10966,7 @@
        height="8"
        x="340"
        y="13" /><rect
-       style="display:inline;fill:#ff5c5b;fill-opacity:1;stroke:none;stroke-width:0.999984;stroke-miterlimit:3.9;stroke-opacity:1;paint-order:stroke fill markers"
+       style="display:inline;fill:#ff5c5b;fill-opacity:1;stroke:none;stroke-width:0.999987;stroke-miterlimit:3.9;stroke-opacity:1;paint-order:stroke fill markers"
        id="rect24855-0"
        width="8"
        height="8"

@@ -52,8 +52,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    float           avgAltimeter;
    float           avgPulse;
-   float           avgSpeed;
    float           maxPulse;
+
+   float           avgSpeed;
+   float           avgPace;
 
    ArrayList<Long> tagIds;
 
@@ -123,6 +125,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
       return startIndex;
    }
 
+   public float getTourPace() {
+      return avgPace;
+   }
+
    public float getTourSpeed() {
       return avgSpeed;
    }
@@ -175,6 +181,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    public void setTourDeviceTime_Elapsed(final int tourDeviceTime_Elapsed) {
       this.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
+   }
+
+   void setTourPace(final float tourPace) {
+      this.avgPace = tourPace;
    }
 
    void setTourSpeed(final float tourSpeed) {

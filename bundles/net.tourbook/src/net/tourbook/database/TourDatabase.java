@@ -173,7 +173,7 @@ public class TourDatabase {
    private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
 
    /**
-    * Milliseconds how log the splash message is delayed before it is updated again.
+    * Milliseconds how long the splash message is delayed before it is updated again.
     */
    private static final int    DELAY_SPLASH_LOGGING                       = 500;
 
@@ -3819,10 +3819,16 @@ public class TourDatabase {
 
             // version 50 start
 
-            + "   AvgAltimeter            FLOAT       DEFAULT 0,                      " + NL //$NON-NLS-1$
-            + "   MaxPulse                FLOAT       DEFAULT 0                        " + NL //$NON-NLS-1$
+            + "   AvgAltimeter      FLOAT       DEFAULT 0,                             " + NL //$NON-NLS-1$
+            + "   MaxPulse          FLOAT       DEFAULT 0,                             " + NL //$NON-NLS-1$
 
             // version 50 end ---------
+
+            // version 51 start
+
+            + "   TourPace          FLOAT       DEFAULT 0                              " + NL //$NON-NLS-1$
+
+            // version 51 end ---------
 
             + ")"); //$NON-NLS-1$
    }
@@ -6009,6 +6015,7 @@ public class TourDatabase {
          updateDb_042_to_043_DataUpdate(conn, splashManager);
          updateDb_046_to_047_DataUpdate(conn, splashManager);
          updateDb_049_To_050_DataUpdate(conn, splashManager);
+         updateDb_050_To_051_DataUpdate(conn, splashManager);
 
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
 
@@ -9581,7 +9588,7 @@ public class TourDatabase {
          return;
       }
 
-      PreparedStatement stmt = null;
+      PreparedStatement stmtNumTours = null;
       PreparedStatement stmtSelect = null;
       PreparedStatement stmtUpdate = null;
 
@@ -9590,8 +9597,8 @@ public class TourDatabase {
          // get number of compared tours
          final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
 
-         stmt = conn.prepareStatement(sql);
-         ResultSet result = stmt.executeQuery();
+         stmtNumTours = conn.prepareStatement(sql);
+         ResultSet result = stmtNumTours.executeQuery();
 
          // get first result
          result.next();
@@ -9616,8 +9623,10 @@ public class TourDatabase {
                   + "UPDATE " + TABLE_TOUR_COMPARED //      //$NON-NLS-1$
 
                   + " SET" //                               //$NON-NLS-1$
+
                   + " AvgAltimeter=?," //                1  //$NON-NLS-1$
                   + " MaxPulse=?" //                     2  //$NON-NLS-1$
+
                   + " WHERE comparedId=?" //             3  //$NON-NLS-1$
             );
 
@@ -9681,7 +9690,7 @@ public class TourDatabase {
 
       } finally {
 
-         net.tourbook.common.util.SQL.close(stmt);
+         net.tourbook.common.util.SQL.close(stmtNumTours);
          net.tourbook.common.util.SQL.close(stmtSelect);
          net.tourbook.common.util.SQL.close(stmtUpdate);
       }
@@ -9699,20 +9708,21 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          /*
-          * Table: TABLE_TOUR_REFERENCE
+          * Tables: TABLE_TOUR_REFERENCE, TABLE_TOUR_COMPARED
           */
 
          // add new columns
 
 // SET_FORMATTING_OFF
 
-         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE, "isTourFilter_ElevationDiff",   DEFAULT_FALSE); //$NON-NLS-1$
-         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE, "isTourFilter_GeoDiff",         DEFAULT_FALSE); //$NON-NLS-1$
-         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE, "isTourFilter_MaxResults",      DEFAULT_FALSE); //$NON-NLS-1$
+         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE,   "isTourFilter_ElevationDiff", DEFAULT_FALSE); //$NON-NLS-1$
+         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE,   "isTourFilter_GeoDiff",       DEFAULT_FALSE); //$NON-NLS-1$
+         SQL.AddColumn_Boolean(stmt,   TABLE_TOUR_REFERENCE,   "isTourFilter_MaxResults",    DEFAULT_FALSE); //$NON-NLS-1$
+         SQL.AddColumn_Float(stmt,     TABLE_TOUR_REFERENCE,   "tourFilter_ElevationDiff",   DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float(stmt,     TABLE_TOUR_REFERENCE,   "tourFilter_GeoDiff",         DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Int  (stmt,     TABLE_TOUR_REFERENCE,   "tourFilter_MaxResults",      DEFAULT_0); //$NON-NLS-1$
 
-         SQL.AddColumn_Float(stmt,     TABLE_TOUR_REFERENCE, "tourFilter_ElevationDiff",     DEFAULT_0); //$NON-NLS-1$
-         SQL.AddColumn_Float(stmt,     TABLE_TOUR_REFERENCE, "tourFilter_GeoDiff",           DEFAULT_0); //$NON-NLS-1$
-         SQL.AddColumn_Int  (stmt,     TABLE_TOUR_REFERENCE, "tourFilter_MaxResults",        DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float(stmt,     TABLE_TOUR_COMPARED,    "TourPace",                   DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }
@@ -9721,6 +9731,130 @@ public class TourDatabase {
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
+   }
+
+   /**
+    * @param conn
+    * @param splashManager
+    * @throws SQLException
+    */
+   private void updateDb_050_To_051_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 51;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      PreparedStatement stmtNumTours = null;
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
+
+      try {
+
+         // get number of compared tours
+         final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
+
+         stmtNumTours = conn.prepareStatement(sql);
+         ResultSet result = stmtNumTours.executeQuery();
+
+         // get first result
+         result.next();
+
+         // get first value
+         final int numComparedTours = result.getInt(1);
+         if (numComparedTours != 0) {
+
+            stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+
+                  + "SELECT" //                             //$NON-NLS-1$
+
+                  + " ComparedId," //                    1  //$NON-NLS-1$
+                  + " TourId," //                        2  //$NON-NLS-1$
+                  + " StartIndex," //                    3  //$NON-NLS-1$
+                  + " EndIndex" //                       4  //$NON-NLS-1$
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
+
+            stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+                  + "UPDATE " + TABLE_TOUR_COMPARED //      //$NON-NLS-1$
+
+                  + " SET" //                               //$NON-NLS-1$
+
+                  + " TourPace = ?" //                   1  //$NON-NLS-1$
+
+                  + " WHERE comparedId = ?" //           2  //$NON-NLS-1$
+            );
+
+            result = stmtSelect.executeQuery();
+
+            int counter = 0;
+
+            long lastUpdateTime = System.currentTimeMillis();
+
+            while (result.next()) {
+
+               ++counter;
+
+               if (splashManager != null) {
+
+                  final long currentTime = System.currentTimeMillis();
+                  final float timeDiff = currentTime - lastUpdateTime;
+
+                  // reduce logging
+                  if (timeDiff > DELAY_SPLASH_LOGGING
+
+                        // update log also for the last tour
+                        || counter == numComparedTours) {
+
+                     lastUpdateTime = currentTime;
+
+                     splashManager.setMessage(NLS.bind(
+                           Messages.Tour_Database_PostUpdate_051_ComparedTour,
+                           new Object[] { counter, numComparedTours }));
+                  }
+               }
+
+               // get data from database
+               final long compareId = result.getLong(1);
+               final long tourId = result.getLong(2);
+               final int startIndex = result.getInt(3);
+               final int endIndex = result.getInt(4);
+
+               final TourData tourData = TourManager.getTour(tourId);
+
+               if (tourData == null) {
+
+                  StatusUtil.logError(NLS.bind(
+                        "Cannot get tour {0} from database to update the average pace in the compared tour {1}.", //$NON-NLS-1$
+                        tourId,
+                        compareId));
+
+               } else {
+
+                  final float avgPace = tourData.computeAvg_FromValues(tourData.getPaceSerie_Metric(), startIndex, endIndex);
+
+                  // update average altimeter for the compared tour
+                  stmtUpdate.setFloat(1, avgPace);
+                  stmtUpdate.setLong(2, compareId);
+                  stmtUpdate.executeUpdate();
+               }
+            }
+         }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtNumTours);
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

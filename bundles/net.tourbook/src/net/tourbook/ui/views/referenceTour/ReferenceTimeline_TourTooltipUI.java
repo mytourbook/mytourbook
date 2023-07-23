@@ -61,10 +61,12 @@ public class ReferenceTimeline_TourTooltipUI {
    private Color  _bgColor;
    private Color  _fgColor;
 
-   private Float  _avgAltimeter;
-   private Float  _avgPulse;
-   private Float  _maxPulse;
-   private Float  _avgSpeed;
+   private float  _avgAltimeter;
+   private float  _avgPulse;
+   private float  _maxPulse;
+   private float  _avgSpeed;
+   private float  _avgPace;
+
    private String _title;
 
    /*
@@ -74,6 +76,8 @@ public class ReferenceTimeline_TourTooltipUI {
 
    private Label     _lblAvgAltimeter;
    private Label     _lblAvgAltimeterUnit;
+   private Label     _lblAvgPace;
+   private Label     _lblAvgPaceUnit;
    private Label     _lblAvgPulse;
    private Label     _lblAvgPulseUnit;
    private Label     _lblAvgSpeed;
@@ -120,14 +124,18 @@ public class ReferenceTimeline_TourTooltipUI {
     * @param avgPulse
     * @param maxPulse
     * @param avgSpeed
+    * @param avgPace
     */
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
                           final String uiText_Title,
-                          final Float avgAltimeter,
-                          final Float avgPulse,
-                          final Float maxPulse,
-                          final Float avgSpeed) {
+
+                          final float avgAltimeter,
+                          final float avgPulse,
+                          final float maxPulse,
+
+                          final float avgSpeed,
+                          final float avgPace) {
 
       _toolTipProvider = toolTipProvider;
 
@@ -136,7 +144,9 @@ public class ReferenceTimeline_TourTooltipUI {
       _avgAltimeter = avgAltimeter;
       _avgPulse = avgPulse;
       _maxPulse = maxPulse;
+
       _avgSpeed = avgSpeed;
+      _avgPace = avgPace;
 
       final Display display = parent.getDisplay();
 
@@ -273,6 +283,15 @@ public class ReferenceTimeline_TourTooltipUI {
       }
       {
          /*
+          * Avg Pace
+          */
+         createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPace);
+
+         _lblAvgPace = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblAvgPaceUnit = createUI_LabelValue(parent, SWT.LEAD);
+      }
+      {
+         /*
           * Avg Altimeter (VAM)
           */
          createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgAltimeter);
@@ -391,18 +410,26 @@ public class ReferenceTimeline_TourTooltipUI {
 
    private void updateUI() {
 
-      _lblTitle.setText(_title);
+// SET_FORMATTING_OFF
 
-      _lblAvgAltimeter.setText(FormatManager.formatElevation(_avgAltimeter));
-      _lblAvgAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
-      _lblAvgPulse.setText(FormatManager.formatPulse(_avgPulse));
-      _lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
-      _lblMaxPulse.setText(FormatManager.formatPulse(_maxPulse));
-      _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
+      _lblTitle            .setText(_title);
 
-      _lblAvgSpeed.setText(FormatManager.formatSpeed(_avgSpeed));
-      _lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+      _lblAvgAltimeter     .setText(FormatManager.formatElevation(_avgAltimeter));
+      _lblAvgAltimeterUnit .setText(UI.UNIT_LABEL_ALTIMETER);
 
+      _lblAvgPulse         .setText(FormatManager.formatPulse(_avgPulse));
+      _lblAvgPulseUnit     .setText(Messages.Value_Unit_Pulse);
+
+      _lblMaxPulse         .setText(FormatManager.formatPulse(_maxPulse));
+      _lblMaxPulseUnit     .setText(Messages.Value_Unit_Pulse);
+
+      _lblAvgSpeed         .setText(FormatManager.formatSpeed(_avgSpeed));
+      _lblAvgSpeedUnit     .setText(UI.UNIT_LABEL_SPEED);
+
+      _lblAvgPace          .setText(UI.format_mm_ss((long) _avgPace));
+      _lblAvgPaceUnit      .setText(UI.UNIT_LABEL_PACE);
+
+// SET_FORMATTING_ON
    }
 
    private void updateUI_Layout() {

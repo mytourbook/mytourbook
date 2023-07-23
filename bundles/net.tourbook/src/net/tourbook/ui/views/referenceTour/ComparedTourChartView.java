@@ -586,13 +586,16 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
     */
    private void fireChangeEvent(final int startIndex, final int endIndex) {
 
+      final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, startIndex, endIndex);
+
       final float avgAltimeter = _tourData.computeAvg_FromValues(_tourData.getAltimeterSerie(), _movedStartIndex, _movedEndIndex);
       final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
       final float maxPulse = _tourData.computeMax_FromValues(_tourData.getPulse_SmoothedSerie(), startIndex, endIndex);
-      final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
-      final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, startIndex, endIndex);
 
-      fireChangeEvent(startIndex, endIndex, avgAltimeter, avgPulse, maxPulse, speed, elapsedTime, false);
+      final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
+      final float pace = TourManager.computeTourPace(_tourData, startIndex, endIndex);
+
+      fireChangeEvent(startIndex, endIndex, avgAltimeter, avgPulse, maxPulse, speed, pace, elapsedTime, false);
    }
 
    /**
@@ -609,6 +612,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
                                 final float avgPulse,
                                 final float maxPulse,
                                 final float speed,
+                                final float pace,
                                 final int tourDeviceTime_Elapsed,
                                 final boolean isDataSaved) {
 
@@ -624,8 +628,10 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
       customData.avgAltimeter = avgAltimeter;
       customData.avgPulse = avgPulse;
       customData.maxPulse = maxPulse;
-      customData.speed = speed;
       customData.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
+
+      customData.speed = speed;
+      customData.pace = pace;
 
       TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, customData, this);
    }
@@ -857,8 +863,9 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             final float avgAltimeter = _tourData.computeAvg_FromValues(_tourData.getAltimeterSerie(), _movedStartIndex, _movedEndIndex);
             final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
             final float maxPulse = _tourData.computeMax_FromValues(_tourData.getPulse_SmoothedSerie(), _movedStartIndex, _movedEndIndex);
-            final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
             final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, _movedStartIndex, _movedEndIndex);
+            final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
+            final float pace = TourManager.computeTourPace(_tourData, _movedStartIndex, _movedEndIndex);
 
             // set new data in entity
             comparedTour.setStartIndex(_movedStartIndex);
@@ -867,6 +874,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             comparedTour.setAvgPulse(avgPulse);
             comparedTour.setMaxPulse(maxPulse);
             comparedTour.setTourSpeed(speed);
+            comparedTour.setTourPace(pace);
 
             // update entity
             ts.begin();
@@ -891,7 +899,15 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             _tourChart.updateChart(chartDataModel, true);
             enableActions();
 
-            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgAltimeter, avgPulse, maxPulse, speed, elapsedTime, true);
+            fireChangeEvent(_defaultStartIndex,
+                  _defaultEndIndex,
+                  avgAltimeter,
+                  avgPulse,
+                  maxPulse,
+                  speed,
+                  pace,
+                  elapsedTime,
+                  true);
          }
       } catch (final Exception e) {
          e.printStackTrace();
@@ -922,7 +938,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
             _comparedTour_ComparedItemId = comparedTourItem.compareId;
             _comparedTour_TourId = comparedTourItem.tourId;
 
-            // update tour map view
+            // update comparison timeline view
             final SelectionPersistedCompareResults persistedCompareResults = new SelectionPersistedCompareResults();
             persistedCompareResults.persistedCompareResults.add(comparedTourItem);
 

@@ -63,8 +63,10 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
    int                compareElapsedTime;
 
    float              compareDistance;
-   float              compareSpeed;
    int                timeInterval;
+
+   float              compareSpeed;
+   float              comparePace;
 
    float              elevationGain;
    float              elevationLoss;

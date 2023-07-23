@@ -29,6 +29,7 @@ import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
@@ -106,6 +107,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    static final boolean        STATE_SHOW_PULSE_AVG_MAX_DEFAULT  = false;
    static final String         STATE_SHOW_SPEED_AVG              = "STATE_SHOW_SPEED_AVG";                             //$NON-NLS-1$
    static final boolean        STATE_SHOW_SPEED_AVG_DEFAULT      = true;
+   static final String         STATE_SHOW_PACE_AVG               = "STATE_SHOW_PACE_AVG";                              //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PACE_AVG_DEFAULT       = true;
 
 // SET_FORMATTING_OFF
 
@@ -155,6 +158,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    private ArrayList<Float>                   _statValues_AvgAltimeter_High = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgAltimeter_Low  = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgPace_High      = new ArrayList<>();
+   private ArrayList<Float>                   _statValues_AvgPace_Low       = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgSpeed_High     = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgSpeed_Low      = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgPulse_Low      = new ArrayList<>();
@@ -182,6 +187,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    private ITourEventListener                 _tourEventListener;
 
+   private boolean                            _isGeoCompare;
    private boolean                            _isShowAllValues;
    private boolean                            _isSynchMinMaxValue;
 
@@ -193,7 +199,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private ActionCopyValuesIntoClipboard      _actionCopyValuesIntoClipboard;
    private ActionShowAllValues                _actionShowAllValues;
    private ActionSyncMinMaxValues             _actionSyncMinMaxValues;
-   private ActionYearStatisticOptions         _actionYearStatOptions;
+   private ActionTimelineOptions              _actionYearStatOptions;
 
    private ReferenceTimeline_TourTooltip      _tourToolTip;
    private TourInfoIconToolTipProvider        _tourInfoToolTipProvider      = new TourInfoIconToolTipProvider();
@@ -214,13 +220,13 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    private Label     _lblRefTourTitle;
 
-
    private Spinner   _spinnerNumberOfVisibleYears;
 
 // SET_FORMATTING_OFF
 
    private Image     _viewImage_ElevationCompare        = TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_Timeline_Elevation).createImage();
    private Image     _viewImage_GeoCompare              = TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_Timeline_Geo).createImage();
+
 
 // SET_FORMATTING_ON
 
@@ -282,7 +288,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
    }
 
-   private class ActionYearStatisticOptions extends ActionToolbarSlideout {
+   private class ActionTimelineOptions extends ActionToolbarSlideout {
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
@@ -428,7 +434,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _actionCopyValuesIntoClipboard = new ActionCopyValuesIntoClipboard();
       _actionShowAllValues = new ActionShowAllValues();
       _actionSyncMinMaxValues = new ActionSyncMinMaxValues();
-      _actionYearStatOptions = new ActionYearStatisticOptions();
+      _actionYearStatOptions = new ActionTimelineOptions();
 
       fillActionBars();
    }
@@ -677,11 +683,16 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
             comparedTourItem.geoCompareTour     = geoComparedTour;
 
+            comparedTourItem.tourTitle          = geoComparedTour.tourTitle;
             comparedTourItem.tourDate           = geoComparedTour.tourStartTime.toLocalDate();
-            comparedTourItem.avgAltimeter       = geoComparedTour.avgAltimeter;
-            comparedTourItem.avgPulse           = geoComparedTour.avgPulse;
+
             comparedTourItem.avgSpeed           = geoComparedTour.avgSpeed;
+            comparedTourItem.avgPace            = geoComparedTour.avgPace;
+
+            comparedTourItem.avgPulse           = geoComparedTour.avgPulse;
             comparedTourItem.maxPulse           = geoComparedTour.maxPulse;
+
+            comparedTourItem.avgAltimeter       = geoComparedTour.avgAltimeter;
 
 // SET_FORMATTING_ON
 
@@ -690,26 +701,31 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       }
    }
 
-   private void createStatisticData_50_OneTour(final TVIRefTour_ComparedTour tourItem) {
+   private void createStatisticData_50_OneTour(final TVIRefTour_ComparedTour comparedTourItem) {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate tourDate   = tourItem.tourDate;
-      final float avgAltimeter   = tourItem.getAvgAltimeter();
-      final float avgPulse       = tourItem.getAvgPulse();
-      final float avgSpeed       = tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE;
+      final LocalDate tourDate   = comparedTourItem.tourDate;
+      final float avgAltimeter   = comparedTourItem.getAvgAltimeter();
+      final float avgPace        = comparedTourItem.getTourPace() * UI.UNIT_VALUE_DISTANCE;
+      final float avgPulse       = comparedTourItem.getAvgPulse();
+      final float avgSpeed       = comparedTourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE;
 
-      _statValues_AllTours          .add(tourItem);
+      _statValues_AllTours          .add(comparedTourItem);
+
       _statValues_DOYValues         .add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
+
+      _statValues_AvgSpeed_Low      .add(avgSpeed - avgSpeed / 100 * _barRelativeHeight);
+      _statValues_AvgSpeed_High     .add(avgSpeed);
+      _statValues_AvgPace_Low       .add(avgPace - avgPace / 100 * _barRelativeHeight);
+      _statValues_AvgPace_High      .add(avgPace);
+
+      _statValues_AvgPulse_Low      .add(avgPulse - avgPulse / 100 * _barRelativeHeight);
+      _statValues_AvgPulse_High     .add(avgPulse);
+      _statValues_MaxPulse          .add(comparedTourItem.getMaxPulse());
 
       _statValues_AvgAltimeter_Low  .add(avgAltimeter - avgAltimeter / 100 * _barRelativeHeight);
       _statValues_AvgAltimeter_High .add(avgAltimeter);
-      _statValues_AvgSpeed_Low      .add(avgSpeed - avgSpeed / 100 * _barRelativeHeight);
-      _statValues_AvgSpeed_High     .add(avgSpeed);
-
-      _statValues_AvgPulse_Low      .add(avgPulse -avgPulse / 100 * _barRelativeHeight);
-      _statValues_AvgPulse_High     .add(avgPulse);
-      _statValues_MaxPulse          .add(tourItem.getMaxPulse());
 
 // SET_FORMATTING_ON
    }
@@ -755,7 +771,11 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             _statValues_AvgAltimeter_High.get(valueIndex),
             _statValues_AvgPulse_High.get(valueIndex),
             _statValues_MaxPulse.get(valueIndex),
-            _statValues_AvgSpeed_High.get(valueIndex));
+
+            _statValues_AvgSpeed_High.get(valueIndex),
+            _statValues_AvgPace_High.get(valueIndex)
+
+      );
    }
 
    private void createUI(final Composite parent) {
@@ -1031,12 +1051,25 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       final StringBuilder sb = new StringBuilder();
 
       /*
+       * Data Title
+       */
+      sb.append(_isGeoCompare
+            ? Messages.Tour_Compare_ViewName_GeoCompareTimeline
+            : Messages.Tour_Compare_ViewName_ElevationCompareTimeline);
+
+      sb.append(NL);
+      sb.append(NL);
+
+      /*
        * Header
        */
       sb.append("Date"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
       sb.append("Avg Speed"); //$NON-NLS-1$
+      sb.append(FIELD_DELIMITER);
+
+      sb.append("Avg Pace"); //$NON-NLS-1$
       sb.append(FIELD_DELIMITER);
 
       sb.append("Avg Altimeter"); //$NON-NLS-1$
@@ -1062,6 +1095,9 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          sb.append(FIELD_DELIMITER);
 
          sb.append(comparedTour.avgSpeed);
+         sb.append(FIELD_DELIMITER);
+
+         sb.append(comparedTour.avgPace);
          sb.append(FIELD_DELIMITER);
 
          sb.append(comparedTour.avgAltimeter);
@@ -1550,11 +1586,14 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       _statValues_AvgAltimeter_Low.clear();
       _statValues_AvgAltimeter_High.clear();
-      _statValues_AvgSpeed_Low.clear();
-      _statValues_AvgSpeed_High.clear();
       _statValues_AvgPulse_Low.clear();
       _statValues_AvgPulse_High.clear();
       _statValues_MaxPulse.clear();
+
+      _statValues_AvgSpeed_Low.clear();
+      _statValues_AvgSpeed_High.clear();
+      _statValues_AvgPace_Low.clear();
+      _statValues_AvgPace_High.clear();
 
       int firstVisibleYear = getFirstVisibleYear();
 
@@ -1624,6 +1663,40 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 //         yDataSpeed.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
          chartModel.addYData(yDataSpeed);
+      }
+
+      /**
+       * Pace
+       */
+      if (Util.getStateBoolean(_state, STATE_SHOW_PACE_AVG, STATE_SHOW_PACE_AVG_DEFAULT)) {
+
+         // set the bar low/high data
+         final ChartDataYSerie yDataPace = new ChartDataYSerie(
+               ChartType.BAR,
+               ArrayListToArray.toFloat(_statValues_AvgPace_Low),
+               ArrayListToArray.toFloat(_statValues_AvgPace_High),
+               true);
+
+         final float[] minMaxValues = _currentRefItem.avgPace_MinMax;
+         yDataPace.setSliderMinMaxValue(minMaxValues);
+         adjustMinMaxValues(yDataPace, minMaxValues);
+
+         TourManager.setBarColors(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
+         TourManager.setGraphColors(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
+
+         yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
+         yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE);
+         yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+         yDataPace.setShowYSlider(true);
+         yDataPace.setYAxisDirection(!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
+
+         /*
+          * ensure that painting of the bar is started at the bottom and not at the visible min
+          * which is above the bottom !!!
+          */
+//         yDataPace.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+
+         chartModel.addYData(yDataPace);
       }
 
       /**
@@ -1768,10 +1841,14 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       // update view icon/name
       if (geoCompareData != null) {
 
+         _isGeoCompare = true;
+
          setTitleImage(_viewImage_GeoCompare);
          setPartName(Messages.Tour_Compare_ViewName_GeoCompareTimeline);
 
       } else {
+
+         _isGeoCompare = false;
 
          setTitleImage(_viewImage_ElevationCompare);
          setPartName(Messages.Tour_Compare_ViewName_ElevationCompareTimeline);

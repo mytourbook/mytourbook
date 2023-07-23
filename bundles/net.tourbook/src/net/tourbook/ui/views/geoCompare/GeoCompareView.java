@@ -1277,6 +1277,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             _maxMinDiff = geoComparedTour.minDiffValue;
          }
 
+         // get ref tour elevation gain/loss
          if (geoComparedTour.tourId == _compareData_RefTour_TourId) {
 
             _refTourElevationGain = geoComparedTour.elevationGainAbsolute;
@@ -2177,12 +2178,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoComparedTour item = (GeoComparedTour) cell.getElement();
 
-            final float avgpace = item.avgPace * UI.UNIT_VALUE_DISTANCE;
+            final float value = item.avgPace * UI.UNIT_VALUE_DISTANCE;
 
-            if (avgpace == 0) {
+            if (value == 0) {
                cell.setText(UI.EMPTY_STRING);
             } else {
-               cell.setText(UI.format_mm_ss((long) avgpace));
+               cell.setText(UI.format_mm_ss((long) value));
             }
          }
       });

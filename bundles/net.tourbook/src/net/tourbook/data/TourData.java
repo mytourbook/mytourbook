@@ -8970,6 +8970,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
+   /**
+    * @return Returns pace data serie in the metric measurement system
+    */
+   public float[] getPaceSerie_Metric() {
+
+      if (paceSerie_Seconds == null) {
+         computeSpeedSeries();
+      }
+
+      return paceSerie_Seconds;
+   }
+
    public float[] getPaceSerie_Summarized_Seconds() {
 
       if (UI.UNIT_IS_PACE_MIN_PER_MILE) {

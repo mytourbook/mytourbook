@@ -265,9 +265,12 @@ public class GeoCompareManager {
          final float distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
          geoComparedTour.distance = distance;
 
-         final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-         final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
-         geoComparedTour.avgPace = distance == 0 ? 0 : time * 1000 / distance;
+         final long time = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)
+               ? recordedTime
+               : movingTime;
+         geoComparedTour.avgPace = distance == 0
+               ? 0
+               : time * 1000 / distance;
       }
 
       geoComparedTour.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);

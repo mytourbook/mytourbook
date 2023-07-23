@@ -2472,8 +2472,8 @@ public class ChartComponents extends Composite {
    private boolean setWidthToSynchedChart() {
 
       final ChartDataXSerie xData = _chartDataModel.getXData();
-      final int markerStartIndex = xData.getXValueMarker_StartIndex();
-      final int markerEndIndex = xData.getXValueMarker_EndIndex();
+      int markerStartIndex = xData.getXValueMarker_StartIndex();
+      int markerEndIndex = xData.getXValueMarker_EndIndex();
 
       // check if synchronization is disabled
       if (synchConfigSrc == null || markerStartIndex == -1) {
@@ -2484,10 +2484,20 @@ public class ChartComponents extends Composite {
       synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
 
       final double[] xValues = xData.getHighValuesDouble()[0];
+      final int numXValues = xValues.length;
+
+      // check bounds to fix exception
+      if (markerStartIndex >= numXValues) {
+         markerStartIndex = numXValues - 1;
+      }
+      if (markerEndIndex >= numXValues) {
+         markerEndIndex = numXValues - 1;
+      }
+
       final double markerValueStart = xValues[markerStartIndex];
 
       final double valueDiff = xValues[markerEndIndex] - markerValueStart;
-      final double valueLast = xValues[xValues.length - 1];
+      final double valueLast = xValues[numXValues - 1];
 
       final int devVisibleChartWidth = getDevVisibleChartWidth();
 

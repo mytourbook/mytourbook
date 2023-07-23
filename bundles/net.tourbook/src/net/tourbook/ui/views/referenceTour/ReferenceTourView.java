@@ -483,9 +483,9 @@ public class ReferenceTourView extends ViewPart implements
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
             if (_isPartVisible == false) {
-               
+
                // prevent to open this view with a selection event
-               
+
                return;
             }
 
@@ -644,8 +644,10 @@ public class ReferenceTourView extends ViewPart implements
                      comparedTour.setAvgAltimeter(compareTourProperty.avgAltimeter);
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
                      comparedTour.setMaxPulse(compareTourProperty.maxPulse);
-                     comparedTour.setTourSpeed(compareTourProperty.speed);
                      comparedTour.setTourDeviceTime_Elapsed(compareTourProperty.tourDeviceTime_Elapsed);
+
+                     comparedTour.setTourSpeed(compareTourProperty.speed);
+                     comparedTour.setTourPace(compareTourProperty.pace);
 
                      // update the viewer
                      _tourViewer.update(comparedTour, null);
@@ -926,6 +928,7 @@ public class ReferenceTourView extends ViewPart implements
       defineColumn_Tags();
       defineColumn_Time_ElapsedTime();
       defineColumn_AvgSpeed();
+      defineColumn_AvgPace();
       defineColumn_AvgAltimeter();
       defineColumn_AvgPulse();
       defineColumn_MaxPulse();
@@ -1041,6 +1044,32 @@ public class ReferenceTourView extends ViewPart implements
                final double value = compareItem.avgAltimeter;
 
                colDef.printDetailValue(cell, value);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Average pace
+    */
+   private void defineColumn_AvgPace() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVIRefTour_ComparedTour) {
+
+               final double value = ((TVIRefTour_ComparedTour) element).avgPace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
             }
          }
       });

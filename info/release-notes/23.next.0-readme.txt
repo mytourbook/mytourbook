@@ -79,6 +79,9 @@ Improvements
 * Compared Tour Chart View
   - Show the reference tour graph which can overlap the compared tour graphs to see the differences more easily
 
+* Tour Compare
+  - Pace values are now everywhere available like the speed values
+
 * Tour Chart
   - New speed/pace graph which shows the average speed for distance intervals
     https://github.com/mytourbook/mytourbook/issues/829 

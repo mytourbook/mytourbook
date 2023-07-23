@@ -706,6 +706,38 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
+    * @return Returns the metric pace or 0 when not available.
+    */
+   public static float computeTourPace(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] distanceSerie = tourData.getMetricDistanceSerie();
+      final int[] timeSerie = tourData.timeSerie;
+
+      if (timeSerie == null
+            || timeSerie.length == 0
+            || startIndex >= distanceSerie.length
+            || endIndex >= distanceSerie.length) {
+
+         return 0;
+      }
+
+      final float distance = distanceSerie[endIndex] - distanceSerie[startIndex];
+
+      if (distance == 0) {
+         return 0;
+      }
+
+      final int time = Math.max(
+            0,
+            timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex));
+
+      return time * 1000 / distance;
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
     * @return Returns the metric speed or 0 when not available.
     */
    public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
@@ -721,7 +753,7 @@ public class TourManager {
       }
 
       final float distance = distanceSerie[endIndex] - distanceSerie[startIndex];
-      final int time = Math.max( //
+      final int time = Math.max(
             0,
             timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex));
 
