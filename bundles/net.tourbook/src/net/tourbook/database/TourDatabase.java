@@ -3848,104 +3848,104 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_TOUR, false)
 
-            + " StartYear           SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartMonth          SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartDay            SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartHour           SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartMinute         SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartWeek           SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartDistance       INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " Distance            INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " StartAltitude       SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " StartPulse          SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " DpTolerance         SMALLINT NOT NULL,                                 " + NL //$NON-NLS-1$
-            + " TourDistance        INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
+            + "   StartYear            SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartMonth           SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartDay             SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartHour            SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartMinute          SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartWeek            SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartDistance        INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   Distance             INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   StartAltitude        SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   StartPulse           SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   DpTolerance          SMALLINT NOT NULL,                              " + NL //$NON-NLS-1$
+            + "   TourDistance         INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
 
             // replaced with BIGINT values in version 22
-            //            + " tourRecordingTime    INTEGER NOT NULL,                   " + NL //$NON-NLS-1$
-            //            + " tourDrivingTime      INTEGER NOT NULL,                   " + NL //$NON-NLS-1$
+            //            + "   tourRecordingTime    INTEGER NOT NULL,                 " + NL //$NON-NLS-1$
+            //            + "   tourDrivingTime      INTEGER NOT NULL,                 " + NL //$NON-NLS-1$
 
-            + " tourAltUp           INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " tourAltDown         INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
+            + "   tourAltUp            INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   tourAltDown          INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
 
-            + " deviceTourType      VARCHAR(" + TourData.DB_LENGTH_DEVICE_TOUR_TYPE + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " devicePluginId      VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_ID + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   deviceTourType       VARCHAR(" + TourData.DB_LENGTH_DEVICE_TOUR_TYPE + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   devicePluginId       VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_ID + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + " deviceTravelTime    BIGINT NOT NULL,                                   " + NL //$NON-NLS-1$
-            + " deviceDistance      INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " deviceWheel         INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " deviceWeight        INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " deviceTotalUp       INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
-            + " deviceTotalDown     INTEGER NOT NULL,                                  " + NL //$NON-NLS-1$
+            + "   deviceTravelTime     BIGINT NOT NULL,                                " + NL //$NON-NLS-1$
+            + "   deviceDistance       INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   deviceWheel          INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   deviceWeight         INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   deviceTotalUp        INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
+            + "   deviceTotalDown      INTEGER NOT NULL,                               " + NL //$NON-NLS-1$
 
             // version 3 start
-            + " deviceMode          SMALLINT,                                          " + NL //$NON-NLS-1$
-            + " deviceTimeInterval  SMALLINT,                                          " + NL //$NON-NLS-1$
+            + "   deviceMode           SMALLINT,                                       " + NL //$NON-NLS-1$
+            + "   deviceTimeInterval   SMALLINT,                                       " + NL //$NON-NLS-1$
             // version 3 end
 
             // version 4 start
 
             // from markus
             // replaced with FLOAT values in version 21
-            //            + " maxAltitude            INTEGER,                          " + NL //$NON-NLS-1$
-            //            + " maxPulse               INTEGER,                          " + NL //$NON-NLS-1$
-            //            + " avgPulse               INTEGER,                          " + NL //$NON-NLS-1$
-            //            + " avgCadence             INTEGER,                          " + NL //$NON-NLS-1$
-            //            + " avgTemperature         INTEGER,                          " + NL //$NON-NLS-1$
+            // + "   maxAltitude            INTEGER,                          " + NL //$NON-NLS-1$
+            // + "   maxPulse               INTEGER,                          " + NL //$NON-NLS-1$
+            // + "   avgPulse               INTEGER,                          " + NL //$NON-NLS-1$
+            // + "   avgCadence             INTEGER,                          " + NL //$NON-NLS-1$
+            // + "   avgTemperature         INTEGER,                          " + NL //$NON-NLS-1$
 
-            + " maxSpeed            FLOAT,                                                   " + NL //$NON-NLS-1$
-            + " tourTitle           VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   maxSpeed             FLOAT,                                                   " + NL //$NON-NLS-1$
+            + "   tourTitle            VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            // OLD + " tourDescription         VARCHAR(4096),                                   " + NL //// version <= 9
-            + " tourDescription     VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + "),   " + NL //// modified in version 10 //$NON-NLS-1$ //$NON-NLS-2$
+            // OLD + "   tourDescription         VARCHAR(4096),                                   " + NL //// version <= 9
+            + "   tourDescription      VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + "),   " + NL //// modified in version 10 //$NON-NLS-1$ //$NON-NLS-2$
 
-            + " tourStartPlace      VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " tourEndPlace        VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " calories            INTEGER,                                                 " + NL //$NON-NLS-1$
+            + "   tourStartPlace       VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tourEndPlace         VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   calories             INTEGER,                                                 " + NL //$NON-NLS-1$
 //
 // RENAMED FIELD - bikerWeight
 //
-            + " bodyWeight          FLOAT,                                                   " + NL //$NON-NLS-1$
-            + " " + KEY_BIKE + "    BIGINT,                                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   bodyWeight           FLOAT,                                                   " + NL //$NON-NLS-1$
+            + "   " + KEY_BIKE + "     BIGINT,                                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // from wolfgang
-            + " devicePluginName    VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " deviceModeName      VARCHAR(" + TourData.DB_LENGTH_DEVICE_MODE_NAME + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   devicePluginName     VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   deviceModeName       VARCHAR(" + TourData.DB_LENGTH_DEVICE_MODE_NAME + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 4 end
 
-            + " " + KEY_TYPE + "    BIGINT,                                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " " + KEY_PERSON + "  BIGINT,                                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TYPE + "     BIGINT,                                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_PERSON + "   BIGINT,                                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 6 start
 
-            + " tourImportFilePath  VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tourImportFilePath   VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 6 end
 
             // version 7 start
 
-            + " mergeSourceTourId      BIGINT,                                               " + NL //$NON-NLS-1$
-            + " mergeTargetTourId      BIGINT,                                               " + NL //$NON-NLS-1$
-            + " mergedTourTimeOffset   INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " mergedAltitudeOffset   INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " startSecond            SMALLINT DEFAULT 0,                                   " + NL //$NON-NLS-1$
+            + "   mergeSourceTourId       BIGINT,                                               " + NL //$NON-NLS-1$
+            + "   mergeTargetTourId       BIGINT,                                               " + NL //$NON-NLS-1$
+            + "   mergedTourTimeOffset    INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   mergedAltitudeOffset    INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   startSecond             SMALLINT DEFAULT 0,                                   " + NL //$NON-NLS-1$
 
-            // version 7 end
+            // version 7 end              
 
-            // version 8 start
+            // version 8 start            
 
-            + " weather_Wind_Direction INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " weather_Wind_Speed     INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weather_Clouds         VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " restPulse              INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " isDistanceFromSensor   SMALLINT DEFAULT 0,                                   " + NL //$NON-NLS-1$
+            + "   weather_Wind_Direction  INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
+            + "   weather_Wind_Speed      INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   weather_Clouds          VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   restPulse               INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   isDistanceFromSensor    SMALLINT DEFAULT 0,                                   " + NL //$NON-NLS-1$
 
-            // version 8 end
+            // version 8 end              
 
-            // version 9 start
+            // version 9 start            
 
-            + " startWeekYear          SMALLINT DEFAULT 1977,                                " + NL //$NON-NLS-1$
+            + "   startWeekYear           SMALLINT DEFAULT 1977,                                " + NL //$NON-NLS-1$
 
             // version 9 end
 
@@ -3957,213 +3957,213 @@ public class TourDatabase {
 
             // version 11 start
             //
-            + " DateTimeCreated        BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
-            + " DateTimeModified       BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
+            + "   DateTimeCreated         BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
+            + "   DateTimeModified        BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
 
-            // version 11 end ---------
+            // version 11 end ---------   
 
             // version 12 start
             //
-            + " IsPulseSensorPresent   INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " IsPowerSensorPresent   INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " DeviceAvgSpeed         FLOAT DEFAULT 0,                                      " + NL //$NON-NLS-1$
-            + " DeviceFirmwareVersion  VARCHAR(" + TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   IsPulseSensorPresent    INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   IsPowerSensorPresent    INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   DeviceAvgSpeed          FLOAT DEFAULT 0,                                      " + NL //$NON-NLS-1$
+            + "   DeviceFirmwareVersion   VARCHAR(" + TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 12 end ---------
 
             // version 13 start
 
-            + " TemperatureScale       INTEGER DEFAULT 1,                                    " + NL //$NON-NLS-1$
-            + " Weather                VARCHAR(" + TourData.DB_LENGTH_WEATHER_V48 + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   TemperatureScale        INTEGER DEFAULT 1,                                    " + NL //$NON-NLS-1$
+            + "   Weather                 VARCHAR(" + TourData.DB_LENGTH_WEATHER_V48 + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            // version 13 end ---------
+            // version 13 end ---------   
 
-            // version 14 start
+            // version 14 start           
 
-            + " ConconiDeflection      INTEGER DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   ConconiDeflection       INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
 
-            // version 14 end ---------
+            // version 14 end ---------   
 
-            // version 17 start
+            // version 17 start           
 
-            + " hrZone0                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone1                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone2                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone3                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone4                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone5                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone6                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone7                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone8                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
-            + " hrZone9                INTEGER DEFAULT -1,                                   " + NL //$NON-NLS-1$
+            + "   hrZone0                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone1                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone2                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone3                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone4                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone5                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone6                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone7                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone8                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
+            + "   hrZone9                 INTEGER DEFAULT -1,                          " + NL //$NON-NLS-1$
 
-            // version 17 end ---------
+            // version 17 end ---------   
 
-            // version 18 start
+            // version 18 start           
 
-            + " NumberOfHrZones         INTEGER DEFAULT 0,                                  " + NL //$NON-NLS-1$
+            + "   NumberOfHrZones         INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
 
-            // version 18 end ---------
+            // version 18 end ---------   
 
-            // version 21 start
+            // version 21 start           
 
-            + " maxAltitude            FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " maxPulse               FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " avgPulse               FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " avgCadence             FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weather_Temperature_Average_Device  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   maxAltitude             FLOAT DEFAULT 0,                             " + NL //$NON-NLS-1$
+            + "   maxPulse                FLOAT DEFAULT 0,                             " + NL //$NON-NLS-1$
+            + "   avgPulse                FLOAT DEFAULT 0,                             " + NL //$NON-NLS-1$
+            + "   avgCadence              FLOAT DEFAULT 0,                             " + NL //$NON-NLS-1$
+            + "   weather_Temperature_Average_Device  FLOAT DEFAULT 0,                 " + NL //$NON-NLS-1$
 
             // version 21 end ---------
 
             // version 22 start  -  12.12
 
-            + " TourStartTime          BIGINT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " TourEndTime            BIGINT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + "   TourStartTime           BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
+            + "   TourEndTime             BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
 
 //
 // RENAMED FIELDs - from TourRecordingTime, TourDrivingTime
 //
-            + " TourDeviceTime_Elapsed  BIGINT DEFAULT 0,                                 " + NL //$NON-NLS-1$
-            + " TourComputedTime_Moving BIGINT DEFAULT 0,                                 " + NL //$NON-NLS-1$
+            + "   TourDeviceTime_Elapsed  BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
+            + "   TourComputedTime_Moving BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
 
             // version 22 end ---------
 
             // version 23 start  -  13.2
 
-            + " numberOfTimeSlices     INTEGER DEFAULT 0,                                 " + NL //$NON-NLS-1$
-            + " numberOfPhotos         INTEGER DEFAULT 0,                                 " + NL //$NON-NLS-1$
-            + " photoTimeAdjustment    INTEGER DEFAULT 0,                                 " + NL //$NON-NLS-1$
+            + "   numberOfTimeSlices      INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
+            + "   numberOfPhotos          INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
+            + "   photoTimeAdjustment     INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
 
-            // version 23 end ---------
+            // version 23 end ---------   
 
-            // version 27 start  -  15.5
+            // version 27 start  -  15.5  
 
-            + " frontShiftCount        INTEGER DEFAULT 0,                                 " + NL //$NON-NLS-1$
-            + " rearShiftCount         INTEGER DEFAULT 0,                                 " + NL //$NON-NLS-1$
+            + "   frontShiftCount         INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
+            + "   rearShiftCount          INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
 
-            // version 27 end ---------
+            // version 27 end ---------   
 
-            // version 29 start  -  15.12
+            // version 29 start  -  15.12 
 
-            + " TourImportFileName     VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   TourImportFileName      VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 29 end ---------
 
             // version 30 start  -  16.1
 
-            + " power_Avg                             FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
-            + " power_Max                             INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
-            + " power_Normalized                      INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
-            + " power_FTP                             INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
+            + "   power_Avg                              FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   power_Max                              INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+            + "   power_Normalized                       INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+            + "   power_FTP                              INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
-            + " power_TotalWork                       BIGINT DEFAULT 0,                   " + NL //$NON-NLS-1$
-            + " power_TrainingStressScore             FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
-            + " power_IntensityFactor                 FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
+            + "   power_TotalWork                        BIGINT DEFAULT 0,             " + NL //$NON-NLS-1$
+            + "   power_TrainingStressScore              FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   power_IntensityFactor                  FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
 
-            + " power_PedalLeftRightBalance           INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
-            + " power_AvgLeftTorqueEffectiveness      FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
-            + " power_AvgRightTorqueEffectiveness     FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
-            + " power_AvgLeftPedalSmoothness          FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
-            + " power_AvgRightPedalSmoothness         FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
+            + "   power_PedalLeftRightBalance            INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+            + "   power_AvgLeftTorqueEffectiveness       FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   power_AvgRightTorqueEffectiveness      FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   power_AvgLeftPedalSmoothness           FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   power_AvgRightPedalSmoothness          FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
 
-            // version 30 end ---------
+            // version 30 end ---------                  
 
-            // version 31 start  -  16.5
+            // version 31 start  -  16.5                 
 
-            + " CadenceMultiplier                     FLOAT DEFAULT 1.0,                  " + NL //$NON-NLS-1$
-            + " IsStrideSensorPresent                 INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
+            + "   CadenceMultiplier                      FLOAT DEFAULT 1.0,            " + NL //$NON-NLS-1$
+            + "   IsStrideSensorPresent                  INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
             // version 31 end ---------
 
             // version 32 start  -  >16.8 ???
 
-            + " TimeZoneId            VARCHAR(" + TourData.DB_LENGTH_TIME_ZONE_ID + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   TimeZoneId            VARCHAR(" + TourData.DB_LENGTH_TIME_ZONE_ID + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 32 end ---------
 
             // version 35 start  -  18.7
 
-            + " runDyn_StanceTime_Min                 SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_StanceTime_Max                 SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_StanceTime_Avg                 FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   runDyn_StanceTime_Min                  SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_StanceTime_Max                  SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_StanceTime_Avg                  FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
-            + " runDyn_StanceTimeBalance_Min          SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_StanceTimeBalance_Max          SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_StanceTimeBalance_Avg          FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   runDyn_StanceTimeBalance_Min           SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_StanceTimeBalance_Max           SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_StanceTimeBalance_Avg           FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
-            + " runDyn_StepLength_Min                 SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_StepLength_Max                 SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_StepLength_Avg                 FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   runDyn_StepLength_Min                  SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_StepLength_Max                  SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_StepLength_Avg                  FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
-            + " runDyn_VerticalOscillation_Min        SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_VerticalOscillation_Max        SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_VerticalOscillation_Avg        FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   runDyn_VerticalOscillation_Min         SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_VerticalOscillation_Max         SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_VerticalOscillation_Avg         FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
-            + " runDyn_VerticalRatio_Min              SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_VerticalRatio_Max              SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " runDyn_VerticalRatio_Avg              FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   runDyn_VerticalRatio_Min               SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_VerticalRatio_Max               SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   runDyn_VerticalRatio_Avg               FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
-            // version 35 end ---------
+            // version 35 end ---------                  
 
-            // version 36 start  -  18.12
+            // version 36 start  -  18.12                
 
-            + " surfing_NumberOfEvents                SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " surfing_MinSpeed_StartStop            SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
-            + " surfing_MinSpeed_Surfing              SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
-            + " surfing_MinTimeDuration               SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
+            + "   surfing_NumberOfEvents                 SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   surfing_MinSpeed_StartStop             SMALLINT DEFAULT -1,          " + NL //$NON-NLS-1$
+            + "   surfing_MinSpeed_Surfing               SMALLINT DEFAULT -1,          " + NL //$NON-NLS-1$
+            + "   surfing_MinTimeDuration                SMALLINT DEFAULT -1,          " + NL //$NON-NLS-1$
 
-            + " surfing_IsMinDistance                 BOOLEAN  DEFAULT FALSE,             " + NL //$NON-NLS-1$
-            + " surfing_MinDistance                   SMALLINT DEFAULT -1,                " + NL //$NON-NLS-1$
+            + "   surfing_IsMinDistance                  BOOLEAN  DEFAULT FALSE,       " + NL //$NON-NLS-1$
+            + "   surfing_MinDistance                    SMALLINT DEFAULT -1,          " + NL //$NON-NLS-1$
 
             // version 36 end ---------
 
             // version 37 start  -  19.3
 
-            + " hasGeoData                            BOOLEAN  DEFAULT FALSE,             " + NL //$NON-NLS-1$
+            + "   hasGeoData                             BOOLEAN  DEFAULT FALSE,       " + NL //$NON-NLS-1$
 
-            // version 37 end ---------
+            // version 37 end ---------                  
 
-            // version 38 start  -  19.5
+            // version 38 start  -  19.5                 
 
-            + " training_TrainingEffect_Aerob         FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " training_TrainingEffect_Anaerob       FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " training_TrainingPerformance          FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   training_TrainingEffect_Aerob          FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   training_TrainingEffect_Anaerob        FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   training_TrainingPerformance           FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
-            // version 38 end
+            // version 38 end                            
 
-            // version 39 start  -  19.7
+            // version 39 start  -  19.7                 
 
-            + " isWeatherDataFromProvider             BOOLEAN  DEFAULT FALSE,             " + NL //$NON-NLS-1$
-            + " weather_Humidity                      SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Precipitation                 FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Pressure                      FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Temperature_Min_Device        FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Temperature_Max_Device        FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Temperature_WindChill         FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + "   isWeatherDataFromProvider              BOOLEAN  DEFAULT FALSE,       " + NL //$NON-NLS-1$
+            + "   weather_Humidity                       SMALLINT DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   weather_Precipitation                  FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   weather_Pressure                       FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   weather_Temperature_Min_Device         FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   weather_Temperature_Max_Device         FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
+            + "   weather_Temperature_WindChill          FLOAT    DEFAULT 0,           " + NL //$NON-NLS-1$
 
             // version 39 end
 
             // version 40 start  -  19.10
 
-            + " power_DataSource   VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + " cadenceZone_SlowTime                  INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
-            + " cadenceZone_FastTime                  INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
-            + " cadenceZones_DelimiterValue           INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
-            + " avgAltitudeChange                     INTEGER DEFAULT 0,                  " + NL //$NON-NLS-1$
+            + "   power_DataSource   VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   cadenceZone_SlowTime                   INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+            + "   cadenceZone_FastTime                   INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+            + "   cadenceZones_DelimiterValue            INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+            + "   avgAltitudeChange                      INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
-            // version 40 end
+            // version 40 end                            
 
-            // version 41 start  -  20.8
+            // version 41 start  -  20.8                 
 
-            + " maxPace                               FLOAT DEFAULT 0,                    " + NL //$NON-NLS-1$
+            + "   maxPace                                FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
 
-            // version 41 end
+            // version 41 end                            
 
-            // version 42 start  -  20.11.1
+            // version 42 start  -  20.11.1              
 
-            + " tourDeviceTime_Recorded               BIGINT,                            " + NL //$NON-NLS-1$
-            + " tourDeviceTime_Paused                 BIGINT,                            " + NL //$NON-NLS-1$
-            + " bodyFat                               FLOAT,                             " + NL //$NON-NLS-1$
+            + "   tourDeviceTime_Recorded                BIGINT,                       " + NL //$NON-NLS-1$
+            + "   tourDeviceTime_Paused                  BIGINT,                       " + NL //$NON-NLS-1$
+            + "   bodyFat                                FLOAT,                        " + NL //$NON-NLS-1$
 
             // version 42 end
 
@@ -4173,26 +4173,26 @@ public class TourDatabase {
              * The first default values were 0 but only when a new tour db was created
              * and not when the tour db was updated !!!
              */
-            + " Battery_Percentage_Start              SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
-            + " Battery_Percentage_End                SMALLINT DEFAULT -1,               " + NL //$NON-NLS-1$
+            + "   Battery_Percentage_Start               SMALLINT DEFAULT -1,          " + NL //$NON-NLS-1$
+            + "   Battery_Percentage_End                 SMALLINT DEFAULT -1,          " + NL //$NON-NLS-1$
 
-            // version 45 end
+            // version 45 end                            
 
             // version 46 start  -  after 21.9
-            // version 46 end
+            // version 46 end                            
 
-            // version 47 start  -  after 21.12
+            // version 47 start  -  after 21.12          
 
-            + " weather_Temperature_Average           FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
-            + " weather_Temperature_Max               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
-            + " weather_Temperature_Min               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
-            + " weather_Snowfall                      FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
+            + "   weather_Temperature_Average            FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   weather_Temperature_Max                FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   weather_Temperature_Min                FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
+            + "   weather_Snowfall                       FLOAT DEFAULT 0,              " + NL //$NON-NLS-1$
 
             // version 47 end
 
             // version 50 start  -  after 23.3
 
-            + " weather_AirQuality   VARCHAR(" + TourData.DB_LENGTH_WEATHER_AIRQUALITY + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   weather_AirQuality   VARCHAR(" + TourData.DB_LENGTH_WEATHER_AIRQUALITY + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 50 end
 
@@ -4204,11 +4204,11 @@ public class TourDatabase {
              * <p>
              * -> the gpsData are put into the serieData object
              */
-            //   + "gpsData                           BLOB,                               " + NL //$NON-NLS-1$
+            //   + "gpsData                              BLOB,                         " + NL //$NON-NLS-1$
 
             // version 5 end
 
-            + " serieData                             BLOB                                " + NL //$NON-NLS-1$
+            + "   serieData                              BLOB                          " + NL //$NON-NLS-1$
 
             + ")"); //$NON-NLS-1$
 
@@ -5248,23 +5248,40 @@ public class TourDatabase {
                   }
                }
 
+               if (splashManager != null) {
+                  splashManager.setMessage(Messages.Database_Monitor_SetupPooledConnection);
+               }
+
                // make the first connection, this takes longer as the subsequent ones
-               try {
+               try (Connection connection = getConnection_Simple()) {
 
-                  if (splashManager != null) {
-                     splashManager.setMessage(Messages.Database_Monitor_SetupPooledConnection);
+               } catch (final SQLException e2) {
+
+                  final String sqlState = e2.getSQLState();
+
+                  if ("08004".equals(sqlState)) { //$NON-NLS-1$
+
+                     /**
+                      * This happens when derby is running in network mode and the database is not
+                      * yet created. This case do not happen for a normal user because derby is
+                      * running by default in the embedded mode.
+                      * <p>
+                      * java.sql.SQLNonTransientConnectionException
+                      * <p>
+                      * The connection was refused because the database tourbook was not found.
+                      */
+
+                     net.tourbook.common.util.SQL.logException(e2);
+
+                  } else {
+
+                     UI.showSQLException(e2);
                   }
-
-                  final Connection connection = getConnection_Simple();
-                  connection.close();
-
-                  // log database path
-                  logDerbyInfo("Database path: " + _databasePath); //$NON-NLS-1$
-
-               } catch (final SQLException e1) {
-                  UI.showSQLException(e1);
                }
             }
+
+            // log database path
+            logDerbyInfo("Database path: " + _databasePath); //$NON-NLS-1$
          }
       };
 

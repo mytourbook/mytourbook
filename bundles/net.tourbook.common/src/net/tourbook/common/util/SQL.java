@@ -109,6 +109,23 @@ public final class SQL {
       return SQL.SQL_STRING_SEPARATOR + string + SQL.SQL_STRING_SEPARATOR;
    }
 
+   public static void logException(SQLException exception) {
+
+      // log into the eclipse log file
+      StatusUtil.log(exception);
+
+      // log into the console
+      while (exception != null) {
+
+         final String sqlExceptionText = Util.getSQLExceptionText(exception);
+
+         System.out.println(sqlExceptionText);
+         exception.printStackTrace();
+
+         exception = exception.getNextException();
+      }
+   }
+
    public static void logParameterMetaData(final PreparedStatement statement) {
 
 //		try {
