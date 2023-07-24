@@ -1720,6 +1720,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_device;
    public static String        Pref_People_Label_first_name;
    public static String        Pref_People_Label_Gender;
+   public static String        Pref_People_Label_GenderDiverse;
    public static String        Pref_People_Label_GenderFemale;
    public static String        Pref_People_Label_GenderMale;
    public static String        Pref_People_Label_height;

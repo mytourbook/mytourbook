@@ -93,6 +93,9 @@ Improvements
  * Tour Concatenation (Frederic)
   - Concatenating TSS values
   
+* Person
+  - Added gender diverse  
+  
 * Theme
   - Show theme selector in the app toolbar
     https://github.com/mytourbook/mytourbook/issues/1129
