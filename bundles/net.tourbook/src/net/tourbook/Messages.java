@@ -1894,8 +1894,8 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
    public static String        RefTour_Action_Link2;
-   public static String        RefTour_Action_NavigateNextTour;
-   public static String        RefTour_Action_NavigatePrevTour;
+   public static String        RefTour_Action_NavigateNextTour2;
+   public static String        RefTour_Action_NavigatePrevTour2;
    public static String        RefTour_Action_RenameReferenceTour;
    public static String        RefTour_Action_SaveMarker;
    public static String        RefTour_Action_SaveAndNext;

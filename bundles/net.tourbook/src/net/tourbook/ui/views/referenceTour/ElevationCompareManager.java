@@ -714,7 +714,7 @@ public class ElevationCompareManager {
       }
 
       /*
-       * Secondly navigate in the year statistic view when view is available
+       * Secondly navigate in the reference timeline view when view is available
        */
       if (navigatedTour == null) {
 

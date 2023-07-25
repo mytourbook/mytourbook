@@ -178,7 +178,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.RefTour_Action_NavigateNextTour);
+         setToolTipText(Messages.RefTour_Action_NavigateNextTour2);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right_Disabled));
@@ -196,7 +196,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.RefTour_Action_NavigatePrevTour);
+         setToolTipText(Messages.RefTour_Action_NavigatePrevTour2);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left_Disabled));
