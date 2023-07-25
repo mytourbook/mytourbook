@@ -822,9 +822,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          case NUMBER_FLOAT:
             numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
+            break;
 
          case ENUMERATION:
-            numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig, 1);
+            numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig);
             break;
 
          case TEXT:
@@ -1082,14 +1083,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private int createUI_Field_Enumeration(final Composite parent,
                                           final TourFilterProperty filterProperty,
-                                          final TourFilterFieldConfig fieldConfig,
-                                          final int fieldNo) {
+                                          final TourFilterFieldConfig fieldConfig) {
 
       final Combo combo = new Combo(parent, SWT.NONE);
       combo.setItems(fieldConfig.values);
 
       combo.setData(filterProperty);
-      //combo.setData(FIELD_NO, fieldNo);
 
       combo.addFocusListener(_keepOpenListener);
       combo.addSelectionListener(_fieldSelectionListener_Combo);
@@ -1536,7 +1535,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _fieldSelectionListener_DateTime = widgetSelectedAdapter(this::onField_Select_DateTime);
       _fieldSelectionListener_Combo = widgetSelectedAdapter(this::onField_Select_Enumeration);
 
-
       _keepOpenListener = new FocusListener() {
 
          @Override
@@ -1577,50 +1575,50 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void onField_Select_DateTime(final SelectionEvent selectionEvent) {
 
-         final DateTime dateTime = (DateTime) (selectionEvent.widget);
+      final DateTime dateTime = (DateTime) (selectionEvent.widget);
 
-         final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
-         final int fieldNo = (int) dateTime.getData(FIELD_NO);
+      final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
+      final int fieldNo = (int) dateTime.getData(FIELD_NO);
 
-         final LocalDateTime localDateTime = LocalDateTime.of(
-               dateTime.getYear(),
-               dateTime.getMonth() + 1,
-               dateTime.getDay(),
-               dateTime.getHours(),
-               dateTime.getMinutes());
+      final LocalDateTime localDateTime = LocalDateTime.of(
+            dateTime.getYear(),
+            dateTime.getMonth() + 1,
+            dateTime.getDay(),
+            dateTime.getHours(),
+            dateTime.getMinutes());
 
-         if (fieldNo == 1) {
-            filterProperty.dateTime1 = localDateTime;
-         } else {
-            filterProperty.dateTime2 = localDateTime;
-         }
-
-         fireModifyEvent();
+      if (fieldNo == 1) {
+         filterProperty.dateTime1 = localDateTime;
+      } else {
+         filterProperty.dateTime2 = localDateTime;
       }
 
- private void onField_Select_Duration(final TimeDuration duration, final int durationTime) {
-
-   final TourFilterProperty filterProperty = (TourFilterProperty) duration.getData();
-   final int fieldNo = (int) duration.getData(FIELD_NO);
-
-   if (fieldNo == 1) {
-      filterProperty.intValue1 = durationTime;
-   } else {
-      filterProperty.intValue2 = durationTime;
+      fireModifyEvent();
    }
 
-   fireModifyEvent();
-}
+   private void onField_Select_Duration(final TimeDuration duration, final int durationTime) {
 
-private void onField_Select_Enumeration(final SelectionEvent selectionEvent) {
+      final TourFilterProperty filterProperty = (TourFilterProperty) duration.getData();
+      final int fieldNo = (int) duration.getData(FIELD_NO);
 
-   final Combo combo = (Combo) (selectionEvent.widget);
+      if (fieldNo == 1) {
+         filterProperty.intValue1 = durationTime;
+      } else {
+         filterProperty.intValue2 = durationTime;
+      }
 
-   final TourFilterProperty filterProperty = (TourFilterProperty) combo.getData();
-   filterProperty.textValue1 = combo.getText();
+      fireModifyEvent();
+   }
 
-   fireModifyEvent();
-}
+   private void onField_Select_Enumeration(final SelectionEvent selectionEvent) {
+
+      final Combo combo = (Combo) (selectionEvent.widget);
+
+      final TourFilterProperty filterProperty = (TourFilterProperty) combo.getData();
+      filterProperty.textValue1 = combo.getText();
+
+      fireModifyEvent();
+   }
 
    /**
     * The most recent value is saved as text value
