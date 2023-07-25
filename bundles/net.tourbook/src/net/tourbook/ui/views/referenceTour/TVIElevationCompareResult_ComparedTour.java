@@ -80,17 +80,20 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
     * When a compared tour is stored in the database, the compareId is set and the data from the
     * database are stored in the field's db...
     */
-   int   dbStartIndex;
-   int   dbEndIndex;
+   int   savedStartIndex;
+   int   savedEndIndex;
 
-   float dbSpeed;
-   int   dbElapsedTime;
+   int   savedElapsedTime;
+
+   float savedSpeed;
+   float savedPace;
 
    /*
     * The moved... fields contain the position of the compared tour when the user moved the
     * position
     */
    float movedSpeed;
+   float movedPace;
 
    @Override
    public boolean equals(final Object obj) {

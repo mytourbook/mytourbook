@@ -448,6 +448,7 @@ public class ElevationCompareResultView extends ViewPart implements
    private void addCompareTourPropertyListener() {
 
       _compareTourPropertyListener = new ITourEventListener() {
+
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
@@ -477,6 +478,7 @@ public class ElevationCompareResultView extends ViewPart implements
                      final TVIElevationCompareResult_ComparedTour resultItem = (TVIElevationCompareResult_ComparedTour) comparedTourItem;
 
                      resultItem.movedSpeed = compareTourProperty.speed;
+                     resultItem.movedPace = compareTourProperty.pace;
 
                      // update viewer
                      _tourViewer.update(comparedTourItem, null);
@@ -498,15 +500,18 @@ public class ElevationCompareResultView extends ViewPart implements
 
                         // compared tour was saved
 
-                        compareTourItem.dbStartIndex = compareTourProperty.startIndex;
-                        compareTourItem.dbEndIndex = compareTourProperty.endIndex;
+                        compareTourItem.savedStartIndex = compareTourProperty.startIndex;
+                        compareTourItem.savedEndIndex = compareTourProperty.endIndex;
 
-                        compareTourItem.dbSpeed = compareTourProperty.speed;
-                        compareTourItem.dbElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
+                        compareTourItem.savedElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
+
+                        compareTourItem.savedSpeed = compareTourProperty.speed;
+                        compareTourItem.savedPace = compareTourProperty.pace;
 
                      } else {
 
                         compareTourItem.movedSpeed = compareTourProperty.speed;
+                        compareTourItem.movedPace = compareTourProperty.pace;
                      }
 
                      // update viewer
@@ -906,6 +911,8 @@ public class ElevationCompareResultView extends ViewPart implements
       defineColumn_Motion_SpeedSaved();
       defineColumn_Motion_SpeedMoved();
       defineColumn_Motion_PaceComputed();
+      defineColumn_Motion_PaceSaved();
+      defineColumn_Motion_PaceMoved();
       defineColumn_Motion_VerticalSpeed();
       defineColumn_Motion_Distance();
 
@@ -1130,8 +1137,8 @@ public class ElevationCompareResultView extends ViewPart implements
       colDef.setIsDefaultColumn();
       colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
       colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
-      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Tooltip);
-      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Label);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Computed_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Computed_Label);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
@@ -1143,6 +1150,76 @@ public class ElevationCompareResultView extends ViewPart implements
 
                final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
                final double value = compareItem.comparePace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Pace moved
+    */
+   private void defineColumn_Motion_PaceMoved() {
+
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceMoved", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Moved_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Moved_Label);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
+               final double value = compareItem.movedPace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Pace saved
+    */
+   private void defineColumn_Motion_PaceSaved() {
+
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceSaved", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Saved_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Saved_Label);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
+               final double value = compareItem.savedPace * UI.UNIT_VALUE_DISTANCE;
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -1193,7 +1270,7 @@ public class ElevationCompareResultView extends ViewPart implements
    }
 
    /**
-    * column: speed moved
+    * Column: Speed moved
     */
    private void defineColumn_Motion_SpeedMoved() {
 
@@ -1229,7 +1306,7 @@ public class ElevationCompareResultView extends ViewPart implements
    }
 
    /**
-    * column: speed saved
+    * Column: Speed saved
     */
    private void defineColumn_Motion_SpeedSaved() {
 
@@ -1254,7 +1331,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
                final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
 
-               final double value = compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.savedSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -2165,12 +2242,16 @@ public class ElevationCompareResultView extends ViewPart implements
 
          removedTourItem.compareId = -1;
 
-         removedTourItem.dbStartIndex = -1;
-         removedTourItem.dbEndIndex = -1;
-         removedTourItem.dbSpeed = 0;
-         removedTourItem.dbElapsedTime = 0;
+         removedTourItem.savedStartIndex = -1;
+         removedTourItem.savedEndIndex = -1;
+
+         removedTourItem.savedElapsedTime = 0;
+
+         removedTourItem.savedSpeed = 0;
+         removedTourItem.savedPace = 0;
 
          removedTourItem.movedSpeed = 0;
+         removedTourItem.movedPace = 0;
       }
 
       // update viewer

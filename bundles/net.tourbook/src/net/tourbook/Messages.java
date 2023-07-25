@@ -362,8 +362,13 @@ public class Messages extends NLS {
    public static String        Compare_Result_Column_kmh_moved_label;
    public static String        Compare_Result_Column_kmh_moved_tooltip;
    public static String        Compare_Result_Column_kmh_tooltip;
-   public static String        Compare_Result_Column_Pace_Label;
-   public static String        Compare_Result_Column_Pace_Tooltip;
+   public static String        Compare_Result_Column_Pace_Computed_Label;
+   public static String        Compare_Result_Column_Pace_Computed_Tooltip;
+   public static String        Compare_Result_Column_Pace_Moved_Label;
+   public static String        Compare_Result_Column_Pace_Moved_Tooltip;
+   public static String        Compare_Result_Column_Pace_Saved_Label;
+   public static String        Compare_Result_Column_Pace_Saved_Tooltip;
+
    public static String        Compare_Result_Column_tour;
 
    public static String        Compute_BreakTime_Button_ComputeAllTours;

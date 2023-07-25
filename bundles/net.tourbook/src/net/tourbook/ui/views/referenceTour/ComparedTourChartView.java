@@ -1171,8 +1171,8 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
          // compared tour is saved
 
-         _defaultStartIndex = _movedStartIndex = elevationComparedResultTour.dbStartIndex;
-         _defaultEndIndex = _movedEndIndex = elevationComparedResultTour.dbEndIndex;
+         _defaultStartIndex = _movedStartIndex = elevationComparedResultTour.savedStartIndex;
+         _defaultEndIndex = _movedEndIndex = elevationComparedResultTour.savedEndIndex;
 
          _computedStartIndex = elevationComparedResultTour.computedStartIndex;
          _computedEndIndex = elevationComparedResultTour.computedEndIndex;
