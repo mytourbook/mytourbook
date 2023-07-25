@@ -59,9 +59,9 @@ public class TVIElevationCompareResult_ReferenceTour extends TVIElevationCompare
    private HashMap<Long, StoredComparedTour> _storedComparedTours;
 
    public TVIElevationCompareResult_ReferenceTour(final TVIElevationCompareResult_RootItem parentItem,
-                                        final String label,
-                                        final RefTourItem refTourItem,
-                                        final long tourId) {
+                                                  final String label,
+                                                  final RefTourItem refTourItem,
+                                                  final long tourId) {
 
       this.setParentItem(parentItem);
 
@@ -174,7 +174,7 @@ public class TVIElevationCompareResult_ReferenceTour extends TVIElevationCompare
             + "   label       =" + label + NL //                  //$NON-NLS-1$
             + "   tourId      =" + tourId + NL //                 //$NON-NLS-1$
 
-//          + "   refTourItem =" + refTourItem + NL //            //$NON-NLS-1$
+            + "   refTourItem =" + refTourItem + NL //            //$NON-NLS-1$
 
             + "]" + NL //                                         //$NON-NLS-1$
 

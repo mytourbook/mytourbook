@@ -93,6 +93,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -154,6 +155,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
    private boolean                             _isToolbarCreated;
    private boolean                             _isToolTipInTour;
+   private boolean                             _isInSelection;
 
    private CompareFilter                       _compareFilter             = CompareFilter.ALL_IS_DISPLAYED;
 
@@ -1608,12 +1610,83 @@ public class ElevationCompareResultView extends ViewPart implements
    }
 
    /**
+    * !!! Recursive !!!
+    * <p>
+    * This is searching an item in the displayed tree items
+    *
+    * @param parentItem
+    * @param requestedItem
+    * @param viewerTreePaths
+    * @return
+    */
+   private void getComparedTour(final TreeViewerItem parentItem,
+                                final TVIRefTour_ComparedTour requestedItem,
+                                final ArrayList<TreeViewerItem> viewerTreePaths) {
+
+      final ArrayList<TreeViewerItem> treeItemChildren = parentItem.getUnfetchedChildren();
+
+      if (treeItemChildren != null) {
+
+         // children are available
+
+         if (parentItem instanceof TVIElevationCompareResult_RootItem) {
+
+            // root item -> ref tour
+
+            final long requestedRefId = requestedItem.refId;
+
+            for (final TreeViewerItem treeItem : treeItemChildren) {
+
+               if (treeItem instanceof TVIElevationCompareResult_ReferenceTour) {
+
+                  final TVIElevationCompareResult_ReferenceTour refTourItem = (TVIElevationCompareResult_ReferenceTour) treeItem;
+                  final long resultRefId = refTourItem.refTourItem.refId;
+
+                  if (resultRefId == requestedRefId) {
+
+                     // ref tour -> compared tour
+
+                     viewerTreePaths.add(refTourItem);
+
+                     getComparedTour(treeItem, requestedItem, viewerTreePaths);
+
+                     return;
+                  }
+               }
+            }
+
+         } else if (parentItem instanceof TVIElevationCompareResult_ReferenceTour) {
+
+            // ref tour -> compared tour
+
+            final long requestedCompareId = requestedItem.compareId;
+
+            for (final TreeViewerItem treeItem : treeItemChildren) {
+
+               if (treeItem instanceof TVIElevationCompareResult_ComparedTour) {
+
+                  final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) treeItem;
+                  final long resultCompareId = compareResultItem.compareId;
+
+                  if (resultCompareId == requestedCompareId) {
+
+                     viewerTreePaths.add(compareResultItem);
+
+                     return;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   /**
     * Recursive method to walk down the tour tree items and find the compared tours
     *
     * @param parentItem
     * @param allRemovedComparedTours
     */
-   private void getComparedTours(final ArrayList<TVIElevationCompareResult_ComparedTour> comparedTours,
+   private void getComparedTours(final ArrayList<TVIElevationCompareResult_ComparedTour> allComparedItems,
                                  final TreeViewerItem parentItem,
                                  final ArrayList<ElevationCompareResult> allRemovedComparedTours) {
 
@@ -1633,14 +1706,14 @@ public class ElevationCompareResultView extends ViewPart implements
                for (final ElevationCompareResult resultItem : allRemovedComparedTours) {
 
                   if (compId == resultItem.compareId) {
-                     comparedTours.add(ttiCompResult);
+                     allComparedItems.add(ttiCompResult);
                   }
                }
 
             } else {
 
                // this is a child which can be the parent for other children
-               getComparedTours(comparedTours, treeItem, allRemovedComparedTours);
+               getComparedTours(allComparedItems, treeItem, allRemovedComparedTours);
             }
          }
       }
@@ -1899,6 +1972,10 @@ public class ElevationCompareResultView extends ViewPart implements
 
    private void onSelect(final SelectionChangedEvent event) {
 
+      if (_isInSelection) {
+         return;
+      }
+
       final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
       final Object treeItem = selection.getFirstElement();
@@ -1917,6 +1994,34 @@ public class ElevationCompareResultView extends ViewPart implements
       }
    }
 
+   private void onSelect_ComparedTour(final TVIRefTour_ComparedTour requestedItem) {
+
+      final ArrayList<TreeViewerItem> viewerTreeItems = new ArrayList<>();
+
+      getComparedTour(_rootItem, requestedItem, viewerTreeItems);
+
+      if (viewerTreeItems.size() < 2) {
+
+         // requested compared tour was not found in the viewer
+
+         return;
+      }
+
+      /*
+       * Select compared tour in the viewer
+       */
+      final TreeViewerItem[] treePathArray = viewerTreeItems.toArray(new TreeViewerItem[viewerTreeItems.size()]);
+
+      final TreePath treePath = new TreePath(treePathArray);
+      final ITreeSelection treeSelection = new TreeSelection(treePath);
+
+      _isInSelection = true;
+      {
+         _tourViewer.setSelection(treeSelection, true);
+      }
+      _isInSelection = false;
+   }
+
    private void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
       if (part == ElevationCompareResultView.this) {
@@ -1930,6 +2035,10 @@ public class ElevationCompareResultView extends ViewPart implements
          if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
             _tourViewer.setSelection(selection, true);
+
+         } else if (firstElement instanceof TVIRefTour_ComparedTour) {
+
+            onSelect_ComparedTour((TVIRefTour_ComparedTour) firstElement);
          }
 
       } else if (selection instanceof SelectionRemovedComparedTours) {
@@ -2048,11 +2157,11 @@ public class ElevationCompareResultView extends ViewPart implements
        * Find/update the removed compared tours in the viewer
        */
 
-      final ArrayList<TVIElevationCompareResult_ComparedTour> comparedTourItems = new ArrayList<>();
-      getComparedTours(comparedTourItems, _rootItem, allRemovedComparedTours);
+      final ArrayList<TVIElevationCompareResult_ComparedTour> allComparedItems = new ArrayList<>();
+      getComparedTours(allComparedItems, _rootItem, allRemovedComparedTours);
 
       // reset entity for the removed compared tours
-      for (final TVIElevationCompareResult_ComparedTour removedTourItem : comparedTourItems) {
+      for (final TVIElevationCompareResult_ComparedTour removedTourItem : allComparedItems) {
 
          removedTourItem.compareId = -1;
 
@@ -2065,7 +2174,7 @@ public class ElevationCompareResultView extends ViewPart implements
       }
 
       // update viewer
-      _tourViewer.update(comparedTourItems.toArray(), null);
+      _tourViewer.update(allComparedItems.toArray(), null);
    }
 
    private void restoreState() {

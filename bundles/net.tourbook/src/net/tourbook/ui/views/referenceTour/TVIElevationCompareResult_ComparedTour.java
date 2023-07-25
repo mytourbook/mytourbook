@@ -180,7 +180,7 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
 //            + "dbSpeed              =" + dbSpeed + NL //                //$NON-NLS-1$
 //            + "dbElapsedTime        =" + dbElapsedTime + NL //          //$NON-NLS-1$
 
-//            + "refTour              =" + refTour + NL //                //$NON-NLS-1$
+            + "refTour              =" + refTour + NL //                //$NON-NLS-1$
 //            + "altitudeDiffSerie=" + (altitudeDiffSerie != null //      //$NON-NLS-1$
 //                  ? Arrays.toString(Arrays.copyOf(altitudeDiffSerie, Math.min(altitudeDiffSerie.length, maxLen)))
 //                  : null) + NL
