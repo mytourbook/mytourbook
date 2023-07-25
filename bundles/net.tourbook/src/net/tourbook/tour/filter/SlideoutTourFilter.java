@@ -106,6 +106,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
    private IPropertyChangeListener            _prefChangeListener_Common;
 
    private SelectionListener                  _fieldSelectionListener_DateTime;
+   private SelectionListener                  _fieldSelectionListener_Combo;
 
    private PixelConverter                     _pc;
 
@@ -1091,7 +1092,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       //combo.setData(FIELD_NO, fieldNo);
 
       combo.addFocusListener(_keepOpenListener);
-      //combo.addSelectionListener(_fieldSelectionListener_DateTime);
+      combo.addSelectionListener(_fieldSelectionListener_Combo);
 
       GridDataFactory.fillDefaults()
             .align(SWT.END, SWT.CENTER)
@@ -1533,6 +1534,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _defaultModifyListener = this::onProfile_Modify;
 
       _fieldSelectionListener_DateTime = widgetSelectedAdapter(this::onField_Select_DateTime);
+      _fieldSelectionListener_Combo = widgetSelectedAdapter(this::onField_Select_Enumeration);
+
 
       _keepOpenListener = new FocusListener() {
 
@@ -1574,40 +1577,50 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void onField_Select_DateTime(final SelectionEvent selectionEvent) {
 
-      final DateTime dateTime = (DateTime) (selectionEvent.widget);
+         final DateTime dateTime = (DateTime) (selectionEvent.widget);
 
-      final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
-      final int fieldNo = (int) dateTime.getData(FIELD_NO);
+         final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
+         final int fieldNo = (int) dateTime.getData(FIELD_NO);
 
-      final LocalDateTime localDateTime = LocalDateTime.of(
-            dateTime.getYear(),
-            dateTime.getMonth() + 1,
-            dateTime.getDay(),
-            dateTime.getHours(),
-            dateTime.getMinutes());
+         final LocalDateTime localDateTime = LocalDateTime.of(
+               dateTime.getYear(),
+               dateTime.getMonth() + 1,
+               dateTime.getDay(),
+               dateTime.getHours(),
+               dateTime.getMinutes());
 
-      if (fieldNo == 1) {
-         filterProperty.dateTime1 = localDateTime;
-      } else {
-         filterProperty.dateTime2 = localDateTime;
+         if (fieldNo == 1) {
+            filterProperty.dateTime1 = localDateTime;
+         } else {
+            filterProperty.dateTime2 = localDateTime;
+         }
+
+         fireModifyEvent();
       }
 
-      fireModifyEvent();
+ private void onField_Select_Duration(final TimeDuration duration, final int durationTime) {
+
+   final TourFilterProperty filterProperty = (TourFilterProperty) duration.getData();
+   final int fieldNo = (int) duration.getData(FIELD_NO);
+
+   if (fieldNo == 1) {
+      filterProperty.intValue1 = durationTime;
+   } else {
+      filterProperty.intValue2 = durationTime;
    }
 
-   private void onField_Select_Duration(final TimeDuration duration, final int durationTime) {
+   fireModifyEvent();
+}
 
-      final TourFilterProperty filterProperty = (TourFilterProperty) duration.getData();
-      final int fieldNo = (int) duration.getData(FIELD_NO);
+private void onField_Select_Enumeration(final SelectionEvent selectionEvent) {
 
-      if (fieldNo == 1) {
-         filterProperty.intValue1 = durationTime;
-      } else {
-         filterProperty.intValue2 = durationTime;
-      }
+   final Combo combo = (Combo) (selectionEvent.widget);
 
-      fireModifyEvent();
-   }
+   final TourFilterProperty filterProperty = (TourFilterProperty) combo.getData();
+   filterProperty.textValue1 = combo.getText();
+
+   fireModifyEvent();
+}
 
    /**
     * The most recent value is saved as text value

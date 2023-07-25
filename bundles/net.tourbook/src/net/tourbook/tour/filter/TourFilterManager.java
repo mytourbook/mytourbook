@@ -1026,7 +1026,7 @@ public class TourFilterManager {
 
          case WEATHER_AIRQUALITY:
             sql = TOUR_DATA_WEATHER_AIRQUALITY;
-            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
+            getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
             break;
 
          case WEATHER_TEMPERATURE:
