@@ -115,7 +115,8 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionValueItem               _actionValue_TimeMoving;
    private ActionValueItem               _actionValue_TimeRecorded;
    private ActionValueItem               _actionValue_TimeSlices;
-   private ActionValueItem               _actionValue_TourCompareResult;
+   private ActionValueItem               _actionValue_TourCompare_Result;
+   private ActionValueItem               _actionValue_TourCompare_RefTour;
 
    private ActionValueItem               _actionValue_RunDyn_StanceTime;
    private ActionValueItem               _actionValue_RunDyn_StanceTimeBalance;
@@ -472,7 +473,7 @@ public class ValuePoint_ToolTip_MenuManager {
             Images.Graph_Temperature,
             Images.Graph_Temperature_Disabled);
 
-      _actionValue_TourCompareResult = new ActionValueItem(
+      _actionValue_TourCompare_Result = new ActionValueItem(
             VALUE_ID_TOUR_COMPARE_RESULT,
             Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
             Images.Graph_TourCompare_ByElevation,
@@ -581,7 +582,8 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
       _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
       _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
-      _actionValue_TourCompareResult            .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
+      _actionValue_TourCompare_RefTour          .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_ReferenceSerie   != null && _tourData.tourCompare_ReferenceSerie.length > 0);
+      _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_DiffSerie        != null && _tourData.tourCompare_DiffSerie.length > 0);
 
       _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
       _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance()   != null);
@@ -630,7 +632,9 @@ public class ValuePoint_ToolTip_MenuManager {
       addItem(_actionValue_RunDyn_StepLength);
       addItem(_actionValue_RunDyn_VerticalOscillation);
       addItem(_actionValue_RunDyn_VerticalRatio);
-      addItem(_actionValue_TourCompareResult);
+      addItem(_actionValue_TourCompare_Result);
+      addItem(_actionValue_TourCompare_RefTour);
+
       if (canBeDisplayed_ChartZoomFactor) {
          addItem(_actionValue_ChartZoomFactor);
       }

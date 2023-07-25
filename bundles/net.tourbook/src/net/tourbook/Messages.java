@@ -362,6 +362,8 @@ public class Messages extends NLS {
    public static String        Compare_Result_Column_kmh_moved_label;
    public static String        Compare_Result_Column_kmh_moved_tooltip;
    public static String        Compare_Result_Column_kmh_tooltip;
+   public static String        Compare_Result_Column_Pace_Label;
+   public static String        Compare_Result_Column_Pace_Tooltip;
    public static String        Compare_Result_Column_tour;
 
    public static String        Compute_BreakTime_Button_ComputeAllTours;
@@ -979,7 +981,10 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Action_HideToursBelow_Tooltip;
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
    public static String        GeoCompare_View_Action_PinTourWhichIsCompared_Tooltip;
+   public static String        GeoCompare_View_Action_SaveCompareSettings_Tooltip;
    public static String        GeoCompare_View_Action_SelectTourWhichIsCompared_Tooltip;
+   public static String        GeoCompare_View_Checkbox_ElevationDifferenceFilter;
+   public static String        GeoCompare_View_Checkbox_ElevationDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter;
@@ -992,8 +997,12 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Column_GeoDiff_Tooltip;
    public static String        GeoCompare_View_Column_SequenceNumber_Header;
    public static String        GeoCompare_View_Column_SequenceNumber_Label;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_ElevationDiff_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_GeoDiff_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
+   public static String        GeoCompare_View_Info_FilterSettingsAreSaved;
    public static String        GeoCompare_View_Label_GeoParts;
    public static String        GeoCompare_View_Label_GeoParts_Tooltip;
    public static String        GeoCompare_View_Label_PossibleTours;
@@ -1006,8 +1015,6 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
    public static String        GeoCompare_View_State_TourFilter;
-
-   public static String        Geo_Compare_Label_ReferenceTour;
 
    public static String        Graph_Label_Time_Break;
    public static String        Graph_Label_Time_Elapsed;
@@ -1713,6 +1720,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_device;
    public static String        Pref_People_Label_first_name;
    public static String        Pref_People_Label_Gender;
+   public static String        Pref_People_Label_GenderDiverse;
    public static String        Pref_People_Label_GenderFemale;
    public static String        Pref_People_Label_GenderMale;
    public static String        Pref_People_Label_height;
@@ -1880,7 +1888,7 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateReferenceTour;
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
-   public static String        RefTour_Action_Link;
+   public static String        RefTour_Action_Link2;
    public static String        RefTour_Action_NavigateNextTour;
    public static String        RefTour_Action_NavigatePrevTour;
    public static String        RefTour_Action_RenameReferenceTour;
@@ -1942,10 +1950,17 @@ public class Messages extends NLS {
 
    public static String        Sensor_Type_GearShifting;
    public static String        Sensor_Type_Other;
+   public static String        Sensor_Type_PowerMeter;
+   public static String        Sensor_Type_Radar;
    public static String        Sensor_Type_RecordingDevice;
+   public static String        Sensor_Type_Wind;
 
+   public static String        Sensor_View_Action_DeleteSensor;
    public static String        Sensor_View_Action_EditSensor;
    public static String        Sensor_View_Action_OpenSensorChart;
+   public static String        Sensor_View_Dialog_CannotDeleteSensor_Message;
+   public static String        Sensor_View_Dialog_DeleteSensor_Message;
+   public static String        Sensor_View_Dialog_DeleteSensor_Title;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;
@@ -2278,6 +2293,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_Label_Title;
 
    public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
+   public static String        Slideout_RefTour_Checkbox_Pace_Avg;
    public static String        Slideout_RefTour_Checkbox_Pulse_Avg;
    public static String        Slideout_RefTour_Checkbox_Pulse_AvgMax;
    public static String        Slideout_RefTour_Checkbox_Speed_Avg;
@@ -2682,6 +2698,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
    public static String        Tour_Action_Graph_SpeedInterval_Tooltip;
    public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
+   public static String        Tour_Action_Graph_TourCompareReferenceTour_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;
    public static String        Tour_Action_graph_altimeter_tooltip;
@@ -2772,6 +2789,7 @@ public class Messages extends NLS {
    public static String        Tour_Compare_ViewName_ElevationCompareTimeline;
    public static String        Tour_Compare_ViewName_GeoComparedTour;
    public static String        Tour_Compare_ViewName_GeoCompareTimeline;
+   public static String        Tour_Compare_ViewName_VirtualReferenceTour;
 
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;
@@ -2800,6 +2818,7 @@ public class Messages extends NLS {
    public static String        Tour_Database_PostUpdate_043_LatLonE6;
    public static String        Tour_Database_PostUpdate_047_Weather;
    public static String        Tour_Database_PostUpdate_050_ComparedTour;
+   public static String        Tour_Database_PostUpdate_051_ComparedTour;
    public static String        Tour_Database_PostUpdate;
    public static String        Tour_Database_TourSaveError;
    public static String        Tour_Database_Update;

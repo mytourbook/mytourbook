@@ -17,6 +17,8 @@ package net.tourbook.ui.views.referenceTour;
 
 import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_ALTIMETER_AVG;
 import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_ALTIMETER_AVG_DEFAULT;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PACE_AVG;
+import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PACE_AVG_DEFAULT;
 import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG;
 import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG_DEFAULT;
 import static net.tourbook.ui.views.referenceTour.ReferenceTimelineView.STATE_SHOW_PULSE_AVG_MAX;
@@ -69,15 +71,16 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
    private Button  _chkShowAltimeter_Avg;
    private Button  _chkShowPulse_Avg;
    private Button  _chkShowPulse_AvgMax;
+   private Button  _chkShowPace_Avg;
    private Button  _chkShowSpeed_Avg;
 
    private Spinner _spinnerBarHeight;
 
    public SlideoutReferenceTimelineOptions(final ReferenceTimelineView refTour_YearStatistic_View,
-                                       final Control ownerControl,
-                                       final ToolBar toolBar,
-                                       final String prefStoreGridPrefix,
-                                       final IDialogSettings state) {
+                                           final Control ownerControl,
+                                           final ToolBar toolBar,
+                                           final String prefStoreGridPrefix,
+                                           final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
@@ -185,6 +188,15 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
          }
          {
             /*
+             * Show avg pace
+             */
+            _chkShowPace_Avg = new Button(group, SWT.CHECK);
+            _chkShowPace_Avg.setText(Messages.Slideout_RefTour_Checkbox_Pace_Avg);
+            _chkShowPace_Avg.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_chkShowPace_Avg);
+         }
+         {
+            /*
              * Show avg altimeter (VAM)
              */
             _chkShowAltimeter_Avg = new Button(group, SWT.CHECK);
@@ -269,11 +281,11 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
       _gridUI.resetToDefaults();
       _gridUI.saveState();
 
-      _chkShowAltimeter_Avg   .setSelection(true);
-      _chkShowPulse_Avg       .setSelection(true);
-      _chkShowPulse_AvgMax    .setSelection(false);
-
-      _chkShowSpeed_Avg       .setSelection(true);
+      _chkShowAltimeter_Avg   .setSelection(STATE_SHOW_ALTIMETER_AVG_DEFAULT);
+      _chkShowPace_Avg        .setSelection(STATE_SHOW_PACE_AVG_DEFAULT);
+      _chkShowPulse_Avg       .setSelection(STATE_SHOW_PULSE_AVG_DEFAULT);
+      _chkShowPulse_AvgMax    .setSelection(STATE_SHOW_PULSE_AVG_MAX_DEFAULT);
+      _chkShowSpeed_Avg       .setSelection(STATE_SHOW_SPEED_AVG_DEFAULT);
 
       _spinnerBarHeight       .setSelection(ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT);
 
@@ -289,6 +301,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkShowAltimeter_Avg   .setSelection(Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, STATE_SHOW_ALTIMETER_AVG_DEFAULT));
+      _chkShowPace_Avg        .setSelection(Util.getStateBoolean(_state, STATE_SHOW_PACE_AVG,      STATE_SHOW_PACE_AVG_DEFAULT));
       _chkShowPulse_Avg       .setSelection(Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG,     STATE_SHOW_PULSE_AVG_DEFAULT));
       _chkShowPulse_AvgMax    .setSelection(Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, STATE_SHOW_PULSE_AVG_MAX_DEFAULT));
       _chkShowSpeed_Avg       .setSelection(Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG,     STATE_SHOW_SPEED_AVG_DEFAULT));
@@ -309,6 +322,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _state.put(STATE_SHOW_ALTIMETER_AVG,   _chkShowAltimeter_Avg   .getSelection());
+      _state.put(STATE_SHOW_PACE_AVG,        _chkShowPace_Avg        .getSelection());
       _state.put(STATE_SHOW_PULSE_AVG,       _chkShowPulse_Avg       .getSelection());
       _state.put(STATE_SHOW_PULSE_AVG_MAX,   _chkShowPulse_AvgMax    .getSelection());
       _state.put(STATE_SHOW_SPEED_AVG,       _chkShowSpeed_Avg       .getSelection());

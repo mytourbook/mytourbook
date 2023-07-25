@@ -15,16 +15,30 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import net.tourbook.chart.ChartSyncMode;
+import net.tourbook.ui.tourChart.TourChart;
 
-public interface ISynchedChart {
+public class RefTourChartChanged {
+
+   TourCompareConfig compareConfig;
+
+   double            xValueDifference;
+
+   TourChart         refTourChart;
 
    /**
-    * Synchronize a compared tour with it's reference tour
-    *
-    * @param isSynched
-    * @param synchMode
+    * @param refTourChart
+    *           reference tour chart
+    * @param compareConfig
+    *           reference id
+    * @param xValueDiff
+    *           value difference in the reference tour
     */
-   abstract void synchCharts(boolean isSynched, ChartSyncMode synchMode);
+   public RefTourChartChanged(final TourChart refTourChart, final TourCompareConfig compareConfig, final double xValueDiff) {
+
+      this.refTourChart = refTourChart;
+      this.compareConfig = compareConfig;
+
+      this.xValueDifference = xValueDiff;
+   }
 
 }

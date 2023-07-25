@@ -41,6 +41,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
    float[]     avgPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
    float[]     maxPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
    float[]     avgSpeed_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
+   float[]     avgPace_MinMax      = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
 
    /**
     * Number of tours
@@ -180,14 +181,15 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
             + " TourCompared.avgPulse," + NL //                5 //$NON-NLS-1$
             + " TourCompared.maxPulse," + NL //                6 //$NON-NLS-1$
             + " TourCompared.tourSpeed," + NL //               7 //$NON-NLS-1$
-            + " TourCompared.startIndex," + NL //              8 //$NON-NLS-1$
-            + " TourCompared.endIndex," + NL //                9 //$NON-NLS-1$
-            + " TourCompared.tourDeviceTime_Elapsed," + NL // 10 //$NON-NLS-1$
+            + " TourCompared.tourPace," + NL //                8 //$NON-NLS-1$
+            + " TourCompared.startIndex," + NL //              9 //$NON-NLS-1$
+            + " TourCompared.endIndex," + NL //               10 //$NON-NLS-1$
+            + " TourCompared.tourDeviceTime_Elapsed," + NL // 11 //$NON-NLS-1$
 
-            + " TourData.tourTitle," + NL //                  11 //$NON-NLS-1$
-            + " TourData.tourType_typeId," + NL //            12 //$NON-NLS-1$
+            + " TourData.tourTitle," + NL //                  12 //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //            13 //$NON-NLS-1$
 
-            + " jTdataTtag.TourTag_tagId" + NL //             13 //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId" + NL //             14 //$NON-NLS-1$
 
             + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -222,7 +224,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 // SET_FORMATTING_OFF
 
             final long tourId          = result.getLong(2);
-            final Object resultTagId   = result.getObject(13);
+            final Object resultTagId   = result.getObject(14);
 
 // SET_FORMATTING_ON
 
@@ -257,16 +259,17 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
                tourItem.avgPulse                   = result.getFloat(5);
                tourItem.maxPulse                   = result.getFloat(6);
                tourItem.avgSpeed                   = result.getFloat(7);
+               tourItem.avgPace                    = result.getFloat(8);
 
-               tourItem.startIndex                 = result.getInt(8);
-               tourItem.endIndex                   = result.getInt(9);
-               tourItem.tourDeviceTime_Elapsed     = result.getInt(10);
+               tourItem.startIndex                 = result.getInt(9);
+               tourItem.endIndex                   = result.getInt(10);
+               tourItem.tourDeviceTime_Elapsed     = result.getInt(11);
 
                /*
                 * From TourData
                 */
-               tourItem.tourTitle                  = result.getString(11);
-               final Object tourTypeId             = result.getObject(12);
+               tourItem.tourTitle                  = result.getString(12);
+               final Object tourTypeId             = result.getObject(13);
 
 // SET_FORMATTING_ON
 
@@ -341,6 +344,9 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
       avgSpeed_MinMax[0] = Float.MIN_VALUE;
       avgSpeed_MinMax[1] = Float.MAX_VALUE;
+
+      avgPace_MinMax[0] = Float.MIN_VALUE;
+      avgPace_MinMax[1] = Float.MAX_VALUE;
    }
 
    @Override
@@ -348,7 +354,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
       return UI.EMPTY_STRING
 
-            + "TVICatalogRefTourItem" + NL //                        //$NON-NLS-1$
+            + "TVIRefTour_RefTourItem" + NL //                       //$NON-NLS-1$
 
             + "[" + NL //                                            //$NON-NLS-1$
 

@@ -148,7 +148,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isVisible_And_Available_TimeMoving;
    private boolean _isVisible_And_Available_TimeRecorded;
    private boolean _isVisible_And_Available_TimeSlice;
-   private boolean _isVisible_And_Available_TourCompareResult;
+   private boolean _isVisible_And_Available_TourCompare_Result;
 
    private boolean _isVisible_And_Available_RunDyn_StanceTime;
    private boolean _isVisible_And_Available_RunDyn_StanceTimeBalance;
@@ -990,7 +990,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private void createUI_310_TourCompareResult(final Composite parent) {
 
-      if (_isVisible_And_Available_TourCompareResult) {
+      if (_isVisible_And_Available_TourCompare_Result) {
 
          final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
          {
@@ -1538,7 +1538,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final boolean isAvailable_TimeMoving            = _tourData.getMovingTimeSerie()                != null;
       final boolean isAvailable_TimeRecorded          = _tourData.getRecordedTimeSerie()              != null;
       final boolean isAvailable_TimeSlice             = true;
-      final boolean isAvailable_TourCompareResult     = _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
+      final boolean isAvailable_TourCompare_Result    = _tourData.tourCompare_DiffSerie               != null && _tourData.tourCompare_DiffSerie.length > 0;
 
       final boolean isAvailable_RunDyn_StanceTime           = _tourData.getRunDyn_StanceTime()           != null;
       final boolean isAvailable_RunDyn_StanceTimeBalance    = _tourData.getRunDyn_StanceTimeBalance()    != null;
@@ -1578,26 +1578,26 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _allVisibleAndAvailable_ValueIds =
 
-              (isAvailable_Altimeter         ? visibleId_Altimeter         : 0)
-            + (isAvailable_Altitude          ? visibleId_Altitude          : 0)
-            + (isAvailable_Cadence           ? visibleId_Cadence           : 0)
-            + (isAvailable_ChartZoomFactor   ? visibleId_ChartZoomFactor   : 0)
-            + (isAvailable_Distance          ? visibleId_Distance          : 0)
-            + (isAvailable_Gears             ? visibleId_Gears             : 0)
-            + (isAvailable_Gradient          ? visibleId_Gradient          : 0)
-            + (isAvailable_Pace              ? visibleId_Pace              : 0)
-            + (isAvailable_Pace_Summarized   ? visibleId_Pace_Summarized   : 0)
-            + (isAvailable_Power             ? visibleId_Power             : 0)
-            + (isAvailable_Pulse             ? visibleId_Pulse             : 0)
-            + (isAvailable_Speed             ? visibleId_Speed             : 0)
-            + (isAvailable_Speed_Summarized  ? visibleId_Speed_Summarized  : 0)
-            + (isAvailable_Temperature       ? visibleId_Temperature       : 0)
-            + (isAvailable_TimeDuration      ? visibleId_TimeDuration      : 0)
-            + (isAvailable_TimeOfDay         ? visibleId_TimeOfDay         : 0)
-            + (isAvailable_TimeMoving        ? visibleId_TimeMoving        : 0)
-            + (isAvailable_TimeRecorded      ? visibleId_TimeRecorded      : 0)
-            + (isAvailable_TimeSlice         ? visibleId_TimeSlice         : 0)
-            + (isAvailable_TourCompareResult ? visibleId_TourCompareResult : 0)
+              (isAvailable_Altimeter            ? visibleId_Altimeter         : 0)
+            + (isAvailable_Altitude             ? visibleId_Altitude          : 0)
+            + (isAvailable_Cadence              ? visibleId_Cadence           : 0)
+            + (isAvailable_ChartZoomFactor      ? visibleId_ChartZoomFactor   : 0)
+            + (isAvailable_Distance             ? visibleId_Distance          : 0)
+            + (isAvailable_Gears                ? visibleId_Gears             : 0)
+            + (isAvailable_Gradient             ? visibleId_Gradient          : 0)
+            + (isAvailable_Pace                 ? visibleId_Pace              : 0)
+            + (isAvailable_Pace_Summarized      ? visibleId_Pace_Summarized   : 0)
+            + (isAvailable_Power                ? visibleId_Power             : 0)
+            + (isAvailable_Pulse                ? visibleId_Pulse             : 0)
+            + (isAvailable_Speed                ? visibleId_Speed             : 0)
+            + (isAvailable_Speed_Summarized     ? visibleId_Speed_Summarized  : 0)
+            + (isAvailable_Temperature          ? visibleId_Temperature       : 0)
+            + (isAvailable_TimeDuration         ? visibleId_TimeDuration      : 0)
+            + (isAvailable_TimeOfDay            ? visibleId_TimeOfDay         : 0)
+            + (isAvailable_TimeMoving           ? visibleId_TimeMoving        : 0)
+            + (isAvailable_TimeRecorded         ? visibleId_TimeRecorded      : 0)
+            + (isAvailable_TimeSlice            ? visibleId_TimeSlice         : 0)
+            + (isAvailable_TourCompare_Result   ? visibleId_TourCompareResult : 0)
 
             + (isAvailable_RunDyn_StanceTime          ? visibleId_RunDyn_StanceTime          : 0)
             + (isAvailable_RunDyn_StanceTimeBalance   ? visibleId_RunDyn_StanceTimeBalance   : 0)
@@ -1626,7 +1626,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _isVisible_And_Available_TimeMoving          = isAvailable_TimeMoving         && visibleId_TimeMoving > 0;
       _isVisible_And_Available_TimeRecorded        = isAvailable_TimeRecorded       && visibleId_TimeRecorded > 0;
       _isVisible_And_Available_TimeSlice           = isAvailable_TimeSlice          && visibleId_TimeSlice > 0;
-      _isVisible_And_Available_TourCompareResult   = isAvailable_TourCompareResult  && visibleId_TourCompareResult > 0;
+      _isVisible_And_Available_TourCompare_Result  = isAvailable_TourCompare_Result && visibleId_TourCompareResult > 0;
 
       _isVisible_And_Available_RunDyn_StanceTime            = isAvailable_RunDyn_StanceTime           && visibleId_RunDyn_StanceTime          > 0;
       _isVisible_And_Available_RunDyn_StanceTimeBalance     = isAvailable_RunDyn_StanceTimeBalance    && visibleId_RunDyn_StanceTimeBalance > 0;
@@ -1655,7 +1655,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (_isVisible_And_Available_TimeMoving                   ? 1 : 0)
             + (_isVisible_And_Available_TimeRecorded                 ? 1 : 0)
             + (_isVisible_And_Available_TimeSlice                    ? 1 : 0)
-            + (_isVisible_And_Available_TourCompareResult            ? 1 : 0)
+            + (_isVisible_And_Available_TourCompare_Result           ? 1 : 0)
 
             + (_isVisible_And_Available_RunDyn_StanceTime            ? 1 : 0)
             + (_isVisible_And_Available_RunDyn_StanceTimeBalance     ? 1 : 0)
@@ -1931,8 +1931,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          _lblDataSerieMax.setText(maxSlices);
       }
 
-      if (_isVisible_And_Available_TourCompareResult) {
-         _lblTourCompareResult.setText(_nf0.format(_tourData.tourCompareSerie[valueIndex]));
+      if (_isVisible_And_Available_TourCompare_Result) {
+         _lblTourCompareResult.setText(_nf0.format(_tourData.tourCompare_DiffSerie[valueIndex]));
       }
 
       if (_isVisible_And_Available_RunDyn_StanceTime) {
@@ -2064,7 +2064,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          updateUI_Color(_lblDataSerieMax, null);
       }
 
-      if (_isVisible_And_Available_TourCompareResult) {
+      if (_isVisible_And_Available_TourCompare_Result) {
          updateUI_Color(_lblTourCompareResult, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
       }
 

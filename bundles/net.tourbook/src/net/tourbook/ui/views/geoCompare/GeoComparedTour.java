@@ -58,7 +58,7 @@ public class GeoComparedTour implements Comparable<Object> {
    long                      minDiffValue = -2;
 
    public float              avgPulse;
-   float                     avgPace;
+   public float              avgPace;
    public float              avgSpeed;
    public float              avgAltimeter;
    public float              maxPulse;
@@ -72,13 +72,16 @@ public class GeoComparedTour implements Comparable<Object> {
    long                      movingTime;
 
    float                     distance;
-   float                     elevationGain;
-   float                     elevationLoss;
+
+   float                     elevationGainAbsolute;
+   float                     elevationGainDiff;
+   float                     elevationLossAbsolute;
+   float                     elevationLossDiff;
 
    /**
     * Ensure that the title is set for sorting
     */
-   String                    tourTitle    = UI.EMPTY_STRING;
+   public String             tourTitle    = UI.EMPTY_STRING;
 
    TourType                  tourType;
 

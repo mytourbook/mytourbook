@@ -2145,7 +2145,7 @@ public class ChartComponents extends Composite {
       }
 
       /*
-       * create synch configuration data
+       * Create synch configuration data
        */
 
       final double[] xValues = xData.getHighValuesDouble()[0];
@@ -2412,7 +2412,9 @@ public class ChartComponents extends Composite {
     */
    void setSliderVisible(final boolean isSliderVisible) {
 
-      devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
+// !!! This causes the chart title and graph label to overlap
+//
+//    devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
 
       componentGraph.setXSliderVisible(isSliderVisible);
    }
@@ -2421,7 +2423,7 @@ public class ChartComponents extends Composite {
     * Set's a {@link SynchConfiguration}, this chart will then be sychronized with the chart which
     * sets the synch config
     *
-    * @param fSynchConfigSrc
+    * @param synchConfigIn
     *           the xMarkerPosition to set
     */
    void setSynchConfig(final SynchConfiguration synchConfigIn) {
@@ -2470,8 +2472,8 @@ public class ChartComponents extends Composite {
    private boolean setWidthToSynchedChart() {
 
       final ChartDataXSerie xData = _chartDataModel.getXData();
-      final int markerStartIndex = xData.getXValueMarker_StartIndex();
-      final int markerEndIndex = xData.getXValueMarker_EndIndex();
+      int markerStartIndex = xData.getXValueMarker_StartIndex();
+      int markerEndIndex = xData.getXValueMarker_EndIndex();
 
       // check if synchronization is disabled
       if (synchConfigSrc == null || markerStartIndex == -1) {
@@ -2482,10 +2484,20 @@ public class ChartComponents extends Composite {
       synchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(_chartDataModel);
 
       final double[] xValues = xData.getHighValuesDouble()[0];
+      final int numXValues = xValues.length;
+
+      // check bounds to fix exception
+      if (markerStartIndex >= numXValues) {
+         markerStartIndex = numXValues - 1;
+      }
+      if (markerEndIndex >= numXValues) {
+         markerEndIndex = numXValues - 1;
+      }
+
       final double markerValueStart = xValues[markerStartIndex];
 
       final double valueDiff = xValues[markerEndIndex] - markerValueStart;
-      final double valueLast = xValues[xValues.length - 1];
+      final double valueLast = xValues[numXValues - 1];
 
       final int devVisibleChartWidth = getDevVisibleChartWidth();
 
@@ -2493,8 +2505,8 @@ public class ChartComponents extends Composite {
       final int xxDevViewPortOffset;
       final double graphZoomRatio;
 
-      switch (_chart._synchMode) {
-      case Chart.SYNCH_MODE_BY_SCALE:
+      switch (_chart.chartSynchMode) {
+      case BY_SCALE:
 
          // get marker data from the synch source
          final float markerWidthRatio = synchConfigSrc.getMarkerWidthRatio();
@@ -2517,7 +2529,7 @@ public class ChartComponents extends Composite {
 
          return true;
 
-      case Chart.SYNCH_MODE_BY_SIZE:
+      case BY_SIZE:
 
          // get marker data from the synch source
          final float synchSrcDevMarkerWidth = synchConfigSrc.getDevMarkerWidth();

@@ -17,7 +17,10 @@ package net.tourbook.ui.views.referenceTour;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.PluginProperties;
+import net.tourbook.application.PluginProperties_TextKeys;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -43,6 +46,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -64,11 +68,16 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
    private ITourEventListener           _tourEventListener;
 
+   private TourCompareConfig            _compareConfig;
+
    /*
     * UI controls
     */
    private PageBook  _pageBook;
    private Composite _pageNoData;
+
+   private Image     _imageRefTour        = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
+   private Image     _imageVirtualRefTour = TourbookPlugin.getImageDescriptor(Images.TourCompare_GeoCompare_RefTour).createImage();
 
    private void addTourEventListener() {
 
@@ -156,6 +165,9 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
    @Override
    public void dispose() {
 
+      UI.disposeResource(_imageRefTour);
+      UI.disposeResource(_imageVirtualRefTour);
+
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       super.dispose();
@@ -201,7 +213,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
             final GeoCompareData geoCompareData = ((GeoComparedTour) firstElement).geoCompareData;
 
-            showRefTour(geoCompareData.refId);
+            showRefTour(geoCompareData.refTour_RefId);
          }
       }
    }
@@ -234,7 +246,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
     * @param compareConfig
     * @return Returns <code>true</code> then the ref tour changed
     */
-   private void setTourCompareConfig(final CompareConfig compareConfig) {
+   private void setTourCompareConfig(final TourCompareConfig compareConfig) {
 
       _tourChart.addDataModelListener(chartDataModel -> {
 
@@ -245,32 +257,44 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
          final ChartDataXSerie xData = chartDataModel.getXData();
          final TourReference refTour = compareConfig.getRefTour();
 
+         final int refTour_StartValueIndex = refTour.getStartValueIndex();
          final int refTour_EndValueIndex = refTour.getEndValueIndex();
          final double[] xValues = xData.getHighValuesDouble()[0];
 
          if (refTour_EndValueIndex >= xValues.length) {
 
-            // an ArrayIndexOutOfBoundsException occured but cannot be reproduced
+            // an ArrayIndexOutOfBoundsException occurred but cannot be reproduced
+
             return;
          }
 
-         // set marker positions
-         xData.setXValueMarker_ValueIndices(refTour.getStartValueIndex(), refTour_EndValueIndex);
-
-         // set the value difference of the synch marker
-         final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
-
-         TourManager.fireEventWithCustomData(
-               TourEventId.REFERENCE_TOUR_CHANGED,
-               new RefTourChanged(_tourChart, refTour.getRefId(), refTourXValueDiff),
-               ReferenceTourChartView.this);
+         // set x-value marker positions
+         xData.setXValueMarker_ValueIndices(refTour_StartValueIndex, refTour_EndValueIndex);
 
          // set title
-         chartDataModel.setTitle(NLS.bind(
-               CHART_TITLE,
-               refTour.getLabel(),
-               TourManager.getTourTitleDetailed(_tourData)));
+         final String tourTitleDetailed = TourManager.getTourTitleDetailed(_tourData);
+         final String refTourLabel = refTour.getLabel();
 
+         chartDataModel.setTitle(refTourLabel.length() == 0
+               ? tourTitleDetailed
+               : NLS.bind(CHART_TITLE, refTourLabel, tourTitleDetailed));
+
+         _tourChart.getDisplay().asyncExec(() -> {
+
+            if (_tourChart.isDisposed()) {
+               return;
+            }
+
+            // set the value difference of the synch marker
+            final double refTourXValueDiff = xValues[refTour_EndValueIndex] - xValues[refTour_StartValueIndex];
+
+            final RefTourChartChanged changeData = new RefTourChartChanged(_tourChart, compareConfig, refTourXValueDiff);
+
+            TourManager.fireEventWithCustomData(
+                  TourEventId.REFERENCE_TOUR_CHANGED,
+                  changeData,
+                  ReferenceTourChartView.this);
+         });
       });
    }
 
@@ -281,19 +305,20 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
          return;
       }
 
-      final CompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(refId);
-      if (tourCompareConfig == null) {
+      final TourCompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+      if (compareConfig == null) {
          return;
       }
 
       /*
-       * show new ref tour
+       * Show new ref tour
        */
 
-      _tourData = tourCompareConfig.getRefTourData();
-      _tourChartConfig = tourCompareConfig.getRefTourChartConfig();
+      _compareConfig = compareConfig;
+      _tourData = compareConfig.getRefTourData();
+      _tourChartConfig = compareConfig.getRefTourChartConfig();
 
-      setTourCompareConfig(tourCompareConfig);
+      setTourCompareConfig(compareConfig);
 
       // set active ref id after the configuration is set
       _activeRefId = refId;
@@ -303,6 +328,7 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
       updateChart();
 
+      updateUI_PartImageAndTitle();
    }
 
    @Override
@@ -322,6 +348,24 @@ public class ReferenceTourChartView extends TourChartViewPart implements ITourCh
 
       // set application window title
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
+   }
+
+   private void updateUI_PartImageAndTitle() {
+
+      final TourReference refTour = _compareConfig.getRefTour();
+
+      if (refTour.isVirtualRefTour()) {
+
+         setTitleImage(_imageVirtualRefTour);
+         setPartName(Messages.Tour_Compare_ViewName_VirtualReferenceTour);
+
+      } else {
+
+         final String refTourViewName = PluginProperties.getText(PluginProperties_TextKeys.View_Name_RefTour_ReferenceTour);
+
+         setTitleImage(_imageRefTour);
+         setPartName(refTourViewName);
+      }
    }
 
 }

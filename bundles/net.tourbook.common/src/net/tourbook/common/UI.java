@@ -177,6 +177,7 @@ public class UI {
    public static final String       SYMBOL_ARROW_RIGHT                 = "\u2192";              //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_LEFT_RIGHT            = "\u2194";              //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_UP_DOWN               = "\u2195";              //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_UP_DOWN_II            = "\u21c5";              //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE                     = "\u00f8";              //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE_WITH_SPACE          = "\u00f8 ";             //$NON-NLS-1$
    public static final String       SYMBOL_BOX                         = "\u25a0";              //$NON-NLS-1$
@@ -1328,16 +1329,8 @@ public class UI {
       }
       clipBoard.dispose();
 
-      final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
-      if (statusLineMgr != null) {
-
-         // show info that data are copied
-         // "Data were copied into the clipboard"
-         statusLineMgr.setMessage(statusMessage);
-
-         // cleanup message
-         display.timerExec(3000, () -> statusLineMgr.setMessage(null));
-      }
+      // show info that data are copied "Data were copied into the clipboard"
+      showStatusLineMessage(statusMessage);
    }
 
    /**
@@ -2994,6 +2987,24 @@ public class UI {
 
          // deny tab access
          control.setVisible(false);
+      }
+   }
+
+   /**
+    * Show a status line message for 3 seconds
+    *
+    * @param statusMessage
+    */
+   public static void showStatusLineMessage(final String statusMessage) {
+
+      final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+
+      if (statusLineMgr != null) {
+
+         statusLineMgr.setMessage(statusMessage);
+
+         // cleanup message
+         Display.getDefault().timerExec(3000, () -> statusLineMgr.setMessage(null));
       }
    }
 

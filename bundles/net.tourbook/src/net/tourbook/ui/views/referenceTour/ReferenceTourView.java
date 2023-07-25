@@ -197,6 +197,7 @@ public class ReferenceTourView extends ViewPart implements
    private boolean                             _isInCollapseAll;
    private boolean                             _isInExpandingSelection;
    private boolean                             _isInRestore;
+   private boolean                             _isPartVisible;
    private int                                 _expandRunnableCounter;
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
@@ -412,7 +413,7 @@ public class ReferenceTourView extends ViewPart implements
             if (tourTreeItem instanceof TVIRefTour_ComparedTour) {
 
                final TVIRefTour_ComparedTour ttiCompResult = (TVIRefTour_ComparedTour) tourTreeItem;
-               final long ttiCompId = ttiCompResult.getCompId();
+               final long ttiCompId = ttiCompResult.getCompareId();
 
                for (final ElevationCompareResult compareResultItem : removedComparedTours) {
 
@@ -433,7 +434,10 @@ public class ReferenceTourView extends ViewPart implements
 
       _partListener = new IPartListener2() {
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            _isPartVisible = true;
+         }
 
          @Override
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -445,7 +449,10 @@ public class ReferenceTourView extends ViewPart implements
          public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
+         public void partHidden(final IWorkbenchPartReference partRef) {
+
+            _isPartVisible = false;
+         }
 
          @Override
          public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -474,6 +481,13 @@ public class ReferenceTourView extends ViewPart implements
 
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+            if (_isPartVisible == false) {
+
+               // prevent to open this view with a selection event
+
+               return;
+            }
 
             // update the view when a new tour reference was created
             if (selection instanceof SelectionPersistedCompareResults) {
@@ -630,8 +644,10 @@ public class ReferenceTourView extends ViewPart implements
                      comparedTour.setAvgAltimeter(compareTourProperty.avgAltimeter);
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
                      comparedTour.setMaxPulse(compareTourProperty.maxPulse);
-                     comparedTour.setTourSpeed(compareTourProperty.speed);
                      comparedTour.setTourDeviceTime_Elapsed(compareTourProperty.tourDeviceTime_Elapsed);
+
+                     comparedTour.setTourSpeed(compareTourProperty.speed);
+                     comparedTour.setTourPace(compareTourProperty.pace);
 
                      // update the viewer
                      _tourViewer.update(comparedTour, null);
@@ -912,6 +928,7 @@ public class ReferenceTourView extends ViewPart implements
       defineColumn_Tags();
       defineColumn_Time_ElapsedTime();
       defineColumn_AvgSpeed();
+      defineColumn_AvgPace();
       defineColumn_AvgAltimeter();
       defineColumn_AvgPulse();
       defineColumn_MaxPulse();
@@ -1027,6 +1044,32 @@ public class ReferenceTourView extends ViewPart implements
                final double value = compareItem.avgAltimeter;
 
                colDef.printDetailValue(cell, value);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Average pace
+    */
+   private void defineColumn_AvgPace() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVIRefTour_ComparedTour) {
+
+               final double value = ((TVIRefTour_ComparedTour) element).avgPace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
             }
          }
       });
@@ -1606,7 +1649,6 @@ public class ReferenceTourView extends ViewPart implements
    }
 
    private void onAction_GeoCompare() {
-      // TODO Auto-generated method stub
 
       if (GeoCompareManager.isGeoComparingOn() == false) {
 
@@ -1650,7 +1692,7 @@ public class ReferenceTourView extends ViewPart implements
 
 //issue: do not final start or show final geo compared tours
 
-         geoCompareView.compareRefTour(refId);
+         geoCompareView.compareNativeRefTour(refId);
       }
    }
 

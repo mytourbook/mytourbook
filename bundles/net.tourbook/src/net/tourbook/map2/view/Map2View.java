@@ -2593,7 +2593,7 @@ public class Map2View extends ViewPart implements
 
    private Set<GeoPosition> getRefTourBounds(final ArrayList<TourData> allTourData) {
 
-      final TourReference refTour = ReferenceTourManager.getGeoCompareReferenceTour();
+      final TourReference refTour = ReferenceTourManager.getGeoCompare_RefTour();
 
       if (refTour == null) {
          return null;
@@ -3429,7 +3429,7 @@ public class Map2View extends ViewPart implements
 
    private void onSelection_GeoComparedTour(final GeoComparedTour geoCompareTour) {
 
-      final TourData refTourData = ReferenceTourManager.getGeoCompareReferenceTour().getTourData();
+      final TourData refTourData = ReferenceTourManager.getGeoCompare_RefTour().getTourData();
 
       final long comparedTourId = geoCompareTour.tourId;
       final TourData comparedTourData = TourManager.getInstance().getTourData(comparedTourId);

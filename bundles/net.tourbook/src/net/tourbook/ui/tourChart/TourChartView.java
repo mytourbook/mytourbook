@@ -54,7 +54,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareEventId;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.geoCompare.IGeoCompareListener;
-import net.tourbook.ui.views.referenceTour.CompareConfig;
+import net.tourbook.ui.views.referenceTour.TourCompareConfig;
 import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
@@ -943,12 +943,12 @@ public class TourChartView extends ViewPart implements
 
             final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
-            final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
-            if (refItem != null) {
+            final TVIRefTour_RefTourItem refTourItem = tourCatalogSelection.getRefItem();
+            if (refTourItem != null) {
 
-               final long refId = refItem.refId;
+               final long refId = refTourItem.refId;
 
-               final CompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
+               final TourCompareConfig compareConfig = ReferenceTourManager.getTourCompareConfig(refId);
                if (compareConfig == null) {
                   return;
                }
@@ -959,7 +959,7 @@ public class TourChartView extends ViewPart implements
                }
 
                updateChart(
-                     refItem.getTourId(),
+                     refTourItem.getTourId(),
                      refTour.getStartIndex(),
                      refTour.getEndIndex());
             }
@@ -1148,22 +1148,24 @@ public class TourChartView extends ViewPart implements
    private void updateChart(final long tourId, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
 
       final TourData tourData = TourManager.getInstance().getTourData(tourId);
-      if (tourData != null) {
 
-         if (_tourData == null || _tourData.equals(tourData) == false) {
-            updateChart(tourData);
-         }
-
-         // set slider position
-         final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-               _tourChart,
-               leftSliderValuesIndex,
-               rightSliderValuesIndex);
-
-         xSliderPosition.setCenterSliderPosition(true);
-
-         _tourChart.selectXSliders(xSliderPosition);
+      if (tourData == null) {
+         return;
       }
+
+      if (_tourData == null || _tourData.equals(tourData) == false) {
+         updateChart(tourData);
+      }
+
+      // set slider position
+      final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+            _tourChart,
+            leftSliderValuesIndex,
+            rightSliderValuesIndex);
+
+      xSliderPosition.setCenterSliderPosition(true);
+
+      _tourChart.selectXSliders(xSliderPosition);
    }
 
    private void updateChart(final TourData tourData) {

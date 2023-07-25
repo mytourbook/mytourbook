@@ -59,6 +59,11 @@ public class TourCompared {
    private float tourSpeed;
 
    /**
+    * @since Db version 51
+    */
+   private float tourPace;
+
+   /**
     * This field is read with sql statements
     */
    @SuppressWarnings("unused")
@@ -119,6 +124,10 @@ public class TourCompared {
       return tourId;
    }
 
+   public float getTourPace() {
+      return tourPace;
+   }
+
    public float getTourSpeed() {
       return tourSpeed;
    }
@@ -161,6 +170,10 @@ public class TourCompared {
 
    public void setTourId(final long tourId) {
       this.tourId = tourId;
+   }
+
+   public void setTourPace(final float tourPace) {
+      this.tourPace = tourPace;
    }
 
    public void setTourSpeed(final float speed) {

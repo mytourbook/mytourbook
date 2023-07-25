@@ -63,8 +63,10 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
    int                compareElapsedTime;
 
    float              compareDistance;
-   float              compareSpeed;
    int                timeInterval;
+
+   float              compareSpeed;
+   float              comparePace;
 
    float              elevationGain;
    float              elevationLoss;
@@ -75,7 +77,7 @@ public class TVIElevationCompareResult_ComparedTour extends TVIElevationCompareR
    float              avgAltimeter;
 
    /*
-    * When a compared tour is stored in the database, the compId is set and the data from the
+    * When a compared tour is stored in the database, the compareId is set and the data from the
     * database are stored in the field's db...
     */
    int   dbStartIndex;

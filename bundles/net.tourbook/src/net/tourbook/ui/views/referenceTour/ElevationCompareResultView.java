@@ -903,6 +903,7 @@ public class ElevationCompareResultView extends ViewPart implements
       defineColumn_Motion_SpeedComputed();
       defineColumn_Motion_SpeedSaved();
       defineColumn_Motion_SpeedMoved();
+      defineColumn_Motion_PaceComputed();
       defineColumn_Motion_VerticalSpeed();
       defineColumn_Motion_Distance();
 
@@ -1111,6 +1112,42 @@ public class ElevationCompareResultView extends ViewPart implements
                final float value = compareItem.compareDistance / (1000 * UI.UNIT_VALUE_DISTANCE);
 
                colDef.printDetailValue(cell, value);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Pace computed
+    */
+   private void defineColumn_Motion_PaceComputed() {
+
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceComputed", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Label);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
+               final double value = compareItem.comparePace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
+
                setCellColor(cell, element);
             }
          }

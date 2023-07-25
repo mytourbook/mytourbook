@@ -183,12 +183,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Text                 _txtBodyMassIndex;
    private Combo                _cboSportComputer;
    private Spinner              _spinnerWeight;
-   private Spinner              _spinnerHeight;
-   private Spinner              _spinnerHeightInches;         // If needed for imperial units
+   private Spinner              _spinnerHeight_MeterOrFeet;
+   private Spinner              _spinnerHeight_Inches;        // If needed for imperial units
    private Spinner              _spinnerRestingHR;
    private Spinner              _spinnerMaxHR;
    private Button               _rdoGenderMale;
    private Button               _rdoGenderFemale;
+   private Button               _rdoGenderDiverse;
 
    private ScrolledComposite    _hrZoneScrolledContainer;
    private Button               _btnModifyHrZones;
@@ -643,19 +644,19 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Control createUI_50_Tab_Person(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-//				.grab(true, false)
-            .applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(5).extendedMargins(0, 0, 7, 0).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
-         createUI_51_Field_FirstName(container);
-         createUI_52_Field_LastName(container);
+         createUI_52_Field_FirstName(container);
+         createUI_53_Field_LastName(container);
 
-         createUI_53_Field_Birthday(container);
-         createUI_54_Field_Gender(container);
-         createUI_55_Field_Weight(container);
-         createUI_56_Field_Height(container);
-         createUI_57_Field_BodyMassIndex(container);
+         createUI_55_Field_Birthday(container);
+         createUI_56_Field_Weight(container);
+         createUI_57_Field_Height(container);
+         createUI_58_Field_BodyMassIndex(container);
+
+         createUI_59_Field_Gender(container);
       }
       container.layout(true, true);
 
@@ -663,9 +664,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    }
 
    /**
-    * field: first name
+    * Field: First name
     */
-   private void createUI_51_Field_FirstName(final Composite parent) {
+   private void createUI_52_Field_FirstName(final Composite parent) {
 
       final Label label = new Label(parent, SWT.NONE);
       label.setText(Messages.Pref_People_Label_first_name);
@@ -674,14 +675,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _txtFirstName.addModifyListener(_defaultModifyListener);
       GridDataFactory.fillDefaults()
             .grab(true, false)
-            .span(2, 1)
+            .span(4, 1)
             .applyTo(_txtFirstName);
    }
 
    /**
-    * field: last name
+    * Field: Last name
     */
-   private void createUI_52_Field_LastName(final Composite parent) {
+   private void createUI_53_Field_LastName(final Composite parent) {
 
       final Label label = new Label(parent, SWT.NONE);
       label.setText(Messages.Pref_People_Label_last_name);
@@ -690,29 +691,28 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _txtLastName.addModifyListener(_defaultModifyListener);
       GridDataFactory.fillDefaults()
             .grab(true, false)
-            .span(2, 1)
+            .span(4, 1)
             .applyTo(_txtLastName);
    }
 
    /**
-    * field: birthday
+    * Field: Birthday
     */
-   private void createUI_53_Field_Birthday(final Composite parent) {
+   private void createUI_55_Field_Birthday(final Composite parent) {
 
-      /*
-       * date-time: birthday
-       */
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_Birthday);
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .span(2, 1)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
+         /*
+          * Label
+          */
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Pref_People_Label_Birthday);
+      }
+      {
+         /*
+          * Date
+          */
+         _dtBirthday = new DateTime(parent, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
 
-         _dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
          _dtBirthday.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             if (UI.isLinuxAsyncEvent(selectionEvent.widget)) {
@@ -721,6 +721,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
             updateUIOnModifiedHrZones();
          }));
+
          _dtBirthday.addKeyListener(new KeyListener() {
 
             @Override
@@ -736,59 +737,35 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             }
          });
          GridDataFactory.fillDefaults()
-               .align(SWT.BEGINNING, SWT.FILL)
+               .align(SWT.FILL, SWT.FILL)
+               .span(3, 1)
                .applyTo(_dtBirthday);
-
+      }
+      {
          /*
-          * label: age
+          * Label: Age
           */
-         _lblAgePerson = new Label(container, SWT.NONE);
+         _lblAgePerson = new Label(parent, SWT.NONE);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_lblAgePerson);
       }
-   }
 
-   /**
-    * field: gender
-    */
-   private void createUI_54_Field_Gender(final Composite parent) {
-
-      // label
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_Gender);
-
-      // radio
-      final Composite containerGender = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .span(2, 1)
-            .applyTo(containerGender);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
-      {
-         _rdoGenderMale = new Button(containerGender, SWT.RADIO);
-         _rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
-         _rdoGenderMale.addSelectionListener(_defaultSelectionListener);
-
-         _rdoGenderFemale = new Button(containerGender, SWT.RADIO);
-         _rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
-         _rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
-      }
+//      UI.createSpacer_Horizontal(parent, 1);
    }
 
    /**
     * field: weight
     */
-   private void createUI_55_Field_Weight(final Composite parent) {
+   private void createUI_56_Field_Weight(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_weight);
-
-      final Composite containerWeight = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(containerWeight);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
+      {
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Pref_People_Label_weight);
+      }
       {
          // spinner: weight
-         _spinnerWeight = new Spinner(containerWeight, SWT.BORDER);
+         _spinnerWeight = new Spinner(parent, SWT.BORDER);
          _spinnerWeight.setDigits(1);
          _spinnerWeight.setMinimum(0);
          _spinnerWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
@@ -796,104 +773,139 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _spinnerWeight.addMouseWheelListener(_defaultMouseWheelListener);
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.FILL)
-//					.hint(_spinnerWidth, SWT.DEFAULT)
                .applyTo(_spinnerWeight);
-
+      }
+      {
          // label: unit
-         label = new Label(containerWeight, SWT.NONE);
+         final Label label = new Label(parent, SWT.NONE);
          label.setText(UI.UNIT_LABEL_WEIGHT);
       }
 
-      // 3rd column filler
-      new Label(parent, SWT.NONE);
+      UI.createSpacer_Horizontal(parent, 2);
    }
 
    /**
     * field: height
     */
-   private void createUI_56_Field_Height(final Composite parent) {
+   private void createUI_57_Field_Height(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_height);
-
-      final Composite containerHeight = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(containerHeight);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(containerHeight);
       {
-         // spinner: height
-         _spinnerHeight = new Spinner(containerHeight, SWT.BORDER);
-         _spinnerHeight.addSelectionListener(_defaultSelectionListener);
-         _spinnerHeight.addMouseWheelListener(_defaultMouseWheelListener);
-         GridDataFactory.fillDefaults()
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_spinnerHeight);
+         // Label: Height
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Pref_People_Label_height);
+      }
 
-         // label: unit
-         label = new Label(containerHeight, SWT.NONE);
-
-         _spinnerHeightInches = new Spinner(containerHeight, SWT.BORDER);
+      {
+         // Spinner: Height
+         _spinnerHeight_MeterOrFeet = new Spinner(parent, SWT.BORDER);
+         _spinnerHeight_MeterOrFeet.addSelectionListener(_defaultSelectionListener);
+         _spinnerHeight_MeterOrFeet.addMouseWheelListener(_defaultMouseWheelListener);
+         GridDataFactory.fillDefaults().applyTo(_spinnerHeight_MeterOrFeet);
+      }
+      {
+         // Unit
 
          if (UI.UNIT_IS_ELEVATION_METER) {
 
-            // Metric units
+            /*
+             * Metric unit
+             */
 
-            _spinnerHeight.setDigits(2);
-            _spinnerHeight.setMinimum(0);
-            _spinnerHeight.setMaximum(300); // 3.00 m
+            _spinnerHeight_MeterOrFeet.setDigits(2);
+            _spinnerHeight_MeterOrFeet.setMinimum(0);
+            _spinnerHeight_MeterOrFeet.setMaximum(300); // 3.00 m
 
-            _spinnerHeightInches.setVisible(false);
-
+            final Label label = new Label(parent, SWT.NONE);
             label.setText(UI.UNIT_METER);
+
+            // create dummy spinner
+            _spinnerHeight_Inches = new Spinner(parent, SWT.BORDER);
+            _spinnerHeight_Inches.setVisible(false);
+
+            UI.createSpacer_Horizontal(parent, 1);
 
          } else {
 
-            // Imperial units
+            /*
+             * Imperial units
+             */
 
-            _spinnerHeight.setDigits(0);
-            _spinnerHeight.setMinimum(0);
-            _spinnerHeight.setMaximum(10);
+            // Spinner: Feet
+            _spinnerHeight_MeterOrFeet.setDigits(0);
+            _spinnerHeight_MeterOrFeet.setMinimum(0);
+            _spinnerHeight_MeterOrFeet.setMaximum(10);
 
+            // Unit: Feet
+            Label label = new Label(parent, SWT.NONE);
             label.setText(UI.UNIT_HEIGHT_FT);
 
-            _spinnerHeightInches.addSelectionListener(_defaultSelectionListener);
-            _spinnerHeightInches.addMouseWheelListener(_defaultMouseWheelListener);
+            // Spinner: Inches
+            _spinnerHeight_Inches = new Spinner(parent, SWT.BORDER);
+            _spinnerHeight_Inches.setDigits(0);
+            _spinnerHeight_Inches.setMinimum(0);
+            _spinnerHeight_Inches.setMaximum(11);
+            _spinnerHeight_Inches.setVisible(true);
+            _spinnerHeight_Inches.addSelectionListener(_defaultSelectionListener);
+            _spinnerHeight_Inches.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerHeight_Inches);
 
-            _spinnerHeightInches.setDigits(0);
-            _spinnerHeightInches.setMinimum(0);
-            _spinnerHeightInches.setMaximum(11);
-            _spinnerHeightInches.setVisible(true);
-
-            label = new Label(containerHeight, SWT.NONE);
+            // Label: Inch
+            label = new Label(parent, SWT.NONE);
             label.setText(UI.UNIT_HEIGHT_IN);
          }
       }
-
-      // filler
-      new Label(parent, SWT.NONE);
    }
 
    /**
     * field: BMI (Body Mass Index)
     */
-   private void createUI_57_Field_BodyMassIndex(final Composite parent) {
+   private void createUI_58_Field_BodyMassIndex(final Composite parent) {
 
-      final Label label = UI.createLabel(parent, Messages.Pref_People_Label_BodyMassIndex);
-      label.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
-
-      final Composite containerHeight = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(containerHeight);
-      GridLayoutFactory.fillDefaults().applyTo(containerHeight);
+      {
+         final Label label = UI.createLabel(parent, Messages.Pref_People_Label_BodyMassIndex);
+         label.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
+      }
       {
          // text: BMI value
-         _txtBodyMassIndex = new Text(containerHeight, SWT.BORDER | SWT.READ_ONLY);
+         _txtBodyMassIndex = new Text(parent, /* SWT.BORDER | */ SWT.READ_ONLY);
          _txtBodyMassIndex.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
-         GridDataFactory.fillDefaults()
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_txtBodyMassIndex);
+         GridDataFactory.fillDefaults().applyTo(_txtBodyMassIndex);
       }
 
-      // filler
-      new Label(parent, SWT.NONE);
+      UI.createSpacer_Horizontal(parent, 3);
+   }
+
+   /**
+    * Field: Gender
+    */
+   private void createUI_59_Field_Gender(final Composite parent) {
+
+      {
+         // label
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Pref_People_Label_Gender);
+      }
+      {
+         // male/female
+         final Composite containerGender = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .span(4, 1)
+               .applyTo(containerGender);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerGender);
+         {
+            _rdoGenderMale = new Button(containerGender, SWT.RADIO);
+            _rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
+            _rdoGenderMale.addSelectionListener(_defaultSelectionListener);
+
+            _rdoGenderFemale = new Button(containerGender, SWT.RADIO);
+            _rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
+            _rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
+
+            _rdoGenderDiverse = new Button(containerGender, SWT.RADIO);
+            _rdoGenderDiverse.setText(Messages.Pref_People_Label_GenderDiverse);
+            _rdoGenderDiverse.addSelectionListener(_defaultSelectionListener);
+         }
+      }
    }
 
    private Control createUI_60_Tab_HRZone(final Composite parent) {
@@ -908,7 +920,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHr);
          GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerHr);
          {
-//				createUI53FieldBirthday(containerHr);
             createUI_62_RestingHR(containerHr);
             createUI_64_MaxHR(containerHr);
          }
@@ -1623,8 +1634,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       _txtBodyMassIndex.setText(String.valueOf(
             UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0,
-                  _spinnerHeight.getSelection(),
-                  _spinnerHeightInches.getSelection())));
+                  _spinnerHeight_MeterOrFeet.getSelection(),
+                  _spinnerHeight_Inches.getSelection())));
    }
 
    private void fireModifyEvent() {
@@ -2113,8 +2124,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       /*
-       * update person
+       * Update person
        */
+      final int gender = _rdoGenderMale.getSelection() ? 0
+            : _rdoGenderFemale.getSelection() ? 1
+                  : _rdoGenderDiverse.getSelection() ? 2
+                        : 0 // default
+      ;
+
       person.setFirstName(_txtFirstName.getText());
       person.setLastName(_txtLastName.getText());
 
@@ -2123,10 +2140,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final float bodyWeight = UI.convertBodyWeightToMetric(_spinnerWeight.getSelection());
       person.setWeight(bodyWeight / 10.0f);
 
-      final float bodyHeight = UI.convertBodyHeightToMetric(_spinnerHeight.getSelection(), _spinnerHeightInches.getSelection());
+      final float bodyHeight = UI.convertBodyHeightToMetric(
+            _spinnerHeight_MeterOrFeet.getSelection(),
+            _spinnerHeight_Inches.getSelection());
       person.setHeight(bodyHeight / 100.0f);
 
-      person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
+      person.setGender(gender);
       person.setRestPulse(_spinnerRestingHR.getSelection());
 
       person.setRawDataPath(_rawDataPathEditor.getStringValue());
@@ -2210,19 +2229,23 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          final float bodyHeight = UI.convertBodyHeightFromMetric(person.getHeight());
 
          if (UI.UNIT_IS_ELEVATION_METER) {
-            _spinnerHeight.setSelection(Math.round(bodyHeight * 100));
+
+            _spinnerHeight_MeterOrFeet.setSelection(Math.round(bodyHeight * 100));
+
          } else {
+
             final float heightFeetInches = bodyHeight / 12;
             final int heightFeet = (int) Math.floor(heightFeetInches);
             final int heightInches = (int) ((heightFeetInches - heightFeet) * 10);
 
-            _spinnerHeight.setSelection(heightFeet);
-            _spinnerHeightInches.setSelection(heightInches);
+            _spinnerHeight_MeterOrFeet.setSelection(heightFeet);
+            _spinnerHeight_Inches.setSelection(heightInches);
          }
 
          _rawDataPathEditor.setStringValue(person.getRawDataPath());
          _rdoGenderMale.setSelection(gender == 0);
-         _rdoGenderFemale.setSelection(gender != 0);
+         _rdoGenderFemale.setSelection(gender == 1);
+         _rdoGenderDiverse.setSelection(gender == 2);
          _spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
 
          final int hrMaxFormulaKey = person.getHrMaxFormula();

@@ -232,13 +232,15 @@ public class Messages extends NLS {
    public static String        ColumnFactory_DPTolerance_Label;
    public static String        ColumnFactory_DPTolerance_Tooltip;
 
-   public static String        ColumnFactory_ElevationGainDelta_Label;
-   public static String        ColumnFactory_ElevationLossDelta_Label;
-   public static String        ColumnFactory_ElevationGainDelta_Tooltip;
-   public static String        ColumnFactory_ElevationLossDelta_Tooltip;
-   public static String        ColumnFactory_ElevationTotal_Gain_Tooltip;
-   public static String        ColumnFactory_ElevationTotal_Loss_Tooltip;
-
+   public static String        ColumnFactory_Elevation_Diff_Tooltip;
+   public static String        ColumnFactory_Elevation_Gain_Tooltip;
+   public static String        ColumnFactory_Elevation_GainDiff_Tooltip;
+   public static String        ColumnFactory_Elevation_GainDelta_Label;
+   public static String        ColumnFactory_Elevation_GainDelta_Tooltip;
+   public static String        ColumnFactory_Elevation_Loss_Tooltip;
+   public static String        ColumnFactory_Elevation_LossDiff_Tooltip;
+   public static String        ColumnFactory_Elevation_LossDelta_Label;
+   public static String        ColumnFactory_Elevation_LossDelta_Tooltip;
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;
    public static String        ColumnFactory_GearFrontShiftCount_Tooltip;

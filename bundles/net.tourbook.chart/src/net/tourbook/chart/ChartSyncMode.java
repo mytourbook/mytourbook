@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,32 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.referenceTour;
+package net.tourbook.chart;
 
-import net.tourbook.ui.tourChart.TourChart;
+public enum ChartSyncMode {
 
-public class RefTourChanged {
+   NO, //
 
-   long      refId;
+   BY_SCALE, //
 
-   double    xValueDifference;
-
-   TourChart refTourChart;
-
-   /**
-    * @param refTourChart
-    *           reference tour chart
-    * @param refId
-    *           reference id
-    * @param xValueDiff
-    *           value difference in the reference tour
-    */
-   public RefTourChanged(final TourChart refTourChart, final long refId, final double xValueDiff) {
-
-      this.refTourChart = refTourChart;
-      this.refId = refId;
-
-      this.xValueDifference = xValueDiff;
-   }
-
+   BY_SIZE, //
 }

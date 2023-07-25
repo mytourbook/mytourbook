@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,7 +54,9 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -70,6 +74,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -123,6 +128,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _nf3.setMaximumFractionDigits(3);
    }
 
+   private Action_DeleteSensor    _action_DeleteSensor;
    private Action_EditSensor      _action_EditSensor;
    private Action_OpenSensorChart _action_OpenSensorChartView;
 
@@ -133,6 +139,23 @@ public class SensorView extends ViewPart implements ITourViewer {
    private Composite      _viewerContainer;
 
    private Menu           _tableContextMenu;
+
+   private class Action_DeleteSensor extends Action {
+
+      public Action_DeleteSensor() {
+
+         setText(Messages.Sensor_View_Action_DeleteSensor);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         onAction_DeleteSensor();
+      }
+   }
 
    private class Action_EditSensor extends Action {
 
@@ -343,6 +366,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       long         usedLastTime;
 
       boolean      isBatteryLevelAvailable;
+
       boolean      isBatteryStatusAvailable;
       boolean      isBatteryVoltageAvailable;
 
@@ -380,6 +404,26 @@ public class SensorView extends ViewPart implements ITourViewer {
          result = prime * result + Objects.hash(sensor.getSensorId());
 
          return result;
+      }
+
+      @Override
+      public String toString() {
+
+         return UI.EMPTY_STRING
+
+               + "SensorItem" + NL //                                                  //$NON-NLS-1$
+
+               + "[" + NL //                                                           //$NON-NLS-1$
+
+               + "sensor                     = " + sensor + NL //                      //$NON-NLS-1$
+               + "usedFirstTime              = " + usedFirstTime + NL //               //$NON-NLS-1$
+               + "usedLastTime               = " + usedLastTime + NL //                //$NON-NLS-1$
+               + "isBatteryLevelAvailable    = " + isBatteryLevelAvailable + NL //     //$NON-NLS-1$
+               + "isBatteryStatusAvailable   = " + isBatteryStatusAvailable + NL //    //$NON-NLS-1$
+               + "isBatteryVoltageAvailable  = " + isBatteryVoltageAvailable + NL //   //$NON-NLS-1$
+
+               + "]" + NL //                                                           //$NON-NLS-1$
+         ;
       }
 
    }
@@ -522,8 +566,9 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void createActions() {
 
-      _action_OpenSensorChartView = new Action_OpenSensorChart();
+      _action_DeleteSensor = new Action_DeleteSensor();
       _action_EditSensor = new Action_EditSensor();
+      _action_OpenSensorChartView = new Action_OpenSensorChart();
    }
 
    private void createMenuManager() {
@@ -584,6 +629,13 @@ public class SensorView extends ViewPart implements ITourViewer {
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
+
+         if (keyEvent.keyCode == SWT.DEL) {
+            onAction_DeleteSensor();
+         }
+      }));
+
       /*
        * Create table viewer
        */
@@ -597,6 +649,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
       _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
+
 
       updateUI_SetSortDirection(
             _markerComparator.__sortColumnId,
@@ -918,10 +971,12 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    private void enableActions() {
 
-      final DeviceSensor selectedSensor = getSelectedSensor();
-      final boolean isSensorSelected = selectedSensor != null;
+      final SensorItem selectedSensorItem = getSelectedSensorItem();
+      final boolean isSensorSelected = selectedSensorItem != null;
 
       _action_OpenSensorChartView.setEnabled(isSensorSelected);
+      _action_DeleteSensor.setEnabled(isSensorSelected);
+      _action_EditSensor.setEnabled(isSensorSelected);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -932,6 +987,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       menuMgr.add(_action_EditSensor);
       menuMgr.add(_action_OpenSensorChartView);
+      menuMgr.add(_action_DeleteSensor);
 
       enableActions();
    }
@@ -957,14 +1013,59 @@ public class SensorView extends ViewPart implements ITourViewer {
       return _columnManager;
    }
 
-   private DeviceSensor getSelectedSensor() {
+   private int getNumberOfTours(final DeviceSensor selectedSensor) {
+
+      String sql = null;
+      int numberOfTours = 0;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         sql = UI.EMPTY_STRING
+
+               // get number of tours
+               + " SELECT COUNT(*)" + NL //                                         //$NON-NLS-1$
+               + " FROM" + NL //                                                    //$NON-NLS-1$
+
+               // get all device values which contain the selected device
+               + " (" + NL //                                                       //$NON-NLS-1$
+
+               + " SELECT " + NL //                                                 //$NON-NLS-1$
+               + "  DISTINCT TOURDATA_TourID," + NL //                              //$NON-NLS-1$
+               + "  DEVICESENSOR_SensorID" + NL //                                  //$NON-NLS-1$
+
+               + "  FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //         //$NON-NLS-1$
+               + "  WHERE DEVICESENSOR_SensorID = ?" + NL //                        //$NON-NLS-1$
+
+               + " ) TourId" + NL //                                                //$NON-NLS-1$
+         ;
+
+         final PreparedStatement stmt = conn.prepareStatement(sql);
+
+         stmt.setLong(1, selectedSensor.getSensorId());
+
+         final ResultSet result = stmt.executeQuery();
+
+         // get first result
+         result.next();
+
+         // get first value
+         numberOfTours = result.getInt(1);
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      }
+
+      return numberOfTours;
+   }
+
+   private SensorItem getSelectedSensorItem() {
 
       final IStructuredSelection selection = _sensorViewer.getStructuredSelection();
       final Object firstElement = selection.getFirstElement();
 
       if (firstElement != null) {
 
-         return ((SensorItem) firstElement).sensor;
+         return ((SensorItem) firstElement);
       }
 
       return null;
@@ -1101,9 +1202,99 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       } finally {
 
-         Util.closeSql(statementMinMax);
-         Util.closeSql(resultMinMax);
+         SQL.close(statementMinMax);
+         SQL.close(resultMinMax);
       }
+   }
+
+   private void onAction_DeleteSensor() {
+
+      final SensorItem selectedSensorItem = getSelectedSensorItem();
+      final DeviceSensor selectedSensor = selectedSensorItem.sensor;
+      final int numSensorTours = getNumberOfTours(selectedSensor);
+
+      if (numSensorTours > 0) {
+
+         // only sensors with 0 tours can be deleted
+
+         MessageDialog.openInformation(_viewerContainer.getShell(),
+
+               Messages.Sensor_View_Dialog_DeleteSensor_Title,
+
+               NLS.bind(Messages.Sensor_View_Dialog_CannotDeleteSensor_Message,
+                     selectedSensor.getLabel(),
+                     numSensorTours));
+
+         return;
+      }
+
+      final int returnCode = new MessageDialog(
+            _viewerContainer.getShell(),
+            Messages.Sensor_View_Dialog_DeleteSensor_Title,
+
+            null, // image
+
+            NLS.bind(Messages.Sensor_View_Dialog_DeleteSensor_Message, selectedSensor.getLabel()),
+            MessageDialog.QUESTION,
+
+            1, // default index
+
+            Messages.App_Action_Delete,
+            IDialogConstants.CANCEL_LABEL
+
+      ).open();
+
+      if (returnCode != Window.OK) {
+         return;
+      }
+
+      /*
+       * Delete sensor
+       */
+
+      final String sql = "DELETE FROM " + TourDatabase.TABLE_DEVICE_SENSOR + " WHERE sensorId=?"; //$NON-NLS-1$ //$NON-NLS-2$
+
+      try (Connection conn = TourDatabase.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql); //
+      ) {
+
+         stmt.setLong(1, selectedSensor.getSensorId());
+         stmt.execute();
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sql);
+      }
+
+      /*
+       * Update UI
+       */
+
+      final Table table = _sensorViewer.getTable();
+
+      // get index for selected sensor
+      final int lastSensorIndex = table.getSelectionIndex();
+
+      // update model
+      TourDatabase.clearDeviceSensors();
+      loadAllSensors();
+
+      // update the viewer
+      updateUI_SetViewerInput();
+
+      // get next sensor
+      SensorItem nextSensorItem = (SensorItem) _sensorViewer.getElementAt(lastSensorIndex);
+
+      if (nextSensorItem == null) {
+         nextSensorItem = (SensorItem) _sensorViewer.getElementAt(lastSensorIndex - 1);
+      }
+
+      // select next sensor
+      if (nextSensorItem != null) {
+         _sensorViewer.setSelection(new StructuredSelection(nextSensorItem), true);
+      }
+
+      table.setFocus();
    }
 
    private void onAction_EditSensor() {

@@ -151,9 +151,10 @@ public class Images {
    public static final String Graph_Swim_Swolf_Disabled                  = "graph-swim-swolf-disabled.png";                       //$NON-NLS-1$
    public static final String Graph_Temperature                          = "graph-temperature.png";                               //$NON-NLS-1$
    public static final String Graph_Temperature_Disabled                 = "graph-temperature-disabled.png";                      //$NON-NLS-1$
+   public static final String Graph_TourCompare                          = "graph-tour-compare.png";                              //$NON-NLS-1$
+   public static final String Graph_TourCompare_Disabled                 = "graph-tour-compare-disabled.png";                     //$NON-NLS-1$
    public static final String Graph_TourCompare_ByElevation              = "graph-tour-compare-elevation.png";                    //$NON-NLS-1$
    public static final String Graph_TourCompare_ByGeo                    = "graph-tour-compare-geo.png";                          //$NON-NLS-1$
-   public static final String Graph_TourCompare_Disabled                 = "graph-tour-compare-disabled.png";                     //$NON-NLS-1$
    public static final String GroupValues                                = "app-group-values.png";                                //$NON-NLS-1$
    public static final String GroupValues_Disabled                       = "app-group-values-disabled.png";                       //$NON-NLS-1$
    public static final String HeartRateVariability                       = "heart-rate-variability.png";                          //$NON-NLS-1$

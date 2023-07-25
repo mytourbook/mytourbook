@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,18 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.referenceTour;
+package net.tourbook.application;
 
-import net.tourbook.chart.ChartSyncMode;
+public final class PluginProperties_TextKeys {
 
-public interface ISynchedChart {
-
-   /**
-    * Synchronize a compared tour with it's reference tour
-    *
-    * @param isSynched
-    * @param synchMode
-    */
-   abstract void synchCharts(boolean isSynched, ChartSyncMode synchMode);
-
+   public static final String View_Name_RefTour_ReferenceTour = "View_Name_RefTour_ReferenceTour"; //$NON-NLS-1$
 }

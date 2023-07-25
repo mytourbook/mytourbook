@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,16 +15,28 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import net.tourbook.chart.ChartSyncMode;
-
-public interface ISynchedChart {
+/**
+ * Defines the kind how tours are compared
+ */
+public enum TourCompareType {
 
    /**
-    * Synchronize a compared tour with it's reference tour
-    *
-    * @param isSynched
-    * @param synchMode
+    * A reference tour is compared with elevation or geo positions
     */
-   abstract void synchCharts(boolean isSynched, ChartSyncMode synchMode);
+   ANY_COMPARE_REFERENCE_TOUR, //
 
+   /**
+    * A reference tour is compared with it's elevation values
+    */
+   ELEVATION_COMPARE_REFERENCE_TOUR, //
+
+   /**
+    * A reference tour is compared with it's geo positions
+    */
+   GEO_COMPARE_REFERENCE_TOUR, //
+
+   /**
+    * Any tour is geo compared
+    */
+   GEO_COMPARE_ANY_TOUR, //
 }

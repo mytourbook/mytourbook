@@ -825,7 +825,7 @@ public class ChartComponentGraph extends Canvas {
          final ChartYDataMinMaxKeeper synchedChartMinMaxKeeper = synchedChartConfig.getYDataMinMaxKeeper();
 
          // get the id for the changed y-slider
-         final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+         final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_GRAPH_ID);
 
          // adjust min value for the changed y-slider
          final HashMap<Integer, Double> minKeeper = synchedChartMinMaxKeeper.getMinValues();
@@ -5855,14 +5855,24 @@ public class ChartComponentGraph extends Canvas {
          // get left/right slider position
          final int valueIndexA = _xSliderA.getValuesIndex();
          final int valueIndexB = _xSliderB.getValuesIndex();
-         final int startIndex = valueIndexA < valueIndexB ? valueIndexA : valueIndexB;
-         final int endIndex = valueIndexA > valueIndexB ? valueIndexA : valueIndexB;
+         int startIndex = valueIndexA < valueIndexB ? valueIndexA : valueIndexB;
+         int endIndex = valueIndexA > valueIndexB ? valueIndexA : valueIndexB;
 
          final ChartDataXSerie xData = drawingData.getXData();
 
          final double scaleX = drawingData.getScaleX();
 
          final double[] xValues = xData.getHighValuesDouble()[0];
+         final int numXValues = xValues.length;
+
+         // fix ArrayIndexOutOfBoundsException
+         if (startIndex >= numXValues) {
+            startIndex = numXValues - 1;
+         }
+         if (endIndex >= numXValues) {
+            endIndex = numXValues - 1;
+         }
+
          final double valueXStart = xValues[startIndex];
          final double valueXEnd = xValues[endIndex];
 
@@ -8645,6 +8655,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       _isSelectionDirty = true;
+
       redraw();
    }
 

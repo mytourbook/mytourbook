@@ -485,8 +485,12 @@ public class ElevationCompareManager {
       compareResult.compareMovingTime = movingTime;
       compareResult.compareElapsedTime = elapsedTime;
       compareResult.compareDistance = compareDistance;
-      compareResult.compareSpeed = compareDistance / movingTime * 3.6f;
       compareResult.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
+
+      compareResult.compareSpeed = compareDistance / movingTime * 3.6f;
+      compareResult.comparePace = compareDistance == 0
+            ? 0
+            : movingTime * 1000 / compareDistance;
 
       compareResult.elevationGain = elevationGain;
       compareResult.elevationLoss = elevationLoss;
@@ -641,16 +645,17 @@ public class ElevationCompareManager {
 
       final String sql = UI.EMPTY_STRING
 
-            + "SELECT" + NL //               //$NON-NLS-1$
+            + "SELECT" + NL //                                       //$NON-NLS-1$
 
-            + " tourId," + NL //          1  //$NON-NLS-1$
-            + " comparedId," + NL //      2  //$NON-NLS-1$
-            + " startIndex," + NL //      3  //$NON-NLS-1$
-            + " endIndex," + NL //        4  //$NON-NLS-1$
-            + " tourSpeed" + NL //        5  //$NON-NLS-1$
+            + " tourId," + NL //                                  1  //$NON-NLS-1$
+            + " comparedId," + NL //                              2  //$NON-NLS-1$
+            + " startIndex," + NL //                              3  //$NON-NLS-1$
+            + " endIndex," + NL //                                4  //$NON-NLS-1$
+            + " tourSpeed," + NL //                               5  //$NON-NLS-1$
+            + " tourPace" + NL //                                 6  //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //  //$NON-NLS-1$
-            + " WHERE refTourId=?" + NL //   //$NON-NLS-1$
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //    //$NON-NLS-1$
+            + " WHERE refTourId=?" + NL //                           //$NON-NLS-1$
       ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
@@ -670,6 +675,7 @@ public class ElevationCompareManager {
             storedComparedTour.startIndex = result.getInt(3);
             storedComparedTour.endIndex = result.getInt(4);
             storedComparedTour.tourSpeed = result.getFloat(5);
+            storedComparedTour.tourPace = result.getFloat(6);
 
             storedComparedTours.put(dbTourId, storedComparedTour);
          }
@@ -784,8 +790,9 @@ public class ElevationCompareManager {
       final float avgAltimeter         = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), startIndex, endIndex);
       final float avgPulse             = tourData.computeAvg_PulseSegment(startIndex, endIndex);
       final float maxPulse             = tourData.computeMax_FromValues(tourData.getPulse_SmoothedSerie(), startIndex, endIndex);
-      final float speed                = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
       final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
+      final float speed                = TourManager.computeTourSpeed(tourData, startIndex, endIndex);
+      final float pace                 = TourManager.computeTourPace(tourData, startIndex, endIndex);
 
 // SET_FORMATTING_ON
 
@@ -802,8 +809,9 @@ public class ElevationCompareManager {
       comparedTour.setAvgAltimeter(avgAltimeter);
       comparedTour.setAvgPulse(avgPulse);
       comparedTour.setMaxPulse(maxPulse);
-      comparedTour.setTourSpeed(speed);
       comparedTour.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
+      comparedTour.setTourSpeed(speed);
+      comparedTour.setTourPace(pace);
 
       // persist entity
       ts.begin();
