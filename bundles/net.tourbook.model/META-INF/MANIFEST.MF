@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: 3D Animated Models
 Bundle-SymbolicName: net.tourbook.model;singleton:=true
-Bundle-Version: 23.5.1.qualifier
+Bundle-Version: 23.8.0.qualifier
 Bundle-Activator: net.tourbook.model.ModelActivator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: net.tourbook.model
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
