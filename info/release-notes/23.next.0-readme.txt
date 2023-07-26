@@ -5,11 +5,6 @@ TODO's
 ======               
 
 
-* AirQuality      - German translation https://github.com/mytourbook/mytourbook/issues/1124
-
-* Tour Chart      - Check "Grid/Units" and "Options" tab in pref page "Appearance/Tour Chart" if something is obsolete
-
-
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3
 

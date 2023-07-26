@@ -1623,7 +1623,6 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Radio_show_distance;
    public static String        Pref_Graphs_Radio_show_time;
    public static String        Pref_Graphs_Tab_graph_defaults;
-   public static String        Pref_Graphs_Tab_Grid;
    public static String        Pref_Graphs_Tab_zoom_options;
 
    public static String        Pref_LiveUpdate_Checkbox;
