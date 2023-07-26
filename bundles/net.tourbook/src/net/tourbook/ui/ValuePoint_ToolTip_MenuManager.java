@@ -116,23 +116,22 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionValueItem               _actionValue_TimeRecorded;
    private ActionValueItem               _actionValue_TimeSlices;
    private ActionValueItem               _actionValue_TourCompare_Result;
-   private ActionValueItem               _actionValue_TourCompare_RefTour;
 
-   private ActionValueItem               _actionValue_RunDyn_StanceTime;
-   private ActionValueItem               _actionValue_RunDyn_StanceTimeBalance;
-   private ActionValueItem               _actionValue_RunDyn_StepLength;
-   private ActionValueItem               _actionValue_RunDyn_VerticalOscillation;
-   private ActionValueItem               _actionValue_RunDyn_VerticalRatio;
+   private ActionValueItem   _actionValue_RunDyn_StanceTime;
+   private ActionValueItem   _actionValue_RunDyn_StanceTimeBalance;
+   private ActionValueItem   _actionValue_RunDyn_StepLength;
+   private ActionValueItem   _actionValue_RunDyn_VerticalOscillation;
+   private ActionValueItem   _actionValue_RunDyn_VerticalRatio;
 
-   private Action                        _actionPinLocation_Header;
-   private ActionPinLocation             _actionPinLocation_Screen;
-   private ActionPinLocation             _actionPinLocation_TopRight;
-   private ActionPinLocation             _actionPinLocation_TopLeft;
-   private ActionPinLocation             _actionPinLocation_BottomLeft;
-   private ActionPinLocation             _actionPinLocation_BottomRight;
-   private ActionPinLocation             _actionPinLocation_MouseXPosition;
+   private Action            _actionPinLocation_Header;
+   private ActionPinLocation _actionPinLocation_Screen;
+   private ActionPinLocation _actionPinLocation_TopRight;
+   private ActionPinLocation _actionPinLocation_TopLeft;
+   private ActionPinLocation _actionPinLocation_BottomLeft;
+   private ActionPinLocation _actionPinLocation_BottomRight;
+   private ActionPinLocation _actionPinLocation_MouseXPosition;
 
-   public boolean                        canBeDisplayed_ChartZoomFactor           = true;
+   public boolean            canBeDisplayed_ChartZoomFactor = true;
 
    private final class ActionCloseTTContextMenu extends Action {
 
@@ -582,7 +581,6 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
       _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
       _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
-      _actionValue_TourCompare_RefTour          .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_ReferenceSerie   != null && _tourData.tourCompare_ReferenceSerie.length > 0);
       _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_DiffSerie        != null && _tourData.tourCompare_DiffSerie.length > 0);
 
       _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
@@ -633,7 +631,6 @@ public class ValuePoint_ToolTip_MenuManager {
       addItem(_actionValue_RunDyn_VerticalOscillation);
       addItem(_actionValue_RunDyn_VerticalRatio);
       addItem(_actionValue_TourCompare_Result);
-      addItem(_actionValue_TourCompare_RefTour);
 
       if (canBeDisplayed_ChartZoomFactor) {
          addItem(_actionValue_ChartZoomFactor);
