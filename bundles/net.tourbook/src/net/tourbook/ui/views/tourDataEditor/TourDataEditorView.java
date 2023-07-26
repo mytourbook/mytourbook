@@ -6842,38 +6842,40 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          Color backgroundColor = null;
          Color foregroundColor = null;
 
+         final boolean isDarkTheme = UI.IS_DARK_THEME;
+
          switch (index) {
 
          case 1: // Good - green
 
-            backgroundColor = new Color(0, 128, 0);
-            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(203, 255, 203);
+            backgroundColor = isDarkTheme ? new Color(0, 175, 0) : new Color(0, 175, 0);
+            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
 
             break;
 
          case 2: // Fair - yellow
 
-            backgroundColor = new Color(255, 255, 0);
-            foregroundColor = UI.IS_DARK_THEME ? new Color(46, 46, 0) : new Color(46, 46, 0);
+            backgroundColor = isDarkTheme ? new Color(170, 170, 0) : new Color(255, 255, 0);
+            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(0, 0, 0);
 
             break;
 
-         case 3: // Moderate - dark yellow
+         case 3: // Moderate - orange
 
-            backgroundColor = new Color(128, 128, 0);
-            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 255, 165);
+            backgroundColor = isDarkTheme ? new Color(255, 128, 0) : new Color(255, 128, 0);
+            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
-         case 4: // Poor - dark red
+         case 4: // Poor - red
 
-            backgroundColor = new Color(128, 0, 0);
-            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 170, 170);
+            backgroundColor = isDarkTheme ? new Color(230, 0, 0) : new Color(230, 0, 0);
+            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
-         case 5: // Very poor - dark grey
+         case 5: // Very poor - pink
 
-            backgroundColor = new Color(128, 128, 128);
-            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
+            backgroundColor = isDarkTheme ? new Color(227, 0, 227) : new Color(227, 0, 227);
+            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
          default:
