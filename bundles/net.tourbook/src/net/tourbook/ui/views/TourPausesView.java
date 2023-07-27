@@ -710,6 +710,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       // set the pause currently selected by the user
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
       _subMenu_SetPauseType.setTourPauses(selectedIndices);
+      _actionDeleteTourPauses.setTourPauses(selectedIndices);
 
       enableActions();
    }

@@ -16,16 +16,14 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
@@ -49,7 +47,7 @@ public class ActionDeletePausesDialog extends Action {
       setEnabled(false);
    }
 
-   private static void doAction(final ITourProvider tourProvider) {
+   private void doAction(final ITourProvider tourProvider) {
 
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
@@ -59,28 +57,26 @@ public class ActionDeletePausesDialog extends Action {
       }
 
       final TourData tourData = selectedTours.get(0);
-      final long[] pausedTime_Data = tourData.getPausedTime_Data();
+      final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed()
+            .collect(Collectors.toList());
+      final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed()
+            .collect(Collectors.toList());
+      final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed()
+            .collect(Collectors.toList());
 
       if (tourData.isManualTour()) {
-         // a manually created tour do not have time slices -> no markers
+         // a manually created tour do not have time slices -> no  pauses
          return;
       }
 
-      final String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
-      final String dialogMessage = "NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel())";
+      String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
+      String dialogMessage = "NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel())";
 
-//      if (_tourPausesViewSelectedIndices > 1) {
-//         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
-//
-//         final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
-//         for (final TourMarker tourMarker : selectedTourMarkers) {
-//            if (markersNames.toString().isEmpty() == false) {
-//               markersNames.append(UI.COMMA_SPACE);
-//            }
-//            markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-//         }
-//         dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
-//      }
+      if (_tourPausesViewSelectedIndices.length > 1) {
+         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
+
+         dialogMessage = "NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString())";
+      }
 
       if (MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
@@ -89,27 +85,33 @@ public class ActionDeletePausesDialog extends Action {
          return;
       }
 
-      final List<TourMarker> _originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
+      for (int index = 0; index < _tourPausesViewSelectedIndices.length; ++index)
+      {
+         listPausedTime_Start.remove(index);
+         listPausedTime_End.remove(index);
 
+         if (listPausedTime_Data != null && listPausedTime_Data.size() > 0) {
+            listPausedTime_Data.remove(index);
+         }
+
+      }
+
+      selectedTours.get(0).finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, listPausedTime_Data);
 //      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
 //         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
 //      }
 
-      final Set<TourMarker> _newTourMarkers = new HashSet<>();
-
-      for (final TourMarker tourMarker : _originalTourMarkers) {
-         _newTourMarkers.add(tourMarker.clone());
-      }
-
-      tourData.setTourMarkers(_newTourMarkers);
-
       TourManager.saveModifiedTours(selectedTours);
-
    }
 
    @Override
    public void run() {
       BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider));
 
+   }
+
+   public void setTourPauses(final int[] tourPausesViewSelectedIndices) {
+
+      _tourPausesViewSelectedIndices = tourPausesViewSelectedIndices;
    }
 }
