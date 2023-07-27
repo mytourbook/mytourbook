@@ -9,15 +9,23 @@
 
       <!-- Linux 64 bit -->
       <antcall target="set-755-in-zip-file">
-         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
+         <param name="zip-file"            value="C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products\mytourbook-23.8.0-linux.gtk.x86_64.tar.gz"/>
          <param name="launcher-filepath"   value="mytourbook/mytourbook"/>
       </antcall>
 
-      <!-- MacOS 64 bit -->
+   	<!-- Linux 64 bit 
       <antcall target="set-755-in-zip-file">
-         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"/>
+         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.tar.gz"/>
+         <param name="launcher-filepath"   value="mytourbook/mytourbook"/>
+      </antcall>
+      -->
+
+      <!-- MacOS 64 bit 
+      <antcall target="set-755-in-zip-file">
+         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.tar.gz"/>
          <param name="launcher-filepath"   value="MyTourbook.app/Contents/MacOS/mytourbook"/>
       </antcall>
+      -->
 
    </target>
 
@@ -35,11 +43,14 @@
        <antcall target="clear-temp-dir"/>
 
        <!-- extract app launcher -->
-       <unzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
+       <gunzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" />
+<!-- 
+       <untar src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
           <patternset>
              <include name="${param-launcher-filepath}" />
           </patternset>
-       </unzip>
+       </untar>
+-->
 
        <!-- create temp zip without launcher-->
        <zip destfile="${temp-new-zip-file}">
