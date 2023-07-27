@@ -450,7 +450,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
             _actionDeleteTourPauses.setTourPauses(selectedIndices);
             _actionDeleteTourPauses.run();
-
          }
       }));
 

@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeletePausesDialog extends Action {
 
-   private ITourProvider         _tourProvider;
+   private ITourProvider _tourProvider;
    private int[]         _tourPausesViewSelectedIndices;
 
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
@@ -85,30 +85,28 @@ public class ActionDeletePausesDialog extends Action {
          return;
       }
 
-      for (int index = 0; index < _tourPausesViewSelectedIndices.length; ++index)
-      {
-         listPausedTime_Start.remove(index);
-         listPausedTime_End.remove(index);
+      for (final int _tourPausesViewSelectedIndex : _tourPausesViewSelectedIndices) {
 
-         if (listPausedTime_Data != null && listPausedTime_Data.size() > 0) {
-            listPausedTime_Data.remove(index);
+         listPausedTime_Start.remove(_tourPausesViewSelectedIndex);
+         listPausedTime_End.remove(_tourPausesViewSelectedIndex);
+
+         if (listPausedTime_Data != null && !listPausedTime_Data.isEmpty()) {
+
+            listPausedTime_Data.remove(_tourPausesViewSelectedIndex);
          }
-
       }
 
       if (listPausedTime_Start.isEmpty()) {
+
          selectedTours.get(0).setPausedTime_Start(null);
          selectedTours.get(0).setPausedTime_End(null);
          selectedTours.get(0).setPausedTime_Data(null);
          selectedTours.get(0).setTourDeviceTime_Paused(0);
       } else {
-      selectedTours.get(0).finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, listPausedTime_Data);
+         selectedTours.get(0).finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, listPausedTime_Data);
       }
 
-      tourData.setTourDeviceTime_Elapsed(tourData.getTourDeviceTime_Recorded() + tourData.getTourDeviceTime_Paused());
-//      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
-//         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
-//      }
+      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
       TourManager.saveModifiedTours(selectedTours);
    }
