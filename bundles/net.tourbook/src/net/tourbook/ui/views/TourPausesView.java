@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
@@ -36,6 +38,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionDeletePausesDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -66,6 +69,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -114,6 +118,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private ZonedDateTime           _tourStartTime;
 
+   private ActionDeletePausesDialog _actionDeleteTourPauses;
    private SubMenu_SetPausesType   _subMenu_SetPauseType;
 
    /*
@@ -364,6 +369,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void createActions() {
 
       _subMenu_SetPauseType = new SubMenu_SetPausesType(this, false);
+      _actionDeleteTourPauses = new ActionDeletePausesDialog(this);
    }
 
    private void createMenuManager() {
@@ -432,6 +438,22 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
+
+         if (keyEvent.keyCode == SWT.DEL) {
+
+            if (_actionDeleteTourPauses.isEnabled() == false) {
+               return;
+            }
+
+            // Retrieves the markers that were selected in the marker dialog
+            final IStructuredSelection selection = (IStructuredSelection) _pausesViewer.getSelection();
+            //  _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
+            // _actionDeleteTourMarkers.run();
+
+         }
+      }));
 
       /*
        * create table viewer
@@ -674,13 +696,16 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void enableActions() {
 
       final boolean isTourInDb = _tourData != null && _tourData.getTourPerson() != null;
+      final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
       _subMenu_SetPauseType.setEnabled(isTourInDb);
+      _actionDeleteTourPauses.setEnabled(isTourInDb && isSingleTour);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_subMenu_SetPauseType);
+      menuMgr.add(_actionDeleteTourPauses);
 
       // set the pause currently selected by the user
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
