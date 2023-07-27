@@ -69,7 +69,6 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -88,38 +87,38 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPausesView extends ViewPart implements ITourProvider, ITourViewer {
 
-   public static final String      ID                              = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
+   public static final String       ID                              = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings    _state                          = TourbookPlugin.getState(ID);
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
+   private PostSelectionProvider    _postSelectionProvider;
+   private ISelectionListener       _postSelectionListener;
+   private IPropertyChangeListener  _prefChangeListener;
+   private IPropertyChangeListener  _prefChangeListener_Common;
+   private ITourEventListener       _tourEventListener;
+   private IPartListener2           _partListener;
 
-   private TourData                _tourData;
+   private TourData                 _tourData;
 
-   private MenuManager             _viewerMenuManager;
-   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager              _viewerMenuManager;
+   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private ColumnManager           _columnManager;
+   private ColumnManager            _columnManager;
 
-   private ArrayList<DevicePause>  _allDevicePauses;
+   private ArrayList<DevicePause>   _allDevicePauses;
 
-   private boolean                 _isInUpdate;
+   private boolean                  _isInUpdate;
 
-   private PixelConverter          _pc;
+   private PixelConverter           _pc;
 
-   private TableViewer             _pausesViewer;
+   private TableViewer              _pausesViewer;
 
-   private ZonedDateTime           _tourStartTime;
+   private ZonedDateTime            _tourStartTime;
 
    private ActionDeletePausesDialog _actionDeleteTourPauses;
-   private SubMenu_SetPausesType   _subMenu_SetPauseType;
+   private SubMenu_SetPausesType    _subMenu_SetPauseType;
 
    /*
     * UI controls
@@ -443,14 +442,14 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          if (keyEvent.keyCode == SWT.DEL) {
 
-            if (_actionDeleteTourPauses.isEnabled() == false) {
+            if (!_actionDeleteTourPauses.isEnabled()) {
                return;
             }
 
             // Retrieves the markers that were selected in the marker dialog
-            final IStructuredSelection selection = (IStructuredSelection) _pausesViewer.getSelection();
-            //  _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
-            // _actionDeleteTourMarkers.run();
+            final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+            _actionDeleteTourPauses.setTourPauses(selectedIndices);
+            _actionDeleteTourPauses.run();
 
          }
       }));

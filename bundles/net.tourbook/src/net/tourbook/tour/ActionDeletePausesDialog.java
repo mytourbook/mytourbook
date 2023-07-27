@@ -96,7 +96,16 @@ public class ActionDeletePausesDialog extends Action {
 
       }
 
+      if (listPausedTime_Start.isEmpty()) {
+         selectedTours.get(0).setPausedTime_Start(null);
+         selectedTours.get(0).setPausedTime_End(null);
+         selectedTours.get(0).setPausedTime_Data(null);
+         selectedTours.get(0).setTourDeviceTime_Paused(0);
+      } else {
       selectedTours.get(0).finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, listPausedTime_Data);
+      }
+
+      tourData.setTourDeviceTime_Elapsed(tourData.getTourDeviceTime_Recorded() + tourData.getTourDeviceTime_Paused());
 //      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
 //         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
 //      }
