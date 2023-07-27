@@ -1,5 +1,10 @@
 23.8.0                                                 ?. August 2023
 
+New
+===
+
+* Java 17 
+  is the new required Java platform. For Windows user, use the embedded Java version and you don't have to care about it.
 
 Improvements
 ============
@@ -101,7 +106,7 @@ Translation
 System   
 ======
 
-* Java 11                     https://adoptium.net/temurin/releases/?version=11
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
 * MyTourbook Milestone 23.8   https://github.com/mytourbook/mytourbook/milestone/11?closed=1
 * Eclipse 2023-06
 * NatTable 2.10               https://www.eclipse.org/nattable/download.php
