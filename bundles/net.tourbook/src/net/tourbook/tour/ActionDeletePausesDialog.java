@@ -24,25 +24,20 @@ import java.util.stream.Collectors;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionDeletePausesDialog extends Action {
 
    private ITourProvider         _tourProvider;
-   private ArrayList<TourMarker> _tourMarkers;
+   private int[]         _tourPausesViewSelectedIndices;
 
-   /**
-    * @param tourProvider
-    */
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
 
       _tourProvider = tourProvider;
@@ -54,39 +49,38 @@ public class ActionDeletePausesDialog extends Action {
       setEnabled(false);
    }
 
-   private static void doAction(final ITourProvider tourProvider,
-                                final ArrayList<TourMarker> selectedTourMarkers) {
+   private static void doAction(final ITourProvider tourProvider) {
 
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
       // check if one tour is selected
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null ||
-            selectedTourMarkers == null || selectedTourMarkers.isEmpty() || selectedTourMarkers.get(0) == null) {
+      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
          return;
       }
 
       final TourData tourData = selectedTours.get(0);
+      final long[] pausedTime_Data = tourData.getPausedTime_Data();
 
       if (tourData.isManualTour()) {
          // a manually created tour do not have time slices -> no markers
          return;
       }
 
-      String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
-      String dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel());
+      final String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
+      final String dialogMessage = "NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel())";
 
-      if (selectedTourMarkers.size() > 1) {
-         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
-
-         final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
-         for (final TourMarker tourMarker : selectedTourMarkers) {
-            if (markersNames.toString().isEmpty() == false) {
-               markersNames.append(UI.COMMA_SPACE);
-            }
-            markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-         }
-         dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
-      }
+//      if (_tourPausesViewSelectedIndices > 1) {
+//         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
+//
+//         final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
+//         for (final TourMarker tourMarker : selectedTourMarkers) {
+//            if (markersNames.toString().isEmpty() == false) {
+//               markersNames.append(UI.COMMA_SPACE);
+//            }
+//            markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+//         }
+//         dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
+//      }
 
       if (MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
@@ -97,9 +91,9 @@ public class ActionDeletePausesDialog extends Action {
 
       final List<TourMarker> _originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
 
-      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
-         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
-      }
+//      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
+//         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
+//      }
 
       final Set<TourMarker> _newTourMarkers = new HashSet<>();
 
@@ -115,16 +109,7 @@ public class ActionDeletePausesDialog extends Action {
 
    @Override
    public void run() {
-      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider, _tourMarkers));
+      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider));
 
    }
-
-   public void setTourMarkers(final Object[] tourMarkers) {
-      _tourMarkers = new ArrayList<>();
-
-      for (final Object tourMarker : tourMarkers) {
-         _tourMarkers.add((TourMarker) tourMarker);
-      }
-   }
-
 }
