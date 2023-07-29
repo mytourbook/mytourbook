@@ -47,6 +47,8 @@ public class TourPausesViewTests extends UITest {
             .contextMenu(Messages.App_Action_DeleteTourPauses)
             .click();
 
+      Utils.clickYesButton(bot);
+
       // assert new state
       pausesViewTable = bot.table();
       //todo fb assert count = previous count - 1

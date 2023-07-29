@@ -84,6 +84,11 @@ public class Utils {
       clickButton(IDialogConstants.OK_LABEL, bot);
    }
 
+   public static void clickYesButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.YES_LABEL, bot);
+   }
+
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
       showTourBookView(bot);
