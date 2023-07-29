@@ -505,6 +505,9 @@ public class Messages extends NLS {
 
    public static String        Dialog_DeleteData_Title;
 
+   public static String        Dialog_DeleteTourPauses_Message;
+   public static String        Dialog_DeleteTourPauses_Title;
+
    public static String        Dialog_DeleteTourValues_Action_OpenDialog;
    public static String        Dialog_DeleteTourValues_Button_Delete;
    public static String        Dialog_DeleteTourValues_Checkbox_Time;

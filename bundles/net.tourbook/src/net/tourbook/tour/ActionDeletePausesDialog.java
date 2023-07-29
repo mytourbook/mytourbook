@@ -23,11 +23,13 @@ import java.util.stream.Collectors;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
@@ -57,6 +59,27 @@ public class ActionDeletePausesDialog extends Action {
       }
 
       final TourData tourData = selectedTours.get(0);
+
+      if (tourData.isManualTour()) {
+         // a manually created tour do not have time slices -> no  pauses
+         return;
+      }
+
+      final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
+
+      final String[] strArray = Arrays.stream(_tourPausesViewSelectedIndices)
+            .map(index -> ++index)
+            .mapToObj(String::valueOf)
+            .toArray(String[]::new);
+      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, strArray));
+
+      if (!MessageDialog.openQuestion(
+            Display.getDefault().getActiveShell(),
+            dialogTitle,
+            dialogMessage)) {
+         return;
+      }
+
       final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed()
             .collect(Collectors.toList());
       final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed()
@@ -64,46 +87,25 @@ public class ActionDeletePausesDialog extends Action {
       final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed()
             .collect(Collectors.toList());
 
-      if (tourData.isManualTour()) {
-         // a manually created tour do not have time slices -> no  pauses
-         return;
-      }
+      for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
 
-      String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
-      String dialogMessage = "NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel())";
-
-      if (_tourPausesViewSelectedIndices.length > 1) {
-         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
-
-         dialogMessage = "NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString())";
-      }
-
-      if (MessageDialog.openQuestion(
-            Display.getDefault().getActiveShell(),
-            dialogTitle,
-            dialogMessage) == false) {
-         return;
-      }
-
-      for (final int _tourPausesViewSelectedIndex : _tourPausesViewSelectedIndices) {
-
-         listPausedTime_Start.remove(_tourPausesViewSelectedIndex);
-         listPausedTime_End.remove(_tourPausesViewSelectedIndex);
+         listPausedTime_Start.remove(index);
+         listPausedTime_End.remove(index);
 
          if (listPausedTime_Data != null && !listPausedTime_Data.isEmpty()) {
 
-            listPausedTime_Data.remove(_tourPausesViewSelectedIndex);
+            listPausedTime_Data.remove(index);
          }
       }
 
       if (listPausedTime_Start.isEmpty()) {
 
-         selectedTours.get(0).setPausedTime_Start(null);
-         selectedTours.get(0).setPausedTime_End(null);
-         selectedTours.get(0).setPausedTime_Data(null);
-         selectedTours.get(0).setTourDeviceTime_Paused(0);
+         tourData.setPausedTime_Start(null);
+         tourData.setPausedTime_End(null);
+         tourData.setPausedTime_Data(null);
+         tourData.setTourDeviceTime_Paused(0);
       } else {
-         selectedTours.get(0).finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, listPausedTime_Data);
+         tourData.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End, listPausedTime_Data);
       }
 
       tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
@@ -114,7 +116,6 @@ public class ActionDeletePausesDialog extends Action {
    @Override
    public void run() {
       BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider));
-
    }
 
    public void setTourPauses(final int[] tourPausesViewSelectedIndices) {
