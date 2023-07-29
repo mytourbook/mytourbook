@@ -45,7 +45,7 @@ public class TourPausesViewTests extends UITest {
             .menu(Messages.Action_PauseType_Set_Manual)
             .click();
 
-      // assert
+      // assert new state
       pausesViewTable = bot.table();
       assertEquals(Messages.Tour_Pauses_Column_TypeValue_Manual, pausesViewTable.cell(0, 1));
 
