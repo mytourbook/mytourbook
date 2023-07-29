@@ -28,6 +28,35 @@ import utils.Utils;
 public class TourPausesViewTests extends UITest {
 
    @Test
+   void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
+
+      // arrange
+      Utils.getTour(bot);
+      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      SWTBotTable pausesViewTable = bot.table();
+      pausesViewTable.select(0);
+
+      // assert initial state
+      //TODO FB assert count of table = X
+      // check the recorded time and pause time values ?
+      assertEquals(2, pausesViewTable.rowCount());
+
+      // act
+      // todo fb trigger the deletion of the selected pause
+      pausesViewTable
+            .contextMenu(Messages.Action_PauseType_Set)
+            .menu(Messages.Action_PauseType_Set_Manual)
+            .click();
+
+      // assert new state
+      pausesViewTable = bot.table();
+      //todo fb assert count = previous count - 1
+      // check the new recorded time and pause time values ?
+
+      assertEquals(Messages.Tour_Pauses_Column_TypeValue_Manual, pausesViewTable.cell(0, 1));
+   }
+
+   @Test
    void Given_PauseTypeAutomatic_When_ChangeToManual_Expect_PauseTypeManual() {
 
       // arrange
@@ -57,35 +86,6 @@ public class TourPausesViewTests extends UITest {
             .click();
       pausesViewTable = bot.table();
       assertEquals(Messages.Tour_Pauses_Column_TypeValue_Automatic, pausesViewTable.cell(0, 1));
-   }
-
-   @Test
-   void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
-
-      // arrange
-      Utils.getTour(bot);
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
-      SWTBotTable pausesViewTable = bot.table();
-      pausesViewTable.select(0);
-
-      // assert initial state
-      //TODO FB assert count of table = X
-      // check the recorded time and pause time values ?
-      assertEquals(Messages.Tour_Pauses_Column_TypeValue_Automatic, pausesViewTable.cell(0, 1));
-
-      // act
-      // todo fb trigger the deletion of the selected pause
-      pausesViewTable
-            .contextMenu(Messages.Action_PauseType_Set)
-            .menu(Messages.Action_PauseType_Set_Manual)
-            .click();
-
-      // assert new state
-      pausesViewTable = bot.table();
-      //todo fb assert count = previous count - 1
-            // check the new recorded time and pause time values ?
-
-      assertEquals(Messages.Tour_Pauses_Column_TypeValue_Manual, pausesViewTable.cell(0, 1));
    }
 
    @Test
