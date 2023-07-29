@@ -37,8 +37,6 @@ public class TourPausesViewTests extends UITest {
       pausesViewTable.select(0);
 
       // assert initial state
-      //TODO FB assert count of table = X
-      // check the recorded time and pause time values ?
       final int tableRowCount = 1;
       assertEquals(tableRowCount, pausesViewTable.rowCount());
 
@@ -46,14 +44,10 @@ public class TourPausesViewTests extends UITest {
       pausesViewTable
             .contextMenu(Messages.App_Action_DeleteTourPauses)
             .click();
-
       Utils.clickYesButton(bot);
 
       // assert new state
       pausesViewTable = bot.table();
-      //todo fb assert count = previous count - 1
-      // check the new recorded time and pause time values ?
-
       assertEquals(tableRowCount - 1, pausesViewTable.rowCount());
    }
 
