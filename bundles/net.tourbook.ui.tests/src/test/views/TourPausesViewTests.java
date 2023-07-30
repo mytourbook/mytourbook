@@ -32,7 +32,7 @@ public class TourPausesViewTests extends UITest {
 
       // arrange
       Utils.getTour(bot);
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
 
@@ -56,7 +56,7 @@ public class TourPausesViewTests extends UITest {
 
       // arrange
       Utils.getTour(bot);
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
 
@@ -88,7 +88,7 @@ public class TourPausesViewTests extends UITest {
 
       Utils.getTour(bot);
 
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
 
       bot.table().select("15:40"); //$NON-NLS-1$
    }

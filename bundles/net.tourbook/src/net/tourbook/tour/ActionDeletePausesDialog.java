@@ -53,7 +53,7 @@ public class ActionDeletePausesDialog extends Action {
 
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
-      // check if one tour is selected
+      // check that only one tour is selected
       if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
          return;
       }
