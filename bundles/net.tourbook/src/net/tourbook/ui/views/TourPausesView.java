@@ -130,19 +130,19 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private Menu      _tableContextMenu;
 
-   public class DevicePause {
+   private class DevicePause {
 
-      long type;
+      private long type;
 
-      long relativeStartTime;
-      long relativeEndTime;
+      private long relativeStartTime;
+      private long relativeEndTime;
 
-      int  serieIndex;
+      private int  serieIndex;
 
-      public DevicePause(final long type,
-                         final long relativeStartTime,
-                         final long relativeEndTime,
-                         final int serieIndex) {
+      private DevicePause(final long type,
+                          final long relativeStartTime,
+                          final long relativeEndTime,
+                          final int serieIndex) {
 
          this.type = type;
 
@@ -446,7 +446,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            // Retrieves the markers that were selected in the marker dialog
+            // Retrieves the pauses that were selected in the pause table
             final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
             _actionDeleteTourPauses.setTourPauses(selectedIndices);
             _actionDeleteTourPauses.run();
