@@ -206,12 +206,12 @@ public class TourFilterManager {
 
    private static final String[]                  VALUES_AIRQUALITY               = {
 
-         net.tourbook.common.Messages.Weather_AirQuality_IsNotDefined,
-         net.tourbook.common.Messages.Weather_AirQuality_Good,
-         net.tourbook.common.Messages.Weather_AirQuality_Fair,
-         net.tourbook.common.Messages.Weather_AirQuality_Moderate,
-         net.tourbook.common.Messages.Weather_AirQuality_Poor,
-         net.tourbook.common.Messages.Weather_AirQuality_VeryPoor
+         net.tourbook.common.Messages.Weather_AirQuality_0_IsNotDefined,
+         net.tourbook.common.Messages.Weather_AirQuality_1_Good,
+         net.tourbook.common.Messages.Weather_AirQuality_2_Fair,
+         net.tourbook.common.Messages.Weather_AirQuality_3_Moderate,
+         net.tourbook.common.Messages.Weather_AirQuality_4_Poor,
+         net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor
    };
 
    private static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {
