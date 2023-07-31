@@ -362,8 +362,13 @@ public class Messages extends NLS {
    public static String        Compare_Result_Column_kmh_moved_label;
    public static String        Compare_Result_Column_kmh_moved_tooltip;
    public static String        Compare_Result_Column_kmh_tooltip;
-   public static String        Compare_Result_Column_Pace_Label;
-   public static String        Compare_Result_Column_Pace_Tooltip;
+   public static String        Compare_Result_Column_Pace_Computed_Label;
+   public static String        Compare_Result_Column_Pace_Computed_Tooltip;
+   public static String        Compare_Result_Column_Pace_Moved_Label;
+   public static String        Compare_Result_Column_Pace_Moved_Tooltip;
+   public static String        Compare_Result_Column_Pace_Saved_Label;
+   public static String        Compare_Result_Column_Pace_Saved_Tooltip;
+
    public static String        Compare_Result_Column_tour;
 
    public static String        Compute_BreakTime_Button_ComputeAllTours;
@@ -1618,7 +1623,6 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Radio_show_distance;
    public static String        Pref_Graphs_Radio_show_time;
    public static String        Pref_Graphs_Tab_graph_defaults;
-   public static String        Pref_Graphs_Tab_Grid;
    public static String        Pref_Graphs_Tab_zoom_options;
 
    public static String        Pref_LiveUpdate_Checkbox;
@@ -1889,8 +1893,8 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
    public static String        RefTour_Action_Link2;
-   public static String        RefTour_Action_NavigateNextTour;
-   public static String        RefTour_Action_NavigatePrevTour;
+   public static String        RefTour_Action_NavigateNextTour2;
+   public static String        RefTour_Action_NavigatePrevTour2;
    public static String        RefTour_Action_RenameReferenceTour;
    public static String        RefTour_Action_SaveMarker;
    public static String        RefTour_Action_SaveAndNext;

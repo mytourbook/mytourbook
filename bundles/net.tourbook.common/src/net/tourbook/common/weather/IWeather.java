@@ -195,7 +195,7 @@ public interface IWeather {
 
    };
 
-   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_IsNotDefined;
+   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_0_IsNotDefined;
 
    /**
     * Text for the weather's air quality
@@ -204,11 +204,11 @@ public interface IWeather {
 
          airQualityIsNotDefined,
 
-         Messages.Weather_AirQuality_Good,
-         Messages.Weather_AirQuality_Fair,
-         Messages.Weather_AirQuality_Moderate,
-         Messages.Weather_AirQuality_Poor,
-         Messages.Weather_AirQuality_VeryPoor
+         Messages.Weather_AirQuality_1_Good,
+         Messages.Weather_AirQuality_2_Fair,
+         Messages.Weather_AirQuality_3_Moderate,
+         Messages.Weather_AirQuality_4_Poor,
+         Messages.Weather_AirQuality_5_VeryPoor
 
    };
 

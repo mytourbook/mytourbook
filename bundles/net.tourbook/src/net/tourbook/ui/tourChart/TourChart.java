@@ -5516,11 +5516,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ? prefGraphTransparencyFilling_Dark
             : prefGraphTransparencyFilling_Light;
 
-      isShowHorizontalGridLines     = Util.getPrefixPrefBoolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-      isShowVerticalGridLines       = Util.getPrefixPrefBoolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+      isShowHorizontalGridLines     = Util.getPrefixPref_Boolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+      isShowVerticalGridLines       = Util.getPrefixPref_Boolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
-      gridVerticalDistance          = Util.getPrefixPrefInt(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-      gridHorizontalDistance        = Util.getPrefixPrefInt(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+      gridVerticalDistance          = Util.getPrefixPref_Int(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+      gridHorizontalDistance        = Util.getPrefixPref_Int(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
 // SET_FORMATTING_ON
    }

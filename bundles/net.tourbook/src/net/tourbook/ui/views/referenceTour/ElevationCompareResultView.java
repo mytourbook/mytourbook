@@ -93,6 +93,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -154,6 +155,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
    private boolean                             _isToolbarCreated;
    private boolean                             _isToolTipInTour;
+   private boolean                             _isInSelection;
 
    private CompareFilter                       _compareFilter             = CompareFilter.ALL_IS_DISPLAYED;
 
@@ -446,6 +448,7 @@ public class ElevationCompareResultView extends ViewPart implements
    private void addCompareTourPropertyListener() {
 
       _compareTourPropertyListener = new ITourEventListener() {
+
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
@@ -475,6 +478,7 @@ public class ElevationCompareResultView extends ViewPart implements
                      final TVIElevationCompareResult_ComparedTour resultItem = (TVIElevationCompareResult_ComparedTour) comparedTourItem;
 
                      resultItem.movedSpeed = compareTourProperty.speed;
+                     resultItem.movedPace = compareTourProperty.pace;
 
                      // update viewer
                      _tourViewer.update(comparedTourItem, null);
@@ -496,15 +500,18 @@ public class ElevationCompareResultView extends ViewPart implements
 
                         // compared tour was saved
 
-                        compareTourItem.dbStartIndex = compareTourProperty.startIndex;
-                        compareTourItem.dbEndIndex = compareTourProperty.endIndex;
+                        compareTourItem.savedStartIndex = compareTourProperty.startIndex;
+                        compareTourItem.savedEndIndex = compareTourProperty.endIndex;
 
-                        compareTourItem.dbSpeed = compareTourProperty.speed;
-                        compareTourItem.dbElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
+                        compareTourItem.savedElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
+
+                        compareTourItem.savedSpeed = compareTourProperty.speed;
+                        compareTourItem.savedPace = compareTourProperty.pace;
 
                      } else {
 
                         compareTourItem.movedSpeed = compareTourProperty.speed;
+                        compareTourItem.movedPace = compareTourProperty.pace;
                      }
 
                      // update viewer
@@ -904,6 +911,8 @@ public class ElevationCompareResultView extends ViewPart implements
       defineColumn_Motion_SpeedSaved();
       defineColumn_Motion_SpeedMoved();
       defineColumn_Motion_PaceComputed();
+      defineColumn_Motion_PaceSaved();
+      defineColumn_Motion_PaceMoved();
       defineColumn_Motion_VerticalSpeed();
       defineColumn_Motion_Distance();
 
@@ -1128,8 +1137,8 @@ public class ElevationCompareResultView extends ViewPart implements
       colDef.setIsDefaultColumn();
       colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
       colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
-      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Tooltip);
-      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Label);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Computed_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Computed_Label);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
@@ -1141,6 +1150,76 @@ public class ElevationCompareResultView extends ViewPart implements
 
                final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
                final double value = compareItem.comparePace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Pace moved
+    */
+   private void defineColumn_Motion_PaceMoved() {
+
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceMoved", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Moved_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Moved_Label);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
+               final double value = compareItem.movedPace * UI.UNIT_VALUE_DISTANCE;
+
+               if (value == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(UI.format_mm_ss((long) value));
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Pace saved
+    */
+   private void defineColumn_Motion_PaceSaved() {
+
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceSaved", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Saved_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Saved_Label);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            if (element instanceof TVIElevationCompareResult_ComparedTour) {
+
+               final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
+               final double value = compareItem.savedPace * UI.UNIT_VALUE_DISTANCE;
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -1191,7 +1270,7 @@ public class ElevationCompareResultView extends ViewPart implements
    }
 
    /**
-    * column: speed moved
+    * Column: Speed moved
     */
    private void defineColumn_Motion_SpeedMoved() {
 
@@ -1227,7 +1306,7 @@ public class ElevationCompareResultView extends ViewPart implements
    }
 
    /**
-    * column: speed saved
+    * Column: Speed saved
     */
    private void defineColumn_Motion_SpeedSaved() {
 
@@ -1252,7 +1331,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
                final TVIElevationCompareResult_ComparedTour compareItem = (TVIElevationCompareResult_ComparedTour) element;
 
-               final double value = compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.savedSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -1608,12 +1687,83 @@ public class ElevationCompareResultView extends ViewPart implements
    }
 
    /**
+    * !!! Recursive !!!
+    * <p>
+    * This is searching an item in the displayed tree items
+    *
+    * @param parentItem
+    * @param requestedItem
+    * @param viewerTreePaths
+    * @return
+    */
+   private void getComparedTour(final TreeViewerItem parentItem,
+                                final TVIRefTour_ComparedTour requestedItem,
+                                final ArrayList<TreeViewerItem> viewerTreePaths) {
+
+      final ArrayList<TreeViewerItem> treeItemChildren = parentItem.getUnfetchedChildren();
+
+      if (treeItemChildren != null) {
+
+         // children are available
+
+         if (parentItem instanceof TVIElevationCompareResult_RootItem) {
+
+            // root item -> ref tour
+
+            final long requestedRefId = requestedItem.refId;
+
+            for (final TreeViewerItem treeItem : treeItemChildren) {
+
+               if (treeItem instanceof TVIElevationCompareResult_ReferenceTour) {
+
+                  final TVIElevationCompareResult_ReferenceTour refTourItem = (TVIElevationCompareResult_ReferenceTour) treeItem;
+                  final long resultRefId = refTourItem.refTourItem.refId;
+
+                  if (resultRefId == requestedRefId) {
+
+                     // ref tour -> compared tour
+
+                     viewerTreePaths.add(refTourItem);
+
+                     getComparedTour(treeItem, requestedItem, viewerTreePaths);
+
+                     return;
+                  }
+               }
+            }
+
+         } else if (parentItem instanceof TVIElevationCompareResult_ReferenceTour) {
+
+            // ref tour -> compared tour
+
+            final long requestedCompareId = requestedItem.compareId;
+
+            for (final TreeViewerItem treeItem : treeItemChildren) {
+
+               if (treeItem instanceof TVIElevationCompareResult_ComparedTour) {
+
+                  final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) treeItem;
+                  final long resultCompareId = compareResultItem.compareId;
+
+                  if (resultCompareId == requestedCompareId) {
+
+                     viewerTreePaths.add(compareResultItem);
+
+                     return;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   /**
     * Recursive method to walk down the tour tree items and find the compared tours
     *
     * @param parentItem
     * @param allRemovedComparedTours
     */
-   private void getComparedTours(final ArrayList<TVIElevationCompareResult_ComparedTour> comparedTours,
+   private void getComparedTours(final ArrayList<TVIElevationCompareResult_ComparedTour> allComparedItems,
                                  final TreeViewerItem parentItem,
                                  final ArrayList<ElevationCompareResult> allRemovedComparedTours) {
 
@@ -1633,14 +1783,14 @@ public class ElevationCompareResultView extends ViewPart implements
                for (final ElevationCompareResult resultItem : allRemovedComparedTours) {
 
                   if (compId == resultItem.compareId) {
-                     comparedTours.add(ttiCompResult);
+                     allComparedItems.add(ttiCompResult);
                   }
                }
 
             } else {
 
                // this is a child which can be the parent for other children
-               getComparedTours(comparedTours, treeItem, allRemovedComparedTours);
+               getComparedTours(allComparedItems, treeItem, allRemovedComparedTours);
             }
          }
       }
@@ -1899,6 +2049,10 @@ public class ElevationCompareResultView extends ViewPart implements
 
    private void onSelect(final SelectionChangedEvent event) {
 
+      if (_isInSelection) {
+         return;
+      }
+
       final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
       final Object treeItem = selection.getFirstElement();
@@ -1917,6 +2071,34 @@ public class ElevationCompareResultView extends ViewPart implements
       }
    }
 
+   private void onSelect_ComparedTour(final TVIRefTour_ComparedTour requestedItem) {
+
+      final ArrayList<TreeViewerItem> viewerTreeItems = new ArrayList<>();
+
+      getComparedTour(_rootItem, requestedItem, viewerTreeItems);
+
+      if (viewerTreeItems.size() < 2) {
+
+         // requested compared tour was not found in the viewer
+
+         return;
+      }
+
+      /*
+       * Select compared tour in the viewer
+       */
+      final TreeViewerItem[] treePathArray = viewerTreeItems.toArray(new TreeViewerItem[viewerTreeItems.size()]);
+
+      final TreePath treePath = new TreePath(treePathArray);
+      final ITreeSelection treeSelection = new TreeSelection(treePath);
+
+      _isInSelection = true;
+      {
+         _tourViewer.setSelection(treeSelection, true);
+      }
+      _isInSelection = false;
+   }
+
    private void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
       if (part == ElevationCompareResultView.this) {
@@ -1930,6 +2112,10 @@ public class ElevationCompareResultView extends ViewPart implements
          if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
 
             _tourViewer.setSelection(selection, true);
+
+         } else if (firstElement instanceof TVIRefTour_ComparedTour) {
+
+            onSelect_ComparedTour((TVIRefTour_ComparedTour) firstElement);
          }
 
       } else if (selection instanceof SelectionRemovedComparedTours) {
@@ -2048,24 +2234,28 @@ public class ElevationCompareResultView extends ViewPart implements
        * Find/update the removed compared tours in the viewer
        */
 
-      final ArrayList<TVIElevationCompareResult_ComparedTour> comparedTourItems = new ArrayList<>();
-      getComparedTours(comparedTourItems, _rootItem, allRemovedComparedTours);
+      final ArrayList<TVIElevationCompareResult_ComparedTour> allComparedItems = new ArrayList<>();
+      getComparedTours(allComparedItems, _rootItem, allRemovedComparedTours);
 
       // reset entity for the removed compared tours
-      for (final TVIElevationCompareResult_ComparedTour removedTourItem : comparedTourItems) {
+      for (final TVIElevationCompareResult_ComparedTour removedTourItem : allComparedItems) {
 
          removedTourItem.compareId = -1;
 
-         removedTourItem.dbStartIndex = -1;
-         removedTourItem.dbEndIndex = -1;
-         removedTourItem.dbSpeed = 0;
-         removedTourItem.dbElapsedTime = 0;
+         removedTourItem.savedStartIndex = -1;
+         removedTourItem.savedEndIndex = -1;
+
+         removedTourItem.savedElapsedTime = 0;
+
+         removedTourItem.savedSpeed = 0;
+         removedTourItem.savedPace = 0;
 
          removedTourItem.movedSpeed = 0;
+         removedTourItem.movedPace = 0;
       }
 
       // update viewer
-      _tourViewer.update(comparedTourItems.toArray(), null);
+      _tourViewer.update(allComparedItems.toArray(), null);
    }
 
    private void restoreState() {

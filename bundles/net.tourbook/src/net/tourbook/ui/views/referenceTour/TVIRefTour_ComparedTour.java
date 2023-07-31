@@ -200,8 +200,8 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
             + "[" + NL //$NON-NLS-1$
 
-//          + " compareId = " + compareId + NL //$NON-NLS-1$
-//          + " refId     = " + refId + NL //$NON-NLS-1$
+            + " compareId = " + compareId + NL //$NON-NLS-1$
+            + " refId     = " + refId + NL //$NON-NLS-1$
             + " tourDate  = " + tourDate + NL //$NON-NLS-1$
             + " tourTitle = " + tourTitle + NL //$NON-NLS-1$
 

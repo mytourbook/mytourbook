@@ -714,7 +714,7 @@ public class ElevationCompareManager {
       }
 
       /*
-       * Secondly navigate in the year statistic view when view is available
+       * Secondly navigate in the reference timeline view when view is available
        */
       if (navigatedTour == null) {
 
@@ -820,11 +820,13 @@ public class ElevationCompareManager {
 
       // updata saved data
       comparedTour_UIItem.compareId = comparedTour.getComparedId();
-      comparedTour_UIItem.dbStartIndex = startIndex;
-      comparedTour_UIItem.dbEndIndex = endIndex;
+      comparedTour_UIItem.savedStartIndex = startIndex;
+      comparedTour_UIItem.savedEndIndex = endIndex;
 
-      comparedTour_UIItem.dbSpeed = speed;
-      comparedTour_UIItem.dbElapsedTime = tourDeviceTime_Elapsed;
+      comparedTour_UIItem.savedElapsedTime = tourDeviceTime_Elapsed;
+
+      comparedTour_UIItem.savedSpeed = speed;
+      comparedTour_UIItem.savedPace = pace;
    }
 
    public static void saveState() {
