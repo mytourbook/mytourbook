@@ -30,13 +30,15 @@ Experimental
 New
 ===
 
-* 
+* Tour Pauses View (Frederic)
+  - Added the ability to delete tour pauses
+  https://github.com/mytourbook/mytourbook/issues/1110
 
 
 Improvements
 ============
 
- * Tour Import (Frederic)
+* Tour Import (Frederic)
   - Setting the cadence type only if the tour contains cadence data
 
 * Tour Book Flat View
