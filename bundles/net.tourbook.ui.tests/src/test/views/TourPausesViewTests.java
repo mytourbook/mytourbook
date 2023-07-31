@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +43,12 @@ public class TourPausesViewTests extends UITest {
       assertEquals(tableRowCount, pausesViewTable.rowCount());
 
       // act
+
+      // Triggering the deletion but not acting yet
+      pausesViewTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
+      Utils.clickNoButton(bot);
+
+      // Triggering the deletion and performing it
       pausesViewTable
             .contextMenu(Messages.App_Action_DeleteTourPauses)
             .click();

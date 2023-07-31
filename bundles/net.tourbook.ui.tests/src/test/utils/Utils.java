@@ -80,6 +80,11 @@ public class Utils {
       clickButton(IDialogConstants.CLOSE_LABEL, bot);
    }
 
+   public static void clickNoButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.NO_LABEL, bot);
+   }
+
    public static void clickOkButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.OK_LABEL, bot);
