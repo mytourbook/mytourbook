@@ -7,7 +7,7 @@
 	<classpathentry exported="true" kind="lib" path="mchange-commons-java-0.2.20.jar"/> <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
 	<classpathentry exported="true" kind="lib" path="caffeine-3.1.4.jar"/> <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
 	<classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
-	<classpathentry exported="true" kind="lib" path="commons-lang3-3.12.0.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+	<classpathentry exported="true" kind="lib" path="commons-lang3-3.13.0.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/> <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
 	<classpathentry exported="true" kind="lib" path="jackson-core-2.15.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 	<classpathentry exported="true" kind="lib" path="jackson-databind-2.15.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->

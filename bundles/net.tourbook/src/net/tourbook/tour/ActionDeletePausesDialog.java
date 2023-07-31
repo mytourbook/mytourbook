@@ -67,11 +67,11 @@ public class ActionDeletePausesDialog extends Action {
 
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
-      final String[] strArray = Arrays.stream(_tourPausesViewSelectedIndices)
+      final String[] incrementedSelectedIndices = Arrays.stream(_tourPausesViewSelectedIndices)
             .map(index -> ++index)
             .mapToObj(String::valueOf)
             .toArray(String[]::new);
-      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, strArray));
+      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, incrementedSelectedIndices));
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
