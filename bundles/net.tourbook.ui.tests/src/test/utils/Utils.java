@@ -41,13 +41,13 @@ public class Utils {
 
    public static final String DIRECTORY               = "Directory";                                      //$NON-NLS-1$
    public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                    //$NON-NLS-1$
-   public static final String STATISTICS_VIEW_NAME    = "Statistics";                                     //$NON-NLS-1$
+   public static final String STATISTICS_VIEW_NAME    = PluginProperties.getText("view_name_Statistics"); //$NON-NLS-1$
    public static final String TOOLS                   = "Tools ";                                         //$NON-NLS-1$
-   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                                      //$NON-NLS-1$
+   public static final String TOURBOOK_VIEW_NAME      = PluginProperties.getText("view_name_Book");       //$NON-NLS-1$
    public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                    //$NON-NLS-1$
-   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                                   //$NON-NLS-1$
+   public static final String TOURMARKERS_VIEW_NAME   = PluginProperties.getText("view_name_Marker");     //$NON-NLS-1$
    public static final String TOURPAUSES_VIEW_NAME    = PluginProperties.getText("View_Name_TourPauses"); //$NON-NLS-1$
-   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";                                 //$NON-NLS-1$
+   public static final String TOURSEGMENTER_VIEW_NAME = PluginProperties.getText("view_name_Segmenter");  //$NON-NLS-1$
 
    public static final String workingDirectory        = System.getProperty("user.dir");                   //$NON-NLS-1$
 
