@@ -58,7 +58,6 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeManager;
-import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
 import net.tourbook.web.WebContentServer;
@@ -458,7 +457,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeFilterManager.restoreState();
 
       ElevationCompareManager.restoreState();
-      GeoCompareManager.restoreState();
       TourFilterManager.restoreState();
       TourGeoFilter_Manager.restoreState();
       TourTagFilterManager.restoreState();
@@ -542,7 +540,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeManager.saveState();
 
       ElevationCompareManager.saveState();
-      GeoCompareManager.saveState();
       TourFilterManager.saveState();
       TourGeoFilter_Manager.saveState();
       TourPhotoManager.saveState();

@@ -1,0 +1,121 @@
+23.8.0                                                 ?. August 2023
+
+New
+===
+
+* Java 17 
+  is the new required Java platform. For Windows user, use the embedded Java version and you don't have to care about it.
+
+* Tour Pauses View (Frederic)
+  - Added the ability to delete tour pauses
+  https://github.com/mytourbook/mytourbook/issues/1110
+
+Improvements
+============
+
+ * Tour Import (Frederic)
+  - Setting the cadence type only if the tour contains cadence data
+
+* Tour Book Flat View
+  - New sortable columns: Average speed and pace
+    https://github.com/mytourbook/mytourbook/discussions/1117
+    
+* Sensor View
+  - Delete sensor when it is contained in 0 tours
+  - Added sensor types: "Power Meter", "Wind", and "Radar"
+    https://github.com/mytourbook/mytourbook/issues/1144
+
+* Reference Tour View
+  - Autoexpand/collapse when selected with the mouse
+  - Expand one category item and collapse others
+  - New coloumn: Flag if a tour contains geo data
+
+* Tour Comparison Timeline
+  - Show geo compared tours instantly when they are modified
+  - Compared tours can be filtered in the "Geo Compare View"
+  
+* Geo Compare View
+  - Display tour filter in the main view
+  - Save filter settings in the reference tour
+  - New filters: 
+    - Filter compared tours by elevation gain/loss difference
+    - Filter compared tours by sequence number
+  - New columns: 
+    - Elevation gain + loss difference
+    - Elevation gain/loss total
+    - Elevation gain/loss difference 
+  
+* Elevation Compare View
+  - New columns: Elevation gain/loss
+  
+* Compared Tour Chart View
+  - Show the reference tour graph which can overlap the compared tour graphs to see the differences more easily
+
+* Tour Compare
+  - Pace values are now everywhere available like the speed values
+
+* Tour Chart
+  - New speed/pace graph which shows the average speed for distance intervals
+    https://github.com/mytourbook/mytourbook/issues/829 
+  - Slider positions are set to a selected reference tour or geo compared tour
+  
+* 2D Map
+  - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed
+
+ * Tour Concatenation (Frederic)
+  - Concatenating TSS values
+  
+* Person
+  - Added gender diverse  
+  
+* Theme
+  - Show theme selector in the app toolbar
+    https://github.com/mytourbook/mytourbook/issues/1129
+
+* App
+  - Show a restart action in the app toolbar
+    https://github.com/mytourbook/mytourbook/issues/1130  
+
+
+Changes
+=======
+
+* Renamed view "Year Statistic" -> "Tour Comparison Timeline"
+  https://github.com/mytourbook/mytourbook/discussions/1128
+
+* Linux and OSX installation files are now .tar.gz compressed and not .zip compressed. 
+  This is now the default for created product files with Eclipse (tycho).
+
+
+Bugfix
+======
+
+* Tour Book (Frederic)
+  - Hiding the temperature value when no value is detected instead of displaying 0 or 32
+  
+* Marker Editor
+  - Fixed height of the marker viewer. This issue exists since ever and was annoying since ever.
+    Until now the marker viewer height decreased every time when this dialog was reopened.
+
+* Tour Segmenter (Frederic)
+  - Fixed an issue where the segment creation was erroneous when using the "Minimum Elevation Difference" after changing the measurement system.
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* MyTourbook Milestone 23.8   https://github.com/mytourbook/mytourbook/milestone/11?closed=1
+* Eclipse 2023-06
+* NatTable 2.10               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.115
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

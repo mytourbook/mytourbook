@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Velocity 1.5
 Bundle-SymbolicName: net.tourbook.ext.velocity;singleton:=true
-Bundle-Version: 23.5.1.qualifier
+Bundle-Version: 23.8.0.qualifier
 Bundle-Activator: net.tourbook.ext.velocity.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.ui,
@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.common,
  net.tourbook.ext.jars,
  net.tourbook.ext.rxtx_2.2
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Eclipse-BuddyPolicy: registered
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: net.tourbook.ext.jars
