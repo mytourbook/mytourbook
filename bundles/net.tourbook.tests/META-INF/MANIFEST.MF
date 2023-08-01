@@ -3,14 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Integration tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.tests;singleton:=true
 Bundle-Version: 23.8.0.qualifier
-Require-Bundle: org.junit.jupiter.api,
- net.tourbook,
+Require-Bundle: net.tourbook,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3,
  net.tourbook.cloud,
  org.eclipse.ui,
  net.tourbook.common,
- org.opentest4j
+ org.opentest4j,
+ junit-jupiter-api
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
