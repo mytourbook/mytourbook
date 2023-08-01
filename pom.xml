@@ -172,6 +172,7 @@
          </configuration>
          <dependencies>
             <dependency>
+               <!-- This is to force Maven Surefire to use JUnit 5 as, otherwise, JUnit 4 is used and tests are not detected/run!? -->
                <groupId>org.apache.maven.surefire</groupId>
                <artifactId>surefire-junit-platform</artifactId>
                <version>3.1.2</version>
