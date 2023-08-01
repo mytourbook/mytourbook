@@ -9,78 +9,83 @@
 
       <!-- Linux 64 bit -->
       <antcall target="set-755-in-zip-file">
-         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
-         <param name="launcher-filepath"   value="mytourbook/mytourbook"/>
+         <param name="src-tar-gz-file"          value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.tar.gz"/>
+         <param name="app-launcher-filepath"    value="mytourbook/mytourbook"/>
       </antcall>
 
       <!-- MacOS 64 bit -->
       <antcall target="set-755-in-zip-file">
-         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"/>
-         <param name="launcher-filepath"   value="MyTourbook.app/Contents/MacOS/mytourbook"/>
+         <param name="src-tar-gz-file"          value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.tar.gz"/>
+         <param name="app-launcher-filepath"    value="MyTourbook.app/Contents/MacOS/mytourbook"/>
       </antcall>
 
    </target>
 
-   
-    <target name="set-755-in-zip-file">
 
-       <property name="param-zip-file"            value="${zip-file}"/>
-       <property name="param-launcher-filepath"   value="${launcher-filepath}"/>
+   <target name="set-755-in-zip-file">
 
-       <property name="temp-expanded-zip-dir"      value="./temp"/>
-       <property name="temp-new-zip-file"         value="temp-new-zip-file"/>
+      <property name="param-src-tar-gz-file"          value="${src-tar-gz-file}"/>
+      <property name="param-app-launcher-filepath"    value="${app-launcher-filepath}"/>
+      
+      <property name="temp-expanded-app-dir"          value="./temp-app"/>
+      <property name="temp-new-tar-gz-file"           value="temp-new-tar-file.tar.gz"/>
 
-       <echo message="Setting executable flag 755 in ${param-zip-file}" />
+      <echo message="Setting executable flag 755 in ${param-src-tar-gz-file}" />
 
-       <antcall target="clear-temp-dir"/>
+      <!-- Cleanup old temp files, is used during debugging -->
+      <antcall target="clear-temp-files"/>
 
-       <!-- extract app launcher -->
-       <unzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
-          <patternset>
-             <include name="${param-launcher-filepath}" />
-          </patternset>
-       </unzip>
+       <!-- .tar.gz -> .tar 
+      <gunzip src="${param-src-tar-gz-file}"/>
+       -->
 
-       <!-- create temp zip without launcher-->
-       <zip destfile="${temp-new-zip-file}">
-           <zipfileset src="${param-zip-file}" excludes="${param-launcher-filepath}"/>
-       </zip>
+      <!-- extract all files -->
+      <untar compression="gzip"     src="${param-src-tar-gz-file}"   dest="${temp-expanded-app-dir}" />
 
        <!-- 
 
-          Copy launcher and set executable bit 755.
+          Copy app launcher and set executable bit 755.
            
           This is the trick to get the app executable on Linux, 
           it took me a day to find a working solution :-( 
           
           Setting this bit is currently not supported by tycho 
           https://bugs.eclipse.org/bugs/show_bug.cgi?id=355370
-          
-       -->
-       <zip destfile="${temp-new-zip-file}"      update="true">
-          
-          <zipfileset 
-             file       ="${temp-expanded-zip-dir}/${param-launcher-filepath}"
-             fullpath   ="${param-launcher-filepath}"
-             filemode   ="755"
-          />
-          
-       </zip>
+      -->
+   	
+      <tar longfile  ="gnu"
+         compression ="gzip"
+         destfile    ="${temp-new-tar-gz-file}"
+   	>
+         <!-- copy app launcher with executable flags -->	
+         <tarfileset  dir="${temp-expanded-app-dir}"   filemode="755">
+            <include name="${param-app-launcher-filepath}"/>
+         </tarfileset>          
+
+      	<!-- copy all other files -->
+         <tarfileset  dir="${temp-expanded-app-dir}">
+            <include name="**"/>
+            <exclude name="${param-app-launcher-filepath}"/>
+         </tarfileset>
+      </tar>
+
+      <!-- replace original tar.gz with modified tar.gz -->
+      <delete file="${param-src-tar-gz-file}"/>
+      <move file="${temp-new-tar-gz-file}" tofile="${param-src-tar-gz-file}"/>
+
+      <!-- cleanup temp files -->
+      <antcall target="clear-temp-files"/>
        
-       <!-- replace original zip with modified zip -->
-       <delete file="${param-zip-file}"/>
-       <move file="${temp-new-zip-file}" tofile="${param-zip-file}"/>
+      <echo message="Executable flag 755 is set in ${param-src-tar-gz-file}" />
 
-       <antcall target="clear-temp-dir"/>
-       
-       <echo message="Executable flag 755 is set in ${param-zip-file}" />
+   </target>
 
-    </target>
-   
 
-   <target name="clear-temp-dir">
-       <delete file  ="${temp-new-zip-file}"       failonerror="false"/>
-       <delete dir   ="${temp-expanded-zip-dir}"   failonerror="false"/>
+   <target name="clear-temp-files">
+
+   	<delete file  ="${temp-new-tar-gz-file}"       failonerror="false"/>
+      <delete dir   ="${temp-expanded-app-dir}"      failonerror="false"/>
+
     </target>
 
 </project>
