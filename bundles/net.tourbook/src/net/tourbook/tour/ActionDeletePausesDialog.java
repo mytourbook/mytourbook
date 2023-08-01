@@ -80,12 +80,9 @@ public class ActionDeletePausesDialog extends Action {
          return;
       }
 
-      final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed()
-            .collect(Collectors.toList());
-      final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed()
-            .collect(Collectors.toList());
-      final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed()
-            .collect(Collectors.toList());
+      final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed().collect(Collectors.toList());
+      final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed().collect(Collectors.toList());
+      final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().collect(Collectors.toList());
 
       for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
 
