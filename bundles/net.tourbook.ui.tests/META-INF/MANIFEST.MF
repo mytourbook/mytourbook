@@ -9,7 +9,6 @@ Require-Bundle: net.tourbook,
  net.tourbook.export,
  net.tourbook.printing,
  net.tourbook.device.garmin.fit,
- org.junit.jupiter.api,
  org.eclipse.swtbot.go,
  net.tourbook.statistics,
  org.eclipse.swtbot.nebula.nattable.finder,
@@ -18,7 +17,8 @@ Require-Bundle: net.tourbook,
  net.tourbook.device.garmin,
  org.opentest4j,
  org.slf4j.api,
- org.eclipse.nebula.widgets.nattable.core
+ org.eclipse.nebula.widgets.nattable.core,
+ junit-jupiter-api
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
