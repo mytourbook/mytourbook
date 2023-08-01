@@ -7,13 +7,6 @@
       <echo message="tycho-path:     '${tycho-path}'"/>
       <echo message="tycho-version:  '${tycho-version}'"/>
 
-      <!-- Linux 64 bit 
-      <antcall target="set-755-in-zip-file">
-         <param name="src-tar-gz-file"          value="C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products\mytourbook-23.8.0-linux.gtk.x86_64.tar.gz"/>
-         <param name="app-launcher-filepath"    value="mytourbook/mytourbook"/>
-      </antcall>
-      -->
-
       <!-- Linux 64 bit -->
       <antcall target="set-755-in-zip-file">
          <param name="src-tar-gz-file"          value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.tar.gz"/>
@@ -80,7 +73,7 @@
       <delete file="${param-src-tar-gz-file}"/>
       <move file="${temp-new-tar-gz-file}" tofile="${param-src-tar-gz-file}"/>
 
-      <!-- Cleanup new temp files -->
+      <!-- cleanup temp files -->
       <antcall target="clear-temp-files"/>
        
       <echo message="Executable flag 755 is set in ${param-src-tar-gz-file}" />
