@@ -108,13 +108,9 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          // Garmin: Elapsed, Timer, and Moving Durations
          // https://developer.garmin.com/fit/cookbook/durations/
 
-         case START:
+         case START -> handleTimerStartEvent(javaTime);
 
-            handleTimerStartEvent(javaTime);
-            break;
-
-         case STOP:
-         case STOP_ALL:
+         case STOP, STOP_ALL -> {
 
             /**
              * eventData == 0: user stop<br>
@@ -126,10 +122,9 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
 
                handleTimerStopEvents(javaTime, eventData);
             }
-            break;
-
-         default:
-            break;
+         }
+         default -> { // Nothing to do
+         }
          }
       }
 
