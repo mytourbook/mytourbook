@@ -192,7 +192,7 @@
             </execution>
          </executions>
          <configuration>
-               <release>11</release>
+               <release>17</release>
          </configuration>
       </plugin>
       
