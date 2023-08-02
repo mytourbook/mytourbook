@@ -739,8 +739,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    /**
     * Select the chart/map slider(s) according to the selected slices
-    *
-    * @return
     */
    private void fireSliderPosition(final StructuredSelection selection) {
 
