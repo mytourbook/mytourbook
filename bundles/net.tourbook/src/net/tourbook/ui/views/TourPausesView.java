@@ -509,7 +509,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * Column: Pause relative end time
+    * Column: Pause duration
     */
    private void defineColumn_PauseDuration() {
 
