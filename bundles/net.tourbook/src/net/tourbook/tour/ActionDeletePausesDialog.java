@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 public class ActionDeletePausesDialog extends Action {
 
    private ITourProvider _tourProvider;
-   private int[]         _tourPausesViewSelectedIndices;
+   private int[][]       _tourPausesViewSelectedPausesStartEndTimes;
 
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
 
@@ -67,11 +67,8 @@ public class ActionDeletePausesDialog extends Action {
 
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
-      final String[] incrementedSelectedIndices = Arrays.stream(_tourPausesViewSelectedIndices)
-            .map(index -> ++index)
-            .mapToObj(String::valueOf)
-            .toArray(String[]::new);
-      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, incrementedSelectedIndices));
+      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message,
+            String.join(UI.COMMA_SPACE, tourPausesViewSelectedPausesStartEndTimes));
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
@@ -84,7 +81,7 @@ public class ActionDeletePausesDialog extends Action {
       final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed().collect(Collectors.toList());
       final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().collect(Collectors.toList());
 
-      for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
+      for (int index = _tourPausesViewSelectedPausesStartEndTimes.length - 1; index >= 0; index--) {
 
          listPausedTime_Start.remove(index);
          listPausedTime_End.remove(index);
@@ -115,8 +112,8 @@ public class ActionDeletePausesDialog extends Action {
       BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider));
    }
 
-   public void setTourPauses(final int[] tourPausesViewSelectedIndices) {
+   public void setTourPausesStartEndTimes(final int[][] tourPausesViewSelectedPausesStartEndTimes) {
 
-      _tourPausesViewSelectedIndices = tourPausesViewSelectedIndices;
+      _tourPausesViewSelectedPausesStartEndTimes = tourPausesViewSelectedPausesStartEndTimes;
    }
 }

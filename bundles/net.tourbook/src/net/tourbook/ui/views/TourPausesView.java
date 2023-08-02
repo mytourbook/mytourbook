@@ -79,6 +79,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -365,6 +366,14 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       _postSelectionProvider.clearSelection();
    }
 
+   private String computePauseEndTime(final DevicePause pause) {
+      return _tourStartTime.plusSeconds(pause._relativeEndTime).format(TimeTools.Formatter_Time_M);
+   }
+
+   private String computePauseStartTime(final DevicePause pause) {
+      return _tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M);
+   }
+
    private void createActions() {
 
       _subMenu_SetPauseType = new SubMenu_SetPausesType(this, false);
@@ -446,9 +455,24 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
+            final TableItem[] items = _pausesViewer.getTable().getItems();
+            int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+            final TableItem item = items[selectedIndices[0]];
+            final DevicePause devicePause = (DevicePause) item.getData();
+
+
             // Retrieves the pauses that were selected in the pause table
-            final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+            selectedIndices = _pausesViewer.getTable().getSelectionIndices();
             _actionDeleteTourPauses.setTourPauses(selectedIndices);
+            final TableItem[] toto = _pausesViewer.getTable().getSelection();
+            final var titi = toto[0];
+
+            /**
+             * final DevicePause pause = (DevicePause) cell.getElement();
+             * cell.setText(_tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M));
+             * }
+             */
+
             _actionDeleteTourPauses.run();
          }
       }));
@@ -583,11 +607,12 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(_tourStartTime.plusSeconds(pause._relativeEndTime).format(TimeTools.Formatter_Time_M));
+            cell.setText(computePauseEndTime(pause));
          }
+
+
       });
    }
-
    /**
     * Column: Pause start time of day
     */
@@ -609,11 +634,10 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(_tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M));
+            cell.setText(computePauseStartTime(pause));
          }
       });
    }
-
    /**
     * Column: Pause relative end time
     */
