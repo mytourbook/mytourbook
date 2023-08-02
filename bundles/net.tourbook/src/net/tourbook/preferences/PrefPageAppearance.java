@@ -503,7 +503,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       boolean isRestartNow = false;
 
       /*
-       * Theme
+       * Selected theme
        */
       if (_themeEngine != null) {
 
@@ -532,23 +532,23 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
 
       /*
-       * Theme
+       * Theme selector in app toolbar
        */
-      if (isRestartNow == false && _chkShowInApp_RestartApp.getSelection() != _isShowInApp_ThemeSelector) {
+      if (isRestartNow == false && _chkShowInApp_ThemeSelector.getSelection() != _isShowInApp_ThemeSelector) {
 
          // field is modified, ask for restart
 
-         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterRestartApp_Message);
+         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message);
       }
 
       /*
        * Restart app
        */
-      if (isRestartNow == false && _chkShowInApp_ThemeSelector.getSelection() != _isShowInApp_RestartApp) {
+      if (isRestartNow == false && _chkShowInApp_RestartApp.getSelection() != _isShowInApp_RestartApp) {
 
          // field is modified, ask for restart
 
-         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message);
+         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterRestartApp_Message);
       }
 
       /*
