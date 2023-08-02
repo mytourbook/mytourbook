@@ -20,13 +20,13 @@
       </dependency>
       <dependency>
          <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.10.0</version>
+                                                                        <version>5.9.3</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
 
    <properties>
-      <tycho.version>4.0.1</tycho.version>
+      <tycho.version>3.0.4</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
