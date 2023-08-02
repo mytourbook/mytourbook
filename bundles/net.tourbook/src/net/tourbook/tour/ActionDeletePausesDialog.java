@@ -23,13 +23,11 @@ import java.util.stream.Collectors;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
@@ -67,8 +65,8 @@ public class ActionDeletePausesDialog extends Action {
 
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
-      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message,
-            String.join(UI.COMMA_SPACE, tourPausesViewSelectedPausesStartEndTimes));
+      final String dialogMessage =
+            "NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, tourPausesViewSelectedPausesStartEndTimes))";
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),

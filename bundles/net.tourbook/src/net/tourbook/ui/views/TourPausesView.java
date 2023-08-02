@@ -463,7 +463,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             // Retrieves the pauses that were selected in the pause table
             selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-            _actionDeleteTourPauses.setTourPauses(selectedIndices);
+            //todo fb _actionDeleteTourPauses.setTourPauses(selectedIndices);
             final TableItem[] toto = _pausesViewer.getTable().getSelection();
             final var titi = toto[0];
 
@@ -732,7 +732,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       // set the pause currently selected by the user
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
       _subMenu_SetPauseType.setTourPauses(selectedIndices);
-      _actionDeleteTourPauses.setTourPauses(selectedIndices);
+      //todo fb  _actionDeleteTourPauses.setTourPauses(selectedIndices);
 
       enableActions();
    }
