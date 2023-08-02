@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>build.net.tourbook</name>
-	<comment></comment>
-	<projects>
-	</projects>
-	<buildSpec>
-	</buildSpec>
-	<natures>
-	</natures>
-	<linkedResources>
-		<link>
-			<name>gradle.properties</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PARENT_LOC/gradle.properties</locationURI>
-		</link>
-		<link>
-			<name>pom-LANGUAGE-FRAGMENTS.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/LANGUAGE-FRAGMENTS/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom-build.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PARENT_LOC/build/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom-bundles.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/bundles/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom-features.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/features/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom-JRE.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/features/feature.net.tourbook.jre/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom-product.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/build/build.net.tourbook.product/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom-update-site.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/build/build.update-site/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>pom.xml</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>settings-bundles.gradle</name>
-			<type>1</type>
-			<location>PARENT-2-PROJECT_LOC/bundles/settings.gradle</location>
-		</link>
-	</linkedResources>
+   <name>build.net.tourbook</name>
+   <comment></comment>
+   <projects>
+   </projects>
+   <buildSpec>
+   </buildSpec>
+   <natures>
+   </natures>
+   <linkedResources>
+
+      <link>
+         <name>gradle-0-ROOT-gradle.properties</name>          <locationURI>PARENT-2-PROJECT_LOC/gradle.properties</locationURI>
+         <type>1</type>
+      </link>
+      <link>
+         <name>gradle-20-BUNDLES--vtm-settings.gradle</name>   <locationURI>PARENT-2-PROJECT_LOC/bundles/settings.gradle</locationURI>
+         <type>1</type>
+      </link>
+
+
+      <link>
+         <name>pom-0-ROOT.xml</name>                  <locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
+         <type>1</type>                         
+      </link>                                   
+      <link>                                    
+         <name>pom-10-BUILD.xml</name>                <locationURI>PARENT-2-PROJECT_LOC/build/pom.xml</locationURI>
+         <type>1</type>                         
+      </link>                                   
+      <link>
+         <name>pom-10---UPDATE-SITE.xml</name>        <locationURI>PARENT-2-PROJECT_LOC/build/build.update-site/pom.xml</locationURI>
+         <type>1</type>
+      </link>
+      <link>                                    
+         <name>pom-10---PRODUCT.xml</name>            <locationURI>PARENT-2-PROJECT_LOC/build/build.net.tourbook.product/pom.xml</locationURI>
+         <type>1</type>                         
+      </link>                                   
+
+
+      <link>                                    
+         <name>pom-20-BUNDLES.xml</name>              <locationURI>PARENT-2-PROJECT_LOC/bundles/pom.xml</locationURI>
+         <type>1</type>                         
+      </link>         
+
+                          
+      <link>                                    
+         <name>pom-30-FEATURES.xml</name>             <locationURI>PARENT-2-PROJECT_LOC/features/pom.xml</locationURI>
+         <type>1</type>                         
+      </link>                                   
+      <link>                                    
+         <name>pom-30---JRE.xml</name>                <locationURI>PARENT-2-PROJECT_LOC/features/feature.net.tourbook.jre/pom.xml</locationURI>
+         <type>1</type>
+      </link>
+
+
+      <link>
+         <name>pom-50-LANGUAGE-FRAGMENTS.xml</name>   <locationURI>PARENT-2-PROJECT_LOC/LANGUAGE-FRAGMENTS/pom.xml</locationURI>
+         <type>1</type>
+      </link>
+
+   </linkedResources>
 </projectDescription>

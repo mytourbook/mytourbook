@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tour Export
 Bundle-SymbolicName: net.tourbook.export;singleton:=true
-Bundle-Version: 23.5.1.qualifier
+Bundle-Version: 23.8.0.qualifier
 Bundle-Activator: net.tourbook.export.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: org.eclipse.core.runtime,
@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.jars,
  net.tourbook.common,
  net.tourbook.ext.velocity
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook,
  net.tourbook.application,
