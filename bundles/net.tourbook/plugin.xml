@@ -2036,7 +2036,7 @@
 
       <key
          commandId="command.net.tourbook.views.tourCatalog.yearStatisticView"
-         sequence="%Shortcut_Key_App_ReferenceTimeline"
+         sequence="%Shortcut_Key_App_TourComparisonTimeline"
          contextId="org.eclipse.ui.contexts.window"
          schemeId="net.tourbook.scheme"/>
 
