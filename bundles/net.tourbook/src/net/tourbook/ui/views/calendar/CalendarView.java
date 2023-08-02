@@ -61,7 +61,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -637,7 +636,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          final Long newTourId = ((SelectionTourId) selection).getTourId();
          final Long oldTourId = _calendarGraph.getSelectedTourId();
 
-         if (newTourId != oldTourId) {
+         if (!newTourId.equals(oldTourId)) {
 
             _stateIsLinked = _actionSetLinked.isChecked();
 
