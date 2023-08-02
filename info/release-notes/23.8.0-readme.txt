@@ -6,6 +6,10 @@ New
 * Java 17 
   is the new required Java platform. For Windows user, use the embedded Java version and you don't have to care about it.
 
+* Tour Pauses View (Frederic)
+  - Added the ability to delete tour pauses
+  https://github.com/mytourbook/mytourbook/issues/1110
+
 Improvements
 ============
 

@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +30,41 @@ import utils.Utils;
 public class TourPausesViewTests extends UITest {
 
    @Test
+   void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
+
+      // arrange
+      Utils.getTour(bot);
+      Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
+      SWTBotTable pausesViewTable = bot.table();
+      pausesViewTable.select(0);
+
+      // assert initial state
+      final int tableRowCount = 1;
+      assertEquals(tableRowCount, pausesViewTable.rowCount());
+
+      // act
+
+      // Triggering the deletion but not acting yet
+      pausesViewTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
+      Utils.clickNoButton(bot);
+
+      // Triggering the deletion and performing it
+      pausesViewTable
+            .contextMenu(Messages.App_Action_DeleteTourPauses)
+            .click();
+      Utils.clickYesButton(bot);
+
+      // assert new state
+      pausesViewTable = bot.table();
+      assertEquals(tableRowCount - 1, pausesViewTable.rowCount());
+   }
+
+   @Test
    void Given_PauseTypeAutomatic_When_ChangeToManual_Expect_PauseTypeManual() {
 
       // arrange
       Utils.getTour(bot);
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
 
@@ -45,7 +77,7 @@ public class TourPausesViewTests extends UITest {
             .menu(Messages.Action_PauseType_Set_Manual)
             .click();
 
-      // assert
+      // assert new state
       pausesViewTable = bot.table();
       assertEquals(Messages.Tour_Pauses_Column_TypeValue_Manual, pausesViewTable.cell(0, 1));
 
@@ -64,7 +96,7 @@ public class TourPausesViewTests extends UITest {
 
       Utils.getTour(bot);
 
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
 
       bot.table().select("15:40"); //$NON-NLS-1$
    }

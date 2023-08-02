@@ -136,6 +136,7 @@ public class Messages extends NLS {
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;
    public static String        App_Action_DeleteTourMarker;
+   public static String        App_Action_DeleteTourPauses;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeselectAll;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -503,6 +504,9 @@ public class Messages extends NLS {
    public static String        Dialog_DatabaseAction_Confirmation_Title;
 
    public static String        Dialog_DeleteData_Title;
+
+   public static String        Dialog_DeleteTourPauses_Message;
+   public static String        Dialog_DeleteTourPauses_Title;
 
    public static String        Dialog_DeleteTourValues_Action_OpenDialog;
    public static String        Dialog_DeleteTourValues_Button_Delete;
