@@ -83,8 +83,7 @@ public class SuuntoWorkoutUploaderTests {
       Display.getDefault().addFilter(SWT.Activate, event -> {
          // Is this a Shell being activated?
 
-         if (event.widget instanceof Shell) {
-            final Shell shell = (Shell) event.widget;
+         if (event.widget instanceof final Shell shell) {
 
             // Look at the shell title to see if it is the one we want
 

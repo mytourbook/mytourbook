@@ -450,9 +450,7 @@ public class TourExporter {
       if (tourMarkers != null) {
 
          for (final Object element : tourMarkers) {
-            if (element instanceof TourMarker) {
-
-               final TourMarker tourMarker = (TourMarker) element;
+            if (element instanceof final TourMarker tourMarker) {
 
                final double longitude = tourMarker.getLongitude();
                final double latitude = tourMarker.getLatitude();
@@ -517,9 +515,7 @@ public class TourExporter {
                endtime = wp.getDate();
             }
 
-            if (wp instanceof GarminTrackpointAdapter) {
-
-               final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+            if (wp instanceof final GarminTrackpointAdapter gta) {
 
                // average heartrate, maximum heartrate
                if (gta.hasValidHeartrate()) {
