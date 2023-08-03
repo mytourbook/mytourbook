@@ -39,7 +39,7 @@ public class TourPausesViewTests extends UITest {
       pausesViewTable.select(0);
 
       // assert initial state
-      final int tableRowCount = 1;
+      final int tableRowCount = 5;
       assertEquals(tableRowCount, pausesViewTable.rowCount());
 
       // act
