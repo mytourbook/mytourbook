@@ -457,7 +457,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             }
 
             final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-            _actionDeleteTourPauses.setTourPauses(selectedIndices);
             setupPausesToDelete(selectedIndices);
 
             _actionDeleteTourPauses.run();
@@ -718,8 +717,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       menuMgr.add(_actionDeleteTourPauses);
 
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+
       _subMenu_SetPauseType.setTourPauses(selectedIndices);
-      _actionDeleteTourPauses.setTourPauses(selectedIndices);
+
       setupPausesToDelete(selectedIndices);
 
       enableActions();
@@ -993,6 +993,8 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    }
 
    private void setupPausesToDelete(final int[] selectedPausesIndices) {
+
+      _actionDeleteTourPauses.setTourPauses(selectedPausesIndices);
 
       final List<String> tourPausesViewSelectedPausesStartEndTimes = new ArrayList<>();
       final TableItem[] items = _pausesViewer.getTable().getItems();
