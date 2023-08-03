@@ -33,7 +33,7 @@ public class TourPausesViewTests extends UITest {
    void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
 
       // arrange
-      Utils.getTour(bot);
+      Utils.getTourWithSeveralPauses(bot);
       Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
@@ -63,7 +63,7 @@ public class TourPausesViewTests extends UITest {
    void Given_PauseTypeAutomatic_When_ChangeToManual_Expect_PauseTypeManual() {
 
       // arrange
-      Utils.getTour(bot);
+      Utils.getTourWithSeveralPauses(bot);
       Utils.showView(bot, Utils.TOURPAUSES_VIEW_NAME);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
