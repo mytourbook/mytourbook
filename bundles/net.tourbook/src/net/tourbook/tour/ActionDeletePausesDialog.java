@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider;
 
@@ -72,7 +73,7 @@ public class ActionDeletePausesDialog extends Action {
 
       for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 2) {
 
-         dialogMessage.append(NLS.bind(Messages.Dialog_DeleteTourPauses_Message_Part2,
+         dialogMessage.append(UI.SYSTEM_NEW_LINE + NLS.bind(Messages.Dialog_DeleteTourPauses_Message_Part2,
                _tourPausesViewSelectedPausesStartEndTimes.get(index),
                _tourPausesViewSelectedPausesStartEndTimes.get(index + 1)));
       }
