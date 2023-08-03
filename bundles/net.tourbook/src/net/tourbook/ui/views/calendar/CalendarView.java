@@ -636,7 +636,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          final Long newTourId = ((SelectionTourId) selection).getTourId();
          final Long oldTourId = _calendarGraph.getSelectedTourId();
 
-         if (!newTourId.equals(oldTourId)) {
+         if (newTourId != oldTourId) {
 
             _stateIsLinked = _actionSetLinked.isChecked();
 
