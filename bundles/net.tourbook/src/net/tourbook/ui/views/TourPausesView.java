@@ -992,11 +992,11 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
     */
    private void setupPausesToDelete() {
 
-      final TableItem[] items = _pausesViewer.getTable().getItems();
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
       _actionDeleteTourPauses.setTourPauses(selectedIndices);
 
       final List<String> tourPausesViewSelectedPausesStartEndTimes = new ArrayList<>();
+      final TableItem[] items = _pausesViewer.getTable().getItems();
       for (final int selectedIndex : selectedIndices) {
 
          final TableItem item = items[selectedIndex];
