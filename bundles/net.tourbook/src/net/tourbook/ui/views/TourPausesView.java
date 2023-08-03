@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -455,23 +456,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            final TableItem[] items = _pausesViewer.getTable().getItems();
-            int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-            final TableItem item = items[selectedIndices[0]];
-            final DevicePause devicePause = (DevicePause) item.getData();
-
-
-            // Retrieves the pauses that were selected in the pause table
-            selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-            //todo fb _actionDeleteTourPauses.setTourPauses(selectedIndices);
-            final TableItem[] toto = _pausesViewer.getTable().getSelection();
-            final var titi = toto[0];
-
-            /**
-             * final DevicePause pause = (DevicePause) cell.getElement();
-             * cell.setText(_tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M));
-             * }
-             */
+            setupPausesToDelete();
 
             _actionDeleteTourPauses.run();
          }
@@ -610,9 +595,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             cell.setText(computePauseEndTime(pause));
          }
 
-
       });
    }
+
    /**
     * Column: Pause start time of day
     */
@@ -638,6 +623,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
          }
       });
    }
+
    /**
     * Column: Pause relative end time
     */
@@ -729,10 +715,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       menuMgr.add(_subMenu_SetPauseType);
       menuMgr.add(_actionDeleteTourPauses);
 
-      // set the pause currently selected by the user
-      final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-      _subMenu_SetPauseType.setTourPauses(selectedIndices);
-      //todo fb  _actionDeleteTourPauses.setTourPauses(selectedIndices);
+      setupPausesToDelete();
 
       enableActions();
    }
@@ -1002,6 +985,26 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    public void setFocus() {
 
       _pausesViewer.getTable().setFocus();
+   }
+
+   /**
+    * Set the pauses currently selected by the user
+    */
+   private void setupPausesToDelete() {
+
+      final TableItem[] items = _pausesViewer.getTable().getItems();
+      final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+      _actionDeleteTourPauses.setTourPauses(selectedIndices);
+
+      final List<String> tourPausesViewSelectedPausesStartEndTimes = new ArrayList<>();
+      for (final int selectedIndex : selectedIndices) {
+
+         final TableItem item = items[selectedIndex];
+         final DevicePause devicePause = (DevicePause) item.getData();
+         tourPausesViewSelectedPausesStartEndTimes.add(computePauseStartTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(computePauseEndTime(devicePause));
+      }
+      _actionDeleteTourPauses.setTourPausesStartEndTimes(tourPausesViewSelectedPausesStartEndTimes);
    }
 
    private void setupViewerContent(final TourData tourData) {

@@ -28,13 +28,15 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionDeletePausesDialog extends Action {
 
    private ITourProvider _tourProvider;
-   private int[][]       _tourPausesViewSelectedPausesStartEndTimes;
+   private int[]         _tourPausesViewSelectedIndices;
+   private List<String>  _tourPausesViewSelectedPausesStartEndTimes;
 
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
 
@@ -65,13 +67,20 @@ public class ActionDeletePausesDialog extends Action {
 
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
-      final String dialogMessage =
-            "NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, tourPausesViewSelectedPausesStartEndTimes))";
+      final StringBuilder dialogMessage = new StringBuilder();
+      dialogMessage.append(Messages.Dialog_DeleteTourPauses_Message_Part1);
+
+      for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 2) {
+
+         dialogMessage.append(NLS.bind(Messages.Dialog_DeleteTourPauses_Message_Part2,
+               _tourPausesViewSelectedPausesStartEndTimes.get(index),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 1)));
+      }
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
             dialogTitle,
-            dialogMessage)) {
+            dialogMessage.toString())) {
          return;
       }
 
@@ -79,7 +88,7 @@ public class ActionDeletePausesDialog extends Action {
       final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed().collect(Collectors.toList());
       final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().collect(Collectors.toList());
 
-      for (int index = _tourPausesViewSelectedPausesStartEndTimes.length - 1; index >= 0; index--) {
+      for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
 
          listPausedTime_Start.remove(index);
          listPausedTime_End.remove(index);
@@ -110,7 +119,12 @@ public class ActionDeletePausesDialog extends Action {
       BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider));
    }
 
-   public void setTourPausesStartEndTimes(final int[][] tourPausesViewSelectedPausesStartEndTimes) {
+   public void setTourPauses(final int[] tourPausesViewSelectedIndices) {
+
+      _tourPausesViewSelectedIndices = tourPausesViewSelectedIndices;
+   }
+
+   public void setTourPausesStartEndTimes(final List<String> tourPausesViewSelectedPausesStartEndTimes) {
 
       _tourPausesViewSelectedPausesStartEndTimes = tourPausesViewSelectedPausesStartEndTimes;
    }
