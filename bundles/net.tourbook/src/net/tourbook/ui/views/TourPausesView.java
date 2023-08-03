@@ -456,7 +456,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            setupPausesToDelete();
+            final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+            _actionDeleteTourPauses.setTourPauses(selectedIndices);
+            setupPausesToDelete(selectedIndices);
 
             _actionDeleteTourPauses.run();
          }
@@ -715,7 +717,10 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       menuMgr.add(_subMenu_SetPauseType);
       menuMgr.add(_actionDeleteTourPauses);
 
-      setupPausesToDelete();
+      final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+      _subMenu_SetPauseType.setTourPauses(selectedIndices);
+      _actionDeleteTourPauses.setTourPauses(selectedIndices);
+      setupPausesToDelete(selectedIndices);
 
       enableActions();
    }
@@ -987,17 +992,11 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       _pausesViewer.getTable().setFocus();
    }
 
-   /**
-    * Set the pauses currently selected by the user
-    */
-   private void setupPausesToDelete() {
-
-      final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-      _actionDeleteTourPauses.setTourPauses(selectedIndices);
+   private void setupPausesToDelete(final int[] selectedPausesIndices) {
 
       final List<String> tourPausesViewSelectedPausesStartEndTimes = new ArrayList<>();
       final TableItem[] items = _pausesViewer.getTable().getItems();
-      for (final int selectedIndex : selectedIndices) {
+      for (final int selectedIndex : selectedPausesIndices) {
 
          final TableItem item = items[selectedIndex];
          final DevicePause devicePause = (DevicePause) item.getData();
