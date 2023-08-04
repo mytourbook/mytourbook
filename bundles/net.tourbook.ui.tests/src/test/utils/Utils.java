@@ -44,13 +44,15 @@ public class Utils {
    public static final String TOOLS                   = "Tools ";                                         //$NON-NLS-1$
 
    public static final String STATISTICS_VIEW_NAME    = PluginProperties.getText("view_name_Statistics"); //$NON-NLS-1$
-   public static final String TOURBOOK_VIEW_NAME      = PluginProperties.getText("view_name_Book");       //$NON-NLS-1$
-   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                    //$NON-NLS-1$
-   public static final String TOURMAP25_VIEW_NAME     = PluginProperties.getText("View_Name_TourMap25");  //$NON-NLS-1$
-   public static final String TOURMAP3_VIEW_NAME      = PluginProperties.getText("View_Name_TourMap3");   //$NON-NLS-1$
-   public static final String TOURMARKERS_VIEW_NAME   = PluginProperties.getText("view_name_Marker");     //$NON-NLS-1$
-   public static final String TOURPAUSES_VIEW_NAME    = PluginProperties.getText("View_Name_TourPauses"); //$NON-NLS-1$
-   public static final String TOURSEGMENTER_VIEW_NAME = PluginProperties.getText("view_name_Segmenter");  //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURBOOK      = PluginProperties.getText("view_name_Book");       //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURDATA      = PluginProperties.getText("View_Name_TourData");   //$NON-NLS-1$
+   public static final String VIEW_NAME_TOUREDITOR    = "Tour Editor";                                    //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURMAP25     = PluginProperties.getText("View_Name_TourMap25");  //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURMAP3      = PluginProperties.getText("View_Name_TourMap3");   //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURMARKERS   = PluginProperties.getText("view_name_Marker");     //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURPAUSES    = PluginProperties.getText("View_Name_TourPauses"); //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURSEGMENTER = PluginProperties.getText("view_name_Segmenter");  //$NON-NLS-1$
+   public static final String VIEW_NAME_WAYPOINTS     = PluginProperties.getText("View_Name_Waypoint");   //$NON-NLS-1$
 
    public static final String workingDirectory        = System.getProperty("user.dir");                   //$NON-NLS-1$
 
@@ -173,7 +175,7 @@ public class Utils {
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
-      return showView(bot, TOURBOOK_VIEW_NAME);
+      return showView(bot, VIEW_NAME_TOURBOOK);
    }
 
    public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {

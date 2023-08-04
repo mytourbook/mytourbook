@@ -47,8 +47,8 @@ public class WorkbenchTests extends UITest {
    @Test
    void open25DMap() {
 
-      Utils.showViewFromMenu(bot, "Map", Utils.TOURMAP25_VIEW_NAME); //$NON-NLS-1$
-      final SWTBotView twoFiveDMapView = Utils.showView(bot, Utils.TOURMAP25_VIEW_NAME);
+      Utils.showViewFromMenu(bot, "Map", Utils.VIEW_NAME_TOURMAP25); //$NON-NLS-1$
+      final SWTBotView twoFiveDMapView = Utils.showView(bot, Utils.VIEW_NAME_TOURMAP25);
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
@@ -62,8 +62,8 @@ public class WorkbenchTests extends UITest {
    @Test
    void open3DMap() {
 
-      Utils.showViewFromMenu(bot, "Map", Utils.TOURMAP3_VIEW_NAME); //$NON-NLS-1$
-      final SWTBotView threeDMapView = Utils.showView(bot, Utils.TOURMAP3_VIEW_NAME);
+      Utils.showViewFromMenu(bot, "Map", Utils.VIEW_NAME_TOURMAP3); //$NON-NLS-1$
+      final SWTBotView threeDMapView = Utils.showView(bot, Utils.VIEW_NAME_TOURMAP3);
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
@@ -93,14 +93,14 @@ public class WorkbenchTests extends UITest {
       //bot.sleep(3000);
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Waypoints").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_WAYPOINTS).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView waypointsView = Utils.showView(bot, "Waypoints"); //$NON-NLS-1$
+      final SWTBotView waypointsView = Utils.showView(bot, Utils.VIEW_NAME_WAYPOINTS);
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Tour Data").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOURDATA).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView tourDataView = Utils.showView(bot, "Tour Data"); //$NON-NLS-1$
+      final SWTBotView tourDataView = Utils.showView(bot, Utils.VIEW_NAME_TOURDATA);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Analyzer"); //$NON-NLS-1$
       final SWTBotView tourAnalyzerView = Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$

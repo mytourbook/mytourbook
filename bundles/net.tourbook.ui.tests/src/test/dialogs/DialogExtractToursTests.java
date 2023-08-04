@@ -40,7 +40,7 @@ public class DialogExtractToursTests extends UITest {
    void extractTour() {
 
       Utils.getTour(bot);
-      SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       bot.toolbarToggleButtonWithTooltip(Messages.app_action_edit_rows_tooltip).click();
 
@@ -63,7 +63,7 @@ public class DialogExtractToursTests extends UITest {
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
       //Check that it contains 10 time slices
-      tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
       timeSlicesTable = tourEditorViewBot.table();
       assertEquals(10, timeSlicesTable.rowCount());
       bot.toolbarToggleButtonWithTooltip(Messages.app_action_edit_rows_tooltip).click();

@@ -48,7 +48,7 @@ public abstract class UITest {
       // read texts from plugin.properties
       PluginProperties.getInstance().populate(TourbookPlugin.getBundleContext().getBundle());
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_TOURBOOK);
       tourBookView = Utils.showTourBookView(bot);
    }
 }
