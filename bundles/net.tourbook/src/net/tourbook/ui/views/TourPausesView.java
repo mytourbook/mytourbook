@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -79,6 +80,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -306,9 +308,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             return;
          }
 
-         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
          } else {
 
@@ -316,9 +318,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
                if (modifiedTours != null) {
 
                   // update modified tour
@@ -342,9 +344,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                   }
                }
 
-            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof final SelectionTourPause pauseSelection) {
 
-               onTourEvent_TourPause((SelectionTourPause) eventData);
+               onTourEvent_TourPause(pauseSelection);
 
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -363,6 +365,14 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       updateUI_PausesViewer();
 
       _postSelectionProvider.clearSelection();
+   }
+
+   private String computePauseEndTime(final DevicePause pause) {
+      return _tourStartTime.plusSeconds(pause._relativeEndTime).format(TimeTools.Formatter_Time_M);
+   }
+
+   private String computePauseStartTime(final DevicePause pause) {
+      return _tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M);
    }
 
    private void createActions() {
@@ -446,9 +456,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            // Retrieves the pauses that were selected in the pause table
             final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
-            _actionDeleteTourPauses.setTourPauses(selectedIndices);
+            setupPausesToDelete(selectedIndices);
+
             _actionDeleteTourPauses.run();
          }
       }));
@@ -509,7 +519,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * Column: Pause relative end time
+    * Column: Pause duration
     */
    private void defineColumn_PauseDuration() {
 
@@ -583,8 +593,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(_tourStartTime.plusSeconds(pause._relativeEndTime).format(TimeTools.Formatter_Time_M));
+            cell.setText(computePauseEndTime(pause));
          }
+
       });
    }
 
@@ -609,7 +620,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(_tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M));
+            cell.setText(computePauseStartTime(pause));
          }
       });
    }
@@ -705,18 +716,17 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       menuMgr.add(_subMenu_SetPauseType);
       menuMgr.add(_actionDeleteTourPauses);
 
-      // set the pause currently selected by the user
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+
       _subMenu_SetPauseType.setTourPauses(selectedIndices);
-      _actionDeleteTourPauses.setTourPauses(selectedIndices);
+
+      setupPausesToDelete(selectedIndices);
 
       enableActions();
    }
 
    /**
     * Select the chart/map slider(s) according to the selected slices
-    *
-    * @return
     */
    private void fireSliderPosition(final StructuredSelection selection) {
 
@@ -736,9 +746,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          // One slice is selected
 
-         if (slice1 instanceof DevicePause) {
+         if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = ((DevicePause) slice1)._serieIndex;
+            final int serieIndexFirst = devicePause._serieIndex;
 
             /*
              * Position slider at the beginning of the slice so that each slice borders has an
@@ -756,9 +766,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          // Two or more slices are selected, set the 2 sliders to the first and last selected slices
 
-         if (slice1 instanceof DevicePause) {
+         if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = ((DevicePause) slice1)._serieIndex;
+            final int serieIndexFirst = devicePause._serieIndex;
 
             /*
              * Position slider at the beginning of the first slice
@@ -850,20 +860,19 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          tourData = tourDataSelection.getTourData();
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         tourId = ((SelectionTourId) selection).getTourId();
+         tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
 
          if (tourIds != null && tourIds.size() > 0) {
 
@@ -874,22 +883,24 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             }
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+
+            tourId = tviRefTour_ComparedTour.getTourId();
+
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
+
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -979,6 +990,22 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    public void setFocus() {
 
       _pausesViewer.getTable().setFocus();
+   }
+
+   private void setupPausesToDelete(final int[] selectedPausesIndices) {
+
+      _actionDeleteTourPauses.setTourPauses(selectedPausesIndices);
+
+      final List<String> tourPausesViewSelectedPausesStartEndTimes = new ArrayList<>();
+      final TableItem[] items = _pausesViewer.getTable().getItems();
+      for (final int selectedIndex : selectedPausesIndices) {
+
+         final TableItem item = items[selectedIndex];
+         final DevicePause devicePause = (DevicePause) item.getData();
+         tourPausesViewSelectedPausesStartEndTimes.add(computePauseStartTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(computePauseEndTime(devicePause));
+      }
+      _actionDeleteTourPauses.setTourPausesStartEndTimes(tourPausesViewSelectedPausesStartEndTimes);
    }
 
    private void setupViewerContent(final TourData tourData) {

@@ -106,6 +106,17 @@ public class Utils {
       return tour;
    }
 
+   public static SWTBotTreeItem getTourWithSeveralPauses(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
    /**
     * Select a tour for which we have SRTM3 data
     */
