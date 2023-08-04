@@ -55,14 +55,15 @@ public class ActionDeletePausesDialog extends Action {
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
       // check that only one tour is selected
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
+      if (selectedTours == null || selectedTours.size() != 1) {
          return;
       }
 
       final TourData tourData = selectedTours.get(0);
 
-      if (tourData.isManualTour()) {
-         // a manually created tour do not have time slices -> no  pauses
+      if (tourData == null || tourData.isManualTour()) {
+
+         // a manually created tour does not have time slices -> no  pauses
          return;
       }
 
