@@ -357,18 +357,18 @@ public class Messages extends NLS {
    public static String        Compare_Result_Column_diff;
    public static String        Compare_Result_Column_diff_label;
    public static String        Compare_Result_Column_diff_tooltip;
-   public static String        Compare_Result_Column_kmh_db_label;
-   public static String        Compare_Result_Column_kmh_db_tooltip;
-   public static String        Compare_Result_Column_kmh_label;
-   public static String        Compare_Result_Column_kmh_moved_label;
-   public static String        Compare_Result_Column_kmh_moved_tooltip;
-   public static String        Compare_Result_Column_kmh_tooltip;
    public static String        Compare_Result_Column_Pace_Computed_Label;
    public static String        Compare_Result_Column_Pace_Computed_Tooltip;
    public static String        Compare_Result_Column_Pace_Moved_Label;
    public static String        Compare_Result_Column_Pace_Moved_Tooltip;
    public static String        Compare_Result_Column_Pace_Saved_Label;
    public static String        Compare_Result_Column_Pace_Saved_Tooltip;
+   public static String        Compare_Result_Column_Speed_Computed_Label;
+   public static String        Compare_Result_Column_Speed_Computed_Tooltip;
+   public static String        Compare_Result_Column_Speed_Moved_Label;
+   public static String        Compare_Result_Column_Speed_Moved_Tooltip;
+   public static String        Compare_Result_Column_Speed_Saved_Label;
+   public static String        Compare_Result_Column_Speed_Saved_Tooltip;
 
    public static String        Compare_Result_Column_tour;
 
@@ -505,7 +505,8 @@ public class Messages extends NLS {
 
    public static String        Dialog_DeleteData_Title;
 
-   public static String        Dialog_DeleteTourPauses_Message;
+   public static String        Dialog_DeleteTourPauses_Message_Part1;
+   public static String        Dialog_DeleteTourPauses_Message_Part2;
    public static String        Dialog_DeleteTourPauses_Title;
 
    public static String        Dialog_DeleteTourValues_Action_OpenDialog;
@@ -998,12 +999,12 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter_Tooltip;
-   public static String        GeoCompare_View_Column_GeoDiff_Header;
-   public static String        GeoCompare_View_Column_GeoDiff_Label;
+   public static String        GeoCompare_View_Column_GeoDiff_Absolute_Header;
+   public static String        GeoCompare_View_Column_GeoDiff_Absolute_Label;
+   public static String        GeoCompare_View_Column_GeoDiff_Absolute_Tooltip;
    public static String        GeoCompare_View_Column_GeoDiff_Relative_Header;
    public static String        GeoCompare_View_Column_GeoDiff_Relative_Label;
    public static String        GeoCompare_View_Column_GeoDiff_Relative_Tooltip;
-   public static String        GeoCompare_View_Column_GeoDiff_Tooltip;
    public static String        GeoCompare_View_Column_SequenceNumber_Header;
    public static String        GeoCompare_View_Column_SequenceNumber_Label;
    public static String        GeoCompare_View_Combo_MouseWheelIncrementer_ElevationDiff_Tooltip;
@@ -1011,7 +1012,6 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
-   public static String        GeoCompare_View_Info_FilterSettingsAreSaved;
    public static String        GeoCompare_View_Label_GeoParts;
    public static String        GeoCompare_View_Label_GeoParts_Tooltip;
    public static String        GeoCompare_View_Label_PossibleTours;
@@ -1024,6 +1024,7 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
    public static String        GeoCompare_View_State_TourFilter;
+   public static String        GeoCompare_View_Statusline_FilterSettingsAreSaved;
 
    public static String        Graph_Label_Time_Break;
    public static String        Graph_Label_Time_Elapsed;
@@ -1896,9 +1897,9 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateReferenceTour;
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
-   public static String        RefTour_Action_Link2;
-   public static String        RefTour_Action_NavigateNextTour2;
-   public static String        RefTour_Action_NavigatePrevTour2;
+   public static String        RefTour_Action_Link_Tooltip2;
+   public static String        RefTour_Action_NavigateNextTour_Tooltip2;
+   public static String        RefTour_Action_NavigatePrevTour_Tooltip2;
    public static String        RefTour_Action_RenameReferenceTour;
    public static String        RefTour_Action_SaveMarker;
    public static String        RefTour_Action_SaveAndNext;

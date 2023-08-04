@@ -1135,8 +1135,8 @@ public class ElevationCompareResultView extends ViewPart implements
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceComputed", SWT.TRAIL); //$NON-NLS-1$
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
-      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderText(UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND + UI.SPACE + UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND + UI.SPACE + UI.UNIT_LABEL_PACE);
       colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Computed_Tooltip);
       colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Computed_Label);
 
@@ -1170,8 +1170,8 @@ public class ElevationCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceMoved", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
-      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderText(UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT + UI.SPACE + UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT + UI.SPACE + UI.UNIT_LABEL_PACE);
       colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Moved_Tooltip);
       colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Moved_Label);
 
@@ -1205,8 +1205,8 @@ public class ElevationCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "paceSaved", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnHeaderText(UI.UNIT_LABEL_PACE);
-      colDef.setColumnUnit(UI.UNIT_LABEL_PACE);
+      colDef.setColumnHeaderText(UI.SYMBOL_WHITE_HARD_SHELL_FLOPPY_DISK + UI.SPACE + UI.UNIT_LABEL_PACE);
+      colDef.setColumnUnit(UI.SYMBOL_WHITE_HARD_SHELL_FLOPPY_DISK + UI.SPACE + UI.UNIT_LABEL_PACE);
       colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Pace_Saved_Tooltip);
       colDef.setColumnLabel(Messages.Compare_Result_Column_Pace_Saved_Label);
 
@@ -1241,10 +1241,10 @@ public class ElevationCompareResultView extends ViewPart implements
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
 
       colDef.setIsDefaultColumn();
-      colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
-      colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
-      colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
+      colDef.setColumnHeaderText(UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND + UI.SPACE + UI.UNIT_LABEL_SPEED);
+      colDef.setColumnUnit(UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND + UI.SPACE + UI.UNIT_LABEL_SPEED);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Speed_Computed_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Speed_Computed_Label);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
       colDef.setValueFormats(//
@@ -1276,10 +1276,10 @@ public class ElevationCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
-      colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
-      colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
+      colDef.setColumnHeaderText(UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT + UI.SPACE + UI.UNIT_LABEL_SPEED);
+      colDef.setColumnUnit(UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT + UI.SPACE + UI.UNIT_LABEL_SPEED);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Speed_Moved_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Speed_Moved_Label);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
       colDef.setValueFormats(//
@@ -1312,10 +1312,10 @@ public class ElevationCompareResultView extends ViewPart implements
 
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnHeaderText(UI.UNIT_LABEL_SPEED);
-      colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
-      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
-      colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
+      colDef.setColumnHeaderText(UI.SYMBOL_WHITE_HARD_SHELL_FLOPPY_DISK + UI.SPACE + UI.UNIT_LABEL_SPEED);
+      colDef.setColumnUnit(UI.SYMBOL_WHITE_HARD_SHELL_FLOPPY_DISK + UI.SPACE + UI.UNIT_LABEL_SPEED);
+      colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_Speed_Saved_Tooltip);
+      colDef.setColumnLabel(Messages.Compare_Result_Column_Speed_Saved_Label);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
       colDef.setValueFormats(//

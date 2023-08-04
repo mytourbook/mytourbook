@@ -37,6 +37,7 @@ public class ActionDeletePausesDialog extends Action {
 
    private ITourProvider _tourProvider;
    private int[]         _tourPausesViewSelectedIndices;
+   private List<String>  _tourPausesViewSelectedPausesStartEndTimes;
 
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
 
@@ -67,16 +68,20 @@ public class ActionDeletePausesDialog extends Action {
 
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
-      final String[] incrementedSelectedIndices = Arrays.stream(_tourPausesViewSelectedIndices)
-            .map(index -> ++index)
-            .mapToObj(String::valueOf)
-            .toArray(String[]::new);
-      final String dialogMessage = NLS.bind(Messages.Dialog_DeleteTourPauses_Message, String.join(UI.COMMA_SPACE, incrementedSelectedIndices));
+      final StringBuilder dialogMessage = new StringBuilder();
+      dialogMessage.append(Messages.Dialog_DeleteTourPauses_Message_Part1);
+
+      for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 2) {
+
+         dialogMessage.append(UI.SYSTEM_NEW_LINE + NLS.bind(Messages.Dialog_DeleteTourPauses_Message_Part2,
+               _tourPausesViewSelectedPausesStartEndTimes.get(index),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 1)));
+      }
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
             dialogTitle,
-            dialogMessage)) {
+            dialogMessage.toString())) {
          return;
       }
 
@@ -118,5 +123,10 @@ public class ActionDeletePausesDialog extends Action {
    public void setTourPauses(final int[] tourPausesViewSelectedIndices) {
 
       _tourPausesViewSelectedIndices = tourPausesViewSelectedIndices;
+   }
+
+   public void setTourPausesStartEndTimes(final List<String> tourPausesViewSelectedPausesStartEndTimes) {
+
+      _tourPausesViewSelectedPausesStartEndTimes = tourPausesViewSelectedPausesStartEndTimes;
    }
 }

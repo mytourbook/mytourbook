@@ -31,7 +31,7 @@ public class ActionLinkTour extends Action {
 
       _tourCatalogView = view;
 
-      setToolTipText(Messages.RefTour_Action_Link2);
+      setToolTipText(Messages.RefTour_Action_Link_Tooltip2);
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncViews));
    }
 

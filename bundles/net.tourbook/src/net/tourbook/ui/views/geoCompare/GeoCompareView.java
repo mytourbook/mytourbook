@@ -2074,9 +2074,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_GEO_DIFF, SWT.TRAIL);
 
-      colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Label);
-      colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Header);
-      colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_GeoDiff_Tooltip);
+      colDef.setColumnLabel(Messages.GeoCompare_View_Column_GeoDiff_Absolute_Label);
+      colDef.setColumnHeaderText(Messages.GeoCompare_View_Column_GeoDiff_Absolute_Header);
+      colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_GeoDiff_Absolute_Tooltip);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -3018,7 +3018,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          net.tourbook.ui.UI.showSQLException(e);
       }
 
-      UI.showStatusLineMessage(Messages.GeoCompare_View_Info_FilterSettingsAreSaved);
+      UI.showStatusLineMessage(Messages.GeoCompare_View_Statusline_FilterSettingsAreSaved);
    }
 
    private void onSelect_ComparerItem(final SelectionChangedEvent event) {
