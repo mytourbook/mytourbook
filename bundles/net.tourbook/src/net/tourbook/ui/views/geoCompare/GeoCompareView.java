@@ -3018,7 +3018,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          net.tourbook.ui.UI.showSQLException(e);
       }
 
-      UI.showStatusLineMessage(Messages.GeoCompare_View_Info_FilterSettingsAreSaved);
+      UI.showStatusLineMessage(Messages.GeoCompare_View_Statusline_FilterSettingsAreSaved);
    }
 
    private void onSelect_ComparerItem(final SelectionChangedEvent event) {

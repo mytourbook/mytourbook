@@ -1012,7 +1012,6 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
-   public static String        GeoCompare_View_Info_FilterSettingsAreSaved;
    public static String        GeoCompare_View_Label_GeoParts;
    public static String        GeoCompare_View_Label_GeoParts_Tooltip;
    public static String        GeoCompare_View_Label_PossibleTours;
@@ -1025,6 +1024,7 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
    public static String        GeoCompare_View_State_TourFilter;
+   public static String        GeoCompare_View_Statusline_FilterSettingsAreSaved;
 
    public static String        Graph_Label_Time_Break;
    public static String        Graph_Label_Time_Elapsed;
@@ -1897,9 +1897,9 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateReferenceTour;
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
-   public static String        RefTour_Action_Link2;
-   public static String        RefTour_Action_NavigateNextTour2;
-   public static String        RefTour_Action_NavigatePrevTour2;
+   public static String        RefTour_Action_Link_Tooltip2;
+   public static String        RefTour_Action_NavigateNextTour_Tooltip2;
+   public static String        RefTour_Action_NavigatePrevTour_Tooltip2;
    public static String        RefTour_Action_RenameReferenceTour;
    public static String        RefTour_Action_SaveMarker;
    public static String        RefTour_Action_SaveAndNext;
