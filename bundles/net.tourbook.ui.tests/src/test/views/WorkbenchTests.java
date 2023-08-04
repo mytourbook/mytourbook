@@ -47,8 +47,8 @@ public class WorkbenchTests extends UITest {
    @Test
    void open25DMap() {
 
-      Utils.showViewFromMenu(bot, "Map", "2.5D Tour Map"); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView twoFiveDMapView = Utils.showView(bot, "2.5D Tour Map"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, "Map", Utils.TOURMAP25_VIEW_NAME); //$NON-NLS-1$
+      final SWTBotView twoFiveDMapView = Utils.showView(bot, Utils.TOURMAP25_VIEW_NAME);
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
@@ -62,8 +62,8 @@ public class WorkbenchTests extends UITest {
    @Test
    void open3DMap() {
 
-      Utils.showViewFromMenu(bot, "Map", "3D Tour Map"); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView threeDMapView = Utils.showView(bot, "3D Tour Map"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, "Map", Utils.TOURMAP3_VIEW_NAME); //$NON-NLS-1$
+      final SWTBotView threeDMapView = Utils.showView(bot, Utils.TOURMAP3_VIEW_NAME);
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
