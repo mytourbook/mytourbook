@@ -91,8 +91,8 @@ public class ActionDeletePausesDialog extends Action {
 
       for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
 
-         listPausedTime_Start.remove(index);
-         listPausedTime_End.remove(index);
+         listPausedTime_Start.remove(_tourPausesViewSelectedIndices[index]);
+         listPausedTime_End.remove(_tourPausesViewSelectedIndices[index]);
 
          if (listPausedTime_Data != null && !listPausedTime_Data.isEmpty()) {
 
