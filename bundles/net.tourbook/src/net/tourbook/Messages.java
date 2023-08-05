@@ -1023,6 +1023,9 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingIsCanceled;
    public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
+   public static String        GeoCompare_View_State_TourFilter_Part1;
+   public static String        GeoCompare_View_State_TourFilter_Part2_Visible;
+   public static String        GeoCompare_View_State_TourFilter_Part3_Hidden;
    public static String        GeoCompare_View_Statusline_FilterSettingsAreSaved;
 
    public static String        Graph_Label_Time_Break;

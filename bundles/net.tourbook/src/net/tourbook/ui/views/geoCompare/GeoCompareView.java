@@ -322,6 +322,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private int                             _mouseWheelIncrementer_GeoDiff;
    private int                             _mouseWheelIncrementer_MaxResults;
 
+   private StyledString                    _compareStatusMessage;
+
    /*
     * UI controls
     */
@@ -715,23 +717,22 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                GeoComparedTour[].class);
 
          final int numFilterVisible = _allSortedAndFiltered_GeoComparedTours.length;
+         final int numFilterHidden = _slideoutGeoCompareState.numTours - numFilterVisible;
 
-// TODO         Messages.GeoCompare_View_State_TourFilter,
+         _compareStatusMessage = new StyledString();
 
-         final StyledString styledText = new StyledString();
-
-         styledText.append("Tour filter", _statusDefaultStyler);
-         styledText.append("    ", _statusDefaultStyler);
-         styledText.append(String.format("visible: %d", numFilterVisible), _statusVisibleStyler);
-         styledText.append("    ", _statusDefaultStyler);
-         styledText.append(String.format("hidden: %d", _slideoutGeoCompareState.numTours - numFilterVisible), _statusHiddenStyler);
+         _compareStatusMessage.append(Messages.GeoCompare_View_State_TourFilter_Part1, _statusDefaultStyler);
+         _compareStatusMessage.append(UI.SPACE4, _statusDefaultStyler);
+         _compareStatusMessage.append(String.format(Messages.GeoCompare_View_State_TourFilter_Part2_Visible, numFilterVisible), _statusVisibleStyler);
+         _compareStatusMessage.append(UI.SPACE4, _statusDefaultStyler);
+         _compareStatusMessage.append(String.format(Messages.GeoCompare_View_State_TourFilter_Part3_Hidden, numFilterHidden), _statusHiddenStyler);
 
          if (UI.IS_DARK_THEME) {
             _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
          }
 
-         _txtCompareStatus_Message.setText(styledText.getString());
-         _txtCompareStatus_Message.setStyleRanges(styledText.getStyleRanges());
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
+         _txtCompareStatus_Message.setStyleRanges(_compareStatusMessage.getStyleRanges());
 
          _lblCompareStatus_Icon.setText(UI.SPACE4);
 
@@ -1737,7 +1738,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             .align(SWT.FILL, SWT.END)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_MAGENTA);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          /*
           * Status color
@@ -1753,12 +1754,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          GridDataFactory.fillDefaults().grab(true, false)
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_txtCompareStatus_Message);
-
-//         _txtCompareStatus_Message.setBackground(UI.IS_DARK_THEME
-//               ? ThemeUtil.getDefaultBackgroundColor_Table()
-//               : ThemeUtil.getDefaultBackgroundColor_Shell());
-
-//         _txtCompareStatus_Message.setBackground(UI.SYS_COLOR_MAGENTA);
       }
       {
          /*
@@ -2707,27 +2702,24 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _compareSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CompareValues());
       _filterSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CompareValues());
 
-// TODO
-
-      // must be run async otherwise the colors are not set
+      // must be run async otherwise the theme colors can be null
       parent.getDisplay().asyncExec(() -> {
 
-         final Color styleBackgroundColor = ThemeUtil.getDefaultBackgroundColor_Table();
+         final Color darkBackgroundColor = ThemeUtil.getDefaultBackgroundColor_Table();
 
          _statusDefaultStyler = UI.IS_DARK_THEME
-               ? new SimpleColorStyler(null, styleBackgroundColor)
+               ? new SimpleColorStyler(null, darkBackgroundColor)
                : new SimpleColorStyler(null, null);
 
          // red
          _statusHiddenStyler = UI.IS_DARK_THEME
-               ? new SimpleColorStyler(new Color(255, 88, 88), styleBackgroundColor)
+               ? new SimpleColorStyler(new Color(255, 99, 99), darkBackgroundColor)
                : new SimpleColorStyler(new Color(255, 0, 0), null);
 
          // green
          _statusVisibleStyler = UI.IS_DARK_THEME
-               ? new SimpleColorStyler(new Color(111, 255, 111), styleBackgroundColor)
+               ? new SimpleColorStyler(new Color(111, 255, 111), darkBackgroundColor)
                : new SimpleColorStyler(new Color(0, 155, 0), null);
-
       });
    }
 
@@ -3017,35 +3009,42 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    private void onPart_Activated() {
-      // TODO Auto-generated method stub
 
       if (UI.IS_DARK_THEME) {
 
-         _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
-         _txtCompareStatus_Message.setBackground(UI.SYS_COLOR_CYAN);
+         // set message again to fix dark theme issues, this is not 100% perfect
+         _parent.getDisplay().asyncExec(() -> {
+
+            _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+
+            _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
+            _txtCompareStatus_Message.setStyleRanges(_compareStatusMessage.getStyleRanges());
+         });
 
       } else {
 
          _lblCompareStatus_Icon.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
          _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
-//         _txtCompareStatus_Message.setBackground(UI.SYS_COLOR_DARK_GREEN);
-
       }
    }
 
    private void onPart_Deactivated() {
-      // TODO Auto-generated method stub
 
       if (UI.IS_DARK_THEME) {
 
-         _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
-         _txtCompareStatus_Message.setBackground(UI.SYS_COLOR_CYAN);
+         // set message again to fix dark theme issues, this is not 100% perfect
+         _parent.getDisplay().asyncExec(() -> {
+
+            _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+
+            _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
+            _txtCompareStatus_Message.setStyleRanges(_compareStatusMessage.getStyleRanges());
+         });
 
       } else {
 
          _lblCompareStatus_Icon.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
          _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
-//         _txtCompareStatus_Message.setBackground(UI.SYS_COLOR_CYAN);
       }
    }
 
@@ -3752,7 +3751,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void updateUI_State_CancelComparing() {
 
-      _txtCompareStatus_Message.setText(Messages.GeoCompare_View_State_ComparingIsCanceled);
+      _compareStatusMessage = new StyledString(Messages.GeoCompare_View_State_ComparingIsCanceled);
+      _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
       _lblCompareStatus_Icon.setText(UI.SPACE4);
       _lblCompareStatus_Icon.setBackground(UI.IS_DARK_THEME
@@ -3766,7 +3766,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // start comparing
 
-         _txtCompareStatus_Message.setText(Messages.GeoCompare_View_State_StartComparing);
+         _compareStatusMessage = new StyledString(Messages.GeoCompare_View_State_StartComparing);
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
          _lblCompareStatus_Icon.setText(UI.SPACE4);
          _lblCompareStatus_Icon.setBackground(UI.SYS_COLOR_GREEN);
@@ -3775,7 +3776,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // comparing is done
 
-         _txtCompareStatus_Message.setText(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
+         _compareStatusMessage = new StyledString(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
          _lblCompareStatus_Icon.setText(UI.SYMBOL_HEAVY_CHECK_MARK);
          _lblCompareStatus_Icon.setBackground(UI.IS_DARK_THEME
@@ -3786,7 +3788,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // comparing is in progress
 
-         _txtCompareStatus_Message.setText(String.format(Messages.GeoCompare_View_State_ComparingTours, workedTours, numTours));
+         _compareStatusMessage = new StyledString(String.format(Messages.GeoCompare_View_State_ComparingTours, workedTours, numTours));
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
          _lblCompareStatus_Icon.setText(UI.SPACE4);
          _lblCompareStatus_Icon.setBackground(COLOR_COMPARING_TOURS);
