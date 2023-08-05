@@ -29,15 +29,16 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionDeletePausesDialog extends Action {
 
-   private ITourProvider _tourProvider;
-   private int[]         _tourPausesViewSelectedIndices;
-   private List<String>  _tourPausesViewSelectedPausesStartEndTimes;
+   private static final String PAUSES_LIST = "%8s\t%10s   ... %10s\t\t%10s    ... %14s\n"; //$NON-NLS-1$
+
+   private ITourProvider       _tourProvider;
+   private int[]               _tourPausesViewSelectedIndices;
+   private List<String>        _tourPausesViewSelectedPausesStartEndTimes;
 
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
 
@@ -70,19 +71,28 @@ public class ActionDeletePausesDialog extends Action {
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
       final StringBuilder dialogMessage = new StringBuilder();
-      dialogMessage.append(Messages.Dialog_DeleteTourPauses_Message_Part1);
 
-      for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 2) {
+      dialogMessage.append(Messages.Dialog_DeleteTourPauses_Message);
+      dialogMessage.append(UI.NEW_LINE);
+      dialogMessage.append(UI.NEW_LINE);
 
-         dialogMessage.append(UI.NEW_LINE + NLS.bind(Messages.Dialog_DeleteTourPauses_Message_Part2,
+      for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 5) {
+
+         dialogMessage.append(String.format(PAUSES_LIST,
+
                _tourPausesViewSelectedPausesStartEndTimes.get(index),
-               _tourPausesViewSelectedPausesStartEndTimes.get(index + 1)));
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 1),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 2),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 3),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 4) //
+         ));
       }
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
             dialogTitle,
             dialogMessage.toString())) {
+
          return;
       }
 

@@ -134,24 +134,24 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private class DevicePause {
 
-      private long _type;
+      private long type;
 
-      private long _relativeStartTime;
-      private long _relativeEndTime;
+      private long relativeStartTime;
+      private long relativeEndTime;
 
-      private int  _serieIndex;
+      private int  serieIndex;
 
       private DevicePause(final long type,
                           final long relativeStartTime,
                           final long relativeEndTime,
                           final int serieIndex) {
 
-         _type = type;
+         this.type = type;
 
-         _relativeStartTime = relativeStartTime;
-         _relativeEndTime = relativeEndTime;
+         this.relativeStartTime = relativeStartTime;
+         this.relativeEndTime = relativeEndTime;
 
-         _serieIndex = serieIndex;
+         this.serieIndex = serieIndex;
       }
    }
 
@@ -163,7 +163,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         return (int) (((DevicePause) (obj1))._relativeStartTime - ((DevicePause) (obj2))._relativeStartTime);
+         return (int) (((DevicePause) (obj1)).relativeStartTime - ((DevicePause) (obj2)).relativeStartTime);
       }
    }
 
@@ -367,14 +367,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       _postSelectionProvider.clearSelection();
    }
 
-   private String computePauseEndTime(final DevicePause pause) {
-      return _tourStartTime.plusSeconds(pause._relativeEndTime).format(TimeTools.Formatter_Time_M);
-   }
-
-   private String computePauseStartTime(final DevicePause pause) {
-      return _tourStartTime.plusSeconds(pause._relativeStartTime).format(TimeTools.Formatter_Time_M);
-   }
-
    private void createActions() {
 
       _subMenu_SetPauseType = new SubMenu_SetPausesType(this, false);
@@ -506,6 +498,40 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       return tableContextMenu;
    }
 
+   private String createUI_Pause_Absolute_EndTime(final DevicePause pause) {
+
+      return _tourStartTime.plusSeconds(pause.relativeEndTime).format(TimeTools.Formatter_Time_M);
+   }
+
+   private String createUI_Pause_Absolute_StartTime(final DevicePause pause) {
+
+      return _tourStartTime.plusSeconds(pause.relativeStartTime).format(TimeTools.Formatter_Time_M);
+   }
+
+   private String createUI_Pause_Duration(final DevicePause pause) {
+
+      return UI.format_hh_mm_ss(pause.relativeEndTime - pause.relativeStartTime);
+   }
+
+   private String createUI_Pause_Relative_EndTime(final DevicePause pause) {
+
+      return UI.format_hh_mm_ss(pause.relativeEndTime);
+   }
+
+   private String createUI_Pause_Relative_StartTime(final DevicePause pause) {
+
+      final long relativeStartTime = pause.relativeStartTime;
+
+      final String timePrefix = relativeStartTime < 0
+
+            // a pause can begin before the tour start time
+            ? UI.SYMBOL_MINUS
+
+            : UI.EMPTY_STRING;
+
+      return timePrefix + UI.format_hh_mm_ss(Math.abs(relativeStartTime));
+   }
+
    private void defineAllColumns() {
 
       defineColumn_PauseDuration();
@@ -540,7 +566,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(UI.format_hh_mm_ss(pause._relativeEndTime - pause._relativeStartTime));
+            cell.setText(createUI_Pause_Duration(pause));
          }
       });
    }
@@ -567,7 +593,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(pause._type == 0 ? Messages.Tour_Pauses_Column_TypeValue_Manual : Messages.Tour_Pauses_Column_TypeValue_Automatic);
+            cell.setText(pause.type == 0
+                  ? Messages.Tour_Pauses_Column_TypeValue_Manual
+                  : Messages.Tour_Pauses_Column_TypeValue_Automatic);
          }
       });
    }
@@ -593,9 +621,8 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(computePauseEndTime(pause));
+            cell.setText(createUI_Pause_Absolute_EndTime(pause));
          }
-
       });
    }
 
@@ -620,7 +647,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(computePauseStartTime(pause));
+            cell.setText(createUI_Pause_Absolute_StartTime(pause));
          }
       });
    }
@@ -647,8 +674,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(UI.format_hh_mm_ss(pause._relativeEndTime));
+            cell.setText(createUI_Pause_Relative_EndTime(pause));
          }
+
       });
    }
 
@@ -674,17 +702,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            final long relativeStartTime = pause._relativeStartTime;
-
-            final String timePrefix = relativeStartTime < 0
-
-                  // a pause can begin before the tour start time
-                  ? UI.SYMBOL_MINUS
-
-                  : UI.EMPTY_STRING;
-
-            cell.setText(timePrefix + UI.format_hh_mm_ss(Math.abs(relativeStartTime)));
+            cell.setText(createUI_Pause_Relative_StartTime(pause));
          }
+
       });
    }
 
@@ -748,7 +768,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = devicePause._serieIndex;
+            final int serieIndexFirst = devicePause.serieIndex;
 
             /*
              * Position slider at the beginning of the slice so that each slice borders has an
@@ -768,13 +788,13 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = devicePause._serieIndex;
+            final int serieIndexFirst = devicePause.serieIndex;
 
             /*
              * Position slider at the beginning of the first slice
              */
             serieIndex1 = serieIndexFirst > 0 ? serieIndexFirst - 1 : 0;
-            serieIndex2 = ((DevicePause) selectedPauses[numSelectedSlices - 1])._serieIndex;
+            serieIndex2 = ((DevicePause) selectedPauses[numSelectedSlices - 1]).serieIndex;
          }
       }
 
@@ -1002,8 +1022,12 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          final TableItem item = items[selectedIndex];
          final DevicePause devicePause = (DevicePause) item.getData();
-         tourPausesViewSelectedPausesStartEndTimes.add(computePauseStartTime(devicePause));
-         tourPausesViewSelectedPausesStartEndTimes.add(computePauseEndTime(devicePause));
+
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Duration(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Relative_StartTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Relative_EndTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Absolute_StartTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Absolute_EndTime(devicePause));
       }
       _actionDeleteTourPauses.setTourPausesStartEndTimes(tourPausesViewSelectedPausesStartEndTimes);
    }
