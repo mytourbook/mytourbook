@@ -5201,7 +5201,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                // set speed for the last interval
                || serieIndex == numTimeSlices - 1) {
 
-            final double travelTime = currentTime - intervalStartTime - intervalBreakTime;
+            final int travelTime = currentTime - intervalStartTime - intervalBreakTime;
             final float travelDistance = tourDistance - intervalStartDistance;
 
             final float speed_Metric = travelTime == 0
