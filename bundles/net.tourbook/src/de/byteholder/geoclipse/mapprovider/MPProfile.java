@@ -466,7 +466,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
 
          StatusUtil.showStatus(
                NLS.bind(
-                     Messages.DBG056_MapProfile_WrongClassForMapProvider,
+                     Messages.Error_MapProfile_WrongClassForMapProvider_DBG056,
                      new Object[] { mpWrapper.getMapProviderId(), wrapperClassName, validClassName }),
                new Exception());
 
@@ -554,7 +554,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
              */
             final StringBuilder sb = new StringBuilder();
 
-            sb.append(NLS.bind(Messages.DBG055_MapProfile_InvalidMapProvider, getName()));
+            sb.append(NLS.bind(Messages.Error_MapProfile_InvalidMapProvider_DBG055, getName()));
 
             for (final MPWrapper mpWrapper : remainingMpWrappers) {
                sb.append(mpWrapper.getMapProviderId());

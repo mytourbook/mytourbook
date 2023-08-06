@@ -55,34 +55,34 @@ public class WmsServerWrapper {
          } catch (final MalformedURLException e) {
 
             exception[0] = e;
-            message[0] = NLS.bind(Messages.DBG028_Wms_Server_Error_MalformedUrl, e.getMessage(), capsUrl);
+            message[0] = NLS.bind(Messages.Error_WmsServer_MalformedUrl_DBG028, e.getMessage(), capsUrl);
 
          } catch (final FileNotFoundException e) {
 
             exception[0] = e;
-            message[0] = NLS.bind(Messages.DBG029_Wms_Server_Error_FileNotFound, e.getMessage(), capsUrl);
+            message[0] = NLS.bind(Messages.Error_WmsServer_FileNotFound_DBG029, e.getMessage(), capsUrl);
 
          } catch (final UnknownHostException e) {
 
             exception[0] = e;
             message[0] = NLS.bind(
-                  Messages.DBG030_Wms_Server_Error_CannotConnectToServer,
+                  Messages.Error_WmsServer_CannotConnectToServer_DBG030,
                   e.getMessage(),
                   capsUrl);
 
          } catch (final IOException e) {
 
             exception[0] = e;
-            message[0] = NLS.bind(Messages.DBG031_Wms_Server_Error_IoException, e.getMessage(), capsUrl);
+            message[0] = NLS.bind(Messages.Error_WmsServer_IoException_DBG031, e.getMessage(), capsUrl);
 
          } catch (final ServiceException e) {
 
             exception[0] = e;
-            message[0] = NLS.bind(Messages.DBG032_Wms_Server_Error_ServiceException, e.getMessage(), capsUrl);
+            message[0] = NLS.bind(Messages.Error_WmsServer_ServiceException_DBG032, e.getMessage(), capsUrl);
 
          } catch (final Exception e) {
             exception[0] = e;
-            message[0] = NLS.bind(Messages.DBG033_Wms_Server_Error_OtherException, e.getMessage(), capsUrl);
+            message[0] = NLS.bind(Messages.Error_WmsServer_OtherException_DBG033, e.getMessage(), capsUrl);
          }
       });
 

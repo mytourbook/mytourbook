@@ -293,7 +293,7 @@ public class MPWms extends MP implements ITileLoader {
       }
 
       if (visibleLayers == 0) {
-         throw new GeoException(NLS.bind(Messages.DBG043_Wms_Server_Error_CannotConnectToServer, getId()));
+         throw new GeoException(NLS.bind(Messages.Error_WmsServer_CannotConnectToServer_DBG043, getId()));
       }
 
       final int imageSize = getTileSize();
@@ -324,25 +324,25 @@ public class MPWms extends MP implements ITileLoader {
 
       } catch (final NoRouteToHostException e) {
          throw new GeoException(NLS.bind(
-               Messages.DBG035_Wms_Server_Error_CannotConnectToServer,
+               Messages.Error_WmsServer_CannotConnectToServer_DBG035,
                e.getMessage(),
                finalUrl), e);
 
       } catch (final IOException e) {
          throw new GeoException(NLS.bind(//
-               Messages.DBG036_Wms_Server_Error_IoException,
+               Messages.Error_WmsServer_IoException_DBG036,
                e.getMessage(),
                finalUrl), e);
 
       } catch (final ServiceException e) {
          throw new GeoException(NLS.bind(//
-               Messages.DBG037_Wms_Server_Error_ServiceException,
+               Messages.Error_WmsServer_ServiceException_DBG037,
                e.getMessage(),
                finalUrl), e);
 
       } catch (final Exception e) {
          throw new GeoException(NLS.bind(//
-               Messages.DBG038_Wms_Server_Error_CannotLoadImage,
+               Messages.Error_WmsServer_CannotLoadImage_DBG038,
                finalUrl), e);
       }
    }
