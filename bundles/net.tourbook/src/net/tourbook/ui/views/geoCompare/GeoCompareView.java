@@ -3013,7 +3013,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (UI.IS_DARK_THEME) {
 
          // set message again to fix dark theme issues, this is not 100% perfect
-         _parent.getDisplay().asyncExec(() -> {
+         _display.asyncExec(() -> {
+
+            if (_display.isDisposed()) {
+               return;
+            }
 
             _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
 
@@ -3033,7 +3037,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (UI.IS_DARK_THEME) {
 
          // set message again to fix dark theme issues, this is not 100% perfect
-         _parent.getDisplay().asyncExec(() -> {
+         _display.asyncExec(() -> {
+
+            if (_display.isDisposed()) {
+               return;
+            }
 
             _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
 
