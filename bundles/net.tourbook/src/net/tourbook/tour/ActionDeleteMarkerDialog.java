@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
@@ -40,9 +42,6 @@ public class ActionDeleteMarkerDialog extends Action {
    private ITourProvider         _tourProvider;
    private ArrayList<TourMarker> _tourMarkers;
 
-   /**
-    * @param tourProvider
-    */
    public ActionDeleteMarkerDialog(final ITourProvider tourProvider) {
 
       _tourProvider = tourProvider;
@@ -54,33 +53,33 @@ public class ActionDeleteMarkerDialog extends Action {
       setEnabled(false);
    }
 
-   private static void doAction(final ITourProvider tourProvider,
-                                final ArrayList<TourMarker> selectedTourMarkers) {
+   private void doAction() {
 
-      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       // check if one tour is selected
       if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null ||
-            selectedTourMarkers == null || selectedTourMarkers.isEmpty() || selectedTourMarkers.get(0) == null) {
+            _tourMarkers == null || _tourMarkers.isEmpty() || _tourMarkers.get(0) == null) {
          return;
       }
 
       final TourData tourData = selectedTours.get(0);
 
       if (tourData.isManualTour()) {
-         // a manually created tour do not have time slices -> no markers
+         // a manually created tour does not have time slices -> no markers
          return;
       }
 
       String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
-      String dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel());
+      String dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (_tourMarkers.get(0)).getLabel());
 
-      if (selectedTourMarkers.size() > 1) {
+      if (_tourMarkers.size() > 1) {
          dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
 
          final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
-         for (final TourMarker tourMarker : selectedTourMarkers) {
-            if (markersNames.toString().isEmpty() == false) {
+         for (final TourMarker tourMarker : _tourMarkers) {
+
+            if (StringUtils.hasContent(markersNames.toString())) {
                markersNames.append(UI.COMMA_SPACE);
             }
             markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -97,7 +96,7 @@ public class ActionDeleteMarkerDialog extends Action {
 
       final List<TourMarker> _originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
 
-      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
+      for (final TourMarker selectedTourMarker : _tourMarkers) {
          _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
       }
 
@@ -115,16 +114,14 @@ public class ActionDeleteMarkerDialog extends Action {
 
    @Override
    public void run() {
-      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider, _tourMarkers));
+      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction());
 
    }
 
    public void setTourMarkers(final Object[] tourMarkers) {
+
       _tourMarkers = new ArrayList<>();
 
-      for (final Object tourMarker : tourMarkers) {
-         _tourMarkers.add((TourMarker) tourMarker);
-      }
+      Arrays.stream(tourMarkers).forEach(tourMarker -> _tourMarkers.add((TourMarker) tourMarker));
    }
-
 }

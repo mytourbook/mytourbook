@@ -45,6 +45,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.ui.SelectionCellLabelProvider;
+import net.tourbook.common.ui.SimpleColorStyler;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
@@ -96,6 +97,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -103,6 +105,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -212,6 +215,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private static final NumberFormat _nf0             = NumberFormat.getNumberInstance();
    private static final NumberFormat _nf1             = NumberFormat.getNumberInstance();
 
+   private static SimpleColorStyler  _statusDefaultStyler;
+   private static SimpleColorStyler  _statusHiddenStyler;
+   private static SimpleColorStyler  _statusVisibleStyler;
+
    static {
 
       _nf0.setMinimumFractionDigits(0);
@@ -315,56 +322,59 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private int                             _mouseWheelIncrementer_GeoDiff;
    private int                             _mouseWheelIncrementer_MaxResults;
 
+   private StyledString                    _compareStatusMessage;
+
    /*
     * UI controls
     */
-   private Display   _display;
+   private Display    _display;
 
-   private Composite _parent;
-   private Composite _viewerContainer;
+   private Composite  _parent;
+   private Composite  _viewerContainer;
 
-   private PageBook  _pageBook;
-   private Composite _pageCompareResult;
-   private Composite _pageMultipleTours;
-   private Composite _pageSelectTourWithGeoData;
+   private PageBook   _pageBook;
+   private Composite  _pageCompareResult;
+   private Composite  _pageMultipleTours;
+   private Composite  _pageSelectTourWithGeoData;
 
-   private Button    _btnSaveFilterSettings;
-   private Button    _chkTourFilter_ElevationDiff;
-   private Button    _chkTourFilter_GeoDiff;
-   private Button    _chkTourFilter_MaxResults;
+   private Button     _btnSaveFilterSettings;
+   private Button     _chkTourFilter_ElevationDiff;
+   private Button     _chkTourFilter_GeoDiff;
+   private Button     _chkTourFilter_MaxResults;
 
-   private Combo     _comboMouseWheelIncrementer_ElevationDiff;
-   private Combo     _comboMouseWheelIncrementer_GeoDiff;
-   private Combo     _comboMouseWheelIncrementer_MaxResults;
+   private Combo      _comboMouseWheelIncrementer_ElevationDiff;
+   private Combo      _comboMouseWheelIncrementer_GeoDiff;
+   private Combo      _comboMouseWheelIncrementer_MaxResults;
 
-   private Label     _lblCompareStatus_Icon;
-   private Label     _lblCompareStatus_Message;
-   private Label     _lblNumGeoGrids;
-   private Label     _lblNumGeoGrids_Value;
-   private Label     _lblNumSlices;
-   private Label     _lblNumSlices_Value;
-   private Label     _lblNumTours;
-   private Label     _lblNumTours_Value;
-   private Label     _lblStartEndIndex;
-   private Label     _lblStartEndIndex_Value;
-   private Label     _lblTitle;
-   private Label     _lblTourFilter_ElevationDiff_Unit;
-   private Label     _lblTourFilter_GeoDiff_Unit;
-   private Label     _lblTourFilter_MaxResults_Unit;
+   private Label      _lblCompareStatus_Icon;
+   private Label      _lblNumGeoGrids;
+   private Label      _lblNumGeoGrids_Value;
+   private Label      _lblNumSlices;
+   private Label      _lblNumSlices_Value;
+   private Label      _lblNumTours;
+   private Label      _lblNumTours_Value;
+   private Label      _lblStartEndIndex;
+   private Label      _lblStartEndIndex_Value;
+   private Label      _lblTitle;
+   private Label      _lblTourFilter_ElevationDiff_Unit;
+   private Label      _lblTourFilter_GeoDiff_Unit;
+   private Label      _lblTourFilter_MaxResults_Unit;
 
-   private Spinner   _spinnerTourFilter_ElevationDiff;
-   private Spinner   _spinnerTourFilter_GeoDiff;
-   private Spinner   _spinnerTourFilter_MaxResults;
+   private StyledText _txtCompareStatus_Message;
 
-   private Menu      _tableContextMenu;
+   private Spinner    _spinnerTourFilter_ElevationDiff;
+   private Spinner    _spinnerTourFilter_GeoDiff;
+   private Spinner    _spinnerTourFilter_MaxResults;
 
-   private Image     _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.TourCompare_GeoCompare_RefTour).createImage();
-   private Image     _imageCompareType_RefTour     = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
-   private Image     _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
-   private Image     _imageOptions_Enabled         = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-   private Image     _imageOptions_Disabled        = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+   private Menu       _tableContextMenu;
 
-   private CLabel    _iconCompareType;
+   private Image      _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.TourCompare_GeoCompare_RefTour).createImage();
+   private Image      _imageCompareType_RefTour     = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
+   private Image      _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
+   private Image      _imageOptions_Enabled         = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+   private Image      _imageOptions_Disabled        = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+
+   private CLabel     _iconCompareType;
 
    private class ActionAppTourFilter extends Action {
 
@@ -707,20 +717,27 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                GeoComparedTour[].class);
 
          final int numFilterVisible = _allSortedAndFiltered_GeoComparedTours.length;
+         final int numFilterHidden = _slideoutGeoCompareState.numTours - numFilterVisible;
 
-         _lblCompareStatus_Message.setText(String.format(
-               Messages.GeoCompare_View_State_TourFilter,
-               numFilterVisible,
-               _slideoutGeoCompareState.numTours - numFilterVisible));
+         _compareStatusMessage = new StyledString();
+
+         _compareStatusMessage.append(Messages.GeoCompare_View_State_TourFilter_Part1, _statusDefaultStyler);
+         _compareStatusMessage.append(UI.SPACE4, _statusDefaultStyler);
+         _compareStatusMessage.append(String.format(Messages.GeoCompare_View_State_TourFilter_Part2_Visible, numFilterVisible), _statusVisibleStyler);
+         _compareStatusMessage.append(UI.SPACE4, _statusDefaultStyler);
+         _compareStatusMessage.append(String.format(Messages.GeoCompare_View_State_TourFilter_Part3_Hidden, numFilterHidden), _statusHiddenStyler);
+
+         if (UI.IS_DARK_THEME) {
+            _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+         }
+
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
+         _txtCompareStatus_Message.setStyleRanges(_compareStatusMessage.getStyleRanges());
 
          _lblCompareStatus_Icon.setText(UI.SPACE4);
-         _lblCompareStatus_Icon.setBackground(UI.IS_DARK_THEME
-               ? ThemeUtil.getDefaultBackgroundColor_Table()
-               : ThemeUtil.getDefaultBackgroundColor_Shell());
 
          return allSortedAndFiltered_GeoComparedTours;
       }
-
    }
 
    private enum InvalidData {
@@ -760,21 +777,40 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == GeoCompareView.this) {
+
+               onPart_Activated();
+            }
+         }
 
          @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == GeoCompareView.this) {
+
+               onPart_Activated();
+            }
+         }
 
          @Override
          public void partClosed(final IWorkbenchPartReference partRef) {
 
             if (partRef.getPart(false) == GeoCompareView.this) {
+
                setState_StopComparing();
             }
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == GeoCompareView.this) {
+
+               onPart_Deactivated();
+            }
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {}
@@ -1702,7 +1738,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             .align(SWT.FILL, SWT.END)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_MAGENTA);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          /*
           * Status color
@@ -1712,12 +1748,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
       {
          /*
-          * Label: Status message
+          * Styled Text: Status message
           */
-         _lblCompareStatus_Message = new Label(container, SWT.NONE);
+         _txtCompareStatus_Message = new StyledText(container, SWT.READ_ONLY);
          GridDataFactory.fillDefaults().grab(true, false)
                .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblCompareStatus_Message);
+               .applyTo(_txtCompareStatus_Message);
       }
       {
          /*
@@ -2418,7 +2454,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _chkTourFilter_GeoDiff                    .setEnabled(isGeoCompareON);
       _chkTourFilter_MaxResults                 .setEnabled(isGeoCompareON);
 
-      _lblCompareStatus_Message                 .setEnabled(isGeoCompareON);
+      _txtCompareStatus_Message                 .setEnabled(isGeoCompareON);
       _lblNumGeoGrids                           .setEnabled(isGeoCompareON);
       _lblNumGeoGrids_Value                     .setEnabled(isGeoCompareON);
       _lblNumSlices                             .setEnabled(isGeoCompareON);
@@ -2665,6 +2701,26 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
       _compareSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CompareValues());
       _filterSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CompareValues());
+
+      // must be run async otherwise the theme colors can be null
+      parent.getDisplay().asyncExec(() -> {
+
+         final Color darkBackgroundColor = ThemeUtil.getDefaultBackgroundColor_Table();
+
+         _statusDefaultStyler = UI.IS_DARK_THEME
+               ? new SimpleColorStyler(null, darkBackgroundColor)
+               : new SimpleColorStyler(null, null);
+
+         // red
+         _statusHiddenStyler = UI.IS_DARK_THEME
+               ? new SimpleColorStyler(new Color(255, 99, 99), darkBackgroundColor)
+               : new SimpleColorStyler(new Color(255, 0, 0), null);
+
+         // green
+         _statusVisibleStyler = UI.IS_DARK_THEME
+               ? new SimpleColorStyler(new Color(111, 255, 111), darkBackgroundColor)
+               : new SimpleColorStyler(new Color(0, 155, 0), null);
+      });
    }
 
    private boolean isIgnorePart(final IWorkbenchPart part, final ISelection selection) {
@@ -2949,6 +3005,54 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
             }
          }
+      }
+   }
+
+   private void onPart_Activated() {
+
+      if (UI.IS_DARK_THEME) {
+
+         // set message again to fix dark theme issues, this is not 100% perfect
+         _display.asyncExec(() -> {
+
+            if (_display.isDisposed()) {
+               return;
+            }
+
+            _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+
+            _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
+            _txtCompareStatus_Message.setStyleRanges(_compareStatusMessage.getStyleRanges());
+         });
+
+      } else {
+
+         _lblCompareStatus_Icon.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+         _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+      }
+   }
+
+   private void onPart_Deactivated() {
+
+      if (UI.IS_DARK_THEME) {
+
+         // set message again to fix dark theme issues, this is not 100% perfect
+         _display.asyncExec(() -> {
+
+            if (_display.isDisposed()) {
+               return;
+            }
+
+            _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Table());
+
+            _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
+            _txtCompareStatus_Message.setStyleRanges(_compareStatusMessage.getStyleRanges());
+         });
+
+      } else {
+
+         _lblCompareStatus_Icon.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
+         _txtCompareStatus_Message.setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
       }
    }
 
@@ -3655,7 +3759,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private void updateUI_State_CancelComparing() {
 
-      _lblCompareStatus_Message.setText(Messages.GeoCompare_View_State_ComparingIsCanceled);
+      _compareStatusMessage = new StyledString(Messages.GeoCompare_View_State_ComparingIsCanceled);
+      _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
       _lblCompareStatus_Icon.setText(UI.SPACE4);
       _lblCompareStatus_Icon.setBackground(UI.IS_DARK_THEME
@@ -3669,7 +3774,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // start comparing
 
-         _lblCompareStatus_Message.setText(Messages.GeoCompare_View_State_StartComparing);
+         _compareStatusMessage = new StyledString(Messages.GeoCompare_View_State_StartComparing);
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
          _lblCompareStatus_Icon.setText(UI.SPACE4);
          _lblCompareStatus_Icon.setBackground(UI.SYS_COLOR_GREEN);
@@ -3678,7 +3784,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // comparing is done
 
-         _lblCompareStatus_Message.setText(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
+         _compareStatusMessage = new StyledString(String.format(Messages.GeoCompare_View_State_CompareResult, numTours));
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
          _lblCompareStatus_Icon.setText(UI.SYMBOL_HEAVY_CHECK_MARK);
          _lblCompareStatus_Icon.setBackground(UI.IS_DARK_THEME
@@ -3689,7 +3796,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // comparing is in progress
 
-         _lblCompareStatus_Message.setText(String.format(Messages.GeoCompare_View_State_ComparingTours, workedTours, numTours));
+         _compareStatusMessage = new StyledString(String.format(Messages.GeoCompare_View_State_ComparingTours, workedTours, numTours));
+         _txtCompareStatus_Message.setText(_compareStatusMessage.getString());
 
          _lblCompareStatus_Icon.setText(UI.SPACE4);
          _lblCompareStatus_Icon.setBackground(COLOR_COMPARING_TOURS);

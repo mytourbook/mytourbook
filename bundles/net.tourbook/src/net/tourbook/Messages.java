@@ -505,8 +505,7 @@ public class Messages extends NLS {
 
    public static String        Dialog_DeleteData_Title;
 
-   public static String        Dialog_DeleteTourPauses_Message_Part1;
-   public static String        Dialog_DeleteTourPauses_Message_Part2;
+   public static String        Dialog_DeleteTourPauses_Message;
    public static String        Dialog_DeleteTourPauses_Title;
 
    public static String        Dialog_DeleteTourValues_Action_OpenDialog;
@@ -1023,7 +1022,9 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingIsCanceled;
    public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
-   public static String        GeoCompare_View_State_TourFilter;
+   public static String        GeoCompare_View_State_TourFilter_Part1;
+   public static String        GeoCompare_View_State_TourFilter_Part2_Visible;
+   public static String        GeoCompare_View_State_TourFilter_Part3_Hidden;
    public static String        GeoCompare_View_Statusline_FilterSettingsAreSaved;
 
    public static String        Graph_Label_Time_Break;

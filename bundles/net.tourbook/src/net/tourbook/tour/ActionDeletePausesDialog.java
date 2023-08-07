@@ -29,15 +29,16 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionDeletePausesDialog extends Action {
 
-   private ITourProvider _tourProvider;
-   private int[]         _tourPausesViewSelectedIndices;
-   private List<String>  _tourPausesViewSelectedPausesStartEndTimes;
+   private static final String PAUSES_LIST = "%8s\t%10s   ... %10s\t\t%10s    ... %14s\n"; //$NON-NLS-1$
+
+   private ITourProvider       _tourProvider;
+   private int[]               _tourPausesViewSelectedIndices;
+   private List<String>        _tourPausesViewSelectedPausesStartEndTimes;
 
    public ActionDeletePausesDialog(final ITourProvider tourProvider) {
 
@@ -50,51 +51,64 @@ public class ActionDeletePausesDialog extends Action {
       setEnabled(false);
    }
 
-   private void doAction(final ITourProvider tourProvider) {
+   private void doAction() {
 
-      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       // check that only one tour is selected
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
+      if (selectedTours == null || selectedTours.size() != 1) {
          return;
       }
 
       final TourData tourData = selectedTours.get(0);
 
-      if (tourData.isManualTour()) {
-         // a manually created tour do not have time slices -> no  pauses
+      if (tourData == null || tourData.isManualTour()) {
+
+         // a manually created tour does not have time slices -> no  pauses
          return;
       }
 
       final String dialogTitle = Messages.Dialog_DeleteTourPauses_Title;
 
       final StringBuilder dialogMessage = new StringBuilder();
-      dialogMessage.append(Messages.Dialog_DeleteTourPauses_Message_Part1);
 
-      for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 2) {
+      dialogMessage.append(Messages.Dialog_DeleteTourPauses_Message);
+      dialogMessage.append(UI.NEW_LINE);
+      dialogMessage.append(UI.NEW_LINE);
 
-         dialogMessage.append(UI.SYSTEM_NEW_LINE + NLS.bind(Messages.Dialog_DeleteTourPauses_Message_Part2,
+      for (int index = 0; index < _tourPausesViewSelectedPausesStartEndTimes.size(); index += 5) {
+
+         dialogMessage.append(String.format(PAUSES_LIST,
+
                _tourPausesViewSelectedPausesStartEndTimes.get(index),
-               _tourPausesViewSelectedPausesStartEndTimes.get(index + 1)));
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 1),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 2),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 3),
+               _tourPausesViewSelectedPausesStartEndTimes.get(index + 4) //
+         ));
       }
 
       if (!MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
             dialogTitle,
             dialogMessage.toString())) {
+
          return;
       }
 
       final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed().collect(Collectors.toList());
       final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed().collect(Collectors.toList());
-      final List<Long> listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().collect(Collectors.toList());
+      List<Long> listPausedTime_Data = null;
 
       for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
 
-         listPausedTime_Start.remove(index);
-         listPausedTime_End.remove(index);
+         listPausedTime_Start.remove(_tourPausesViewSelectedIndices[index]);
+         listPausedTime_End.remove(_tourPausesViewSelectedIndices[index]);
 
-         if (listPausedTime_Data != null && !listPausedTime_Data.isEmpty()) {
+         final var pausedTime_Data = tourData.getPausedTime_Data();
+         if (pausedTime_Data != null && pausedTime_Data.length > 0) {
+
+            listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().collect(Collectors.toList());
 
             listPausedTime_Data.remove(index);
          }
@@ -117,7 +131,7 @@ public class ActionDeletePausesDialog extends Action {
 
    @Override
    public void run() {
-      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction(_tourProvider));
+      BusyIndicator.showWhile(Display.getCurrent(), () -> doAction());
    }
 
    public void setTourPauses(final int[] tourPausesViewSelectedIndices) {

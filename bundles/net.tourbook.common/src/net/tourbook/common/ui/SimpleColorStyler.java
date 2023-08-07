@@ -13,29 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.common.ui;
 
-import net.tourbook.common.ui.SelectionCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.TextStyle;
 
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.swt.graphics.Point;
+public class SimpleColorStyler extends Styler {
 
-public abstract class TourInfoToolTip_CustomSelection_CellLabelProvider
+   private final Color _foregroundColor;
+   private final Color _backgroundColor;
 
-      extends SelectionCellLabelProvider
-      implements IColumnViewerTourIdProvider {
+   public SimpleColorStyler(final Color foregroundColor,
+                            final Color backgroundColor) {
 
-   @Override
-   public Object getData(final ViewerCell cell) {
-      return null;
+      _foregroundColor = foregroundColor;
+      _backgroundColor = backgroundColor;
    }
 
    @Override
-   public Point getToolTipShift(final Object object) {
-      return new Point(1, 0);
+   public void applyStyles(final TextStyle textStyle) {
+
+      if (_foregroundColor != null) {
+         textStyle.foreground = _foregroundColor;
+      }
+
+      if (_backgroundColor != null) {
+         textStyle.background = _backgroundColor;
+      }
    }
-
-   @Override
-   public abstract Long getTourId(final ViewerCell cell);
-
 }
