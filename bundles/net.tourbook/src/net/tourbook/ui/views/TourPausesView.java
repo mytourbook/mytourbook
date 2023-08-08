@@ -449,6 +449,10 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             }
 
             final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+            if (selectedIndices.length == 0) {
+               return;
+            }
+
             setupPausesToDelete(selectedIndices);
 
             _actionDeleteTourPauses.run();
