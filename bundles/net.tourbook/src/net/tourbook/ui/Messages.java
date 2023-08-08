@@ -564,6 +564,7 @@ public class Messages extends NLS {
    public static String        Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
    public static String        Tour_Tooltip_Action_EditFormatPreferences;
+   public static String        Tour_Tooltip_Combo_UIWidthSize_Tooltip;
    public static String        Tour_Tooltip_Format_DateWeekTime;
    public static String        Tour_Tooltip_Format_HistoryDateTime;
    public static String        Tour_Tooltip_Format_Pace;
