@@ -22,6 +22,8 @@ import net.tourbook.common.util.Util;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
@@ -78,7 +80,13 @@ public class PositionedWizardDialog extends WizardDialog {
 
       super.configureShell(shell);
 
-      shell.addDisposeListener(disposeEvent -> onDispose());
+      shell.addDisposeListener(new DisposeListener() {
+
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
    }
 
    @Override
