@@ -949,7 +949,7 @@ public class ChartComponentGraph extends Canvas {
       double valueHalf;
 
       /*
-       * get the marker positon for the next value
+       * get the marker position for the next value
        */
       if (valueDraggingDiff > 0) {
 

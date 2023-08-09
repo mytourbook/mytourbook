@@ -146,7 +146,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
    private boolean                           _isDataDirty;
 
    /*
-    * 3 positons for the marker are available: computed, default(saved) and moved
+    * 3 positions for the marker are available: computed, default(saved) and moved
     */
    private int    _computedStartIndex;
    private int    _computedEndIndex;
