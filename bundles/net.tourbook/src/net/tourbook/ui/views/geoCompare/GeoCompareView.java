@@ -2713,12 +2713,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // red
          _statusHiddenStyler = UI.IS_DARK_THEME
-               ? new SimpleColorStyler(new Color(255, 99, 99), darkBackgroundColor)
+               ? new SimpleColorStyler(new Color(255, 66, 66), darkBackgroundColor)
                : new SimpleColorStyler(new Color(255, 0, 0), null);
 
          // green
          _statusVisibleStyler = UI.IS_DARK_THEME
-               ? new SimpleColorStyler(new Color(111, 255, 111), darkBackgroundColor)
+               ? new SimpleColorStyler(new Color(66, 255, 66), darkBackgroundColor)
                : new SimpleColorStyler(new Color(0, 155, 0), null);
       });
    }
@@ -3039,7 +3039,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          // set message again to fix dark theme issues, this is not 100% perfect
          _display.asyncExec(() -> {
 
-            if (_display.isDisposed()) {
+            if (_txtCompareStatus_Message.isDisposed()) {
                return;
             }
 
