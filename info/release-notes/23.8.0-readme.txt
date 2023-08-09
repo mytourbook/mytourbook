@@ -86,6 +86,8 @@ Improvements
 Changes
 =======
 
+* Some icons are updated
+
 * Renamed view "Year Statistic" -> "Tour Comparison Timeline"
   https://github.com/mytourbook/mytourbook/discussions/1128
 
