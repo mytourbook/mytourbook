@@ -162,7 +162,9 @@ public class ChartDataYSerie extends ChartDataSerie {
     *           When <code>true</code> then 0 values will be ignored when computing min/max
     *           values.
     */
-   public ChartDataYSerie(final ChartType chartType, final float[] valueSerie, final boolean isIgnoreZero) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[] valueSerie,
+                          final boolean isIgnoreZero) {
 
       _chartType = chartType;
       _isIgnoreMinMaxZero = isIgnoreZero;
@@ -170,14 +172,19 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(new float[][] { valueSerie });
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[] lowValueSerie,
+                          final float[] highValueSerie) {
 
       _chartType = chartType;
 
       setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie, final boolean isIgnoreZero) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[] lowValueSerie,
+                          final float[] highValueSerie,
+                          final boolean isIgnoreZero) {
 
       _chartType = chartType;
       _isIgnoreMinMaxZero = isIgnoreZero;
@@ -185,14 +192,17 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[][] valueSeries) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[][] valueSeries) {
 
       _chartType = chartType;
 
       setMinMaxValues(valueSeries);
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[][] valueSerie, final boolean isIgnoreZero) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[][] valueSerie,
+                          final boolean isIgnoreZero) {
 
       _chartType = chartType;
       _isIgnoreMinMaxZero = isIgnoreZero;
@@ -200,7 +210,9 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(valueSerie);
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[][] lowValueSeries,
+                          final float[][] highValueSeries) {
 
       _chartType = chartType;
 
@@ -547,7 +559,8 @@ public class ChartDataYSerie extends ChartDataSerie {
                || _chartType == ChartType.LINE_WITH_BARS
                || _chartType == ChartType.HORIZONTAL_BAR
                || _chartType == ChartType.XY_SCATTER
-               || _chartType == ChartType.HISTORY) {
+               || _chartType == ChartType.HISTORY
+               || _chartType == ChartType.SYMBOL) {
 
             setMinMaxValues_Line(valueSeries);
 

@@ -269,7 +269,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
          saveState();
 
-         _refTour_StatisticView.updateUI_YearChart_WithCurrentGeoData();
+         _refTour_StatisticView.updateUI_TimelineChart_WithCurrentGeoData();
       });
    }
 

@@ -1765,6 +1765,10 @@ public class ChartComponentGraph extends Canvas {
 
             drawAsync_530_BarGraph(gcGraph_WithOSXFix, graphDrawingData);
 
+         } else if (chartType == ChartType.SYMBOL) {
+
+            drawAsync_580_SymbolGraph(gcGraph_WithOSXFix, graphDrawingData);
+
          } else if (chartType == ChartType.LINE_WITH_BARS) {
 
             drawAsync_540_LineWithBarGraph(gcGraph_WithOSXFix, graphDrawingData);
@@ -1804,8 +1808,6 @@ public class ChartComponentGraph extends Canvas {
          if (isOSX) {
             gcGraph_WithOSXFix.dispose();
          }
-//         System.out.println("20 <- 10\tdrawAsync110GraphImage");
-//         // TODO remove SYSTEM.OUT.PRINTLN
       }
 
       if (_canChartBeOverlapped && _isChartOverlapped) {
@@ -4531,6 +4533,219 @@ public class ChartComponentGraph extends Canvas {
       // reset to default
       gc.setAlpha(0xFF);
       gc.setAntialias(SWT.OFF);
+   }
+
+   /**
+    * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
+    * if null is returned, a line graph will be drawn instead
+    *
+    * @param gcGraph
+    * @param drawingData
+    */
+   private void drawAsync_580_SymbolGraph(final GC gcGraph, final GraphDrawingData drawingData) {
+
+      // get the chart data
+      final ChartDataXSerie xData = drawingData.getXData();
+      final ChartDataYSerie yData = drawingData.getYData();
+      final int[][] colorsIndex = yData.getColorsIndex();
+
+      gcGraph.setLineStyle(SWT.LINE_SOLID);
+
+      // get the colors
+      final RGB[] rgbLine = yData.getRgbBar_Line();
+      final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
+      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
+
+      // get the chart values
+      final double scaleX = drawingData.getScaleX();
+      final double scaleY = drawingData.getScaleY();
+      final float graphYBorderBottom = drawingData.getGraphYBottom();
+      final boolean isBottomTop = yData.isYAxisDirection();
+
+      // get the horizontal offset for the graph
+      double devXOffset;
+      if (_chartComponents.synchConfigSrc == null) {
+
+         // a synch marker is not set, draw it normally
+         devXOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
+
+      } else {
+
+         // adjust the start position to the synch marker position
+         devXOffset = _xxDevViewPortLeftBorder / scaleX;
+      }
+
+      final int devGraphCanvasHeight = drawingData.devGraphHeight;
+
+      /*
+       * Get the top/bottom for the graph, a chart can contain multiple canvas. Canvas is the area
+       * where the graph is painted.
+       */
+      final int devYCanvasBottom = devGraphCanvasHeight;
+      final int devYCanvasTop = 0;
+
+      final int devYChartBottom = drawingData.getDevYBottom();
+      final int devYChartTop = devYChartBottom - devGraphCanvasHeight;
+
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final float[][] yHighSeries = yData.getHighValuesFloat();
+
+      final int serieLength = yHighSeries.length;
+      final int valueLength = xValues.length;
+
+      // keep the bar rectangles for all canvas
+      final Rectangle[][] barRecangles = new Rectangle[serieLength][valueLength];
+      final Rectangle[][] barFocusRecangles = new Rectangle[serieLength][valueLength];
+      drawingData.setBarRectangles(barRecangles);
+      drawingData.setBarFocusRectangles(barFocusRecangles);
+
+      // keep the height for stacked bar charts
+      final int[] devHeightSummary = new int[valueLength];
+
+      final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
+      final int devBarWidth = Math.max(1, devBarWidthOriginal);
+      final int devBarWidth2 = devBarWidth / 2;
+
+      final int serieLayout = yData.getChartLayout();
+      final int devBarRectangleStartXPos = drawingData.getDevBarRectangleXPos();
+      final int barPosition = drawingData.getBarPosition();
+
+      // loop: all data series
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+         final float[] yHighValues = yHighSeries[serieIndex];
+
+         int devBarXPos = devBarRectangleStartXPos;
+         int devBarWidthPositioned = devBarWidth;
+
+         // reposition the rectangle when the bars are beside each other
+         if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
+            devBarXPos += serieIndex * devBarWidth;
+            devBarWidthPositioned = devBarWidth - 1;
+         }
+
+         int devXPosNextBar = 0;
+
+         // loop: all values in the current serie
+         for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+            // get the x position
+            int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
+
+            // center the bar
+            if (devBarWidth > 1 && barPosition == GraphDrawingData.BAR_POS_CENTER) {
+               devXPos -= devBarWidth2;
+            }
+
+            // check array bounds
+            if (valueIndex >= yHighValues.length) {
+               break;
+            }
+
+            final float valueY = yHighValues[valueIndex];
+
+            /*
+             * get y positions
+             */
+            int devYPosChart;
+            int devYPosCanvas;
+            if (isBottomTop) {
+
+               final int devYBar = (int) ((valueY - graphYBorderBottom) * scaleY);
+
+               devYPosChart = devYChartBottom - devYBar;
+               devYPosCanvas = devYCanvasBottom - devYBar;
+
+            } else {
+
+               final int devYBar = (int) ((graphYBorderBottom) * scaleY);
+
+               devYPosChart = devYChartTop + devYBar;
+               devYPosCanvas = devYCanvasTop + devYBar;
+            }
+
+            int devXPosShape = devXPos;
+            int devShapeSize = devBarWidthPositioned;
+
+            /*
+             * make sure the bars do not overlap
+             */
+            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE && devXPosNextBar > 0) {
+
+               if (devXPos < devXPosNextBar) {
+
+                  // bars do overlap
+
+                  final int devDiff = devXPosNextBar - devXPos;
+
+                  devXPosShape = devXPos + devDiff;
+                  devShapeSize = devBarWidthPositioned - devDiff;
+               }
+            }
+            devXPosNextBar = devXPos + devBarWidthPositioned;
+
+            /*
+             * Get colors
+             */
+            final int colorIndex = colorsIndex[serieIndex][valueIndex];
+
+            final RGB rgbBrightDef = rgbBright[colorIndex];
+            final RGB rgbDarkDef = rgbDark[colorIndex];
+            final RGB rgbLineDef = rgbLine[colorIndex];
+
+            final Color colorBright = getColor(rgbBrightDef);
+            final Color colorDark = getColor(rgbDarkDef);
+            final Color colorLine = getColor(rgbLineDef);
+
+            gcGraph.setBackground(colorDark);
+
+            // ensure the symbol is visible
+            if (devShapeSize < 1) {
+               devShapeSize = 1;
+            }
+
+            gcGraph.setLineWidth(3);
+
+            /*
+             * Draw bar
+             */
+            final Rectangle barShapeCanvas = new Rectangle(
+                  devXPosShape,
+                  devYPosCanvas,
+                  devShapeSize,
+                  devShapeSize);
+
+            gcGraph.setForeground(colorBright);
+            gcGraph.fillGradientRectangle(
+                  barShapeCanvas.x,
+                  barShapeCanvas.y,
+                  barShapeCanvas.width,
+                  barShapeCanvas.height,
+                  false);
+
+            gcGraph.setForeground(colorLine);
+            gcGraph.drawRectangle(barShapeCanvas);
+
+            // keep symbol positions
+            barRecangles[serieIndex][valueIndex] = new Rectangle(
+                  devXPosShape,
+                  devYPosChart,
+                  devShapeSize,
+                  devShapeSize);
+
+            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
+                  devXPosShape - 2,
+                  devYPosChart - 2,
+                  devShapeSize + 4,
+                  devShapeSize + 7);
+
+            // keep the height for the bar
+            devHeightSummary[valueIndex] += devShapeSize;
+         }
+      }
+
+      // reset clipping
+      gcGraph.setClipping((Rectangle) null);
    }
 
    private void drawAsync_600_LineGraph_NoBackground(final GC gc,

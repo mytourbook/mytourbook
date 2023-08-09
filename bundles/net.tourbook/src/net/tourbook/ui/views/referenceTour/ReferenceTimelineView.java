@@ -161,7 +161,6 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private ArrayList<Float>                   _statValues_AvgPace_High      = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgPace_Low       = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgSpeed_High     = new ArrayList<>();
-   private ArrayList<Float>                   _statValues_AvgSpeed_Low      = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgPulse_Low      = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgPulse_High     = new ArrayList<>();
    private ArrayList<Float>                   _statValues_MaxPulse          = new ArrayList<>();
@@ -214,7 +213,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private Composite _pageYearChart;
    private Composite _headerContainer;
 
-   private Chart     _yearChart;
+   private Chart     _timelineChart;
 
    private Combo     _comboLastVisibleYear;
 
@@ -312,7 +311,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
 
-            updateUI_YearChart();
+            updateUI_TimelineChart();
          }
       };
 
@@ -324,12 +323,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
             // measurement system has changed -> recreate the chart
 
-            _yearChart.dispose();
+            _timelineChart.dispose();
             createUI_30_Chart(_pageYearChart);
 
             _pageYearChart.layout();
 
-            updateUI_YearChart();
+            updateUI_TimelineChart();
          }
       };
 
@@ -368,7 +367,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
                if (compareTourProperty.isDataSaved) {
-                  updateUI_YearChart();
+                  updateUI_TimelineChart();
                }
             }
          }
@@ -715,7 +714,6 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       _statValues_DOYValues         .add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
 
-      _statValues_AvgSpeed_Low      .add(avgSpeed - avgSpeed / 100 * _barRelativeHeight);
       _statValues_AvgSpeed_High     .add(avgSpeed);
       _statValues_AvgPace_Low       .add(avgPace - avgPace / 100 * _barRelativeHeight);
       _statValues_AvgPace_High      .add(avgPace);
@@ -882,20 +880,20 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
     */
    private void createUI_30_Chart(final Composite parent) {
 
-      _yearChart = new Chart(parent, SWT.NONE);
-      _yearChart.addBarSelectionListener((serieIndex, valueIndex) -> onSelect_ComparedTour(valueIndex));
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_yearChart);
+      _timelineChart = new Chart(parent, SWT.NONE);
+      _timelineChart.addBarSelectionListener((serieIndex, valueIndex) -> onSelect_ComparedTour(valueIndex));
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_timelineChart);
 
       // set tour info icon into the left axis
-      _tourToolTip = new ReferenceTimeline_TourTooltip(_yearChart.getToolTipControl());
+      _tourToolTip = new ReferenceTimeline_TourTooltip(_timelineChart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
       _tourToolTip.addHideListener(event -> {
 
          // hide hovered image
-         _yearChart.getToolTipControl().afterHideToolTip();
+         _timelineChart.getToolTipControl().afterHideToolTip();
       });
 
-      _yearChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
+      _timelineChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
 
    }
@@ -951,7 +949,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             final GeoCompareData geoCompareData = (GeoCompareData) eventData;
 
             // update year statistic with provided geo compare data
-            updateUI_YearChart(geoCompareData, false);
+            updateUI_TimelineChart(geoCompareData, false);
          }
 
          break;
@@ -962,7 +960,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       case SET_COMPARING_OFF:
 
          _currentGeoCompareData = null;
-         updateUI_YearChart();
+         updateUI_TimelineChart();
 
          break;
       default:
@@ -1122,7 +1120,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       _isShowAllValues = isShowAllValues;
 
-      updateUI_YearChart();
+      updateUI_TimelineChart();
 
       enableControls();
    }
@@ -1135,7 +1133,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       _isSynchMinMaxValue = isSyncMinMaxValue;
 
-      updateUI_YearChart();
+      updateUI_TimelineChart();
    }
 
    /**
@@ -1174,7 +1172,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       // update year data
       setYearData();
 
-      updateUI_YearChart_WithCurrentGeoData();
+      updateUI_TimelineChart_WithCurrentGeoData();
    }
 
    /**
@@ -1198,7 +1196,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
       setYearData();
 
-      updateUI_YearChart_WithCurrentGeoData();
+      updateUI_TimelineChart_WithCurrentGeoData();
 
       // reselect last selected tour
       selectTourInYearChart(selectedTourId);
@@ -1221,7 +1219,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                _currentGeoCompareData = null;
             }
 
-            updateUI_YearChart(true);
+            updateUI_TimelineChart(true);
 
          } else {
 
@@ -1238,7 +1236,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                // update year data
                setYearData();
 
-               updateUI_YearChart();
+               updateUI_TimelineChart();
             }
          }
 
@@ -1327,7 +1325,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
                if (isUpdateYearChart) {
 
-                  updateUI_YearChart();
+                  updateUI_TimelineChart();
                }
 
                // select tour in the year chart
@@ -1341,7 +1339,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                final GeoComparedTour geoComparedTour = (GeoComparedTour) firstElement;
 
                // update year statistic with provided geo compare data
-               updateUI_YearChart(geoComparedTour.geoCompareData, false);
+               updateUI_TimelineChart(geoComparedTour.geoCompareData, false);
 
                selectTourInYearChart(geoComparedTour);
 
@@ -1368,7 +1366,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
                      _currentGeoCompareData = null;
 
-                     updateUI_YearChart();
+                     updateUI_TimelineChart();
                   }
 
                   selectTourInYearChart(tourId);
@@ -1391,7 +1389,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
             _currentRefItem = ElevationCompareManager.createCatalogRefItem(refTourId);
 
-            updateUI_YearChart();
+            updateUI_TimelineChart();
          }
 
       } else if (selection instanceof SelectionPersistedCompareResults) {
@@ -1410,7 +1408,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
             _currentRefItem = ElevationCompareManager.createCatalogRefItem(savedRefId);
 
-            updateUI_YearChart();
+            updateUI_TimelineChart();
          }
       }
    }
@@ -1460,7 +1458,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          }
       }
 
-      _yearChart.setSelectedBars(selectedTours);
+      _timelineChart.setSelectedBars(selectedTours);
    }
 
    /**
@@ -1501,13 +1499,13 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 //         selectedTours[0] = true;
       }
 
-      _yearChart.setSelectedBars(selectedTours);
+      _timelineChart.setSelectedBars(selectedTours);
    }
 
    @Override
    public void setFocus() {
 
-      _yearChart.setFocus();
+      _timelineChart.setFocus();
    }
 
    /**
@@ -1530,12 +1528,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       }
    }
 
-   private void updateUI_YearChart() {
+   private void updateUI_TimelineChart() {
 
-      updateUI_YearChart(false);
+      updateUI_TimelineChart(false);
    }
 
-   private void updateUI_YearChart(final boolean isShowLatestYear) {
+   private void updateUI_TimelineChart(final boolean isShowLatestYear) {
 
       GeoCompareData geoCompareData = null;
 
@@ -1548,7 +1546,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          geoCompareData = _currentGeoCompareData;
       }
 
-      updateUI_YearChart(geoCompareData, isShowLatestYear);
+      updateUI_TimelineChart(geoCompareData, isShowLatestYear);
    }
 
    /**
@@ -1558,7 +1556,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
     * @param isShowLatestYear
     *           Shows the latest year and the years before
     */
-   private void updateUI_YearChart(final GeoCompareData geoCompareData,
+   private void updateUI_TimelineChart(final GeoCompareData geoCompareData,
                                    final boolean isShowLatestYear) {
 
       if (geoCompareData != null && _currentRefItem == null) {
@@ -1590,7 +1588,6 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _statValues_AvgPulse_High.clear();
       _statValues_MaxPulse.clear();
 
-      _statValues_AvgSpeed_Low.clear();
       _statValues_AvgSpeed_High.clear();
       _statValues_AvgPace_Low.clear();
       _statValues_AvgPace_High.clear();
@@ -1638,10 +1635,9 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
        */
       if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, STATE_SHOW_SPEED_AVG_DEFAULT)) {
 
-         // set the bar low/high data
+         // set the symbol high data
          final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
-               ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgSpeed_Low),
+               ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgSpeed_High),
                true);
 
@@ -1655,12 +1651,6 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          yDataSpeed.setYTitle(OtherMessages.GRAPH_LABEL_SPEED);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
-
-         /*
-          * ensure that painting of the bar is started at the bottom and not at the visible min
-          * which is above the bottom !!!
-          */
-//         yDataSpeed.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
          chartModel.addYData(yDataSpeed);
       }
@@ -1808,16 +1798,16 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          }
       });
 
-      net.tourbook.ui.UI.updateChartProperties(_yearChart, PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_timelineChart, PREF_PREFIX);
 
-      final ChartTitleSegmentConfig ctsConfig = _yearChart.getChartTitleSegmentConfig();
+      final ChartTitleSegmentConfig ctsConfig = _timelineChart.getChartTitleSegmentConfig();
       ctsConfig.isShowSegmentTitle = true;
 
       // show the data in the chart
-      _yearChart.updateChart(chartModel, false, false);
+      _timelineChart.updateChart(chartModel, false, false);
 
       // reset selectable bars otherwise some bars on the right side could not be selectable !!!
-      _yearChart.setSelectedBars(null);
+      _timelineChart.setSelectedBars(null);
 
       /*
        * Update start year combo box
@@ -1861,8 +1851,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _lblRefTourTitle.getParent().layout(true, true);
    }
 
-   void updateUI_YearChart_WithCurrentGeoData() {
+   void updateUI_TimelineChart_WithCurrentGeoData() {
 
-      updateUI_YearChart(_currentGeoCompareData, false);
+      updateUI_TimelineChart(_currentGeoCompareData, false);
    }
 }
