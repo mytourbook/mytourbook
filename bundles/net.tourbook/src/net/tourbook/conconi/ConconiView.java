@@ -348,7 +348,7 @@ public class ConconiView extends ViewPart {
       float maxXValue = 0;
 
       /*
-       * create data series which contain valid data, reduce data that the highes value for an x
+       * create data series which contain valid data, reduce data that the highest value for an x
        * value is displayed
        */
       for (int tourIndex = 0; tourIndex < validDataLength; tourIndex++) {
