@@ -30,6 +30,7 @@ import net.tourbook.chart.XValueMarkerListener;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -910,7 +911,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
                   true);
          }
       } catch (final Exception e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       } finally {
          if (ts.isActive()) {
             ts.rollback();
@@ -947,7 +948,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
       } catch (final Exception e) {
 
-         e.printStackTrace();
+         StatusUtil.log(e);
 
       } finally {
          if (ts.isActive()) {
