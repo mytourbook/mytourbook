@@ -444,6 +444,7 @@ public class Messages extends NLS {
 
    public static String        Conconi_Chart_Chk_LogScaling;
    public static String        Conconi_Chart_Chk_LogScaling_Tooltip;
+   //todo fb rename to Deflection
    public static String        Conconi_Chart_DeflactionPoint;
    public static String        Conconi_Chart_InvalidData;
    public static String        Conconi_Chart_Label_ScalingFactor;
