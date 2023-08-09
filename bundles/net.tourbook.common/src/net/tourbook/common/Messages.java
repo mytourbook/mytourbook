@@ -30,6 +30,10 @@ public class Messages extends NLS {
 
    public static String        App_Error_NotSupportedValueFormatter;
 
+   public static String        App_Size_Large;
+   public static String        App_Size_Medium;
+   public static String        App_Size_Small;
+
    public static String        App_Theme_BackgroundColor_Light_Tooltip;
    public static String        App_Theme_BackgroundColor_Dark_Tooltip;
    public static String        App_Theme_BrightTheme;
