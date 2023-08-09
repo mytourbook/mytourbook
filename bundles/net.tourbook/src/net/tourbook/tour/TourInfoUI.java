@@ -1547,9 +1547,12 @@ public class TourInfoUI {
 
    private void fillUI() {
 
-      _comboUIWidth_Size.add(OtherMessages.APP_SIZE_SMALL);
-      _comboUIWidth_Size.add(OtherMessages.APP_SIZE_MEDIUM);
-      _comboUIWidth_Size.add(OtherMessages.APP_SIZE_LARGE);
+      if (_comboUIWidth_Size != null && _comboUIWidth_Size.isDisposed() == false) {
+
+         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_SMALL);
+         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_MEDIUM);
+         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_LARGE);
+      }
    }
 
    private int getSelectedUIWidthSizeIndex() {

@@ -65,7 +65,7 @@ Improvements
   - Pace values are now available everywhere like the speed values
 
  * Tour Concatenation (Frederic)
-  - Concatenating TSS values
+  - Concatenating TSS (Training Stress Score) values
 
 * Tour Info Tooltip
   - Keep tooltip width for different sizes 
@@ -86,7 +86,8 @@ Improvements
 Changes
 =======
 
-* Some icons are updated
+* Icons
+  - Updated some icons
 
 * Renamed view "Year Statistic" -> "Tour Comparison Timeline"
   https://github.com/mytourbook/mytourbook/discussions/1128
