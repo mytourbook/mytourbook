@@ -7097,7 +7097,9 @@ public class Map2 extends Canvas {
       // display poi in the center of the map which make it also visible
       setMapCenter(twp.getPosition());
 
-      if (tourToolTipProvider instanceof final WayPointToolTipProvider wpToolTipProvider) {
+      if (tourToolTipProvider instanceof WayPointToolTipProvider) {
+
+         final WayPointToolTipProvider wpToolTipProvider = (WayPointToolTipProvider) tourToolTipProvider;
 
          final HoveredAreaContext hoveredContext = wpToolTipProvider.getHoveredContext(
                _worldPixel_TopLeft_Viewport.width / 2,
