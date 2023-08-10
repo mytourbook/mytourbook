@@ -96,7 +96,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private static final String STATE_IS_SYNC_MIN_MAX_VALUES     = "STATE_IS_SYNC_MIN_MAX_VALUES";                     //$NON-NLS-1$
    private static final String STATE_NUMBER_OF_VISIBLE_YEARS    = "STATE_NUMBER_OF_VISIBLE_YEARS";                    //$NON-NLS-1$
    static final String         STATE_SYMBOL_SIZE                = "STATE_SYMBOL_SIZE";                                //$NON-NLS-1$
-   static final int            STATE_SYMBOL_SIZE_DEFAULT        = 8;
+   static final int            STATE_SYMBOL_SIZE_DEFAULT        = 3;
    static final int            STATE_SYMBOL_SIZE_MIN            = 1;
    static final int            STATE_SYMBOL_SIZE_MAX            = 100;
    static final String         STATE_SHOW_ALTIMETER_AVG         = "STATE_SHOW_ALTIMETER_AVG";                         //$NON-NLS-1$
@@ -1415,7 +1415,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _actionShowAllValues.setChecked(_isShowAllValues);
       _actionSyncMinMaxValues.setChecked(_isSynchMinMaxValue);
 
-      final int numVisibleYears = Util.getStateInt(_state, ReferenceTimelineView.STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
+      final int numVisibleYears = Util.getStateInt(_state, STATE_NUMBER_OF_VISIBLE_YEARS, 3, 1, 100);
       _numVisibleYears = numVisibleYears;
       _spinnerNumberOfVisibleYears.setSelection(numVisibleYears);
 
@@ -1586,10 +1586,10 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       int firstVisibleYear = getFirstVisibleYear();
 
       _symbolSize = Util.getStateInt(_state,
-            ReferenceTimelineView.STATE_SYMBOL_SIZE,
-            ReferenceTimelineView.STATE_SYMBOL_SIZE_DEFAULT,
-            ReferenceTimelineView.STATE_SYMBOL_SIZE_MIN,
-            ReferenceTimelineView.STATE_SYMBOL_SIZE_MAX);
+            STATE_SYMBOL_SIZE,
+            STATE_SYMBOL_SIZE_DEFAULT,
+            STATE_SYMBOL_SIZE_MIN,
+            STATE_SYMBOL_SIZE_MAX);
 
       // keep/remove current geo compare data
       _currentGeoCompareData = geoCompareData;
@@ -1626,7 +1626,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
        */
       if (Util.getStateBoolean(_state, STATE_SHOW_SPEED_AVG, STATE_SHOW_SPEED_AVG_DEFAULT)) {
 
-         // set the symbol high data
+         // set the graph data
          final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
                ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgSpeed_High),
@@ -1653,7 +1653,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
        */
       if (Util.getStateBoolean(_state, STATE_SHOW_PACE_AVG, STATE_SHOW_PACE_AVG_DEFAULT)) {
 
-         // set the bar low/high data
+         // set the graph data
          final ChartDataYSerie yDataPace = new ChartDataYSerie(
                ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgPace_High),
@@ -1682,7 +1682,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
        */
       if (Util.getStateBoolean(_state, STATE_SHOW_ALTIMETER_AVG, STATE_SHOW_ALTIMETER_AVG_DEFAULT)) {
 
-         // set the bar low/high data
+         // set the graph data
          final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
                ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgAltimeter_High),
@@ -1708,7 +1708,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
        */
       if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG, STATE_SHOW_PULSE_AVG_DEFAULT)) {
 
-         // set the bar low/high data
+         // set the graph data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
                ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgPulse_High),

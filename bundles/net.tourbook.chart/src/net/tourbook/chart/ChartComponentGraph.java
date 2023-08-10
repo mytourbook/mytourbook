@@ -4591,13 +4591,11 @@ public class ChartComponentGraph extends Canvas {
       final int valueLength = xValues.length;
 
       // keep the bar rectangles for all canvas
-      final Rectangle[][] barRecangles = new Rectangle[serieLength][valueLength];
-      final Rectangle[][] barFocusRecangles = new Rectangle[serieLength][valueLength];
-      drawingData.setBarRectangles(barRecangles);
-      drawingData.setBarFocusRectangles(barFocusRecangles);
+      final Rectangle[][] symbolRecangles = new Rectangle[serieLength][valueLength];
+      final Rectangle[][] symbolFocusRecangles = new Rectangle[serieLength][valueLength];
+      drawingData.setBarRectangles(symbolRecangles);
+      drawingData.setBarFocusRectangles(symbolFocusRecangles);
 
-      // keep the height for stacked bar charts
-      final int[] devHeightSummary = new int[valueLength];
 
       final int devSymbolSize_Original = drawingData.getSymbolSize();
       final int devSymbolSize = Math.max(1, devSymbolSize_Original);
@@ -4605,7 +4603,7 @@ public class ChartComponentGraph extends Canvas {
 
       final int serieLayout = yData.getChartLayout();
       final int devSymbolRectangleStartXPos = drawingData.getDevBarRectangleXPos();
-      final int barPosition = drawingData.getBarPosition();
+      final int symbolPosition = drawingData.getBarPosition();
 
       // this antialias is not perfect but better than without
       gcGraph.setTextAntialias(SWT.ON);
@@ -4615,25 +4613,25 @@ public class ChartComponentGraph extends Canvas {
 
          final float[] yHighValues = yHighSeries[serieIndex];
 
-         int devBarXPos = devSymbolRectangleStartXPos;
-         int devBarWidthPositioned = devSymbolSize;
+         int devSymbolXPos = devSymbolRectangleStartXPos;
+         int devSymbolWidthPositioned = devSymbolSize;
 
          // reposition the rectangle when the bars are beside each other
          if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
-            devBarXPos += serieIndex * devSymbolSize;
-            devBarWidthPositioned = devSymbolSize - 1;
+            devSymbolXPos += serieIndex * devSymbolSize;
+            devSymbolWidthPositioned = devSymbolSize - 1;
          }
 
-         int devXPosNextBar = 0;
+         final int devXPosNextSymbol = 0;
 
          // loop: all values in the current serie
          for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
 
             // get the x position
-            int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
+            int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devSymbolXPos;
 
-            // center the bar
-            if (devSymbolSize > 1 && barPosition == GraphDrawingData.BAR_POS_CENTER) {
+            // center the symbol
+            if (devSymbolSize > 1 && symbolPosition == GraphDrawingData.BAR_POS_CENTER) {
                devXPos -= devSymbolSize2;
             }
 
@@ -4651,38 +4649,21 @@ public class ChartComponentGraph extends Canvas {
             int devYPosCanvas;
             if (isBottomTop) {
 
-               final int devYBar = (int) ((valueY - graphYBorderBottom) * scaleY);
+               final int devYSymbol = (int) ((valueY - graphYBorderBottom) * scaleY);
 
-               devYPosChart = devYChartBottom - devYBar;
-               devYPosCanvas = devYCanvasBottom - devYBar;
+               devYPosChart = devYChartBottom - devYSymbol;
+               devYPosCanvas = devYCanvasBottom - devYSymbol;
 
             } else {
 
-               final int devYBar = (int) ((graphYBorderBottom) * scaleY);
+               final int devYSymbol = (int) ((graphYBorderBottom) * scaleY);
 
-               devYPosChart = devYChartTop + devYBar;
-               devYPosCanvas = devYCanvasTop + devYBar;
+               devYPosChart = devYChartTop + devYSymbol;
+               devYPosCanvas = devYCanvasTop + devYSymbol;
             }
 
-            int devXPosShape = devXPos;
-            int devShapeSize = devBarWidthPositioned;
-
-            /*
-             * make sure the bars do not overlap
-             */
-            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE && devXPosNextBar > 0) {
-
-               if (devXPos < devXPosNextBar) {
-
-                  // bars do overlap
-
-                  final int devDiff = devXPosNextBar - devXPos;
-
-                  devXPosShape = devXPos + devDiff;
-                  devShapeSize = devBarWidthPositioned - devDiff;
-               }
-            }
-            devXPosNextBar = devXPos + devBarWidthPositioned;
+            final int devXPosShape = devXPos;
+            int devShapeSize = devSymbolWidthPositioned;
 
             /*
              * Get colors
@@ -4704,17 +4685,17 @@ public class ChartComponentGraph extends Canvas {
             /*
              * Draw symbol
              */
-            final Rectangle barShapeCanvas = new Rectangle(
+            final Rectangle symbolCanvas = new Rectangle(
                   devXPosShape,
                   devYPosCanvas,
                   devShapeSize,
                   devShapeSize);
 
             gcGraph.fillRectangle(
-                  barShapeCanvas.x,
-                  barShapeCanvas.y,
-                  barShapeCanvas.width,
-                  barShapeCanvas.height);
+                  symbolCanvas.x,
+                  symbolCanvas.y,
+                  symbolCanvas.width,
+                  symbolCanvas.height);
 
 //            gcGraph.fillOval(
 //                  barShapeCanvas.x,
@@ -4723,20 +4704,17 @@ public class ChartComponentGraph extends Canvas {
 //                  barShapeCanvas.height);
 
             // keep symbol positions
-            barRecangles[serieIndex][valueIndex] = new Rectangle(
+            symbolRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape,
                   devYPosChart,
                   devShapeSize,
                   devShapeSize);
 
-            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
+            symbolFocusRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape - 2,
                   devYPosChart - 2,
                   devShapeSize + 4,
                   devShapeSize + 7);
-
-            // keep the height for the symbol
-            devHeightSummary[valueIndex] += devShapeSize;
          }
       }
 

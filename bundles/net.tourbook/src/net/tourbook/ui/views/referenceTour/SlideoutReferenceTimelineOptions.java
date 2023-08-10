@@ -226,9 +226,9 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
              */
 
             // Relative height of the bar graph
-            
+
             // !!! remove after MT 23.8 !!!
-            
+
             final String obsolete1 = Messages.Slideout_RefTour_Spinner_BarSize_Tooltip;
 
             // &Bar height
@@ -290,7 +290,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
       _chkShowPulse_AvgMax    .setSelection(STATE_SHOW_PULSE_AVG_MAX_DEFAULT);
       _chkShowSpeed_Avg       .setSelection(STATE_SHOW_SPEED_AVG_DEFAULT);
 
-      _spinnerSymbolSize       .setSelection(ReferenceTimelineView.STATE_SYMBOL_SIZE_DEFAULT);
+      _spinnerSymbolSize      .setSelection(ReferenceTimelineView.STATE_SYMBOL_SIZE_DEFAULT);
 
 // SET_FORMATTING_ON
 
