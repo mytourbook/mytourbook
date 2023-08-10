@@ -5,6 +5,12 @@ TODO's
 ======               
 
 
+* Remove these messages after 23.8
+
+            Messages.Slideout_RefTour_Spinner_BarSize_Tooltip
+            Messages.Slideout_RefTour_Label_BarSize
+
+
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3
 

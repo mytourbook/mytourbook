@@ -2310,6 +2310,7 @@ public class Messages extends NLS {
    public static String        Slideout_RefTour_Group_Graphs;
    public static String        Slideout_RefTour_Label_BarSize;
    public static String        Slideout_RefTour_Label_ReferenceTimelineOptions;
+   public static String        Slideout_RefTour_Label_SymbolSize;
    public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;

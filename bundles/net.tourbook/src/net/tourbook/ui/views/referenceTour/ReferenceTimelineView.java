@@ -87,28 +87,28 @@ import org.eclipse.ui.part.ViewPart;
 
 public class ReferenceTimelineView extends ViewPart implements IGeoCompareListener {
 
-   public static final String  ID                                = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
+   public static final String  ID                               = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
-   private static final char   NL                                = UI.NEW_LINE;
-   private static final char   FIELD_DELIMITER                   = UI.TAB;
+   private static final char   NL                               = UI.NEW_LINE;
+   private static final char   FIELD_DELIMITER                  = UI.TAB;
 
-   private static final String STATE_IS_SHOW_ALL_VALUES          = "STATE_IS_SHOW_ALL_VALUES";                         //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_MIN_MAX_VALUES      = "STATE_IS_SYNC_MIN_MAX_VALUES";                     //$NON-NLS-1$
-   private static final String STATE_NUMBER_OF_VISIBLE_YEARS     = "STATE_NUMBER_OF_VISIBLE_YEARS";                    //$NON-NLS-1$
-   static final String         STATE_RELATIVE_BAR_HEIGHT         = "STATE_RELATIVE_BAR_HEIGHT";                        //$NON-NLS-1$
-   static final int            STATE_RELATIVE_BAR_HEIGHT_DEFAULT = 20;
-   static final int            STATE_RELATIVE_BAR_HEIGHT_MIN     = 1;
-   static final int            STATE_RELATIVE_BAR_HEIGHT_MAX     = 100;
-   static final String         STATE_SHOW_ALTIMETER_AVG          = "STATE_SHOW_ALTIMETER_AVG";                         //$NON-NLS-1$
-   static final boolean        STATE_SHOW_ALTIMETER_AVG_DEFAULT  = true;
-   static final String         STATE_SHOW_PULSE_AVG              = "STATE_SHOW_PULSE_AVG";                             //$NON-NLS-1$
-   static final boolean        STATE_SHOW_PULSE_AVG_DEFAULT      = true;
-   static final String         STATE_SHOW_PULSE_AVG_MAX          = "STATE_SHOW_PULSE_AVG_MAX";                         //$NON-NLS-1$
-   static final boolean        STATE_SHOW_PULSE_AVG_MAX_DEFAULT  = false;
-   static final String         STATE_SHOW_SPEED_AVG              = "STATE_SHOW_SPEED_AVG";                             //$NON-NLS-1$
-   static final boolean        STATE_SHOW_SPEED_AVG_DEFAULT      = true;
-   static final String         STATE_SHOW_PACE_AVG               = "STATE_SHOW_PACE_AVG";                              //$NON-NLS-1$
-   static final boolean        STATE_SHOW_PACE_AVG_DEFAULT       = true;
+   private static final String STATE_IS_SHOW_ALL_VALUES         = "STATE_IS_SHOW_ALL_VALUES";                         //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_MIN_MAX_VALUES     = "STATE_IS_SYNC_MIN_MAX_VALUES";                     //$NON-NLS-1$
+   private static final String STATE_NUMBER_OF_VISIBLE_YEARS    = "STATE_NUMBER_OF_VISIBLE_YEARS";                    //$NON-NLS-1$
+   static final String         STATE_SYMBOL_SIZE                = "STATE_SYMBOL_SIZE";                                //$NON-NLS-1$
+   static final int            STATE_SYMBOL_SIZE_DEFAULT        = 8;
+   static final int            STATE_SYMBOL_SIZE_MIN            = 1;
+   static final int            STATE_SYMBOL_SIZE_MAX            = 100;
+   static final String         STATE_SHOW_ALTIMETER_AVG         = "STATE_SHOW_ALTIMETER_AVG";                         //$NON-NLS-1$
+   static final boolean        STATE_SHOW_ALTIMETER_AVG_DEFAULT = true;
+   static final String         STATE_SHOW_PULSE_AVG             = "STATE_SHOW_PULSE_AVG";                             //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PULSE_AVG_DEFAULT     = true;
+   static final String         STATE_SHOW_PULSE_AVG_MAX         = "STATE_SHOW_PULSE_AVG_MAX";                         //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PULSE_AVG_MAX_DEFAULT = false;
+   static final String         STATE_SHOW_SPEED_AVG             = "STATE_SHOW_SPEED_AVG";                             //$NON-NLS-1$
+   static final boolean        STATE_SHOW_SPEED_AVG_DEFAULT     = true;
+   static final String         STATE_SHOW_PACE_AVG              = "STATE_SHOW_PACE_AVG";                              //$NON-NLS-1$
+   static final boolean        STATE_SHOW_PACE_AVG_DEFAULT      = true;
 
 // SET_FORMATTING_OFF
 
@@ -157,15 +157,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    private ArrayList<Integer>                 _statValues_DOYValues         = new ArrayList<>();
 
    private ArrayList<Float>                   _statValues_AvgAltimeter_High = new ArrayList<>();
-   private ArrayList<Float>                   _statValues_AvgAltimeter_Low  = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgPace_High      = new ArrayList<>();
-   private ArrayList<Float>                   _statValues_AvgPace_Low       = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgSpeed_High     = new ArrayList<>();
-   private ArrayList<Float>                   _statValues_AvgPulse_Low      = new ArrayList<>();
    private ArrayList<Float>                   _statValues_AvgPulse_High     = new ArrayList<>();
    private ArrayList<Float>                   _statValues_MaxPulse          = new ArrayList<>();
 
-   private int                                _barRelativeHeight;
+   private int                                _symbolSize;
 
    /**
     * Reference tour item for which the statistic is displayed. This statistic can display only
@@ -715,14 +712,11 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _statValues_DOYValues         .add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
 
       _statValues_AvgSpeed_High     .add(avgSpeed);
-      _statValues_AvgPace_Low       .add(avgPace - avgPace / 100 * _barRelativeHeight);
       _statValues_AvgPace_High      .add(avgPace);
 
-      _statValues_AvgPulse_Low      .add(avgPulse - avgPulse / 100 * _barRelativeHeight);
       _statValues_AvgPulse_High     .add(avgPulse);
       _statValues_MaxPulse          .add(comparedTourItem.getMaxPulse());
 
-      _statValues_AvgAltimeter_Low  .add(avgAltimeter - avgAltimeter / 100 * _barRelativeHeight);
       _statValues_AvgAltimeter_High .add(avgAltimeter);
 
 // SET_FORMATTING_ON
@@ -1557,7 +1551,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
     *           Shows the latest year and the years before
     */
    private void updateUI_TimelineChart(final GeoCompareData geoCompareData,
-                                   final boolean isShowLatestYear) {
+                                       final boolean isShowLatestYear) {
 
       if (geoCompareData != null && _currentRefItem == null) {
 
@@ -1582,23 +1576,20 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       _statValues_AllTours.clear();
       _statValues_DOYValues.clear();
 
-      _statValues_AvgAltimeter_Low.clear();
       _statValues_AvgAltimeter_High.clear();
-      _statValues_AvgPulse_Low.clear();
       _statValues_AvgPulse_High.clear();
       _statValues_MaxPulse.clear();
 
       _statValues_AvgSpeed_High.clear();
-      _statValues_AvgPace_Low.clear();
       _statValues_AvgPace_High.clear();
 
       int firstVisibleYear = getFirstVisibleYear();
 
-      _barRelativeHeight = Util.getStateInt(_state,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MIN,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MAX);
+      _symbolSize = Util.getStateInt(_state,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE_DEFAULT,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE_MIN,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE_MAX);
 
       // keep/remove current geo compare data
       _currentGeoCompareData = geoCompareData;
@@ -1652,6 +1643,8 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
 
+         yDataSpeed.setSymbolSize(_symbolSize);
+
          chartModel.addYData(yDataSpeed);
       }
 
@@ -1662,8 +1655,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
          // set the bar low/high data
          final ChartDataYSerie yDataPace = new ChartDataYSerie(
-               ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgPace_Low),
+               ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgPace_High),
                true);
 
@@ -1678,13 +1670,9 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE);
          yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
          yDataPace.setShowYSlider(true);
-         yDataPace.setYAxisDirection(!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
+         yDataPace.setYAxisDirection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED) == false);
 
-         /*
-          * ensure that painting of the bar is started at the bottom and not at the visible min
-          * which is above the bottom !!!
-          */
-//         yDataPace.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+         yDataPace.setSymbolSize(_symbolSize);
 
          chartModel.addYData(yDataPace);
       }
@@ -1696,8 +1684,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
          // set the bar low/high data
          final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
-               ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgAltimeter_Low),
+               ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgAltimeter_High),
                true);
 
@@ -1711,12 +1698,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          yDataAltimeter.setYTitle(OtherMessages.GRAPH_LABEL_ALTIMETER);
          yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
          yDataAltimeter.setShowYSlider(true);
-
-         /*
-          * ensure that painting of the bar is started at the bottom and not at the visible min
-          * which is above the bottom !!!
-          */
-//         yDataAltimeter.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+         yDataAltimeter.setSymbolSize(_symbolSize);
 
          chartModel.addYData(yDataAltimeter);
       }
@@ -1728,8 +1710,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
          // set the bar low/high data
          final ChartDataYSerie yDataMaxPulse = new ChartDataYSerie(
-               ChartType.BAR,
-               ArrayListToArray.toFloat(_statValues_AvgPulse_Low),
+               ChartType.SYMBOL,
                ArrayListToArray.toFloat(_statValues_AvgPulse_High),
                true);
 
@@ -1743,18 +1724,13 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          yDataMaxPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT_AVG);
          yDataMaxPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          yDataMaxPulse.setShowYSlider(true);
-
-         /*
-          * Ensure that painting of the bar is started at the bottom and not at the visible min
-          * which is above the bottom !!!
-          */
-//         yDataMaxPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
+         yDataMaxPulse.setSymbolSize(_symbolSize);
 
          chartModel.addYData(yDataMaxPulse);
       }
 
       /**
-       * Avg/max pulse
+       * Show avg/max pulse as bar graph
        */
       if (Util.getStateBoolean(_state, STATE_SHOW_PULSE_AVG_MAX, STATE_SHOW_PULSE_AVG_MAX_DEFAULT)) {
 
@@ -1775,12 +1751,6 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          yDataMaxPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT_AVG_MAX);
          yDataMaxPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          yDataMaxPulse.setShowYSlider(true);
-
-         /*
-          * Ensure that painting of the bar is started at the bottom and not at the visible min
-          * which is above the bottom !!!
-          */
-//         yDataMaxPulse.setGraphFillMethod(ChartDataYSerie.BAR_DRAW_METHOD_BOTTOM);
 
          chartModel.addYData(yDataMaxPulse);
       }

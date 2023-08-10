@@ -147,6 +147,11 @@ public class ChartDataYSerie extends ChartDataSerie {
    private boolean                _isShowBarsMoreVisible;
 
    /**
+    * Width/height when a sympol is displayed
+    */
+   private int                    _symbolSize                       = 8;
+
+   /**
     * When this value is > 0 a line chart will not draw a line to the next value point when the
     * difference in the x-data values is greater than this value.
     * <p>
@@ -422,6 +427,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    public float[] getSliderMinMaxValue() {
       return _sliderMinMaxValue;
+   }
+
+   public int getSymbolSize() {
+      return _symbolSize;
    }
 
    public String getXTitle() {
@@ -858,6 +867,10 @@ public class ChartDataYSerie extends ChartDataSerie {
    public void setSliderMinMaxValue(final float[] sliderMinMaxValue) {
 
       _sliderMinMaxValue = sliderMinMaxValue;
+   }
+
+   public void setSymbolSize(final int symbolSize) {
+      _symbolSize = symbolSize;
    }
 
    /**

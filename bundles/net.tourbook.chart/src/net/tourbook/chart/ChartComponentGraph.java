@@ -4536,8 +4536,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
-    * if null is returned, a line graph will be drawn instead
+    * Draws a symbol for each data point
     *
     * @param gcGraph
     * @param drawingData
@@ -4548,8 +4547,6 @@ public class ChartComponentGraph extends Canvas {
       final ChartDataXSerie xData = drawingData.getXData();
       final ChartDataYSerie yData = drawingData.getYData();
       final int[][] colorsIndex = yData.getColorsIndex();
-
-      gcGraph.setLineStyle(SWT.LINE_SOLID);
 
       // get the colors
       final RGB[] rgbLine = yData.getRgbBar_Line();
@@ -4602,26 +4599,29 @@ public class ChartComponentGraph extends Canvas {
       // keep the height for stacked bar charts
       final int[] devHeightSummary = new int[valueLength];
 
-      final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
-      final int devBarWidth = Math.max(1, devBarWidthOriginal);
-      final int devBarWidth2 = devBarWidth / 2;
+      final int devSymbolSize_Original = drawingData.getSymbolSize();
+      final int devSymbolSize = Math.max(1, devSymbolSize_Original);
+      final int devSymbolSize2 = devSymbolSize / 2;
 
       final int serieLayout = yData.getChartLayout();
-      final int devBarRectangleStartXPos = drawingData.getDevBarRectangleXPos();
+      final int devSymbolRectangleStartXPos = drawingData.getDevBarRectangleXPos();
       final int barPosition = drawingData.getBarPosition();
+
+      // this antialias is not perfect but better than without
+      gcGraph.setTextAntialias(SWT.ON);
 
       // loop: all data series
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
          final float[] yHighValues = yHighSeries[serieIndex];
 
-         int devBarXPos = devBarRectangleStartXPos;
-         int devBarWidthPositioned = devBarWidth;
+         int devBarXPos = devSymbolRectangleStartXPos;
+         int devBarWidthPositioned = devSymbolSize;
 
          // reposition the rectangle when the bars are beside each other
          if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
-            devBarXPos += serieIndex * devBarWidth;
-            devBarWidthPositioned = devBarWidth - 1;
+            devBarXPos += serieIndex * devSymbolSize;
+            devBarWidthPositioned = devSymbolSize - 1;
          }
 
          int devXPosNextBar = 0;
@@ -4633,8 +4633,8 @@ public class ChartComponentGraph extends Canvas {
             int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
 
             // center the bar
-            if (devBarWidth > 1 && barPosition == GraphDrawingData.BAR_POS_CENTER) {
-               devXPos -= devBarWidth2;
+            if (devSymbolSize > 1 && barPosition == GraphDrawingData.BAR_POS_CENTER) {
+               devXPos -= devSymbolSize2;
             }
 
             // check array bounds
@@ -4689,14 +4689,11 @@ public class ChartComponentGraph extends Canvas {
              */
             final int colorIndex = colorsIndex[serieIndex][valueIndex];
 
-            final RGB rgbBrightDef = rgbBright[colorIndex];
             final RGB rgbDarkDef = rgbDark[colorIndex];
-            final RGB rgbLineDef = rgbLine[colorIndex];
 
-            final Color colorBright = getColor(rgbBrightDef);
             final Color colorDark = getColor(rgbDarkDef);
-            final Color colorLine = getColor(rgbLineDef);
 
+            gcGraph.setForeground(colorDark);
             gcGraph.setBackground(colorDark);
 
             // ensure the symbol is visible
@@ -4704,10 +4701,8 @@ public class ChartComponentGraph extends Canvas {
                devShapeSize = 1;
             }
 
-            gcGraph.setLineWidth(3);
-
             /*
-             * Draw bar
+             * Draw symbol
              */
             final Rectangle barShapeCanvas = new Rectangle(
                   devXPosShape,
@@ -4715,16 +4710,17 @@ public class ChartComponentGraph extends Canvas {
                   devShapeSize,
                   devShapeSize);
 
-            gcGraph.setForeground(colorBright);
-            gcGraph.fillGradientRectangle(
+            gcGraph.fillRectangle(
                   barShapeCanvas.x,
                   barShapeCanvas.y,
                   barShapeCanvas.width,
-                  barShapeCanvas.height,
-                  false);
+                  barShapeCanvas.height);
 
-            gcGraph.setForeground(colorLine);
-            gcGraph.drawRectangle(barShapeCanvas);
+//            gcGraph.fillOval(
+//                  barShapeCanvas.x,
+//                  barShapeCanvas.y,
+//                  barShapeCanvas.width,
+//                  barShapeCanvas.height);
 
             // keep symbol positions
             barRecangles[serieIndex][valueIndex] = new Rectangle(
@@ -4739,7 +4735,7 @@ public class ChartComponentGraph extends Canvas {
                   devShapeSize + 4,
                   devShapeSize + 7);
 
-            // keep the height for the bar
+            // keep the height for the symbol
             devHeightSummary[valueIndex] += devShapeSize;
          }
       }
