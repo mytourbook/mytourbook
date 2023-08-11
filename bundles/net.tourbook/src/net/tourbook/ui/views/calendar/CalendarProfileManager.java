@@ -57,7 +57,7 @@ import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-public class CalendarProfileManager {
+class CalendarProfileManager {
 
    private static final String DEFAULT_PREFIX    = " : ";                                  //$NON-NLS-1$
    //
@@ -308,6 +308,7 @@ public class CalendarProfileManager {
    private static final DataFormatter _weekFormatter_Time_Paused;
    private static final DataFormatter _weekFormatter_Time_Moving;
    private static final DataFormatter _weekFormatter_Time_Break;
+   private static final DataFormatter _weekFormatter_TrainingLoad_Tss;
 
    static final DataFormatter[]       allTourContentFormatter;
    static final DataFormatter[]       allWeekFormatter;
@@ -400,6 +401,8 @@ public class CalendarProfileManager {
       _weekFormatter_Time_Moving                   = createFormatter_Time_Moving();
       _weekFormatter_Time_Break                    = createFormatter_Time_Break();
 
+      _weekFormatter_TrainingLoad_Tss              = createFormatter_TrainingLoad_Tss();
+
       allWeekFormatter = new DataFormatter[] {
 
             DEFAULT_EMPTY_FORMATTER,
@@ -419,7 +422,9 @@ public class CalendarProfileManager {
             _weekFormatter_Time_Recorded,
             _weekFormatter_Time_Paused,
             _weekFormatter_Time_Moving,
-            _weekFormatter_Time_Break
+            _weekFormatter_Time_Break,
+
+            _weekFormatter_TrainingLoad_Tss
       };
 
       DEFAULT_TOUR_FORMATTER_DATA = new FormatterData[] {
@@ -483,7 +488,6 @@ public class CalendarProfileManager {
          // repeat continuously -> is more handier
          new ColumnLayout_ComboData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Profile_ColumnLayout_Continuously),
       };
-
    private static final DayHeaderDateFormat_ComboData[] _allDateHeaderDateFormat_ComboData =
 
       new DayHeaderDateFormat_ComboData[] {
@@ -497,7 +501,6 @@ public class CalendarProfileManager {
          new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH_YEAR,       TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
          new DayHeaderDateFormat_ComboData(DayDateFormat.AUTOMATIC,            Messages.Calendar_Profile_DayHeaderDateFormat_Automatic),
       };
-
    private static final TourBackground_ComboData[] _allTourBackground_ComboData =
 
       new TourBackground_ComboData[] {
@@ -623,6 +626,7 @@ public class CalendarProfileManager {
     * Contains all calendar profiles which are loaded from a xml file.
     */
    private static final ArrayList<CalendarProfile> _allCalendarProfiles       = new ArrayList<>();
+
    private static final ArrayList<CalendarProfile> _allDefaultDefaultProfiles = new ArrayList<>();
    static {
       createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
@@ -640,7 +644,7 @@ public class CalendarProfileManager {
       String        label;
       CalendarColor color;
 
-      public CalendarColor_ComboData(final CalendarColor color, final String label) {
+      private CalendarColor_ComboData(final CalendarColor color, final String label) {
 
          this.color = color;
          this.label = label;
@@ -653,7 +657,7 @@ public class CalendarProfileManager {
       String      label;
       ColumnStart columnLayout;
 
-      public ColumnLayout_ComboData(final ColumnStart columnLayout, final String label) {
+      private ColumnLayout_ComboData(final ColumnStart columnLayout, final String label) {
 
          this.columnLayout = columnLayout;
          this.label = label;
@@ -665,7 +669,7 @@ public class CalendarProfileManager {
       String            label;
       DateColumnContent dateColumn;
 
-      public DateColumn_ComboData(final DateColumnContent dateColumn, final String label) {
+      private DateColumn_ComboData(final DateColumnContent dateColumn, final String label) {
 
          this.dateColumn = dateColumn;
          this.label = label;
@@ -677,7 +681,7 @@ public class CalendarProfileManager {
       String        label;
       CalendarColor dayContentColor;
 
-      DayContentColor_ComboData(final CalendarColor dayContentColor, final String label) {
+      private DayContentColor_ComboData(final CalendarColor dayContentColor, final String label) {
 
          this.label = label;
          this.dayContentColor = dayContentColor;
@@ -690,7 +694,7 @@ public class CalendarProfileManager {
       String        label;
       DayDateFormat dayHeaderDateFormat;
 
-      public DayHeaderDateFormat_ComboData(final DayDateFormat dayHeaderDateFormat, final String label) {
+      private DayHeaderDateFormat_ComboData(final DayDateFormat dayHeaderDateFormat, final String label) {
 
          this.dayHeaderDateFormat = dayHeaderDateFormat;
          this.label = label;
@@ -717,7 +721,7 @@ public class CalendarProfileManager {
        * @param defaultId
        * @param label
        */
-      ProfileDefaultId_ComboData(final DefaultId defaultId, final String label) {
+      private ProfileDefaultId_ComboData(final DefaultId defaultId, final String label) {
 
          this.defaultId = defaultId;
          this.labelOrUserId = label;
@@ -760,7 +764,7 @@ public class CalendarProfileManager {
       boolean        isColor1;
       boolean        isColor2;
 
-      public TourBackground_ComboData(final TourBackground tourBackground,
+      private TourBackground_ComboData(final TourBackground tourBackground,
                                       final String label,
                                       final boolean isColor1,
                                       final boolean isColor2,
@@ -783,7 +787,7 @@ public class CalendarProfileManager {
       boolean    isColor;
       boolean    isWidth;
 
-      public TourBorder_ComboData(final TourBorder tourBorder,
+      private TourBorder_ComboData(final TourBorder tourBorder,
                                   final String label,
                                   final boolean isColor,
                                   final boolean isWidth) {
@@ -1409,11 +1413,6 @@ public class CalendarProfileManager {
       return dataFormatter;
    }
 
-   /**
-    * Break time
-    *
-    * @return
-    */
    private static DataFormatter createFormatter_Time_Break() {
 
       final DataFormatter dataFormatter = new DataFormatter(
@@ -1755,6 +1754,52 @@ public class CalendarProfileManager {
 
          @Override
          public ValueFormat[] getValueFormats() {
+            return new ValueFormat[] { ValueFormat.TEXT };
+         }
+
+         @Override
+         void setValueFormat(final ValueFormat valueFormat) {}
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   /**
+    * TSS: Training Stress Score
+    */
+   private static DataFormatter createFormatter_TrainingLoad_Tss() {
+
+      final DataFormatter dataFormatter = new DataFormatter(
+            FormatterID.TRAININGLOAD_TSS,
+            Messages.Calendar_Profile_Value_TrainingStress_Tss,
+            //TODO FB UI.EMPTY_STRING
+            GraphColorManager.PREF_GRAPH_TIME) {
+
+         @Override
+         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+            final float trainingLoad_Tss = data.trainingLoad_Tss;
+            if (trainingLoad_Tss > 0) {
+
+               return String.valueOf(trainingLoad_Tss);
+
+            } else {
+
+               return UI.EMPTY_STRING;
+            }
+         }
+
+         @Override
+         public ValueFormat getDefaultFormat() {
+            return ValueFormat.TEXT;
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
             return new ValueFormat[] { ValueFormat.TEXT };
          }
 
@@ -3734,6 +3779,10 @@ public class CalendarProfileManager {
             _tourFormatter_Time_Break.setValueFormat(valueFormat);
             break;
 
+         case TRAININGLOAD_TSS:
+            _tourFormatter_Time_Recorded.setValueFormat(valueFormat);
+            break;
+
          case WEATHER_ICON:
             _tourFormatter_Weather_Icon.setValueFormat(valueFormat);
             break;
@@ -3802,6 +3851,10 @@ public class CalendarProfileManager {
 
          case TIME_BREAK:
             _weekFormatter_Time_Break.setValueFormat(valueFormat);
+            break;
+
+         case TRAININGLOAD_TSS:
+            _weekFormatter_TrainingLoad_Tss.setValueFormat(valueFormat);
             break;
 
          default:

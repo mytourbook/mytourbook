@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2022 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,7 @@ import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
-public class CalendarTourDataProvider {
+class CalendarTourDataProvider {
 
    private static final char                            NL                = UI.NEW_LINE;
 
@@ -165,7 +165,7 @@ public class CalendarTourDataProvider {
       return dt;
    }
 
-   public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay) {
+   CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay) {
 
       final WeekFields cw = TimeTools.calendarWeek;
 
@@ -421,6 +421,8 @@ public class CalendarTourDataProvider {
 
          ArrayList<String> dbTourWeatherClouds = null;
 
+         ArrayList<Float> dbTourTrainingStressScore = null;
+
          ArrayList<Integer> dbCalories = null;
          FloatArrayList dbPowerAvg = null;
          FloatArrayList dbPulseAvg = null;
@@ -467,8 +469,9 @@ public class CalendarTourDataProvider {
                + "   TourAltDown," + NL //                        18 //$NON-NLS-1$
                + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
                + "   Power_Avg," + NL //                          20 //$NON-NLS-1$
-               + "   TourDeviceTime_Recorded," + NL //            21 //$NON-NLS-1$
-               + "   weather_Clouds" + NL //                      22 //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded" + UI.SYMBOL_COMMA + NL // 21 //$NON-NLS-1$
+               + "   weather_Clouds" + UI.SYMBOL_COMMA + NL //          22 //$NON-NLS-1$
+               + "   power_TrainingStressScore" + NL //                 23 //$NON-NLS-1$
 
                + NL
 
@@ -539,6 +542,8 @@ public class CalendarTourDataProvider {
 
                   dbTourWeatherClouds = new ArrayList<>();
 
+                  dbTourTrainingStressScore = new ArrayList<>();
+
                   dbCalories = new ArrayList<>();
                   dbPowerAvg = new FloatArrayList();
                   dbPulseAvg = new FloatArrayList();
@@ -558,8 +563,8 @@ public class CalendarTourDataProvider {
                if (tourId == lastTourId) {
 
                   // get additional tags from outer join
-                  if (dbTagId instanceof Long) {
-                     tagIds.add((Long) dbTagId);
+                  if (dbTagId instanceof final Long tagId) {
+                     tagIds.add(tagId);
                   }
 
                } else {
@@ -606,10 +611,10 @@ public class CalendarTourDataProvider {
 
                   dbCalories.add(result.getInt(16));
 
-                  if (dbTagId instanceof Long) {
+                  if (dbTagId instanceof final Long tagId) {
 
                      tagIds = new ArrayList<>();
-                     tagIds.add((Long) dbTagId);
+                     tagIds.add(tagId);
 
                      dbTagIds.put(tourId, tagIds);
                   }
@@ -619,6 +624,8 @@ public class CalendarTourDataProvider {
                   dbPowerAvg.add(result.getFloat(20));
 
                   dbTourWeatherClouds.add(result.getString(22));
+
+                  dbTourTrainingStressScore.add(result.getFloat(23));
 
                   /*
                    * convert type id to the type index in the tour type array, this is also
@@ -687,6 +694,8 @@ public class CalendarTourDataProvider {
                data.tourDescription = dbTourDescription.get(tourIndex);
 
                data.weatherClouds = dbTourWeatherClouds.get(tourIndex);
+
+               data.trainingLoad_Tss = dbTourTrainingStressScore.get(tourIndex);
 
                final LocalDate tourDate = LocalDate.of(year, month, data.day);
                data.tourDate = tourDate;
