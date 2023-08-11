@@ -152,13 +152,13 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView photosAndToursView = Utils.showView(bot, Utils.VIEW_NAME_PHOTOSANDTOURS);
 
-      Utils.showViewFromMenu(bot, "Tour", "Tour &Photos"); //$NON-NLS-1$ //$NON-NLS-2$
+      Utils.showViewFromMenu(bot, "Tour", Utils.VIEW_NAME_PHOTOSTOURSPHOTOS); //$NON-NLS-1$
       final SWTBotView tourPhotosView = Utils.showView(bot, Utils.VIEW_NAME_PHOTOSTOURSPHOTOS);
 
-      Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$ //$NON-NLS-2$
+      Utils.showViewFromMenu(bot, "Map", Utils.VIEW_NAME_MAPBOOKMARK); //$NON-NLS-1$
       final SWTBotView mapBookmarkView = Utils.showView(bot, Utils.VIEW_NAME_MAPBOOKMARK);
 
-      Utils.showViewFromMenu(bot, "Map", "Model &Player"); //$NON-NLS-1$ //$NON-NLS-2$
+      Utils.showViewFromMenu(bot, "Map", Utils.VIEW_NAME_MODELPLAYER); //$NON-NLS-1$
       final SWTBotView modelPlayerView = Utils.showView(bot, Utils.VIEW_NAME_MODELPLAYER);
 
       bot.sleep(3000);
