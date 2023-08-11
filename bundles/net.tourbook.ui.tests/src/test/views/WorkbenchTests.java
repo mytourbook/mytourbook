@@ -15,8 +15,6 @@
  *******************************************************************************/
 package views;
 
-import net.tourbook.application.PluginProperties;
-
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.BeforeClass;
@@ -73,8 +71,6 @@ public class WorkbenchTests extends UITest {
    @Test
    void testOpenViews() {
 
-      String viewName;
-
       //Select a tour so that the selected views contain information
       Utils.showTourBookView(bot);
 
@@ -102,23 +98,23 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView tourDataView = Utils.showView(bot, Utils.VIEW_NAME_TOURDATA);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Analyzer"); //$NON-NLS-1$
-      final SWTBotView tourAnalyzerView = Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TOURANALYZER);
+      final SWTBotView tourAnalyzerView = Utils.showView(bot, Utils.VIEW_NAME_TOURANALYZER);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Compare Geo Tour"); //$NON-NLS-1$
-      final SWTBotView geoCompareView = Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
+      final SWTBotView geoCompareView = Utils.showView(bot, Utils.VIEW_NAME_GEOCOMPARE);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Chart Smoothing"); //$NON-NLS-1$
-      final SWTBotView tourChartSmoothingView = Utils.showView(bot, "Tour Chart Smoothing"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TOURCHARTSMOOTHING);
+      final SWTBotView tourChartSmoothingView = Utils.showView(bot, Utils.VIEW_NAME_TOURCHARTSMOOTHING);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Statistic Values"); //$NON-NLS-1$
-      final SWTBotView statisticValuesView = Utils.showView(bot, "Statistic Values"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_STATISTICVALUES);
+      final SWTBotView statisticValuesView = Utils.showView(bot, Utils.VIEW_NAME_STATISTICVALUES);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Training"); //$NON-NLS-1$
-      final SWTBotView trainingView = Utils.showView(bot, "Training"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TRAINING);
+      final SWTBotView trainingView = Utils.showView(bot, Utils.VIEW_NAME_TRAINING);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Heart Rate Variability"); //$NON-NLS-1$
-      final SWTBotView heartRateVariabilityView = Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_HEARTRATEVARIABILITY);
+      final SWTBotView heartRateVariabilityView = Utils.showView(bot, Utils.VIEW_NAME_HEARTRATEVARIABILITY);
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Photos"); //$NON-NLS-1$
       final SWTBotView photosView = Utils.showView(bot, "Photos"); //$NON-NLS-1$
@@ -128,15 +124,14 @@ public class WorkbenchTests extends UITest {
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
       final SWTBotView searchToursView = Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Tour Marker"); //$NON-NLS-1$
-      final SWTBotView tourMarkerView = Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_TOURMARKERALL);
+      final SWTBotView tourMarkerView = Utils.showView(bot, Utils.VIEW_NAME_TOURMARKERALL);
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
-      final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_COLLATEDTOURS);
+      final SWTBotView collatedToursView = Utils.showView(bot, Utils.VIEW_NAME_COLLATEDTOURS);
 
-      viewName = PluginProperties.getText("View_Name_ReferenceTours"); //$NON-NLS-1$
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, viewName);
-      final SWTBotView referenceToursView = Utils.showView(bot, viewName);
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_REFERENCETOURS);
+      final SWTBotView referenceToursView = Utils.showView(bot, Utils.VIEW_NAME_REFERENCETOURS);
 
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
@@ -147,11 +142,10 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
 
-      viewName = PluginProperties.getText("View_Name_TourComparisonTimeline"); //$NON-NLS-1$
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(viewName).select();
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(Utils.VIEW_NAME_TOURCOMPARISONTIMELINE).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView yearStatisticView = Utils.showView(bot, viewName);
+      final SWTBotView yearStatisticView = Utils.showView(bot, Utils.VIEW_NAME_TOURCOMPARISONTIMELINE);
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$

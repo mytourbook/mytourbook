@@ -35,7 +35,7 @@ public class StatisticsViewTests extends UITest {
    public void testStatisticsView() {
 
       bot.toolbarButtonWithTooltip("Statistics (Ctrl+Shift+S)").click(); //$NON-NLS-1$
-      final SWTBotView statisticsView = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME);
+      final SWTBotView statisticsView = Utils.showView(bot, Utils.VIEW_NAME_STATISTICS);
       final SWTBot statisticsViewBot = statisticsView.bot();
       bot.sleep(3000);
 
