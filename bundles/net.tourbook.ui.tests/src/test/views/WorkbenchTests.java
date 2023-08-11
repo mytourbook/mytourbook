@@ -122,7 +122,7 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
-      final SWTBotView searchToursView = Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
+      final SWTBotView searchToursView = Utils.showView(bot, Utils.VIEW_NAME_SEARCHALL);
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_TOURMARKERALL);
       final SWTBotView tourMarkerView = Utils.showView(bot, Utils.VIEW_NAME_TOURMARKERALL);
@@ -138,9 +138,9 @@ public class WorkbenchTests extends UITest {
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Elevation Compare").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode(Utils.VIEW_NAME_ELEVATIONCOMPARE).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView comparisonResultsView = Utils.showView(bot, "Elevation Compare"); //$NON-NLS-1$
+      final SWTBotView comparisonResultsView = Utils.showView(bot, Utils.VIEW_NAME_ELEVATIONCOMPARE);
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(Utils.VIEW_NAME_TOURCOMPARISONTIMELINE).select();
@@ -148,18 +148,18 @@ public class WorkbenchTests extends UITest {
       final SWTBotView yearStatisticView = Utils.showView(bot, Utils.VIEW_NAME_TOURCOMPARISONTIMELINE);
 
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode(Utils.VIEW_NAME_PHOTOSANDTOURS).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
+      final SWTBotView photosAndToursView = Utils.showView(bot, Utils.VIEW_NAME_PHOTOSANDTOURS);
 
       Utils.showViewFromMenu(bot, "Tour", "Tour &Photos"); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView tourPhotosView = Utils.showView(bot, "Tour Photos"); //$NON-NLS-1$
+      final SWTBotView tourPhotosView = Utils.showView(bot, Utils.VIEW_NAME_PHOTOSTOURSPHOTOS);
 
       Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView mapBookmarkView = Utils.showView(bot, "Map Bookmark"); //$NON-NLS-1$
+      final SWTBotView mapBookmarkView = Utils.showView(bot, Utils.VIEW_NAME_MAPBOOKMARK);
 
       Utils.showViewFromMenu(bot, "Map", "Model &Player"); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView modelPlayerView = Utils.showView(bot, "Model Player"); //$NON-NLS-1$
+      final SWTBotView modelPlayerView = Utils.showView(bot, Utils.VIEW_NAME_MODELPLAYER);
 
       bot.sleep(3000);
 
