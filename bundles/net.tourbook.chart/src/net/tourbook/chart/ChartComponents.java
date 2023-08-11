@@ -296,7 +296,7 @@ public class ChartComponents extends Composite {
       final ChartDataXSerie xData = _chartDataModel.getXData();
       final ChartDataXSerie xData2nd = _chartDataModel.getXData2nd();
 
-      final int graphCount = yDataList.size();
+      final int numGraphs = yDataList.size();
       int graphIndex = 1;
 
       // loop all graphs
@@ -324,6 +324,9 @@ public class ChartComponents extends Composite {
             }
          }
 
+         // transfer symbol size
+         graphDrawingData.setSymbolSize(yData.getSymbolSize());
+
          // set x/y data
          graphDrawingData.setXData(xData);
          graphDrawingData.setXData2nd(xData2nd);
@@ -331,7 +334,7 @@ public class ChartComponents extends Composite {
 
          // compute x/y values
          createDrawingData_X(graphDrawingData);
-         createDrawingData_Y(graphDrawingData, graphCount, graphIndex);
+         createDrawingData_Y(graphDrawingData, numGraphs, graphIndex);
 
          // reset adjusted y-slider value
          yData.adjustedYValue = Float.MIN_VALUE;

@@ -41,7 +41,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -62,7 +61,6 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
    private IDialogSettings       _state;
 
-   private MouseWheelListener    _defaultMouseWheelListener;
    private SelectionListener     _defaultSelectionListener;
 
    /*
@@ -74,7 +72,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
    private Button  _chkShowPace_Avg;
    private Button  _chkShowSpeed_Avg;
 
-   private Spinner _spinnerBarHeight;
+   private Spinner _spinnerSymbolSize;
 
    public SlideoutReferenceTimelineOptions(final ReferenceTimelineView refTour_YearStatistic_View,
                                            final Control ownerControl,
@@ -224,28 +222,38 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
          }
          {
             /*
-             * Bar size
+             * Symbol size
              */
-            final String tooltip = Messages.Slideout_RefTour_Spinner_BarSize_Tooltip;
+
+            // Relative height of the bar graph
+
+            // !!! remove after MT 23.8 !!!
+
+            final String obsolete1 = Messages.Slideout_RefTour_Spinner_BarSize_Tooltip;
+
+            // &Bar height
+            final String obsolete2 = Messages.Slideout_RefTour_Label_BarSize;
 
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Slideout_RefTour_Label_BarSize);
-            label.setToolTipText(tooltip);
+            label.setText(Messages.Slideout_RefTour_Label_SymbolSize);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
 
-            _spinnerBarHeight = new Spinner(group, SWT.BORDER);
-            _spinnerBarHeight.setMinimum(1);
-            _spinnerBarHeight.setMaximum(100);
-            _spinnerBarHeight.setIncrement(1);
-            _spinnerBarHeight.setPageIncrement(10);
-            _spinnerBarHeight.setToolTipText(tooltip);
-            _spinnerBarHeight.addMouseWheelListener(_defaultMouseWheelListener);
-            _spinnerBarHeight.addSelectionListener(_defaultSelectionListener);
+            _spinnerSymbolSize = new Spinner(group, SWT.BORDER);
+            _spinnerSymbolSize.setMinimum(1);
+            _spinnerSymbolSize.setMaximum(100);
+            _spinnerSymbolSize.setIncrement(1);
+            _spinnerSymbolSize.setPageIncrement(10);
+            _spinnerSymbolSize.addSelectionListener(_defaultSelectionListener);
+            _spinnerSymbolSize.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               onChangeUI();
+            });
+
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerBarHeight);
+                  .applyTo(_spinnerSymbolSize);
          }
       }
    }
@@ -254,11 +262,6 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = mouseEvent -> {
-
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-         onChangeUI();
-      };
    }
 
    private void onChangeUI() {
@@ -269,7 +272,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
          saveState();
 
-         _refTour_StatisticView.updateUI_YearChart_WithCurrentGeoData();
+         _refTour_StatisticView.updateUI_TimelineChart_WithCurrentGeoData();
       });
    }
 
@@ -287,7 +290,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
       _chkShowPulse_AvgMax    .setSelection(STATE_SHOW_PULSE_AVG_MAX_DEFAULT);
       _chkShowSpeed_Avg       .setSelection(STATE_SHOW_SPEED_AVG_DEFAULT);
 
-      _spinnerBarHeight       .setSelection(ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT);
+      _spinnerSymbolSize      .setSelection(ReferenceTimelineView.STATE_SYMBOL_SIZE_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -308,11 +311,11 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
 // SET_FORMATTING_ON
 
-      _spinnerBarHeight.setSelection(Util.getStateInt(_state,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_DEFAULT,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MIN,
-            ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT_MAX));
+      _spinnerSymbolSize.setSelection(Util.getStateInt(_state,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE_DEFAULT,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE_MIN,
+            ReferenceTimelineView.STATE_SYMBOL_SIZE_MAX));
    }
 
    private void saveState() {
@@ -327,7 +330,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
       _state.put(STATE_SHOW_PULSE_AVG_MAX,   _chkShowPulse_AvgMax    .getSelection());
       _state.put(STATE_SHOW_SPEED_AVG,       _chkShowSpeed_Avg       .getSelection());
 
-      _state.put(ReferenceTimelineView.STATE_RELATIVE_BAR_HEIGHT,  _spinnerBarHeight       .getSelection());
+      _state.put(ReferenceTimelineView.STATE_SYMBOL_SIZE,  _spinnerSymbolSize       .getSelection());
 
 // SET_FORMATTING_ON
    }

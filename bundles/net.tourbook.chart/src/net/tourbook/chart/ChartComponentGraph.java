@@ -949,7 +949,7 @@ public class ChartComponentGraph extends Canvas {
       double valueHalf;
 
       /*
-       * get the marker positon for the next value
+       * get the marker position for the next value
        */
       if (valueDraggingDiff > 0) {
 
@@ -1765,6 +1765,10 @@ public class ChartComponentGraph extends Canvas {
 
             drawAsync_530_BarGraph(gcGraph_WithOSXFix, graphDrawingData);
 
+         } else if (chartType == ChartType.SYMBOL) {
+
+            drawAsync_580_SymbolGraph(gcGraph_WithOSXFix, graphDrawingData);
+
          } else if (chartType == ChartType.LINE_WITH_BARS) {
 
             drawAsync_540_LineWithBarGraph(gcGraph_WithOSXFix, graphDrawingData);
@@ -1804,8 +1808,6 @@ public class ChartComponentGraph extends Canvas {
          if (isOSX) {
             gcGraph_WithOSXFix.dispose();
          }
-//         System.out.println("20 <- 10\tdrawAsync110GraphImage");
-//         // TODO remove SYSTEM.OUT.PRINTLN
       }
 
       if (_canChartBeOverlapped && _isChartOverlapped) {
@@ -4531,6 +4533,193 @@ public class ChartComponentGraph extends Canvas {
       // reset to default
       gc.setAlpha(0xFF);
       gc.setAntialias(SWT.OFF);
+   }
+
+   /**
+    * Draws a symbol for each data point
+    *
+    * @param gcGraph
+    * @param drawingData
+    */
+   private void drawAsync_580_SymbolGraph(final GC gcGraph, final GraphDrawingData drawingData) {
+
+      // get the chart data
+      final ChartDataXSerie xData = drawingData.getXData();
+      final ChartDataYSerie yData = drawingData.getYData();
+      final int[][] colorsIndex = yData.getColorsIndex();
+
+      // get the colors
+      final RGB[] rgbLine = yData.getRgbBar_Line();
+      final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
+      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
+
+      // get the chart values
+      final double scaleX = drawingData.getScaleX();
+      final double scaleY = drawingData.getScaleY();
+      final float graphYBorderBottom = drawingData.getGraphYBottom();
+      final boolean isBottomTop = yData.isYAxisDirection();
+
+      // get the horizontal offset for the graph
+      double devXOffset;
+      if (_chartComponents.synchConfigSrc == null) {
+
+         // a synch marker is not set, draw it normally
+         devXOffset = Math.max(0, _xxDevViewPortLeftBorder) / scaleX;
+
+      } else {
+
+         // adjust the start position to the synch marker position
+         devXOffset = _xxDevViewPortLeftBorder / scaleX;
+      }
+
+      final int devGraphCanvasHeight = drawingData.devGraphHeight;
+
+      /*
+       * Get the top/bottom for the graph, a chart can contain multiple canvas. Canvas is the area
+       * where the graph is painted.
+       */
+      final int devYCanvasBottom = devGraphCanvasHeight;
+      final int devYCanvasTop = 0;
+
+      final int devYChartBottom = drawingData.getDevYBottom();
+      final int devYChartTop = devYChartBottom - devGraphCanvasHeight;
+
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final float[][] yHighSeries = yData.getHighValuesFloat();
+
+      final int serieLength = yHighSeries.length;
+      final int valueLength = xValues.length;
+
+      // keep the bar rectangles for all canvas
+      final Rectangle[][] symbolRecangles = new Rectangle[serieLength][valueLength];
+      final Rectangle[][] symbolFocusRecangles = new Rectangle[serieLength][valueLength];
+      drawingData.setBarRectangles(symbolRecangles);
+      drawingData.setBarFocusRectangles(symbolFocusRecangles);
+
+
+      final int devSymbolSize_Original = drawingData.getSymbolSize();
+      final int devSymbolSize = Math.max(1, devSymbolSize_Original);
+      final int devSymbolSize2 = devSymbolSize / 2;
+
+      final int serieLayout = yData.getChartLayout();
+      final int devSymbolRectangleStartXPos = drawingData.getDevBarRectangleXPos();
+      final int symbolPosition = drawingData.getBarPosition();
+
+      // this antialias is not perfect but better than without
+      gcGraph.setTextAntialias(SWT.ON);
+
+      // loop: all data series
+      for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+         final float[] yHighValues = yHighSeries[serieIndex];
+
+         int devSymbolXPos = devSymbolRectangleStartXPos;
+         int devSymbolWidthPositioned = devSymbolSize;
+
+         // reposition the rectangle when the bars are beside each other
+         if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
+            devSymbolXPos += serieIndex * devSymbolSize;
+            devSymbolWidthPositioned = devSymbolSize - 1;
+         }
+
+         final int devXPosNextSymbol = 0;
+
+         // loop: all values in the current serie
+         for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+            // get the x position
+            int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devSymbolXPos;
+
+            // center the symbol
+            if (devSymbolSize > 1 && symbolPosition == GraphDrawingData.BAR_POS_CENTER) {
+               devXPos -= devSymbolSize2;
+            }
+
+            // check array bounds
+            if (valueIndex >= yHighValues.length) {
+               break;
+            }
+
+            final float valueY = yHighValues[valueIndex];
+
+            /*
+             * get y positions
+             */
+            int devYPosChart;
+            int devYPosCanvas;
+            if (isBottomTop) {
+
+               final int devYSymbol = (int) ((valueY - graphYBorderBottom) * scaleY);
+
+               devYPosChart = devYChartBottom - devYSymbol;
+               devYPosCanvas = devYCanvasBottom - devYSymbol;
+
+            } else {
+
+               final int devYSymbol = (int) ((graphYBorderBottom) * scaleY);
+
+               devYPosChart = devYChartTop + devYSymbol;
+               devYPosCanvas = devYCanvasTop + devYSymbol;
+            }
+
+            final int devXPosShape = devXPos;
+            int devShapeSize = devSymbolWidthPositioned;
+
+            /*
+             * Get colors
+             */
+            final int colorIndex = colorsIndex[serieIndex][valueIndex];
+
+            final RGB rgbDarkDef = rgbDark[colorIndex];
+
+            final Color colorDark = getColor(rgbDarkDef);
+
+            gcGraph.setForeground(colorDark);
+            gcGraph.setBackground(colorDark);
+
+            // ensure the symbol is visible
+            if (devShapeSize < 1) {
+               devShapeSize = 1;
+            }
+
+            /*
+             * Draw symbol
+             */
+            final Rectangle symbolCanvas = new Rectangle(
+                  devXPosShape,
+                  devYPosCanvas,
+                  devShapeSize,
+                  devShapeSize);
+
+            gcGraph.fillRectangle(
+                  symbolCanvas.x,
+                  symbolCanvas.y,
+                  symbolCanvas.width,
+                  symbolCanvas.height);
+
+//            gcGraph.fillOval(
+//                  barShapeCanvas.x,
+//                  barShapeCanvas.y,
+//                  barShapeCanvas.width,
+//                  barShapeCanvas.height);
+
+            // keep symbol positions
+            symbolRecangles[serieIndex][valueIndex] = new Rectangle(
+                  devXPosShape,
+                  devYPosChart,
+                  devShapeSize,
+                  devShapeSize);
+
+            symbolFocusRecangles[serieIndex][valueIndex] = new Rectangle(
+                  devXPosShape - 2,
+                  devYPosChart - 2,
+                  devShapeSize + 4,
+                  devShapeSize + 7);
+         }
+      }
+
+      // reset clipping
+      gcGraph.setClipping((Rectangle) null);
    }
 
    private void drawAsync_600_LineGraph_NoBackground(final GC gc,

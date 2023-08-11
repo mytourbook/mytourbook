@@ -3015,7 +3015,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          // set message again to fix dark theme issues, this is not 100% perfect
          _display.asyncExec(() -> {
 
-            if (_display.isDisposed()) {
+            if (_txtCompareStatus_Message.isDisposed()) {
                return;
             }
 

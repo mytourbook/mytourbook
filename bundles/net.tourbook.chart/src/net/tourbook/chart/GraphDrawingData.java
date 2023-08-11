@@ -107,6 +107,12 @@ public class GraphDrawingData {
    private float     _graphYTop;
 
    private int       _barPosition              = BAR_POS_LEFT;
+
+   /**
+    * Width/height when a sympol is displayed
+    */
+   private int       _symbolSize               = 8;
+
    private ChartType _chartType;
 
    private String    _errorMessage;
@@ -232,6 +238,10 @@ public class GraphDrawingData {
 
    public double getScaleY() {
       return _scaleY;
+   }
+
+   public int getSymbolSize() {
+      return _symbolSize;
    }
 
    public int getTitleTextPosition() {
@@ -420,6 +430,10 @@ public class GraphDrawingData {
 
    public void setScaleY(final double scaleY) {
       _scaleY = scaleY;
+   }
+
+   public void setSymbolSize(final int symbolSize) {
+      _symbolSize = symbolSize;
    }
 
    /**

@@ -2030,7 +2030,7 @@ public class Map2 extends Canvas {
 
    /**
     * @param mouseEvent
-    * @return Returns mouse positon in the map border or <code>null</code> when the border is not
+    * @return Returns mouse position in the map border or <code>null</code> when the border is not
     *         hovered. The returned absolute values are higher when the mouse is closer to the
     *         border.
     */

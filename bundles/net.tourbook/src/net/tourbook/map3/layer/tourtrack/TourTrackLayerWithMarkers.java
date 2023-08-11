@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,7 +65,7 @@ public class TourTrackLayerWithMarkers extends MarkerLayer implements PropertyCh
       // TODO remove SYSTEM.OUT
    }
 
-   public void setDefaultPositons() {
+   public void setDefaultPositions() {
 
       final BasicMarkerAttributes attrs = new BasicMarkerAttributes(Material.WHITE, BasicMarkerShape.SPHERE, 1d);
 
