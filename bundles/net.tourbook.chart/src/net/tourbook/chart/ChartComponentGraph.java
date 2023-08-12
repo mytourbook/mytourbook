@@ -4596,7 +4596,6 @@ public class ChartComponentGraph extends Canvas {
       drawingData.setBarRectangles(symbolRecangles);
       drawingData.setBarFocusRectangles(symbolFocusRecangles);
 
-
       final int devSymbolSize_Original = drawingData.getSymbolSize();
       final int devSymbolSize = Math.max(1, devSymbolSize_Original);
       final int devSymbolSize2 = devSymbolSize / 2;
@@ -4647,16 +4646,13 @@ public class ChartComponentGraph extends Canvas {
              */
             int devYPosChart;
             int devYPosCanvas;
+            final int devYSymbol = (int) ((valueY - graphYBorderBottom) * scaleY);
             if (isBottomTop) {
-
-               final int devYSymbol = (int) ((valueY - graphYBorderBottom) * scaleY);
 
                devYPosChart = devYChartBottom - devYSymbol;
                devYPosCanvas = devYCanvasBottom - devYSymbol;
 
             } else {
-
-               final int devYSymbol = (int) ((graphYBorderBottom) * scaleY);
 
                devYPosChart = devYChartTop + devYSymbol;
                devYPosCanvas = devYCanvasTop + devYSymbol;
