@@ -112,6 +112,8 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
       restoreState();
 
+      enableControls();
+
       return ui;
    }
 
@@ -197,6 +199,21 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
             _chkShowPace_Avg.setText(Messages.Slideout_RefTour_Checkbox_Pace_Avg);
             _chkShowPace_Avg.addSelectionListener(_defaultSelectionListener);
             gd.applyTo(_chkShowPace_Avg);
+
+            {
+               /*
+                * Invert pace graph
+                */
+               _chkInvertPaceGraph = new Button(group, SWT.CHECK);
+               _chkInvertPaceGraph.setText(Messages.Slideout_TourChartOptions_Checkbox_InvertPaceGraph);
+               _chkInvertPaceGraph.setToolTipText(Messages.Slideout_TourChartOptions_Checkbox_InvertPaceGraph_Tooltip);
+               _chkInvertPaceGraph.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .indent(16, 0)
+                     .span(2, 1)
+                     .applyTo(_chkInvertPaceGraph);
+            }
          }
          {
             /*
@@ -260,17 +277,14 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
                   .align(SWT.BEGINNING, SWT.FILL)
                   .applyTo(_spinnerSymbolSize);
          }
-         {
-            /*
-             * Invert pace graph
-             */
-            _chkInvertPaceGraph = new Button(group, SWT.CHECK);
-            _chkInvertPaceGraph.setText(Messages.Slideout_TourChartOptions_Checkbox_InvertPaceGraph);
-            _chkInvertPaceGraph.setToolTipText(Messages.Slideout_TourChartOptions_Checkbox_InvertPaceGraph_Tooltip);
-            _chkInvertPaceGraph.addSelectionListener(_defaultSelectionListener);
-            gd.applyTo(_chkInvertPaceGraph);
-         }
       }
+   }
+
+   private void enableControls() {
+
+      final boolean isPaceSelected = _chkShowPace_Avg.getSelection();
+
+      _chkInvertPaceGraph.setEnabled(isPaceSelected);
    }
 
    private void initUI() {
@@ -281,8 +295,10 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
    private void onChangeUI() {
 
-      // update chart async that the UI is updated immediately
+      enableControls();
 
+      // update chart async that the UI is updated immediately
+      
       Display.getCurrent().asyncExec(() -> {
 
          saveState();
