@@ -22,6 +22,7 @@ Improvements
   - New speed/pace graph which shows the average speed for distance intervals
     https://github.com/mytourbook/mytourbook/issues/829 
   - Slider positions are set to a selected reference tour or geo compared tour
+  - Set x-axis default unit (time or distance) by pressing also the <Ctrl> key
   
 * 2D Map
   - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed

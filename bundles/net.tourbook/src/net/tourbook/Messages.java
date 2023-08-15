@@ -2753,6 +2753,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_SetTimeZone;
    public static String        Tour_Action_SetWeatherConditions;
    public static String        Tour_Action_ShowBreaktimeValues;
+   public static String        Tour_Action_ShowDistanceOnXAxis_Tooltip;
+   public static String        Tour_Action_ShowTimeOnXAxis_Tooltip;
    public static String        Tour_Action_ShowTourPauses;
    public static String        Tour_Action_ShowTourPauses_Tooltip;
    public static String        Tour_Action_ShowValuePointValue;

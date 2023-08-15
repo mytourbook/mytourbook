@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.common.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Event;
 
 public class ActionXAxisDistance extends Action {
 
@@ -29,11 +30,14 @@ public class ActionXAxisDistance extends Action {
 
    public ActionXAxisDistance(final TourChart tourChart) {
 
-      super(Messages.Tour_Action_show_distance_on_x_axis, AS_RADIO_BUTTON);
+      super(UI.SPACE1, AS_RADIO_BUTTON);
 
-      this._tourChart = tourChart;
+      final String obsolete1 = Messages.Tour_Action_show_distance_on_x_axis;
+      final String obsolete2 = Messages.Tour_Action_show_distance_on_x_axis_tooltip;
 
-      setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
+      _tourChart = tourChart;
+
+      setToolTipText(Messages.Tour_Action_ShowDistanceOnXAxis_Tooltip);
 
       setImages();
 
@@ -41,8 +45,9 @@ public class ActionXAxisDistance extends Action {
    }
 
    @Override
-   public void run() {
-      _tourChart.actionXAxisDistance(isChecked());
+   public void runWithEvent(final Event event) {
+
+      _tourChart.actionXAxisDistance(event, isChecked());
    }
 
    public void setImages() {

@@ -10,6 +10,11 @@ TODO's
             Messages.Slideout_RefTour_Spinner_BarSize_Tooltip
             Messages.Slideout_RefTour_Label_BarSize
 
+            Messages.Tour_Action_show_distance_on_x_axis;
+            Messages.Tour_Action_show_distance_on_x_axis_tooltip;
+            Messages.Tour_Action_show_time_on_x_axis;
+            Messages.Tour_Action_show_time_on_x_axis_tooltip;
+
 
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3

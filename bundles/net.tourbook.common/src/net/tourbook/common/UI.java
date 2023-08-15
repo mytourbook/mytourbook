@@ -2066,6 +2066,19 @@ public class UI {
       return false;
    }
 
+   public static boolean isShiftKey(final Event event) {
+
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+      } else {
+         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+      }
+
+      return isShiftKey;
+   }
+
    public static boolean isShiftKey(final KeyEvent keyEvent) {
 
       boolean isShiftKey;
@@ -2079,14 +2092,14 @@ public class UI {
       return isShiftKey;
    }
 
-   public static boolean isShiftKey(final MouseEvent event) {
+   public static boolean isShiftKey(final MouseEvent mouseEvent) {
 
       boolean isShiftKey;
 
       if (IS_OSX) {
-         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+         isShiftKey = (mouseEvent.stateMask & SWT.MOD3) > 0;
       } else {
-         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+         isShiftKey = (mouseEvent.stateMask & SWT.MOD2) > 0;
       }
 
       return isShiftKey;

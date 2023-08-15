@@ -1013,9 +1013,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    /**
     * Set the X-axis to distance
     *
+    * @param event
     * @param isChecked
     */
-   public void actionXAxisDistance(final boolean isChecked) {
+   public void actionXAxisDistance(final Event event, final boolean isChecked) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // set distance as default
+
+         _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+      }
+
 
       // check if the distance axis button was pressed
       if (isChecked && !_tcc.isShowTimeOnXAxis) {
@@ -1039,9 +1048,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
+    * @param event
     * @param isChecked
     */
-   public void actionXAxisTime(final boolean isChecked) {
+   public void actionXAxisTime(final Event event, final boolean isChecked) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // set time as default
+
+         _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
+         _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, UI.isShiftKey(event));
+      }
 
       // check if the time axis button was already pressed
       if (isChecked && _tcc.isShowTimeOnXAxis) {
