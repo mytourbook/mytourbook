@@ -19,5 +19,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.babel.core
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %plugin.provider
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Localization: plugin
