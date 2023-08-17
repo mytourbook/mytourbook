@@ -405,7 +405,7 @@ public class PropertiesSerializer {
          String key = key2;
          final Message message = messagesBundle.getMessage(key);
          String value = message.getValue();
-         final String comment = message.getComment();
+         String comment = message.getComment();
 
          if (value != null) {
             // escape backslashes
@@ -447,7 +447,12 @@ public class PropertiesSerializer {
             key = convertUnicodeToEncoded(key);
             value = convertUnicodeToEncoded(value);
          }
+
          if (comment != null && comment.length() > 0) {
+
+            // cleanup new line chars
+            comment = comment.replaceAll("\r\n|\r|\n", SYSTEM_LINE_SEP);
+
             text.append(comment);
          }
 
