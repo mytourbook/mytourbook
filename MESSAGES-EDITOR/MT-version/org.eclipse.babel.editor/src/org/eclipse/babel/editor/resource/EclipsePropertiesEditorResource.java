@@ -141,7 +141,7 @@ public class EclipsePropertiesEditorResource extends AbstractPropertiesResource 
 
       if (documentProvider == null) {
 
-         System.out.println("documentProvider == null");
+         System.out.println("[org.eclipse.babel.editor.resource.EclipsePropertiesEditorResource.getText()] documentProvider == null");
 
          return null;
       }
