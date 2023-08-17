@@ -27,6 +27,7 @@ import org.eclipse.babel.editor.i18n.actions.ShowMissingAction;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -112,9 +113,14 @@ public class EntryRightBanner extends Composite {
 //          if (!PlatformUI.getWorkbench().getDisplay().isDisposed()
 //             && !editor.getMarkerManager().isDisposed()) {
 
-            Composite parent = getParent();
+            Composite parent = null;
 
-            if (parent.isDisposed()) {
+            try {
+
+               parent = getParent();
+
+            } catch (SWTException e) {
+
                return;
             }
 
