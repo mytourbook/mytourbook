@@ -4,7 +4,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.babel.core.message.plugin.BabelCorePlugin
 Bundle-Name: Babel Core Plug-in
 Bundle-SymbolicName: org.eclipse.babel.core;singleton:=true
-Bundle-Version: 1.0.5.2023-08-17-MT-4
+Bundle-Version: 1.0.5.2023-08-19-MT
 Export-Package: org.eclipse.babel.core.message,
  org.eclipse.babel.core.message.checks,
  org.eclipse.babel.core.message.checks.proximity,
