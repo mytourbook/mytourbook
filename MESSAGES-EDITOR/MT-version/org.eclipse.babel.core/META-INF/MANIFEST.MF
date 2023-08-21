@@ -1,8 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.eclipse.babel.core.message.plugin.BabelCorePlugin
 Bundle-Name: Babel Core Plug-in
-Bundle-SymbolicName: org.eclipse.babel.core
-Bundle-Version: 1.0.3.2020-09-21-MT
+Bundle-SymbolicName: org.eclipse.babel.core;singleton:=true
+Bundle-Version: 1.0.6.2023-08-19-MT
 Export-Package: org.eclipse.babel.core.message,
  org.eclipse.babel.core.message.checks,
  org.eclipse.babel.core.message.checks.proximity,
@@ -12,7 +14,8 @@ Export-Package: org.eclipse.babel.core.message,
  org.eclipse.babel.core.message.tree,
  org.eclipse.babel.core.message.tree.visitor,
  org.eclipse.babel.core.util
+Import-Package: org.eclipse.ui.plugin
 Require-Bundle: org.eclipse.core.databinding,
  org.eclipse.core.resources,
  org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17

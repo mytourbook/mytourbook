@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %plugin.name
 Bundle-SymbolicName: org.eclipse.babel.editor;singleton:=true
-Bundle-Version: 1.0.3.2020-09-21-MT
+Bundle-Version: 1.0.6.2023-08-19-MT
 Bundle-Activator: org.eclipse.babel.editor.plugin.MessagesEditorPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -19,5 +19,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.babel.core
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %plugin.provider
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Localization: plugin
