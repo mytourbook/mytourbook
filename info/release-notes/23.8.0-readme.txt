@@ -1,11 +1,12 @@
-23.8.0                                                 ?. August 2023
+23.8.0                                                   21. August 2023
 
 New
 ===
 
 * Java 17 
   Is the new required Java platform. 
-  For Windows user, use MyTourbook with the embedded Java and you don't have to care about it.
+  For Windows user, use MyTourbook with the embedded Java and you don't 
+  have to care about it.
   
 
 Improvements
@@ -25,7 +26,8 @@ Improvements
   - Set x-axis default unit (time or distance) by pressing also the <Ctrl> key
   
 * 2D Map
-  - The action "Show entire tour in the map" will show only the reference part of a tour when a reference tour is displayed
+  - The action "Show entire tour in the map" will show only the reference 
+    part of a tour when a reference tour is displayed
 
 * Tour Pauses View (Frederic)
   - Added the ability to delete tour pauses
@@ -60,7 +62,8 @@ Improvements
   - New columns: Elevation gain/loss
   
 * Compared Tour Chart View
-  - Show the reference tour graph which can overlap the compared tour graphs to see the differences more easily
+  - Show the reference tour graph which can overlap the compared tour 
+    graphs to see the differences more easily
 
 * Tour Compare
   - Pace values are now available everywhere like the speed values
@@ -108,7 +111,8 @@ Bugfix
     Until now the marker viewer height decreased every time when this dialog was reopened.
 
 * Tour Segmenter (Frederic)
-  - Fixed an issue where the segment creation was erroneous when using the "Minimum Elevation Difference" after changing the measurement system.
+  - Fixed an issue where the segment creation was erroneous when using 
+    the "Minimum Elevation Difference" after changing the measurement system.
 
 
 Translation    
