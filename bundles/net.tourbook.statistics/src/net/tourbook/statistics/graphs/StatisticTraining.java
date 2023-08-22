@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -352,7 +352,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             _statisticData_Training.allElevationUp_Low,
             _statisticData_Training.allElevationUp_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_UP);
       yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);

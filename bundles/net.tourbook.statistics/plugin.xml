@@ -199,6 +199,41 @@
       />
 
 
+      <!-- ELEVATION DOWN -->
+
+      <statistic
+         name           ="%Pref_Day_Summary_Elevation_Down"
+         class          ="net.tourbook.statistics.graphs.StatisticDay_Elevation_Down"
+         id             ="net.tourbook.statistics.StatisticSummary_Day_Elevation_Down"
+         category-data  ="Elevation"
+         category-time  ="Day"
+      />
+
+      <statistic
+         name           ="%Pref_Week_Summary_Elevation_Down"
+         class          ="net.tourbook.statistics.graphs.StatisticWeek_Elevation_Down"
+         id             ="net.tourbook.statistics.StatisticSummary_Week_Elevation_Down"
+         category-data  ="Elevation"
+         category-time  ="Week"
+      />
+
+      <statistic
+         name           ="%Pref_Month_Summary_Elevation_Down"
+         class          ="net.tourbook.statistics.graphs.StatisticMonth_Elevation_Down"
+         id             ="net.tourbook.statistics.StatisticSummary_Month_Elevation_Down"
+         category-data  ="Elevation"
+         category-time  ="Month"
+      />
+
+      <statistic
+         name           ="%Pref_Year_Summary_Elevation_Down"
+         class          ="net.tourbook.statistics.graphs.StatisticYear_Elevation_Down"
+         id             ="net.tourbook.statistics.StatisticSummary_Year_Elevation_Down"
+         category-data  ="Elevation"
+         category-time  ="Year"
+      />
+
+
       <!-- ATHLETE -->
 
       <statistic

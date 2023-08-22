@@ -18,22 +18,28 @@ package net.tourbook.statistics.graphs;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 
-public class StatisticDay_Elevation_Up extends StatisticDay {
+public class StatisticMonth_Elevation_Down extends StatisticMonth {
+
+   @Override
+   protected String getBarOrderingStateKey() {
+
+      return STATE_BAR_ORDERING_MONTH_ELEVATION_DOWN;
+   }
 
    @Override
    ChartDataModel getChartDataModel() {
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-      createXDataDay(chartDataModel);
-      createYDataElevationUp(chartDataModel);
+      createXData_Months(chartDataModel);
+      createYData_ElevationDown(chartDataModel);
 
       return chartDataModel;
    }
 
    @Override
-   protected String getGridPrefPrefix() {
-      return GRID_DAY_ELEVATION_UP;
-   }
+   public String getGridPrefPrefix() {
 
+      return GRID_MONTH_ELEVATION_DOWN;
+   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,9 +46,10 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    /*
     * UI controls
     */
-   private Button _chkShowElevationUp;
    private Button _chkShowDistance;
    private Button _chkShowDurationTime;
+   private Button _chkShowElevationUp;
+   private Button _chkShowElevationDown;
    private Button _chkShowNumberOfTours;
    private Button _chkShowYearSeparator;
    private Button _chkTooltip_ShowPercentageValues;
@@ -92,11 +93,19 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       }
       {
          /*
-          * Show altitude
+          * Show elevation up
           */
          _chkShowElevationUp = new Button(group, SWT.CHECK);
          _chkShowElevationUp.setText(Messages.Pref_Statistic_Checkbox_Altitude);
          _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
+      }
+      {
+         /*
+          * Show elevation down
+          */
+         _chkShowElevationDown = new Button(group, SWT.CHECK);
+         _chkShowElevationDown.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+         _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
       }
       {
          /*
@@ -280,9 +289,10 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowElevationUp.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE));
       _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE));
       _chkShowDurationTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
+      _chkShowElevationUp.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_DOWN));
       _chkShowNumberOfTours.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS));
       _chkShowYearSeparator.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR));
 
@@ -296,6 +306,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       final Enum<DurationTime> durationTime = Util.getEnumValue(
             _prefStore.getDefaultString(ITourbookPreferences.STAT_MONTH_DURATION_TIME),
             DurationTime.MOVING);
+
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
       _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
@@ -308,9 +319,10 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowElevationUp.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE));
       _chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE));
       _chkShowDurationTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
+      _chkShowElevationUp.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_DOWN));
       _chkShowNumberOfTours.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS));
 
       _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
@@ -337,9 +349,10 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE, _chkShowElevationUp.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, _chkShowDurationTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP, _chkShowElevationUp.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_DOWN, _chkShowElevationDown.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, _chkShowNumberOfTours.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, _chkTooltip_ShowPercentageValues.getSelection());

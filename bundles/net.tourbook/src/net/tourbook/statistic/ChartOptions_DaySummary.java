@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,8 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    /*
     * UI controls
     */
-   private Button _chkShowAltitude;
+   private Button _chkShowElevationUp;
+   private Button _chkShowElevationDown;
    private Button _chkShowDistance;
    private Button _chkShowDuration;
    private Button _chkShowAvgSpeed;
@@ -80,11 +81,19 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
          }
          {
             /*
-             * Show altitude
+             * Show elevation up
              */
-            _chkShowAltitude = new Button(group, SWT.CHECK);
-            _chkShowAltitude.setText(Messages.Pref_Statistic_Checkbox_Altitude);
-            _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
+            _chkShowElevationUp = new Button(group, SWT.CHECK);
+            _chkShowElevationUp.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+            _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show elevation down
+             */
+            _chkShowElevationDown = new Button(group, SWT.CHECK);
+            _chkShowElevationDown.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+            _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
@@ -193,20 +202,24 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE));
-      _chkShowAvgPace.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE));
-      _chkShowAvgSpeed.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED));
-      _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE));
-      _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION));
+// SET_FORMATTING_OFF
+
+      _chkShowAvgPace      .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE));
+      _chkShowAvgSpeed     .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED));
+      _chkShowDistance     .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE));
+      _chkShowDuration     .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION));
+      _chkShowElevationUp  .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_DOWN));
 
       final Enum<DurationTime> durationTime = Util.getEnumValue(
             _prefStore.getDefaultString(ITourbookPreferences.STAT_DAY_DURATION_TIME),
             DurationTime.MOVING);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
-      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
-      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+
+      _rdoDuration_BreakTime     .setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime    .setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime   .setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime  .setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime    .setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -214,20 +227,22 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowAltitude.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE));
-      _chkShowAvgPace.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE));
-      _chkShowAvgSpeed.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED));
-      _chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE));
-      _chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION));
+      _chkShowAvgPace      .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE));
+      _chkShowAvgSpeed     .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED));
+      _chkShowDistance     .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE));
+      _chkShowDuration     .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION));
+      _chkShowElevationUp  .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_DOWN));
 
       final Enum<DurationTime> durationTime = Util.getEnumValue(
             _prefStore.getString(ITourbookPreferences.STAT_DAY_DURATION_TIME),
             DurationTime.MOVING);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
-      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
-      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+
+      _rdoDuration_BreakTime     .setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime    .setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime   .setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime  .setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime .setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -235,11 +250,14 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE, _chkShowAltitude.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE, _chkShowAvgPace.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED, _chkShowAvgSpeed.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION, _chkShowDuration.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE,        _chkShowAvgPace.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED,       _chkShowAvgSpeed.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE,        _chkShowDistance.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION,        _chkShowDuration.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_UP,    _chkShowElevationUp.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_DOWN,  _chkShowElevationDown.getSelection());
+
+// SET_FORMATTING_ON
 
       String selectedDurationType = UI.EMPTY_STRING;
 

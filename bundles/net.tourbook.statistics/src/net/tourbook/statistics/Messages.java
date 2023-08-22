@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,13 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.statistics.messages"; //$NON-NLS-1$
 
-   public static String        LABEL_GRAPH_ALTITUDE;
    public static String        LABEL_GRAPH_BATTERY;
    public static String        LABEL_GRAPH_BODY_FAT;
    public static String        LABEL_GRAPH_BODY_WEIGHT;
    public static String        LABEL_GRAPH_DAYTIME;
    public static String        LABEL_GRAPH_DISTANCE;
+   public static String        LABEL_GRAPH_ELEVATION_DOWN;
+   public static String        LABEL_GRAPH_ELEVATION_UP;
    public static String        LABEL_GRAPH_NUMBER_OF_TOURS;
    public static String        LABEL_GRAPH_PACE;
    public static String        LABEL_GRAPH_SPEED;
@@ -51,7 +52,9 @@ public class Messages extends NLS {
    public static String        Statistic_Value_Date_Month_Header1;
    public static String        Statistic_Value_Date_Week_Header1;
    public static String        Statistic_Value_Date_Year_Header1;
-   public static String        Statistic_Value_Elevation_ElevationUp_Header1;
+   public static String        Statistic_Value_Elevation_Down_Header2;
+   public static String        Statistic_Value_Elevation_Header1;
+   public static String        Statistic_Value_Elevation_Up_Header2;
    public static String        Statistic_Value_HR_Summary_Header1;
    public static String        Statistic_Value_HR_Zone_1_Header1;
    public static String        Statistic_Value_HR_Zone_10_Header1;

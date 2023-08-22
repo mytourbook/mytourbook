@@ -70,77 +70,81 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, UI.SYMBOL_DOT);
       store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$
 
+// SET_FORMATTING_OFF
+
       /*
        * Statistics
        */
-      store.setDefault(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE, 0);
-      store.setDefault(ITourbookPreferences.STAT_ALTITUDE_INTERVAL, 250);
-      store.setDefault(ITourbookPreferences.STAT_ALTITUDE_NUMBERS, 21);
+      store.setDefault(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,    0);
+      store.setDefault(ITourbookPreferences.STAT_ALTITUDE_INTERVAL,     250);
+      store.setDefault(ITourbookPreferences.STAT_ALTITUDE_NUMBERS,      21);
 
-      store.setDefault(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE, 0);
-      store.setDefault(ITourbookPreferences.STAT_DISTANCE_INTERVAL, 10);
-      store.setDefault(ITourbookPreferences.STAT_DISTANCE_NUMBERS, 21);
+      store.setDefault(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,    0);
+      store.setDefault(ITourbookPreferences.STAT_DISTANCE_INTERVAL,     10);
+      store.setDefault(ITourbookPreferences.STAT_DISTANCE_NUMBERS,      21);
 
-      store.setDefault(ITourbookPreferences.STAT_DURATION_LOW_VALUE, 0);
-      store.setDefault(ITourbookPreferences.STAT_DURATION_INTERVAL, 60);
-      store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS, 12);
+      store.setDefault(ITourbookPreferences.STAT_DURATION_LOW_VALUE,    0);
+      store.setDefault(ITourbookPreferences.STAT_DURATION_INTERVAL,     60);
+      store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS,      12);
 
-      store.setDefault(ITourbookPreferences.STAT_DAY_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE, true);
-      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE, true);
-      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED, true);
-      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE, true);
-      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION, true);
-      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_DAY_DURATION_TIME,                       DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_ELEVATION_UP,                true);
+      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE,                    true);
+      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED,                   true);
+      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE,                    true);
+      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION,                    true);
+      store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_YEAR_SEPARATOR,              true);
 
-      store.setDefault(ITourbookPreferences.STAT_WEEK_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_CHART_TYPE,                         ChartDataSerie.CHART_TYPE_BAR_STACKED);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_DURATION_TIME,                      DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_UP,               true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE,                   true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION,                   true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS,            true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR,             true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES,  true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES,     true);
 
-      store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE, true);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE, true);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, true);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, true);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE,                        ChartDataSerie.CHART_TYPE_BAR_STACKED);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME,                     DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP,              true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE,                  true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION,                  true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS,           true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR,            true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES,    true);
 
-      store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE,                         ChartDataSerie.CHART_TYPE_BAR_STACKED);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME,                      DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP,               true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE,                   true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION,                   true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS,            true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR,             true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES,  true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES,     true);
 
-      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
-      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME,                          DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES,      true);
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES,         true);
 
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT, true);
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE, true);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME,                       DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT,             true);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT_ANAEROBIC,   true);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE,        true);
 
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME, DurationTime.MOVING.name());
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT, true);
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE, true);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME,                      DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT,            true);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC,  true);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE,       true);
 
-      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE, 200.0);
-      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE, 0.0);
-      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE, 100.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MIN_VISIBLE_VALUE,   0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYWEIGHT_YAXIS_MAX_VISIBLE_VALUE,   200.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MIN_VISIBLE_VALUE,      0.0);
+      store.setDefault(ITourbookPreferences.STAT_BODYFAT_YAXIS_MAX_VISIBLE_VALUE,      100.0);
+
+// SET_FORMATTING_ON
 
       /*
        * Graph preferences
