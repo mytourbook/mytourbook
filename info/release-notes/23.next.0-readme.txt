@@ -20,6 +20,11 @@ TODO's
             Messages.Tour_Action_show_time_on_x_axis;
             Messages.Tour_Action_show_time_on_x_axis_tooltip;
 
+            Pref_Day_Summary_Altitude
+            Pref_Week_Summary_Altitude
+            Pref_Month_Summary_Altitude
+            Pref_Year_Summary_Altitude
+
 
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3

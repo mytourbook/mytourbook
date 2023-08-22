@@ -115,7 +115,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
       _sortingByCategoryData.put("Training",    3); //$NON-NLS-1$
       _sortingByCategoryData.put("Time",        20); //$NON-NLS-1$
       _sortingByCategoryData.put("Distance",    21); //$NON-NLS-1$
-      _sortingByCategoryData.put("Altitude",    22); //$NON-NLS-1$
+      _sortingByCategoryData.put("Elevation",   22); //$NON-NLS-1$
       _sortingByCategoryData.put("AthleteData", 30); //$NON-NLS-1$
       _sortingByCategoryData.put("Battery",     40); //$NON-NLS-1$
       _sortingByCategoryData.put("Sensor",      42); //$NON-NLS-1$
