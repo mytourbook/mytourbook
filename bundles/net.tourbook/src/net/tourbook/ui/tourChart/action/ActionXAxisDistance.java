@@ -32,9 +32,6 @@ public class ActionXAxisDistance extends Action {
 
       super(UI.SPACE1, AS_RADIO_BUTTON);
 
-      final String obsolete1 = Messages.Tour_Action_show_distance_on_x_axis;
-      final String obsolete2 = Messages.Tour_Action_show_distance_on_x_axis_tooltip;
-
       _tourChart = tourChart;
 
       setToolTipText(Messages.Tour_Action_ShowDistanceOnXAxis_Tooltip);

@@ -4,30 +4,22 @@
 TODO's
 ======               
 
+* TRANSLATION
+
+  - Inform translators to update the Messages editor by using the install procedure from
+    https://mytourbook.sourceforge.io/mytourbook/index.php/development/translation/install-resource-editor
+  - The internal newline char is now forced to Unix that different translators create the same output
+  - The headerline shows the used messages editor and version
+  - I'm using this https://github.com/mytourbook/eclipse-rbe messages editor which is faster when many languages are edited but it has the major disadvantage that new texts are not displayed in the "Problems" view
+
 
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
-
   Code should always ask the workbench for the display rather than rely on Display.getDefault()
   
 
-* Remove these messages after 23.8
-
-            Messages.Slideout_RefTour_Spinner_BarSize_Tooltip
-            Messages.Slideout_RefTour_Label_BarSize
-
-            Messages.Tour_Action_show_distance_on_x_axis;
-            Messages.Tour_Action_show_distance_on_x_axis_tooltip;
-            Messages.Tour_Action_show_time_on_x_axis;
-            Messages.Tour_Action_show_time_on_x_axis_tooltip;
-
-            Pref_Day_Summary_Altitude
-            Pref_Week_Summary_Altitude
-            Pref_Month_Summary_Altitude
-            Pref_Year_Summary_Altitude
-
-
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3
+
 
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script

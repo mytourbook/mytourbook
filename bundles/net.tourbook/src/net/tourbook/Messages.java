@@ -2308,10 +2308,8 @@ public class Messages extends NLS {
    public static String        Slideout_RefTour_Checkbox_Pulse_AvgMax;
    public static String        Slideout_RefTour_Checkbox_Speed_Avg;
    public static String        Slideout_RefTour_Group_Graphs;
-   public static String        Slideout_RefTour_Label_BarSize;
    public static String        Slideout_RefTour_Label_ReferenceTimelineOptions;
    public static String        Slideout_RefTour_Label_SymbolSize;
-   public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
@@ -2758,12 +2756,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_ShowTourPauses;
    public static String        Tour_Action_ShowTourPauses_Tooltip;
    public static String        Tour_Action_ShowValuePointValue;
-   public static String        Tour_Action_show_distance_on_x_axis;
-   public static String        Tour_Action_show_distance_on_x_axis_tooltip;
    public static String        tour_action_show_srtm_data;
    public static String        Tour_Action_show_start_time_on_x_axis;
-   public static String        Tour_Action_show_time_on_x_axis;
-   public static String        Tour_Action_show_time_on_x_axis_tooltip;
    public static String        Tour_Action_Swim_Strokes_Tooltip;
    public static String        Tour_Action_Swim_Swolf_Tooltip;
    public static String        Tour_Action_TourInfo_Tooltip;

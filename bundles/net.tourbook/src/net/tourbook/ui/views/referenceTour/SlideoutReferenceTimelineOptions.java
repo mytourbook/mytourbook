@@ -249,13 +249,6 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 
             // Relative height of the bar graph
 
-            // !!! remove after MT 23.8 !!!
-
-            final String obsolete1 = Messages.Slideout_RefTour_Spinner_BarSize_Tooltip;
-
-            // &Bar height
-            final String obsolete2 = Messages.Slideout_RefTour_Label_BarSize;
-
             final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Slideout_RefTour_Label_SymbolSize);
             GridDataFactory.fillDefaults()
@@ -298,7 +291,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
       enableControls();
 
       // update chart async that the UI is updated immediately
-      
+
       Display.getCurrent().asyncExec(() -> {
 
          saveState();

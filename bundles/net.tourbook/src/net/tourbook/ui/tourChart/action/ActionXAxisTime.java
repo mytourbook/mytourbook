@@ -34,9 +34,6 @@ public class ActionXAxisTime extends Action {
 
       _tourChart = tourChart;
 
-      final String obsolete1 = Messages.Tour_Action_show_time_on_x_axis;
-      final String obsolete2 = Messages.Tour_Action_show_time_on_x_axis_tooltip;
-
       setToolTipText(Messages.Tour_Action_ShowTimeOnXAxis_Tooltip);
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.XAxis_ShowTime));
 
