@@ -76,7 +76,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private void createUI_100_Graphs(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_MonthSummary);
+      group.setText(Messages.Slideout_StatisticOptions_Group_MonthSummary);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
@@ -88,7 +88,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
           * Show distance
           */
          _chkShowDistance = new Button(group, SWT.CHECK);
-         _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
+         _chkShowDistance.setText(Messages.Slideout_StatisticOptions_Checkbox_Distance);
          _chkShowDistance.addSelectionListener(_defaultSelectionListener);
       }
       {
@@ -96,7 +96,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
           * Show elevation up
           */
          _chkShowElevationUp = new Button(group, SWT.CHECK);
-         _chkShowElevationUp.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+         _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
          _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
       }
       {
@@ -104,7 +104,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
           * Show elevation down
           */
          _chkShowElevationDown = new Button(group, SWT.CHECK);
-         _chkShowElevationDown.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+         _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
          _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
       }
       {
@@ -112,7 +112,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
           * Show time
           */
          _chkShowDurationTime = new Button(group, SWT.CHECK);
-         _chkShowDurationTime.setText(Messages.Pref_Statistic_Checkbox_Duration);
+         _chkShowDurationTime.setText(Messages.Slideout_StatisticOptions_Checkbox_Duration);
          _chkShowDurationTime.addSelectionListener(_defaultSelectionListener);
 
          /*
@@ -131,7 +131,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                 * Elapsed time
                 */
                _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
-               _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+               _rdoDuration_ElapsedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_ElapsedTime);
                _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
             }
             {
@@ -145,7 +145,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                 * Recorded time
                 */
                _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
-               _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+               _rdoDuration_RecordedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_RecordedTime);
                _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
             }
 
@@ -154,7 +154,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                 * Moving time
                 */
                _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
-               _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
+               _rdoDuration_MovingTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_MovingTime);
                _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
             }
 
@@ -164,7 +164,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                 * Paused time
                 */
                _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
-               _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+               _rdoDuration_PausedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_PausedTime);
                _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
             }
             {
@@ -172,7 +172,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                 * Break time
                 */
                _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-               _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
+               _rdoDuration_BreakTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_BreakTime);
                _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
             }
          }
@@ -194,7 +194,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
           * Show number of tours
           */
          _chkShowNumberOfTours = new Button(group, SWT.CHECK);
-         _chkShowNumberOfTours.setText(Messages.Pref_Statistic_Checkbox_NumberOfTours);
+         _chkShowNumberOfTours.setText(Messages.Slideout_StatisticOptions_Checkbox_NumberOfTours);
          _chkShowNumberOfTours.addSelectionListener(_defaultSelectionListener);
       }
       {
@@ -202,7 +202,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
           * Show year separator
           */
          _chkShowYearSeparator = new Button(group, SWT.CHECK);
-         _chkShowYearSeparator.setText(Messages.Pref_Statistic_Checkbox_YearSeparator);
+         _chkShowYearSeparator.setText(Messages.Slideout_StatisticOptions_Checkbox_YearSeparator);
          _chkShowYearSeparator.addSelectionListener(_defaultSelectionListener);
       }
    }
@@ -210,7 +210,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private void createUI_200_StatisticTooltip(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_StatisticTooltip);
+      group.setText(Messages.Slideout_StatisticOptions_Group_StatisticTooltip);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
@@ -219,7 +219,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
              * Show total values
              */
             _chkTooltip_ShowSummaryValues = new Button(group, SWT.CHECK);
-            _chkTooltip_ShowSummaryValues.setText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues);
+            _chkTooltip_ShowSummaryValues.setText(Messages.Slideout_StatisticOptions_Checkbox_ShowSummaryValues);
             _chkTooltip_ShowSummaryValues.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -227,7 +227,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
              * Show % values
              */
             _chkTooltip_ShowPercentageValues = new Button(group, SWT.CHECK);
-            _chkTooltip_ShowPercentageValues.setText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues);
+            _chkTooltip_ShowPercentageValues.setText(Messages.Slideout_StatisticOptions_Checkbox_ShowPercentageValues);
 //          tooltip: Percentage of the bar value to the total value
             _chkTooltip_ShowPercentageValues.addSelectionListener(_defaultSelectionListener);
          }
@@ -237,7 +237,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private void createUI_300_ChartType(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_ChartType);
+      group.setText(Messages.Slideout_StatisticOptions_Group_ChartType);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -247,7 +247,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
              * Bar adjacent
              */
             _rdoChartType_BarAdjacent = new Button(group, SWT.RADIO);
-            _rdoChartType_BarAdjacent.setText(Messages.Pref_Statistic_Radio_BarAdjacent);
+            _rdoChartType_BarAdjacent.setText(Messages.Slideout_StatisticOptions_Radio_BarAdjacent);
             _rdoChartType_BarAdjacent.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -255,7 +255,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
              * Bar adjacent
              */
             _rdoChartType_BarStacked = new Button(group, SWT.RADIO);
-            _rdoChartType_BarStacked.setText(Messages.Pref_Statistic_Radio_BarStacked);
+            _rdoChartType_BarStacked.setText(Messages.Slideout_StatisticOptions_Radio_BarStacked);
             _rdoChartType_BarStacked.addSelectionListener(_defaultSelectionListener);
          }
       }

@@ -84,7 +84,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 
       final Group group = new Group(parent, SWT.NONE);
 //		group.setText(Messages.Pref_Graphs_Group_Grid);
-      group.setText(Messages.Pref_Statistic_Group_TourFrequency);
+      group.setText(Messages.Slideout_StatisticOptions_Group_TourFrequency);
       GridDataFactory.fillDefaults()//
             .grab(true, false)
             .span(2, 1)
@@ -101,7 +101,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Label: Minimum
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Statistic_Label_Minimum);
+            label.setText(Messages.Slideout_StatisticOptions_Label_Minimum);
             GridDataFactory.fillDefaults()//
                   .align(SWT.FILL, SWT.CENTER)
                   .indent(leftPadding, 0)
@@ -113,7 +113,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Label: Interval
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Statistic_Label_Interval);
+            label.setText(Messages.Slideout_StatisticOptions_Label_Interval);
             GridDataFactory.fillDefaults()//
                   .align(SWT.FILL, SWT.CENTER)
                   .indent(leftPadding, 0)
@@ -125,7 +125,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Label: Number of bars
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Statistic_Label_NumberOfBars);
+            label.setText(Messages.Slideout_StatisticOptions_Label_NumberOfBars);
             GridDataFactory.fillDefaults()//
                   .align(SWT.FILL, SWT.CENTER)
                   .indent(leftPadding, 0)
@@ -141,7 +141,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
                 * Label: Distance
                 */
                final Label label = new Label(group, SWT.NONE);
-               label.setText(Messages.Pref_Statistic_Label_distance);
+               label.setText(Messages.Slideout_StatisticOptions_Label_Distance);
                GridDataFactory.fillDefaults()//
                      .align(SWT.FILL, SWT.CENTER)
                      .applyTo(label);
@@ -221,7 +221,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
                 * Label: Altitude
                 */
                final Label label = new Label(group, SWT.NONE);
-               label.setText(Messages.Pref_Statistic_Label_altitude);
+               label.setText(Messages.Slideout_StatisticOptions_Label_Altitude);
                GridDataFactory.fillDefaults()//
                      .align(SWT.FILL, SWT.CENTER)
                      .applyTo(label);
@@ -301,7 +301,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
                 * Label: Duration
                 */
                final Label label = new Label(group, SWT.NONE);
-               label.setText(Messages.Pref_Statistic_Label_duration);
+               label.setText(Messages.Slideout_StatisticOptions_Label_Duration);
                GridDataFactory.fillDefaults()//
                      .align(SWT.FILL, SWT.CENTER)
                      .applyTo(label);
@@ -381,7 +381,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
    private void createUI_20_DurationTime(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_DurationTime);
+      group.setText(Messages.Slideout_StatisticOptions_Group_DurationTime);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults()
             .numColumns(2)
@@ -394,7 +394,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Elapsed time
              */
             _rdoDuration_ElapsedTime = new Button(group, SWT.RADIO);
-            _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+            _rdoDuration_ElapsedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_ElapsedTime);
             _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -408,7 +408,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Recorded time
              */
             _rdoDuration_RecordedTime = new Button(group, SWT.RADIO);
-            _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+            _rdoDuration_RecordedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_RecordedTime);
             _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -416,7 +416,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Moving time
              */
             _rdoDuration_MovingTime = new Button(group, SWT.RADIO);
-            _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
+            _rdoDuration_MovingTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_MovingTime);
             _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
          }
 
@@ -426,7 +426,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Paused time
              */
             _rdoDuration_PausedTime = new Button(group, SWT.RADIO);
-            _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+            _rdoDuration_PausedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_PausedTime);
             _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -434,7 +434,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Break time
              */
             _rdoDuration_BreakTime = new Button(group, SWT.RADIO);
-            _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
+            _rdoDuration_BreakTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_BreakTime);
             _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
          }
       }
@@ -455,7 +455,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
    private void createUI_30_StatisticTooltip(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_StatisticTooltip);
+      group.setText(Messages.Slideout_StatisticOptions_Group_StatisticTooltip);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
@@ -464,7 +464,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Show total values
              */
             _chkTooltip_ShowSummaryValues = new Button(group, SWT.CHECK);
-            _chkTooltip_ShowSummaryValues.setText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues);
+            _chkTooltip_ShowSummaryValues.setText(Messages.Slideout_StatisticOptions_Checkbox_ShowSummaryValues);
             _chkTooltip_ShowSummaryValues.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -472,7 +472,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
              * Show % values
              */
             _chkTooltip_ShowPercentageValues = new Button(group, SWT.CHECK);
-            _chkTooltip_ShowPercentageValues.setText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues);
+            _chkTooltip_ShowPercentageValues.setText(Messages.Slideout_StatisticOptions_Checkbox_ShowPercentageValues);
 //          tooltip: Percentage of the bar value to the total value
             _chkTooltip_ShowPercentageValues.addSelectionListener(_defaultSelectionListener);
          }

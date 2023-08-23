@@ -173,7 +173,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
    private Composite createUI(final Composite parent) {
 
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.pref_statistic_lbl_info);
+      label.setText(Messages.Pref_Statistic_Label_Info);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);

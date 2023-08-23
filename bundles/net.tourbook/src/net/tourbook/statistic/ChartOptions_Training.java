@@ -74,7 +74,7 @@ public class ChartOptions_Training implements IStatisticOptions {
       createUI_10_Training(parent);
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_DaySummary);
+      group.setText(Messages.Slideout_StatisticOptions_Group_DaySummary);
       GridDataFactory.fillDefaults()//
             .grab(true, false)
             .span(2, 1)
@@ -90,7 +90,7 @@ public class ChartOptions_Training implements IStatisticOptions {
    private void createUI_10_Training(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_Training);
+      group.setText(Messages.Slideout_StatisticOptions_Group_Training);
       GridDataFactory.fillDefaults()//
             .grab(true, false)
             .span(2, 1)
@@ -102,7 +102,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show training effect
              */
             _chkShow_TrainingEffect = new Button(group, SWT.CHECK);
-            _chkShow_TrainingEffect.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect_Aerob);
+            _chkShow_TrainingEffect.setText(Messages.Slideout_StatisticOptions_Checkbox_TrainingEffect_Aerob);
             _chkShow_TrainingEffect.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -110,7 +110,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show training effect anaerobic
              */
             _chkShow_TrainingEffect_Anaerobic = new Button(group, SWT.CHECK);
-            _chkShow_TrainingEffect_Anaerobic.setText(Messages.Pref_Statistic_Checkbox_TrainingEffect_Anaerob);
+            _chkShow_TrainingEffect_Anaerobic.setText(Messages.Slideout_StatisticOptions_Checkbox_TrainingEffect_Anaerob);
             _chkShow_TrainingEffect_Anaerobic.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -118,7 +118,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show training performance
              */
             _chkShow_TrainingPerformance = new Button(group, SWT.CHECK);
-            _chkShow_TrainingPerformance.setText(Messages.Pref_Statistic_Checkbox_TrainingPerformance);
+            _chkShow_TrainingPerformance.setText(Messages.Slideout_StatisticOptions_Checkbox_TrainingPerformance);
             _chkShow_TrainingPerformance.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -126,8 +126,8 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show training performance average value
              */
             _chkShow_TrainingPerformance_AvgValue = new Button(group, SWT.CHECK);
-            _chkShow_TrainingPerformance_AvgValue.setText(Messages.Pref_Statistic_Checkbox_TrainingPerformance_AvgValue);
-            _chkShow_TrainingPerformance_AvgValue.setToolTipText(Messages.Pref_Statistic_Checkbox_TrainingPerformance_AvgValue_Tooltip);
+            _chkShow_TrainingPerformance_AvgValue.setText(Messages.Slideout_StatisticOptions_Checkbox_TrainingPerformance_AvgValue);
+            _chkShow_TrainingPerformance_AvgValue.setToolTipText(Messages.Slideout_StatisticOptions_Checkbox_TrainingPerformance_AvgValue_Tooltip);
             _chkShow_TrainingPerformance_AvgValue.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().indent(16, 0).applyTo(_chkShow_TrainingPerformance_AvgValue);
          }
@@ -145,7 +145,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show distance
              */
             _chkShowDistance = new Button(container, SWT.CHECK);
-            _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
+            _chkShowDistance.setText(Messages.Slideout_StatisticOptions_Checkbox_Distance);
             _chkShowDistance.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -153,7 +153,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show altitude
              */
             _chkShowAltitude = new Button(container, SWT.CHECK);
-            _chkShowAltitude.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+            _chkShowAltitude.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
             _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -161,7 +161,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show time
              */
             _chkShowDuration = new Button(container, SWT.CHECK);
-            _chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
+            _chkShowDuration.setText(Messages.Slideout_StatisticOptions_Checkbox_Duration);
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
@@ -179,7 +179,7 @@ public class ChartOptions_Training implements IStatisticOptions {
                    * Elapsed time
                    */
                   _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+                  _rdoDuration_ElapsedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_ElapsedTime);
                   _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -187,7 +187,7 @@ public class ChartOptions_Training implements IStatisticOptions {
                    * Recorded time
                    */
                   _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+                  _rdoDuration_RecordedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_RecordedTime);
                   _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -195,7 +195,7 @@ public class ChartOptions_Training implements IStatisticOptions {
                    * Paused time
                    */
                   _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_PausedTime);
                   _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -203,7 +203,7 @@ public class ChartOptions_Training implements IStatisticOptions {
                    * Moving time
                    */
                   _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
+                  _rdoDuration_MovingTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_MovingTime);
                   _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -211,7 +211,7 @@ public class ChartOptions_Training implements IStatisticOptions {
                    * Break time
                    */
                   _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
+                  _rdoDuration_BreakTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_BreakTime);
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
@@ -230,7 +230,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show avg speed
              */
             _chkShowAvgSpeed = new Button(container, SWT.CHECK);
-            _chkShowAvgSpeed.setText(Messages.Pref_Statistic_Checkbox_AvgSpeed);
+            _chkShowAvgSpeed.setText(Messages.Slideout_StatisticOptions_Checkbox_AvgSpeed);
             _chkShowAvgSpeed.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -238,7 +238,7 @@ public class ChartOptions_Training implements IStatisticOptions {
              * Show avg pace
              */
             _chkShowAvgPace = new Button(container, SWT.CHECK);
-            _chkShowAvgPace.setText(Messages.Pref_Statistic_Checkbox_AvgPace);
+            _chkShowAvgPace.setText(Messages.Slideout_StatisticOptions_Checkbox_AvgPace);
             _chkShowAvgPace.addSelectionListener(_defaultSelectionListener);
          }
       }

@@ -55,11 +55,11 @@ public class StatisticsViewTests extends UITest {
       numYearComboBox.setSelection("9"); //$NON-NLS-1$
       assertEquals("9", numYearComboBox.selection()); //$NON-NLS-1$
 
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_MonthSummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_YearSummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_TourFrequency);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_DaySummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_WeekSummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_MonthSummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_YearSummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_TourFrequency);
       statisticsTypeComboBox.setSelection("HR Zones - Week"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("HR Zones - Month"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Training - Line"); //$NON-NLS-1$
