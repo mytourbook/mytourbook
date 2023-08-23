@@ -84,7 +84,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
              * Show elevation up
              */
             _chkShowElevationUp = new Button(group, SWT.CHECK);
-            _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
+            _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationUp);
             _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -92,7 +92,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
              * Show elevation down
              */
             _chkShowElevationDown = new Button(group, SWT.CHECK);
-            _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
+            _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationDown);
             _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
          }
          {

@@ -2317,6 +2317,8 @@ public class Messages extends NLS {
    public static String        Slideout_StatisticOptions_Checkbox_AvgSpeed;
    public static String        Slideout_StatisticOptions_Checkbox_Distance;
    public static String        Slideout_StatisticOptions_Checkbox_Duration;
+   public static String        Slideout_StatisticOptions_Checkbox_ElevationDown;
+   public static String        Slideout_StatisticOptions_Checkbox_ElevationUp;
    public static String        Slideout_StatisticOptions_Checkbox_NumberOfTours;
    public static String        Slideout_StatisticOptions_Checkbox_ShowPercentageValues;
    public static String        Slideout_StatisticOptions_Checkbox_ShowSummaryValues;
