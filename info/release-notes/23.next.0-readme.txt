@@ -49,7 +49,9 @@ New
 Improvements
 ============
 
- * 
+* Statistics
+  - Show elevation loss values
+    https://github.com/mytourbook/mytourbook/issues/1034
 
 
 Changes
