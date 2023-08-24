@@ -364,15 +364,6 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK));
 
-      _colorSelector_ContentCategory_Bright     .restoreCustomColors(_state);
-      _colorSelector_ContentCategory_Dark       .restoreCustomColors(_state);
-      _colorSelector_ContentSubCategory_Bright  .restoreCustomColors(_state);
-      _colorSelector_ContentSubCategory_Dark    .restoreCustomColors(_state);
-      _colorSelector_DateCategory_Bright        .restoreCustomColors(_state);
-      _colorSelector_DateCategory_Dark          .restoreCustomColors(_state);
-      _colorSelector_DateSubCategory_Bright     .restoreCustomColors(_state);
-      _colorSelector_DateSubCategory_Dark       .restoreCustomColors(_state);
-
       _chkLiveUpdate    .setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
       _chkViewGridLines .setSelection(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
    }
@@ -388,8 +379,6 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
       Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT,     _colorSelector_DateSubCategory_Bright    .getColorValue());
       Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,       _colorSelector_DateSubCategory_Dark      .getColorValue());
 
-      // all color selectors have the same custom colors
-      _colorSelector_ContentCategory_Bright.saveCustomColors(_state);
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE,   _chkLiveUpdate.getSelection());
       _prefStore.setValue(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES,              _chkViewGridLines.getSelection());
@@ -410,26 +399,6 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
 
          // log selected color as Java code
          System.out.println(UI.logRGB(colorSelectorExtended.getColorValue()));
-
-         final RGB[] customColors = colorSelectorExtended.getCustomColors();
-
-         if (customColors != null) {
-
-            // update all color selectors with the same custom colors
-
-// SET_FORMATTING_OFF
-
-            _colorSelector_ContentCategory_Bright     .setCustomColors(customColors);
-            _colorSelector_ContentCategory_Dark       .setCustomColors(customColors);
-            _colorSelector_ContentSubCategory_Bright  .setCustomColors(customColors);
-            _colorSelector_ContentSubCategory_Dark    .setCustomColors(customColors);
-            _colorSelector_DateCategory_Bright        .setCustomColors(customColors);
-            _colorSelector_DateCategory_Dark          .setCustomColors(customColors);
-            _colorSelector_DateSubCategory_Bright     .setCustomColors(customColors);
-            _colorSelector_DateSubCategory_Dark       .setCustomColors(customColors);
-
-// SET_FORMATTING_ON
-         }
       }
    }
 

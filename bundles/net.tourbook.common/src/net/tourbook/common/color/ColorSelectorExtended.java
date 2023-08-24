@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -71,26 +72,33 @@ public class ColorSelectorExtended extends EventManager {
     *
     * @since 3.0
     */
-   public static final String                         PROP_COLORCHANGE        = "colorValue";              //$NON-NLS-1$
+   public static final String           PROP_COLORCHANGE        = "colorValue";                                                                //$NON-NLS-1$
 
-   private static final String                        XML_STATE_CUSTOM_COLORS = "XML_STATE_CUSTOM_COLORS"; //$NON-NLS-1$
+   private static final String          XML_STATE_CUSTOM_COLORS = "XML_STATE_CUSTOM_COLORS";                                                   //$NON-NLS-1$
 
-   private static final String                        TAG_CUSTOM_COLOR        = "color";                   //$NON-NLS-1$
-   private static final String                        ATTR_RED                = "red";                     //$NON-NLS-1$
-   private static final String                        ATTR_GREEN              = "green";                   //$NON-NLS-1$
-   private static final String                        ATTR_BLUE               = "blue";                    //$NON-NLS-1$
+   private static final String          TAG_CUSTOM_COLOR        = "color";                                                                     //$NON-NLS-1$
+   private static final String          ATTR_RED                = "red";                                                                       //$NON-NLS-1$
+   private static final String          ATTR_GREEN              = "green";                                                                     //$NON-NLS-1$
+   private static final String          ATTR_BLUE               = "blue";                                                                      //$NON-NLS-1$
 
-   private Button                                     fButton;
-   private RGB                                        fColorValue;
-   private Point                                      fExtent;
-   private Image                                      fImage;
+   private static final IDialogSettings _state                  = CommonActivator.getState("net.tourbook.common.color.ColorSelectorExtended"); //$NON-NLS-1$
+
+   private RGB                          _colorValue;
+   private Point                        _selectorImageSize;
+
+   /*
+    * UI resources
+    */
+   private Image                                      _buttonImage;
+
+   private Button                                     _btnColorSelector;
 
    /**
     * All colors which are displayed as custom colors in the color dialog, is limited to 16 in Win.
     */
    private RGB[]                                      _allCustomRGBs;
 
-   private final ListenerList<IColorSelectorListener> _openListeners          = new ListenerList<>();
+   private final ListenerList<IColorSelectorListener> _openListeners = new ListenerList<>();
 
    /**
     * Create a new instance of the receiver and the button that it wrappers in
@@ -101,22 +109,32 @@ public class ColorSelectorExtended extends EventManager {
     */
    public ColorSelectorExtended(final Composite parent) {
 
-      fButton = new Button(parent, SWT.PUSH);
-      fExtent = computeImageSize(parent);
-      fImage = new Image(parent.getDisplay(), fExtent.x, fExtent.y);
-      final GC gc = new GC(fImage);
-      gc.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER));
-      gc.fillRectangle(0, 0, fExtent.x, fExtent.y);
+      final Display display = parent.getDisplay();
+
+      _btnColorSelector = new Button(parent, SWT.PUSH);
+      _selectorImageSize = computeImageSize(parent);
+      _buttonImage = new Image(display, _selectorImageSize.x, _selectorImageSize.y);
+
+      final GC gc = new GC(_buttonImage);
+      {
+         gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BORDER));
+         gc.fillRectangle(0, 0, _selectorImageSize.x, _selectorImageSize.y);
+      }
       gc.dispose();
-      fButton.setImage(fImage);
-      fButton.addSelectionListener(widgetSelectedAdapter(event -> open()));
-      fButton.addDisposeListener(event -> {
-         if (fImage != null) {
-            fImage.dispose();
-            fImage = null;
+
+      _btnColorSelector.setImage(_buttonImage);
+      _btnColorSelector.addSelectionListener(widgetSelectedAdapter(event -> open()));
+
+      _btnColorSelector.addDisposeListener(event -> {
+
+         if (_buttonImage != null) {
+
+            _buttonImage.dispose();
+            _buttonImage = null;
          }
       });
-      fButton.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+
+      _btnColorSelector.getAccessible().addAccessibleListener(new AccessibleAdapter() {
          @Override
          public void getName(final AccessibleEvent e) {
             e.result = JFaceResources.getString("ColorSelector.Name"); //$NON-NLS-1$
@@ -135,29 +153,38 @@ public class ColorSelectorExtended extends EventManager {
     * @since 3.0
     */
    public void addListener(final IPropertyChangeListener listener) {
+
       addListenerObject(listener);
    }
 
    public void addOpenListener(final IColorSelectorListener listener) {
+
       _openListeners.add(listener);
    }
 
    /**
     * Compute the size of the image to be displayed.
     *
-    * @param window
+    * @param parent
     *           -
     *           the window used to calculate
     * @return <code>Point</code>
     */
-   private Point computeImageSize(final Control window) {
-      final GC gc = new GC(window);
-      final Font f = JFaceResources.getFontRegistry().get(
-            JFaceResources.DIALOG_FONT);
-      gc.setFont(f);
-      final int height = gc.getFontMetrics().getHeight();
+   private Point computeImageSize(final Control parent) {
+
+      int fontHeight;
+
+      final GC gc = new GC(parent);
+      {
+         final Font dialogFont = JFaceResources.getFontRegistry().get(JFaceResources.DIALOG_FONT);
+
+         gc.setFont(dialogFont);
+
+         fontHeight = gc.getFontMetrics().getHeight();
+      }
       gc.dispose();
-      return new Point(height * 3 - 6, height);
+
+      return new Point(fontHeight * 3 - 6, fontHeight);
    }
 
    /**
@@ -186,7 +213,8 @@ public class ColorSelectorExtended extends EventManager {
     * @return <code>Button</code>
     */
    public Button getButton() {
-      return fButton;
+
+      return _btnColorSelector;
    }
 
    /**
@@ -195,11 +223,8 @@ public class ColorSelectorExtended extends EventManager {
     * @return <code>RGB</code>
     */
    public RGB getColorValue() {
-      return fColorValue;
-   }
 
-   public RGB[] getCustomColors() {
-      return _allCustomRGBs;
+      return _colorValue;
    }
 
    /**
@@ -210,14 +235,19 @@ public class ColorSelectorExtended extends EventManager {
     * @return
     */
    public RGBA getRGBA(final int opacity) {
-      return new RGBA(fColorValue.red, fColorValue.green, fColorValue.blue, opacity);
+
+      return new RGBA(_colorValue.red, _colorValue.green, _colorValue.blue, opacity);
    }
 
    public void open() {
 
       fireOpenEvent(true);
 
+      restoreCustomColors();
+
       openColorDialog();
+
+      saveCustomColors();
 
       fireOpenEvent(false);
    }
@@ -230,9 +260,9 @@ public class ColorSelectorExtended extends EventManager {
     */
    private void openColorDialog() {
 
-      final ColorDialog colorDialog = new ColorDialog(fButton.getShell());
+      final ColorDialog colorDialog = new ColorDialog(_btnColorSelector.getShell());
 
-      colorDialog.setRGB(fColorValue);
+      colorDialog.setRGB(_colorValue);
       colorDialog.setRGBs(_allCustomRGBs);
 
       final RGB newColor = colorDialog.open();
@@ -241,8 +271,10 @@ public class ColorSelectorExtended extends EventManager {
 
       if (newColor != null) {
 
-         final RGB oldValue = fColorValue;
-         fColorValue = newColor;
+         // color dialog is NOT canceled
+
+         final RGB oldValue = _colorValue;
+         _colorValue = newColor;
          final Object[] finalListeners = getListeners();
 
          if (finalListeners.length > 0) {
@@ -279,9 +311,9 @@ public class ColorSelectorExtended extends EventManager {
       _openListeners.remove(listener);
    }
 
-   public void restoreCustomColors(final IDialogSettings state) {
+   private void restoreCustomColors() {
 
-      final String stateValue = Util.getStateString(state, XML_STATE_CUSTOM_COLORS, null);
+      final String stateValue = Util.getStateString(_state, XML_STATE_CUSTOM_COLORS, null);
 
       if ((stateValue != null) && (stateValue.length() > 0)) {
 
@@ -318,7 +350,7 @@ public class ColorSelectorExtended extends EventManager {
       setCustomColors(allCustomRGB.toArray(new RGB[allCustomRGB.size()]));
    }
 
-   public void saveCustomColors(final IDialogSettings state) {
+   private void saveCustomColors() {
 
       // Build the XML block for writing the bindings and active scheme.
       final XMLMemento xmlMemento = XMLMemento.createWriteRoot(XML_STATE_CUSTOM_COLORS);
@@ -329,7 +361,7 @@ public class ColorSelectorExtended extends EventManager {
       try (Writer writer = new StringWriter()) {
 
          xmlMemento.save(writer);
-         state.put(XML_STATE_CUSTOM_COLORS, writer.toString());
+         _state.put(XML_STATE_CUSTOM_COLORS, writer.toString());
 
       } catch (final IOException e) {
 
@@ -360,7 +392,8 @@ public class ColorSelectorExtended extends EventManager {
     */
    public void setColorValue(final RGB rgb) {
 
-      fColorValue = rgb;
+      _colorValue = rgb;
+
       updateColorImage();
    }
 
@@ -369,7 +402,7 @@ public class ColorSelectorExtended extends EventManager {
     *
     * @param allCustomRGBs
     */
-   public void setCustomColors(final RGB[] allCustomRGBs) {
+   private void setCustomColors(final RGB[] allCustomRGBs) {
 
       _allCustomRGBs = allCustomRGBs;
    }
@@ -387,7 +420,7 @@ public class ColorSelectorExtended extends EventManager {
 
    public void setToolTipText(final String tooltipText) {
 
-      fButton.setToolTipText(tooltipText);
+      _btnColorSelector.setToolTipText(tooltipText);
    }
 
    /**
@@ -395,12 +428,20 @@ public class ColorSelectorExtended extends EventManager {
     * setting.
     */
    protected void updateColorImage() {
-      final Display display = fButton.getDisplay();
-      final GC gc = new GC(fImage);
-      final Color color = new Color(display, fColorValue);
-      gc.setBackground(color);
-      gc.fillRectangle(1, 1, fExtent.x - 2, fExtent.y - 2);
+
+      final GC gc = new GC(_buttonImage);
+      {
+         final Color color = new Color(_colorValue);
+         gc.setBackground(color);
+
+         gc.fillRectangle(
+               1,
+               1,
+               _selectorImageSize.x - 2,
+               _selectorImageSize.y - 2);
+      }
       gc.dispose();
-      fButton.setImage(fImage);
+
+      _btnColorSelector.setImage(_buttonImage);
    }
 }

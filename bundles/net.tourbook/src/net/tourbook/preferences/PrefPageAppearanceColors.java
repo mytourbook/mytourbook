@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,6 @@ import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -124,8 +123,6 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
-
-   private static final IDialogSettings  _state            = CommonActivator.getState(ID);
 
    private TreeViewer                    _colorViewer;
    private GraphColorItem                _selectedColor;
@@ -872,8 +869,6 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       // live update
       _chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
-
-      _colorSelector.restoreCustomColors(_state);
    }
 
    private void updateAndSaveColors() {
@@ -881,8 +876,6 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       GraphColorManager.saveColors();
 
       MapColorProvider.updateMap2Colors();
-
-      _colorSelector.saveCustomColors(_state);
 
       // force to change the status
       _prefStore.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
