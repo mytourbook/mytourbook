@@ -482,7 +482,7 @@ public class ChartDataYSerie extends ChartDataSerie {
     * <code>true</code>: the direction is from bottom to top by increasing number <br>
     * <code>false</code>: the direction is from top to bottom by increasing number
     */
-   public boolean isYAxisDirection() {
+   public boolean isYAxis_Bottom2Top() {
       return _yAxisDirection;
    }
 

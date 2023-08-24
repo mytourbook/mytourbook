@@ -337,7 +337,7 @@ public class ChartComponentAxis extends Canvas {
 
          final String title = yData.getYTitle();
          final String unitLabel = yData.getUnitLabel();
-         final boolean isBottomUp = yData.isYAxisDirection();
+         final boolean isBottomUp = yData.isYAxis_Bottom2Top();
 
          final float graphYBottom = drawingData.getGraphYBottom();
          final int devGraphHeight = drawingData.devGraphHeight;

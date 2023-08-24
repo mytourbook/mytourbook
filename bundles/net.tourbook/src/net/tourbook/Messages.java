@@ -2312,7 +2312,6 @@ public class Messages extends NLS {
    public static String        Slideout_SensorTourFilter_Radio_Year;
    public static String        Slideout_SensorTourFilter_Radio_Year_Tooltip;
 
-   public static String        Slideout_StatisticOptions_Checkbox_Altitude;
    public static String        Slideout_StatisticOptions_Checkbox_AvgPace;
    public static String        Slideout_StatisticOptions_Checkbox_AvgSpeed;
    public static String        Slideout_StatisticOptions_Checkbox_Distance;

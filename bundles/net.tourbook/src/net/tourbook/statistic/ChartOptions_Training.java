@@ -47,9 +47,10 @@ public class ChartOptions_Training implements IStatisticOptions {
    private Button           _chkShow_TrainingPerformance;
    private Button           _chkShow_TrainingPerformance_AvgValue;
 
-   private Button           _chkShowAltitude;
    private Button           _chkShowDistance;
    private Button           _chkShowDuration;
+   private Button           _chkShowElevationUp;
+   private Button           _chkShowElevationDown;
    private Button           _chkShowAvgSpeed;
    private Button           _chkShowAvgPace;
 
@@ -150,11 +151,19 @@ public class ChartOptions_Training implements IStatisticOptions {
          }
          {
             /*
-             * Show altitude
+             * Show elevation up
              */
-            _chkShowAltitude = new Button(container, SWT.CHECK);
-            _chkShowAltitude.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
-            _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
+            _chkShowElevationUp = new Button(container, SWT.CHECK);
+            _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationUp);
+            _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show elevation down
+             */
+            _chkShowElevationDown = new Button(container, SWT.CHECK);
+            _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationDown);
+            _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
@@ -275,23 +284,26 @@ public class ChartOptions_Training implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Altitude));
-      _chkShowAvgPace.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Avg_Pace));
-      _chkShowAvgSpeed.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Avg_Speed));
-      _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Distance));
-      _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Duration));
+// SET_FORMATTING_OFF
+
+      _chkShowElevationUp        .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_ElevationUp));
+      _chkShowElevationDown      .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_ElevationDown));
+      _chkShowAvgPace            .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Avg_Pace));
+      _chkShowAvgSpeed           .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Avg_Speed));
+      _chkShowDistance           .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Distance));
+      _chkShowDuration           .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Duration));
 
       final Enum<DurationTime> durationTime = Util.getEnumValue(_prefStore.getDefaultString(_prefKeys.durationTime), DurationTime.MOVING);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
-      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
-      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+      _rdoDuration_BreakTime     .setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime    .setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime   .setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime  .setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime    .setSelection(durationTime.equals(DurationTime.PAUSED));
 
-      _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect));
-      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
-      _chkShow_TrainingPerformance.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingPerformance));
-      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingPerformance_AvgValue));
+      _chkShow_TrainingEffect                .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect));
+      _chkShow_TrainingEffect_Anaerobic      .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
+      _chkShow_TrainingPerformance           .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingPerformance));
+      _chkShow_TrainingPerformance_AvgValue  .setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingPerformance_AvgValue));
 
       enableControls();
    }
@@ -299,23 +311,24 @@ public class ChartOptions_Training implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowAltitude.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Altitude));
-      _chkShowAvgPace.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Avg_Pace));
-      _chkShowAvgSpeed.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Avg_Speed));
-      _chkShowDistance.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Distance));
-      _chkShowDuration.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Duration));
+      _chkShowElevationUp        .setSelection(_prefStore.getBoolean(_prefKeys.isShow_ElevationUp));
+      _chkShowElevationDown      .setSelection(_prefStore.getBoolean(_prefKeys.isShow_ElevationDown));
+      _chkShowAvgPace            .setSelection(_prefStore.getBoolean(_prefKeys.isShow_Avg_Pace));
+      _chkShowAvgSpeed           .setSelection(_prefStore.getBoolean(_prefKeys.isShow_Avg_Speed));
+      _chkShowDistance           .setSelection(_prefStore.getBoolean(_prefKeys.isShow_Distance));
+      _chkShowDuration           .setSelection(_prefStore.getBoolean(_prefKeys.isShow_Duration));
 
       final Enum<DurationTime> durationTime = Util.getEnumValue(_prefStore.getString(_prefKeys.durationTime), DurationTime.MOVING);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
-      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
-      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+      _rdoDuration_BreakTime     .setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime    .setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime   .setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime  .setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime    .setSelection(durationTime.equals(DurationTime.PAUSED));
 
-      _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect));
-      _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
-      _chkShow_TrainingPerformance.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingPerformance));
-      _chkShow_TrainingPerformance_AvgValue.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingPerformance_AvgValue));
+      _chkShow_TrainingEffect                .setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect));
+      _chkShow_TrainingEffect_Anaerobic      .setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
+      _chkShow_TrainingPerformance           .setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingPerformance));
+      _chkShow_TrainingPerformance_AvgValue  .setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingPerformance_AvgValue));
 
       enableControls();
    }
@@ -323,11 +336,14 @@ public class ChartOptions_Training implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(_prefKeys.isShow_Altitude, _chkShowAltitude.getSelection());
-      _prefStore.setValue(_prefKeys.isShow_Avg_Pace, _chkShowAvgPace.getSelection());
-      _prefStore.setValue(_prefKeys.isShow_Avg_Speed, _chkShowAvgSpeed.getSelection());
-      _prefStore.setValue(_prefKeys.isShow_Distance, _chkShowDistance.getSelection());
-      _prefStore.setValue(_prefKeys.isShow_Duration, _chkShowDuration.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_ElevationUp,     _chkShowElevationUp.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_ElevationDown,   _chkShowElevationDown.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Avg_Pace,        _chkShowAvgPace.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Avg_Speed,       _chkShowAvgSpeed.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Distance,        _chkShowDistance.getSelection());
+      _prefStore.setValue(_prefKeys.isShow_Duration,        _chkShowDuration.getSelection());
+
+// SET_FORMATTING_ON
 
       // duration time
       String selectedDurationType = UI.EMPTY_STRING;
