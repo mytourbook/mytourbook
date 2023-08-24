@@ -109,7 +109,7 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
              * Show elevation up
              */
             _chkShowElevationUp = new Button(container, SWT.CHECK);
-            _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
+            _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationUp);
             _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -117,7 +117,7 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
              * Show elevation down
              */
             _chkShowElevationDown = new Button(container, SWT.CHECK);
-            _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_Altitude);
+            _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationDown);
             _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -302,29 +302,31 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE));
-      _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
-      _chkShowElevationUp.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP));
-      _chkShowElevationDown.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_DOWN));
-      _chkShowNumberOfTours.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS));
+// SET_FORMATTING_OFF
 
-      _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
-      _chkTooltip_ShowSummaryValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
+      _chkShowDistance           .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE));
+      _chkShowDuration           .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
+      _chkShowElevationUp        .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown      .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_DOWN));
+      _chkShowNumberOfTours      .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS));
 
-      _chkShowYearSeparator.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
+      _chkTooltip_ShowPercentageValues .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
+      _chkTooltip_ShowSummaryValues    .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
+
+      _chkShowYearSeparator            .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
 
       final String chartType = _prefStore.getDefaultString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
-      _rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
-      _rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
+      _rdoChartType_BarAdjacent  .setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
+      _rdoChartType_BarStacked   .setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
 
       final Enum<DurationTime> durationTime = Util.getEnumValue(
             _prefStore.getDefaultString(ITourbookPreferences.STAT_YEAR_DURATION_TIME),
             DurationTime.MOVING);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
-      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
-      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+      _rdoDuration_BreakTime     .setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime    .setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime   .setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime  .setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime    .setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -332,29 +334,29 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE));
-      _chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
-      _chkShowElevationUp.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP));
-      _chkShowElevationDown.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_DOWN));
-      _chkShowNumberOfTours.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS));
+      _chkShowDistance           .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE));
+      _chkShowDuration           .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
+      _chkShowElevationUp        .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown      .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_DOWN));
+      _chkShowNumberOfTours      .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS));
 
-      _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
-      _chkTooltip_ShowSummaryValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
+      _chkTooltip_ShowPercentageValues .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
+      _chkTooltip_ShowSummaryValues    .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
 
-      _chkShowYearSeparator.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
+      _chkShowYearSeparator            .setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
 
       final String chartType = _prefStore.getString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
-      _rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
-      _rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
+      _rdoChartType_BarAdjacent  .setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
+      _rdoChartType_BarStacked   .setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
 
       final Enum<DurationTime> durationTime = Util.getEnumValue(
             _prefStore.getString(ITourbookPreferences.STAT_YEAR_DURATION_TIME),
             DurationTime.MOVING);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
-      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
-      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+      _rdoDuration_BreakTime     .setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime    .setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime   .setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime  .setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime    .setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -362,22 +364,23 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, _chkShowDuration.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP, _chkShowElevationUp.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_DOWN, _chkShowElevationDown.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, _chkShowNumberOfTours.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE,          _chkShowDistance.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION,          _chkShowDuration.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_UP,      _chkShowElevationUp.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_ELEVATION_DOWN,    _chkShowElevationDown.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS,   _chkShowNumberOfTours.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, _chkTooltip_ShowPercentageValues.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, _chkTooltip_ShowSummaryValues.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES,  _chkTooltip_ShowPercentageValues.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES,     _chkTooltip_ShowSummaryValues.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, _chkShowYearSeparator.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR,             _chkShowYearSeparator.getSelection());
 
-      _prefStore.setValue(
-            ITourbookPreferences.STAT_YEAR_CHART_TYPE,
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_CHART_TYPE,
             _rdoChartType_BarAdjacent.getSelection()
                   ? ChartDataSerie.CHART_TYPE_BAR_ADJACENT
                   : ChartDataSerie.CHART_TYPE_BAR_STACKED);
+
+// SET_FORMATTING_ON
 
       String selectedDurationType = UI.EMPTY_STRING;
 

@@ -372,6 +372,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setAllValueColors(0);
       yData.setVisibleMinValue(0);
       yData.setShowYSlider(true);
+      yData.setYAxisDirection(false);
 
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds, _appTourTypeFilter);

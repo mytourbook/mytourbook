@@ -31,8 +31,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 
 public class ChartOptions_DaySummary implements IStatisticOptions {
 
@@ -43,10 +45,10 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    /*
     * UI controls
     */
-   private Button _chkShowElevationUp;
-   private Button _chkShowElevationDown;
    private Button _chkShowDistance;
    private Button _chkShowDuration;
+   private Button _chkShowElevationUp;
+   private Button _chkShowElevationDown;
    private Button _chkShowAvgSpeed;
    private Button _chkShowAvgPace;
 
@@ -111,8 +113,9 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
                   .grab(true, false)
                   .indent(16, 0)
                   .applyTo(timeContainer);
-            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(timeContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
             {
+               // row 1
                {
                   /*
                    * Elapsed time
@@ -121,6 +124,12 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
                   _rdoDuration_ElapsedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_ElapsedTime);
                   _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
                }
+               {
+                  // spacer
+                  new Label(timeContainer, SWT.NONE);
+               }
+
+               // row 2
                {
                   /*
                    * Recorded time
@@ -131,19 +140,21 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
                }
                {
                   /*
-                   * Paused time
-                   */
-                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_PausedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_PausedTime);
-                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
-               }
-               {
-                  /*
                    * Moving time
                    */
                   _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
                   _rdoDuration_MovingTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_MovingTime);
                   _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
+               }
+
+               // row 3
+               {
+                  /*
+                   * Paused time
+                   */
+                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_PausedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
                   /*
@@ -154,6 +165,18 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
+
+            // set tab order that device and computed times are grouped together
+            final Control[] tabList = {
+
+                  _rdoDuration_ElapsedTime,
+                  _rdoDuration_RecordedTime,
+                  _rdoDuration_PausedTime,
+
+                  _rdoDuration_MovingTime,
+                  _rdoDuration_BreakTime,
+            };
+            timeContainer.setTabList(tabList);
          }
          {
             /*

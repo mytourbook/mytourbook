@@ -505,6 +505,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
+      yData.setYAxisDirection(false);
+
       yData.setVisibleMinValue(0);
       yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 

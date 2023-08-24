@@ -183,6 +183,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
+
             // set tab order that device and computed times are grouped together
             final Control[] tabList = {
 
