@@ -3469,8 +3469,17 @@ public class ChartComponentGraph extends Canvas {
 
          int devXPosNextBar = 0;
 
+         final int[] colorIndexSerie = colorsIndex[serieIndex];
+
          // loop: all values in the current serie
          for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+            if (valueIndex >= colorIndexSerie.length) {
+
+               // fix ArrayIndexOutOfBoundsException
+
+               break;
+            }
 
             // get the x position
             int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
@@ -3504,14 +3513,15 @@ public class ChartComponentGraph extends Canvas {
             if (valueIndex >= yHighValues.length) {
                break;
             }
-            final float valueYHigh = yHighValues[valueIndex];
 
+            final float valueYHigh = yHighValues[valueIndex];
             final float barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
 
 // DISABLED, that these bars are not totally hidden
-//            if (barHeight == 0) {
-//               continue;
-//            }
+// Reverted, otherwise a line is painted when a bar is not available
+            if (barHeight == 0) {
+               continue;
+            }
 
             int devBarHeight = (int) (barHeight * scaleY);
 
@@ -3564,7 +3574,7 @@ public class ChartComponentGraph extends Canvas {
             /*
              * Get colors
              */
-            final int colorIndex = colorsIndex[serieIndex][valueIndex];
+            final int colorIndex = colorIndexSerie[valueIndex];
 
             final RGB rgbBrightDef = rgbBright[colorIndex];
             final RGB rgbDarkDef = rgbDark[colorIndex];
