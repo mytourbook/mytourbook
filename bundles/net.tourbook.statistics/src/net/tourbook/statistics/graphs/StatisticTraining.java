@@ -186,6 +186,9 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       _chart.setShowZoomActions(true);
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
+// antialias looks ugly
+//      _chart.graphAntialiasing = SWT.ON;
+
       // set tour info icon into the left axis
       _tourToolTip = new StatisticTourToolTip(_chart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
@@ -439,7 +442,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             _statisticData_Training.allElevationDown_Low,
             _statisticData_Training.allElevationDown_High);
 
-//      yData.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
       yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_DOWN);
       yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -447,6 +449,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setShowYSlider(true);
       yData.setYAxisDirection(false);
       yData.setVisibleMinValue(0);
+      yData.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+
       yData.setColorIndex(new int[][] { _statisticData_Training.allTypeColorIndices });
 
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
@@ -470,6 +474,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
+      yData.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+
       yData.setColorIndex(new int[][] { _statisticData_Training.allTypeColorIndices });
 
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
