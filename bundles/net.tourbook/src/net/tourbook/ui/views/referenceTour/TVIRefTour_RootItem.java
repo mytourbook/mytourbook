@@ -55,9 +55,10 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
             + " TourReference.TourData_tourId," + NL //                                3  //$NON-NLS-1$
 
             + " TourData.hasGeoData," + NL //                                          4  //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //                                     5  //$NON-NLS-1$
 
             // get number of compared tours
-            + "(" + NL //                                                              5  //$NON-NLS-1$
+            + "(" + NL //                                                              6  //$NON-NLS-1$
             + "   SELECT SUM(1)" + NL //                                                  //$NON-NLS-1$
             + "      FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //                    //$NON-NLS-1$
             + "      WHERE " + TourDatabase.TABLE_TOUR_COMPARED + ".reftourid=" + TourDatabase.TABLE_TOUR_REFERENCE + ".refid" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -82,11 +83,26 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
 
             children.add(refItem);
 
+            /*
+             * From TourReference
+             */
             refItem.label = result.getString(1);
             refItem.refId = result.getLong(2);
             refItem.setTourId(result.getLong(3));
+
+            /*
+             * From TourData
+             */
             refItem.hasGeoData = result.getBoolean(4);
-            refItem.numTours = result.getInt(5);
+            final Object tourTypeId = result.getObject(5);
+
+            refItem.numTours = result.getInt(6);
+
+            // tour type
+            refItem.tourTypeId = tourTypeId == null
+                  ? TourDatabase.ENTITY_IS_NOT_SAVED
+                  : (Long) tourTypeId;
+
          }
 
       } catch (final SQLException e) {

@@ -180,6 +180,7 @@ public class UI {
    public static final String       SYMBOL_ARROW_UP_DOWN_II              = "\u21c5";                                    //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE                       = "\u00f8";                                    //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE_WITH_SPACE            = "\u00f8 ";                                   //$NON-NLS-1$
+   public static final String       SYMBOL_BLACK_LARGE_CIRCLE            = "\u2B24";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BOX                           = "\u25a0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BULLET                        = "\u2022";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DASH                          = "\u2212";                                    //$NON-NLS-1$

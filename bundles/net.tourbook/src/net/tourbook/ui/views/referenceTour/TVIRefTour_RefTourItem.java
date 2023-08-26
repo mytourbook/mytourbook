@@ -35,7 +35,11 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
    String      label;
    public long refId;
 
+   /*
+    * Fields from TourData
+    */
    boolean     hasGeoData;
+   long        tourTypeId;
 
    float[]     avgAltimeter_MinMax = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
    float[]     avgPulse_MinMax     = new float[] { Float.MIN_VALUE, Float.MAX_VALUE };
@@ -87,13 +91,169 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
          // fetch compared tour items
 
-         fetchComparedTours(this, children, -1);
+         fetchChildren_WithoutSubCategories(this, children, -1);
 
       } else {
 
          // fetch year items
 
          fetchChildren_WithYearCategories(children);
+      }
+   }
+
+   /**
+    * @param parentItem
+    * @param children
+    * @param year
+    *           Fetch compared tours for this year or for all years when <code>year == -1</code>
+    */
+   void fetchChildren_WithoutSubCategories(final TreeViewerItem parentItem,
+                                           final ArrayList<TreeViewerItem> children,
+                                           final int year) {
+
+      final boolean isWithYear = year != -1;
+
+      final String sqlYear = isWithYear
+
+            ? " AND TourCompared.startYear=?" //$NON-NLS-1$
+            : UI.EMPTY_STRING;
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                   //$NON-NLS-1$
+
+            + " TourCompared.comparedId," + NL //              1 //$NON-NLS-1$
+            + " TourCompared.tourId," + NL //                  2 //$NON-NLS-1$
+            + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
+            + " TourCompared.avgAltimeter," + NL //            4 //$NON-NLS-1$
+            + " TourCompared.avgPulse," + NL //                5 //$NON-NLS-1$
+            + " TourCompared.maxPulse," + NL //                6 //$NON-NLS-1$
+            + " TourCompared.tourSpeed," + NL //               7 //$NON-NLS-1$
+            + " TourCompared.tourPace," + NL //                8 //$NON-NLS-1$
+            + " TourCompared.startIndex," + NL //              9 //$NON-NLS-1$
+            + " TourCompared.endIndex," + NL //               10 //$NON-NLS-1$
+            + " TourCompared.tourDeviceTime_Elapsed," + NL // 11 //$NON-NLS-1$
+
+            + " TourData.hasGeoData," + NL //                 12 //$NON-NLS-1$
+            + " TourData.tourTitle," + NL //                  13 //$NON-NLS-1$
+            + " TourData.tourType_typeId," + NL //            14 //$NON-NLS-1$
+
+            + " jTdataTtag.TourTag_tagId" + NL //             15 //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+
+            // get data for a tour
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourCompared.tourId = TourData.tourId" + NL //                                        //$NON-NLS-1$
+
+            // get tag id's
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
+
+            + " WHERE TourCompared.refTourId=?" + sqlYear + NL //                                        //$NON-NLS-1$
+            + " ORDER BY TourCompared.tourDate" + NL //                                                  //$NON-NLS-1$
+      ;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+         statement.setLong(1, refId);
+
+         if (isWithYear) {
+            statement.setInt(2, year);
+         }
+
+         final ResultSet result = statement.executeQuery();
+
+         long lastTourId = -1;
+         ArrayList<Long> tagIds = null;
+
+         while (result.next()) {
+
+// SET_FORMATTING_OFF
+
+            final long tourId          = result.getLong(2);
+            final Object resultTagId   = result.getObject(15);
+
+// SET_FORMATTING_ON
+
+            if (tourId == lastTourId) {
+
+               // get tags from outer join
+
+               if (resultTagId instanceof Long) {
+                  tagIds.add((Long) resultTagId);
+               }
+
+            } else {
+
+               // a new tour is in the resultset
+
+               final TVIRefTour_ComparedTour tourItem = new TVIRefTour_ComparedTour(parentItem);
+               children.add(tourItem);
+
+// SET_FORMATTING_OFF
+
+               tourItem.refId = refId;
+
+               /*
+                * From TourCompared
+                */
+               tourItem.compareId                  = result.getLong(1);
+               tourItem.setTourId(tourId);
+
+               final Date tourDate                 = result.getDate(3);
+
+               tourItem.avgAltimeter               = result.getFloat(4);
+               tourItem.avgPulse                   = result.getFloat(5);
+               tourItem.maxPulse                   = result.getFloat(6);
+               tourItem.avgSpeed                   = result.getFloat(7);
+               tourItem.avgPace                    = result.getFloat(8);
+
+               tourItem.startIndex                 = result.getInt(9);
+               tourItem.endIndex                   = result.getInt(10);
+               tourItem.tourDeviceTime_Elapsed     = result.getInt(11);
+
+               /*
+                * From TourData
+                */
+               tourItem.hasGeoData                 = result.getBoolean(12);
+               tourItem.tourTitle                  = result.getString(13);
+               final Object tourTypeId             = result.getObject(14);
+
+// SET_FORMATTING_ON
+
+               // tour date
+               if (tourDate != null) {
+
+                  final LocalDate localDate = tourDate.toLocalDate();
+
+                  tourItem.tourDate = localDate;
+                  tourItem.year = localDate.getYear();
+               }
+
+               // tour type
+               tourItem.tourTypeId = tourTypeId == null
+                     ? TourDatabase.ENTITY_IS_NOT_SAVED
+                     : (Long) tourTypeId;
+
+               // tour tags
+               if (resultTagId instanceof Long) {
+
+                  if (tourItem.tagIds != null) {
+                     tourItem.tagIds.clear();
+                  }
+
+                  tourItem.tagIds = tagIds = new ArrayList<>();
+                  tagIds.add((Long) resultTagId);
+               }
+            }
+
+            lastTourId = tourId;
+         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
       }
    }
 
@@ -146,160 +306,6 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
             yearItem.numTours = result.getInt(2);
 
             numTours = result.getInt(2);
-         }
-
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-   }
-
-   /**
-    * @param parentItem
-    * @param children
-    * @param year
-    *           Fetch compared tours for this year or for all years when <code>year == -1</code>
-    */
-   void fetchComparedTours(final TreeViewerItem parentItem,
-                           final ArrayList<TreeViewerItem> children,
-                           final int year) {
-
-      final boolean isWithYear = year != -1;
-
-      final String sqlYear = isWithYear
-
-            ? " AND TourCompared.startYear=?" //$NON-NLS-1$
-            : UI.EMPTY_STRING;
-
-      final String sql = UI.EMPTY_STRING
-
-            + "SELECT" + NL //                                   //$NON-NLS-1$
-
-            + " TourCompared.comparedId," + NL //              1 //$NON-NLS-1$
-            + " TourCompared.tourId," + NL //                  2 //$NON-NLS-1$
-            + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
-            + " TourCompared.avgAltimeter," + NL //            4 //$NON-NLS-1$
-            + " TourCompared.avgPulse," + NL //                5 //$NON-NLS-1$
-            + " TourCompared.maxPulse," + NL //                6 //$NON-NLS-1$
-            + " TourCompared.tourSpeed," + NL //               7 //$NON-NLS-1$
-            + " TourCompared.tourPace," + NL //                8 //$NON-NLS-1$
-            + " TourCompared.startIndex," + NL //              9 //$NON-NLS-1$
-            + " TourCompared.endIndex," + NL //               10 //$NON-NLS-1$
-            + " TourCompared.tourDeviceTime_Elapsed," + NL // 11 //$NON-NLS-1$
-
-            + " TourData.tourTitle," + NL //                  12 //$NON-NLS-1$
-            + " TourData.tourType_typeId," + NL //            13 //$NON-NLS-1$
-
-            + " jTdataTtag.TourTag_tagId" + NL //             14 //$NON-NLS-1$
-
-            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
-
-            // get data for a tour
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourCompared.tourId = TourData.tourId" + NL //                                        //$NON-NLS-1$
-
-            // get tag id's
-            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
-
-            + " WHERE TourCompared.refTourId=?" + sqlYear + NL //                                        //$NON-NLS-1$
-            + " ORDER BY TourCompared.tourDate" + NL //                                                  //$NON-NLS-1$
-      ;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         statement.setLong(1, refId);
-
-         if (isWithYear) {
-            statement.setInt(2, year);
-         }
-
-         final ResultSet result = statement.executeQuery();
-
-         long lastTourId = -1;
-         ArrayList<Long> tagIds = null;
-
-         while (result.next()) {
-
-// SET_FORMATTING_OFF
-
-            final long tourId          = result.getLong(2);
-            final Object resultTagId   = result.getObject(14);
-
-// SET_FORMATTING_ON
-
-            if (tourId == lastTourId) {
-
-               // get tags from outer join
-
-               if (resultTagId instanceof Long) {
-                  tagIds.add((Long) resultTagId);
-               }
-
-            } else {
-
-               // a new tour is in the resultset
-
-               final TVIRefTour_ComparedTour tourItem = new TVIRefTour_ComparedTour(parentItem);
-               children.add(tourItem);
-
-// SET_FORMATTING_OFF
-
-               tourItem.refId = refId;
-
-               /*
-                * From TourCompared
-                */
-               tourItem.compareId                  = result.getLong(1);
-               tourItem.setTourId(tourId);
-
-               final Date tourDate                 = result.getDate(3);
-
-               tourItem.avgAltimeter               = result.getFloat(4);
-               tourItem.avgPulse                   = result.getFloat(5);
-               tourItem.maxPulse                   = result.getFloat(6);
-               tourItem.avgSpeed                   = result.getFloat(7);
-               tourItem.avgPace                    = result.getFloat(8);
-
-               tourItem.startIndex                 = result.getInt(9);
-               tourItem.endIndex                   = result.getInt(10);
-               tourItem.tourDeviceTime_Elapsed     = result.getInt(11);
-
-               /*
-                * From TourData
-                */
-               tourItem.tourTitle                  = result.getString(12);
-               final Object tourTypeId             = result.getObject(13);
-
-// SET_FORMATTING_ON
-
-               // tour date
-               if (tourDate != null) {
-
-                  final LocalDate localDate = tourDate.toLocalDate();
-
-                  tourItem.tourDate = localDate;
-                  tourItem.year = localDate.getYear();
-               }
-
-               // tour type
-               tourItem.tourTypeId = tourTypeId == null
-                     ? TourDatabase.ENTITY_IS_NOT_SAVED
-                     : (Long) tourTypeId;
-
-               // tour tags
-               if (resultTagId instanceof Long) {
-
-                  if (tourItem.tagIds != null) {
-                     tourItem.tagIds.clear();
-                  }
-
-                  tourItem.tagIds = tagIds = new ArrayList<>();
-                  tagIds.add((Long) resultTagId);
-               }
-            }
-
-            lastTourId = tourId;
          }
 
       } catch (final SQLException e) {

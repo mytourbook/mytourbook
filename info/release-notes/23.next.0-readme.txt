@@ -52,6 +52,10 @@ Improvements
 * Statistics
   - Show elevation loss values
     https://github.com/mytourbook/mytourbook/issues/1034
+    
+* Reference Tours
+  - Show tour type for the reference tour
+  - Show geo flag for the compared tour
 
 * Color Selector
   - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.

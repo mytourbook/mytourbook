@@ -1154,13 +1154,20 @@ public class ReferenceTourView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVIRefTour_RefTourItem) {
 
-               final boolean hasGeoData = ((TVIRefTour_RefTourItem) element).hasGeoData;
-               if (hasGeoData) {
+            if (element instanceof final TVIRefTour_RefTourItem refTourItem) {
+
+               if (refTourItem.hasGeoData) {
                   cell.setText(UI.SYMBOL_FULL_BLOCK);
                }
+
+            } else if (element instanceof final TVIRefTour_ComparedTour comparedTourItem) {
+
+               if (comparedTourItem.hasGeoData) {
+                  cell.setText(UI.SYMBOL_BLACK_LARGE_CIRCLE);
+               }
             }
+
          }
       });
    }
@@ -1179,6 +1186,7 @@ public class ReferenceTourView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
+
             if (element instanceof TVIRefTour_ComparedTour) {
 
                final float value = ((TVIRefTour_ComparedTour) element).maxPulse;
@@ -1785,10 +1793,18 @@ public class ReferenceTourView extends ViewPart implements
 
       final Object itemData = event.item.getData();
 
-      if (itemData instanceof TVIRefTour_ComparedTour) {
+      long tourTypeId = -1;
 
-         final TVIRefTour_ComparedTour tviItem = (TVIRefTour_ComparedTour) itemData;
-         final long tourTypeId = tviItem.tourTypeId;
+      if (itemData instanceof final TVIRefTour_ComparedTour tviItem) {
+
+         tourTypeId = tviItem.tourTypeId;
+
+      } else if (itemData instanceof final TVIRefTour_RefTourItem tviItem) {
+
+         tourTypeId = tviItem.tourTypeId;
+      }
+
+      if (tourTypeId >= 0) {
 
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
