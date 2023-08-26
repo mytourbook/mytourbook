@@ -3244,39 +3244,26 @@ public class ChartComponentGraph extends Canvas {
 
                true //              is vertical
          );
-//         gc.fillRectangle(
-//
-//               0, //                x
-//               devGraphHeight, //   y
-//
-//               devGraphWidth, //    width
-//               -devGraphHeight //   height
-//         );
 
       } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+         int devY;
+         int devHeight;
 
          /*
           * Fill above 0 line
           */
 
-         if (isBottom2Top) {
+         gc.setForeground(colorBgDark);
+         gc.setBackground(colorBgBright);
 
-            gc.setForeground(colorBgDark);
-            gc.setBackground(colorBgBright);
+         devY = isBottom2Top
+               ? (int) devY0
+               : (int) Math.max(0, devY0Top2Bottom);
 
-         } else {
-
-            gc.setForeground(colorBgBright);
-            gc.setBackground(colorBgDark);
-         }
-
-         int devY = (int) (isBottom2Top
-               ? devY0
-               : devY0Top2Bottom);
-
-         int devHeight = (int) (isBottom2Top
-               ? -(devYGraphTop - devY_XAxisLine)
-               : 100);
+         devHeight = isBottom2Top
+               ? (int) -(devYGraphTop - devY_XAxisLine)
+               : (int) Math.min(devGraphHeight, devGraphHeight - devY0Top2Bottom);
 
          gc.fillGradientRectangle(
 
@@ -3294,8 +3281,12 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorBgBright);
          gc.setBackground(colorBgDark);
 
-         devY = devGraphHeight;
+         devY = isBottom2Top
+               ? (int) devGraphHeight
+               : (int) devY0Top2Bottom;
 
+// devHeight needs to be adjusted for isBottom2Top==false,
+// currently there is no case to test it
          devHeight = -(int) Math.min(devGraphHeight, devGraphHeight - devY0Inverse);
 
          gc.fillGradientRectangle(
