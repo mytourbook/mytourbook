@@ -233,7 +233,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
