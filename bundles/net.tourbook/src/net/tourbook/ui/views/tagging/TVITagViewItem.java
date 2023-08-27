@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,49 +38,51 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
-            + "SUM(tourDistance)," //              0   //$NON-NLS-1$
-            + "SUM(TourDeviceTime_Elapsed)," //    1   //$NON-NLS-1$
-            + "SUM(tourComputedTime_Moving)," //   2   //$NON-NLS-1$
-            + "SUM(tourAltUp)," //                 3   //$NON-NLS-1$
-            + "SUM(tourAltDown)," //               4   //$NON-NLS-1$
+            + "SUM(tourDistance)," + NL //                  0  //$NON-NLS-1$
+            + "SUM(TourDeviceTime_Elapsed)," + NL //        1  //$NON-NLS-1$
+            + "SUM(tourComputedTime_Moving)," + NL //       2  //$NON-NLS-1$
+            + "SUM(tourAltUp)," + NL //                     3  //$NON-NLS-1$
+            + "SUM(tourAltDown)," + NL //                   4  //$NON-NLS-1$
 
-            + "MAX(maxPulse)," //                  5   //$NON-NLS-1$
-            + "MAX(maxAltitude)," //               6   //$NON-NLS-1$
-            + "MAX(maxSpeed)," //                  7   //$NON-NLS-1$
+            + "MAX(maxPulse)," + NL //                      5  //$NON-NLS-1$
+            + "MAX(maxAltitude)," + NL //                   6  //$NON-NLS-1$
+            + "MAX(maxSpeed)," + NL //                      7  //$NON-NLS-1$
 
-            + "AVG( CASE WHEN AVGPULSE = 0         THEN NULL ELSE AVGPULSE END)," //                                    8   //$NON-NLS-1$
-            + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," //                                 9   //$NON-NLS-1$
-            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," //  10   //$NON-NLS-1$
+            + "AVG( CASE WHEN AVGPULSE = 0      THEN NULL ELSE AVGPULSE END)," + NL //                8  //$NON-NLS-1$
+            + "AVG( CASE WHEN AVGCADENCE = 0    THEN NULL ELSE AVGCADENCE END )," + NL //             9  //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0 " //                                //$NON-NLS-1$
+            + "  THEN NULL" //                                                                           //$NON-NLS-1$
+            + "  ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," + NL //   10 //$NON-NLS-1$
 
-            + "SUM(TourDeviceTime_Recorded)," //    11   //$NON-NLS-1$
+            + "SUM(TourDeviceTime_Recorded)," + NL //   11 //$NON-NLS-1$
 
             // tour counter
-            + "SUM(1)" //                          12   //$NON-NLS-1$
+            + "SUM(1)" + NL //                          12 //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING
 
-            + "tourDistance," //             0   //$NON-NLS-1$
-            + "TourDeviceTime_Elapsed," //   1   //$NON-NLS-1$
-            + "tourComputedTime_Moving," //  2   //$NON-NLS-1$
-            + "tourAltUp," //                3   //$NON-NLS-1$
-            + "tourAltDown," //              4   //$NON-NLS-1$
+            + "tourDistance," + NL //                       0  //$NON-NLS-1$
+            + "TourDeviceTime_Elapsed," + NL //             1  //$NON-NLS-1$
+            + "tourComputedTime_Moving," + NL //            2  //$NON-NLS-1$
+            + "tourAltUp," + NL //                          3  //$NON-NLS-1$
+            + "tourAltDown," + NL //                        4  //$NON-NLS-1$
 
-            + "maxPulse," //                 5   //$NON-NLS-1$
-            + "maxAltitude," //              6   //$NON-NLS-1$
-            + "maxSpeed," //                 7   //$NON-NLS-1$
+            + "maxPulse," + NL //                           5  //$NON-NLS-1$
+            + "maxAltitude," + NL //                        6  //$NON-NLS-1$
+            + "maxSpeed," + NL //                           7  //$NON-NLS-1$
 
-            + "avgPulse," //                 8   //$NON-NLS-1$
-            + "avgCadence," //               9   //$NON-NLS-1$
-            + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," //         10   //$NON-NLS-1$
-            + "TourDeviceTime_Recorded" //   11   //$NON-NLS-1$
+            + "avgPulse," + NL //                           8  //$NON-NLS-1$
+            + "avgCadence," + NL //                         9  //$NON-NLS-1$
+            + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," + NL //     10 //$NON-NLS-1$
+            + "TourDeviceTime_Recorded" + NL //             11 //$NON-NLS-1$
       ;
    }
 
    protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /**
-    * content which is displayed in the tree column
+    * Content which is displayed in the tree column
     */
    String                           treeColumn;
 
@@ -121,25 +123,27 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          final SQLFilter sqlFilter = new SQLFilter();
 
          /*
-          * get tags
+          * Get tags
           */
          final String sql = UI.EMPTY_STRING
-               //
-               + ("SELECT " + SQL_SUM_COLUMNS) //$NON-NLS-1$
-               + (" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData") //$NON-NLS-1$ //$NON-NLS-2$
+
+               + "SELECT " + SQL_SUM_COLUMNS + NL //                                               //$NON-NLS-1$
+               + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
 
                // get data for a tour
-               + (" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ") //$NON-NLS-1$ //$NON-NLS-2$
-               + (" jtblTagData.TourData_tourId = TourData.tourId") //$NON-NLS-1$
+               + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON " + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + " jtblTagData.TourData_tourId = TourData.tourId" + NL //                          //$NON-NLS-1$
 
-               + " WHERE jtblTagData.TourTag_TagId = ?" //$NON-NLS-1$
+               + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
                + sqlFilter.getWhereClause();
 
          final PreparedStatement statement = conn.prepareStatement(sql);
+
          statement.setLong(1, tagItem.getTagId());
          sqlFilter.setParameters(statement, 2);
 
          final ResultSet result = statement.executeQuery();
+
          while (result.next()) {
             tagItem.readSumColumnData(result, 1);
          }
@@ -154,60 +158,66 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          }
 
       } catch (final SQLException e) {
+
          net.tourbook.ui.UI.showSQLException(e);
       }
    }
 
    void readDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
-      colDistance = result.getLong(startIndex + 0);
+// SET_FORMATTING_OFF
 
-      colElapsedTime = result.getLong(startIndex + 1);
-      colMovingTime = result.getLong(startIndex + 2);
-      colPausedTime = colElapsedTime - colMovingTime;
+      colDistance                = result.getLong(startIndex + 0);
 
-      colAltitudeUp = result.getLong(startIndex + 3);
-      colAltitudeDown = result.getLong(startIndex + 4);
+      colElapsedTime             = result.getLong(startIndex + 1);
+      colMovingTime              = result.getLong(startIndex + 2);
+      colPausedTime              = colElapsedTime - colMovingTime;
 
-      colMaxPulse = result.getLong(startIndex + 5);
-      colMaxAltitude = result.getLong(startIndex + 6);
-      colMaxSpeed = result.getFloat(startIndex + 7);
+      colAltitudeUp              = result.getLong(startIndex + 3);
+      colAltitudeDown            = result.getLong(startIndex + 4);
 
-      colAvgPulse = result.getFloat(startIndex + 8);
-      colAvgCadence = result.getFloat(startIndex + 9);
-      colAvgTemperature_Device = result.getFloat(startIndex + 10);
+      colMaxPulse                = result.getLong(startIndex + 5);
+      colMaxAltitude             = result.getLong(startIndex + 6);
+      colMaxSpeed                = result.getFloat(startIndex + 7);
 
-      colRecordedTime = result.getLong(startIndex + 11);
+      colAvgPulse                = result.getFloat(startIndex + 8);
+      colAvgCadence              = result.getFloat(startIndex + 9);
+      colAvgTemperature_Device   = result.getFloat(startIndex + 10);
+
+      colRecordedTime            = result.getLong(startIndex + 11);
 
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final long time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
+
       // prevent divide by 0
-      colAvgSpeed = (time == 0 ? 0 : 3.6f * colDistance / time);
-      colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
+      colAvgSpeed    = time        == 0 ? 0 : 3.6f * colDistance / time;
+      colAvgPace     = colDistance == 0 ? 0 : time * 1000f / colDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
 
-         colDistance = UI.scrambleNumbers(colDistance);
+         colDistance                = UI.scrambleNumbers(colDistance);
 
-         colElapsedTime = UI.scrambleNumbers(colElapsedTime);
-         colRecordedTime = UI.scrambleNumbers(colRecordedTime);
-         colMovingTime = UI.scrambleNumbers(colMovingTime);
-         colPausedTime = UI.scrambleNumbers(colPausedTime);
+         colElapsedTime             = UI.scrambleNumbers(colElapsedTime);
+         colRecordedTime            = UI.scrambleNumbers(colRecordedTime);
+         colMovingTime              = UI.scrambleNumbers(colMovingTime);
+         colPausedTime              = UI.scrambleNumbers(colPausedTime);
 
-         colAltitudeUp = UI.scrambleNumbers(colAltitudeUp);
-         colAltitudeDown = UI.scrambleNumbers(colAltitudeDown);
+         colAltitudeUp              = UI.scrambleNumbers(colAltitudeUp);
+         colAltitudeDown            = UI.scrambleNumbers(colAltitudeDown);
 
-         colMaxPulse = UI.scrambleNumbers(colMaxPulse);
-         colMaxAltitude = UI.scrambleNumbers(colMaxAltitude);
-         colMaxSpeed = UI.scrambleNumbers(colMaxSpeed);
+         colMaxPulse                = UI.scrambleNumbers(colMaxPulse);
+         colMaxAltitude             = UI.scrambleNumbers(colMaxAltitude);
+         colMaxSpeed                = UI.scrambleNumbers(colMaxSpeed);
 
-         colAvgPulse = UI.scrambleNumbers(colAvgPulse);
-         colAvgCadence = UI.scrambleNumbers(colAvgCadence);
-         colAvgTemperature_Device = UI.scrambleNumbers(colAvgTemperature_Device);
+         colAvgPulse                = UI.scrambleNumbers(colAvgPulse);
+         colAvgCadence              = UI.scrambleNumbers(colAvgCadence);
+         colAvgTemperature_Device   = UI.scrambleNumbers(colAvgTemperature_Device);
 
-         colAvgSpeed = UI.scrambleNumbers(colAvgSpeed);
-         colAvgPace = UI.scrambleNumbers(colAvgPace);
+         colAvgSpeed                = UI.scrambleNumbers(colAvgSpeed);
+         colAvgPace                 = UI.scrambleNumbers(colAvgPace);
       }
+
+// SET_FORMATTING_ON
    }
 
    public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {

@@ -1832,6 +1832,7 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub;
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
+   public static String        pref_view_layout_label_Tour;
 
    public static String        Pref_Weather_Button_TestHTTPConnection;
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey;

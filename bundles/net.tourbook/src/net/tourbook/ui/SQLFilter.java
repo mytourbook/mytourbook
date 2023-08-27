@@ -52,8 +52,8 @@ public class SQLFilter {
    public static final Set<SQLAppFilter>  ONLY_FAST_APP_FILTERS = new HashSet<>();
 
    /**
-    * Exclude all special app filters, so only default filters are applied, e.g. person, tour type,
-    * tour data
+    * Exclude all special app filters, so only default filters are applied, which are person, tour
+    * type and tour data
     */
    public static final Set<SQLAppFilter>  NO_PHOTOS             = new HashSet<>();
 
@@ -63,7 +63,6 @@ public class SQLFilter {
       ANY_APP_FILTERS.add(SQLAppFilter.GeoLocation);
       ANY_APP_FILTERS.add(SQLAppFilter.Tag);
 
-      // default is using the photo filter
       DEFAULT_APP_FILTERS.add(SQLAppFilter.Photo);
       DEFAULT_APP_FILTERS.add(SQLAppFilter.GeoLocation);
 
@@ -78,7 +77,7 @@ public class SQLFilter {
    private int               _lastParameterIndex;
 
    /**
-    * Create sql app filter with the photo filter
+    * Create sql app filter which contains the mostly fast app filters
     */
    public SQLFilter() {
 

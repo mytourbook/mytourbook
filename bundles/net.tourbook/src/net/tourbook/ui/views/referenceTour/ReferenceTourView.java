@@ -982,7 +982,7 @@ public class ReferenceTourView extends ViewPart implements
                final TVIRefTour_RefTourItem refItem = (TVIRefTour_RefTourItem) element;
 
                final StyledString styledString = new StyledString();
-               styledString.append(refItem.label, net.tourbook.ui.UI.TAG_STYLER);
+               styledString.append(refItem.label, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
 
                cell.setText(styledString.getString());
                cell.setStyleRanges(styledString.getStyleRanges());
@@ -993,7 +993,7 @@ public class ReferenceTourView extends ViewPart implements
 
                final TVIRefTour_YearItem yearItem = (TVIRefTour_YearItem) element;
                final StyledString styledString = new StyledString();
-               styledString.append(Integer.toString(yearItem.year), net.tourbook.ui.UI.TAG_SUB_STYLER);
+               styledString.append(Integer.toString(yearItem.year), net.tourbook.ui.UI.DATE_CATEGORY_STYLER);
                styledString.append("   " + yearItem.numTours, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
                cell.setText(styledString.getString());
