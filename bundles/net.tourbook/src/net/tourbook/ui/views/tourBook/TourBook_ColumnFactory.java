@@ -4124,11 +4124,16 @@ class TourBook_ColumnFactory {
       } else {
 
          if (element instanceof TVITourBookYear) {
+
             cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY));
+
          } else if (element instanceof TVITourBookYearCategorized) {
+
             cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY));
-//         } else if (element instanceof TVITourBookTour) {
-//            cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+
+         } else if (element instanceof TVITourBookTour) {
+
+            cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TOUR));
          }
       }
    }

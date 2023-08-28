@@ -295,7 +295,7 @@ public class NatTable_DataLoader {
 
             // tags are combined with OR
 
-            final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+            final SQLFilter sqlFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
             String sqlSelectFields_1 = sqlSelectFields_Raw;
             if (sqlSelectFields_1.length() > 0) {
@@ -429,7 +429,7 @@ public class NatTable_DataLoader {
 
             if (TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr()) {
 
-               final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+               final SQLFilter sqlFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
                sql = NL
 
@@ -555,7 +555,7 @@ public class NatTable_DataLoader {
 
 //      final long start = System.nanoTime();
 
-      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
       /**
        * Using this syntax from

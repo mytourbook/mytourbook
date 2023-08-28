@@ -89,6 +89,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -112,6 +113,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -229,6 +231,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private Action_SingleExpand_CollapseOthers  _actionContext_SingleExpand_CollapseOthers;
 
    private PixelConverter                      _pc;
+
+   private Color                               _colorContentCategory;
+   private Color                               _colorContentSubCategory;
+   private Color                               _colorDateCategory;
+   private Color                               _colorDateSubCategory;
+   private Color                               _colorTour;
 
    /*
     * UI resources
@@ -632,6 +640,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
+            updateColors();
+
             _tagViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
             _tagViewer.refresh();
@@ -785,6 +795,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       addSelectionListener();
       restoreState();
 
+      updateColors();
       reloadViewer();
 
       restoreState_Viewer();
@@ -1002,6 +1013,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             if (viewItem instanceof TVITagView_Tour) {
 
+               // tour
+
                styledString.append(viewItem.treeColumn);
 
                cell.setImage(TourTypeImage.getTourTypeImage(((TVITagView_Tour) viewItem).tourTypeId));
@@ -1009,26 +1022,34 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             } else if (viewItem instanceof TVITagView_Tag) {
 
+               // tag
+
                final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
 
-               styledString.append(viewItem.treeColumn, net.tourbook.ui.UI.TAG_STYLER);
-               styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+               styledString.append(viewItem.treeColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+               styledString.append(UI.SPACE3 + viewItem.colTourCounter, net.tourbook.ui.UI.TOUR_STYLER);
+
                cell.setImage(tagItem.isRoot ? _imgTagRoot : _imgTag);
 
             } else if (viewItem instanceof TVITagView_TagCategory) {
 
-               styledString.append(viewItem.treeColumn, net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+               // tag category
+
+               styledString.append(viewItem.treeColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
+
                cell.setImage(_imgTagCategory);
 
             } else if (viewItem instanceof TVITagView_Year || viewItem instanceof TVITagView_Month) {
 
+               // year or month
+
                styledString.append(viewItem.treeColumn);
-               styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+               styledString.append(UI.SPACE3 + viewItem.colTourCounter, net.tourbook.ui.UI.TOUR_STYLER);
 
                if (viewItem instanceof TVITagView_Month) {
-                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY));
+                  cell.setForeground(_colorDateSubCategory);
                } else {
-                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY));
+                  cell.setForeground(_colorDateCategory);
                }
 
             } else {
@@ -1373,11 +1394,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
 
                cell.setText(TourDatabase.getTagPropertyValue((tagItem).tagId, TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES_ID));
+               setCellColor(cell, element);
 
             } else if (viewItem instanceof TVITagView_TagCategory) {
 
                final TVITagView_TagCategory categoryItem = (TVITagView_TagCategory) viewItem;
                cell.setText(TourDatabase.getTagCategoryNotes((categoryItem).tagCategoryId));
+               setCellColor(cell, element);
 
             } else {
 
@@ -1405,12 +1428,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                final long tagId = ((TVITagView_Tag) element).getTagId();
 
                cell.setText(Long.toString(tagId));
+               setCellColor(cell, element);
 
             } else if (element instanceof TVITagView_TagCategory) {
 
                final long categoryId = ((TVITagView_TagCategory) element).getCategoryId();
 
                cell.setText(Long.toString(categoryId));
+               setCellColor(cell, element);
 
             } else {
 
@@ -1430,8 +1455,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(UI.EMPTY_STRING);
-
             final Object element = cell.getElement();
             if (element instanceof TVITagView_Tag) {
 
@@ -1440,6 +1463,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                cell.setText(TourDatabase.getTagPropertyValue(
                      (tagItem).tagId,
                      TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH_ID));
+
+               setCellColor(cell, element);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
             }
          }
       });
@@ -1484,6 +1513,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                cell.setText(tagNames);
                setCellColor(cell, element);
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -2567,14 +2597,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private void setCellColor(final ViewerCell cell, final Object element) {
 
       // set color
-      if (element instanceof TVITagView_Tag) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY));
+
+      if (element instanceof TVITagView_TagCategory) {
+
+         cell.setForeground(_colorContentCategory);
+
+      } else if (element instanceof TVITagView_Tag) {
+
+         cell.setForeground(_colorContentSubCategory);
+
       } else if (element instanceof TVITagView_Year) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY));
+
+         cell.setForeground(_colorDateCategory);
+
       } else if (element instanceof TVITagView_Month) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY));
-//      } else if (element instanceof TVITagView_Tour) {
-//         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+
+         cell.setForeground(_colorDateSubCategory);
+
+      } else if (element instanceof TVITagView_Tour) {
+
+         cell.setForeground(_colorTour);
       }
    }
 
@@ -2622,6 +2664,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _action_ToggleTagFilter.setChecked(true);
       _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter));
+   }
+
+   private void updateColors() {
+
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+// SET_FORMATTING_OFF
+
+      _colorContentCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_CATEGORY);
+      _colorContentSubCategory   = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
+      _colorDateCategory         = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY);
+      _colorDateSubCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY);
+      _colorTour                 = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_TOUR);
+
+// SET_FORMATTING_ON
    }
 
    @Override

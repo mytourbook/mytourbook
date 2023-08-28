@@ -922,7 +922,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                   tagName = UI.scrambleText(tagName);
                }
 
-               styledString.append(tagName, net.tourbook.ui.UI.TAG_STYLER);
+               styledString.append(tagName, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
                cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
 
             } else if (element instanceof TVIPrefTagCategory) {
@@ -936,7 +936,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                if (UI.IS_SCRAMBLE_DATA) {
                   categoryName = UI.scrambleText(categoryName);
                }
-               styledString.append(categoryName, net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+               styledString.append(categoryName, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                // get number of categories
                final int categoryCounter = tourTagCategory.getCategoryCounter();

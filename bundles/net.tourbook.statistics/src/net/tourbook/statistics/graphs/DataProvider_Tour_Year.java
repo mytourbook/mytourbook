@@ -258,7 +258,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 
          String fromTourData;
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
 

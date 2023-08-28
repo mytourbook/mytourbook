@@ -76,7 +76,7 @@ public class SensorDataProvider {
          /*
           * Setup app filter
           */
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
          if (isAppFilter) {
 
             final String sqlTourIds = UI.EMPTY_STRING

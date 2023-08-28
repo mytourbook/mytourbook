@@ -45,27 +45,31 @@ public class TVITagView_Root extends TVITagViewItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final StringBuilder sb = new StringBuilder();
-
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          PreparedStatement statement;
          ResultSet result;
 
+         String sql;
+
          if (_tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
 
             /*
-             * get tag categories
+             * Get tag categories
              */
-            sb.append("SELECT"); //               //$NON-NLS-1$
-            sb.append(" tagCategoryId,"); //    1 //$NON-NLS-1$
-            sb.append(" name"); //              2 //$NON-NLS-1$
+            sql = UI.EMPTY_STRING
 
-            sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY); //$NON-NLS-1$
-            sb.append(" WHERE isRoot = 1"); //$NON-NLS-1$
-            sb.append(" ORDER BY name"); //$NON-NLS-1$
+                  + "SELECT" + NL //                     //$NON-NLS-1$
 
-            statement = conn.prepareStatement(sb.toString());
+                  + " tagCategoryId," + NL //          1 //$NON-NLS-1$
+                  + " name" + NL //                    2 //$NON-NLS-1$
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + NL //$NON-NLS-1$
+                  + " WHERE isRoot = 1" + NL //          //$NON-NLS-1$
+                  + " ORDER BY name" + NL //             //$NON-NLS-1$
+            ;
+
+            statement = conn.prepareStatement(sql);
             result = statement.executeQuery();
 
             while (result.next()) {
@@ -83,31 +87,37 @@ public class TVITagView_Root extends TVITagViewItem {
          }
 
          /*
-          * get tags
+          * Get tags
           */
-         final String whereClause = _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
+         final String sqlWhere = _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
+
                ? UI.EMPTY_STRING
-               : _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
-                     " WHERE isRoot = 1" //$NON-NLS-1$
+               : _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL
+
+                     ? " WHERE isRoot = 1" + NL //                //$NON-NLS-1$
                      : UI.EMPTY_STRING;
 
-         sb.delete(0, sb.length());
-         sb.append("SELECT"); //            //$NON-NLS-1$
-         sb.append(" tagId,"); //         1 //$NON-NLS-1$
-         sb.append(" name,"); //          2 //$NON-NLS-1$
-         sb.append(" expandType,"); //    3 //$NON-NLS-1$
-         sb.append(" isRoot"); //         4 //$NON-NLS-1$
+         sql = UI.EMPTY_STRING
 
-         sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG); //$NON-NLS-1$
-         sb.append(whereClause);
-         sb.append(" ORDER BY name"); //$NON-NLS-1$
+               + "SELECT" + NL //                                 //$NON-NLS-1$
 
-         statement = conn.prepareStatement(sb.toString());
+               + " tagId," + NL //                             1  //$NON-NLS-1$
+               + " name," + NL //                              2  //$NON-NLS-1$
+               + " expandType," + NL //                        3  //$NON-NLS-1$
+               + " isRoot" + NL //                             4  //$NON-NLS-1$
+
+               + " FROM " + TourDatabase.TABLE_TOUR_TAG + NL //   //$NON-NLS-1$
+               + sqlWhere
+               + " ORDER BY name" + NL //                         //$NON-NLS-1$
+         ;
+
+         statement = conn.prepareStatement(sql);
          result = statement.executeQuery();
 
          while (result.next()) {
 
             final TVITagView_Tag tagItem = new TVITagView_Tag(this);
+
             children.add(tagItem);
 
             final long tagId = result.getLong(1);
