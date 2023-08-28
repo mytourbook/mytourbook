@@ -403,29 +403,6 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       chartDataModel.addYData(_athleteBodyWeight_YData);
    }
 
-   /**
-    * Altitude
-    */
-   void createYDataAltitude(final ChartDataModel chartModel) {
-
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            _statisticData_Day.allElevationUp_Low,
-            _statisticData_Day.allElevationUp_High);
-
-      yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
-
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-
-      chartModel.addYData(yData);
-   }
-
    void createYDataAvgPace(final ChartDataModel chartDataModel) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
@@ -511,6 +488,54 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
 
       chartModel.addYData(_yData_Duration);
+   }
+
+   /**
+    * Elevation down
+    */
+   void createYDataElevationDown(final ChartDataModel chartModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.BAR,
+            _statisticData_Day.allElevationDown_Low,
+            _statisticData_Day.allElevationDown_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_DOWN);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAllValueColors(0);
+      yData.setShowYSlider(true);
+      yData.setYAxisDirection(false);
+
+      yData.setVisibleMinValue(0);
+      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+      chartModel.addYData(yData);
+   }
+
+   /**
+    * Elevation up
+    */
+   void createYDataElevationUp(final ChartDataModel chartModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.BAR,
+            _statisticData_Day.allElevationUp_Low,
+            _statisticData_Day.allElevationUp_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_UP);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAllValueColors(0);
+      yData.setShowYSlider(true);
+      yData.setVisibleMinValue(0);
+      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+      chartModel.addYData(yData);
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -186,6 +186,9 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       _chart.setShowZoomActions(true);
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
+// antialias looks ugly
+//      _chart.graphAntialiasing = SWT.ON;
+
       // set tour info icon into the left axis
       _tourToolTip = new StatisticTourToolTip(_chart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
@@ -342,29 +345,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       chartModel.setXData(xData);
    }
 
-   /**
-    * Altitude
-    */
-   void createYData_Altitude(final ChartDataModel chartModel, final ChartType chartType) {
-
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            chartType,
-            _statisticData_Training.allElevationUp_Low,
-            _statisticData_Training.allElevationUp_High);
-
-      yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _statisticData_Training.allTypeColorIndices });
-
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-
-      chartModel.addYData(yData);
-   }
-
    void createYData_AvgPace(final ChartDataModel chartDataModel, final ChartType chartType) {
 
       final ChartDataYSerie yData = new ChartDataYSerie(
@@ -450,6 +430,57 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
 
       chartModel.addYData(_yData_Duration);
+   }
+
+   /**
+    * Elevation loss
+    */
+   void createYData_ElevationDown(final ChartDataModel chartModel, final ChartType chartType) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            chartType,
+            _statisticData_Training.allElevationDown_Low,
+            _statisticData_Training.allElevationDown_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_DOWN);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAllValueColors(0);
+      yData.setShowYSlider(true);
+      yData.setYAxisDirection(false);
+      yData.setVisibleMinValue(0);
+      yData.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+
+      yData.setColorIndex(new int[][] { _statisticData_Training.allTypeColorIndices });
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+      chartModel.addYData(yData);
+   }
+
+   /**
+    * Elevation gain
+    */
+   void createYData_ElevationUp(final ChartDataModel chartModel, final ChartType chartType) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            chartType,
+            _statisticData_Training.allElevationUp_Low,
+            _statisticData_Training.allElevationUp_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_UP);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAllValueColors(0);
+      yData.setShowYSlider(true);
+      yData.setVisibleMinValue(0);
+      yData.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
+
+      yData.setColorIndex(new int[][] { _statisticData_Training.allTypeColorIndices });
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+      chartModel.addYData(yData);
    }
 
    /**

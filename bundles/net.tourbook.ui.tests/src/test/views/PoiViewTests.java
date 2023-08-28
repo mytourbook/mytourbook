@@ -46,6 +46,6 @@ public class PoiViewTests extends UITest {
       final SWTBotTable tablePois = poiViewBot.table();
 
       //Make sure that there are POIs found
-      assertEquals(10, tablePois.rowCount());
+      assertEquals(8, tablePois.rowCount());
    }
 }

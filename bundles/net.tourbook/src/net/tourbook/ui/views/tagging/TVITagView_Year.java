@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -83,9 +83,11 @@ public class TVITagView_Year extends TVITagViewItem {
       }
 
       final TVITagView_Year other = (TVITagView_Year) obj;
+
       if (_isMonth != other._isMonth) {
          return false;
       }
+
       if (_year != other._year) {
          return false;
       }
@@ -105,9 +107,9 @@ public class TVITagView_Year extends TVITagViewItem {
    protected void fetchChildren() {
 
       if (_isMonth) {
-         setChildren(readYearChildrenMonths());
+         setChildren(readYearChildren_Months());
       } else {
-         setChildren(readYearChildrenTours());
+         setChildren(readYearChildren_Tours());
       }
    }
 
@@ -133,39 +135,41 @@ public class TVITagView_Year extends TVITagViewItem {
       return result;
    }
 
-   private ArrayList<TreeViewerItem> readYearChildrenMonths() {
+   private ArrayList<TreeViewerItem> readYearChildren_Months() {
 
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
-          * get all tours for the tag Id of this tree item
+          * Get all tours for the tag ID of this tree item
           */
 
          final SQLFilter sqlFilter = new SQLFilter();
-         final StringBuilder sb = new StringBuilder();
 
-         sb.append("SELECT"); //$NON-NLS-1$
-         sb.append(" startYear,"); //		// 1 //$NON-NLS-1$
-         sb.append(" startMonth,"); //		// 2 //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
 
-         sb.append(SQL_SUM_COLUMNS);
+               + "SELECT" + NL //               //$NON-NLS-1$
+               + " startYear," + NL //       1  //$NON-NLS-1$
+               + " startMonth," + NL //      2  //$NON-NLS-1$
 
-         sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+               + SQL_SUM_COLUMNS
 
-         // get all tours for current tag and year
-         sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
-         sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId "); //$NON-NLS-1$
+               + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
-         sb.append(" WHERE jTdataTtag.TourTag_TagId=?"); //$NON-NLS-1$
-         sb.append(" AND startYear=?"); //$NON-NLS-1$
-         sb.append(sqlFilter.getWhereClause());
+               // get all tours for current tag and year
+               + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON jTdataTtag.TourData_tourId=TourData.tourId " + NL //                      //$NON-NLS-1$
 
-         sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
-         sb.append(" ORDER BY startYear"); //$NON-NLS-1$
+               + " WHERE jTdataTtag.TourTag_TagId=?" + NL //                                    //$NON-NLS-1$
+               + " AND startYear=?" + NL //                                                     //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+               + " GROUP BY startYear, startMonth" + NL //                                      //$NON-NLS-1$
+               + " ORDER BY startYear" + NL //                                                  //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, _tagItem.getTagId());
          statement.setInt(2, _year);
          sqlFilter.setParameters(statement, 3);
@@ -191,42 +195,45 @@ public class TVITagView_Year extends TVITagViewItem {
       return children;
    }
 
-   private ArrayList<TreeViewerItem> readYearChildrenTours() {
+   private ArrayList<TreeViewerItem> readYearChildren_Tours() {
 
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
-          * get all tours for the tag Id of this tree item
+          * Get all tours for the tag Id of this tree item
           */
 
          final SQLFilter sqlFilter = new SQLFilter();
-         final StringBuilder sb = new StringBuilder();
 
-         sb.append("SELECT"); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
 
-         sb.append(" tourID,"); //							1	 //$NON-NLS-1$
-         sb.append(" jTdataTtag2.TourTag_tagId,");//			2 //$NON-NLS-1$
-         sb.append(TVITagView_Tour.SQL_TOUR_COLUMNS); //		3
+               + "SELECT" + NL //                              //$NON-NLS-1$
 
-         sb.append(" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+               + " tourID," + NL //                         1  //$NON-NLS-1$
+               + " jTdataTtag2.TourTag_tagId," + NL //      2  //$NON-NLS-1$
+               + TVITagView_Tour.SQL_TOUR_COLUMNS + NL //   3
 
-         // get all tours for current tag and year/month
-         sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
-         sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId "); //$NON-NLS-1$
+               + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
 
-         // get all tag id's for one tour
-         sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
-         sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId"); //$NON-NLS-1$
+               // get all tours for current tag and year/month
+               + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON jTdataTtag.TourData_tourId=TourData.tourId " + NL //                                  //$NON-NLS-1$
 
-         sb.append(" WHERE jTdataTtag.TourTag_TagId=?"); //$NON-NLS-1$
-         sb.append(" AND startYear=?"); //$NON-NLS-1$
-         sb.append(sqlFilter.getWhereClause());
+               // get all tag id's for one tour
+               + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag2" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON TourData.tourID = jTdataTtag2.TourData_tourId" + NL //                                //$NON-NLS-1$
 
-         sb.append(" ORDER BY startMonth, startDay, startHour, startMinute"); //$NON-NLS-1$
+               + " WHERE jTdataTtag.TourTag_TagId=?" + NL //                                                //$NON-NLS-1$
+               + " AND startYear=?" + NL //                                                                 //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
 
-         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+               + " ORDER BY startMonth, startDay, startHour, startMinute" + NL //                           //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+
          statement.setLong(1, _tagItem.getTagId());
          statement.setInt(2, _year);
          sqlFilter.setParameters(statement, 3);
@@ -265,6 +272,7 @@ public class TVITagView_Year extends TVITagViewItem {
             lastTourId = tourId;
          }
       } catch (final SQLException e) {
+
          UI.showSQLException(e);
       }
 
@@ -273,14 +281,18 @@ public class TVITagView_Year extends TVITagViewItem {
 
    @Override
    public String toString() {
-      return "TVITagView_Year " //$NON-NLS-1$
-            + System.identityHashCode(this)
-            + " [_year=" //$NON-NLS-1$
-            + _year
-            + ", _isMonth=" //$NON-NLS-1$
-            + _isMonth
-            + ", _tagItem=" //$NON-NLS-1$
-            + _tagItem
-            + "]"; //$NON-NLS-1$
+
+      return UI.EMPTY_STRING
+
+            + "TVITagView_Year " + System.identityHashCode(this) + NL //   //$NON-NLS-1$
+
+            + " [" + NL //                                                 //$NON-NLS-1$
+
+            + "_year    = " + _year + NL //                                //$NON-NLS-1$
+            + "_isMonth = " + _isMonth + NL //                             //$NON-NLS-1$
+            + "_tagItem = " + _tagItem + NL //                             //$NON-NLS-1$
+
+            + "]" + NL //                                                  //$NON-NLS-1$
+      ;
    }
 }

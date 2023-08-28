@@ -180,6 +180,7 @@ public class UI {
    public static final String       SYMBOL_ARROW_UP_DOWN_II              = "\u21c5";                                    //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE                       = "\u00f8";                                    //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE_WITH_SPACE            = "\u00f8 ";                                   //$NON-NLS-1$
+   public static final String       SYMBOL_BLACK_LARGE_CIRCLE            = "\u2B24";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BOX                           = "\u25a0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BULLET                        = "\u2022";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DASH                          = "\u2212";                                    //$NON-NLS-1$
@@ -2066,6 +2067,19 @@ public class UI {
       return false;
    }
 
+   public static boolean isShiftKey(final Event event) {
+
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+      } else {
+         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+      }
+
+      return isShiftKey;
+   }
+
    public static boolean isShiftKey(final KeyEvent keyEvent) {
 
       boolean isShiftKey;
@@ -2079,14 +2093,14 @@ public class UI {
       return isShiftKey;
    }
 
-   public static boolean isShiftKey(final MouseEvent event) {
+   public static boolean isShiftKey(final MouseEvent mouseEvent) {
 
       boolean isShiftKey;
 
       if (IS_OSX) {
-         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+         isShiftKey = (mouseEvent.stateMask & SWT.MOD3) > 0;
       } else {
-         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+         isShiftKey = (mouseEvent.stateMask & SWT.MOD2) > 0;
       }
 
       return isShiftKey;

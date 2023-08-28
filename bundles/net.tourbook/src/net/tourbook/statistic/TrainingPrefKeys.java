@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,11 +17,12 @@ package net.tourbook.statistic;
 
 public class TrainingPrefKeys {
 
-   public String isShow_Altitude;
    public String isShow_Avg_Pace;
    public String isShow_Avg_Speed;
    public String isShow_Distance;
    public String isShow_Duration;
+   public String isShow_ElevationUp;
+   public String isShow_ElevationDown;
 
    public String isShow_TrainingEffect;
    public String isShow_TrainingEffect_Anaerobic;

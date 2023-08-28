@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,9 +45,10 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
    /*
     * UI controls
     */
-   private Button _chkShowAltitude;
    private Button _chkShowDistance;
    private Button _chkShowDuration;
+   private Button _chkShowElevationUp;
+   private Button _chkShowElevationDown;
    private Button _chkShowNumberOfTours;
    private Button _chkTooltip_ShowSummaryValues;
    private Button _chkTooltip_ShowPercentageValues;
@@ -73,7 +74,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
    private void createUI_10_Graphs(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_WeekSummary);
+      group.setText(Messages.Slideout_StatisticOptions_Group_WeekSummary);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
@@ -95,23 +96,31 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
              * Show distance
              */
             _chkShowDistance = new Button(container, SWT.CHECK);
-            _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
+            _chkShowDistance.setText(Messages.Slideout_StatisticOptions_Checkbox_Distance);
             _chkShowDistance.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
-             * Show altitude
+             * Show elevation up
              */
-            _chkShowAltitude = new Button(container, SWT.CHECK);
-            _chkShowAltitude.setText(Messages.Pref_Statistic_Checkbox_Altitude);
-            _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
+            _chkShowElevationUp = new Button(container, SWT.CHECK);
+            _chkShowElevationUp.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationUp);
+            _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show elevation down
+             */
+            _chkShowElevationDown = new Button(container, SWT.CHECK);
+            _chkShowElevationDown.setText(Messages.Slideout_StatisticOptions_Checkbox_ElevationDown);
+            _chkShowElevationDown.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
              * Show time
              */
             _chkShowDuration = new Button(container, SWT.CHECK);
-            _chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
+            _chkShowDuration.setText(Messages.Slideout_StatisticOptions_Checkbox_Duration);
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
@@ -130,7 +139,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                    * Elapsed time
                    */
                   _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+                  _rdoDuration_ElapsedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_ElapsedTime);
                   _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -144,7 +153,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                    * Recorded time
                    */
                   _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+                  _rdoDuration_RecordedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_RecordedTime);
                   _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -152,7 +161,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                    * Moving time
                    */
                   _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
+                  _rdoDuration_MovingTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_MovingTime);
                   _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
                }
 
@@ -162,7 +171,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                    * Paused time
                    */
                   _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_PausedTime);
                   _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -170,10 +179,11 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                    * Break time
                    */
                   _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
+                  _rdoDuration_BreakTime.setText(Messages.Slideout_StatisticOptions_Radio_Duration_BreakTime);
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
+
             // set tab order that device and computed times are grouped together
             final Control[] tabList = {
 
@@ -192,7 +202,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
              * Show number of tours
              */
             _chkShowNumberOfTours = new Button(container, SWT.CHECK);
-            _chkShowNumberOfTours.setText(Messages.Pref_Statistic_Checkbox_NumberOfTours);
+            _chkShowNumberOfTours.setText(Messages.Slideout_StatisticOptions_Checkbox_NumberOfTours);
             _chkShowNumberOfTours.addSelectionListener(_defaultSelectionListener);
          }
       }
@@ -201,7 +211,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
    private void createUI_20_StatisticTooltip(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Statistic_Group_StatisticTooltip);
+      group.setText(Messages.Slideout_StatisticOptions_Group_StatisticTooltip);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
@@ -210,7 +220,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
              * Show total values
              */
             _chkTooltip_ShowSummaryValues = new Button(group, SWT.CHECK);
-            _chkTooltip_ShowSummaryValues.setText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues);
+            _chkTooltip_ShowSummaryValues.setText(Messages.Slideout_StatisticOptions_Checkbox_ShowSummaryValues);
             _chkTooltip_ShowSummaryValues.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -218,7 +228,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
              * Show % values
              */
             _chkTooltip_ShowPercentageValues = new Button(group, SWT.CHECK);
-            _chkTooltip_ShowPercentageValues.setText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues);
+            _chkTooltip_ShowPercentageValues.setText(Messages.Slideout_StatisticOptions_Checkbox_ShowPercentageValues);
 //          tooltip: Percentage of the bar value to the total value
             _chkTooltip_ShowPercentageValues.addSelectionListener(_defaultSelectionListener);
          }
@@ -229,7 +239,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 
       final Group group = new Group(parent, SWT.NONE);
 //      group.setText(Messages.Pref_Graphs_Group_Grid);
-      group.setText(Messages.Pref_Statistic_Group_ChartType);
+      group.setText(Messages.Slideout_StatisticOptions_Group_ChartType);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -239,7 +249,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
              * Bar adjacent
              */
             _rdoChartType_BarAdjacent = new Button(group, SWT.RADIO);
-            _rdoChartType_BarAdjacent.setText(Messages.Pref_Statistic_Radio_BarAdjacent);
+            _rdoChartType_BarAdjacent.setText(Messages.Slideout_StatisticOptions_Radio_BarAdjacent);
             _rdoChartType_BarAdjacent.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -247,7 +257,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
              * Bar adjacent
              */
             _rdoChartType_BarStacked = new Button(group, SWT.RADIO);
-            _rdoChartType_BarStacked.setText(Messages.Pref_Statistic_Radio_BarStacked);
+            _rdoChartType_BarStacked.setText(Messages.Slideout_StatisticOptions_Radio_BarStacked);
             _rdoChartType_BarStacked.addSelectionListener(_defaultSelectionListener);
          }
       }
@@ -281,9 +291,10 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE));
       _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE));
       _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION));
+      _chkShowElevationUp.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_DOWN));
       _chkShowNumberOfTours.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS));
 
       _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
@@ -308,9 +319,10 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowAltitude.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE));
       _chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE));
       _chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION));
+      _chkShowElevationUp.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_UP));
+      _chkShowElevationDown.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_DOWN));
       _chkShowNumberOfTours.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS));
 
       _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
@@ -335,9 +347,10 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE, _chkShowAltitude.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, _chkShowDuration.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_UP, _chkShowElevationUp.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_ELEVATION_DOWN, _chkShowElevationDown.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS, _chkShowNumberOfTours.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, _chkTooltip_ShowPercentageValues.getSelection());

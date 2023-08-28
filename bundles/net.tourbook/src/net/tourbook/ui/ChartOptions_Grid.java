@@ -116,7 +116,6 @@ public class ChartOptions_Grid {
              * spinner: horizontal grid
              */
             _spinnerGridHorizontalDistance = new Spinner(group, SWT.BORDER);
-            _spinnerGridHorizontalDistance.setToolTipText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
             _spinnerGridHorizontalDistance.setMinimum(10);
             _spinnerGridHorizontalDistance.setMaximum(1000);
             _spinnerGridHorizontalDistance.addMouseWheelListener(_defaultMouseWheelListener);
@@ -146,7 +145,6 @@ public class ChartOptions_Grid {
              * spinner: vertical grid
              */
             _spinnerGridVerticalDistance = new Spinner(group, SWT.BORDER);
-            _spinnerGridVerticalDistance.setToolTipText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
             _spinnerGridVerticalDistance.setMinimum(10);
             _spinnerGridVerticalDistance.setMaximum(1000);
             _spinnerGridVerticalDistance.addMouseWheelListener(_defaultMouseWheelListener);

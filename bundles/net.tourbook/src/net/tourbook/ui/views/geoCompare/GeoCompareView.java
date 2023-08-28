@@ -1469,8 +1469,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-//            .grab(true, false)
-            .span(2, 1)
+            .grab(true, false)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_GREEN);
@@ -1494,7 +1493,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              * Title
              */
             _lblTitle = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false)
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblTitle);
 //            _lblTitle.setBackground(UI.SYS_COLOR_MAGENTA);
@@ -3689,6 +3689,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (geoCompareData == null) {
 
          _lblTitle.setText(UI.EMPTY_STRING);
+         _lblTitle.setToolTipText(UI.EMPTY_STRING);
 
          _iconCompareType.setImage(_imageCompareType_PlaceHolder);
          _iconCompareType.setToolTipText(UI.EMPTY_STRING);
@@ -3698,6 +3699,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       } else {
 
          _lblTitle.setText(_compareData_TourTitle);
+         _lblTitle.setToolTipText(_compareData_TourTitle);
 
          final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(geoCompareData.refTour_RefId);
 

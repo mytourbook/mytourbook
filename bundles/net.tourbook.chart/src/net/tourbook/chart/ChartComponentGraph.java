@@ -53,6 +53,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.LineAttributes;
 import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.PathData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -709,7 +710,7 @@ public class ChartComponentGraph extends Canvas {
       final int devYSliderLine1 = slider1.getDevYSliderLine();
       final int devYSliderLine2 = slider2.getDevYSliderLine();
 
-      final boolean isBottomToTop = drawingData.getYData().isYAxisDirection();
+      final boolean isBottomToTop = drawingData.getYData().isYAxis_Bottom2Top();
 
       double graphValue1 = 0;
       double graphValue2 = 0;
@@ -1219,7 +1220,7 @@ public class ChartComponentGraph extends Canvas {
           */
          int devYGraph = 0;
 
-         if (drawingData.getYData().isYAxisDirection()) {
+         if (drawingData.getYData().isYAxis_Bottom2Top()) {
             devYGraph = devYBottom - (int) ((yValue - graphYBottom) * drawingData.getScaleY());
          } else {
             devYGraph = devYTop + (int) ((yValue - graphYBottom) * drawingData.getScaleY());
@@ -2423,7 +2424,7 @@ public class ChartComponentGraph extends Canvas {
       final int devGraphHeight = drawingData.devGraphHeight;
       final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-      final boolean isBottomUp = drawingData.getYData().isYAxisDirection();
+      final boolean isBottomUp = drawingData.getYData().isYAxis_Bottom2Top();
       final boolean isTopDown = isBottomUp == false;
 
       final int devYTop = 0;
@@ -2485,7 +2486,7 @@ public class ChartComponentGraph extends Canvas {
       final int devGraphHeight = drawingData.devGraphHeight;
       final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-      final boolean isBottomUp = drawingData.getYData().isYAxisDirection();
+      final boolean isBottomUp = drawingData.getYData().isYAxis_Bottom2Top();
       final boolean isTopDown = isBottomUp == false;
 
       final int devYTop = 0;
@@ -2728,7 +2729,7 @@ public class ChartComponentGraph extends Canvas {
 
       final int numYValues = yValues.length;
 
-      final boolean isBottom2Top = yData.isYAxisDirection();
+      final boolean isBottom2Top = yData.isYAxis_Bottom2Top();
       final int graphFillMethod = yData.getGraphFillMethod();
       final boolean[] noFill = xData.getNoLine();
       final boolean[] lineGaps = yData.getLineGaps();
@@ -2780,9 +2781,7 @@ public class ChartComponentGraph extends Canvas {
       final PointLong[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
       RectangleLong prevLineRect = null;
 
-      /*
-       *
-       */
+      // this is y==0 from the viewport bottom and not from the SWT bottom where 0,0 is top/left
       final float devY0Inverse = devGraphHeight + devYGraphBottom;
 
       /*
@@ -2842,7 +2841,12 @@ public class ChartComponentGraph extends Canvas {
       boolean isSetHoveredIndex = false;
 
       final long[] devXPositions = new long[endIndex];
+
+      // dev position for y == 0
       final float devY0 = devY0Inverse - devY_XAxisLine;
+
+      // dev position for y == 0 when isBottom2Top == true
+      final float devY0Top2Bottom = devGraphHeight - devY0Inverse;
 
       /*
        * draw the lines into the paths
@@ -2891,7 +2895,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * Draw first point
+          * Draw FIRST point
           */
          if (isDrawFirstPoint) {
 
@@ -2925,10 +2929,19 @@ public class ChartComponentGraph extends Canvas {
 
                // start from the x-axis, y=0
 
-               devYStart = devY0;
+               devYStart = isBottom2Top
+
+                     // start from bottom
+                     ? devY0
+
+                     // start from top
+                     : devY0Top2Bottom;
             }
 
-            final float devY = devY0Inverse - devY1Prev;
+            final float devY = isBottom2Top
+
+                  ? devY0Inverse - devY1Prev
+                  : devY1Prev + devY0Top2Bottom;
 
             path.moveTo((int) devXFirstPointF, (int) devYStart);
             path.lineTo((int) devXFirstPointF, (int) devY);
@@ -2953,7 +2966,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * Draw line to current point
+          * Draw line to CURRENT point
           */
          final long devXPrev_long = (long) devXPrev;
          final long devY1_long = (long) devY1;
@@ -3031,7 +3044,7 @@ public class ChartComponentGraph extends Canvas {
                devY = isBottom2Top
 
                      ? devY0Inverse - devY1
-                     : devY1 - devY_XAxisLine;
+                     : devY1 + devY0Top2Bottom;
 
             } else {
 
@@ -3057,7 +3070,7 @@ public class ChartComponentGraph extends Canvas {
                      final int devY_NoLine = isBottom2Top
 
                            ? (int) (devY0Inverse - devY1Prev)
-                           : (int) (devY1Prev - devY_XAxisLine);
+                           : (int) (devY1Prev + devY0Top2Bottom);
 
                      path.lineTo((int) devXPrevNoLine, devY_NoLine);
                   }
@@ -3065,7 +3078,7 @@ public class ChartComponentGraph extends Canvas {
                   devY = isBottom2Top
 
                         ? devY0Inverse - devY1
-                        : devY1 - devY_XAxisLine;
+                        : devY1 + devY0Top2Bottom;
 
                   path.lineTo(devXf, devY);
 
@@ -3106,18 +3119,21 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * Draw last point
+          * Draw LAST point
           */
-         if (valueIndex == lastIndex ||
+         if (valueIndex == lastIndex
 
-         // check if last visible position + 1 is reached
-               devX > devXVisibleWidth) {
+               // check if last visible position + 1 is reached
+               || devX > devXVisibleWidth) {
 
             /*
              * This is the last point for a filled graph
              */
 
-            final float devY = devY0Inverse - devY1;
+            final float devY = isBottom2Top
+
+                  ? devY0Inverse - devY1
+                  : devY1 + devY0Top2Bottom;
 
             path.lineTo((int) devXf, (int) devY);
 
@@ -3133,13 +3149,20 @@ public class ChartComponentGraph extends Canvas {
             } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
                // draw line to the x-axis, y=0
+               final float devYEnd = isBottom2Top
+                     ? devY0
+                     : devY0Top2Bottom;
 
-               path.lineTo((int) devXf, (int) devY0);
+               path.lineTo((int) devXf, (int) devYEnd);
             }
+
+            final float devYBottom = isBottom2Top
+                  ? 0
+                  : devY0;
 
             // moveTo() is necessary that the graph is filled correctly (to prevent a triangle filled shape)
             // finalize previous subpath
-            path.moveTo((int) devXf, 0);
+            path.moveTo((int) devXf, devYBottom);
 
             if (isPath2) {
                path2.lineTo(devXf, devY0Inverse - devY2);
@@ -3201,6 +3224,7 @@ public class ChartComponentGraph extends Canvas {
       /*
        * Fill the graph
        */
+
       if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
          /*
@@ -3210,14 +3234,21 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorBgDark);
          gc.setBackground(colorBgBright);
 
-         gc.fillGradientRectangle(//
-               0,
-               devGraphHeight,
-               devGraphWidth,
-               -devGraphHeight,
-               true);
+         gc.fillGradientRectangle(
+
+               0, //                x
+               devGraphHeight, //   y
+
+               devGraphWidth, //    width
+               -devGraphHeight, //  height
+
+               true //              is vertical
+         );
 
       } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+         int devY;
+         int devHeight;
 
          /*
           * Fill above 0 line
@@ -3226,11 +3257,22 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorBgDark);
          gc.setBackground(colorBgBright);
 
+         devY = isBottom2Top
+               ? (int) devY0
+               : (int) Math.max(0, devY0Top2Bottom);
+
+         devHeight = isBottom2Top
+               ? (int) -(devYGraphTop - devY_XAxisLine)
+               : (int) Math.min(devGraphHeight, devGraphHeight - devY0Top2Bottom);
+
          gc.fillGradientRectangle(
+
                0,
-               (int) devY0,
+               devY,
+
                devGraphWidth,
-               -(int) (devYGraphTop - devY_XAxisLine),
+               devHeight,
+
                true);
 
          /*
@@ -3239,11 +3281,22 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorBgBright);
          gc.setBackground(colorBgDark);
 
+         devY = isBottom2Top
+               ? (int) devGraphHeight
+               : (int) devY0Top2Bottom;
+
+// devHeight needs to be adjusted for isBottom2Top==false,
+// currently there is no case to test it
+         devHeight = -(int) Math.min(devGraphHeight, devGraphHeight - devY0Inverse);
+
          gc.fillGradientRectangle(
+
                0,
-               devGraphHeight, // start from the graph bottom
+               devY, // start from the graph bottom
+
                devGraphWidth,
-               -(int) Math.min(devGraphHeight, devGraphHeight - devY0Inverse),
+               devHeight,
+
                true);
 
       } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
@@ -3288,6 +3341,12 @@ public class ChartComponentGraph extends Canvas {
       gc.setForeground(colorLine);
 
       gc.drawPath(path);
+
+      boolean isDebug = false;
+      isDebug = false;
+      if (isDebug) {
+         logPath(path);
+      }
 
       // dispose resources
       path.dispose();
@@ -3398,7 +3457,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleX = drawingData.getScaleX();
       final double scaleY = drawingData.getScaleY();
       final float graphYBorderBottom = drawingData.getGraphYBottom();
-      final boolean isBottomTop = yData.isYAxisDirection();
+      final boolean isBottomTop = yData.isYAxis_Bottom2Top();
 
       // get the horizontal offset for the graph
       double devXOffset;
@@ -3469,8 +3528,17 @@ public class ChartComponentGraph extends Canvas {
 
          int devXPosNextBar = 0;
 
+         final int[] colorIndexSerie = colorsIndex[serieIndex];
+
          // loop: all values in the current serie
          for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+            if (valueIndex >= colorIndexSerie.length) {
+
+               // fix ArrayIndexOutOfBoundsException
+
+               break;
+            }
 
             // get the x position
             int devXPos = (int) ((xValues[valueIndex] - devXOffset) * scaleX) + devBarXPos;
@@ -3504,14 +3572,15 @@ public class ChartComponentGraph extends Canvas {
             if (valueIndex >= yHighValues.length) {
                break;
             }
-            final float valueYHigh = yHighValues[valueIndex];
 
+            final float valueYHigh = yHighValues[valueIndex];
             final float barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
 
 // DISABLED, that these bars are not totally hidden
-//            if (barHeight == 0) {
-//               continue;
-//            }
+// Reverted, otherwise a line is painted when a bar is not available
+            if (barHeight == 0) {
+               continue;
+            }
 
             int devBarHeight = (int) (barHeight * scaleY);
 
@@ -3564,7 +3633,7 @@ public class ChartComponentGraph extends Canvas {
             /*
              * Get colors
              */
-            final int colorIndex = colorsIndex[serieIndex][valueIndex];
+            final int colorIndex = colorIndexSerie[valueIndex];
 
             final RGB rgbBrightDef = rgbBright[colorIndex];
             final RGB rgbDarkDef = rgbDark[colorIndex];
@@ -3684,7 +3753,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleX = drawingData.getScaleX();
       final double scaleY = drawingData.getScaleY();
       final float graphYBottom = drawingData.getGraphYBottom();
-      final boolean axisDirection = yData.isYAxisDirection();
+      final boolean axisDirection = yData.isYAxis_Bottom2Top();
 //      final int barPosition = drawingData.getBarPosition();
 
       // get the horizontal offset for the graph
@@ -4549,15 +4618,15 @@ public class ChartComponentGraph extends Canvas {
       final int[][] colorsIndex = yData.getColorsIndex();
 
       // get the colors
-      final RGB[] rgbLine = yData.getRgbBar_Line();
+//      final RGB[] rgbLine = yData.getRgbBar_Line();
       final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
-      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
+//      final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
       // get the chart values
       final double scaleX = drawingData.getScaleX();
       final double scaleY = drawingData.getScaleY();
       final float graphYBorderBottom = drawingData.getGraphYBottom();
-      final boolean isBottomTop = yData.isYAxisDirection();
+      final boolean isBottomTop = yData.isYAxis_Bottom2Top();
 
       // get the horizontal offset for the graph
       double devXOffset;
@@ -4596,7 +4665,6 @@ public class ChartComponentGraph extends Canvas {
       drawingData.setBarRectangles(symbolRecangles);
       drawingData.setBarFocusRectangles(symbolFocusRecangles);
 
-
       final int devSymbolSize_Original = drawingData.getSymbolSize();
       final int devSymbolSize = Math.max(1, devSymbolSize_Original);
       final int devSymbolSize2 = devSymbolSize / 2;
@@ -4622,7 +4690,7 @@ public class ChartComponentGraph extends Canvas {
             devSymbolWidthPositioned = devSymbolSize - 1;
          }
 
-         final int devXPosNextSymbol = 0;
+//         final int devXPosNextSymbol = 0;
 
          // loop: all values in the current serie
          for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
@@ -4647,16 +4715,13 @@ public class ChartComponentGraph extends Canvas {
              */
             int devYPosChart;
             int devYPosCanvas;
+            final int devYSymbol = (int) ((valueY - graphYBorderBottom) * scaleY);
             if (isBottomTop) {
-
-               final int devYSymbol = (int) ((valueY - graphYBorderBottom) * scaleY);
 
                devYPosChart = devYChartBottom - devYSymbol;
                devYPosCanvas = devYCanvasBottom - devYSymbol;
 
             } else {
-
-               final int devYSymbol = (int) ((graphYBorderBottom) * scaleY);
 
                devYPosChart = devYChartTop + devYSymbol;
                devYPosCanvas = devYCanvasTop + devYSymbol;
@@ -5187,7 +5252,7 @@ public class ChartComponentGraph extends Canvas {
                path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
             }
 
-            if (yData.isYAxisDirection()) {
+            if (yData.isYAxis_Bottom2Top()) {
                devY = devY0Inverse - devY1;
             } else {
                devY = devY1 - devY_XAxisLine;
@@ -6141,7 +6206,7 @@ public class ChartComponentGraph extends Canvas {
             final StringBuilder labelText = new StringBuilder();
 
             float devYValue = 0;
-            if (drawingData.getYData().isYAxisDirection()) {
+            if (drawingData.getYData().isYAxis_Bottom2Top()) {
                devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
                      + drawingData.getGraphYBottom());
             } else {
@@ -7407,6 +7472,24 @@ public class ChartComponentGraph extends Canvas {
       }
 
       return null;
+   }
+
+   private void logPath(final Path path) {
+
+      System.out.println();
+      System.out.println();
+
+      final PathData pathData = path.getPathData();
+
+      final float[] points = pathData.points;
+
+      for (int pathIndex = 0; pathIndex < points.length; pathIndex += 2) {
+
+         final float pointX = points[pathIndex];
+         final float pointY = points[pathIndex + 1];
+
+         System.out.println(String.format("%5d  %7.0f  %7.0f", pathIndex / 2, pointX, pointY));
+      }
    }
 
    /**

@@ -45,7 +45,7 @@ public class TVIWizardCompareRoot extends TVIWizardCompareItem {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          // use fast app filter
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
 
          String sqlWhere = UI.EMPTY_STRING;
 

@@ -45,6 +45,7 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
     */
    long            tourTypeId;
    String          tourTitle;
+   boolean         hasGeoData;
 
    LocalDate       tourDate;
    int             year;

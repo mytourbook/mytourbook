@@ -324,9 +324,31 @@ public abstract class StatisticMonth extends TourbookStatistic {
       chartDataModel.addYData(_yData_DurationTime);
    }
 
-   void createYData_Elevation(final ChartDataModel chartDataModel) {
+   void createYData_ElevationDown(final ChartDataModel chartDataModel) {
 
-      // elevation
+      // elevation down
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.BAR,
+            getChartType(_chartType),
+            _statisticData_Month.elevationDown_Low_Resorted,
+            _statisticData_Month.elevationDown_High_Resorted);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_DOWN);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+      yData.setYAxisDirection(false);
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
+
+      chartDataModel.addYData(yData);
+   }
+
+   void createYData_ElevationUp(final ChartDataModel chartDataModel) {
+
+      // elevation up
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
@@ -334,7 +356,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             _statisticData_Month.elevationUp_Low_Resorted,
             _statisticData_Month.elevationUp_High_Resorted);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+      yData.setYTitle(Messages.LABEL_GRAPH_ELEVATION_UP);
       yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);

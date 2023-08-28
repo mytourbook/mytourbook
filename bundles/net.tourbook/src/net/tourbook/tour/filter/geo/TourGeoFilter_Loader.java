@@ -200,7 +200,7 @@ public class TourGeoFilter_Loader {
          final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
 
          // get app filter without geo location, this is added here
-         appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+         appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
 
          sqlSelect = UI.EMPTY_STRING
 

@@ -69,7 +69,8 @@ public interface ITourbookPreferences {
     * Statistic summary
     */
    public static final String STAT_DAY_DURATION_TIME                           = "STAT_DAY_DURATION_TIME";                           //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_ALTITUDE                        = "STAT_DAY_IS_SHOW_ALTITUDE";                        //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_ELEVATION_UP                    = "STAT_DAY_IS_SHOW_ELEVATION_UP";                    //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_ELEVATION_DOWN                  = "STAT_DAY_IS_SHOW_ELEVATION_DOWN";                  //$NON-NLS-1$
    public static final String STAT_DAY_IS_SHOW_AVG_PACE                        = "STAT_DAY_IS_SHOW_AVG_PACE";                        //$NON-NLS-1$
    public static final String STAT_DAY_IS_SHOW_AVG_SPEED                       = "STAT_DAY_IS_SHOW_AVG_SPEED";                       //$NON-NLS-1$
    public static final String STAT_DAY_IS_SHOW_DISTANCE                        = "STAT_DAY_IS_SHOW_DISTANCE";                        //$NON-NLS-1$
@@ -78,7 +79,8 @@ public interface ITourbookPreferences {
 
    public static final String STAT_WEEK_DURATION_TIME                          = "STAT_WEEK_DURATION_TIME";                          //$NON-NLS-1$
    public static final String STAT_WEEK_CHART_TYPE                             = "STAT_WEEK_CHART_TYPE";                             //$NON-NLS-1$
-   public static final String STAT_WEEK_IS_SHOW_ALTITUDE                       = "STAT_WEEK_IS_SHOW_ALTITUDE";                       //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_ELEVATION_UP                   = "STAT_WEEK_IS_SHOW_ELEVATION_UP";                   //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_ELEVATION_DOWN                 = "STAT_WEEK_IS_SHOW_ELEVATION_DOWN";                 //$NON-NLS-1$
    public static final String STAT_WEEK_IS_SHOW_DISTANCE                       = "STAT_WEEK_IS_SHOW_DISTANCE";                       //$NON-NLS-1$
    public static final String STAT_WEEK_IS_SHOW_DURATION                       = "STAT_WEEK_IS_SHOW_DURATION";                       //$NON-NLS-1$
    public static final String STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS                = "STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS";                //$NON-NLS-1$
@@ -88,7 +90,8 @@ public interface ITourbookPreferences {
 
    public static final String STAT_MONTH_DURATION_TIME                         = "STAT_MONTH_DURATION_TIME";                         //$NON-NLS-1$
    public static final String STAT_MONTH_CHART_TYPE                            = "STAT_MONTH_CHART_TYPE";                            //$NON-NLS-1$
-   public static final String STAT_MONTH_IS_SHOW_ALTITUDE                      = "STAT_MONTH_IS_SHOW_ALTITUDE";                      //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_ELEVATION_UP                  = "STAT_MONTH_IS_SHOW_ELEVATION_UP";                  //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_ELEVATION_DOWN                = "STAT_MONTH_IS_SHOW_ELEVATION_DOWN";                //$NON-NLS-1$
    public static final String STAT_MONTH_IS_SHOW_DISTANCE                      = "STAT_MONTH_IS_SHOW_DISTANCE";                      //$NON-NLS-1$
    public static final String STAT_MONTH_IS_SHOW_DURATION                      = "STAT_MONTH_IS_SHOW_DURATION";                      //$NON-NLS-1$
    public static final String STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS               = "STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS";               //$NON-NLS-1$
@@ -98,7 +101,8 @@ public interface ITourbookPreferences {
 
    public static final String STAT_YEAR_DURATION_TIME                          = "STAT_YEAR_DURATION_TIME";                          //$NON-NLS-1$
    public static final String STAT_YEAR_CHART_TYPE                             = "STAT_YEAR_CHART_TYPE";                             //$NON-NLS-1$
-   public static final String STAT_YEAR_IS_SHOW_ALTITUDE                       = "STAT_YEAR_IS_SHOW_ALTITUDE";                       //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_ELEVATION_UP                   = "STAT_YEAR_IS_SHOW_ELEVATION_UP";                   //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_ELEVATION_DOWN                 = "STAT_YEAR_IS_SHOW_ELEVATION_DOWN";                 //$NON-NLS-1$
    public static final String STAT_YEAR_IS_SHOW_DISTANCE                       = "STAT_YEAR_IS_SHOW_DISTANCE";                       //$NON-NLS-1$
    public static final String STAT_YEAR_IS_SHOW_DURATION                       = "STAT_YEAR_IS_SHOW_DURATION";                       //$NON-NLS-1$
    public static final String STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS                = "STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS";                //$NON-NLS-1$
@@ -114,22 +118,24 @@ public interface ITourbookPreferences {
     * Statistic: Training
     */
    public static final String STAT_TRAINING_BAR_DURATION_TIME                           = "STAT_TRAINING_BAR_DURATION_TIME";                           //$NON-NLS-1$
-   public static final String STAT_TRAINING_BAR_IS_SHOW_ALTITUDE                        = "STAT_TRAINING_BAR_IS_SHOW_ALTITUDE";                        //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_AVG_PACE                        = "STAT_TRAINING_BAR_IS_SHOW_AVG_PACE";                        //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_AVG_SPEED                       = "STAT_TRAINING_BAR_IS_SHOW_AVG_SPEED";                       //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_DISTANCE                        = "STAT_TRAINING_BAR_IS_SHOW_DISTANCE";                        //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_DURATION                        = "STAT_TRAINING_BAR_IS_SHOW_DURATION";                        //$NON-NLS-1$
+   public static final String STAT_TRAINING_BAR_IS_SHOW_ELEVATION_UP                    = "STAT_TRAINING_BAR_IS_SHOW_ELEVATION_UP";                    //$NON-NLS-1$
+   public static final String STAT_TRAINING_BAR_IS_SHOW_ELEVATION_DOWN                  = "STAT_TRAINING_BAR_IS_SHOW_ELEVATION_DOWN";                  //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT                 = "STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT";                 //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT_ANAEROBIC       = "STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT_ANAEROBIC";       //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE            = "STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE";            //$NON-NLS-1$
    public static final String STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE  = "STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE";  //$NON-NLS-1$
 
    public static final String STAT_TRAINING_LINE_DURATION_TIME                          = "STAT_TRAINING_LINE_DURATION_TIME";                          //$NON-NLS-1$
-   public static final String STAT_TRAINING_LINE_IS_SHOW_ALTITUDE                       = "STAT_TRAINING_LINE_IS_SHOW_ALTITUDE";                       //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_AVG_PACE                       = "STAT_TRAINING_LINE_IS_SHOW_AVG_PACE";                       //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_AVG_SPEED                      = "STAT_TRAINING_LINE_IS_SHOW_AVG_SPEED";                      //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_DISTANCE                       = "STAT_TRAINING_LINE_IS_SHOW_DISTANCE";                       //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_DURATION                       = "STAT_TRAINING_LINE_IS_SHOW_DURATION";                       //$NON-NLS-1$
+   public static final String STAT_TRAINING_LINE_IS_SHOW_ELEVATION_UP                   = "STAT_TRAINING_LINE_IS_SHOW_ELEVATION_UP";                   //$NON-NLS-1$
+   public static final String STAT_TRAINING_LINE_IS_SHOW_ELEVATION_DOWN                 = "STAT_TRAINING_LINE_IS_SHOW_ELEVATION_DOWN";                 //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT                = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT";                //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC      = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC";      //$NON-NLS-1$
    public static final String STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE           = "STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE";           //$NON-NLS-1$

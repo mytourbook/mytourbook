@@ -153,18 +153,36 @@ public class StatisticValue {
        */
       if (_head2_Raw != null) {
 
-         _head2 = getSpaceBefore() + getPaddedText(_head2_Raw) + getSpaceAfter() + COLUMN_SEPARATOR;
+         if (_unitLabel_Raw != null) {
+
+            _head2 = getSpaceBefore()
+                  + getPaddedText(_head2_Raw + UI.SPACE + UI.SYMBOL_BRACKET_LEFT + _unitLabel_Raw + UI.SYMBOL_BRACKET_RIGHT)
+                  + getSpaceAfter()
+                  + COLUMN_SEPARATOR;
+
+         } else {
+
+            _head2 = getSpaceBefore()
+                  + getPaddedText(_head2_Raw)
+                  + getSpaceAfter()
+                  + COLUMN_SEPARATOR;
+         }
 
       } else {
 
          if (_unitLabel_Raw != null) {
 
-            _head2 = getSpaceBefore() + getPaddedText(UI.SYMBOL_BRACKET_LEFT + _unitLabel_Raw + UI.SYMBOL_BRACKET_RIGHT) + getSpaceAfter()
+            _head2 = getSpaceBefore()
+                  + getPaddedText(UI.SYMBOL_BRACKET_LEFT + _unitLabel_Raw + UI.SYMBOL_BRACKET_RIGHT)
+                  + getSpaceAfter()
                   + COLUMN_SEPARATOR;
 
          } else {
 
-            _head2 = getSpaceBefore() + getPaddedText(UI.EMPTY_STRING) + getSpaceAfter() + COLUMN_SEPARATOR;
+            _head2 = getSpaceBefore()
+                  + getPaddedText(UI.EMPTY_STRING)
+                  + getSpaceAfter()
+                  + COLUMN_SEPARATOR;
          }
       }
 

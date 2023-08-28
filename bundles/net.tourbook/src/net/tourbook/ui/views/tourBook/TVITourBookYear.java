@@ -81,7 +81,7 @@ public class TVITourBookYear extends TVITourBookItem {
             sqlSumYearFieldSub = "StartMonth"; //$NON-NLS-1$
          }
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
          String sqlFromTourData;
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();

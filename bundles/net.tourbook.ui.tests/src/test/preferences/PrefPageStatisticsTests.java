@@ -30,7 +30,7 @@ public class PrefPageStatisticsTests extends UITest {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Statistics").select(); //$NON-NLS-1$
 
-      bot.table().select(Messages.Pref_Statistic_Group_YearSummary);
+      bot.table().select(Messages.Slideout_StatisticOptions_Group_YearSummary);
       bot.button(Messages.app_action_button_down).click();
       bot.button(Messages.app_action_button_up).click();
       bot.button(Messages.Pref_Statistic_Action_SortByData).click();

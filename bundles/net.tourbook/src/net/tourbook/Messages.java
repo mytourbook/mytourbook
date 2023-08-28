@@ -1751,43 +1751,7 @@ public class Messages extends NLS {
 
    public static String        Pref_Statistic_Action_SortByData;
    public static String        Pref_Statistic_Action_SortByTime;
-   public static String        Pref_Statistic_Checkbox_Altitude;
-   public static String        Pref_Statistic_Checkbox_AvgPace;
-   public static String        Pref_Statistic_Checkbox_AvgSpeed;
-   public static String        Pref_Statistic_Checkbox_Distance;
-   public static String        Pref_Statistic_Checkbox_Duration;
-   public static String        Pref_Statistic_Checkbox_NumberOfTours;
-   public static String        Pref_Statistic_Checkbox_ShowPercentageValues;
-   public static String        Pref_Statistic_Checkbox_ShowSummaryValues;
-   public static String        Pref_Statistic_Checkbox_TrainingEffect_Aerob;
-   public static String        Pref_Statistic_Checkbox_TrainingEffect_Anaerob;
-   public static String        Pref_Statistic_Checkbox_TrainingPerformance;
-   public static String        Pref_Statistic_Checkbox_TrainingPerformance_AvgValue;
-   public static String        Pref_Statistic_Checkbox_TrainingPerformance_AvgValue_Tooltip;
-   public static String        Pref_Statistic_Checkbox_YearSeparator;
-   public static String        Pref_Statistic_Group_ChartType;
-   public static String        Pref_Statistic_Group_DaySummary;
-   public static String        Pref_Statistic_Group_DurationTime;
-   public static String        Pref_Statistic_Group_MonthSummary;
-   public static String        Pref_Statistic_Group_StatisticTooltip;
-   public static String        Pref_Statistic_Group_TourFrequency;
-   public static String        Pref_Statistic_Group_Training;
-   public static String        Pref_Statistic_Group_WeekSummary;
-   public static String        Pref_Statistic_Group_YearSummary;
-   public static String        Pref_Statistic_Label_altitude;
-   public static String        Pref_Statistic_Label_distance;
-   public static String        Pref_Statistic_Label_duration;
-   public static String        Pref_Statistic_Label_Interval;
-   public static String        Pref_Statistic_Label_Minimum;
-   public static String        Pref_Statistic_Label_NumberOfBars;
-   public static String        pref_statistic_lbl_info;
-   public static String        Pref_Statistic_Radio_BarAdjacent;
-   public static String        Pref_Statistic_Radio_BarStacked;
-   public static String        Pref_Statistic_Radio_Duration_BreakTime;
-   public static String        Pref_Statistic_Radio_Duration_ElapsedTime;
-   public static String        Pref_Statistic_Radio_Duration_MovingTime;
-   public static String        Pref_Statistic_Radio_Duration_PausedTime;
-   public static String        Pref_Statistic_Radio_Duration_RecordedTime;
+   public static String        Pref_Statistic_Label_Info;
 
    public static String        Pref_Swimming_Label_Info;
 
@@ -1870,6 +1834,7 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub;
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
+   public static String        pref_view_layout_label_Tour;
 
    public static String        Pref_Weather_Button_TestHTTPConnection;
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey;
@@ -2310,10 +2275,8 @@ public class Messages extends NLS {
    public static String        Slideout_RefTour_Checkbox_Pulse_AvgMax;
    public static String        Slideout_RefTour_Checkbox_Speed_Avg;
    public static String        Slideout_RefTour_Group_Graphs;
-   public static String        Slideout_RefTour_Label_BarSize;
    public static String        Slideout_RefTour_Label_ReferenceTimelineOptions;
    public static String        Slideout_RefTour_Label_SymbolSize;
-   public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
@@ -2352,7 +2315,44 @@ public class Messages extends NLS {
    public static String        Slideout_SensorTourFilter_Radio_Year;
    public static String        Slideout_SensorTourFilter_Radio_Year_Tooltip;
 
+   public static String        Slideout_StatisticOptions_Checkbox_AvgPace;
+   public static String        Slideout_StatisticOptions_Checkbox_AvgSpeed;
+   public static String        Slideout_StatisticOptions_Checkbox_Distance;
+   public static String        Slideout_StatisticOptions_Checkbox_Duration;
+   public static String        Slideout_StatisticOptions_Checkbox_ElevationDown;
+   public static String        Slideout_StatisticOptions_Checkbox_ElevationUp;
+   public static String        Slideout_StatisticOptions_Checkbox_NumberOfTours;
+   public static String        Slideout_StatisticOptions_Checkbox_ShowPercentageValues;
+   public static String        Slideout_StatisticOptions_Checkbox_ShowSummaryValues;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingEffect_Aerob;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingEffect_Anaerob;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingPerformance;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingPerformance_AvgValue;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingPerformance_AvgValue_Tooltip;
+   public static String        Slideout_StatisticOptions_Checkbox_YearSeparator;
+   public static String        Slideout_StatisticOptions_Group_ChartType;
+   public static String        Slideout_StatisticOptions_Group_DaySummary;
+   public static String        Slideout_StatisticOptions_Group_DurationTime;
+   public static String        Slideout_StatisticOptions_Group_MonthSummary;
+   public static String        Slideout_StatisticOptions_Group_StatisticTooltip;
+   public static String        Slideout_StatisticOptions_Group_TourFrequency;
+   public static String        Slideout_StatisticOptions_Group_Training;
+   public static String        Slideout_StatisticOptions_Group_WeekSummary;
+   public static String        Slideout_StatisticOptions_Group_YearSummary;
+   public static String        Slideout_StatisticOptions_Label_Altitude;
+   public static String        Slideout_StatisticOptions_Label_Distance;
+   public static String        Slideout_StatisticOptions_Label_Duration;
+   public static String        Slideout_StatisticOptions_Label_Interval;
+   public static String        Slideout_StatisticOptions_Label_Minimum;
+   public static String        Slideout_StatisticOptions_Label_NumberOfBars;
    public static String        Slideout_StatisticOptions_Label_Title;
+   public static String        Slideout_StatisticOptions_Radio_BarAdjacent;
+   public static String        Slideout_StatisticOptions_Radio_BarStacked;
+   public static String        Slideout_StatisticOptions_Radio_Duration_BreakTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_ElapsedTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_MovingTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_PausedTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_RecordedTime;
 
    public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers;
    public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip;
@@ -2755,15 +2755,13 @@ public class Messages extends NLS {
    public static String        Tour_Action_SetTimeZone;
    public static String        Tour_Action_SetWeatherConditions;
    public static String        Tour_Action_ShowBreaktimeValues;
+   public static String        Tour_Action_ShowDistanceOnXAxis_Tooltip;
+   public static String        Tour_Action_ShowTimeOnXAxis_Tooltip;
    public static String        Tour_Action_ShowTourPauses;
    public static String        Tour_Action_ShowTourPauses_Tooltip;
    public static String        Tour_Action_ShowValuePointValue;
-   public static String        Tour_Action_show_distance_on_x_axis;
-   public static String        Tour_Action_show_distance_on_x_axis_tooltip;
    public static String        tour_action_show_srtm_data;
    public static String        Tour_Action_show_start_time_on_x_axis;
-   public static String        Tour_Action_show_time_on_x_axis;
-   public static String        Tour_Action_show_time_on_x_axis_tooltip;
    public static String        Tour_Action_Swim_Strokes_Tooltip;
    public static String        Tour_Action_Swim_Swolf_Tooltip;
    public static String        Tour_Action_TourInfo_Tooltip;

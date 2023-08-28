@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,25 +52,26 @@ public class TVITagView_TagCategory extends TVITagViewItem {
          final String jTblCatTag = TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
          final String jTblCatCat = TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
 
-         final StringBuilder sb = new StringBuilder();
-
          /*
-          * get tag categories
+          * Get tag categories
           */
-         sb.append("SELECT"); //$NON-NLS-1$
+         String sql = UI.EMPTY_STRING
 
-         sb.append(" tblCat.tagCategoryId,");//	//1 //$NON-NLS-1$
-         sb.append(" tblCat.name");//			//2 //$NON-NLS-1$
+               + "SELECT" + NL //                                 //$NON-NLS-1$
 
-         sb.append(" FROM " + jTblCatCat + " jTblCatCat"); //$NON-NLS-1$ //$NON-NLS-2$
+               + " tblCat.tagCategoryId," + NL //              1  //$NON-NLS-1$
+               + " tblCat.name" + NL //                        2  //$NON-NLS-1$
 
-         sb.append(" LEFT OUTER JOIN " + tblCat + " tblCat ON "); //$NON-NLS-1$ //$NON-NLS-2$
-         sb.append(" jTblCatCat.TourTagCategory_tagCategoryId2 = tblCat.tagCategoryId "); //$NON-NLS-1$
+               + " FROM " + jTblCatCat + " jTblCatCat" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
 
-         sb.append(" WHERE jTblCatCat.TourTagCategory_tagCategoryId1 = ?");// + tagCategoryId); //$NON-NLS-1$
-         sb.append(" ORDER BY tblCat.name"); //$NON-NLS-1$
+               + " LEFT OUTER JOIN " + tblCat + " tblCat ON " + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
+               + " jTblCatCat.TourTagCategory_tagCategoryId2 = tblCat.tagCategoryId " + NL //      //$NON-NLS-1$
 
-         PreparedStatement statement = conn.prepareStatement(sb.toString());
+               + " WHERE jTblCatCat.TourTagCategory_tagCategoryId1 = ?" + NL //                    //$NON-NLS-1$
+               + " ORDER BY tblCat.name" + NL //                                                   //$NON-NLS-1$
+         ;
+
+         PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, tagCategoryId);
 
          ResultSet result = statement.executeQuery();
@@ -88,25 +89,26 @@ public class TVITagView_TagCategory extends TVITagViewItem {
          }
 
          /*
-          * get tags
+          * Get tags
           */
-         sb.setLength(0);
-         sb.append("SELECT"); //$NON-NLS-1$
+         sql = UI.EMPTY_STRING
 
-         sb.append(" tblTag.tagId,");//		1 //$NON-NLS-1$
-         sb.append(" tblTag.name,");//		2 //$NON-NLS-1$
-         sb.append(" tblTag.expandType");//	3 //$NON-NLS-1$
+               + "SELECT" + NL //                        //$NON-NLS-1$
 
-         sb.append(" FROM " + jTblCatTag + " jTblCatTag" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+               + " tblTag.tagId," + NL //             1  //$NON-NLS-1$
+               + " tblTag.name," + NL //              2  //$NON-NLS-1$
+               + " tblTag.expandType" + NL //         3  //$NON-NLS-1$
 
-         // get all tags for the category
-         sb.append(" LEFT OUTER JOIN " + tblTag + " tblTag ON"); //$NON-NLS-1$ //$NON-NLS-2$
-         sb.append(" jTblCatTag.TourTag_TagId = tblTag.tagId" + UI.NEW_LINE); //$NON-NLS-1$
+               + " FROM " + jTblCatTag + " jTblCatTag" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
 
-         sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?" + UI.NEW_LINE); //$NON-NLS-1$
-         sb.append(" ORDER BY tblTag.name" + UI.NEW_LINE); //$NON-NLS-1$
+               // get all tags for the category
+               + " LEFT OUTER JOIN " + tblTag + " tblTag ON" + NL //             //$NON-NLS-1$ //$NON-NLS-2$
+               + " jTblCatTag.TourTag_TagId = tblTag.tagId" + NL //              //$NON-NLS-1$
 
-         final String sql = sb.toString();
+               + " WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?" + NL //   //$NON-NLS-1$
+               + " ORDER BY tblTag.name" + NL //                                 //$NON-NLS-1$
+         ;
+
          statement = conn.prepareStatement(sql);
          statement.setLong(1, tagCategoryId);
 
@@ -145,12 +147,16 @@ public class TVITagView_TagCategory extends TVITagViewItem {
 
    @Override
    public String toString() {
-      return "TVITagView_TagCategory " //$NON-NLS-1$
-            + System.identityHashCode(this)
-            + " [tagCategoryId=" //$NON-NLS-1$
-            + tagCategoryId
-            + ", name=" //$NON-NLS-1$
-            + name
-            + "]"; //$NON-NLS-1$
+
+      return UI.EMPTY_STRING
+
+            + "TVITagView_TagCategory " + System.identityHashCode(this) + NL //       //$NON-NLS-1$
+
+            + "[" + NL //                                     //$NON-NLS-1$
+            + "tagCategoryId = " + tagCategoryId + NL //      //$NON-NLS-1$
+            + "name          = " + name + NL //               //$NON-NLS-1$
+
+            + "]" + NL //                                     //$NON-NLS-1$
+      ;
    }
 }

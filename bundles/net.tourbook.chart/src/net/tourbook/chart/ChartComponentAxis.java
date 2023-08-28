@@ -34,7 +34,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -312,7 +311,6 @@ public class ChartComponentAxis extends Canvas {
          graphNo++;
 
          final boolean isLastGraph = graphNo == lastGraphNo;
-//			final boolean isFirstGraph = graphNo == 1;
 
          /*
           * Draw units only for the last overlapped graph
@@ -320,8 +318,12 @@ public class ChartComponentAxis extends Canvas {
 
          final boolean isLastOverlappedGraph = isGraphOverlapped && isLastGraph;
 
-         final boolean isDrawGridAndUnits = !canChartBeOverlapped
-               || (canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
+         final boolean isDrawGridAndUnits =
+
+               // chart is not overlapped
+               canChartBeOverlapped == false
+
+                     || (canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
 
          if (isDrawGridAndUnits == false) {
             continue;
@@ -335,7 +337,7 @@ public class ChartComponentAxis extends Canvas {
 
          final String title = yData.getYTitle();
          final String unitLabel = yData.getUnitLabel();
-         final boolean isBottomUp = yData.isYAxisDirection();
+         final boolean isBottomUp = yData.isYAxis_Bottom2Top();
 
          final float graphYBottom = drawingData.getGraphYBottom();
          final int devGraphHeight = drawingData.devGraphHeight;
@@ -368,15 +370,19 @@ public class ChartComponentAxis extends Canvas {
 //					labelExtend = gc.textExtent(yTitle);
 //				}
 
-            int xPos = labelExtend.y / 2;
-            int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
+            final int xPos = labelExtend.y / 2;
+            final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
 
             gc.setForeground(new Color(yData.getRgbGraph_Text()));
 
             final Transform tr = new Transform(_display);
             {
-               xPos = DPIUtil.autoScaleUp(xPos);
-               yPos = DPIUtil.autoScaleUp(yPos);
+               /**
+                * Have no idea why this scaling needs now to be disabled otherwise the labels are
+                * not displayed correctly
+                */
+//               xPos = DPIUtil.autoScaleUp(xPos);
+//               yPos = DPIUtil.autoScaleUp(yPos);
 
                tr.translate(xPos, yPos);
                tr.rotate(-90f);
