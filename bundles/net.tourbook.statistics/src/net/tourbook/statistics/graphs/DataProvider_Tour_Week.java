@@ -358,6 +358,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                   + "      TourDistance," + NL //                                                        //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                           //$NON-NLS-1$
+                  + "      TourAltDown," + NL //                                                           //$NON-NLS-1$
 
                   + "      TourType_TypeId," + NL //                                                      //$NON-NLS-1$
 
