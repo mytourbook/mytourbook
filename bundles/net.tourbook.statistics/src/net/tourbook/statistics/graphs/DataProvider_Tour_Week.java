@@ -38,7 +38,7 @@ import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
-public class DataProvider_Tour_Week extends DataProvider {
+class DataProvider_Tour_Week extends DataProvider {
 
    private TourStatisticData_Week _tourWeekData;
 
