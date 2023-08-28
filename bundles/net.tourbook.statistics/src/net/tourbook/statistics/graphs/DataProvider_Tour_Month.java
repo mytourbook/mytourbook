@@ -107,6 +107,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                   + "      TourDistance," + NL //                                               //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                   //$NON-NLS-1$
+                  + "      TourAltDown," + NL //                                                   //$NON-NLS-1$
 
                   + "      BodyWeight,         " + NL //       //$NON-NLS-1$
                   + "      BodyFat          " + NL //       //$NON-NLS-1$
