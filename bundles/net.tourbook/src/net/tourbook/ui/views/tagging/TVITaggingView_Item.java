@@ -30,7 +30,7 @@ import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-public abstract class TVITagViewItem extends TreeViewerItem {
+public abstract class TVITaggingView_Item extends TreeViewerItem {
 
    static final String SQL_SUM_COLUMNS;
    static final String SQL_SUM_COLUMNS_TOUR;
@@ -116,7 +116,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
     *
     * @param tagItem
     */
-   public static void readTagTotals(final TVITagView_Tag tagItem) {
+   public static void readTagTotals(final TVITaggingView_Tag tagItem) {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 

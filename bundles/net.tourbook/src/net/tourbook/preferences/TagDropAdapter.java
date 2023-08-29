@@ -545,8 +545,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
       targetCategories.add(draggedCategory);
 
       // update counter
-      lazyTargetCategory.setTagCounter(lazyTargetCategory.getTourTags().size());
-      lazyTargetCategory.setCategoryCounter(targetCategories.size());
+      lazyTargetCategory.setNumberOfTags(lazyTargetCategory.getTourTags().size());
+      lazyTargetCategory.setNumberOfCategories(targetCategories.size());
 
       return TourDatabase.saveEntity(lazyTargetCategory, lazyTargetCategory.getCategoryId(), TourTagCategory.class);
    }
@@ -570,8 +570,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
       targetTags.add(draggedTag);
 
       // update counter
-      lazyTargetCategory.setTagCounter(targetTags.size());
-      lazyTargetCategory.setCategoryCounter(lazyTargetCategory.getTagCategories().size());
+      lazyTargetCategory.setNumberOfTags(targetTags.size());
+      lazyTargetCategory.setNumberOfCategories(lazyTargetCategory.getTagCategories().size());
 
       return TourDatabase.saveEntity(lazyTargetCategory, lazyTargetCategory.getCategoryId(), TourTagCategory.class);
    }
@@ -605,8 +605,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
       if (isRemoved) {
 
          // update counter
-         lazyParentCategory.setCategoryCounter(parentChildrenCategories.size());
-         lazyParentCategory.setTagCounter(lazyParentCategory.getTourTags().size());
+         lazyParentCategory.setNumberOfCategories(parentChildrenCategories.size());
+         lazyParentCategory.setNumberOfTags(lazyParentCategory.getTourTags().size());
 
          return TourDatabase.saveEntity(
                lazyParentCategory,
@@ -636,8 +636,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
       lazyTourTags.remove(draggedTag);
 
       // update counter
-      lazyCategory.setTagCounter(lazyTourTags.size());
-      lazyCategory.setCategoryCounter(lazyCategory.getTagCategories().size());
+      lazyCategory.setNumberOfTags(lazyTourTags.size());
+      lazyCategory.setNumberOfCategories(lazyCategory.getTagCategories().size());
 
       return TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class);
    }

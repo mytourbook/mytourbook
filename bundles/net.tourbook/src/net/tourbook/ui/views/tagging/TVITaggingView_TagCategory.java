@@ -20,22 +20,83 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
 
-public class TVITagView_TagCategory extends TVITagViewItem {
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Tree;
 
-   long   tagCategoryId;
-   String name;
+public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
-   public TVITagView_TagCategory(final TVITagViewItem parentItem) {
+   private TourTagCategory _tourTagCategory;
+
+//   long                    tagCategoryId;
+//
+//   String                  name;
+
+   private TourTagCategory _tagCategory;
+
+   public TVITaggingView_TagCategory(final TVITaggingView_Item parentItem) {
+
       setParentItem(parentItem);
    }
 
    @Override
    protected void fetchChildren() {
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+      if (em == null) {
+         return;
+      }
+
+      final TreeViewer tagViewer = getTagViewer();
+      final Tree tree = tagViewer.getTree();
+
+      final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, _tourTagCategory.getCategoryId());
+
+      // create tag items
+      final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
+      for (final TourTag tourTag : lazyTourTags) {
+         addChild(new TVIPrefTag(tagViewer, tourTag));
+      }
+
+      // create category items
+      final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
+      for (final TourTagCategory tagCategory : lazyTourTagCategories) {
+         addChild(new TVIPrefTagCategory(tagViewer, tagCategory));
+      }
+
+      // update number of categories/tags
+      _tourTagCategory.setNumberOfTags(lazyTourTags.size());
+      _tourTagCategory.setNumberOfCategories(lazyTourTagCategories.size());
+
+      em.close();
+
+      /*
+       * Show number of tags/categories in the viewer, this must be done after the viewer task is
+       * finished
+       */
+      tree.getDisplay().asyncExec(() -> {
+
+         if (tree.isDisposed()) {
+            return;
+         }
+
+         tagViewer.update(TVIPrefTagCategory.this, null);
+      });
+   }
+
+   protected void fetchChildren_OLD() {
 
       // create child items for this tag category item
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
@@ -57,12 +118,12 @@ public class TVITagView_TagCategory extends TVITagViewItem {
           */
          String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                 //$NON-NLS-1$
+               + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
-               + " tblCat.tagCategoryId," + NL //              1  //$NON-NLS-1$
-               + " tblCat.name" + NL //                        2  //$NON-NLS-1$
+               + " tblCat.tagCategoryId," + NL //                                               1  //$NON-NLS-1$
+               + " tblCat.name" + NL //                                                         2  //$NON-NLS-1$
 
-               + " FROM " + jTblCatCat + " jTblCatCat" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+               + " FROM " + jTblCatCat + " jTblCatCat" + NL //                                     //$NON-NLS-1$ //$NON-NLS-2$
 
                + " LEFT OUTER JOIN " + tblCat + " tblCat ON " + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
                + " jTblCatCat.TourTagCategory_tagCategoryId2 = tblCat.tagCategoryId " + NL //      //$NON-NLS-1$
@@ -77,7 +138,7 @@ public class TVITagView_TagCategory extends TVITagViewItem {
          ResultSet result = statement.executeQuery();
          while (result.next()) {
 
-            final TVITagView_TagCategory treeItem = new TVITagView_TagCategory(this);
+            final TVITaggingView_TagCategory treeItem = new TVITaggingView_TagCategory(this);
             children.add(treeItem);
 
             treeItem.tagCategoryId = result.getLong(1);
@@ -93,11 +154,11 @@ public class TVITagView_TagCategory extends TVITagViewItem {
           */
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                        //$NON-NLS-1$
+               + "SELECT" + NL //                                                //$NON-NLS-1$
 
-               + " tblTag.tagId," + NL //             1  //$NON-NLS-1$
-               + " tblTag.name," + NL //              2  //$NON-NLS-1$
-               + " tblTag.expandType" + NL //         3  //$NON-NLS-1$
+               + " tblTag.tagId," + NL //                                     1  //$NON-NLS-1$
+               + " tblTag.name," + NL //                                      2  //$NON-NLS-1$
+               + " tblTag.expandType" + NL //                                 3  //$NON-NLS-1$
 
                + " FROM " + jTblCatTag + " jTblCatTag" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -115,7 +176,7 @@ public class TVITagView_TagCategory extends TVITagViewItem {
          result = statement.executeQuery();
          while (result.next()) {
 
-            final TVITagView_Tag tagItem = new TVITagView_Tag(this);
+            final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(this);
             children.add(tagItem);
 
             final long tagId = result.getLong(1);
@@ -145,18 +206,29 @@ public class TVITagView_TagCategory extends TVITagViewItem {
       return name;
    }
 
+   public TourTagCategory getTourTagCategory() {
+
+      return _tagCategory;
+   }
+
+   public void setTagCategory(final TourTagCategory tagCategory) {
+
+      _tagCategory = tagCategory;
+   }
+
    @Override
    public String toString() {
 
       return UI.EMPTY_STRING
 
-            + "TVITagView_TagCategory " + System.identityHashCode(this) + NL //       //$NON-NLS-1$
+            + "TVITagView_TagCategory " + System.identityHashCode(this) + NL //$NON-NLS-1$
 
-            + "[" + NL //                                     //$NON-NLS-1$
-            + "tagCategoryId = " + tagCategoryId + NL //      //$NON-NLS-1$
-            + "name          = " + name + NL //               //$NON-NLS-1$
+            + "[" + NL //                                      //$NON-NLS-1$
 
-            + "]" + NL //                                     //$NON-NLS-1$
+            + " tagCategoryId = " + tagCategoryId + NL //      //$NON-NLS-1$
+            + " name          = " + name + NL //               //$NON-NLS-1$
+
+            + "]" + NL //                                      //$NON-NLS-1$
       ;
    }
 }

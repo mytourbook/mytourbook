@@ -3219,6 +3219,7 @@ public class Messages extends NLS {
    public static String        Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String        Tour_Tags_Action_Layout_Hierarchical_Tooltip;
    public static String        Tour_Tags_Action_OnMouseSelect_ExpandCollapse;
+   public static String        Tour_Tags_Action_Preferences_Tooltip;
    public static String        Tour_Tags_Action_SingleExpand_CollapseOthers;
    public static String        Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String        Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;

@@ -35,7 +35,7 @@ import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVITagView_Tag extends TVITagViewItem {
+public class TVITaggingView_Tag extends TVITaggingView_Item {
 
    long           tagId;
 
@@ -45,7 +45,7 @@ public class TVITagView_Tag extends TVITagViewItem {
 
    public boolean isRoot = false;
 
-   public TVITagView_Tag(final TVITagViewItem parentItem) {
+   public TVITaggingView_Tag(final TVITaggingView_Item parentItem) {
       setParentItem(parentItem);
    }
 
@@ -60,7 +60,7 @@ public class TVITagView_Tag extends TVITagViewItem {
       if (getClass() != obj.getClass()) {
          return false;
       }
-      final TVITagView_Tag other = (TVITagView_Tag) obj;
+      final TVITaggingView_Tag other = (TVITaggingView_Tag) obj;
       if (tagId != other.tagId) {
          return false;
       }
@@ -158,7 +158,7 @@ public class TVITagView_Tag extends TVITagViewItem {
 
                + " TourData.tourId," + NL //                   1  //$NON-NLS-1$
                + " jTdataTtag2.TourTag_tagId," + NL //         2 //$NON-NLS-1$
-               + TVITagView_Tour.SQL_TOUR_COLUMNS + NL //      3
+               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //      3
 
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -178,7 +178,7 @@ public class TVITagView_Tag extends TVITagViewItem {
          ;
 
          long previousTourId = -1;
-         TVITagView_Tour tourItem = null;
+         TVITaggingView_Tour tourItem = null;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, tagId);
@@ -200,7 +200,7 @@ public class TVITagView_Tag extends TVITagViewItem {
 
             } else {
 
-               tourItem = new TVITagView_Tour(this);
+               tourItem = new TVITaggingView_Tour(this);
                children.add(tourItem);
 
                tourItem.tourId = tourId;
@@ -262,7 +262,7 @@ public class TVITagView_Tag extends TVITagViewItem {
 
             final int dbYear = result.getInt(1);
 
-            final TVITagView_Year yearItem = new TVITagView_Year(this, dbYear, isMonth);
+            final TVITaggingView_Year yearItem = new TVITaggingView_Year(this, dbYear, isMonth);
             children.add(yearItem);
 
             yearItem.treeColumn = Integer.toString(dbYear);
@@ -334,14 +334,14 @@ public class TVITagView_Tag extends TVITagViewItem {
 
          // this tag was remove from tours
 
-         final HashMap<Long, TVITagView_Tour> removedTours = new HashMap<>();
+         final HashMap<Long, TVITaggingView_Tour> removedTours = new HashMap<>();
 
          // loop all tour items
          for (final TreeViewerItem treeItem : unfetchedChildren) {
 
-            if (treeItem instanceof TVITagView_Tour) {
+            if (treeItem instanceof TVITaggingView_Tour) {
 
-               final TVITagView_Tour tourItem = (TVITagView_Tour) treeItem;
+               final TVITaggingView_Tour tourItem = (TVITaggingView_Tour) treeItem;
                final long itemTourId = tourItem.getTourId();
 
                // find tour item in the modified tours
@@ -359,7 +359,7 @@ public class TVITagView_Tag extends TVITagViewItem {
             }
          }
 
-         final Collection<TVITagView_Tour> removedTourItems = removedTours.values();
+         final Collection<TVITaggingView_Tour> removedTourItems = removedTours.values();
 
          // update model
          unfetchedChildren.removeAll(removedTours.values());
