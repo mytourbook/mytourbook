@@ -153,6 +153,11 @@ public class UI {
     */
    public static final String            VIEW_COLOR_TOUR                 = "VIEW_COLOR_TOUR";                 //$NON-NLS-1$
 
+   /**
+    * Color for totals or number of ...
+    */
+   public static final String            VIEW_COLOR_TOTAL                = "VIEW_COLOR_TOTAL";                //$NON-NLS-1$
+
    public static final String            SYMBOL_AVERAGE                  = "\u00f8";                          //$NON-NLS-1$
    public static final String            SYMBOL_AVERAGE_WITH_SPACE       = "\u00f8 ";                         //$NON-NLS-1$
    public static final String            SYMBOL_DASH                     = "-";                               //$NON-NLS-1$
@@ -194,6 +199,7 @@ public class UI {
    public static Styler                  CONTENT_CATEGORY_STYLER;
    public static Styler                  DATE_CATEGORY_STYLER;
    public static Styler                  TOUR_STYLER;
+   public static Styler                  TOTAL_STYLER;
 
    private static final String           DEFAULT_MONO_FONT               = "Courier";                         //$NON-NLS-1$
 
@@ -234,12 +240,13 @@ public class UI {
       IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,  TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       /*
-       * Set stylers for the view colors
+       * Set stylers for the view colors, the color is retrieved every time from the color registry
        */
       CONTENT_CATEGORY_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_CATEGORY,      null);
       CONTENT_SUB_CATEGORY_STYLER   = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_SUB_CATEGORY,  null);
       DATE_CATEGORY_STYLER          = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_CATEGORY,         null);
       TOUR_STYLER                   = StyledString.createColorRegistryStyler(VIEW_COLOR_TOUR,                  null);
+      TOTAL_STYLER                  = StyledString.createColorRegistryStyler(VIEW_COLOR_TOTAL,                 null);
 
 // SET_FORMATTING_ON
    }
@@ -1062,6 +1069,19 @@ public class UI {
                   : Util.getStateRGB(state,
                         PrefPageViewColors.STATE_VIEW_COLOR_TOUR_DARK,
                         PrefPageViewColors.STATE_VIEW_COLOR_TOUR_DEFAULT_DARK));
+
+      // total
+      colorRegistry.put(VIEW_COLOR_TOTAL,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK));
    }
 
    public static GridData setWidth(final Control control, final int width) {

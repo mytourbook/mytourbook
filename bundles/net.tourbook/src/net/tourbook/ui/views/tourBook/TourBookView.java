@@ -283,7 +283,7 @@ public class TourBookView extends ViewPart implements
    private ColumnManager                   _columnManager_NatTable;
    private ColumnManager                   _columnManager_Tree;
    //
-   private OpenDialogManager               _openDlgMgr                          = new OpenDialogManager();
+   private OpenDialogManager               _openDlgMgr                         = new OpenDialogManager();
    //
    private PostSelectionProvider           _postSelectionProvider;
    //
@@ -330,11 +330,11 @@ public class TourBookView extends ViewPart implements
     */
    private int                             _natTable_ContextMenuActivator;
    //
-   private int                             _selectedYear                        = -1;
-   private int                             _selectedYearSub                     = -1;
-   private final ArrayList<Long>           _selectedTourIds                     = new ArrayList<>();
+   private int                             _selectedYear                       = -1;
+   private int                             _selectedYearSub                    = -1;
+   private final ArrayList<Long>           _selectedTourIds                    = new ArrayList<>();
    //
-   private TourCollectionFilter            _tourCollectionFilter                = TourCollectionFilter.COLLECTED_TOURS;
+   private TourCollectionFilter            _tourCollectionFilter               = TourCollectionFilter.COLLECTED_TOURS;
    //
    private boolean                         _isCollapseOthers;
    private boolean                         _isInFireSelection;
@@ -342,7 +342,7 @@ public class TourBookView extends ViewPart implements
    private boolean                         _isInStartup;
    private boolean                         _isLayoutNatTable;
    //
-   private final TourDoubleClickState      _tourDoubleClickState                = new TourDoubleClickState();
+   private final TourDoubleClickState      _tourDoubleClickState               = new TourDoubleClickState();
    //
    private NatTableViewer_TourInfo_ToolTip _tourInfoToolTip_NatTable;
    private TreeViewerTourInfoToolTip       _tourInfoToolTip_Tree;
@@ -350,8 +350,8 @@ public class TourBookView extends ViewPart implements
    private TagMenuManager                  _tagMenuManager;
    private MenuManager                     _viewerMenuManager_NatTable;
    private MenuManager                     _viewerMenuManager_Tree;
-   private IContextMenuProvider            _viewerContextMenuProvider_NatTable  = new ContextMenuProvider_NatTable();
-   private IContextMenuProvider            _viewerContextMenuProvider_Tree      = new ContextMenuProvider_Tree();
+   private IContextMenuProvider            _viewerContextMenuProvider_NatTable = new ContextMenuProvider_NatTable();
+   private IContextMenuProvider            _viewerContextMenuProvider_Tree     = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues        _subMenu_AdjustTourValues;
    //
@@ -1206,12 +1206,14 @@ public class TourBookView extends ViewPart implements
 
          } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
+            _columnFactory.updateColors();
+
             _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
             _tourViewer_Tree.refresh();
 
             /*
-             * the tree must be redrawn because the styled text does not show with the new color
+             * The tree must be redrawn because the styled text does not show with the new color
              */
             _tourViewer_Tree.getTree().redraw();
          }
@@ -1420,6 +1422,8 @@ public class TourBookView extends ViewPart implements
          }
 
          _isInStartup = true;
+
+         _columnFactory.updateColors();
 
          setupTourViewerContent();
 
@@ -3029,8 +3033,6 @@ public class TourBookView extends ViewPart implements
          reloadViewer();
       }
    }
-
-
 
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {

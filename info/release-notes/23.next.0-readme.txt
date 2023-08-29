@@ -49,6 +49,9 @@ New
 Improvements
 ============
 
+* Tour Book
+  - Use custom colors for tour and total values
+
 * Statistics
   - Show elevation loss values
     https://github.com/mytourbook/mytourbook/issues/1034
