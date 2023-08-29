@@ -71,6 +71,7 @@ public class Images {
    public static final String App_Sort                                   = "app-sort.png";                                        //$NON-NLS-1$
    public static final String App_Sort_Disabled                          = "app-sort-disabled.png";                               //$NON-NLS-1$
    public static final String App_Today                                  = "today.png";                                           //$NON-NLS-1$
+   public static final String App_Today_Disabled                         = "today-disabled.png";                                  //$NON-NLS-1$
    public static final String App_Trash                                  = "trash.png";                                           //$NON-NLS-1$
    public static final String App_Trash_Disabled                         = "trash-disabled.png";                                  //$NON-NLS-1$
    public static final String App_Trash_Themed                           = "trash-blue.png";                                      //$NON-NLS-1$

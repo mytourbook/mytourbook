@@ -379,6 +379,7 @@ public class TourBookView extends ViewPart implements
    private ActionDeleteTourMenu               _actionDeleteTourMenu;
    private ActionDeleteTourValues             _actionDeleteTourValues;
    private ActionEditTour                     _actionEditTour;
+   private ActionGotoToday                    _actionGotoToday;
    private ActionJoinTours                    _actionJoinTours;
    private ActionLinkWithOtherViews           _actionLinkWithOtherViews;
    private ActionMergeTour                    _actionMergeTour;
@@ -427,6 +428,22 @@ public class TourBookView extends ViewPart implements
             super.run();
          }
          _isInCollapseAll = false;
+      }
+   }
+
+   private class ActionGotoToday extends Action {
+
+      public ActionGotoToday() {
+
+         super(Messages.Calendar_View_Action_GotoToday, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today_Disabled));
+      }
+
+      @Override
+      public void run() {
+         actionGotoToday();
       }
    }
 
@@ -1117,6 +1134,71 @@ public class TourBookView extends ViewPart implements
 //      new CSVExport(selection, path.toOSString());
    }
 
+   private void actionGotoToday() {
+      // TODO Auto-generated method stub
+
+      if (_isLayoutNatTable) {
+
+         // flat view
+
+      } else {
+
+         // tree view
+
+         final TreeViewerItem treeItem = actionGotoToday_GetLastChild(_rootItem_Tree);
+
+         if (treeItem != null) {
+
+         }
+
+         System.out.println(UI.timeStamp() + " treeItem: " + treeItem);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      }
+   }
+
+   /**
+    * !!! Recursive !!!
+    *
+    * @param treeItem
+    * @return
+    */
+   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem treeItem) {
+
+      TreeViewerItem lastChildItem = treeItem;
+
+      final ArrayList<TreeViewerItem> fetchedChildren = treeItem.getFetchedChildren();
+      final int numChildren = fetchedChildren.size();
+
+      if (numChildren > 0) {
+
+         final TreeViewerItem childrenLastChildItem = fetchedChildren.get(numChildren - 1);
+
+         if (childrenLastChildItem instanceof final TVITourBookYear yearItem) {
+
+            if (yearItem.isRowSummary) {
+
+               // use the last available year
+
+               if (numChildren>1) {
+
+
+               } else {
+
+                  // there is only a total row
+
+                  lastChildItem
+               }
+            }
+
+         }
+
+         lastChildItem = actionGotoToday_GetLastChild(childrenLastChildItem);
+      }
+
+      return lastChildItem;
+   }
+
    void actionSelectYearMonthTours() {
 
       if (_actionSelectAllTours.isChecked()) {
@@ -1262,6 +1344,8 @@ public class TourBookView extends ViewPart implements
                reloadViewer();
             }
 
+            enableActions();
+
          } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
 
             _columnFactory.updateToolTipState();
@@ -1391,7 +1475,9 @@ public class TourBookView extends ViewPart implements
       _actionExpandSelection           = new ActionExpandSelection(this);
       _actionExportTour                = new ActionExport(this);
       _actionExportViewCSV             = new ActionExportViewCSV(this);
+      _actionGotoToday                 = new ActionGotoToday();
       _actionJoinTours                 = new ActionJoinTours(this);
+      _actionLinkWithOtherViews        = new ActionLinkWithOtherViews();
       _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, true);
       _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this);
       _actionMergeTour                 = new ActionMergeTour(this);
@@ -1405,8 +1491,6 @@ public class TourBookView extends ViewPart implements
       _actionTourBookOptions           = new ActionTourBookOptions();
       _actionTourCollectionFilter      = new ActionTourCollectionFilter();
       _actionUploadTour                = new ActionUpload(this);
-
-      _actionLinkWithOtherViews        = new ActionLinkWithOtherViews();
 
       _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
       _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
@@ -2024,6 +2108,10 @@ public class TourBookView extends ViewPart implements
       final boolean isOneTour = numTourItems == 1;
       final boolean isAllToursSelected = _actionSelectAllTours.isChecked();
 
+      final int numAvailableItems = _isLayoutNatTable
+            ? _natTable_DataLoader.getNumberOfToursWithoutCollectionFilter()
+            : _rootItem_Tree.getChildren().size();
+
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
       // set initial state to false until data are loaded, actions are enabled only for a single tour -> multiple tour is always false
@@ -2085,6 +2173,7 @@ public class TourBookView extends ViewPart implements
       _actionEditTour.setEnabled(isOneTour);
       _actionExportTour.setEnabled(isTourSelected);
       _actionExportViewCSV.setEnabled(numSelectedItems > 0);
+      _actionGotoToday.setEnabled(numAvailableItems > 0);
       _actionJoinTours.setEnabled(numTourItems > 1);
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
@@ -2138,17 +2227,18 @@ public class TourBookView extends ViewPart implements
    private void fillActionBars() {
 
       /*
-       * fill view menu
+       * Fill view menu
        */
       final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
       menuMgr.add(_actionRefreshView);
 
       /*
-       * fill view toolbar
+       * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+      tbm.add(_actionGotoToday);
       tbm.add(_actionToggleViewLayout);
       tbm.add(_actionTourCollectionFilter);
       tbm.add(_actionSelectAllTours);
@@ -3732,7 +3822,7 @@ public class TourBookView extends ViewPart implements
       _state.put(STATE_IS_SELECT_YEAR_MONTH_TOURS, _actionSelectAllTours.isChecked());
 
       _state.put(STATE_IS_LINK_WITH_OTHER_VIEWS, _actionLinkWithOtherViews.getSelection());
-      
+
       _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionContext_SingleExpand_CollapseOthers.isChecked());
       _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionContext_OnMouseSelect_ExpandCollapse.isChecked());
 
