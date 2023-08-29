@@ -34,7 +34,7 @@ import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
-public class DataProvider_Tour_Month extends DataProvider {
+class DataProvider_Tour_Month extends DataProvider {
 
    private TourStatisticData_Month _tourMonthData;
 
@@ -107,6 +107,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                   + "      TourDistance," + NL //                                               //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                   //$NON-NLS-1$
+                  + "      TourAltDown," + NL //                                                   //$NON-NLS-1$
 
                   + "      BodyWeight,         " + NL //       //$NON-NLS-1$
                   + "      BodyFat          " + NL //       //$NON-NLS-1$

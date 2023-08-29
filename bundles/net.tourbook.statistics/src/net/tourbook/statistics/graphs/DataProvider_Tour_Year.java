@@ -196,7 +196,9 @@ public class DataProvider_Tour_Year extends DataProvider {
                      _tourYearData.breakTime[tourTypeIndex][yearIndex],
 
                      _tourYearData.distance_High[tourTypeIndex][yearIndex] / 1000,
+
                      _tourYearData.elevationUp_High[tourTypeIndex][yearIndex],
+                     _tourYearData.elevationDown_High[tourTypeIndex][yearIndex],
 
                      _tourYearData.numTours_High[tourTypeIndex][yearIndex]
 

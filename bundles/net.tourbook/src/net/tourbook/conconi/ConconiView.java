@@ -658,7 +658,7 @@ public class ConconiView extends ViewPart {
           * label: deflection point
           */
          label = new Label(container, SWT.NONE);
-         label.setText(Messages.Conconi_Chart_DeflactionPoint);
+         label.setText(Messages.Conconi_Chart_DeflectionPoint);
 
          final Composite deflContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(deflContainer);

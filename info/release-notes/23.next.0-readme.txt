@@ -49,6 +49,11 @@ New
 Improvements
 ============
 
+* Tour Book
+  - Use custom colors for tour and total values
+  - New action: One click to expand only one item and collapse any others
+  - New action: One click to expand/collapse an item when selected with mouse
+
 * Statistics
   - Show elevation loss values
     https://github.com/mytourbook/mytourbook/issues/1034
