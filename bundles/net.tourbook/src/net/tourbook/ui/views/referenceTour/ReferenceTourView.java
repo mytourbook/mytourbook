@@ -1979,11 +1979,6 @@ public class ReferenceTourView extends ViewPart implements
        */
       UI.activateView(this, ID);
 
-      onTourViewer_Selection_FireSelection(selectionChangedEvent);
-   }
-
-   private void onTourViewer_Selection_FireSelection(final SelectionChangedEvent selectionChangedEvent) {
-
       final TreeSelection treeSelection = (TreeSelection) selectionChangedEvent.getSelection();
 
       boolean isCategorySelected = false;
@@ -2030,15 +2025,12 @@ public class ReferenceTourView extends ViewPart implements
       }
 
       // category is selected, expand/collapse category items
+      if (isCategorySelected
 
-      if (_isSelectedWithKeyboard == false) {
+            // do not expand/collapse when keyboard is used -> unusable
+            && _isSelectedWithKeyboard == false) {
 
-         // do not expand/collapse when keyboard is used -> unusable
-
-         if (isCategorySelected) {
-
-            onSelect_CategoryItem(treeSelection);
-         }
+         onSelect_CategoryItem(treeSelection);
       }
 
       // reset state
