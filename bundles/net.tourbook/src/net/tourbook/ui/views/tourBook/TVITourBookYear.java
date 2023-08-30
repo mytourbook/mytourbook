@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
    private static final String YEAR_WEEK_FORMAT = "[%02d] %s"; //$NON-NLS-1$
 
-   private TourBookViewLayout  _subCategory;
+   private TourBookViewLayout  _viewLayout;
 
    boolean                     isRowSummary;
 
@@ -46,7 +46,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
       super(view);
 
-      _subCategory = view.getViewLayout();
+      _viewLayout = view.getViewLayout();
 
       setParentItem(parentItem);
    }
@@ -58,7 +58,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final boolean isWeekDisplayed = _subCategory == TourBookViewLayout.CATEGORY_WEEK;
+         final boolean isWeekDisplayed = _viewLayout == TourBookViewLayout.CATEGORY_WEEK;
 
          final ArrayList<TreeViewerItem> children = new ArrayList<>();
          setChildren(children);
@@ -160,7 +160,7 @@ public class TVITourBookYear extends TVITourBookItem {
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final TVITourBookItem tourItem = new TVITourBookYearCategorized(tourBookView, this, _subCategory);
+            final TVITourBookItem tourItem = new TVITourBookYearCategorized(tourBookView, this, _viewLayout);
 
             children.add(tourItem);
 
@@ -235,17 +235,18 @@ public class TVITourBookYear extends TVITourBookItem {
 
    @Override
    public String toString() {
-      return
 
-      UI.EMPTY_STRING
+      return NL
 
-//      getClass().getName() + "\n"
+            + "TVITourBookYear" + NL //                        //$NON-NLS-1$
 
-//          + "_subCategory = " + _subCategory + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-//          + "isRowSummary = " + isRowSummary + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "[" + NL //                                      //$NON-NLS-1$
 
-            + "tourYear     = " + tourYear + "  colCounter   = " + colCounter + "\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "tourYear     = " + tourYear + NL //              //$NON-NLS-1$
+            + "isRowSummary = " + isRowSummary + NL //          //$NON-NLS-1$
+            + "_viewLayout  = " + _viewLayout + NL //           //$NON-NLS-1$
 
+            + "]" + NL //                                      //$NON-NLS-1$
       ;
    }
 

@@ -379,7 +379,7 @@ public class TourBookView extends ViewPart implements
    private ActionDeleteTourMenu               _actionDeleteTourMenu;
    private ActionDeleteTourValues             _actionDeleteTourValues;
    private ActionEditTour                     _actionEditTour;
-   private ActionGotoToday                    _actionGotoToday;
+   private ActionGotoLastTour                 _actionGotoToday;
    private ActionJoinTours                    _actionJoinTours;
    private ActionLinkWithOtherViews           _actionLinkWithOtherViews;
    private ActionMergeTour                    _actionMergeTour;
@@ -431,11 +431,11 @@ public class TourBookView extends ViewPart implements
       }
    }
 
-   private class ActionGotoToday extends Action {
+   private class ActionGotoLastTour extends Action {
 
-      public ActionGotoToday() {
+      public ActionGotoLastTour() {
 
-         super(Messages.Calendar_View_Action_GotoToday, AS_PUSH_BUTTON);
+         super(Messages.Tour_Book_Action_GoToLastTour_Tooltip, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today_Disabled));
@@ -443,7 +443,7 @@ public class TourBookView extends ViewPart implements
 
       @Override
       public void run() {
-         actionGotoToday();
+         actionGoToLastTour();
       }
    }
 
@@ -1134,69 +1134,134 @@ public class TourBookView extends ViewPart implements
 //      new CSVExport(selection, path.toOSString());
    }
 
-   private void actionGotoToday() {
-      // TODO Auto-generated method stub
+   private void actionGoToLastTour() {
 
       if (_isLayoutNatTable) {
 
          // flat view
 
+         final int numRows = _natTable_DataProvider.getRowCount();
+
+         if (numRows > 0) {
+
+            final int[] lastRowPosition = { numRows - 1 };
+
+            selectTours_NatTable(lastRowPosition, true, true, true);
+         }
+
       } else {
 
          // tree view
 
-         final TreeViewerItem treeItem = actionGotoToday_GetLastChild(_rootItem_Tree);
+         final List<TreeViewerItem> allLastChildren = new ArrayList<>();
 
-         if (treeItem != null) {
+         actionGotoToday_GetLastChild(_rootItem_Tree, allLastChildren);
 
+         final TreeViewerItem[] treePathArray = allLastChildren.toArray(new TreeViewerItem[allLastChildren.size()]);
+         final TreePath lastChildTreePath = new TreePath(treePathArray);
+         final TreeSelection treeSelection = new TreeSelection(lastChildTreePath);
+
+         final Tree tree = _tourViewer_Tree.getTree();
+
+         if (_isBehaviour_SingleExpand_CollapseOthers) {
+
+            _isInExpandingSelection = true;
+            {
+               /*
+                * Collapse all tree paths
+                */
+               tree.setRedraw(false);
+               {
+                  _isInSelection = true;
+                  {
+                     final TreePath[] allExpandedTreePaths = _tourViewer_Tree.getExpandedTreePaths();
+
+                     for (final TreePath treePath : allExpandedTreePaths) {
+
+                        // skip last child when it is already open to prevent flickering
+
+                        if (lastChildTreePath.startsWith(treePath, null)) {
+                           continue;
+                        }
+
+                        _tourViewer_Tree.setExpandedState(treePath, false);
+                     }
+                  }
+                  _isInSelection = false;
+               }
+               tree.setRedraw(true);
+            }
+            _isInExpandingSelection = false;
          }
 
-         System.out.println(UI.timeStamp() + " treeItem: " + treeItem);
-// TODO remove SYSTEM.OUT.PRINTLN
+         /*
+          * Goto/expand last item
+          */
+         tree.getDisplay().asyncExec(() -> {
 
+            if (tree.isDisposed()) {
+               return;
+            }
+
+            tree.setRedraw(false);
+            {
+               _isInSelection = true;
+               {
+                  _tourViewer_Tree.setSelection(treeSelection, true);
+               }
+               _isInSelection = false;
+            }
+            tree.setRedraw(true);
+         });
       }
    }
 
    /**
     * !!! Recursive !!!
     *
-    * @param treeItem
+    * @param parentItem
+    * @param allLastChildren
     * @return
     */
-   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem treeItem) {
+   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem, final List<TreeViewerItem> allLastChildren) {
 
-      TreeViewerItem lastChildItem = treeItem;
+      final List<TreeViewerItem> allChildren = parentItem.getFetchedChildren();
 
-      final ArrayList<TreeViewerItem> fetchedChildren = treeItem.getFetchedChildren();
-      final int numChildren = fetchedChildren.size();
+      final int numChildren = allChildren.size();
 
       if (numChildren > 0) {
 
-         final TreeViewerItem childrenLastChildItem = fetchedChildren.get(numChildren - 1);
+         TreeViewerItem lastChild = allChildren.get(numChildren - 1);
 
-         if (childrenLastChildItem instanceof final TVITourBookYear yearItem) {
+         if (lastChild instanceof final TVITourBookYear yearItem) {
+
+            // skip summary item
 
             if (yearItem.isRowSummary) {
 
                // use the last available year
 
-               if (numChildren>1) {
+               if (numChildren > 1) {
 
+                  // use previous child
+                  lastChild = allChildren.get(numChildren - 2);
 
                } else {
 
                   // there is only a total row
 
-                  lastChildItem
+                  return null;
                }
             }
-
          }
 
-         lastChildItem = actionGotoToday_GetLastChild(childrenLastChildItem);
+         // keep child tree
+         allLastChildren.add(lastChild);
+
+         return actionGotoToday_GetLastChild(lastChild, allLastChildren);
       }
 
-      return lastChildItem;
+      return null;
    }
 
    void actionSelectYearMonthTours() {
@@ -1268,9 +1333,10 @@ public class TourBookView extends ViewPart implements
          }
       }
 
-      enableActions();
-
       reopenFirstSelectedTour();
+
+      // must be called AFTER the view content is set otherwise a NPE could occur
+      enableActions();
    }
 
    private void addPartListener() {
@@ -1475,7 +1541,7 @@ public class TourBookView extends ViewPart implements
       _actionExpandSelection           = new ActionExpandSelection(this);
       _actionExportTour                = new ActionExport(this);
       _actionExportViewCSV             = new ActionExportViewCSV(this);
-      _actionGotoToday                 = new ActionGotoToday();
+      _actionGotoToday                 = new ActionGotoLastTour();
       _actionJoinTours                 = new ActionJoinTours(this);
       _actionLinkWithOtherViews        = new ActionLinkWithOtherViews();
       _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, true);
