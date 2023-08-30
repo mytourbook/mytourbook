@@ -302,16 +302,28 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
       {
          /*
-          * Toolbar: Restart app
+          * Toolbar: Restart app, scramble
           */
          final boolean isShowRestartApp = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
-         if (isShowRestartApp) {
+         final boolean isShowScambleData = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_IN_APP);
+
+         if (isShowRestartApp || isShowScambleData) {
 
             final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-            tbMgr.add(_contribItem_RestartApp);
 
-            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
-            coolBarMgr.add(tbContribItem);
+            if (isShowRestartApp) {
+
+               tbMgr.add(_contribItem_RestartApp);
+
+               final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
+               coolBarMgr.add(tbContribItem);
+            }
+
+            if (isShowScambleData) {
+
+               final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "scambleData"); //$NON-NLS-1$
+               coolBarMgr.add(tbContribItem);
+            }
          }
       }
 
