@@ -213,6 +213,13 @@ public class TVITourBookYear extends TVITourBookItem {
             tourItem.colTourDateTime = new TourDateTime(zonedWeekDate);
 
             tourItem.addSumColumns(result, 3);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+
+               tourItem.scrambleData();
+
+               tourItem.treeColumn = UI.scrambleText(tourItem.treeColumn);
+            }
          }
 
       } catch (final SQLException e) {

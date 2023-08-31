@@ -1499,6 +1499,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
    public static String        Pref_Appearance_Check_AutoOpenTagging;
    public static String        Pref_Appearance_Check_RestartAppInAppToolbar;
+   public static String        Pref_Appearance_Check_ShowInAppToolbar_ScrambleData;
    public static String        Pref_Appearance_Check_ShowThemeSelectorInAppToolbar;
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Combo_Theme_Tooltip;
@@ -1507,6 +1508,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Dialog_RestartAfterRestartApp_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message;
+   public static String        Pref_Appearance_Dialog_ScrambleData_Message;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
    public static String        Pref_Appearance_Group_Theme;

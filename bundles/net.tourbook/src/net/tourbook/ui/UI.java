@@ -790,8 +790,17 @@ public class UI {
    public static String getTourTypeLabel(final long tourTypeId) {
 
       for (final TourType tourType : TourDatabase.getAllTourTypes()) {
+         
          if (tourType.getTypeId() == tourTypeId) {
-            return tourType.getName();
+
+            String tourTypeText = tourType.getName();
+
+            if (net.tourbook.common.UI.IS_SCRAMBLE_DATA) {
+
+               tourTypeText = net.tourbook.common.UI.scrambleText(tourTypeText);
+            }
+
+            return tourTypeText;
          }
       }
 

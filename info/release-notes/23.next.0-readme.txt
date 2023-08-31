@@ -67,6 +67,9 @@ Improvements
 * Color Selector
   - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
     https://github.com/mytourbook/mytourbook/issues/1169
+    
+* macOS ARM
+  - Support macOS ARM platform    
 
 Changes
 =======

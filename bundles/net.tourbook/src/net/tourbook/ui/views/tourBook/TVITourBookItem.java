@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,27 +39,29 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-   static ZonedDateTime       calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+   private static final String SCRAMBLE_FIELD_PREFIX = "col";                                                          //$NON-NLS-1$
+
+   static ZonedDateTime        calendar8             = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
    /**
     * All tour fields in the tourbook view, the first field is <code>tourId</code> which can be
     * prefixed with <code>DISTINCT</code>
     */
-   public static final String SQL_ALL_TOUR_FIELDS;
+   public static final String  SQL_ALL_TOUR_FIELDS;
 
-   public static final String SQL_ALL_OTHER_FIELDS;
-   public static final int    SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
+   public static final String  SQL_ALL_OTHER_FIELDS;
+   public static final int     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
 
    /**
     * <b>All</b> fields which are used in {@link #SQL_SUM_COLUMNS} <b>MUST be defined in</b>
     * {@link #SQL_SUM_FIELDS}, otherwise the SQL fails
     */
-   static final String        SQL_SUM_COLUMNS;
+   static final String         SQL_SUM_COLUMNS;
 
    /**
     * SQL fields for {@link #SQL_SUM_COLUMNS}, the field ordering is NOT important
     */
-   static final String        SQL_SUM_FIELDS;
+   static final String         SQL_SUM_FIELDS;
 
    static {
 
@@ -703,7 +707,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000f / dbDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
+
          tourItem.scrambleData();
+
+         tourItem.treeColumn = UI.scrambleText(tourItem.treeColumn);
       }
 
       return tourItem;
@@ -772,12 +779,14 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colTemperature_Average           = result.getFloat(startIndex + 29);
 
+      colTourDeviceTime_Paused         = colTourDeviceTime_Elapsed - colTourDeviceTime_Recorded;
+      colTourComputedTime_Break        = colTourDeviceTime_Elapsed - colTourComputedTime_Moving;
+
+      colSlowVsFastCadence             = TourManager.generateCadenceZones_TimePercentages(
+                                                cadenceZone_SlowTime, 
+                                                cadenceZone_FastTime);
+      
 // SET_FORMATTING_ON
-
-      colTourDeviceTime_Paused = colTourDeviceTime_Elapsed - colTourDeviceTime_Recorded;
-      colTourComputedTime_Break = colTourDeviceTime_Elapsed - colTourComputedTime_Moving;
-
-      colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
    }
 
    @Override
@@ -871,6 +880,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             getTourDataFields(result, tourItem);
 
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourItem.tourYearSub = UI.scrambleNumbers(tourItem.tourYearSub);
+            }
+
             children.add(tourItem);
 
             // get first tag id
@@ -907,6 +920,54 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       int result = 1;
       result = prime * result + ((colTourDateTime == null) ? 0 : colTourDateTime.hashCode());
       return result;
+   }
+
+   /**
+    * Scramble all fields which fieldname is starting with "col"
+    */
+   void scrambleData() {
+
+      try {
+
+         for (final Field field : TVITourBookItem.class.getDeclaredFields()) {
+
+            final String fieldName = field.getName();
+
+            if ("colClouds".equals(fieldName)) {
+
+               // skip cloud field otherwise the cloud icon is not displayed
+               continue;
+            }
+
+            if (fieldName.startsWith(SCRAMBLE_FIELD_PREFIX)) {
+
+               final Type fieldType = field.getGenericType();
+
+               if (Integer.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getInt(this)));
+
+               } else if (Long.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getLong(this)));
+
+               } else if (Float.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getFloat(this)));
+
+               } else if (String.class.equals(fieldType)) {
+
+                  final String fieldValue = (String) field.get(this);
+                  final String scrambledText = UI.scrambleText(fieldValue);
+
+                  field.set(this, scrambledText);
+               }
+            }
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+         e.printStackTrace();
+      }
    }
 
 }

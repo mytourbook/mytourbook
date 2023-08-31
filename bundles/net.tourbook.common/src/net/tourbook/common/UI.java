@@ -2748,6 +2748,11 @@ public class UI {
       IS_BRIGHT_THEME = isDarkThemeSelected == false;
    }
 
+   public static void setIsScrambleData(final boolean isScrambleData) {
+
+      IS_SCRAMBLE_DATA = isScrambleData;
+   }
+
    /**
     * Set the themed image descriptor for a {@link UIElement} with images from the
     * {@link TourbookPlugin} plugin

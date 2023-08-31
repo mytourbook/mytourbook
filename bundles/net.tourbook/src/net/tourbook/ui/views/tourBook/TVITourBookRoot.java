@@ -160,6 +160,13 @@ public class TVITourBookRoot extends TVITourBookItem {
                yearItem.isRowSummary = true;
             }
 
+            if (UI.IS_SCRAMBLE_DATA) {
+
+               yearItem.scrambleData();
+
+               yearItem.treeColumn = UI.scrambleText(yearItem.treeColumn);
+            }
+
             yearIndex++;
          }
 

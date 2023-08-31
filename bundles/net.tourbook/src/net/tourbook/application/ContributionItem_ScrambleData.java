@@ -20,22 +20,21 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.PlatformUI;
 
-public class ScrambleDataContributionItem extends ContributionItem {
+public class ContributionItem_ScrambleData extends ContributionItem {
 
    private ToolItem _actionToolItem;
 
    private Image    _actionImage;
 
-   public ScrambleDataContributionItem() {
+   public ContributionItem_ScrambleData() {
 
       createActionImage();
    }
@@ -61,16 +60,21 @@ public class ScrambleDataContributionItem extends ContributionItem {
             createActionImage();
          }
 
-         _actionToolItem = new ToolItem(toolbar, SWT.PUSH);
+         _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
 
-         _actionToolItem.setToolTipText(Messages.Action_App_ScrableData_Tooltip);
+         _actionToolItem.setToolTipText(Messages.Action_App_ScrambleData_Tooltip);
          _actionToolItem.setImage(_actionImage);
          _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            UI.setScrableData()
+            final boolean isSelected = _actionToolItem.getSelection();
+
+            UI.setIsScrambleData(isSelected);
          }
 
          ));
+
+         // set initial selection which can be set with the command line
+         _actionToolItem.setSelection(UI.IS_SCRAMBLE_DATA);
       }
    }
 

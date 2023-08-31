@@ -83,6 +83,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
    private MeasurementSystemContributionItem _contribItem_MeasurementSystem;
    private PersonContributionItem            _contribItem_PersonSelector;
    private RestartAppContributionItem        _contribItem_RestartApp;
+   private ContributionItem_ScrambleData     _contribItem_ScrambleData;
    private ThemeSelectorContributionItem     _contribItem_ThemeSelector;
    private TourTypeContributionItem          _contribItem_TourType;
 
@@ -302,10 +303,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
       {
          /*
-          * Toolbar: Restart app, scramble
+          * Toolbar: Restart app, scramble data
           */
          final boolean isShowRestartApp = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
-         final boolean isShowScambleData = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_IN_APP);
+         final boolean isShowScambleData = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP);
 
          if (isShowRestartApp || isShowScambleData) {
 
@@ -320,6 +321,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             }
 
             if (isShowScambleData) {
+
+               tbMgr.add(_contribItem_ScrambleData);
 
                final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "scambleData"); //$NON-NLS-1$
                coolBarMgr.add(tbContribItem);
@@ -367,6 +370,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       _contribItem_MeasurementSystem   = new MeasurementSystemContributionItem();
       _contribItem_PersonSelector      = new PersonContributionItem();
       _contribItem_RestartApp          = new RestartAppContributionItem();
+      _contribItem_ScrambleData        = new ContributionItem_ScrambleData();
       _contribItem_ThemeSelector       = new ThemeSelectorContributionItem();
       _contribItem_TourType            = new TourTypeContributionItem();
 
