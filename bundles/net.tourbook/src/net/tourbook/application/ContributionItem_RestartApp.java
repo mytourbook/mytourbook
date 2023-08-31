@@ -29,13 +29,13 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 
-public class RestartAppContributionItem extends ContributionItem {
+public class ContributionItem_RestartApp extends ContributionItem {
 
    private ToolItem _actionToolItem;
 
    private Image    _actionImage;
 
-   public RestartAppContributionItem() {
+   public ContributionItem_RestartApp() {
 
       createActionImage();
    }

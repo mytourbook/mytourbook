@@ -28,7 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourTypeContributionItem;
+import net.tourbook.application.ContributionItem_TourType;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -91,7 +91,7 @@ public class TourTypeFilterManager {
     */
    private static ActionTTFilter            _selectedFilterAction;
 
-   private static TourTypeContributionItem  _tourTypeContribItem;
+   private static ContributionItem_TourType  _tourTypeContribItem;
 
    static {
 
@@ -573,7 +573,7 @@ public class TourTypeFilterManager {
       });
    }
 
-   public static void setToolBarContribItem(final TourTypeContributionItem tourTypeContribItem) {
+   public static void setToolBarContribItem(final ContributionItem_TourType tourTypeContribItem) {
       _tourTypeContribItem = tourTypeContribItem;
    }
 

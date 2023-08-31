@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 
-public class TourTypeContributionItem extends CustomControlContribution {
+public class ContributionItem_TourType extends CustomControlContribution {
 
 	private static final String		ID			= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
 
@@ -87,7 +87,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private Label					_lblFilterIcon;
 	private Link					_lnkFilterText;
 
-	public TourTypeContributionItem() {
+	public ContributionItem_TourType() {
 		super(ID);
 	}
 
