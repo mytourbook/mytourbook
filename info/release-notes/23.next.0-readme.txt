@@ -70,6 +70,7 @@ Improvements
     
 * macOS ARM
   - Support macOS ARM platform    
+    https://github.com/mytourbook/mytourbook/discussions/1174
 
 Changes
 =======
