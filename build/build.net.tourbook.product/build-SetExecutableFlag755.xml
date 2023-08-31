@@ -13,9 +13,15 @@
          <param name="app-launcher-filepath"    value="mytourbook/mytourbook"/>
       </antcall>
 
-      <!-- MacOS 64 bit -->
+      <!-- MacOS x86 64 bit -->
       <antcall target="set-755-in-zip-file">
          <param name="src-tar-gz-file"          value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.tar.gz"/>
+         <param name="app-launcher-filepath"    value="MyTourbook.app/Contents/MacOS/mytourbook"/>
+      </antcall>
+
+      <!-- MacOS AArch64 bit -->
+      <antcall target="set-755-in-zip-file">
+         <param name="src-tar-gz-file"          value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.aarch64.tar.gz"/>
          <param name="app-launcher-filepath"    value="MyTourbook.app/Contents/MacOS/mytourbook"/>
       </antcall>
 
