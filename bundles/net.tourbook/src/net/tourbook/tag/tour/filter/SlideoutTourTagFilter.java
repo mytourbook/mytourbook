@@ -1092,8 +1092,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
                styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                // get number of categories
-               final int categoryCounter = tourTagCategory.getCategoryCounter();
-               final int tagCounter = tourTagCategory.getTagCounter();
+               final int categoryCounter = tourTagCategory.getNumberOfCategories();
+               final int tagCounter = tourTagCategory.getNumberOfTags();
                if (categoryCounter == -1 && tagCounter == -1) {
 
 //                  styledString.append("  ...", StyledString.COUNTER_STYLER);

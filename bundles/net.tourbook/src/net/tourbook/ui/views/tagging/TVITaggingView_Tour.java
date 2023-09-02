@@ -24,7 +24,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.TourDatabase;
 
-public class TVITagView_Tour extends TVITagViewItem {
+public class TVITaggingView_Tour extends TVITaggingView_Item {
 
    public static final String SQL_TOUR_COLUMNS = UI.EMPTY_STRING
 
@@ -55,7 +55,7 @@ public class TVITagView_Tour extends TVITagViewItem {
    public long                deviceStartDistance;
    public short               deviceTimeInterval;
 
-   public TVITagView_Tour(final TVITagViewItem parentItem) {
+   public TVITaggingView_Tour(final TVITaggingView_Item parentItem) {
       setParentItem(parentItem);
    }
 

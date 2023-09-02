@@ -28,11 +28,11 @@ import net.tourbook.database.TourDatabase;
 /**
  * root item for the tag view
  */
-public class TVITagView_Root extends TVITagViewItem {
+public class TVITaggingView_Root extends TVITaggingView_Item {
 
    private int _tagViewStructure;
 
-   public TVITagView_Root(final int tagViewStructure) {
+   public TVITaggingView_Root(final int tagViewStructure) {
       _tagViewStructure = tagViewStructure;
    }
 
@@ -74,7 +74,7 @@ public class TVITagView_Root extends TVITagViewItem {
 
             while (result.next()) {
 
-               final TVITagView_TagCategory treeItem = new TVITagView_TagCategory(this);
+               final TVITaggingView_TagCategory treeItem = new TVITaggingView_TagCategory(this);
                children.add(treeItem);
 
                treeItem.tagCategoryId = result.getLong(1);
@@ -116,7 +116,7 @@ public class TVITagView_Root extends TVITagViewItem {
 
          while (result.next()) {
 
-            final TVITagView_Tag tagItem = new TVITagView_Tag(this);
+            final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(this);
 
             children.add(tagItem);
 

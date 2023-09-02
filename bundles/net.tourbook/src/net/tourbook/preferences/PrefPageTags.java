@@ -417,7 +417,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                final Set<TourTag> lazyTourTags = parentTagCategoryEntity.getTourTags();
                lazyTourTags.add(tourTag);
 
-               parentTagCategory.setTagCounter(lazyTourTags.size());
+               parentTagCategory.setNumberOfTags(lazyTourTags.size());
             }
             em.close();
 
@@ -576,7 +576,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       _tagViewer.addDoubleClickListener(doubleClickEvent -> onTagViewer_DoubleClick());
 
-      _tagViewer.addSelectionChangedListener(this::onTagViewer_Selection);
+      _tagViewer.addSelectionChangedListener(selectionChangedEvent -> onTagViewer_Selection(selectionChangedEvent));
 
       _tagViewer.addDragSupport(
             DND.DROP_MOVE,
@@ -764,8 +764,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                   styledString.append(categoryName, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                   // get number of categories
-                  final int categoryCounter = tourTagCategory.getCategoryCounter();
-                  final int tagCounter = tourTagCategory.getTagCounter();
+                  final int categoryCounter = tourTagCategory.getNumberOfCategories();
+                  final int tagCounter = tourTagCategory.getNumberOfTags();
                   if (categoryCounter == -1 && tagCounter == -1) {
 
 //                  styledString.append("  ...", StyledString.COUNTER_STYLER);
@@ -1205,7 +1205,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             lazyTourTagCategories.add(savedNewCategory);
 
             // update number of categories
-            parentCategoryEntity.setCategoryCounter(lazyTourTagCategories.size());
+            parentCategoryEntity.setNumberOfCategories(lazyTourTagCategories.size());
 
             /*
              * Persist parent category
@@ -1406,8 +1406,15 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          if (_isSelectedWithKeyboard == false) {
 
             if (_tagViewer.getExpandedState(selectedItem)) {
+
+               // expanded -> collapsed
+
                _tagViewer.collapseToLevel(selectedItem, 1);
+
             } else {
+
+               // collapsed -> expanded
+
                _tagViewer.expandToLevel(selectedItem, 1);
             }
          }
