@@ -2789,9 +2789,7 @@ public class TourDatabase {
             final List<?> resultList = emQuery.getResultList();
             for (final Object result : resultList) {
 
-               if (result instanceof TourTag) {
-
-                  final TourTag tourTag = (TourTag) result;
+               if (result instanceof final TourTag tourTag) {
 
                   allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
                   allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);

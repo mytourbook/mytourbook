@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.TourDatabase;
+
+import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITaggingView_Tour extends TVITaggingView_Item {
 
@@ -55,7 +57,10 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    public long                deviceStartDistance;
    public short               deviceTimeInterval;
 
-   public TVITaggingView_Tour(final TVITaggingView_Item parentItem) {
+   public TVITaggingView_Tour(final TVITaggingView_Item parentItem, final TreeViewer treeViewer) {
+
+      super(treeViewer);
+
       setParentItem(parentItem);
    }
 

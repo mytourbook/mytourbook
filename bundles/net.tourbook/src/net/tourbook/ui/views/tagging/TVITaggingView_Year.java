@@ -22,24 +22,32 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.UI;
+
+import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITaggingView_Year extends TVITaggingView_Item {
 
-   private final int      _year;
+   private final int          _year;
+
    private TVITaggingView_Tag _tagItem;
 
    /**
     * <code>true</code> when the children of this year item contains month items<br>
     * <code>false</code> when the children of this year item contains tour items
     */
-   private boolean        _isMonth;
+   private boolean            _isMonth;
 
-   public TVITaggingView_Year(final TVITaggingView_Tag parentItem, final int year, final boolean isMonth) {
+   public TVITaggingView_Year(final TVITaggingView_Tag parentItem,
+                              final int year,
+                              final boolean isMonth,
+                              final TreeViewer treeViewer) {
+
+      super(treeViewer);
 
       setParentItem(parentItem);
 
@@ -114,7 +122,7 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
    }
 
    public long getTagId() {
-      return _tagItem.tagId;
+      return _tagItem.getTagId();
    }
 
    public TVITaggingView_Tag getTagItem() {
@@ -180,12 +188,16 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
             final int dbYear = result.getInt(1);
             final int dbMonth = result.getInt(2);
 
-            final TVITaggingView_Month tourItem = new TVITaggingView_Month(this, dbYear, dbMonth);
+            final TVITaggingView_Month tourItem = new TVITaggingView_Month(this, dbYear, dbMonth, getTagViewer());
             children.add(tourItem);
 
-            tourItem.treeColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
+            tourItem.firstColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
 
             tourItem.readSumColumnData(result, 3);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+            }
          }
 
       } catch (final SQLException e) {
@@ -259,14 +271,19 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
 
                // resultset contains a new tour
 
-               tourItem = new TVITaggingView_Tour(this);
+               tourItem = new TVITaggingView_Tour(this, getTagViewer());
 
                children.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultTagId, 3);
 
-               tourItem.treeColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+               tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
             }
 
             lastTourId = tourId;

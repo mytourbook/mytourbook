@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
@@ -37,16 +35,34 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITaggingView_Tag extends TVITaggingView_Item {
 
-   long           tagId;
+   private TourTag _tourTag;
 
-   String         name;
+   private long    _tagId;
 
-   private int    _expandType;
+   /**
+    * 0 ... TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
+    * 1 ... TourTag.EXPAND_TYPE_FLAT
+    * 2 ... TourTag.EXPAND_TYPE_YEAR_DAY
+    */
+   private int     _expandType;
 
-   public boolean isRoot = false;
+   public TVITaggingView_Tag(final TourTag tourTag,
+                             final TVITaggingView_Item parentItem,
+                             final TreeViewer treeViewer) {
 
-   public TVITaggingView_Tag(final TVITaggingView_Item parentItem) {
+      super(treeViewer);
+
+      _tourTag = tourTag;
+      _tagId = _tourTag.getTagId();
+      _expandType = _tourTag.getExpandType();
+
       setParentItem(parentItem);
+
+      firstColumn = tourTag.getTagName();
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         firstColumn = UI.scrambleText(firstColumn);
+      }
    }
 
    @Override
@@ -61,7 +77,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          return false;
       }
       final TVITaggingView_Tag other = (TVITaggingView_Tag) obj;
-      if (tagId != other.tagId) {
+      if (_tagId != other._tagId) {
          return false;
       }
       return true;
@@ -72,14 +88,17 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       switch (_expandType) {
 
-      case TourTag.EXPAND_TYPE_FLAT:
-         setChildren(readTagChildren_Tours(UI.EMPTY_STRING));
-         break;
-
+      // 0
       case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
          setChildren(readTagChildren_Years(true, UI.EMPTY_STRING));
          break;
 
+      // 1
+      case TourTag.EXPAND_TYPE_FLAT:
+         setChildren(readTagChildren_Tours(UI.EMPTY_STRING));
+         break;
+
+      // 2
       case TourTag.EXPAND_TYPE_YEAR_DAY:
          setChildren(readTagChildren_Years(false, UI.EMPTY_STRING));
          break;
@@ -94,12 +113,8 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
       return _expandType;
    }
 
-   public String getName() {
-      return name;
-   }
-
    public long getTagId() {
-      return tagId;
+      return _tagId;
    }
 
    /**
@@ -133,11 +148,15 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
       return sb.toString();
    }
 
+   public TourTag getTourTag() {
+      return _tourTag;
+   }
+
    @Override
    public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + (int) (tagId ^ (tagId >>> 32));
+      result = prime * result + (int) (_tagId ^ (_tagId >>> 32));
       return result;
    }
 
@@ -181,7 +200,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          TVITaggingView_Tour tourItem = null;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
-         statement.setLong(1, tagId);
+         statement.setLong(1, _tagId);
          sqlFilter.setParameters(statement, 2);
 
          final ResultSet result = statement.executeQuery();
@@ -200,13 +219,17 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
             } else {
 
-               tourItem = new TVITaggingView_Tour(this);
+               tourItem = new TVITaggingView_Tour(this, getTagViewer());
                children.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultTagId, 3);
 
-               tourItem.treeColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+               tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
             }
 
             previousTourId = tourId;
@@ -254,7 +277,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
-         statement.setLong(1, tagId);
+         statement.setLong(1, _tagId);
          sqlFilter.setParameters(statement, 2);
 
          final ResultSet result = statement.executeQuery();
@@ -262,11 +285,15 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
             final int dbYear = result.getInt(1);
 
-            final TVITaggingView_Year yearItem = new TVITaggingView_Year(this, dbYear, isMonth);
+            final TVITaggingView_Year yearItem = new TVITaggingView_Year(this, dbYear, isMonth, getTagViewer());
             children.add(yearItem);
 
-            yearItem.treeColumn = Integer.toString(dbYear);
+            yearItem.firstColumn = Integer.toString(dbYear);
             yearItem.readSumColumnData(result, 2);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               yearItem.firstColumn = UI.scrambleText(yearItem.firstColumn);
+            }
          }
 
       } catch (final SQLException e) {
@@ -387,46 +414,6 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
       tagViewer.update(allYearItems.toArray(), null);
    }
 
-   public void setExpandType(final int expandType) {
-      _expandType = expandType;
-   }
-
-   public String setName(final String name) {
-      this.name = name;
-      return name;
-   }
-
-   /**
-    * Set the expand type for the item and save the changed model in the database
-    *
-    * @param expandType
-    */
-   public void setNewExpandType(final int expandType) {
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      try {
-
-         final TourTag tagInDb = em.find(TourTag.class, tagId);
-
-         if (tagInDb != null) {
-
-            tagInDb.setExpandType(expandType);
-
-            TourDatabase.saveEntity(tagInDb, tagId, TourTag.class);
-         }
-
-      } catch (final Exception e) {
-         e.printStackTrace();
-      } finally {
-
-         em.close();
-
-         _expandType = expandType;
-      }
-
-   }
-
    @Override
    public String toString() {
 
@@ -436,8 +423,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
             + "[" + NL //                       //$NON-NLS-1$
 
-            + "tagId = " + tagId + NL //        //$NON-NLS-1$
-            + "name  = " + name + NL //         //$NON-NLS-1$
+            + _tourTag
 
             + "]" + NL //                       //$NON-NLS-1$
       ;

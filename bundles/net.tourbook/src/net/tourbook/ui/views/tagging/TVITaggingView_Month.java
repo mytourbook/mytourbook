@@ -21,19 +21,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.UI;
+
+import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITaggingView_Month extends TVITaggingView_Item {
 
    private final TVITaggingView_Year _yearItem;
 
-   private final int             _year;
-   private final int             _month;
+   private final int                 _year;
+   private final int                 _month;
 
-   public TVITaggingView_Month(final TVITaggingView_Year parentItem, final int dbYear, final int dbMonth) {
+   public TVITaggingView_Month(final TVITaggingView_Year parentItem,
+                               final int dbYear,
+                               final int dbMonth,
+                               final TreeViewer treeViewer) {
+
+      super(treeViewer);
 
       setParentItem(parentItem);
 
@@ -119,7 +126,7 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
    protected void fetchChildren() {
 
       /*
-       * set tour children for the month
+       * Set tour children for the month
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
@@ -138,7 +145,7 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
                + " tourID," + NL //                //				1	//$NON-NLS-1$
                + " jTdataTtag2.TourTag_tagId," + NL //         2  //$NON-NLS-1$
 
-               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //      3
+               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //  3
 
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -184,14 +191,19 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
             } else {
 
                // new tour is in the resultset
-               tourItem = new TVITaggingView_Tour(this);
+               tourItem = new TVITaggingView_Tour(this, getTagViewer());
 
                children.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultTagId, 3);
 
-               tourItem.treeColumn = Integer.toString(tourItem.tourDay);
+               tourItem.firstColumn = Integer.toString(tourItem.tourDay);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
             }
 
             lastTourId = tourId;

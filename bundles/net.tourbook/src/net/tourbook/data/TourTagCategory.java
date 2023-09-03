@@ -260,4 +260,8 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       notes = modifiedTagCategory.notes;
    }
 
+   public long getTagCategoryId() {
+      return tagCategoryId;
+   }
+
 }

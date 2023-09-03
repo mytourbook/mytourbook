@@ -23,6 +23,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -3040,6 +3042,29 @@ public class UI {
          // deny tab access
          control.setVisible(false);
       }
+   }
+
+   public static void showSQLException(final SQLException ex) {
+
+      Display.getDefault().asyncExec(() -> {
+
+         SQLException e = ex;
+
+         while (e != null) {
+
+            final String sqlExceptionText = Util.getSQLExceptionText(e);
+
+            // log also the stacktrace
+            StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
+
+            MessageDialog.openError(
+                  Display.getDefault().getActiveShell(),
+                  "SQL Error", //$NON-NLS-1$
+                  sqlExceptionText);
+
+            e = e.getNextException();
+         }
+      });
    }
 
    /**

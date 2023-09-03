@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,13 +29,18 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.views.tourBook.TVITourBookItem;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.TreeViewer;
 
 public abstract class TVITaggingView_Item extends TreeViewerItem {
 
-   static final String SQL_SUM_COLUMNS;
-   static final String SQL_SUM_COLUMNS_TOUR;
+   static final String         SQL_SUM_COLUMNS;
+   static final String         SQL_SUM_COLUMNS_TOUR;
+
+   private static final String SCRAMBLE_FIELD_PREFIX = "col"; //$NON-NLS-1$
+
    static {
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
@@ -82,9 +89,9 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /**
-    * Content which is displayed in the tree column
+    * Content which is displayed in the first tree column
     */
-   String                           treeColumn;
+   String                           firstColumn;
 
    long                             colDistance;
 
@@ -107,9 +114,16 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    float                            colAvgCadence;
    float                            colAvgTemperature_Device;
 
-   long                             colTourCounter;
+   long                             colNumItems;
 
    int                              temperatureDigits;
+
+   private TreeViewer               _tagViewer;
+
+   public TVITaggingView_Item(final TreeViewer tagViewer) {
+
+      _tagViewer = tagViewer;
+   }
 
    /**
     * Read sum totals from the database for the tagItem
@@ -148,7 +162,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             tagItem.readSumColumnData(result, 1);
          }
 
-         if (tagItem.colTourCounter == 0) {
+         if (tagItem.colNumItems == 0) {
 
             /*
              * to hide the '+' for an item which has no children, an empty list of children will be
@@ -161,6 +175,11 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
          net.tourbook.ui.UI.showSQLException(e);
       }
+   }
+
+   public TreeViewer getTagViewer() {
+
+      return _tagViewer;
    }
 
    void readDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
@@ -193,38 +212,60 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       colAvgSpeed    = time        == 0 ? 0 : 3.6f * colDistance / time;
       colAvgPace     = colDistance == 0 ? 0 : time * 1000f / colDistance;
 
-      if (UI.IS_SCRAMBLE_DATA) {
-
-         colDistance                = UI.scrambleNumbers(colDistance);
-
-         colElapsedTime             = UI.scrambleNumbers(colElapsedTime);
-         colRecordedTime            = UI.scrambleNumbers(colRecordedTime);
-         colMovingTime              = UI.scrambleNumbers(colMovingTime);
-         colPausedTime              = UI.scrambleNumbers(colPausedTime);
-
-         colAltitudeUp              = UI.scrambleNumbers(colAltitudeUp);
-         colAltitudeDown            = UI.scrambleNumbers(colAltitudeDown);
-
-         colMaxPulse                = UI.scrambleNumbers(colMaxPulse);
-         colMaxAltitude             = UI.scrambleNumbers(colMaxAltitude);
-         colMaxSpeed                = UI.scrambleNumbers(colMaxSpeed);
-
-         colAvgPulse                = UI.scrambleNumbers(colAvgPulse);
-         colAvgCadence              = UI.scrambleNumbers(colAvgCadence);
-         colAvgTemperature_Device   = UI.scrambleNumbers(colAvgTemperature_Device);
-
-         colAvgSpeed                = UI.scrambleNumbers(colAvgSpeed);
-         colAvgPace                 = UI.scrambleNumbers(colAvgPace);
-      }
-
 // SET_FORMATTING_ON
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         scrambleData();
+      }
    }
 
    public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
       readDefaultColumnData(result, startIndex);
 
-      colTourCounter = result.getLong(startIndex + 12);
+      colNumItems = result.getLong(startIndex + 12);
+   }
+
+   /**
+    * Scramble all fields which fieldname is starting with "col"
+    */
+   private void scrambleData() {
+
+      try {
+
+         for (final Field field : TVITourBookItem.class.getDeclaredFields()) {
+
+            final String fieldName = field.getName();
+
+            if (fieldName.startsWith(SCRAMBLE_FIELD_PREFIX)) {
+
+               final Type fieldType = field.getGenericType();
+
+               if (Integer.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getInt(this)));
+
+               } else if (Long.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getLong(this)));
+
+               } else if (Float.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getFloat(this)));
+
+               } else if (String.class.equals(fieldType)) {
+
+                  final String fieldValue = (String) field.get(this);
+                  final String scrambledText = UI.scrambleText(fieldValue);
+
+                  field.set(this, scrambledText);
+               }
+            }
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+         e.printStackTrace();
+      }
    }
 
 }

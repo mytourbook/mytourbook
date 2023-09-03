@@ -185,6 +185,23 @@ public class TagManager {
    }
 
    /**
+    * Clear all tag resources within MT and fire a tag modify event, ensure that
+    * {@link TourManager#isTourEditorModified()} <code>== false</code>
+    */
+   public static void clearAllTagResourcesAndFireModifyEvent() {
+
+      // remove old tags from cached tours
+      TourDatabase.clearTourTags();
+
+      TagMenuManager.clearRecentTags();
+
+      TourManager.getInstance().clearTourDataCache();
+
+      // fire modify event
+      TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+   }
+
+   /**
     * Deletes a tour tag from all contained tours and in the tag structure. This event
     * {@link TourEventId#TAG_STRUCTURE_CHANGED} is fired when done.
     *
@@ -240,7 +257,7 @@ public class TagManager {
 
             if (deleteTourTag_10(allTags)) {
 
-               fireChangeEvent();
+               clearAllTagResourcesAndFireModifyEvent();
 
                updateTourTagFilterProfiles(allTags);
 
@@ -374,7 +391,7 @@ public class TagManager {
 
             if (deleteTourTagCategory_10(categoryId, categoryName)) {
 
-               fireChangeEvent();
+               clearAllTagResourcesAndFireModifyEvent();
 
                returnValue[0] = true;
             }
@@ -450,7 +467,7 @@ public class TagManager {
     */
    public static void disposeTagImages() {
 
-      _tagImagesCache.values().forEach(UI::disposeResource);
+      _tagImagesCache.values().forEach(image -> UI.disposeResource(image));
 
       _tagImagesCache.clear();
    }
@@ -512,19 +529,6 @@ public class TagManager {
       }
 
       return tourTagsAccumulatedValues;
-   }
-
-   private static void fireChangeEvent() {
-
-      // remove old tags from cached tours
-      TourDatabase.clearTourTags();
-
-      TagMenuManager.clearRecentTags();
-
-      TourManager.getInstance().clearTourDataCache();
-
-      // fire modify event
-      TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
    }
 
    private static long getNumberOfItems(final Connection conn, final String sql) {
