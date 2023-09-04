@@ -52,7 +52,6 @@ import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.ActionSetTagStructure;
 import net.tourbook.tag.ActionSetTagStructure_All;
 import net.tourbook.tag.ChangedTags;
-import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
@@ -244,16 +243,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    /*
     * UI resources
     */
-   private final Image _imgTagCategory = TourbookPlugin.getImage(Images.Tag_Category);
-   private final Image _imgTag         = TourbookPlugin.getImage(Images.Tag);
-   private final Image _imgTagRoot     = TourbookPlugin.getImage(Images.Tag_Root);
-
+   private final Image                         _imgTagCategory                          = TourbookPlugin.getImage(Images.Tag_Category);
+   private final Image                         _imgTag                                  = TourbookPlugin.getImage(Images.Tag);
+   private final Image                         _imgTagRoot                              = TourbookPlugin.getImage(Images.Tag_Root);
+   
    /*
     * UI controls
     */
-   private Composite _viewerContainer;
+   private Composite                           _viewerContainer;
 
-   private Menu      _treeContextMenu;
+   private Menu                                _treeContextMenu;
 
    private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
 
@@ -379,29 +378,27 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         if (obj1 instanceof TVITaggingView_Tour && obj2 instanceof TVITaggingView_Tour) {
+         if (obj1 instanceof final TVITaggingView_Tour tourItem1 && obj2 instanceof final TVITaggingView_Tour tourItem2) {
 
             // sort tours by date
-            final TVITaggingView_Tour tourItem1 = (TVITaggingView_Tour) (obj1);
-            final TVITaggingView_Tour tourItem2 = (TVITaggingView_Tour) (obj2);
 
             return tourItem1.tourDate.compareTo(tourItem2.tourDate);
+
          }
 
-         if (obj1 instanceof TVITaggingView_Year && obj2 instanceof TVITaggingView_Year) {
-
-            final TVITaggingView_Year yearItem1 = (TVITaggingView_Year) (obj1);
-            final TVITaggingView_Year yearItem2 = (TVITaggingView_Year) (obj2);
+         if (obj1 instanceof final TVITaggingView_Year yearItem1 && obj2 instanceof final TVITaggingView_Year yearItem2) {
 
             return yearItem1.compareTo(yearItem2);
          }
 
-         if (obj1 instanceof TVITaggingView_Month && obj2 instanceof TVITaggingView_Month) {
-
-            final TVITaggingView_Month monthItem1 = (TVITaggingView_Month) (obj1);
-            final TVITaggingView_Month monthItem2 = (TVITaggingView_Month) (obj2);
+         if (obj1 instanceof final TVITaggingView_Month monthItem1 && obj2 instanceof final TVITaggingView_Month monthItem2) {
 
             return monthItem1.compareTo(monthItem2);
+         }
+
+         if (obj1 instanceof final TVITaggingView_TagCategory iItem1 && obj2 instanceof final TVITaggingView_TagCategory item2) {
+
+            return iItem1.getTourTagCategory().getCategoryName().compareTo(item2.getTourTagCategory().getCategoryName());
          }
 
          return 0;
@@ -512,44 +509,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-         if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
-
-            // nothing is filtered
-            return true;
-         }
-
-         // tags are filtered
-
-         if (element instanceof final TVITaggingView_Tag tagItem) {
-
-            final boolean hasChildren = tagItem.getFetchedChildren().size() > 0;
-
-            if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasChildren) {
-
-               // tags with tours -> show it
-
-               return true;
-
-            } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasChildren == false) {
-
-               // tags without tours -> show it
-
-               return true;
-
-            } else {
-
-               return false;
-            }
-
-         } else if (element instanceof TVITaggingView_TagCategory) {
-
-            // ignore for now a deep inspection of the category items/subitems
-
-            return true;
-         }
-
-         // all other items are not filtered
-         return true;
+         return isInTagItemFilter(element);
       }
    }
 
@@ -747,7 +707,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionContext_EditQuick                     = new ActionEditQuick(this);
       _actionContext_EditTag                       = new ActionEditTag(this);
       _actionContext_EditTour                      = new ActionEditTour(this);
-      _actionContext_ExpandSelection               = new ActionExpandSelection(this);
+      _actionContext_ExpandSelection               = new ActionExpandSelection(this, true);
       _actionContext_ExportTour                    = new ActionExport(this);
       _actionContext_OnMouseSelect_ExpandCollapse  = new Action_OnMouseSelect_ExpandCollapse();
       _actionContext_OpenTagPrefs                  = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
@@ -1022,11 +982,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             final Object element = cell.getElement();
             final TVITaggingView_Item viewItem = (TVITaggingView_Item) element;
+
             final StyledString styledString = new StyledString();
+
+            final long numTours = viewItem.numTours;
 
             if (viewItem instanceof final TVITaggingView_Tour tourItem) {
 
-               // tour
+               /*
+                * Tour
+                */
 
                styledString.append(viewItem.firstColumn);
 
@@ -1035,16 +1000,23 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             } else if (viewItem instanceof final TVITaggingView_Tag tagItem) {
 
-               // tag
+               /*
+                * Tag
+                */
 
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
-               styledString.append(UI.SPACE3 + viewItem.colNumItems, net.tourbook.ui.UI.TOUR_STYLER);
+
+               if (numTours > 0) {
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
 
                cell.setImage(tagItem.getTourTag().isRoot() ? _imgTagRoot : _imgTag);
 
             } else if (viewItem instanceof final TVITaggingView_TagCategory categoryItem) {
 
-               // tag category
+               /*
+                * Tag category
+                */
 
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
@@ -1052,55 +1024,65 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                final TourTagCategory tagCategory = categoryItem.getTourTagCategory();
                final int numCategories = tagCategory.getNumberOfCategories();
                final int numTags = tagCategory.getNumberOfTags();
-               
+
                if (numCategories == -1 && numTags == -1) {
 
                } else {
 
-                  String numberOfText = UI.EMPTY_STRING;
+                  String numCategoriesText = UI.EMPTY_STRING;
+                  String numTagsText = UI.EMPTY_STRING;
+                  String numToursText = UI.EMPTY_STRING;
 
                   if (numCategories > 0) {
-                     numberOfText = UI.SLASH_WITH_SPACE + numCategories;
+
+                     numCategoriesText = UI.EMPTY_STRING + numCategories;
                   }
 
-                  styledString.append(UI.SPACE3 + numTags + numberOfText, net.tourbook.ui.UI.TOUR_STYLER);
+                  if (numTags > 0) {
+
+                     numTagsText = (numCategories > 0
+
+                           ? UI.SPACE3
+                           : UI.EMPTY_STRING)
+
+                           + numTags;
+                  }
+
+                  if (numTours > 0) {
+
+                     numToursText = (numTours > 0
+
+                           ? UI.SPACE3
+                           : UI.EMPTY_STRING)
+
+                           + numTours;
+                  }
+
+                  if (numTags > 0 || numCategories > 0) {
+
+                     styledString.append(UI.SPACE3 + numCategoriesText + numTagsText, net.tourbook.ui.UI.TOUR_STYLER);
+                  }
+
+                  if (numTours > 0) {
+
+                     styledString.append(numToursText, net.tourbook.ui.UI.TOTAL_STYLER);
+                  }
                }
 
                cell.setImage(_imgTagCategory);
-
-            } else if (element instanceof final TVIPrefTagCategory categoryItem) {
-
-               final TourTagCategory tourTagCategory = categoryItem.getTourTagCategory();
-
-               cell.setImage(_imgTagCategory);
-
-               String categoryName = tourTagCategory.getCategoryName();
-               if (UI.IS_SCRAMBLE_DATA) {
-                  categoryName = UI.scrambleText(categoryName);
-               }
-               styledString.append(categoryName, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
-
-               // get number of categories
-               final int numCategories = tourTagCategory.getNumberOfCategories();
-               final int numTags = tourTagCategory.getNumberOfTags();
-               if (numCategories == -1 && numTags == -1) {
-
-               } else {
-
-                  String categoryText = UI.EMPTY_STRING;
-                  if (numCategories > 0) {
-                     categoryText = "/" + numCategories; //$NON-NLS-1$
-                  }
-                  styledString.append("   " + numTags + categoryText, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-               }
 
             } else if (viewItem instanceof TVITaggingView_Year
                   || viewItem instanceof TVITaggingView_Month) {
 
-               // year or month
+               /*
+                * Year or month
+                */
 
                styledString.append(viewItem.firstColumn);
-               styledString.append(UI.SPACE3 + viewItem.colNumItems, net.tourbook.ui.UI.TOUR_STYLER);
+
+               if (numTours > 0) {
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
 
                if (viewItem instanceof TVITaggingView_Month) {
                   cell.setForeground(_colorDateSubCategory);
@@ -1770,11 +1752,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionContext_DeleteTag.setEnabled(isTagSelected);
       _actionContext_DeleteTagCategory.setEnabled(isCategorySelected);
 
-      _actionContext_ExpandSelection.setEnabled(firstElement == null
-            ? false
-            : selectedItems == 1
-                  ? firstElementHasChildren
-                  : true);
+//      _actionContext_ExpandSelection.setEnabled(firstElement == null
+//            ? false
+//            : selectedItems == 1
+//                  ? firstElementHasChildren
+//                  : true);
+      _actionContext_ExpandSelection.setEnabled(true);
 
       _actionContext_ExportTour.setEnabled(isIteratedTours);
 
@@ -1960,6 +1943,73 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
+    * @param item
+    * @return Returns <code>true</code> when the item is in the current tag filter visible
+    */
+   private boolean isInTagItemFilter(final Object item) {
+
+//      final TVITaggingView_Item viewItem = (TVITaggingView_Item) item;
+
+      if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
+
+         // nothing is filtered
+
+         return true;
+      }
+
+      if (item instanceof final TVITaggingView_Tag tagItem) {
+
+         // tags are filtered
+
+         final boolean hasChildren = tagItem.getFetchedChildren().size() > 0;
+
+         if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasChildren) {
+
+            // tags with tours -> show it
+
+            return true;
+
+         } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasChildren == false) {
+
+            // tags without tours -> show it
+
+            return true;
+
+         } else {
+
+            return false;
+         }
+
+      } else if (item instanceof final TVITaggingView_TagCategory categoryItem) {
+
+         // ignore for now a deep inspection of the category items/subitems
+
+//         final boolean hasChildren = categoryItem.getFetchedChildren().size() > 0;
+//
+//         if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasChildren) {
+//
+//            // tags with tours -> show it
+//
+//            return true;
+//
+//         } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasChildren == false) {
+//
+//            // tags without tours -> show it
+//
+//            return true;
+//
+//         } else {
+//
+//            return false;
+//         }
+      }
+
+      // all other items are not filtered
+
+      return true;
+   }
+
+   /**
     * Load all tree items that category items do show the number of items
     */
    private void loadAllTreeItems() {
@@ -1984,9 +2034,77 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void loadAllTreeItems(final TreeViewerItem parentItem) {
 
-      for (final TreeViewerItem childItem : parentItem.getFetchedChildren()) {
+      final ArrayList<TreeViewerItem> allFetchedChildren = parentItem.getFetchedChildren();
+
+      for (final TreeViewerItem childItem : allFetchedChildren) {
 
          loadAllTreeItems(childItem);
+      }
+
+      // update number of tours
+
+      final int numChildren = allFetchedChildren.size();
+      if (numChildren > 0) {
+
+         /*
+          * Get number of tours
+          */
+         int numTours = 0;
+
+         for (final TreeViewerItem childItem : allFetchedChildren) {
+
+            if (childItem instanceof final TVITaggingView_Tour tourItem) {
+               numTours++;
+            }
+         }
+
+         /*
+          * Update number of tours in parent items
+          */
+         if (parentItem instanceof final TVITaggingView_Tag tagItem) {
+
+            tagItem.numTours += numTours;
+
+         } else if (parentItem instanceof final TVITaggingView_Year yearItem) {
+
+            yearItem.numTours += numTours;
+
+            final TreeViewerItem yearParent = yearItem.getParentItem();
+            if (yearParent instanceof final TVITaggingView_Tag tagItem) {
+
+               tagItem.numTours += numTours;
+            }
+
+         } else if (parentItem instanceof final TVITaggingView_Month monthItem) {
+
+            monthItem.numTours += numTours;
+
+            final TreeViewerItem monthParent = monthItem.getParentItem();
+            if (monthParent instanceof final TVITaggingView_Year yearItem) {
+
+               yearItem.numTours += numTours;
+
+               final TreeViewerItem yearParent = yearItem.getParentItem();
+               if (yearParent instanceof final TVITaggingView_Tag tagItem) {
+
+                  tagItem.numTours += numTours;
+               }
+            }
+
+         } else if (parentItem instanceof final TVITaggingView_TagCategory categoryItem) {
+
+            long allNumChildTours = 0;
+
+            for (final TreeViewerItem treeViewerItem : allFetchedChildren) {
+
+               if (treeViewerItem instanceof final TVITaggingView_Item viewItem) {
+
+                  allNumChildTours += viewItem.numTours;
+               }
+            }
+
+            categoryItem.numTours += allNumChildTours;
+         }
       }
    }
 
@@ -2396,9 +2514,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _rootItem = new TVITaggingView_Root(_tagViewer, isTreeLayoutHierarchical);
 
-      _tagViewer.setInput(_rootItem);
-
+      // first: load all tree items
       loadAllTreeItems();
+
+      // second: update viewer
+      _tagViewer.setInput(_rootItem);
    }
 
    private void restoreState() {

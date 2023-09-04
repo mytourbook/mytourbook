@@ -29,7 +29,6 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.views.tourBook.TVITourBookItem;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -61,10 +60,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             + "  THEN NULL" //                                                                           //$NON-NLS-1$
             + "  ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," + NL //   10 //$NON-NLS-1$
 
-            + "SUM(TourDeviceTime_Recorded)," + NL //   11 //$NON-NLS-1$
-
-            // tour counter
-            + "SUM(1)" + NL //                          12 //$NON-NLS-1$
+            + "SUM(TourDeviceTime_Recorded)" + NL //        11 //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING
@@ -114,7 +110,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    float                            colAvgCadence;
    float                            colAvgTemperature_Device;
 
-   long                             colNumItems;
+   long                             numTours;
 
    int                              temperatureDigits;
 
@@ -162,7 +158,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             tagItem.readSumColumnData(result, 1);
          }
 
-         if (tagItem.colNumItems == 0) {
+         if (tagItem.numTours == 0) {
 
             /*
              * to hide the '+' for an item which has no children, an empty list of children will be
@@ -222,8 +218,6 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
       readDefaultColumnData(result, startIndex);
-
-      colNumItems = result.getLong(startIndex + 12);
    }
 
    /**
@@ -233,7 +227,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
       try {
 
-         for (final Field field : TVITourBookItem.class.getDeclaredFields()) {
+         for (final Field field : TVITaggingView_Item.class.getDeclaredFields()) {
 
             final String fieldName = field.getName();
 

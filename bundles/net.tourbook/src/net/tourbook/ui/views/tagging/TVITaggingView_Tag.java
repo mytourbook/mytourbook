@@ -39,13 +39,6 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
    private long    _tagId;
 
-   /**
-    * 0 ... TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
-    * 1 ... TourTag.EXPAND_TYPE_FLAT
-    * 2 ... TourTag.EXPAND_TYPE_YEAR_DAY
-    */
-   private int     _expandType;
-
    public TVITaggingView_Tag(final TourTag tourTag,
                              final TVITaggingView_Item parentItem,
                              final TreeViewer treeViewer) {
@@ -54,7 +47,6 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       _tourTag = tourTag;
       _tagId = _tourTag.getTagId();
-      _expandType = _tourTag.getExpandType();
 
       setParentItem(parentItem);
 
@@ -86,7 +78,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
    @Override
    protected void fetchChildren() {
 
-      switch (_expandType) {
+      switch (_tourTag.getExpandType()) {
 
       // 0
       case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
@@ -110,7 +102,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
    }
 
    public int getExpandType() {
-      return _expandType;
+      return _tourTag.getExpandType();
    }
 
    public long getTagId() {
@@ -313,7 +305,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
     */
    public void refresh(final TreeViewer tagViewer, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
 
-      switch (_expandType) {
+      switch (_tourTag.getExpandType()) {
 
       case TourTag.EXPAND_TYPE_FLAT:
 
@@ -421,11 +413,12 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
             + "TVITagView_Tag " + System.identityHashCode(this) + NL //       //$NON-NLS-1$
 
-            + "[" + NL //                       //$NON-NLS-1$
+            + "[" + NL //                                                     //$NON-NLS-1$
 
+            + " numTours = " + numTours + NL //                               //$NON-NLS-1$
             + _tourTag
 
-            + "]" + NL //                       //$NON-NLS-1$
+            + "]" + NL //                                                     //$NON-NLS-1$
       ;
    }
 

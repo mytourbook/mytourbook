@@ -120,4 +120,19 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
          addChild(new TVITaggingView_Tag(tourTag, this, getTagViewer()));
       }
    }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "TVITaggingView_Root" + NL //                                         //$NON-NLS-1$
+
+            + "[" + NL //                                                           //$NON-NLS-1$
+
+            + " _isTreeLayoutHierarchical=" + _isTreeLayoutHierarchical + NL //     //$NON-NLS-1$
+
+            + "]" + NL //                                                           //$NON-NLS-1$
+      ;
+   }
 }

@@ -50,11 +50,13 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    int                        tourDay;
 
    String                     tourTitle;
+
    long                       tourTypeId;
 
    ArrayList<Long>            tagIds;
 
    public long                deviceStartDistance;
+
    public short               deviceTimeInterval;
 
    public TVITaggingView_Tour(final TVITaggingView_Item parentItem, final TreeViewer treeViewer) {
@@ -77,7 +79,9 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    @Override
    protected void fetchChildren() {}
 
-   public void getTourColumnData(final ResultSet result, final Object resultTagId, final int startIndex)
+   public void getTourColumnData(final ResultSet result,
+                                 final Object resultTagId,
+                                 final int startIndex)
          throws SQLException {
 
       tourYear = result.getInt(startIndex + 0);
@@ -113,5 +117,30 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    @Override
    public boolean hasChildren() {
       return false;
+   }
+
+   @Override
+   public String toString() {
+
+      final int maxLen = 5;
+
+      return UI.EMPTY_STRING
+
+            + "TVITaggingView_Tour" + NL //              //$NON-NLS-1$
+
+            + "[" + NL //                                //$NON-NLS-1$
+
+            + " tourId     = " + tourId + NL //          //$NON-NLS-1$
+            + " tourDate   = " + tourDate + NL //        //$NON-NLS-1$
+            + " tourTitle  = " + tourTitle + NL //       //$NON-NLS-1$
+            + " tourTypeId = " + tourTypeId + NL //      //$NON-NLS-1$
+
+            + " tagIds     = " + (tagIds != null //      //$NON-NLS-1$
+                  ? tagIds.subList(0, Math.min(tagIds.size(), maxLen))
+                  : null) + NL
+
+            + "]" + NL //                                //$NON-NLS-1$
+
+      ;
    }
 }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -61,18 +63,21 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
       final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, _tagCategory.getCategoryId());
 
+      // create category items
+      final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
+
+      final ArrayList<TourTagCategory> sortedCategories = new ArrayList<>(lazyTourTagCategories);
+      Collections.sort(sortedCategories);
+
+      for (final TourTagCategory tagCategory : lazyTourTagCategories) {
+         addChild(new TVITaggingView_TagCategory(tagCategory, this, tagViewer));
+      }
+
       // create tag items
       final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
       for (final TourTag tourTag : lazyTourTags) {
 
          addChild(new TVITaggingView_Tag(tourTag, this, tagViewer));
-      }
-
-      // create category items
-      final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
-      for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-
-         addChild(new TVITaggingView_TagCategory(tagCategory, this, tagViewer));
       }
 
       // update number of categories/tags

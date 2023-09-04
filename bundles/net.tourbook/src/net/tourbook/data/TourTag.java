@@ -88,9 +88,9 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
     * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
     * structures
     * <p>
-    * 0 ... EXPAND_TYPE_YEAR_MONTH_DAY
-    * 1 ... EXPAND_TYPE_FLAT
-    * 2 ... EXPAND_TYPE_YEAR_DAY
+    * <li>0 ... EXPAND_TYPE_YEAR_MONTH_DAY</li>
+    * <li>1 ... EXPAND_TYPE_FLAT</li>
+    * <li>2 ... EXPAND_TYPE_YEAR_DAY</li>
     */
    private int    expandType = EXPAND_TYPE_FLAT;
 
@@ -193,6 +193,9 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
       return true;
    }
 
+   /**
+    * @return {@link #expandType}
+    */
    public int getExpandType() {
       return expandType;
    }
