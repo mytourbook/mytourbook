@@ -2306,7 +2306,14 @@ public class TourDatabase {
          sb.append(tagName);
       }
 
-      return sb.toString();
+      String tagNamesText = sb.toString();
+
+      if (net.tourbook.common.UI.IS_SCRAMBLE_DATA) {
+
+         tagNamesText = net.tourbook.common.UI.scrambleText(tagNamesText);
+      }
+
+      return tagNamesText;
    }
 
    public static String getTagNamesText(final Set<Long> alltagIds, final boolean isVertical) {
@@ -4562,7 +4569,7 @@ public class TourDatabase {
             + "   isRoot                     INTEGER,                                  " + NL //$NON-NLS-1$
             + "   name                       VARCHAR(" + TourTag.DB_LENGTH_NAME + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            // version 38 start              
+            // version 38 start
 
             + "   notes                      VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 

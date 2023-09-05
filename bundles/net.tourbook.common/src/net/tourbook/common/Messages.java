@@ -47,6 +47,7 @@ public class Messages extends NLS {
 
    public static String        Action_App_CustomizeColumnsAndProfiles;
    public static String        Action_App_RestartApp_Tooltip;
+   public static String        Action_App_ScrambleData_Tooltip;
    public static String        Action_App_SizeAllColumnsToFit;
 
    public static String        Action_ColumnManager_Column_Info;

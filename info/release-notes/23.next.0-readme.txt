@@ -51,6 +51,8 @@ Improvements
 
 * Tour Book
   - Use custom colors for tour and total values
+  - New action: Go to last tour
+    https://github.com/mytourbook/mytourbook/issues/1173
   - New action: One click to expand only one item and collapse any others
   - New action: One click to expand/collapse an item when selected with mouse
 
@@ -65,6 +67,10 @@ Improvements
 * Color Selector
   - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
     https://github.com/mytourbook/mytourbook/issues/1169
+    
+* macOS ARM
+  - Support macOS ARM platform    
+    https://github.com/mytourbook/mytourbook/discussions/1174
 
 Changes
 =======

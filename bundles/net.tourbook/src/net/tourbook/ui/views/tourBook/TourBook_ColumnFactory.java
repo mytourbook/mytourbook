@@ -2806,11 +2806,19 @@ class TourBook_ColumnFactory {
 
             final ValueFormat valueFormatter = colDef_NatTable.getValueFormat_Detail();
 
+            String tourStartTime;
+
             if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
-               return tourStartDateTime.format(TimeTools.Formatter_Time_M);
+               tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_M);
             } else {
-               return tourStartDateTime.format(TimeTools.Formatter_Time_S);
+               tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_S);
             }
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourStartTime = UI.scrambleText(tourStartTime);
+            }
+
+            return tourStartTime;
          }
 
          @Override
@@ -2849,11 +2857,19 @@ class TourBook_ColumnFactory {
 
                final ValueFormat valueFormatter = colDef_Tree.getValueFormat_Detail();
 
+               String tourStartTime;
+
                if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
-                  cell.setText(tourStartDateTime.format(TimeTools.Formatter_Time_M));
+                  tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_M);
                } else {
-                  cell.setText(tourStartDateTime.format(TimeTools.Formatter_Time_S));
+                  tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_S);
                }
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourStartTime = UI.scrambleText(tourStartTime);
+               }
+
+               cell.setText(tourStartTime);
 
                setCellColor(cell, element);
             }

@@ -15,10 +15,6 @@
    
    <dependencies>
       <dependency>
-         <artifactId>org.eclipse.core.runtime</artifactId>              <groupId>org.eclipse.core</groupId>
-                                                                        <version>3.7.0</version>
-      </dependency>
-      <dependency>
          <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
                                                                         <version>5.9.3</version>
          <scope>test</scope>
@@ -159,6 +155,7 @@
                   <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
                   <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
                   <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>      </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>aarch64</arch>     </environment>
 
                </environments>
             </configuration>
@@ -208,11 +205,13 @@
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
                                                                <version>0.8.10</version>
          <executions>
+         
             <execution>
                <goals>
                   <goal>prepare-agent</goal>
                </goals>
             </execution>
+            
             <execution>
                <id>all-tests-report</id>
                <phase>verify</phase>
@@ -223,7 +222,8 @@
                   <skip>true</skip>
                </configuration>
             </execution>
-	     <execution>
+            
+            <execution>
                <id>merge-all-jacoco</id>
                <phase>verify</phase>
                <goals>
@@ -233,22 +233,23 @@
                   <destFile>${session.executionRootDirectory}/mergedJaCoCoReport.exec</destFile> 
                   <append>true</append> 
                   <skip>true</skip>
-               <fileSets>
-                  <fileSet>
-                  <directory>${project.build.directory}</directory>
-                  <includes>
-                    <include>*.exec</include>
-                  </includes>
-                  </fileSet>
-                  <fileSet>
-                  <directory>${session.executionRootDirectory}</directory>
-                  <includes>
-                    <include>mergedJaCoCoReport.exec</include>
-                  </includes>
-                </fileSet>
-              </fileSets>
-            </configuration> 
-        </execution>
+                  <fileSets>
+                     <fileSet>
+                        <directory>${project.build.directory}</directory>
+                        <includes>
+                          <include>*.exec</include>
+                        </includes>
+                     </fileSet>
+                     <fileSet>
+                        <directory>${session.executionRootDirectory}</directory>
+                        <includes>
+                          <include>mergedJaCoCoReport.exec</include>
+                        </includes>
+                     </fileSet>
+                  </fileSets>
+               </configuration> 
+            </execution>
+            
          </executions>
       </plugin>
 

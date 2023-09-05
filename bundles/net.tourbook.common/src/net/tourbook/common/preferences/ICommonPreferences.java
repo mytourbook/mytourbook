@@ -18,10 +18,11 @@ package net.tourbook.common.preferences;
 public interface ICommonPreferences {
 
    /*
-    * Appearance
+    * Appearance, is mainly used for debugging purposes
     */
-   public static final String APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP     = "APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP";     //$NON-NLS-1$
-   public static final String APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP = "APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP"; //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP       = "APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP";       //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP   = "APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP";   //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP = "APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP"; //$NON-NLS-1$
 
    /*
     * Theme

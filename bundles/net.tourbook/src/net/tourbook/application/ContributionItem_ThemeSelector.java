@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-public class ThemeSelectorContributionItem extends CustomControlContribution {
+public class ContributionItem_ThemeSelector extends CustomControlContribution {
 
    private static final String           ID                = "net.tourbook.application.ThemeSelectorContributionItem"; //$NON-NLS-1$
 
@@ -62,7 +62,7 @@ public class ThemeSelectorContributionItem extends CustomControlContribution {
     */
    private ComboViewer _comboThemeSelector;
 
-   public ThemeSelectorContributionItem() {
+   public ContributionItem_ThemeSelector() {
 
       super(ID);
    }

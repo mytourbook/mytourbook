@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-public class PersonContributionItem extends CustomControlContribution {
+public class ContributionItem_Person extends CustomControlContribution {
 
    private static final String     ID         = "net.tourbook.clientselector";  //$NON-NLS-1$
 
@@ -56,11 +56,11 @@ public class PersonContributionItem extends CustomControlContribution {
 
    private Combo                   _cboPeople;
 
-   public PersonContributionItem() {
+   public ContributionItem_Person() {
       this(ID);
    }
 
-   protected PersonContributionItem(final String id) {
+   protected ContributionItem_Person(final String id) {
       super(id);
    }
 

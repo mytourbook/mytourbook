@@ -71,6 +71,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private boolean                       _isShowInApp_MemoryMonitor;
    private boolean                       _isShowInApp_RestartApp;
+   private boolean                       _isShowInApp_ScrambleData;
    private boolean                       _isShowInApp_ThemeSelector;
 
    private int                           _hintDefaultSpinnerWidth;
@@ -95,6 +96,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Button  _chkAutoOpenTagging;
    private Button  _chkShowInApp_MemoryMonitor;
    private Button  _chkShowInApp_RestartApp;
+   private Button  _chkShowInApp_ScrambleData;
    private Button  _chkShowInApp_ThemeSelector;
    private Button  _chkTaggingAnimation;
 
@@ -300,6 +302,13 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
       {
          /*
+          * Checkbox: Show restart app action in app toolbar
+          */
+         _chkShowInApp_ScrambleData = new Button(parent, SWT.CHECK);
+         _chkShowInApp_ScrambleData.setText(Messages.Pref_Appearance_Check_ShowInAppToolbar_ScrambleData);
+      }
+      {
+         /*
           * Memory monitor
           */
          _chkShowInApp_MemoryMonitor = new Button(parent, SWT.CHECK);
@@ -481,6 +490,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       _chkShowInApp_MemoryMonitor   .setSelection(false);
       _chkShowInApp_RestartApp      .setSelection(false);
+      _chkShowInApp_ScrambleData    .setSelection(false);
       _chkShowInApp_ThemeSelector   .setSelection(false);
 
 // SET_FORMATTING_ON
@@ -552,6 +562,16 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
 
       /*
+       * Scramble displayed data
+       */
+      if (isRestartNow == false && _chkShowInApp_ScrambleData.getSelection() != _isShowInApp_ScrambleData) {
+
+         // field is modified, ask for restart
+
+         isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_ScrambleData_Message);
+      }
+
+      /*
        * Memory monitor
        */
       if (isRestartNow == false && _chkShowInApp_MemoryMonitor.getSelection() != _isShowInApp_MemoryMonitor) {
@@ -611,16 +631,18 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       _isShowInApp_MemoryMonitor = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP);
       _isShowInApp_RestartApp    = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
+      _isShowInApp_ScrambleData  = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP);
       _isShowInApp_ThemeSelector = _prefStore_Common.getBoolean(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP);
 
-      _chkShowInApp_MemoryMonitor.setSelection(_isShowInApp_MemoryMonitor);
-      _chkShowInApp_RestartApp   .setSelection(_isShowInApp_RestartApp);
-      _chkShowInApp_ThemeSelector.setSelection(_isShowInApp_ThemeSelector);
+      _chkShowInApp_MemoryMonitor   .setSelection(_isShowInApp_MemoryMonitor);
+      _chkShowInApp_RestartApp      .setSelection(_isShowInApp_RestartApp);
+      _chkShowInApp_ScrambleData    .setSelection(_isShowInApp_ScrambleData);
+      _chkShowInApp_ThemeSelector   .setSelection(_isShowInApp_ThemeSelector);
 
-      _chkAutoOpenTagging        .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-      _chkTaggingAnimation       .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-      _spinnerAutoOpenDelay      .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
-      _spinnerRecentTags         .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _chkAutoOpenTagging           .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation          .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay         .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _spinnerRecentTags            .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
       _logMessageFontEditor.setPreferenceStore(_prefStore);
       _logMessageFontEditor.load();
@@ -634,9 +656,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION,     _chkTaggingAnimation.getSelection());
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,  _spinnerAutoOpenDelay.getSelection());
 
-      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,      _chkShowInApp_MemoryMonitor.getSelection());
-      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP,  _chkShowInApp_RestartApp.getSelection());
-      _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,           _chkShowInApp_ThemeSelector.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,         _chkShowInApp_MemoryMonitor.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP,     _chkShowInApp_RestartApp.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP,   _chkShowInApp_ScrambleData.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,              _chkShowInApp_ThemeSelector.getSelection());
 
 // SET_FORMATTING_ON
    }
