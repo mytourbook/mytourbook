@@ -243,16 +243,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    /*
     * UI resources
     */
-   private final Image                         _imgTagCategory                          = TourbookPlugin.getImage(Images.Tag_Category);
-   private final Image                         _imgTag                                  = TourbookPlugin.getImage(Images.Tag);
-   private final Image                         _imgTagRoot                              = TourbookPlugin.getImage(Images.Tag_Root);
-   
+   private final Image _imgTagCategory = TourbookPlugin.getImage(Images.Tag_Category);
+   private final Image _imgTag         = TourbookPlugin.getImage(Images.Tag);
+   private final Image _imgTagRoot     = TourbookPlugin.getImage(Images.Tag_Root);
+
    /*
     * UI controls
     */
-   private Composite                           _viewerContainer;
+   private Composite _viewerContainer;
 
-   private Menu                                _treeContextMenu;
+   private Menu      _treeContextMenu;
 
    private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
 
@@ -983,9 +983,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             final Object element = cell.getElement();
             final TVITaggingView_Item viewItem = (TVITaggingView_Item) element;
 
-            final StyledString styledString = new StyledString();
+            long numTours = viewItem.numTours;
 
-            final long numTours = viewItem.numTours;
+            // hide number of tours
+            if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS) {
+               numTours = 0;
+            }
+
+            final StyledString styledString = new StyledString();
 
             if (viewItem instanceof final TVITaggingView_Tour tourItem) {
 
@@ -1021,52 +1026,31 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                // get number of tags/categories
-               final TourTagCategory tagCategory = categoryItem.getTourTagCategory();
-               final int numCategories = tagCategory.getNumberOfCategories();
-               final int numTags = tagCategory.getNumberOfTags();
+               final int numTags = categoryItem.numTags;
+               final int numCategories = categoryItem.numTagCategories;
 
-               if (numCategories == -1 && numTags == -1) {
+               final int numTagNoTours = categoryItem.numTags_NoTours;
 
-               } else {
+               if (numCategories > 0) {
 
-                  String numCategoriesText = UI.EMPTY_STRING;
-                  String numTagsText = UI.EMPTY_STRING;
-                  String numToursText = UI.EMPTY_STRING;
+                  styledString.append(UI.SPACE3 + numCategories, net.tourbook.ui.UI.TOUR_STYLER);
+               }
 
-                  if (numCategories > 0) {
+               if (numTags > 0) {
 
-                     numCategoriesText = UI.EMPTY_STRING + numCategories;
-                  }
+                  styledString.append(UI.SPACE3 + numTags, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+               }
 
-                  if (numTags > 0) {
+               if (numTours > 0) {
 
-                     numTagsText = (numCategories > 0
+                  final String numToursText = (numTours > 0
 
-                           ? UI.SPACE3
-                           : UI.EMPTY_STRING)
+                        ? UI.SPACE3
+                        : UI.EMPTY_STRING)
 
-                           + numTags;
-                  }
+                        + numTours;
 
-                  if (numTours > 0) {
-
-                     numToursText = (numTours > 0
-
-                           ? UI.SPACE3
-                           : UI.EMPTY_STRING)
-
-                           + numTours;
-                  }
-
-                  if (numTags > 0 || numCategories > 0) {
-
-                     styledString.append(UI.SPACE3 + numCategoriesText + numTagsText, net.tourbook.ui.UI.TOUR_STYLER);
-                  }
-
-                  if (numTours > 0) {
-
-                     styledString.append(numToursText, net.tourbook.ui.UI.TOTAL_STYLER);
-                  }
+                  styledString.append(numToursText, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
                cell.setImage(_imgTagCategory);
@@ -1094,6 +1078,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                styledString.append(viewItem.firstColumn);
             }
+
+            styledString.append(UI.SPACE3);
+            styledString.append(UI.SPACE3 + viewItem.numTags_WithTours, net.tourbook.ui.UI.TOTAL_STYLER);
+            styledString.append(UI.SPACE3 + viewItem.numTags_NoTours, net.tourbook.ui.UI.TOTAL_STYLER);
 
             cell.setText(styledString.getString());
             cell.setStyleRanges(styledString.getStyleRanges());
@@ -1948,8 +1936,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private boolean isInTagItemFilter(final Object item) {
 
-//      final TVITaggingView_Item viewItem = (TVITaggingView_Item) item;
-
       if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
 
          // nothing is filtered
@@ -1957,19 +1943,24 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          return true;
       }
 
-      if (item instanceof final TVITaggingView_Tag tagItem) {
+      if (false
+            || item instanceof final TVITaggingView_TagCategory
+            || item instanceof final TVITaggingView_Tag
+            || item instanceof final TVITaggingView_Year
+            || item instanceof final TVITaggingView_Month) {
 
          // tags are filtered
 
-         final boolean hasChildren = tagItem.getFetchedChildren().size() > 0;
+         final boolean hasTour = ((TVITaggingView_Item) item).numTours > 0;
+         final boolean hasTagsNoTours = ((TVITaggingView_Item) item).numTags_NoTours > 0;
 
-         if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasChildren) {
+         if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasTour) {
 
             // tags with tours -> show it
 
             return true;
 
-         } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasChildren == false) {
+         } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasTagsNoTours) {
 
             // tags without tours -> show it
 
@@ -1979,29 +1970,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             return false;
          }
-
-      } else if (item instanceof final TVITaggingView_TagCategory categoryItem) {
-
-         // ignore for now a deep inspection of the category items/subitems
-
-//         final boolean hasChildren = categoryItem.getFetchedChildren().size() > 0;
-//
-//         if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasChildren) {
-//
-//            // tags with tours -> show it
-//
-//            return true;
-//
-//         } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasChildren == false) {
-//
-//            // tags without tours -> show it
-//
-//            return true;
-//
-//         } else {
-//
-//            return false;
-//         }
       }
 
       // all other items are not filtered
@@ -2038,74 +2006,131 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       for (final TreeViewerItem childItem : allFetchedChildren) {
 
+         // skip tour items, they do not have further children
+         if (childItem instanceof TVITaggingView_Tour) {
+            continue;
+         }
+
          loadAllTreeItems(childItem);
       }
 
-      // update number of tours
+      /*
+       * Collect number of ...
+       */
+      int numAllTagCategories = 0;
+      int numAllTags = 0;
 
-      final int numChildren = allFetchedChildren.size();
-      if (numChildren > 0) {
+      int numTags_WithTours = 0;
+      int numTags_NoTours = 0;
 
-         /*
-          * Get number of tours
-          */
-         int numTours = 0;
+      int numTours_InTourItems = 0;
+      int numTours_InTagSubCats = 0;
 
-         for (final TreeViewerItem childItem : allFetchedChildren) {
+      for (final TreeViewerItem childItem : allFetchedChildren) {
 
-            if (childItem instanceof final TVITaggingView_Tour tourItem) {
-               numTours++;
-            }
+         if (childItem instanceof final TVITaggingView_Tour tourItem) {
+
+            numTours_InTourItems++;
+
+         } else if (childItem instanceof TVITaggingView_Year
+               || childItem instanceof TVITaggingView_Month) {
+
+            // collect number of tours in the tag sub categories
+
+            numTours_InTagSubCats += ((TVITaggingView_Item) childItem).numTours;
+
+         } else if (childItem instanceof TVITaggingView_TagCategory) {
+
+            numAllTagCategories++;
+
+         } else if (childItem instanceof TVITaggingView_Tag) {
+
+            numAllTags++;
+
+         }
+      }
+
+      if (numTours_InTourItems == 0 && numTours_InTagSubCats == 0) {
+
+         numTags_NoTours++;
+
+      } else {
+
+         numTags_WithTours++;
+      }
+
+// SET_FORMATTING_OFF
+
+      /*
+       * Update number of tours in parent item and up to the tag item
+       */
+      if (parentItem instanceof final TVITaggingView_Tag tagItem) {
+
+         tagItem.numTours           += numTours_InTourItems;
+         tagItem.numTags_WithTours  += numTags_WithTours;
+         tagItem.numTags_NoTours    += numTags_NoTours;
+
+      } else if (parentItem instanceof final TVITaggingView_Year yearItem) {
+
+         yearItem.numTours          += numTours_InTourItems;
+         yearItem.numTags_WithTours += numTags_WithTours;
+         yearItem.numTags_NoTours   += numTags_NoTours;
+
+         final TreeViewerItem yearParent = yearItem.getParentItem();
+         if (yearParent instanceof final TVITaggingView_Tag tagItem) {
+
+            tagItem.numTours           += numTours_InTourItems;
+            tagItem.numTags_WithTours  += numTags_WithTours;
+            tagItem.numTags_NoTours    += numTags_NoTours;
          }
 
-         /*
-          * Update number of tours in parent items
-          */
-         if (parentItem instanceof final TVITaggingView_Tag tagItem) {
+      } else if (parentItem instanceof final TVITaggingView_Month monthItem) {
 
-            tagItem.numTours += numTours;
+         monthItem.numTours            += numTours_InTourItems;
+         monthItem.numTags_WithTours   += numTags_WithTours;
+         monthItem.numTags_NoTours     += numTags_NoTours;
 
-         } else if (parentItem instanceof final TVITaggingView_Year yearItem) {
+         final TreeViewerItem monthParent = monthItem.getParentItem();
+         if (monthParent instanceof final TVITaggingView_Year yearItem) {
 
-            yearItem.numTours += numTours;
+            yearItem.numTours          += numTours_InTourItems;
+            yearItem.numTags_WithTours += numTags_WithTours;
+            yearItem.numTags_NoTours   += numTags_NoTours;
 
             final TreeViewerItem yearParent = yearItem.getParentItem();
             if (yearParent instanceof final TVITaggingView_Tag tagItem) {
 
-               tagItem.numTours += numTours;
+               tagItem.numTours           += numTours_InTourItems;
+               tagItem.numTags_WithTours  += numTags_WithTours;
+               tagItem.numTags_NoTours    += numTags_NoTours;
             }
-
-         } else if (parentItem instanceof final TVITaggingView_Month monthItem) {
-
-            monthItem.numTours += numTours;
-
-            final TreeViewerItem monthParent = monthItem.getParentItem();
-            if (monthParent instanceof final TVITaggingView_Year yearItem) {
-
-               yearItem.numTours += numTours;
-
-               final TreeViewerItem yearParent = yearItem.getParentItem();
-               if (yearParent instanceof final TVITaggingView_Tag tagItem) {
-
-                  tagItem.numTours += numTours;
-               }
-            }
-
-         } else if (parentItem instanceof final TVITaggingView_TagCategory categoryItem) {
-
-            long allNumChildTours = 0;
-
-            for (final TreeViewerItem treeViewerItem : allFetchedChildren) {
-
-               if (treeViewerItem instanceof final TVITaggingView_Item viewItem) {
-
-                  allNumChildTours += viewItem.numTours;
-               }
-            }
-
-            categoryItem.numTours += allNumChildTours;
          }
+
+      } else if (parentItem instanceof final TVITaggingView_TagCategory categoryItem) {
+
+         long allNumChild_Tours           = 0;
+         long allNumChild_TagsNoTours     = 0;
+         long allNumChild_TagsWithTours   = 0;
+
+         for (final TreeViewerItem treeViewerItem : allFetchedChildren) {
+
+            if (treeViewerItem instanceof final TVITaggingView_Item viewItem) {
+
+               allNumChild_Tours          += viewItem.numTours;
+               allNumChild_TagsNoTours    += viewItem.numTags_NoTours;
+               allNumChild_TagsWithTours  += viewItem.numTags_WithTours;
+            }
+         }
+
+         categoryItem.numTagCategories    += numAllTagCategories;
+         categoryItem.numTags             += numAllTags;
+
+         categoryItem.numTours            += allNumChild_Tours;
+         categoryItem.numTags_WithTours   += allNumChild_TagsWithTours;
+         categoryItem.numTags_NoTours     += allNumChild_TagsNoTours;
       }
+
+// SET_FORMATTING_ON
    }
 
    private void onAction_DeleteTag() {

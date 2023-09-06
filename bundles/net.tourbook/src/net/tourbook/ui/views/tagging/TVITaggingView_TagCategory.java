@@ -33,6 +33,9 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
    private TourTagCategory _tagCategory;
 
+   int                     numTagCategories;
+   int                     numTags;
+
    public TVITaggingView_TagCategory(final TourTagCategory tagCategory,
                                      final TVITaggingView_Item parentItem,
                                      final TreeViewer treeViewer) {
@@ -77,7 +80,11 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
       final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
       for (final TourTag tourTag : lazyTourTags) {
 
-         addChild(new TVITaggingView_Tag(tourTag, this, tagViewer));
+         final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, tagViewer);
+
+         readTagTotals(tagItem);
+
+         addChild(tagItem);
       }
 
       // update number of categories/tags
@@ -118,11 +125,16 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
             + "TVITagView_TagCategory " + System.identityHashCode(this) + NL //$NON-NLS-1$
 
-            + "[" + NL //                                      //$NON-NLS-1$
+            + "[" + NL //                                               //$NON-NLS-1$
 
             + _tagCategory
 
-            + "]" + NL //                                      //$NON-NLS-1$
+            + NL
+            + "  numTours          = " + numTours + NL //               //$NON-NLS-1$
+            + "  numTags_WithTours = " + numTags_WithTours + NL //      //$NON-NLS-1$
+            + "  numTags_NoTours   = " + numTags_NoTours + NL //        //$NON-NLS-1$
+
+            + "]" + NL //                                               //$NON-NLS-1$
       ;
    }
 }

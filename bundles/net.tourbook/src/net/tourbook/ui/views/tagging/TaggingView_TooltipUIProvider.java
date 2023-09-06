@@ -293,7 +293,7 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
       final TVITaggingView_TagCategory tagCategoryItem = (TVITaggingView_TagCategory) _viewerCellData;
 
       final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
-      final TourTagCategory tagCategory = allTourTagCategories.get(tagCategoryItem.getCategoryId());
+      final TourTagCategory tagCategory = allTourTagCategories.get(tagCategoryItem.getTourTagCategory().getCategoryId());
 
       return tagCategory;
    }

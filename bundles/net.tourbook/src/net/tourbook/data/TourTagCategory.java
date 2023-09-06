@@ -150,6 +150,10 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       return tourTagCategory;
    }
 
+   public long getTagCategoryId() {
+      return tagCategoryId;
+   }
+
    /**
     * @return Returns the tags which belong to this category, the tags will be fetched with the
     *         fetch type {@link FetchType#LAZY}
@@ -243,9 +247,9 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
 
             + "TourTagCategory" + NL //                        //$NON-NLS-1$
 
-            + " name          = " + name + NL //               //$NON-NLS-1$
-            + " tagCategoryId = " + tagCategoryId + NL //      //$NON-NLS-1$
-            + " isRoot        = " + isRoot + NL //             //$NON-NLS-1$
+            + "  name          = " + name + NL //              //$NON-NLS-1$
+//          + "  tagCategoryId = " + tagCategoryId + NL //     //$NON-NLS-1$
+            + "  isRoot        = " + isRoot + NL //            //$NON-NLS-1$
       ;
    }
 
@@ -258,10 +262,6 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
 
       name = modifiedTagCategory.name;
       notes = modifiedTagCategory.notes;
-   }
-
-   public long getTagCategoryId() {
-      return tagCategoryId;
    }
 
 }

@@ -77,7 +77,11 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
 
       for (final TourTag tourTag : allTags) {
 
-         addChild(new TVITaggingView_Tag(tourTag, this, getTagViewer()));
+         final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, getTagViewer());
+
+         readTagTotals(tagItem);
+
+         addChild(tagItem);
       }
    }
 
@@ -117,7 +121,11 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
 
       for (final TourTag tourTag : allTags) {
 
-         addChild(new TVITaggingView_Tag(tourTag, this, getTagViewer()));
+         final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, getTagViewer());
+
+         readTagTotals(tagItem);
+
+         addChild(tagItem);
       }
    }
 
@@ -130,7 +138,7 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
 
             + "[" + NL //                                                           //$NON-NLS-1$
 
-            + " _isTreeLayoutHierarchical=" + _isTreeLayoutHierarchical + NL //     //$NON-NLS-1$
+            + "  _isTreeLayoutHierarchical=" + _isTreeLayoutHierarchical + NL //     //$NON-NLS-1$
 
             + "]" + NL //                                                           //$NON-NLS-1$
       ;

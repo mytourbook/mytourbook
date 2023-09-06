@@ -305,9 +305,16 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
 
             + " [" + NL //                                                 //$NON-NLS-1$
 
-            + "_year    = " + _year + NL //                                //$NON-NLS-1$
-            + "_isMonth = " + _isMonth + NL //                             //$NON-NLS-1$
-            + "_tagItem = " + _tagItem + NL //                             //$NON-NLS-1$
+            + "  _year        = " + _year + NL //                          //$NON-NLS-1$
+            + "  _isMonth     = " + _isMonth + NL //                       //$NON-NLS-1$
+
+            + NL
+            + "  numTours          = " + numTours + NL //                  //$NON-NLS-1$
+            + "  numTags_WithTours = " + numTags_WithTours + NL //         //$NON-NLS-1$
+            + "  numTags_NoTours   = " + numTags_NoTours + NL //           //$NON-NLS-1$
+
+//          + NL
+//          + "_tagItem  = " + _tagItem + NL //                            //$NON-NLS-1$
 
             + "]" + NL //                                                  //$NON-NLS-1$
       ;

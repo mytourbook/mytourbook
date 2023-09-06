@@ -337,17 +337,17 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
 
             + "TourTag" + NL //                                //$NON-NLS-1$
 
-            + " tagId         = " + tagId + NL //              //$NON-NLS-1$
-            + " isRoot        = " + isRoot + NL //             //$NON-NLS-1$
-            + " name          = " + name + NL //               //$NON-NLS-1$
-            + " notes         = " + notes + NL //              //$NON-NLS-1$
-            + " expandType    = " + expandType + NL //         //$NON-NLS-1$
+            + "  name          = " + name + NL //              //$NON-NLS-1$
+            + "  isRoot        = " + isRoot + NL //            //$NON-NLS-1$
+//          + "  tagId         = " + tagId + NL //             //$NON-NLS-1$
+//          + "  notes         = " + notes + NL //             //$NON-NLS-1$
+//          + "  expandType    = " + expandType + NL //        //$NON-NLS-1$
+//
+//          + "  _createId     = " + _createId + NL //         //$NON-NLS-1$
+//
+//          + "  imageFilePath = " + imageFilePath + NL //     //$NON-NLS-1$
 
-            + " _createId     = " + _createId + NL //          //$NON-NLS-1$
-
-            + " imageFilePath = " + imageFilePath + NL //      //$NON-NLS-1$
-
-//          + " tourData      = " + tourData + NL //           //$NON-NLS-1$
+//          + "  tourData      = " + tourData + NL //          //$NON-NLS-1$
       ;
    }
 

@@ -82,7 +82,7 @@ class ActionEditTag extends Action {
          final TVITaggingView_TagCategory tagCategoryItem = (TVITaggingView_TagCategory) viewerCellData;
 
          final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
-         final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getCategoryId());
+         final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getTourTagCategory().getCategoryId());
 
          dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_EditCategory_Message, tagCategory.getCategoryName());
 

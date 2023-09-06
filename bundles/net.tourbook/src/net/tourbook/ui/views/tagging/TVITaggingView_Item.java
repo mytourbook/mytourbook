@@ -21,7 +21,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -92,10 +91,10 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    long                             colDistance;
 
    long                             colElapsedTime;
+
    long                             colRecordedTime;
    long                             colMovingTime;
    long                             colPausedTime;
-
    long                             colAltitudeUp;
    long                             colAltitudeDown;
 
@@ -111,6 +110,9 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    float                            colAvgTemperature_Device;
 
    long                             numTours;
+
+   int                              numTags_WithTours;
+   int                              numTags_NoTours;
 
    int                              temperatureDigits;
 
@@ -164,7 +166,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
              * to hide the '+' for an item which has no children, an empty list of children will be
              * created
              */
-            tagItem.setChildren(new ArrayList<>());
+//            tagItem.setChildren(new ArrayList<>());
          }
 
       } catch (final SQLException e) {
@@ -261,5 +263,4 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
          e.printStackTrace();
       }
    }
-
 }
