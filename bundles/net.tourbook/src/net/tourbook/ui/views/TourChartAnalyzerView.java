@@ -1042,14 +1042,12 @@ public class TourChartAnalyzerView extends ViewPart {
          final int valueDivisor = serieData.getValueDivisor();
 
          double[] values = null;
-         if (serieData instanceof ChartDataYSerie) {
+         if (serieData instanceof final ChartDataYSerie yData) {
 
-            final ChartDataYSerie yData = (ChartDataYSerie) serieData;
             values = yData.getHighValuesDouble()[0];
 
-         } else if (serieData instanceof ChartDataXSerie) {
+         } else if (serieData instanceof final ChartDataXSerie graphXData) {
 
-            final ChartDataXSerie graphXData = (ChartDataXSerie) serieData;
             values = graphXData.getHighValuesDouble()[0];
          }
 
