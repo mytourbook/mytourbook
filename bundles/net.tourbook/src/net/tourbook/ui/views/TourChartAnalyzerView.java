@@ -33,7 +33,9 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.chart.Util;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -74,49 +76,53 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourChartAnalyzerView extends ViewPart {
 
-   public static final String          ID               = "net.tourbook.views.TourChartAnalyzer"; //$NON-NLS-1$
+   //todo fb detect when measurement units have changed
 
-   private static final int            LAYOUT_1_COLUMNS = 0;
-   private static final int            LAYOUT_2_COLUMNS = 1;
-   private static final int            LAYOUT_3_COLUMNS = 2;
-   private static final int            LAYOUT_6_COLUMNS = 3;
+   public static final String            ID                = "net.tourbook.views.TourChartAnalyzer"; //$NON-NLS-1$
 
-   private final IPreferenceStore      _prefStore       = TourbookPlugin.getPrefStore();
+   private static final int              LAYOUT_1_COLUMNS  = 0;
+   private static final int              LAYOUT_2_COLUMNS  = 1;
+   private static final int              LAYOUT_3_COLUMNS  = 2;
+   private static final int              LAYOUT_6_COLUMNS  = 3;
 
-   private IPartListener2              _partListener;
-   private ISelectionListener          _postSelectionListener;
-   private IPropertyChangeListener     _prefChangeListener;
-   private ITourEventListener          _tourEventListener;
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
+   private final IPreferenceStore        _prefStore        = TourbookPlugin.getPrefStore();
 
-   private ChartDataModel              _chartDataModel;
-   private ChartDrawingData            _chartDrawingData;
-   private ArrayList<GraphDrawingData> _graphDrawingData;
+   private IPartListener2                _partListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+   private ITourEventListener            _tourEventListener;
 
-   private final ArrayList<GraphInfo>  _graphInfos      = new ArrayList<>();
+   private ChartDataModel                _chartDataModel;
+   private ChartDrawingData              _chartDrawingData;
+   private ArrayList<GraphDrawingData>   _graphDrawingData;
 
-   private final ColorCache            _colorCache      = new ColorCache();
+   private final ArrayList<GraphInfo>    _graphInfos       = new ArrayList<>();
 
-   private SelectionChartInfo          _chartInfo;
+   private final ColorCache              _colorCache       = new ColorCache();
 
-   private int                         _layoutFormat;
+   private SelectionChartInfo            _chartInfo;
+
+   private int                           _layoutFormat;
 
    /**
     * space between columns
     */
-   int                                 _columnSpacing   = 1;
+   int                                   _columnSpacing    = 1;
 
-   private boolean                     _isPartVisible   = false;
+   private boolean                       _isPartVisible    = false;
 
-   private PixelConverter              _pc;
+   private PixelConverter                _pc;
 
-   private int                         _valueIndexLeftBackup;
-   private int                         _valueIndexRightBackup;
+   private int                           _valueIndexLeftBackup;
+   private int                           _valueIndexRightBackup;
 
-   private int                         _valueIndexLeftLast;
-   private int                         _valueIndexRightLast;
+   private int                           _valueIndexLeftLast;
+   private int                           _valueIndexRightLast;
 
-   private long                        _lastUpdateUITime;
-   private int[]                       _updateCounter   = new int[] { 0 };
+   private long                          _lastUpdateUITime;
+   private int[]                         _updateCounter    = new int[] { 0 };
 
    /*
     * UI controls
@@ -221,7 +227,32 @@ public class TourChartAnalyzerView extends ViewPart {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+            // measurement system has changed
+
+            /*
+             * update viewer
+             */
+//_columnManager.saveState(_state);
+//            _columnManager.clearColumns();
+//            defineAllColumns();
+//
+//            recreateViewer(null);
+
+            updateInfo(_chartInfo, true);
+
+            // different unit labels have different widths
+            _pageBook.layout(true, true);
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addTourEventListener() {
