@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -100,7 +99,6 @@ public class TourChartAnalyzerView extends ViewPart {
    private SelectionChartInfo          _chartInfo;
 
    private int                         _layoutFormat;
-
 
    /**
     * space between columns
@@ -145,12 +143,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
       _partContainer.addControlListener(controlResizedAdapter(controlEvent -> onResizeUI()));
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            onSelection(selection);
-         }
-      };
+      _postSelectionListener = (part, selection) -> onSelection(selection);
       page.addPostSelectionListener(_postSelectionListener);
    }
 
@@ -233,31 +226,28 @@ public class TourChartAnalyzerView extends ViewPart {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId tourEventId, final Object eventData) {
+      _tourEventListener = (part, tourEventId, eventData) -> {
 
-            if (part == TourChartAnalyzerView.this) {
-               return;
-            }
+         if (part == TourChartAnalyzerView.this) {
+            return;
+         }
 
-            if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-               onSelection((ISelection) eventData);
+            onSelection(selection);
 
-            } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-               onSelection((ISelection) eventData);
+            onSelection(selection);
 
-            } else if (tourEventId == TourEventId.MAP_SELECTION && eventData instanceof SelectionMapSelection) {
+         } else if (tourEventId == TourEventId.MAP_SELECTION && eventData instanceof SelectionMapSelection) {
 
-               // sliders are set in the tour chart
-               updateInfo();
+            // sliders are set in the tour chart
+            updateInfo();
 
-            } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-               clearView();
-            }
+            clearView();
          }
       };
 
@@ -757,17 +747,15 @@ public class TourChartAnalyzerView extends ViewPart {
          return;
       }
 
-      if (selection instanceof SelectionChartInfo) {
+      if (selection instanceof final SelectionChartInfo chartInfo) {
 
-         updateInfo((SelectionChartInfo) selection, false);
+         updateInfo(chartInfo, false);
 
-      } else if (selection instanceof SelectionChartXSliderPosition) {
+      } else if (selection instanceof final SelectionChartXSliderPosition sliderPosition) {
 
-         updateInfo(((SelectionChartXSliderPosition) selection));
+         updateInfo(sliderPosition);
 
-      } else if (selection instanceof SelectionTourData) {
-
-         final SelectionTourData selectionTourData = (SelectionTourData) selection;
+      } else if (selection instanceof final SelectionTourData selectionTourData) {
 
          TourChart tourChart = selectionTourData.getTourChart();
 
@@ -783,9 +771,9 @@ public class TourChartAnalyzerView extends ViewPart {
 
          updateInfo();
 
-      } else if (selection instanceof SelectionTourChart) {
+      } else if (selection instanceof final SelectionTourChart selectionTourChart) {
 
-         final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
+         final TourChart tourChart = selectionTourChart.getTourChart();
 
          if (tourChart != null) {
             updateInfo(tourChart.getChartInfo(), false);
