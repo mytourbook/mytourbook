@@ -110,8 +110,6 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    float                            colAvgTemperature_Device;
 
    long                             numTours;
-
-   int                              numTags_WithTours;
    int                              numTags_NoTours;
 
    int                              temperatureDigits;

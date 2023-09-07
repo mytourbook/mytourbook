@@ -1026,18 +1026,25 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                // get number of tags/categories
-               final int numTags = categoryItem.numTags;
-               final int numCategories = categoryItem.numTagCategories;
+               int numTags = categoryItem.numTags;
+               int numCategories = categoryItem.numTagCategories;
 
-               final int numTagNoTours = categoryItem.numTags_NoTours;
+               /**
+                * Hide number of tags & categories, it's toooo complicated to compute it, an
+                * alternative could be to filter tags with sql.
+                */
+               if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS
+                     || _tagFilterType == TagFilterType.TAGS_WITH_TOURS) {
+
+                  numTags = 0;
+                  numCategories = 0;
+               }
 
                if (numCategories > 0) {
-
                   styledString.append(UI.SPACE3 + numCategories, net.tourbook.ui.UI.TOUR_STYLER);
                }
 
                if (numTags > 0) {
-
                   styledString.append(UI.SPACE3 + numTags, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
                }
 
@@ -1078,10 +1085,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                styledString.append(viewItem.firstColumn);
             }
-
-            styledString.append(UI.SPACE3);
-            styledString.append(UI.SPACE3 + viewItem.numTags_WithTours, net.tourbook.ui.UI.TOTAL_STYLER);
-            styledString.append(UI.SPACE3 + viewItem.numTags_NoTours, net.tourbook.ui.UI.TOTAL_STYLER);
 
             cell.setText(styledString.getString());
             cell.setStyleRanges(styledString.getStyleRanges());
@@ -1943,26 +1946,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          return true;
       }
 
+      // tags are filtered
+
       if (false
             || item instanceof final TVITaggingView_TagCategory
             || item instanceof final TVITaggingView_Tag
             || item instanceof final TVITaggingView_Year
             || item instanceof final TVITaggingView_Month) {
 
-         // tags are filtered
-
          final boolean hasTour = ((TVITaggingView_Item) item).numTours > 0;
          final boolean hasTagsNoTours = ((TVITaggingView_Item) item).numTags_NoTours > 0;
 
          if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasTour) {
 
-            // tags with tours -> show it
+            // show tags WITH tours
 
             return true;
 
          } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasTagsNoTours) {
 
-            // tags without tours -> show it
+            // show tags WITHOUT tours
 
             return true;
 
@@ -2020,7 +2023,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       int numAllTagCategories = 0;
       int numAllTags = 0;
 
-      int numTags_WithTours = 0;
       int numTags_NoTours = 0;
 
       int numTours_InTourItems = 0;
@@ -2053,10 +2055,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       if (numTours_InTourItems == 0 && numTours_InTagSubCats == 0) {
 
          numTags_NoTours++;
-
-      } else {
-
-         numTags_WithTours++;
       }
 
 // SET_FORMATTING_OFF
@@ -2067,41 +2065,35 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       if (parentItem instanceof final TVITaggingView_Tag tagItem) {
 
          tagItem.numTours           += numTours_InTourItems;
-         tagItem.numTags_WithTours  += numTags_WithTours;
          tagItem.numTags_NoTours    += numTags_NoTours;
 
       } else if (parentItem instanceof final TVITaggingView_Year yearItem) {
 
          yearItem.numTours          += numTours_InTourItems;
-         yearItem.numTags_WithTours += numTags_WithTours;
          yearItem.numTags_NoTours   += numTags_NoTours;
 
          final TreeViewerItem yearParent = yearItem.getParentItem();
          if (yearParent instanceof final TVITaggingView_Tag tagItem) {
 
             tagItem.numTours           += numTours_InTourItems;
-            tagItem.numTags_WithTours  += numTags_WithTours;
             tagItem.numTags_NoTours    += numTags_NoTours;
          }
 
       } else if (parentItem instanceof final TVITaggingView_Month monthItem) {
 
          monthItem.numTours            += numTours_InTourItems;
-         monthItem.numTags_WithTours   += numTags_WithTours;
          monthItem.numTags_NoTours     += numTags_NoTours;
 
          final TreeViewerItem monthParent = monthItem.getParentItem();
          if (monthParent instanceof final TVITaggingView_Year yearItem) {
 
             yearItem.numTours          += numTours_InTourItems;
-            yearItem.numTags_WithTours += numTags_WithTours;
             yearItem.numTags_NoTours   += numTags_NoTours;
 
             final TreeViewerItem yearParent = yearItem.getParentItem();
             if (yearParent instanceof final TVITaggingView_Tag tagItem) {
 
                tagItem.numTours           += numTours_InTourItems;
-               tagItem.numTags_WithTours  += numTags_WithTours;
                tagItem.numTags_NoTours    += numTags_NoTours;
             }
          }
@@ -2110,7 +2102,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          long allNumChild_Tours           = 0;
          long allNumChild_TagsNoTours     = 0;
-         long allNumChild_TagsWithTours   = 0;
 
          for (final TreeViewerItem treeViewerItem : allFetchedChildren) {
 
@@ -2118,7 +2109,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                allNumChild_Tours          += viewItem.numTours;
                allNumChild_TagsNoTours    += viewItem.numTags_NoTours;
-               allNumChild_TagsWithTours  += viewItem.numTags_WithTours;
             }
          }
 
@@ -2126,7 +2116,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          categoryItem.numTags             += numAllTags;
 
          categoryItem.numTours            += allNumChild_Tours;
-         categoryItem.numTags_WithTours   += allNumChild_TagsWithTours;
          categoryItem.numTags_NoTours     += allNumChild_TagsNoTours;
       }
 

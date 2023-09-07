@@ -419,7 +419,6 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
             + NL
             + "  numTours          = " + numTours + NL //                     //$NON-NLS-1$
-            + "  numTags_WithTours = " + numTags_WithTours + NL //            //$NON-NLS-1$
             + "  numTags_NoTours   = " + numTags_NoTours + NL //              //$NON-NLS-1$
 
             + "]" + NL //                                                     //$NON-NLS-1$
