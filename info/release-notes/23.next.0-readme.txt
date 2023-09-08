@@ -72,6 +72,9 @@ Improvements
   - Support macOS ARM platform    
     https://github.com/mytourbook/mytourbook/discussions/1174
 
+* Tour Blog View & Tour Analyzer View
+  - Refreshing each view when the measurement system is changed
+
 Changes
 =======
 
