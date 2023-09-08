@@ -78,6 +78,11 @@ public class TourChartAnalyzerView extends ViewPart {
 
    //todo fb detect when measurement units have changed
 
+   //do the same for the tour blog view
+   // any other views ??
+
+   // linux async event when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa
+
    public static final String            ID                = "net.tourbook.views.TourChartAnalyzer"; //$NON-NLS-1$
 
    private static final int              LAYOUT_1_COLUMNS  = 0;
