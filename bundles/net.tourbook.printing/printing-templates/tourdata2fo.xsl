@@ -457,7 +457,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(tourAltUp div $unitAltitude, '#.##')"/>
+											<xsl:value-of select="format-number(tourAltUp div $unitAltitude, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelAltitude"/>
 										</fo:block>
@@ -475,7 +475,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(tourAltDown div $unitAltitude, '#.##')"/>
+											<xsl:value-of select="format-number(tourAltDown div $unitAltitude, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelAltitude"/>
 										</fo:block>
