@@ -22,24 +22,32 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.UI;
 
-public class TVITagView_Year extends TVITagViewItem {
+import org.eclipse.jface.viewers.TreeViewer;
 
-   private final int      _year;
-   private TVITagView_Tag _tagItem;
+public class TVITaggingView_Year extends TVITaggingView_Item {
+
+   private final int          _year;
+
+   private TVITaggingView_Tag _tagItem;
 
    /**
     * <code>true</code> when the children of this year item contains month items<br>
     * <code>false</code> when the children of this year item contains tour items
     */
-   private boolean        _isMonth;
+   private boolean            _isMonth;
 
-   public TVITagView_Year(final TVITagView_Tag parentItem, final int year, final boolean isMonth) {
+   public TVITaggingView_Year(final TVITaggingView_Tag parentItem,
+                              final int year,
+                              final boolean isMonth,
+                              final TreeViewer treeViewer) {
+
+      super(treeViewer);
 
       setParentItem(parentItem);
 
@@ -49,12 +57,12 @@ public class TVITagView_Year extends TVITagViewItem {
    }
 
    /**
-    * Compare two instances of {@link TVITagView_Year}
+    * Compare two instances of {@link TVITaggingView_Year}
     *
     * @param otherYearItem
     * @return
     */
-   public int compareTo(final TVITagView_Year otherYearItem) {
+   public int compareTo(final TVITaggingView_Year otherYearItem) {
 
       if (this == otherYearItem) {
          return 0;
@@ -82,7 +90,7 @@ public class TVITagView_Year extends TVITagViewItem {
          return false;
       }
 
-      final TVITagView_Year other = (TVITagView_Year) obj;
+      final TVITaggingView_Year other = (TVITaggingView_Year) obj;
 
       if (_isMonth != other._isMonth) {
          return false;
@@ -114,10 +122,10 @@ public class TVITagView_Year extends TVITagViewItem {
    }
 
    public long getTagId() {
-      return _tagItem.tagId;
+      return _tagItem.getTagId();
    }
 
-   public TVITagView_Tag getTagItem() {
+   public TVITaggingView_Tag getTagItem() {
       return _tagItem;
    }
 
@@ -180,12 +188,16 @@ public class TVITagView_Year extends TVITagViewItem {
             final int dbYear = result.getInt(1);
             final int dbMonth = result.getInt(2);
 
-            final TVITagView_Month tourItem = new TVITagView_Month(this, dbYear, dbMonth);
+            final TVITaggingView_Month tourItem = new TVITaggingView_Month(this, dbYear, dbMonth, getTagViewer());
             children.add(tourItem);
 
-            tourItem.treeColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
+            tourItem.firstColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
 
             tourItem.readSumColumnData(result, 3);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+            }
          }
 
       } catch (final SQLException e) {
@@ -213,7 +225,7 @@ public class TVITagView_Year extends TVITagViewItem {
 
                + " tourID," + NL //                         1  //$NON-NLS-1$
                + " jTdataTtag2.TourTag_tagId," + NL //      2  //$NON-NLS-1$
-               + TVITagView_Tour.SQL_TOUR_COLUMNS + NL //   3
+               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //   3
 
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -239,7 +251,7 @@ public class TVITagView_Year extends TVITagViewItem {
          sqlFilter.setParameters(statement, 3);
 
          long lastTourId = -1;
-         TVITagView_Tour tourItem = null;
+         TVITaggingView_Tour tourItem = null;
 
          final ResultSet result = statement.executeQuery();
          while (result.next()) {
@@ -259,14 +271,19 @@ public class TVITagView_Year extends TVITagViewItem {
 
                // resultset contains a new tour
 
-               tourItem = new TVITagView_Tour(this);
+               tourItem = new TVITaggingView_Tour(this, getTagViewer());
 
                children.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultTagId, 3);
 
-               tourItem.treeColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+               tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
             }
 
             lastTourId = tourId;
@@ -288,9 +305,15 @@ public class TVITagView_Year extends TVITagViewItem {
 
             + " [" + NL //                                                 //$NON-NLS-1$
 
-            + "_year    = " + _year + NL //                                //$NON-NLS-1$
-            + "_isMonth = " + _isMonth + NL //                             //$NON-NLS-1$
-            + "_tagItem = " + _tagItem + NL //                             //$NON-NLS-1$
+            + "  _year        = " + _year + NL //                          //$NON-NLS-1$
+            + "  _isMonth     = " + _isMonth + NL //                       //$NON-NLS-1$
+
+            + NL
+            + "  numTours          = " + numTours + NL //                  //$NON-NLS-1$
+            + "  numTags_NoTours   = " + numTags_NoTours + NL //           //$NON-NLS-1$
+
+//          + NL
+//          + "_tagItem  = " + _tagItem + NL //                            //$NON-NLS-1$
 
             + "]" + NL //                                                  //$NON-NLS-1$
       ;

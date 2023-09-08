@@ -66,7 +66,7 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
    public static final RGB               STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT    = new RGB(0xf2, 0x5b, 0x0);
 
    public static final RGB               STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT                 = new RGB(0x00, 0x00, 0x00);
-   public static final RGB               STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT                = new RGB(0xb3, 0x43, 0x0);
+   public static final RGB               STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT                = new RGB(0x64, 0xa6, 0x0);
 
    public static final RGB               STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_DARK       = new RGB(0xe8, 0xe8, 0xe8);
    public static final RGB               STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK   = new RGB(0xff, 0x85, 0x3c);

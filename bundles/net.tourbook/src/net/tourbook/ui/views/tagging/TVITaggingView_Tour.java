@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.TourDatabase;
 
-public class TVITagView_Tour extends TVITagViewItem {
+import org.eclipse.jface.viewers.TreeViewer;
+
+public class TVITaggingView_Tour extends TVITaggingView_Item {
 
    public static final String SQL_TOUR_COLUMNS = UI.EMPTY_STRING
 
@@ -48,14 +50,19 @@ public class TVITagView_Tour extends TVITagViewItem {
    int                        tourDay;
 
    String                     tourTitle;
+
    long                       tourTypeId;
 
    ArrayList<Long>            tagIds;
 
    public long                deviceStartDistance;
+
    public short               deviceTimeInterval;
 
-   public TVITagView_Tour(final TVITagViewItem parentItem) {
+   public TVITaggingView_Tour(final TVITaggingView_Item parentItem, final TreeViewer treeViewer) {
+
+      super(treeViewer);
+
       setParentItem(parentItem);
    }
 
@@ -72,7 +79,9 @@ public class TVITagView_Tour extends TVITagViewItem {
    @Override
    protected void fetchChildren() {}
 
-   public void getTourColumnData(final ResultSet result, final Object resultTagId, final int startIndex)
+   public void getTourColumnData(final ResultSet result,
+                                 final Object resultTagId,
+                                 final int startIndex)
          throws SQLException {
 
       tourYear = result.getInt(startIndex + 0);
@@ -108,5 +117,30 @@ public class TVITagView_Tour extends TVITagViewItem {
    @Override
    public boolean hasChildren() {
       return false;
+   }
+
+   @Override
+   public String toString() {
+
+      final int maxLen = 5;
+
+      return UI.EMPTY_STRING
+
+            + "TVITaggingView_Tour" + NL //              //$NON-NLS-1$
+
+            + "[" + NL //                                //$NON-NLS-1$
+
+            + " tourId     = " + tourId + NL //          //$NON-NLS-1$
+            + " tourDate   = " + tourDate + NL //        //$NON-NLS-1$
+            + " tourTitle  = " + tourTitle + NL //       //$NON-NLS-1$
+            + " tourTypeId = " + tourTypeId + NL //      //$NON-NLS-1$
+
+            + " tagIds     = " + (tagIds != null //      //$NON-NLS-1$
+                  ? tagIds.subList(0, Math.min(tagIds.size(), maxLen))
+                  : null) + NL
+
+            + "]" + NL //                                //$NON-NLS-1$
+
+      ;
    }
 }

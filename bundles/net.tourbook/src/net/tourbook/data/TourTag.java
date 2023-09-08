@@ -47,9 +47,9 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
    public static final int            DB_LENGTH_NAME             = 255;
    public static final int            DB_LENGTH_NOTES            = 32000;
 
-   public static final int            EXPAND_TYPE_YEAR_MONTH_DAY = 0;
    public static final int            EXPAND_TYPE_FLAT           = 1;
    public static final int            EXPAND_TYPE_YEAR_DAY       = 2;
+   public static final int            EXPAND_TYPE_YEAR_MONTH_DAY = 0;
 
    /**
     * Manually created marker or imported marker create a unique id to identify them, saved marker
@@ -65,8 +65,11 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
    private long   tagId      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
-    * This is a root tag when set to <code>1</code>, derby does not support BOOLEAN, 1 =
-    * <code>true</code>, 0 = <code>false</code>
+    * Derby does not support BOOLEAN (when this was implemented)
+    * <p>
+    * <code>1 = true</code><br>
+    * <code>0 = false</code>
+    * <p>
     */
    private int    isRoot     = 0;
 
@@ -84,6 +87,10 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
    /**
     * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
     * structures
+    * <p>
+    * <li>0 ... EXPAND_TYPE_YEAR_MONTH_DAY</li>
+    * <li>1 ... EXPAND_TYPE_FLAT</li>
+    * <li>2 ... EXPAND_TYPE_YEAR_DAY</li>
     */
    private int    expandType = EXPAND_TYPE_FLAT;
 
@@ -186,6 +193,9 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
       return true;
    }
 
+   /**
+    * @return {@link #expandType}
+    */
    public int getExpandType() {
       return expandType;
    }
@@ -325,22 +335,19 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
 
       return UI.EMPTY_STRING
 
-            + "TourTag" + NL //                          //$NON-NLS-1$
-            + "[" + NL //                                //$NON-NLS-1$
+            + "TourTag" + NL //                                //$NON-NLS-1$
 
-            + "   tagId         =" + tagId + NL //         //$NON-NLS-1$
-            + "   isRoot        =" + isRoot + NL //        //$NON-NLS-1$
-            + "   name          =" + name + NL //          //$NON-NLS-1$
-            + "   notes         =" + notes + NL //         //$NON-NLS-1$
-            + "   expandType    =" + expandType + NL //    //$NON-NLS-1$
+            + "  name          = " + name + NL //              //$NON-NLS-1$
+            + "  isRoot        = " + isRoot + NL //            //$NON-NLS-1$
+//          + "  tagId         = " + tagId + NL //             //$NON-NLS-1$
+//          + "  notes         = " + notes + NL //             //$NON-NLS-1$
+//          + "  expandType    = " + expandType + NL //        //$NON-NLS-1$
+//
+//          + "  _createId     = " + _createId + NL //         //$NON-NLS-1$
+//
+//          + "  imageFilePath = " + imageFilePath + NL //     //$NON-NLS-1$
 
-            + "   _createId     =" + _createId + NL //     //$NON-NLS-1$
-
-            + "   imageFilePath =" + imageFilePath + NL //     //$NON-NLS-1$
-
-//          + "   tourData      =" + tourData + NL //      //$NON-NLS-1$
-
-            + "]" + NL //                                //$NON-NLS-1$
+//          + "  tourData      = " + tourData + NL //          //$NON-NLS-1$
       ;
    }
 

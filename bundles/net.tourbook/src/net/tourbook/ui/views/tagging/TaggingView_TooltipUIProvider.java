@@ -290,17 +290,17 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
    private TourTagCategory getTagCategory() {
 
-      final TVITagView_TagCategory tagCategoryItem = (TVITagView_TagCategory) _viewerCellData;
+      final TVITaggingView_TagCategory tagCategoryItem = (TVITaggingView_TagCategory) _viewerCellData;
 
       final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
-      final TourTagCategory tagCategory = allTourTagCategories.get(tagCategoryItem.getCategoryId());
+      final TourTagCategory tagCategory = allTourTagCategories.get(tagCategoryItem.getTourTagCategory().getCategoryId());
 
       return tagCategory;
    }
 
    private TourTag getTourTag() {
 
-      final TVITagView_Tag tagItem = (TVITagView_Tag) _viewerCellData;
+      final TVITaggingView_Tag tagItem = (TVITaggingView_Tag) _viewerCellData;
 
       final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
       final TourTag tourTag = allTourTags.get(tagItem.getTagId());
@@ -312,13 +312,13 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
       _content_Notes = null;
 
-      if (_viewerCellData instanceof TVITagView_Tag) {
+      if (_viewerCellData instanceof TVITaggingView_Tag) {
 
          final TourTag tourTag = getTourTag();
 
          _content_Notes = tourTag.getNotes();
 
-      } else if (_viewerCellData instanceof TVITagView_TagCategory) {
+      } else if (_viewerCellData instanceof TVITaggingView_TagCategory) {
 
          final TourTagCategory tagCategory = getTagCategory();
 
@@ -330,7 +330,7 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
    private void updateUI() {
 
-      if (_viewerCellData instanceof TVITagView_Tag) {
+      if (_viewerCellData instanceof TVITaggingView_Tag) {
 
          final TourTag tourTag = getTourTag();
 
@@ -338,7 +338,7 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          _actionEditTag.setToolTipText(Messages.Action_Tag_Edit_Tooltip);
 
-      } else if (_viewerCellData instanceof TVITagView_TagCategory) {
+      } else if (_viewerCellData instanceof TVITaggingView_TagCategory) {
 
          final TourTagCategory tagCategory = getTagCategory();
 

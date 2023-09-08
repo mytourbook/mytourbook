@@ -790,7 +790,7 @@ public class UI {
    public static String getTourTypeLabel(final long tourTypeId) {
 
       for (final TourType tourType : TourDatabase.getAllTourTypes()) {
-         
+
          if (tourType.getTypeId() == tourTypeId) {
 
             String tourTypeText = tourType.getName();
@@ -1109,25 +1109,11 @@ public class UI {
 
    public static void showSQLException(final SQLException ex) {
 
-      Display.getDefault().asyncExec(() -> {
-
-         SQLException e = ex;
-
-         while (e != null) {
-
-            final String sqlExceptionText = Util.getSQLExceptionText(e);
-
-            // log also the stacktrace
-            StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
-
-            MessageDialog.openError(
-                  Display.getDefault().getActiveShell(),
-                  "SQL Error", //$NON-NLS-1$
-                  sqlExceptionText);
-
-            e = e.getNextException();
-         }
-      });
+      /**
+       * Redirect to common code, once upon when all old showSQLException are using this from the
+       * common code, this method should be deleted
+       */
+      net.tourbook.common.UI.showSQLException(ex);
    }
 
    /**

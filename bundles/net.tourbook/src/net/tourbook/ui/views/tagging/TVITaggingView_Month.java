@@ -21,19 +21,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.UI;
 
-public class TVITagView_Month extends TVITagViewItem {
+import org.eclipse.jface.viewers.TreeViewer;
 
-   private final TVITagView_Year _yearItem;
+public class TVITaggingView_Month extends TVITaggingView_Item {
 
-   private final int             _year;
-   private final int             _month;
+   private final TVITaggingView_Year _yearItem;
 
-   public TVITagView_Month(final TVITagView_Year parentItem, final int dbYear, final int dbMonth) {
+   private final int                 _year;
+   private final int                 _month;
+
+   public TVITaggingView_Month(final TVITaggingView_Year parentItem,
+                               final int dbYear,
+                               final int dbMonth,
+                               final TreeViewer treeViewer) {
+
+      super(treeViewer);
 
       setParentItem(parentItem);
 
@@ -43,12 +50,12 @@ public class TVITagView_Month extends TVITagViewItem {
    }
 
    /**
-    * Compare two instances of {@link TVITagView_Month}
+    * Compare two instances of {@link TVITaggingView_Month}
     *
     * @param otherMonthItem
     * @return
     */
-   public int compareTo(final TVITagView_Month otherMonthItem) {
+   public int compareTo(final TVITaggingView_Month otherMonthItem) {
 
       if (this == otherMonthItem) {
          return 0;
@@ -91,7 +98,7 @@ public class TVITagView_Month extends TVITagViewItem {
          return false;
       }
 
-      final TVITagView_Month other = (TVITagView_Month) obj;
+      final TVITaggingView_Month other = (TVITaggingView_Month) obj;
 
       if (_month != other._month) {
          return false;
@@ -119,7 +126,7 @@ public class TVITagView_Month extends TVITagViewItem {
    protected void fetchChildren() {
 
       /*
-       * set tour children for the month
+       * Set tour children for the month
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
@@ -138,7 +145,7 @@ public class TVITagView_Month extends TVITagViewItem {
                + " tourID," + NL //                //				1	//$NON-NLS-1$
                + " jTdataTtag2.TourTag_tagId," + NL //         2  //$NON-NLS-1$
 
-               + TVITagView_Tour.SQL_TOUR_COLUMNS + NL //      3
+               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //  3
 
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -165,7 +172,7 @@ public class TVITagView_Month extends TVITagViewItem {
          sqlFilter.setParameters(statement, 4);
 
          long lastTourId = -1;
-         TVITagView_Tour tourItem = null;
+         TVITaggingView_Tour tourItem = null;
 
          final ResultSet result = statement.executeQuery();
          while (result.next()) {
@@ -184,14 +191,19 @@ public class TVITagView_Month extends TVITagViewItem {
             } else {
 
                // new tour is in the resultset
-               tourItem = new TVITagView_Tour(this);
+               tourItem = new TVITaggingView_Tour(this, getTagViewer());
 
                children.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultTagId, 3);
 
-               tourItem.treeColumn = Integer.toString(tourItem.tourDay);
+               tourItem.firstColumn = Integer.toString(tourItem.tourDay);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
             }
 
             lastTourId = tourId;
@@ -205,7 +217,7 @@ public class TVITagView_Month extends TVITagViewItem {
       return _month;
    }
 
-   public TVITagView_Year getYearItem() {
+   public TVITaggingView_Year getYearItem() {
       return _yearItem;
    }
 
@@ -228,9 +240,12 @@ public class TVITagView_Month extends TVITagViewItem {
 
             + "[" + NL //                                                     //$NON-NLS-1$
 
-            + " _year     = " + _year + NL //                                 //$NON-NLS-1$
-            + " _month    = " + _month + NL //                                //$NON-NLS-1$
-            + " _yearItem = " + _yearItem + NL //                             //$NON-NLS-1$
+            + "  _year         = " + _year + NL //                            //$NON-NLS-1$
+            + "  _month        = " + _month + NL //                           //$NON-NLS-1$
+            + "  _yearItem     = " + _yearItem + NL //                        //$NON-NLS-1$
+
+            + "  numTours          = " + numTours + NL //                     //$NON-NLS-1$
+            + "  numTags_NoTours   = " + numTags_NoTours + NL //              //$NON-NLS-1$
 
             + "]" + NL //                                                     //$NON-NLS-1$
       ;

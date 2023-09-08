@@ -8792,7 +8792,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       enableActions();
 
       /**
-       * This is not an eclipse editor part but the property change must be fired to show the start
+       * This is not an eclipse editor part but the property change must be fired to show the star
        * "*" marker in the part name
        */
       firePropertyChange(PROP_DIRTY);
