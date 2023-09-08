@@ -29,8 +29,10 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -133,12 +135,14 @@ public class TourBlogView extends ViewPart {
    private static final String           HREF_MARKER_ITEM = "#MarkerItem";                //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore       = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state           = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_WEB       = WEB.getState();
 
    private PostSelectionProvider         _postSelectionProvider;
    private ISelectionListener            _postSelectionListener;
    private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
    private ITourEventListener            _tourEventListener;
    private IPartListener2                _partListener;
 
@@ -227,7 +231,20 @@ public class TourBlogView extends ViewPart {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+            // measurement system has changed
+
+            updateUI();
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -738,6 +755,7 @@ public class TourBlogView extends ViewPart {
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

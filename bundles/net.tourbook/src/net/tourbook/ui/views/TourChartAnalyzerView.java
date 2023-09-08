@@ -731,6 +731,7 @@ public class TourChartAnalyzerView extends ViewPart {
       page.removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       _colorCache.dispose();
 
