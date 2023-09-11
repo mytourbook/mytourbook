@@ -167,7 +167,7 @@ public class TourManager {
    public static final String  CUSTOM_DATA_POWER                               = "power";                                                       //$NON-NLS-1$
    public static final String  CUSTOM_DATA_PULSE                               = "pulse";                                                       //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                       //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SPEED_INTERVAL                      = "speed-interval";                                              //$NON-NLS-1$
+   private static final String CUSTOM_DATA_SPEED_INTERVAL                      = "speed-interval";                                              //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SPEED_SUMMARIZED                    = "speed-summarized";                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                 //$NON-NLS-1$
    private static final String CUSTOM_DATA_TIME                                = "time";                                                        //$NON-NLS-1$
@@ -2832,6 +2832,7 @@ public class TourManager {
          } catch (InvocationTargetException | InterruptedException e) {
 
             TourLogManager.log_EXCEPTION_WithStacktrace(e);
+            Thread.currentThread().interrupt();
          }
       }
 
