@@ -3739,7 +3739,6 @@ public class TourManager {
        * Compute the average altimeter speed between the two sliders
        */
       _computeAvg_Altimeter = new ComputeChartValue() {
-         //todo fb
 
          @Override
          public float compute() {
