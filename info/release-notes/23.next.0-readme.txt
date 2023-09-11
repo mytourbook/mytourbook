@@ -60,6 +60,10 @@ Improvements
   - Show elevation loss values
     https://github.com/mytourbook/mytourbook/issues/1034
     
+* Tagged Tours
+  - Show number of items in the collapsed tags and tag categories
+    https://github.com/mytourbook/mytourbook/issues/1180    
+    
 * Reference Tours
   - Show tour type for the reference tour
   - Show geo flag for the compared tour
