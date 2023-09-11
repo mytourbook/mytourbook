@@ -1376,7 +1376,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       // must be run async -> dark theme is overwriting it
-      parent.getDisplay().asyncExec(() -> {
+      final Display display = parent.getDisplay();
+
+      display.asyncExec(() -> {
+
+         if (display.isDisposed()) {
+            return;
+         }
 
          for (int zoneIndex = 0; zoneIndex < allHrZoneColorLabel.length; zoneIndex++) {
 
