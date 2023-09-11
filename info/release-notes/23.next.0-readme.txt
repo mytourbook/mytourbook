@@ -84,7 +84,7 @@ Improvements
   - Refreshing each view when the measurement system is changed
 
 * Tour Print
-  - Added paused time values and rounded values
+  - Added recorded and paused time values. Rounded values (elevation gain, distance...)
 
 Changes
 =======
