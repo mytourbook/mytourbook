@@ -100,7 +100,7 @@ Bugfix
     https://github.com/mytourbook/mytourbook/issues/1171
 
 * Tour Analyzer View
-  - Some values are not properly computed when the measurement system is changed
+  - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
 
 
 Translation    
