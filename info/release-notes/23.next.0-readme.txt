@@ -96,6 +96,9 @@ Bugfix
   - Reimport a renamed tcx file does not change the importfilename in my tourbook anymore
     https://github.com/mytourbook/mytourbook/issues/1171
 
+* Tour Analyzer View
+  - Some values are not properly computed when the measurement system is changed
+
 
 Translation    
 ===========
