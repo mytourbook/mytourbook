@@ -3791,7 +3791,7 @@ public class TourManager {
       };
 
       /*
-       * Compute the average altimeter speed between the two sliders
+       * Compute the average gradient between the two sliders
        */
       _computeAvg_Gradient = new ComputeChartValue() {
 
