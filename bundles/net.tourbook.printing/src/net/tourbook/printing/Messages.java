@@ -77,6 +77,7 @@ public class Messages extends NLS {
    public static String        Tour_Print_Tour;
    public static String        Tour_Print_Tour_Moving_Time;
    public static String        Tour_Print_Tour_Break_Time;
+   public static String        Tour_Print_Tour_Paused_Time;
    public static String        Tour_Print_Tour_Time;
    public static String        Tour_Print_Tour_Markers;
 

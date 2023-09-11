@@ -234,7 +234,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left" white-space-collapse="false" white-space="pre">
-											<xsl:value-of select="format-number(tourDistance div 1000 div $unitDistance, '#.00')"/>
+											<xsl:value-of select="format-number(tourDistance div 1000 div $unitDistance, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelDistance"/>
 										</fo:block>

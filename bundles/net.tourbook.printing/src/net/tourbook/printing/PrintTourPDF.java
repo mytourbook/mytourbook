@@ -228,6 +228,7 @@ public class PrintTourPDF extends PrintTourExtension {
       transformer.setParameter("lang.Tour_Print_Time_Distance_Speed",   Messages.Tour_Print_Time_Distance_Speed); //$NON-NLS-1$
       transformer.setParameter("lang.Tour_Print_Tour_Time",             Messages.Tour_Print_Tour_Time); //$NON-NLS-1$
       transformer.setParameter("lang.Tour_Print_Tour_Break_Time",       Messages.Tour_Print_Tour_Break_Time); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Tour_Paused_Time",      Messages.Tour_Print_Tour_Paused_Time); //$NON-NLS-1$
       transformer.setParameter("lang.Tour_Print_Tour_Moving_Time",      Messages.Tour_Print_Tour_Moving_Time); //$NON-NLS-1$
       transformer.setParameter("lang.Tour_Print_Distance",              Messages.Tour_Print_Distance); //$NON-NLS-1$
       transformer.setParameter("lang.Tour_Print_Maximum_Speed",         Messages.Tour_Print_Maximum_Speed); //$NON-NLS-1$
