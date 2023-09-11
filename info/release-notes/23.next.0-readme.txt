@@ -83,6 +83,9 @@ Improvements
 * Tour Blog View & Tour Analyzer View
   - Refreshing each view when the measurement system is changed
 
+* Tour Print
+  - Added paused time values and rounded values
+
 Changes
 =======
 
