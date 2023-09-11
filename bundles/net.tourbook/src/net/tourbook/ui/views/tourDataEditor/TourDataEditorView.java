@@ -224,6 +224,7 @@ import org.eclipse.ui.progress.UIJob;
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
    //todo fb // linux async event when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa
+//see exampled UI.isLinuxAsyncEvent
 
    public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";    //$NON-NLS-1$
    //
