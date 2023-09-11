@@ -67,6 +67,10 @@ Improvements
 * Reference Tours
   - Show tour type for the reference tour
   - Show geo flag for the compared tour
+  
+* Tour Blog
+  - Detect http links in the tour description to make them clickable
+    https://github.com/mytourbook/mytourbook/issues/1102
 
 * Color Selector
   - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
