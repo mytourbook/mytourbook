@@ -239,17 +239,7 @@ public class TourChartAnalyzerView extends ViewPart {
          if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
             // measurement system has changed
-
-            /*
-             * update viewer
-             */
-//_columnManager.saveState(_state);
-//            _columnManager.clearColumns();
-//            defineAllColumns();
-//
-//            recreateViewer(null);
-
-            updateInfo(_chartInfo, true);
+            updateInfo();
 
             // different unit labels have different widths
             _pageBook.layout(true, true);
@@ -866,7 +856,7 @@ public class TourChartAnalyzerView extends ViewPart {
    }
 
    /**
-    * Update values with data from the tour chart which MULT be open
+    * Update values with data from the tour chart which MUST be open
     */
    private void updateInfo() {
 
