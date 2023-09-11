@@ -11,6 +11,8 @@
 	<xsl:param name="lang.Tour_Print_Tour_Time" select="''"/>
 	<xsl:param name="lang.Tour_Print_Tour_Break_Time" select="''"/>
 	<xsl:param name="lang.Tour_Print_Tour_Moving_Time" select="''"/>
+	<xsl:param name="lang.Tour_Print_Tour_Paused_Time" select="''"/>
+	<xsl:param name="lang.Tour_Print_Tour_Recorded_Time" select="''"/>
 	<xsl:param name="lang.Tour_Print_Distance" select="''"/>
 	<xsl:param name="lang.Tour_Print_Maximum_Speed" select="''"/>
 	<xsl:param name="lang.Tour_Print_Personal" select="''"/>
@@ -196,6 +198,22 @@
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
+											<xsl:value-of select="$lang.Tour_Print_Tour_Moving_Time"/>
+											:
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="left">
+											<xsl:call-template name="FormatTime">
+												<xsl:with-param name="theTime" select="tourComputedTime_Moving"/>
+											</xsl:call-template>
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+								<!-- tour break time -->
+								<fo:table-row>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="right" vertical-align="top">
 											<xsl:value-of select="$lang.Tour_Print_Tour_Break_Time"/>
 											:
 										</fo:block>
@@ -208,18 +226,34 @@
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								<!-- tour moving time -->
+								<!-- tour recorded time -->
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
-											<xsl:value-of select="$lang.Tour_Print_Tour_Moving_Time"/>
+											<xsl:value-of select="$lang.Tour_Print_Tour_Recorded_Time"/>
 											:
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
 											<xsl:call-template name="FormatTime">
-												<xsl:with-param name="theTime" select="tourComputedTime_Moving"/>
+												<xsl:with-param name="theTime" select="tourDeviceTime_Recorded"/>
+											</xsl:call-template>
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+								<!-- tour paused time -->
+								<fo:table-row>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="right" vertical-align="top">
+											<xsl:value-of select="$lang.Tour_Print_Tour_Paused_Time"/>
+											:
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="left">
+											<xsl:call-template name="FormatTime">
+												<xsl:with-param name="theTime" select="tourDeviceTime_Paused"/>
 											</xsl:call-template>
 										</fo:block>
 									</fo:table-cell>
@@ -250,7 +284,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(maxSpeed div $unitDistance, '#.00')"/>
+											<xsl:value-of select="format-number(maxSpeed div $unitDistance, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelSpeed"/>
 										</fo:block>
@@ -315,7 +349,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(avgPulse, '#.0')"/>
+											<xsl:value-of select="format-number(avgPulse, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelHeartBeat"/>
 										</fo:block>
@@ -347,7 +381,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(avgCadence, '#.0')"/>
+											<xsl:value-of select="format-number(avgCadence, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelCadence"/>
 										</fo:block>
@@ -459,7 +493,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left" vertical-align="top" white-space-collapse="false" white-space="pre">
-											<xsl:value-of select="format-number(distance20 div 1000 div $unitDistance, '#.00')"/>
+											<xsl:value-of select="format-number(distance20 div 1000 div $unitDistance, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelDistance"/>
 										</fo:block>

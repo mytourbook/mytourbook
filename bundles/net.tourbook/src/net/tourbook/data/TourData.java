@@ -324,6 +324,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Total recorded time in seconds
     */
+   @XmlElement
    @JsonProperty
    private long                  tourDeviceTime_Recorded;
 
@@ -332,6 +333,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     *
     * This number could come from a direct value or from {@link tourTimerPauses}
     */
+   @XmlElement
    @JsonProperty
    private long                  tourDeviceTime_Paused;
 
@@ -2438,9 +2440,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Override
    public int compareTo(final Object obj) {
 
-      if (obj instanceof TourData) {
-
-         final TourData otherTourData = (TourData) obj;
+      if (obj instanceof final TourData otherTourData) {
 
          final long tourStartTime2 = otherTourData.tourStartTime;
 
@@ -7731,8 +7731,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return true;
       }
 
-      if (obj instanceof TourData) {
-         return tourId.longValue() == ((TourData) obj).tourId.longValue();
+      if (obj instanceof final TourData tourData) {
+         return tourId.longValue() == tourData.tourId.longValue();
       }
 
       return false;
