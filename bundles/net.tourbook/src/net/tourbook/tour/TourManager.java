@@ -3755,8 +3755,8 @@ public class TourManager {
 
             final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 
-            final float leftAltitude = altitudeValues[valueIndexLeft] * UI.UNIT_VALUE_ELEVATION;
-            final float rightAltitude = altitudeValues[valueIndexRight] * UI.UNIT_VALUE_ELEVATION;
+            final float leftAltitude = altitudeValues[valueIndexLeft];
+            final float rightAltitude = altitudeValues[valueIndexRight];
             final double leftTime = timeValues[valueIndexLeft];
             final double rightTime = timeValues[valueIndexRight];
 
