@@ -1456,12 +1456,12 @@ public class TourManager {
          for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
 
             final IEditorPart activeEditor = wbPage.getActiveEditor();
-            if (activeEditor instanceof TourEditor) {
+            if (activeEditor instanceof final TourEditor tourEditor) {
 
                /*
                 * check if the tour data in the editor is the same
                 */
-               final TourChart tourChart = ((TourEditor) activeEditor).getTourChart();
+               final TourChart tourChart = tourEditor.getTourChart();
                final TourData tourChartTourData = tourChart.getTourData();
                if (tourChartTourData == tourData) {
 
@@ -1483,9 +1483,7 @@ public class TourManager {
             if (viewRef != null) {
 
                final IViewPart view = viewRef.getView(false);
-               if (view instanceof TourChartView) {
-
-                  final TourChartView tourChartView = ((TourChartView) view);
+               if (view instanceof final TourChartView tourChartView) {
 
                   /*
                    * check if the tour data in the tour chart is the same
@@ -1582,9 +1580,8 @@ public class TourManager {
             for (final IViewReference viewRef : viewRefs) {
 
                final IViewPart view = viewRef.getView(false);
-               if (view instanceof ITourProvider) {
+               if (view instanceof final ITourProvider tourProvider) {
 
-                  final ITourProvider tourProvider = (ITourProvider) view;
                   final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
                   if (selectedTours != null) {
@@ -1795,17 +1792,17 @@ public class TourManager {
 
       Object[] selectedItems = null;
 
-      if (tourViewer instanceof TourBookView) {
+      if (tourViewer instanceof final TourBookView tourBookView) {
 
-         selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
+         selectedItems = tourBookView.getSelectedTourIDs().toArray();
 
-      } else if (tourViewer instanceof CollatedToursView) {
+      } else if (tourViewer instanceof final CollatedToursView collatedToursView) {
 
-         selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
+         selectedItems = collatedToursView.getSelectedTourIDs().toArray();
 
-      } else if (tourViewer instanceof RawDataView) {
+      } else if (tourViewer instanceof final RawDataView rawDataView) {
 
-         selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
+         selectedItems = rawDataView.getSelectedTourIDs().toArray();
       }
 
       return selectedItems;
@@ -2230,9 +2227,9 @@ public class TourManager {
 
             final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
-            if (viewPart instanceof TourDataEditorView) {
+            if (viewPart instanceof final TourDataEditorView tourDataEditorViewPart) {
 
-               tourDataEditorView[0] = (TourDataEditorView) viewPart;
+               tourDataEditorView[0] = tourDataEditorViewPart;
 
                if (isActive) {
 
@@ -2778,7 +2775,7 @@ public class TourManager {
 
       final List<TourData> allModifiedTours = new ArrayList<>();
 
-      if (allTourData == null || allTourData.size() == 0) {
+      if (allTourData == null || allTourData.isEmpty()) {
          return allModifiedTours;
       }
 
@@ -3741,6 +3738,7 @@ public class TourManager {
        * Compute the average altimeter speed between the two sliders
        */
       _computeAvg_Altimeter = new ComputeChartValue() {
+         //todo fb
 
          @Override
          public float compute() {
@@ -3757,8 +3755,8 @@ public class TourManager {
 
             final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
 
-            final float leftAltitude = altitudeValues[valueIndexLeft];
-            final float rightAltitude = altitudeValues[valueIndexRight];
+            final float leftAltitude = altitudeValues[valueIndexLeft] * UI.UNIT_VALUE_ELEVATION;
+            final float rightAltitude = altitudeValues[valueIndexRight] * UI.UNIT_VALUE_ELEVATION;
             final double leftTime = timeValues[valueIndexLeft];
             final double rightTime = timeValues[valueIndexRight];
 
@@ -3786,7 +3784,9 @@ public class TourManager {
 
             final TourData tourData = (TourData) chartModel.getCustomData(CUSTOM_DATA_TOUR_DATA);
 
-            return tourData.computeAvg_Altitude(valueIndexLeft, valueIndexRight);
+            final float averageAltitude = tourData.computeAvg_Altitude(valueIndexLeft, valueIndexRight);
+
+            return averageAltitude / UI.UNIT_VALUE_ELEVATION;
          }
       };
 
@@ -3807,10 +3807,10 @@ public class TourManager {
             final float[] altitudeValues = ((ChartDataYSerie) (customDataAltitude)).getHighValuesFloat()[0];
             final double[] distanceValues = ((ChartDataXSerie) (customDataDistance)).getHighValuesDouble()[0];
 
-            final float leftAltitude = altitudeValues[valueIndexLeft];
-            final float rightAltitude = altitudeValues[valueIndexRight];
-            final double leftDistance = distanceValues[valueIndexLeft];
-            final double rightDistance = distanceValues[valueIndexRight];
+            final float leftAltitude = altitudeValues[valueIndexLeft] * UI.UNIT_VALUE_ELEVATION;
+            final float rightAltitude = altitudeValues[valueIndexRight] * UI.UNIT_VALUE_ELEVATION;
+            final double leftDistance = distanceValues[valueIndexLeft] * UI.UNIT_VALUE_DISTANCE;
+            final double rightDistance = distanceValues[valueIndexRight] * UI.UNIT_VALUE_DISTANCE;
 
             if (leftDistance == rightDistance) {
                // left and right slider are at the same position
@@ -6189,8 +6189,7 @@ public class TourManager {
       ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
       if (selectedTours.isEmpty()) {
 
-         if (tourProvider instanceof ITourProviderAll) {
-            final ITourProviderAll allTourProvider = (ITourProviderAll) tourProvider;
+         if (tourProvider instanceof final ITourProviderAll allTourProvider) {
             selectedTours = allTourProvider.getAllSelectedTours();
 
             if (selectedTours.isEmpty()) {
