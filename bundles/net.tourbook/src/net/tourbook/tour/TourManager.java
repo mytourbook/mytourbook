@@ -1793,17 +1793,17 @@ public class TourManager {
 
       Object[] selectedItems = null;
 
-      if (tourViewer instanceof final TourBookView tourBookView) {
+      if (tourViewer instanceof TourBookView) {
 
-         selectedItems = tourBookView.getSelectedTourIDs().toArray();
+         selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
 
-      } else if (tourViewer instanceof final CollatedToursView collatedToursView) {
+      } else if (tourViewer instanceof CollatedToursView) {
 
-         selectedItems = collatedToursView.getSelectedTourIDs().toArray();
+         selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
 
-      } else if (tourViewer instanceof final RawDataView rawDataView) {
+      } else if (tourViewer instanceof RawDataView) {
 
-         selectedItems = rawDataView.getSelectedTourIDs().toArray();
+         selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
       }
 
       return selectedItems;
