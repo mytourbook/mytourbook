@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2431,6 +2431,9 @@ public class ColumnManager {
    private void setColumnIdAndWidth(final ArrayList<String> columnIdsAndWidth, final String columnId, int columnWidth) {
 
       final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+      if (colDef == null) {
+         return;
+      }
 
       if (colDef.isColumnHidden()) {
 
