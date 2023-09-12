@@ -40,10 +40,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 public class Utils {
 
    public static final String DIRECTORY               = "Directory";                                          //$NON-NLS-1$
+   public static final String TOOLS                   = "Tools ";                                             //$NON-NLS-1$
    public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                        //$NON-NLS-1$
+
    public static final String MAPPROPERTIES_VIEW_NAME = PluginProperties.getText("view_name_map_properties"); //$NON-NLS-1$
    public static final String STATISTICS_VIEW_NAME    = PluginProperties.getText("view_name_Statistics");     //$NON-NLS-1$
-   public static final String TOOLS                   = "Tools ";                                             //$NON-NLS-1$
+   public static final String TAGGEDTOURS_VIEW_NAME   = PluginProperties.getText("view_name_tagView");        //$NON-NLS-1$
    public static final String TOURANALYZER_VIEW_NAME  = PluginProperties.getText("view_name_Analyzer");       //$NON-NLS-1$
    public static final String TOURBLOG_VIEW_NAME      = PluginProperties.getText("View_Name_TourBlog");       //$NON-NLS-1$
    public static final String TOURBOOK_VIEW_NAME      = PluginProperties.getText("view_name_Book");           //$NON-NLS-1$
