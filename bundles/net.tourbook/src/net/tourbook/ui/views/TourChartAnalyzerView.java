@@ -767,15 +767,17 @@ public class TourChartAnalyzerView extends ViewPart {
          return;
       }
 
-      if (selection instanceof final SelectionChartInfo chartInfo) {
+      if (selection instanceof SelectionChartInfo) {
 
-         updateInfo(chartInfo, false);
+         updateInfo((SelectionChartInfo) selection, false);
 
-      } else if (selection instanceof final SelectionChartXSliderPosition sliderPosition) {
+      } else if (selection instanceof SelectionChartXSliderPosition) {
 
-         updateInfo(sliderPosition);
+         updateInfo(((SelectionChartXSliderPosition) selection));
 
-      } else if (selection instanceof final SelectionTourData selectionTourData) {
+      } else if (selection instanceof SelectionTourData) {
+
+         final SelectionTourData selectionTourData = (SelectionTourData) selection;
 
          TourChart tourChart = selectionTourData.getTourChart();
 
@@ -791,9 +793,9 @@ public class TourChartAnalyzerView extends ViewPart {
 
          updateInfo();
 
-      } else if (selection instanceof final SelectionTourChart selectionTourChart) {
+      } else if (selection instanceof SelectionTourChart) {
 
-         final TourChart tourChart = selectionTourChart.getTourChart();
+         final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
 
          if (tourChart != null) {
             updateInfo(tourChart.getChartInfo(), false);
