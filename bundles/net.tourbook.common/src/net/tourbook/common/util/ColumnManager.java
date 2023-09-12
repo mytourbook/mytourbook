@@ -1633,11 +1633,8 @@ public class ColumnManager {
             if (table.isDisposed()) {
                return null;
             }
-            try {
-               columnOrder = table.getColumnOrder();
-            } catch (final Exception e) {
-               StatusUtil.log(e);
-            }
+            columnOrder = table.getColumnOrder();
+
          } else if (_columnViewer instanceof TreeViewer) {
 
             final Tree tree = ((TreeViewer) _columnViewer).getTree();
