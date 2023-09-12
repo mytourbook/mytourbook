@@ -34,13 +34,14 @@ public class TourChartAnalyzerViewTests extends UITest {
 
    @Test
    void testAnalyzerView_Basic() {
-
-      Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
-
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+      
+ final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
+      
+      Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
 
+   
       final SWTBotView tourAnalyzerView = getTourAnalyzerView();
 
       //Change the measurement system to imperial
