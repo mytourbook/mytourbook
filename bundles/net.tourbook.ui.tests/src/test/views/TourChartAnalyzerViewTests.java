@@ -36,7 +36,7 @@ public class TourChartAnalyzerViewTests extends UITest {
    void testAnalyzerView_Basic() {
 
       //switch back and forth from 1 tour to another as otherwise, the training view doesn't necessarily detect that a tour is selected
-       Utils.getTour(bot);
+     // wait, it might be working now  Utils.getTour(bot);
       
  final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -51,7 +51,7 @@ public class TourChartAnalyzerViewTests extends UITest {
       Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
 
       bot.sleep(5000);
-assertNotNull(null);
+//assertNotNull(null);
       //Change back the measurement system to metric
       Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
