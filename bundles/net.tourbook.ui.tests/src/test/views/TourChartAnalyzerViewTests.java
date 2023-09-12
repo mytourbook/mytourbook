@@ -29,7 +29,10 @@ public class TourChartAnalyzerViewTests extends UITest {
 //   @AfterAll
 //   @Override
 //   public void cleanUp() {
-//       // empty or add your implementation
+//      // empty or add your implementation
+//      final var toto = 2;
+//      final SWTBotView tourAnalyzerView = getTourAnalyzerView();
+//      tourAnalyzerView.close();
 //   }
 
    private SWTBotView getTourAnalyzerView() {
@@ -45,10 +48,10 @@ public class TourChartAnalyzerViewTests extends UITest {
  final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
-      
+
       Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
 
-   
+
       final SWTBotView tourAnalyzerView = getTourAnalyzerView();
 
       //Change the measurement system to imperial
