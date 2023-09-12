@@ -26,6 +26,12 @@ import utils.Utils;
 
 public class TourChartAnalyzerViewTests extends UITest {
 
+//   @AfterAll
+//   @Override
+//   public void cleanUp() {
+//       // empty or add your implementation
+//   }
+
    private SWTBotView getTourAnalyzerView() {
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURANALYZER_VIEW_NAME);
@@ -47,7 +53,7 @@ public class TourChartAnalyzerViewTests extends UITest {
       Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
 
       bot.sleep(5000);
-assertNotNull(null);
+      assertNotNull(null);
       //Change back the measurement system to metric
       Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
