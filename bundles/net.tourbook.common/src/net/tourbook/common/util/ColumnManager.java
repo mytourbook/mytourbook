@@ -122,7 +122,7 @@ public class ColumnManager {
    private static final String ATTR_VISIBLE_COLUMN_IDS                   = "visibleColumnIds";                  //$NON-NLS-1$
    private static final String ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH         = "visibleColumnIdsAndWidth";          //$NON-NLS-1$
    //
-   static final String         COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
+   private static final String COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
    static final String         COLUMN_TEXT_SEPARATOR                     = "   \u00B7   ";                      //$NON-NLS-1$
 
    /**
@@ -3126,7 +3126,7 @@ public class ColumnManager {
    /**
     * Read the sorting order and column width from the viewer/nattable.
     */
-   public void setVisibleColumnIds_FromViewer() {
+   private void setVisibleColumnIds_FromViewer() {
 
       final String[] visibleColumnIds = getColumns_FromViewer_Ids();
 
