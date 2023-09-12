@@ -24,6 +24,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
+import net.tourbook.Messages;
+import net.tourbook.application.PluginProperties;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -37,17 +39,26 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   public static final String DIRECTORY               = "Directory";                                                          //$NON-NLS-1$
-   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                                        //$NON-NLS-1$
-   public static final String STATISTICS_VIEW_NAME    = "Statistics";                                                         //$NON-NLS-1$
-   public static final String TOOLS                   = "Tools ";                                                             //$NON-NLS-1$
-   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                                                          //$NON-NLS-1$
-   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                                        //$NON-NLS-1$
-   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                                                       //$NON-NLS-1$
-   public static final String TOURPAUSES_VIEW_NAME    = "Tour Pauses";                                                        //$NON-NLS-1$
-   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";                                                     //$NON-NLS-1$
+   public static final String DIRECTORY               = "Directory";                                      //$NON-NLS-1$
+   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                    //$NON-NLS-1$
+   public static final String STATISTICS_VIEW_NAME    = PluginProperties.getText("view_name_Statistics"); //$NON-NLS-1$
+   public static final String TOOLS                   = "Tools ";                                         //$NON-NLS-1$
+   public static final String TOURBOOK_VIEW_NAME      = PluginProperties.getText("view_name_Book");       //$NON-NLS-1$
+   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                    //$NON-NLS-1$
+   public static final String TOURMARKERS_VIEW_NAME   = PluginProperties.getText("view_name_Marker");     //$NON-NLS-1$
+   public static final String TOURPAUSES_VIEW_NAME    = PluginProperties.getText("View_Name_TourPauses"); //$NON-NLS-1$
+   public static final String TOURSEGMENTER_VIEW_NAME = PluginProperties.getText("view_name_Segmenter");  //$NON-NLS-1$
 
-   public static final String workingDirectory        = System.getProperty("user.dir");                                       //$NON-NLS-1$
+   public static final String workingDirectory        = System.getProperty("user.dir");                   //$NON-NLS-1$
+
+   public static void changeMeasurementSystem(final SWTWorkbenchBot bot, final String measurementSystem) {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
+      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+      bot.comboBox(0).setSelection(measurementSystem);
+      Utils.clickApplyAndCloseButton(bot);
+   }
 
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
 
@@ -69,9 +80,19 @@ public class Utils {
       clickButton(IDialogConstants.CLOSE_LABEL, bot);
    }
 
+   public static void clickNoButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.NO_LABEL, bot);
+   }
+
    public static void clickOkButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.OK_LABEL, bot);
+   }
+
+   public static void clickYesButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.YES_LABEL, bot);
    }
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
@@ -80,6 +101,17 @@ public class Utils {
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   3").expand() //$NON-NLS-1$
             .getNode("Jan   3").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
+   public static SWTBotTreeItem getTourWithSeveralPauses(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       return tour;

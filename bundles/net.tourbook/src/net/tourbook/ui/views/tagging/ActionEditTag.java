@@ -59,9 +59,9 @@ class ActionEditTag extends Action {
       /*
        * Open dialog
        */
-      if (viewerCellData instanceof TVITagView_Tag) {
+      if (viewerCellData instanceof TVITaggingView_Tag) {
 
-         final TVITagView_Tag tourTagItem = ((TVITagView_Tag) viewerCellData);
+         final TVITaggingView_Tag tourTagItem = ((TVITaggingView_Tag) viewerCellData);
 
          final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
@@ -77,12 +77,12 @@ class ActionEditTag extends Action {
             return;
          }
 
-      } else if (viewerCellData instanceof TVITagView_TagCategory) {
+      } else if (viewerCellData instanceof TVITaggingView_TagCategory) {
 
-         final TVITagView_TagCategory tagCategoryItem = (TVITagView_TagCategory) viewerCellData;
+         final TVITaggingView_TagCategory tagCategoryItem = (TVITaggingView_TagCategory) viewerCellData;
 
          final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
-         final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getCategoryId());
+         final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getTourTagCategory().getCategoryId());
 
          dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_EditCategory_Message, tagCategory.getCategoryName());
 
@@ -106,24 +106,24 @@ class ActionEditTag extends Action {
 
          final ColumnViewer tagViewer = _tourViewer.getViewer();
 
-         if (viewerCellData instanceof TVITagView_Tag) {
+         if (viewerCellData instanceof TVITaggingView_Tag) {
 
             // update model
             final TourTag tourTag = finalTourTag[0];
             TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
 
             // update UI
-            final TVITagView_Tag tourTagItem = ((TVITagView_Tag) viewerCellData);
+            final TVITaggingView_Tag tourTagItem = ((TVITaggingView_Tag) viewerCellData);
             tagViewer.update(tourTagItem, null);
 
-         } else if (viewerCellData instanceof TVITagView_TagCategory) {
+         } else if (viewerCellData instanceof TVITaggingView_TagCategory) {
 
             // update model
             final TourTagCategory tagCategory = finalTagCategory[0];
             TourDatabase.saveEntity(tagCategory, tagCategory.getCategoryId(), TourTagCategory.class);
 
             // update UI
-            final TVITagView_TagCategory tagCategory_Item = ((TVITagView_TagCategory) viewerCellData);
+            final TVITaggingView_TagCategory tagCategory_Item = ((TVITaggingView_TagCategory) viewerCellData);
             tagViewer.update(tagCategory_Item, null);
          }
 

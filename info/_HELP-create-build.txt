@@ -18,10 +18,11 @@ AND REVIEW IT MANUALLY IN ALL MODIFIED FILES, subversions must not be modified e
  One Click build process (since 18.1)
 #####################################
 
+* Set java path in C:\Users\Wolfgang\.gradle\gradle.properties
 * Set version number in gradle.properties in the .git root
 * Set version number as described below (Build with POM)
 
-* Run "gradlew" in "C:\DAT\MT\mytourbook\build\build.net.tourbook" this will run the default task
+Run "gradlew" in "C:\DAT\MT\mytourbook\build\build.net.tourbook" this will run the default task
 
 
 Setup to run gradle:
@@ -33,7 +34,7 @@ Setup to run gradle:
 
 Setup the graddle wrapper in the build folder:
 
-   gradle wrapper --gradle-version 6.9
+   gradlew wrapper --gradle-version 8.2.1
 
 
 #################
@@ -89,7 +90,7 @@ Setup the graddle wrapper in the build folder:
  Update Eclipse NL repo
 ###########################
 
-see "build\build.eclipse.4.14.nl.repo\How to update this p2 repo.txt"
+see "build\build.eclipse.4.23.nl.repo\How to update this p2 repo.txt"
 
 
 

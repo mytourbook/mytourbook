@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
-public class DataProvider_Tour_Week extends DataProvider {
+class DataProvider_Tour_Week extends DataProvider {
 
    private TourStatisticData_Week _tourWeekData;
 
@@ -78,7 +78,9 @@ public class DataProvider_Tour_Week extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
 
             + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
+
             + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
+            + STAT_VALUE_ELEVATION_DOWN.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead1()
 
@@ -101,7 +103,9 @@ public class DataProvider_Tour_Week extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getHead2()
 
             + STAT_VALUE_MOTION_DISTANCE.getHead2()
+
             + STAT_VALUE_ELEVATION_UP.getHead2()
+            + STAT_VALUE_ELEVATION_DOWN.getHead2()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead2()
 
@@ -124,7 +128,9 @@ public class DataProvider_Tour_Week extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getValueFormatting()
 
             + STAT_VALUE_MOTION_DISTANCE.getValueFormatting()
+
             + STAT_VALUE_ELEVATION_UP.getValueFormatting()
+            + STAT_VALUE_ELEVATION_DOWN.getValueFormatting()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getValueFormatting()
 
@@ -257,7 +263,9 @@ public class DataProvider_Tour_Week extends DataProvider {
                      _tourWeekData.breakTime[tourTypeIndex][weekIndex],
 
                      _tourWeekData.distance_High[tourTypeIndex][weekIndex] / 1000,
+
                      _tourWeekData.elevationUp_High[tourTypeIndex][weekIndex],
+                     _tourWeekData.elevationDown_High[tourTypeIndex][weekIndex],
 
                      numTours
 
@@ -323,7 +331,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
          String fromTourData;
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
 
@@ -350,6 +358,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                   + "      TourDistance," + NL //                                                        //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                           //$NON-NLS-1$
+                  + "      TourAltDown," + NL //                                                           //$NON-NLS-1$
 
                   + "      TourType_TypeId," + NL //                                                      //$NON-NLS-1$
 
@@ -399,11 +408,12 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                + "   SUM(TourDistance)," + NL //                              9  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                                 10 //$NON-NLS-1$
+               + "   SUM(TourAltDown)," + NL //                               11 //$NON-NLS-1$
 
-               + "   SUM(1)," + NL //                                          11 //$NON-NLS-1$
+               + "   SUM(1)," + NL //                                         12 //$NON-NLS-1$
 
-               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
-               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyWeight = 0    THEN NULL ELSE BodyWeight END)," + NL //  13 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0       THEN NULL ELSE BodyFat END)" + NL //      14 //$NON-NLS-1$
 
                + fromTourData
 
@@ -429,7 +439,9 @@ public class DataProvider_Tour_Week extends DataProvider {
          final int[][] allDbBreakTime = new int[numTourTypes][numAllWeeks];
 
          final float[][] allDbDistance = new float[numTourTypes][numAllWeeks];
-         final float[][] allDbElevation = new float[numTourTypes][numAllWeeks];
+
+         final float[][] allDbElevationUp = new float[numTourTypes][numAllWeeks];
+         final float[][] allDbElevationDown = new float[numTourTypes][numAllWeeks];
 
          final float[][] allDbNumTours = new float[numTourTypes][numAllWeeks];
 
@@ -497,12 +509,13 @@ public class DataProvider_Tour_Week extends DataProvider {
             final int dbValue_DurationTime      = result.getInt(8);
 
             final int dbValue_Distance          = (int) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_Elevation         = (int) (result.getInt(10) / UI.UNIT_VALUE_ELEVATION);
+            final int dbValue_ElevationUp       = (int) (result.getInt(10) / UI.UNIT_VALUE_ELEVATION);
+            final int dbValue_ElevationDown     = (int) (result.getInt(11) / UI.UNIT_VALUE_ELEVATION);
 
-            final int dbValue_NumTours          = result.getInt(11);
+            final int dbValue_NumTours          = result.getInt(12);
 
-            final float dbValue_BodyWeight      = result.getFloat(12) * UI.UNIT_VALUE_WEIGHT;
-            final float dbValue_BodyFat         = result.getFloat(13);
+            final float dbValue_BodyWeight      = result.getFloat(13) * UI.UNIT_VALUE_WEIGHT;
+            final float dbValue_BodyFat         = result.getFloat(14);
 
 // SET_FORMATTING_ON
 
@@ -533,7 +546,9 @@ public class DataProvider_Tour_Week extends DataProvider {
             allDbDurationTime[colorIndex][weekIndex] = dbValue_DurationTime;
 
             allDbDistance[colorIndex][weekIndex] = dbValue_Distance;
-            allDbElevation[colorIndex][weekIndex] = dbValue_Elevation;
+
+            allDbElevationUp[colorIndex][weekIndex] = dbValue_ElevationUp;
+            allDbElevationDown[colorIndex][weekIndex] = dbValue_ElevationDown;
 
             allDbNumTours[colorIndex][weekIndex] = dbValue_NumTours;
 
@@ -565,7 +580,9 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.distance_High = allDbDistance;
 
          _tourWeekData.elevationUp_Low = new float[numTourTypes][numAllWeeks];
-         _tourWeekData.elevationUp_High = allDbElevation;
+         _tourWeekData.elevationUp_High = allDbElevationUp;
+         _tourWeekData.elevationDown_Low = new float[numTourTypes][numAllWeeks];
+         _tourWeekData.elevationDown_High = allDbElevationDown;
 
          _tourWeekData.numTours_Low = new float[numTourTypes][numAllWeeks];
          _tourWeekData.numTours_High = allDbNumTours;

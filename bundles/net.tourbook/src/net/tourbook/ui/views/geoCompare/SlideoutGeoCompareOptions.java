@@ -67,8 +67,6 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
    private static IDialogSettings        _state;
 
    private SelectionListener             _compareSelectionListener;
-   private MouseWheelListener            _compareMouseWheelListener10;
-   private MouseWheelListener            _compareMouseWheelListener100;
    private MouseWheelListener            _mapOptions_MouseWheelListener;
    private IPropertyChangeListener       _mapOptions_PropertyListener;
    private SelectionListener             _mapOptions_SelectionListener;
@@ -261,7 +259,10 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
                _spinnerGeo_DistanceInterval.setMaximum(1_000);
                _spinnerGeo_DistanceInterval.setPageIncrement(10);
                _spinnerGeo_DistanceInterval.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_DistanceInterval.addMouseWheelListener(_compareMouseWheelListener10);
+               _spinnerGeo_DistanceInterval.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+                  onChange_CompareParameter();
+               });
                gridData_EndFill.applyTo(_spinnerGeo_DistanceInterval);
 
                _secondColumnControls.add(_spinnerGeo_DistanceInterval);
@@ -289,9 +290,12 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
                _spinnerGeo_Accuracy = new Spinner(container, SWT.BORDER);
                _spinnerGeo_Accuracy.setMinimum(100);
                _spinnerGeo_Accuracy.setMaximum(100_000);
-               _spinnerGeo_Accuracy.setPageIncrement(100);
+               _spinnerGeo_Accuracy.setPageIncrement(1000);
                _spinnerGeo_Accuracy.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_Accuracy.addMouseWheelListener(_compareMouseWheelListener100);
+               _spinnerGeo_Accuracy.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1000);
+                  onChange_CompareParameter();
+               });
 
                _secondColumnControls.add(_spinnerGeo_Accuracy);
             }
@@ -439,14 +443,6 @@ class SlideoutGeoCompareOptions extends AdvancedSlideout implements IColorSelect
       parent.addDisposeListener(disposeEvent -> onDisposeSlideout());
 
       _compareSelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_CompareParameter());
-      _compareMouseWheelListener10 = mouseEvent -> {
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-         onChange_CompareParameter();
-      };
-      _compareMouseWheelListener100 = mouseEvent -> {
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 100);
-         onChange_CompareParameter();
-      };
 
       _mapOptions_SelectionListener = widgetSelectedAdapter(selectionEvent -> onChange_MapOptions());
       _mapOptions_MouseWheelListener = mouseEvent -> {

@@ -148,6 +148,16 @@ public class UI {
     */
    public static final String            VIEW_COLOR_DATE_SUB_CATEGORY    = "VIEW_COLOR_DATE_SUB_CATEGORY";    //$NON-NLS-1$
 
+   /**
+    * Color for normal, not categorized tour values
+    */
+   public static final String            VIEW_COLOR_TOUR                 = "VIEW_COLOR_TOUR";                 //$NON-NLS-1$
+
+   /**
+    * Color for totals or number of ...
+    */
+   public static final String            VIEW_COLOR_TOTAL                = "VIEW_COLOR_TOTAL";                //$NON-NLS-1$
+
    public static final String            SYMBOL_AVERAGE                  = "\u00f8";                          //$NON-NLS-1$
    public static final String            SYMBOL_AVERAGE_WITH_SPACE       = "\u00f8 ";                         //$NON-NLS-1$
    public static final String            SYMBOL_DASH                     = "-";                               //$NON-NLS-1$
@@ -185,11 +195,14 @@ public class UI {
    private static DateFormat             _dateFormatterShort;
    private static DateFormat             _timeFormatterShort;
 
-   public static Styler                  TAG_STYLER;
-   public static Styler                  TAG_CATEGORY_STYLER;
-   public static Styler                  TAG_SUB_STYLER;
+   public static Styler                  CONTENT_SUB_CATEGORY_STYLER;
+   public static Styler                  CONTENT_CATEGORY_STYLER;
+   public static Styler                  DATE_CATEGORY_STYLER;
+   public static Styler                  TOUR_STYLER;
+   public static Styler                  TOTAL_STYLER;
 
    private static final String           DEFAULT_MONO_FONT               = "Courier";                         //$NON-NLS-1$
+
    private static Font                   _fontForLogging;
 
    static {
@@ -227,11 +240,13 @@ public class UI {
       IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,  TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       /*
-       * set tag styler
+       * Set stylers for the view colors, the color is retrieved every time from the color registry
        */
-      TAG_CATEGORY_STYLER  = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_CATEGORY,      null);
-      TAG_STYLER           = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_SUB_CATEGORY,  null);
-      TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_CATEGORY,         null);
+      CONTENT_CATEGORY_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_CATEGORY,      null);
+      CONTENT_SUB_CATEGORY_STYLER   = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_SUB_CATEGORY,  null);
+      DATE_CATEGORY_STYLER          = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_CATEGORY,         null);
+      TOUR_STYLER                   = StyledString.createColorRegistryStyler(VIEW_COLOR_TOUR,                  null);
+      TOTAL_STYLER                  = StyledString.createColorRegistryStyler(VIEW_COLOR_TOTAL,                 null);
 
 // SET_FORMATTING_ON
    }
@@ -775,8 +790,17 @@ public class UI {
    public static String getTourTypeLabel(final long tourTypeId) {
 
       for (final TourType tourType : TourDatabase.getAllTourTypes()) {
+
          if (tourType.getTypeId() == tourTypeId) {
-            return tourType.getName();
+
+            String tourTypeText = tourType.getName();
+
+            if (net.tourbook.common.UI.IS_SCRAMBLE_DATA) {
+
+               tourTypeText = net.tourbook.common.UI.scrambleText(tourTypeText);
+            }
+
+            return tourTypeText;
          }
       }
 
@@ -1041,6 +1065,32 @@ public class UI {
                   : Util.getStateRGB(state,
                         PrefPageViewColors.STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,
                         PrefPageViewColors.STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK));
+
+      // tour
+      colorRegistry.put(VIEW_COLOR_TOUR,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOUR_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOUR_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOUR_DEFAULT_DARK));
+
+      // total
+      colorRegistry.put(VIEW_COLOR_TOTAL,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK));
    }
 
    public static GridData setWidth(final Control control, final int width) {
@@ -1059,25 +1109,11 @@ public class UI {
 
    public static void showSQLException(final SQLException ex) {
 
-      Display.getDefault().asyncExec(() -> {
-
-         SQLException e = ex;
-
-         while (e != null) {
-
-            final String sqlExceptionText = Util.getSQLExceptionText(e);
-
-            // log also the stacktrace
-            StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
-
-            MessageDialog.openError(
-                  Display.getDefault().getActiveShell(),
-                  "SQL Error", //$NON-NLS-1$
-                  sqlExceptionText);
-
-            e = e.getNextException();
-         }
-      });
+      /**
+       * Redirect to common code, once upon when all old showSQLException are using this from the
+       * common code, this method should be deleted
+       */
+      net.tourbook.common.UI.showSQLException(ex);
    }
 
    /**
@@ -1095,11 +1131,11 @@ public class UI {
 
       chart.updateProperties(
 
-            Util.getPrefixPrefInt(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
-            Util.getPrefixPrefInt(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
+            Util.getPrefixPref_Int(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
+            Util.getPrefixPref_Int(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
 
-            Util.getPrefixPrefBoolean(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-            Util.getPrefixPrefBoolean(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+            Util.getPrefixPref_Boolean(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+            Util.getPrefixPref_Boolean(_prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
 
             _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR),
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR),

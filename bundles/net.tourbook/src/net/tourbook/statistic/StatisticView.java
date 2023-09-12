@@ -781,7 +781,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          String sqlFromTourData;
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
@@ -1199,7 +1199,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final String[] stackedNames = statContext.outBarNames;
 
       // hide combo when bars are not available
-      if (stackedNames == null) {
+      if (stackedNames == null || stackedNames.length == 0) {
 
          _comboBarVerticalOrder.setEnabled(false);
          _isVerticalOrderDisabled = true;

@@ -50,22 +50,22 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-   private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";             //$NON-NLS-1$
+   private static final String                MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";             //$NON-NLS-1$
 
-   private static final IPreferenceStore     _prefStore_Common               = CommonActivator.getPrefStore();
+   private static final IPreferenceStore      _prefStore_Common               = CommonActivator.getPrefStore();
 
-   private IWorkbenchWindow                  _window;
+   private IWorkbenchWindow                   _window;
 
-   private IWorkbenchAction                  _actionAbout;
-   private IWorkbenchAction                  _actionPerspective_Save;
-   private IWorkbenchAction                  _actionPerspective_Reset;
-   private IWorkbenchAction                  _actionPerspective_Close;
-   private IWorkbenchAction                  _actionPerspective_CloseAll;
-   private IWorkbenchAction                  _actionPreferences;
-   private IWorkbenchAction                  _actionQuit;
+   private IWorkbenchAction                   _actionAbout;
+   private IWorkbenchAction                   _actionPerspective_Save;
+   private IWorkbenchAction                   _actionPerspective_Reset;
+   private IWorkbenchAction                   _actionPerspective_Close;
+   private IWorkbenchAction                   _actionPerspective_CloseAll;
+   private IWorkbenchAction                   _actionPreferences;
+   private IWorkbenchAction                   _actionQuit;
 
-   private ActionContributionItem            _actionContribItem_Preferences;
-   private ActionContributionItem            _actionContribItem_Quit;
+   private ActionContributionItem             _actionContribItem_Preferences;
+   private ActionContributionItem             _actionContribItem_Quit;
 
    /**
     * Customize perspective is disabled, because when the dialog is closed, the tour type UI
@@ -76,17 +76,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     */
 // private IWorkbenchAction                  _actionEditActionSets;
 
-   private ActionTourDataFilter              _actionTourFilter_Data;
-   private ActionTourGeoFilter               _actionTourFilter_Geo;
-   private ActionTourTagFilter               _actionTourFilter_Tag;
+   private ActionTourDataFilter               _actionTourFilter_Data;
+   private ActionTourGeoFilter                _actionTourFilter_Geo;
+   private ActionTourTagFilter                _actionTourFilter_Tag;
 
-   private MeasurementSystemContributionItem _contribItem_MeasurementSystem;
-   private PersonContributionItem            _contribItem_PersonSelector;
-   private RestartAppContributionItem        _contribItem_RestartApp;
-   private ThemeSelectorContributionItem     _contribItem_ThemeSelector;
-   private TourTypeContributionItem          _contribItem_TourType;
+   private ContributionItem_MeasurementSystem _contribItem_MeasurementSystem;
+   private ContributionItem_Person            _contribItem_PersonSelector;
+   private ContributionItem_RestartApp        _contribItem_RestartApp;
+   private ContributionItem_ScrambleData      _contribItem_ScrambleData;
+   private ContributionItem_ThemeSelector     _contribItem_ThemeSelector;
+   private ContributionItem_TourType          _contribItem_TourType;
 
-   private ActionOtherViews                  _actionOtherViews;
+   private ActionOtherViews                   _actionOtherViews;
 
    public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
       super(configurer);
@@ -302,16 +303,30 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
       {
          /*
-          * Toolbar: Restart app
+          * Toolbar: Restart app, scramble data
           */
          final boolean isShowRestartApp = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
-         if (isShowRestartApp) {
+         final boolean isShowScambleData = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP);
+
+         if (isShowRestartApp || isShowScambleData) {
 
             final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-            tbMgr.add(_contribItem_RestartApp);
 
-            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
-            coolBarMgr.add(tbContribItem);
+            if (isShowRestartApp) {
+
+               tbMgr.add(_contribItem_RestartApp);
+
+               final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
+               coolBarMgr.add(tbContribItem);
+            }
+
+            if (isShowScambleData) {
+
+               tbMgr.add(_contribItem_ScrambleData);
+
+               final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "scambleData"); //$NON-NLS-1$
+               coolBarMgr.add(tbContribItem);
+            }
          }
       }
 
@@ -334,7 +349,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       menuBar.add(createMenu_50_Help());
    }
 
-   public PersonContributionItem getPersonSelector() {
+   public ContributionItem_Person getPersonSelector() {
 
       return _contribItem_PersonSelector;
    }
@@ -352,11 +367,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       _actionTourFilter_Geo            = new ActionTourGeoFilter();
       _actionTourFilter_Tag            = new ActionTourTagFilter();
 
-      _contribItem_MeasurementSystem   = new MeasurementSystemContributionItem();
-      _contribItem_PersonSelector      = new PersonContributionItem();
-      _contribItem_RestartApp          = new RestartAppContributionItem();
-      _contribItem_ThemeSelector       = new ThemeSelectorContributionItem();
-      _contribItem_TourType            = new TourTypeContributionItem();
+      _contribItem_MeasurementSystem   = new ContributionItem_MeasurementSystem();
+      _contribItem_PersonSelector      = new ContributionItem_Person();
+      _contribItem_RestartApp          = new ContributionItem_RestartApp();
+      _contribItem_ScrambleData        = new ContributionItem_ScrambleData();
+      _contribItem_ThemeSelector       = new ContributionItem_ThemeSelector();
+      _contribItem_TourType            = new ContributionItem_TourType();
 
       _actionQuit = ActionFactory.QUIT.create(window);
       register(_actionQuit);

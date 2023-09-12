@@ -26,7 +26,7 @@ import net.tourbook.ui.UI;
 
 public class TVITourBookYearCategorized extends TVITourBookItem {
 
-   private TourBookViewLayout _category;
+   private TourBookViewLayout _viewLayout;
 
    public TVITourBookYearCategorized(final TourBookView view,
                                      final TVITourBookItem parentItem,
@@ -34,7 +34,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
       super(view);
 
-      _category = itemType;
+      _viewLayout = itemType;
 
       setParentItem(parentItem);
    }
@@ -51,7 +51,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
       String sumYear = UI.EMPTY_STRING;
       String sumYearSub = UI.EMPTY_STRING;
 
-      if (_category == TourBookViewLayout.CATEGORY_WEEK) {
+      if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
 
          // categorize by week
 
@@ -66,7 +66,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
 
-      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
       final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
@@ -120,7 +120,23 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
    }
 
    public TourBookViewLayout getCategory() {
-      return _category;
+      return _viewLayout;
    }
 
+   @Override
+   public String toString() {
+
+      return NL
+
+            + "TVITourBookYearCategorized" + NL //             //$NON-NLS-1$
+
+            + "[" + NL //                                      //$NON-NLS-1$
+
+            + "tourYear    = " + tourYear + NL //              //$NON-NLS-1$
+            + "tourYearSub = " + tourYearSub + NL //           //$NON-NLS-1$
+            + "_viewLayout = " + _viewLayout + NL //           //$NON-NLS-1$
+
+            + "]" + NL //                                      //$NON-NLS-1$
+      ;
+   }
 }

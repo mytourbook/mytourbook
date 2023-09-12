@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,8 @@ public class ChartDataYSerie extends ChartDataSerie {
     */
    public static final int        BAR_LAYOUT_BESIDE                 = 3;
 
-   public static final String     YDATA_INFO                        = "yDataInfo";                //$NON-NLS-1$
+   public static final String     YDATA_GRAPH_ID                    = "yDataGraphID";             //$NON-NLS-1$
+   public static final String     CLONE_MIN_MAX_VALUES_GRAPH_ID     = "cloneMinMaxValuesGraphID"; //$NON-NLS-1$
 
    public static final int        FILL_METHOD_NO                    = 0;
    public static final int        FILL_METHOD_FILL_BOTTOM           = 1;
@@ -112,7 +113,7 @@ public class ChartDataYSerie extends ChartDataSerie {
     * Mostly the top slider
     */
    private ChartYSlider           _ySlider1;
-   
+
    /**
     * Mostly the bottom Slider
     */
@@ -146,6 +147,11 @@ public class ChartDataYSerie extends ChartDataSerie {
    private boolean                _isShowBarsMoreVisible;
 
    /**
+    * Width/height when a sympol is displayed
+    */
+   private int                    _symbolSize                       = 8;
+
+   /**
     * When this value is > 0 a line chart will not draw a line to the next value point when the
     * difference in the x-data values is greater than this value.
     * <p>
@@ -161,7 +167,9 @@ public class ChartDataYSerie extends ChartDataSerie {
     *           When <code>true</code> then 0 values will be ignored when computing min/max
     *           values.
     */
-   public ChartDataYSerie(final ChartType chartType, final float[] valueSerie, final boolean isIgnoreZero) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[] valueSerie,
+                          final boolean isIgnoreZero) {
 
       _chartType = chartType;
       _isIgnoreMinMaxZero = isIgnoreZero;
@@ -169,14 +177,19 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(new float[][] { valueSerie });
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[] lowValueSerie,
+                          final float[] highValueSerie) {
 
       _chartType = chartType;
 
       setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[] lowValueSerie, final float[] highValueSerie, final boolean isIgnoreZero) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[] lowValueSerie,
+                          final float[] highValueSerie,
+                          final boolean isIgnoreZero) {
 
       _chartType = chartType;
       _isIgnoreMinMaxZero = isIgnoreZero;
@@ -184,14 +197,17 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(new float[][] { lowValueSerie }, new float[][] { highValueSerie });
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[][] valueSeries) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[][] valueSeries) {
 
       _chartType = chartType;
 
       setMinMaxValues(valueSeries);
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[][] valueSerie, final boolean isIgnoreZero) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[][] valueSerie,
+                          final boolean isIgnoreZero) {
 
       _chartType = chartType;
       _isIgnoreMinMaxZero = isIgnoreZero;
@@ -199,7 +215,9 @@ public class ChartDataYSerie extends ChartDataSerie {
       setMinMaxValues(valueSerie);
    }
 
-   public ChartDataYSerie(final ChartType chartType, final float[][] lowValueSeries, final float[][] highValueSeries) {
+   public ChartDataYSerie(final ChartType chartType,
+                          final float[][] lowValueSeries,
+                          final float[][] highValueSeries) {
 
       _chartType = chartType;
 
@@ -411,6 +429,10 @@ public class ChartDataYSerie extends ChartDataSerie {
       return _sliderMinMaxValue;
    }
 
+   public int getSymbolSize() {
+      return _symbolSize;
+   }
+
    public String getXTitle() {
       return null;
    }
@@ -460,7 +482,7 @@ public class ChartDataYSerie extends ChartDataSerie {
     * <code>true</code>: the direction is from bottom to top by increasing number <br>
     * <code>false</code>: the direction is from top to bottom by increasing number
     */
-   public boolean isYAxisDirection() {
+   public boolean isYAxis_Bottom2Top() {
       return _yAxisDirection;
    }
 
@@ -546,7 +568,8 @@ public class ChartDataYSerie extends ChartDataSerie {
                || _chartType == ChartType.LINE_WITH_BARS
                || _chartType == ChartType.HORIZONTAL_BAR
                || _chartType == ChartType.XY_SCATTER
-               || _chartType == ChartType.HISTORY) {
+               || _chartType == ChartType.HISTORY
+               || _chartType == ChartType.SYMBOL) {
 
             setMinMaxValues_Line(valueSeries);
 
@@ -844,6 +867,10 @@ public class ChartDataYSerie extends ChartDataSerie {
    public void setSliderMinMaxValue(final float[] sliderMinMaxValue) {
 
       _sliderMinMaxValue = sliderMinMaxValue;
+   }
+
+   public void setSymbolSize(final int symbolSize) {
+      _symbolSize = symbolSize;
    }
 
    /**

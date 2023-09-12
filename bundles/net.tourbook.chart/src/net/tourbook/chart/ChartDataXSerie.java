@@ -43,16 +43,17 @@ public class ChartDataXSerie extends ChartDataSerie {
    /**
     * End value for the x-axis or {@link Double#MIN_VALUE} when not set.
     */
-   private double                 _xAxisMaxValueForced   = Double.MIN_VALUE;
+   private double                 _xAxisMaxValueForced     = Double.MIN_VALUE;
 
    /**
-    * Index in the x-data at which the graph is painted in the marker color, <code>-1</code>
+    * Start index in the x-data at which the graph is painted in the marker color, <code>-1</code>
     * disables the synch marker
     */
    private int                    _xValueMarker_StartIndex = -1;
 
    /**
-    * Index in the x-data at which the graph is stoped to painted in the marker color
+    * End index in the x-data at which the graph is painted in the marker color, <code>-1</code>
+    * disables the synch marker
     */
    private int                    _xValueMarker_EndIndex   = -1;
 
@@ -77,9 +78,9 @@ public class ChartDataXSerie extends ChartDataSerie {
     * Scaling for the x-axis which is computed with {@link Math#pow(double, double)} when this
     * value is <code>!= 1</code>. Extended scaling is used in the conconi view.
     */
-   private double                 _scalingFactor         = 1;
+   private double                 _scalingFactor           = 1;
 
-   private double                 _scalingMaxValue       = 1;
+   private double                 _scalingMaxValue         = 1;
 
    /**
     * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,

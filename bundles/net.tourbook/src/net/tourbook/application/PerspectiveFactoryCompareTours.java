@@ -16,8 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.ui.views.referenceTour.ElevationCompareResultView;
-import net.tourbook.ui.views.referenceTour.RefTour_ComparedTourView;
-import net.tourbook.ui.views.referenceTour.RefTour_ReferenceTourView;
+import net.tourbook.ui.views.referenceTour.ComparedTourChartView;
+import net.tourbook.ui.views.referenceTour.ReferenceTourChartView;
 import net.tourbook.ui.views.referenceTour.ReferenceTimelineView;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 
@@ -41,8 +41,8 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
       layout.addShowViewShortcut(ElevationCompareResultView.ID);
       layout.addShowViewShortcut(ReferenceTourView.ID);
-      layout.addShowViewShortcut(RefTour_ComparedTourView.ID);
-      layout.addShowViewShortcut(RefTour_ReferenceTourView.ID);
+      layout.addShowViewShortcut(ComparedTourChartView.ID);
+      layout.addShowViewShortcut(ReferenceTourChartView.ID);
       layout.addShowViewShortcut(ReferenceTimelineView.ID);
 
 // SET_FORMATTING_OFF
@@ -74,7 +74,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
             IPageLayout.TOP,        0.7f,    IPageLayout.ID_EDITOR_AREA);
 
-      refFolder.addView(RefTour_ReferenceTourView.ID);
+      refFolder.addView(ReferenceTourChartView.ID);
 
       //--------------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
             IPageLayout.BOTTOM,     0.5f,    FOLDER_ID_REF);
 
-      compFolder.addView(RefTour_ComparedTourView.ID);
+      compFolder.addView(ComparedTourChartView.ID);
 
 // SET_FORMATTING_ON
    }

@@ -48,7 +48,7 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
       setChildren(children);
 
       // use fast app filter
-      final SQLFilter appFilter = new SQLFilter(SQLFilter.FAST_APP_FILTER);
+      final SQLFilter appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
 
       String sqlWhere = UI.EMPTY_STRING;
 

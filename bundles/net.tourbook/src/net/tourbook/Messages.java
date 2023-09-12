@@ -136,6 +136,7 @@ public class Messages extends NLS {
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;
    public static String        App_Action_DeleteTourMarker;
+   public static String        App_Action_DeleteTourPauses;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeselectAll;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
@@ -356,12 +357,19 @@ public class Messages extends NLS {
    public static String        Compare_Result_Column_diff;
    public static String        Compare_Result_Column_diff_label;
    public static String        Compare_Result_Column_diff_tooltip;
-   public static String        Compare_Result_Column_kmh_db_label;
-   public static String        Compare_Result_Column_kmh_db_tooltip;
-   public static String        Compare_Result_Column_kmh_label;
-   public static String        Compare_Result_Column_kmh_moved_label;
-   public static String        Compare_Result_Column_kmh_moved_tooltip;
-   public static String        Compare_Result_Column_kmh_tooltip;
+   public static String        Compare_Result_Column_Pace_Computed_Label;
+   public static String        Compare_Result_Column_Pace_Computed_Tooltip;
+   public static String        Compare_Result_Column_Pace_Moved_Label;
+   public static String        Compare_Result_Column_Pace_Moved_Tooltip;
+   public static String        Compare_Result_Column_Pace_Saved_Label;
+   public static String        Compare_Result_Column_Pace_Saved_Tooltip;
+   public static String        Compare_Result_Column_Speed_Computed_Label;
+   public static String        Compare_Result_Column_Speed_Computed_Tooltip;
+   public static String        Compare_Result_Column_Speed_Moved_Label;
+   public static String        Compare_Result_Column_Speed_Moved_Tooltip;
+   public static String        Compare_Result_Column_Speed_Saved_Label;
+   public static String        Compare_Result_Column_Speed_Saved_Tooltip;
+
    public static String        Compare_Result_Column_tour;
 
    public static String        Compute_BreakTime_Button_ComputeAllTours;
@@ -436,7 +444,7 @@ public class Messages extends NLS {
 
    public static String        Conconi_Chart_Chk_LogScaling;
    public static String        Conconi_Chart_Chk_LogScaling_Tooltip;
-   public static String        Conconi_Chart_DeflactionPoint;
+   public static String        Conconi_Chart_DeflectionPoint;
    public static String        Conconi_Chart_InvalidData;
    public static String        Conconi_Chart_Label_ScalingFactor;
    public static String        Conconi_Chart_Label_Tour;
@@ -496,6 +504,9 @@ public class Messages extends NLS {
    public static String        Dialog_DatabaseAction_Confirmation_Title;
 
    public static String        Dialog_DeleteData_Title;
+
+   public static String        Dialog_DeleteTourPauses_Message;
+   public static String        Dialog_DeleteTourPauses_Title;
 
    public static String        Dialog_DeleteTourValues_Action_OpenDialog;
    public static String        Dialog_DeleteTourValues_Button_Delete;
@@ -979,19 +990,25 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_Action_HideToursBelow_Tooltip;
    public static String        GeoCompare_View_Action_OnOff_Tooltip;
    public static String        GeoCompare_View_Action_PinTourWhichIsCompared_Tooltip;
+   public static String        GeoCompare_View_Action_SaveCompareSettings_Tooltip;
    public static String        GeoCompare_View_Action_SelectTourWhichIsCompared_Tooltip;
+   public static String        GeoCompare_View_Checkbox_ElevationDifferenceFilter;
+   public static String        GeoCompare_View_Checkbox_ElevationDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter;
    public static String        GeoCompare_View_Checkbox_GeoDifferenceFilter_Tooltip;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter;
    public static String        GeoCompare_View_Checkbox_MaxResultsFilter_Tooltip;
-   public static String        GeoCompare_View_Column_GeoDiff_Header;
-   public static String        GeoCompare_View_Column_GeoDiff_Label;
+   public static String        GeoCompare_View_Column_GeoDiff_Absolute_Header;
+   public static String        GeoCompare_View_Column_GeoDiff_Absolute_Label;
+   public static String        GeoCompare_View_Column_GeoDiff_Absolute_Tooltip;
    public static String        GeoCompare_View_Column_GeoDiff_Relative_Header;
    public static String        GeoCompare_View_Column_GeoDiff_Relative_Label;
    public static String        GeoCompare_View_Column_GeoDiff_Relative_Tooltip;
-   public static String        GeoCompare_View_Column_GeoDiff_Tooltip;
    public static String        GeoCompare_View_Column_SequenceNumber_Header;
    public static String        GeoCompare_View_Column_SequenceNumber_Label;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_ElevationDiff_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_GeoDiff_Tooltip;
+   public static String        GeoCompare_View_Combo_MouseWheelIncrementer_MaxResults_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_GeoTour_Tooltip;
    public static String        GeoCompare_View_Icon_CompareType_RefTour_Tooltip;
    public static String        GeoCompare_View_Label_GeoParts;
@@ -1005,9 +1022,10 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingIsCanceled;
    public static String        GeoCompare_View_State_ComparingTours;
    public static String        GeoCompare_View_State_StartComparing;
-   public static String        GeoCompare_View_State_TourFilter;
-
-   public static String        Geo_Compare_Label_ReferenceTour;
+   public static String        GeoCompare_View_State_TourFilter_Part1;
+   public static String        GeoCompare_View_State_TourFilter_Part2_Visible;
+   public static String        GeoCompare_View_State_TourFilter_Part3_Hidden;
+   public static String        GeoCompare_View_Statusline_FilterSettingsAreSaved;
 
    public static String        Graph_Label_Time_Break;
    public static String        Graph_Label_Time_Elapsed;
@@ -1481,6 +1499,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
    public static String        Pref_Appearance_Check_AutoOpenTagging;
    public static String        Pref_Appearance_Check_RestartAppInAppToolbar;
+   public static String        Pref_Appearance_Check_ShowInAppToolbar_ScrambleData;
    public static String        Pref_Appearance_Check_ShowThemeSelectorInAppToolbar;
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Combo_Theme_Tooltip;
@@ -1489,6 +1508,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Dialog_RestartAfterRestartApp_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message;
+   public static String        Pref_Appearance_Dialog_ScrambleData_Message;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
    public static String        Pref_Appearance_Group_Theme;
@@ -1611,7 +1631,6 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Radio_show_distance;
    public static String        Pref_Graphs_Radio_show_time;
    public static String        Pref_Graphs_Tab_graph_defaults;
-   public static String        Pref_Graphs_Tab_Grid;
    public static String        Pref_Graphs_Tab_zoom_options;
 
    public static String        Pref_LiveUpdate_Checkbox;
@@ -1713,6 +1732,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_device;
    public static String        Pref_People_Label_first_name;
    public static String        Pref_People_Label_Gender;
+   public static String        Pref_People_Label_GenderDiverse;
    public static String        Pref_People_Label_GenderFemale;
    public static String        Pref_People_Label_GenderMale;
    public static String        Pref_People_Label_height;
@@ -1731,43 +1751,7 @@ public class Messages extends NLS {
 
    public static String        Pref_Statistic_Action_SortByData;
    public static String        Pref_Statistic_Action_SortByTime;
-   public static String        Pref_Statistic_Checkbox_Altitude;
-   public static String        Pref_Statistic_Checkbox_AvgPace;
-   public static String        Pref_Statistic_Checkbox_AvgSpeed;
-   public static String        Pref_Statistic_Checkbox_Distance;
-   public static String        Pref_Statistic_Checkbox_Duration;
-   public static String        Pref_Statistic_Checkbox_NumberOfTours;
-   public static String        Pref_Statistic_Checkbox_ShowPercentageValues;
-   public static String        Pref_Statistic_Checkbox_ShowSummaryValues;
-   public static String        Pref_Statistic_Checkbox_TrainingEffect_Aerob;
-   public static String        Pref_Statistic_Checkbox_TrainingEffect_Anaerob;
-   public static String        Pref_Statistic_Checkbox_TrainingPerformance;
-   public static String        Pref_Statistic_Checkbox_TrainingPerformance_AvgValue;
-   public static String        Pref_Statistic_Checkbox_TrainingPerformance_AvgValue_Tooltip;
-   public static String        Pref_Statistic_Checkbox_YearSeparator;
-   public static String        Pref_Statistic_Group_ChartType;
-   public static String        Pref_Statistic_Group_DaySummary;
-   public static String        Pref_Statistic_Group_DurationTime;
-   public static String        Pref_Statistic_Group_MonthSummary;
-   public static String        Pref_Statistic_Group_StatisticTooltip;
-   public static String        Pref_Statistic_Group_TourFrequency;
-   public static String        Pref_Statistic_Group_Training;
-   public static String        Pref_Statistic_Group_WeekSummary;
-   public static String        Pref_Statistic_Group_YearSummary;
-   public static String        Pref_Statistic_Label_altitude;
-   public static String        Pref_Statistic_Label_distance;
-   public static String        Pref_Statistic_Label_duration;
-   public static String        Pref_Statistic_Label_Interval;
-   public static String        Pref_Statistic_Label_Minimum;
-   public static String        Pref_Statistic_Label_NumberOfBars;
-   public static String        pref_statistic_lbl_info;
-   public static String        Pref_Statistic_Radio_BarAdjacent;
-   public static String        Pref_Statistic_Radio_BarStacked;
-   public static String        Pref_Statistic_Radio_Duration_BreakTime;
-   public static String        Pref_Statistic_Radio_Duration_ElapsedTime;
-   public static String        Pref_Statistic_Radio_Duration_MovingTime;
-   public static String        Pref_Statistic_Radio_Duration_PausedTime;
-   public static String        Pref_Statistic_Radio_Duration_RecordedTime;
+   public static String        Pref_Statistic_Label_Info;
 
    public static String        Pref_Swimming_Label_Info;
 
@@ -1850,6 +1834,8 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub;
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
+   public static String        Pref_View_Layout_Label_Total;
+   public static String        Pref_View_Layout_Label_Tour;
 
    public static String        Pref_Weather_Button_TestHTTPConnection;
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey;
@@ -1873,8 +1859,6 @@ public class Messages extends NLS {
    public static String        Reference_Timeline_Action_SyncMinMaxValues_Tooltip;
    public static String        Reference_Timeline_Combo_LastYears_Tooltip;
    public static String        Reference_Timeline_Combo_NumberOfYears_Tooltip;
-   public static String        Reference_Timeline_Image_ElevationCompare_Tooltip;
-   public static String        Reference_Timeline_Image_GeoCompare_Tooltip;
    public static String        Reference_Timeline_Page_SelectReferenceTour;
 
    public static String        RefTour_Action_CreateLeftMarker;
@@ -1882,10 +1866,9 @@ public class Messages extends NLS {
    public static String        RefTour_Action_CreateReferenceTour;
    public static String        RefTour_Action_CreateRightMarker;
    public static String        RefTour_Action_DeleteTours;
-
-   public static String        RefTour_Action_Link;
-   public static String        RefTour_Action_NavigateNextTour;
-   public static String        RefTour_Action_NavigatePrevTour;
+   public static String        RefTour_Action_Link_Tooltip2;
+   public static String        RefTour_Action_NavigateNextTour_Tooltip2;
+   public static String        RefTour_Action_NavigatePrevTour_Tooltip2;
    public static String        RefTour_Action_RenameReferenceTour;
    public static String        RefTour_Action_SaveMarker;
    public static String        RefTour_Action_SaveAndNext;
@@ -1945,10 +1928,17 @@ public class Messages extends NLS {
 
    public static String        Sensor_Type_GearShifting;
    public static String        Sensor_Type_Other;
+   public static String        Sensor_Type_PowerMeter;
+   public static String        Sensor_Type_Radar;
    public static String        Sensor_Type_RecordingDevice;
+   public static String        Sensor_Type_Wind;
 
+   public static String        Sensor_View_Action_DeleteSensor;
    public static String        Sensor_View_Action_EditSensor;
    public static String        Sensor_View_Action_OpenSensorChart;
+   public static String        Sensor_View_Dialog_CannotDeleteSensor_Message;
+   public static String        Sensor_View_Dialog_DeleteSensor_Message;
+   public static String        Sensor_View_Dialog_DeleteSensor_Title;
 
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;
@@ -2281,13 +2271,13 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_Label_Title;
 
    public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
+   public static String        Slideout_RefTour_Checkbox_Pace_Avg;
    public static String        Slideout_RefTour_Checkbox_Pulse_Avg;
    public static String        Slideout_RefTour_Checkbox_Pulse_AvgMax;
    public static String        Slideout_RefTour_Checkbox_Speed_Avg;
    public static String        Slideout_RefTour_Group_Graphs;
-   public static String        Slideout_RefTour_Label_BarSize;
    public static String        Slideout_RefTour_Label_ReferenceTimelineOptions;
-   public static String        Slideout_RefTour_Spinner_BarSize_Tooltip;
+   public static String        Slideout_RefTour_Label_SymbolSize;
 
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
    public static String        Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
@@ -2326,7 +2316,44 @@ public class Messages extends NLS {
    public static String        Slideout_SensorTourFilter_Radio_Year;
    public static String        Slideout_SensorTourFilter_Radio_Year_Tooltip;
 
+   public static String        Slideout_StatisticOptions_Checkbox_AvgPace;
+   public static String        Slideout_StatisticOptions_Checkbox_AvgSpeed;
+   public static String        Slideout_StatisticOptions_Checkbox_Distance;
+   public static String        Slideout_StatisticOptions_Checkbox_Duration;
+   public static String        Slideout_StatisticOptions_Checkbox_ElevationDown;
+   public static String        Slideout_StatisticOptions_Checkbox_ElevationUp;
+   public static String        Slideout_StatisticOptions_Checkbox_NumberOfTours;
+   public static String        Slideout_StatisticOptions_Checkbox_ShowPercentageValues;
+   public static String        Slideout_StatisticOptions_Checkbox_ShowSummaryValues;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingEffect_Aerob;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingEffect_Anaerob;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingPerformance;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingPerformance_AvgValue;
+   public static String        Slideout_StatisticOptions_Checkbox_TrainingPerformance_AvgValue_Tooltip;
+   public static String        Slideout_StatisticOptions_Checkbox_YearSeparator;
+   public static String        Slideout_StatisticOptions_Group_ChartType;
+   public static String        Slideout_StatisticOptions_Group_DaySummary;
+   public static String        Slideout_StatisticOptions_Group_DurationTime;
+   public static String        Slideout_StatisticOptions_Group_MonthSummary;
+   public static String        Slideout_StatisticOptions_Group_StatisticTooltip;
+   public static String        Slideout_StatisticOptions_Group_TourFrequency;
+   public static String        Slideout_StatisticOptions_Group_Training;
+   public static String        Slideout_StatisticOptions_Group_WeekSummary;
+   public static String        Slideout_StatisticOptions_Group_YearSummary;
+   public static String        Slideout_StatisticOptions_Label_Altitude;
+   public static String        Slideout_StatisticOptions_Label_Distance;
+   public static String        Slideout_StatisticOptions_Label_Duration;
+   public static String        Slideout_StatisticOptions_Label_Interval;
+   public static String        Slideout_StatisticOptions_Label_Minimum;
+   public static String        Slideout_StatisticOptions_Label_NumberOfBars;
    public static String        Slideout_StatisticOptions_Label_Title;
+   public static String        Slideout_StatisticOptions_Radio_BarAdjacent;
+   public static String        Slideout_StatisticOptions_Radio_BarStacked;
+   public static String        Slideout_StatisticOptions_Radio_Duration_BreakTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_ElapsedTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_MovingTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_PausedTime;
+   public static String        Slideout_StatisticOptions_Radio_Duration_RecordedTime;
 
    public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers;
    public static String        Slideout_TMVOptions_Label_TimeUsedBetweenMarkers_Tooltip;
@@ -2359,6 +2386,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity;
    public static String        Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
    public static String        Slideout_TourChartOptions_Label_PulseGraph;
+   public static String        Slideout_TourChartOptions_Label_SpeedAndPaceDistanceInterval;
    public static String        Slideout_TourChartOptions_Label_Title;
    public static String        Slideout_TourChartOptions_Radio_SRTM1;
    public static String        Slideout_TourChartOptions_Radio_SRTM1_Tooltip;
@@ -2679,10 +2707,12 @@ public class Messages extends NLS {
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
    public static String        Tour_Action_GeoCompare;
-
    public static String        Tour_Action_GeoCompare_Tooltip;
+   public static String        Tour_Action_Graph_PaceInterval_Tooltip;
    public static String        Tour_Action_Graph_PaceSummarized_Tooltip;
+   public static String        Tour_Action_Graph_SpeedInterval_Tooltip;
    public static String        Tour_Action_Graph_SpeedSummarized_Tooltip;
+   public static String        Tour_Action_Graph_TourCompareReferenceTour_Tooltip;
    public static String        Tour_Action_GraphGears;
    public static String        Tour_Action_GraphOverlapped;
    public static String        Tour_Action_graph_altimeter_tooltip;
@@ -2726,15 +2756,13 @@ public class Messages extends NLS {
    public static String        Tour_Action_SetTimeZone;
    public static String        Tour_Action_SetWeatherConditions;
    public static String        Tour_Action_ShowBreaktimeValues;
+   public static String        Tour_Action_ShowDistanceOnXAxis_Tooltip;
+   public static String        Tour_Action_ShowTimeOnXAxis_Tooltip;
    public static String        Tour_Action_ShowTourPauses;
    public static String        Tour_Action_ShowTourPauses_Tooltip;
    public static String        Tour_Action_ShowValuePointValue;
-   public static String        Tour_Action_show_distance_on_x_axis;
-   public static String        Tour_Action_show_distance_on_x_axis_tooltip;
    public static String        tour_action_show_srtm_data;
    public static String        Tour_Action_show_start_time_on_x_axis;
-   public static String        Tour_Action_show_time_on_x_axis;
-   public static String        Tour_Action_show_time_on_x_axis_tooltip;
    public static String        Tour_Action_Swim_Strokes_Tooltip;
    public static String        Tour_Action_Swim_Swolf_Tooltip;
    public static String        Tour_Action_TourInfo_Tooltip;
@@ -2759,6 +2787,7 @@ public class Messages extends NLS {
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
    public static String        Tour_Book_Action_delete_selected_tours_menu;
    public static String        Tour_Book_Action_ExportViewCSV_Tooltip;
+   public static String        Tour_Book_Action_GoToLastTour_Tooltip;
    public static String        Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String        Tour_Book_Combo_statistic_tooltip;
    public static String        Tour_Book_Label_chart_title;
@@ -2768,6 +2797,12 @@ public class Messages extends NLS {
    public static String        Tour_Book_SortColumnTooltip;
 
    public static String        Tour_Chart_Label_ValuePoint_Title;
+
+   public static String        Tour_Compare_ViewName_ElevationComparedTour;
+   public static String        Tour_Compare_ViewName_ElevationCompareTimeline;
+   public static String        Tour_Compare_ViewName_GeoComparedTour;
+   public static String        Tour_Compare_ViewName_GeoCompareTimeline;
+   public static String        Tour_Compare_ViewName_VirtualReferenceTour;
 
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;
@@ -2796,6 +2831,7 @@ public class Messages extends NLS {
    public static String        Tour_Database_PostUpdate_043_LatLonE6;
    public static String        Tour_Database_PostUpdate_047_Weather;
    public static String        Tour_Database_PostUpdate_050_ComparedTour;
+   public static String        Tour_Database_PostUpdate_051_ComparedTour;
    public static String        Tour_Database_PostUpdate;
    public static String        Tour_Database_TourSaveError;
    public static String        Tour_Database_Update;
@@ -3187,6 +3223,7 @@ public class Messages extends NLS {
    public static String        Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String        Tour_Tags_Action_Layout_Hierarchical_Tooltip;
    public static String        Tour_Tags_Action_OnMouseSelect_ExpandCollapse;
+   public static String        Tour_Tags_Action_Preferences_Tooltip;
    public static String        Tour_Tags_Action_SingleExpand_CollapseOthers;
    public static String        Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String        Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;

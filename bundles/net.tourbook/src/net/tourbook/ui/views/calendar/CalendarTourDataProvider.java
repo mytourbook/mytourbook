@@ -437,7 +437,7 @@ public class CalendarTourDataProvider {
          long lastTourId = -1;
          ArrayList<Long> tagIds = null;
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
@@ -755,7 +755,7 @@ public class CalendarTourDataProvider {
          final int year = weekLoader.year;
          final int week = weekLoader.week;
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          String sqlFromTourData;
 

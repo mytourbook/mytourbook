@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,14 +37,20 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourTagCategory implements Cloneable, Comparable<Object> {
 
+   private static final char          NL              = UI.NEW_LINE;
+
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       tagCategoryId    = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       tagCategoryId   = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
-    * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
+    * Derby does not support BOOLEAN (when this was implemented)
+    * <p>
+    * <code>1 = true</code><br>
+    * <code>0 = false</code>
+    * <p>
     */
-   private int                        isRoot           = 0;
+   private int                        isRoot          = 0;
 
    @Basic(optional = false)
    private String                     name;
@@ -52,32 +58,31 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
    /**
     * Notes for this tag category
     */
-   private String                     notes;                                              // db-version 38
+   private String                     notes;                                             // db-version 38
 
    @ManyToMany(fetch = FetchType.LAZY)
    @JoinTable(joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID", referencedColumnName = "TagCategoryId"), //
          inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagId") //
    )
-   private final Set<TourTag>         tourTags         = new HashSet<>();
+   private final Set<TourTag>         tourTags        = new HashSet<>();
 
    @ManyToMany(fetch = FetchType.LAZY)
-   @JoinTable(
-         joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
+   @JoinTable(joinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID1", referencedColumnName = "TagCategoryId"), //
          inverseJoinColumns = @JoinColumn(name = "TOURTAGCATEGORY_TagCategoryID2", referencedColumnName = "TagCategoryId")//
    )
-   private final Set<TourTagCategory> tourTagCategory  = new HashSet<>();
+   private final Set<TourTagCategory> tourTagCategory = new HashSet<>();
 
    /**
-    * contains the number of categories or <code>-1</code> when the categories are not loaded
+    * Contains the number of categories or <code>-1</code> when the categories are not loaded
     */
    @Transient
-   private int                        _categoryCounter = -1;
+   private int                        _numCategories  = -1;
 
    /**
-    * contains the number of tags or <code>-1</code> when the tags are not loaded
+    * Contains the number of tags or <code>-1</code> when the tags are not loaded
     */
    @Transient
-   private int                        _tagCounter      = -1;
+   private int                        _numTags        = -1;
 
    /**
     * Default constructor used in ejb
@@ -113,10 +118,6 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       return 0;
    }
 
-   public int getCategoryCounter() {
-      return _categoryCounter;
-   }
-
    public long getCategoryId() {
       return tagCategoryId;
    }
@@ -137,12 +138,20 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       return notes;
    }
 
+   public int getNumberOfCategories() {
+      return _numCategories;
+   }
+
+   public int getNumberOfTags() {
+      return _numTags;
+   }
+
    public Set<TourTagCategory> getTagCategories() {
       return tourTagCategory;
    }
 
-   public int getTagCounter() {
-      return _tagCounter;
+   public long getTagCategoryId() {
+      return tagCategoryId;
    }
 
    /**
@@ -197,10 +206,6 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       return true;
    }
 
-   public void setCategoryCounter(final int fCategoryCounter) {
-      this._categoryCounter = fCategoryCounter;
-   }
-
    /**
     * Set the name for the tag category
     *
@@ -214,29 +219,38 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
       this.notes = notes;
    }
 
-   /**
-    * set root flag if this tag is a root item or not, 1 = <code>true</code>, 0 =
-    * <code>false</code>
-    */
-   public void setRoot(final boolean isRoot) {
-      this.isRoot = isRoot ? 1 : 0;
+   public void setNumberOfCategories(final int numCategories) {
+
+      _numCategories = numCategories;
    }
 
-   public void setTagCounter(final int fTagCounter) {
-      this._tagCounter = fTagCounter;
+   public void setNumberOfTags(final int numTags) {
+
+      _numTags = numTags;
+   }
+
+   /**
+    * Set root flag if this tag is a root item or not
+    * <p>
+    * 1 = <code>true</code><br>
+    * 0 = <code>false</code>
+    */
+   public void setRoot(final boolean isRoot) {
+
+      this.isRoot = isRoot ? 1 : 0;
    }
 
    @Override
    public String toString() {
 
-      final String category = "TourTagCategory" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + "\t" + name //$NON-NLS-1$
-            + "\tID:" + tagCategoryId //$NON-NLS-1$
-            + "\tisRoot:" + isRoot //$NON-NLS-1$
+            + "TourTagCategory" + NL //                        //$NON-NLS-1$
+
+            + "  name          = " + name + NL //              //$NON-NLS-1$
+//          + "  tagCategoryId = " + tagCategoryId + NL //     //$NON-NLS-1$
+            + "  isRoot        = " + isRoot + NL //            //$NON-NLS-1$
       ;
-
-      return category;
    }
 
    /**

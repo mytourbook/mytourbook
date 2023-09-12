@@ -128,12 +128,12 @@ public class EasyImportManager {
    private static final String      ATTR_IL_TOUR_TYPE_CADENCE                          = "tourTypeCadence";                                   //$NON-NLS-1$
    //
    public static final String       LOG_EASY_IMPORT_000_IMPORT_START                   = Messages.Log_EasyImport_000_ImportStart;
-   public static final String       LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES              = Messages.Log_EasyImport_001_BackupTourFiles;
-   public static final String       LOG_EASY_IMPORT_001_COPY                           = Messages.Log_EasyImport_001_Copy;
-   public static final String       LOG_EASY_IMPORT_002_TOUR_FILES_START               = Messages.Log_EasyImport_002_TourFilesStart;
-   public static final String       LOG_EASY_IMPORT_002_END                            = Messages.Log_EasyImport_002_End;
-   public static final String       LOG_EASY_IMPORT_003_TOUR_TYPE                      = Messages.Log_EasyImport_003_TourType;
-   public static final String       LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM                 = Messages.Log_EasyImport_003_TourType_Item;
+   private static final String      LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES              = Messages.Log_EasyImport_001_BackupTourFiles;
+   private static final String      LOG_EASY_IMPORT_001_COPY                           = Messages.Log_EasyImport_001_Copy;
+   static final String              LOG_EASY_IMPORT_002_TOUR_FILES_START               = Messages.Log_EasyImport_002_TourFilesStart;
+   static final String              LOG_EASY_IMPORT_002_END                            = Messages.Log_EasyImport_002_End;
+   private static final String      LOG_EASY_IMPORT_003_TOUR_TYPE                      = Messages.Log_EasyImport_003_TourType;
+   private static final String      LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM                 = Messages.Log_EasyImport_003_TourType_Item;
    public static final String       LOG_EASY_IMPORT_004_SET_LAST_MARKER                = Messages.Log_EasyImport_004_SetLastMarker;
    public static final String       LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE             = Messages.Log_EasyImport_005_AdjustTemperatureValues;
    public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION               = Messages.Log_EasyImport_006_AdjustElevation;
@@ -1319,7 +1319,11 @@ public class EasyImportManager {
             tourTypeName = tourType.getName();
 
             tourData.setTourType(tourType);
-            tourData.setCadenceMultiplier(tourTypeCadence.getMultiplier());
+            final float[] cadenceSerie = tourData.getCadenceSerie();
+            if (cadenceSerie != null && cadenceSerie.length > 0) {
+
+               tourData.setCadenceMultiplier(tourTypeCadence.getMultiplier());
+            }
          }
 
       } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {

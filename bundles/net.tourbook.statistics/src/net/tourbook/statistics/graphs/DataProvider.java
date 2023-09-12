@@ -17,6 +17,7 @@ package net.tourbook.statistics.graphs;
 
 import java.time.ZonedDateTime;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
@@ -27,31 +28,28 @@ import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
-   private static final String APP_UNIT_HHMMSS        = net.tourbook.Messages.App_Unit_HHMMSS;
-   private static final String APP_UNIT_SECONDS_SMALL = net.tourbook.Messages.App_Unit_Seconds_Small;
+   private static final String UNIT_NUMBER         = "#";                            //$NON-NLS-1$
 
-   private static final String UNIT_NUMBER            = "#";                                         //$NON-NLS-1$
+   private static final String VALUE_FORMAT_2D     = "%2d";                          //$NON-NLS-1$
+   private static final String VALUE_FORMAT_3D     = "%3d";                          //$NON-NLS-1$
+   private static final String VALUE_FORMAT_4D     = "%4d";                          //$NON-NLS-1$
+   private static final String VALUE_FORMAT_6D     = "%6d";                          //$NON-NLS-1$
+   private static final String VALUE_FORMAT_10D    = "%10d";                         //$NON-NLS-1$
+   private static final String VALUE_FORMAT_13D    = "%13d";                         //$NON-NLS-1$
 
-   private static final String VALUE_FORMAT_2D        = "%2d";                                       //$NON-NLS-1$
-   private static final String VALUE_FORMAT_3D        = "%3d";                                       //$NON-NLS-1$
-   private static final String VALUE_FORMAT_4D        = "%4d";                                       //$NON-NLS-1$
-   private static final String VALUE_FORMAT_6D        = "%6d";                                       //$NON-NLS-1$
-   private static final String VALUE_FORMAT_10D       = "%10d";                                      //$NON-NLS-1$
-   private static final String VALUE_FORMAT_13D       = "%13d";                                      //$NON-NLS-1$
+   private static final String VALUE_FORMAT_6_0F   = "%6.0f";                        //$NON-NLS-1$
+   private static final String VALUE_FORMAT_6_1F   = "%6.1f";                        //$NON-NLS-1$
+   private static final String VALUE_FORMAT_6_2F   = "%6.2f";                        //$NON-NLS-1$
+   private static final String VALUE_FORMAT_7_2F   = "%7.2f";                        //$NON-NLS-1$
+   private static final String VALUE_FORMAT_10_0F  = "%10.0f";                       //$NON-NLS-1$
+   private static final String VALUE_FORMAT_10_3F  = "%10.3f";                       //$NON-NLS-1$
 
-   private static final String VALUE_FORMAT_6_0F      = "%6.0f";                                     //$NON-NLS-1$
-   private static final String VALUE_FORMAT_6_1F      = "%6.1f";                                     //$NON-NLS-1$
-   private static final String VALUE_FORMAT_6_2F      = "%6.2f";                                     //$NON-NLS-1$
-   private static final String VALUE_FORMAT_7_2F      = "%7.2f";                                     //$NON-NLS-1$
-   private static final String VALUE_FORMAT_10_0F     = "%10.0f";                                    //$NON-NLS-1$
-   private static final String VALUE_FORMAT_10_3F     = "%10.3f";                                    //$NON-NLS-1$
+   static final String         VALUE_FORMAT_S      = "%s";                           //$NON-NLS-1$
+   private static final String VALUE_FORMAT_8_8S   = "%8.8s";                        //$NON-NLS-1$
+   private static final String VALUE_FORMAT_13S    = "%13s";                         //$NON-NLS-1$
+   private static final String VALUE_FORMAT_20_20S = "%-20.20s";                     //$NON-NLS-1$
 
-   static final String         VALUE_FORMAT_S         = "%s";                                        //$NON-NLS-1$
-   private static final String VALUE_FORMAT_8_8S      = "%8.8s";                                     //$NON-NLS-1$
-   private static final String VALUE_FORMAT_13S       = "%13s";                                      //$NON-NLS-1$
-   private static final String VALUE_FORMAT_20_20S    = "%-20.20s";                                  //$NON-NLS-1$
-
-   static final char           NL                     = net.tourbook.common.UI.NEW_LINE;
+   static final char           NL                  = net.tourbook.common.UI.NEW_LINE;
 
 // SET_FORMATTING_OFF
 
@@ -75,11 +73,11 @@ public abstract class DataProvider {
    /*
     * Time
     */
-   static final StatisticValue STAT_VALUE_TIME_DEVICE_ELAPSED  = new StatisticValue(Messages.Statistic_Value_Time_Device_Elapsed_Header1,    null,    APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_TIME_DEVICE_RECORDED = new StatisticValue(Messages.Statistic_Value_Time_Device_Recorded_Header1,   null,    APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_TIME_DEVICE_PAUSED   = new StatisticValue(Messages.Statistic_Value_Time_Device_Paused_Header1,     null,    APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_TIME_COMPUTED_MOVING = new StatisticValue(Messages.Statistic_Value_Time_Computed_Moving_Header1,   null,    APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_TIME_COMPUTED_BREAK  = new StatisticValue(Messages.Statistic_Value_Time_Computed_Break_Header1,    null,    APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_TIME_DEVICE_ELAPSED  = new StatisticValue(Messages.Statistic_Value_Time_Device_Elapsed_Header1,    null,    OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_TIME_DEVICE_RECORDED = new StatisticValue(Messages.Statistic_Value_Time_Device_Recorded_Header1,   null,    OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_TIME_DEVICE_PAUSED   = new StatisticValue(Messages.Statistic_Value_Time_Device_Paused_Header1,     null,    OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_TIME_COMPUTED_MOVING = new StatisticValue(Messages.Statistic_Value_Time_Computed_Moving_Header1,   null,    OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_TIME_COMPUTED_BREAK  = new StatisticValue(Messages.Statistic_Value_Time_Computed_Break_Header1,    null,    OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
 
    /*
     * Motion
@@ -91,23 +89,24 @@ public abstract class DataProvider {
    /*
     * Elevation
     */
-   static final StatisticValue STAT_VALUE_ELEVATION_UP         = new StatisticValue(Messages.Statistic_Value_Elevation_ElevationUp_Header1,   null,    null,    VALUE_FORMAT_10_0F,   10);
+   static final StatisticValue STAT_VALUE_ELEVATION_UP         = new StatisticValue(Messages.Statistic_Value_Elevation_Header1,   Messages.Statistic_Value_Elevation_Up_Header2,    UI.UNIT_LABEL_ELEVATION,   VALUE_FORMAT_10_0F,   10);
+   static final StatisticValue STAT_VALUE_ELEVATION_DOWN       = new StatisticValue(Messages.Statistic_Value_Elevation_Header1,   Messages.Statistic_Value_Elevation_Down_Header2,  UI.UNIT_LABEL_ELEVATION,   VALUE_FORMAT_10_0F,   10);
 
    /*
     * HR Zones
     */
-   static final StatisticValue STAT_VALUE_HR_ZONE_1            = new StatisticValue(Messages.Statistic_Value_HR_Zone_1_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_2            = new StatisticValue(Messages.Statistic_Value_HR_Zone_2_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_3            = new StatisticValue(Messages.Statistic_Value_HR_Zone_3_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_4            = new StatisticValue(Messages.Statistic_Value_HR_Zone_4_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_5            = new StatisticValue(Messages.Statistic_Value_HR_Zone_5_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_6            = new StatisticValue(Messages.Statistic_Value_HR_Zone_6_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_7            = new StatisticValue(Messages.Statistic_Value_HR_Zone_7_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_8            = new StatisticValue(Messages.Statistic_Value_HR_Zone_8_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_9            = new StatisticValue(Messages.Statistic_Value_HR_Zone_9_Header1,               null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_ZONE_10           = new StatisticValue(Messages.Statistic_Value_HR_Zone_10_Header1,              null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
-   static final StatisticValue STAT_VALUE_HR_SUMMARY_SECONDS   = new StatisticValue(Messages.Statistic_Value_HR_Summary_Header1,              null,   APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_13D,   13);
-   static final StatisticValue STAT_VALUE_HR_SUMMARY_HHMMSS    = new StatisticValue(Messages.Statistic_Value_HR_Summary_Header1,              null,   APP_UNIT_HHMMSS,           VALUE_FORMAT_13S,   13);
+   static final StatisticValue STAT_VALUE_HR_ZONE_1            = new StatisticValue(Messages.Statistic_Value_HR_Zone_1_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_2            = new StatisticValue(Messages.Statistic_Value_HR_Zone_2_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_3            = new StatisticValue(Messages.Statistic_Value_HR_Zone_3_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_4            = new StatisticValue(Messages.Statistic_Value_HR_Zone_4_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_5            = new StatisticValue(Messages.Statistic_Value_HR_Zone_5_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_6            = new StatisticValue(Messages.Statistic_Value_HR_Zone_6_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_7            = new StatisticValue(Messages.Statistic_Value_HR_Zone_7_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_8            = new StatisticValue(Messages.Statistic_Value_HR_Zone_8_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_9            = new StatisticValue(Messages.Statistic_Value_HR_Zone_9_Header1,               null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_ZONE_10           = new StatisticValue(Messages.Statistic_Value_HR_Zone_10_Header1,              null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_10D,   10);
+   static final StatisticValue STAT_VALUE_HR_SUMMARY_SECONDS   = new StatisticValue(Messages.Statistic_Value_HR_Summary_Header1,              null,   OtherMessages.APP_UNIT_SECONDS_SMALL,    VALUE_FORMAT_13D,   13);
+   static final StatisticValue STAT_VALUE_HR_SUMMARY_HHMMSS    = new StatisticValue(Messages.Statistic_Value_HR_Summary_Header1,              null,   OtherMessages.APP_UNIT_HHMMSS,           VALUE_FORMAT_13S,   13);
 
    /*
     * Training

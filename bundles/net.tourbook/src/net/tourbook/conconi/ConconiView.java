@@ -143,8 +143,8 @@ public class ConconiView extends ViewPart {
 
    private Combo                 _comboTests;
    private Scale                 _scaleDeflection;
-   private Label                 _lblDeflactionPulse;
-   private Label                 _lblDeflactionPower;
+   private Label                 _lblDeflectionPulse;
+   private Label                 _lblDeflectionPower;
 
    private Button                _chkExtendedScaling;
    private Label                 _lblFactor;
@@ -348,7 +348,7 @@ public class ConconiView extends ViewPart {
       float maxXValue = 0;
 
       /*
-       * create data series which contain valid data, reduce data that the highes value for an x
+       * create data series which contain valid data, reduce data that the highest value for an x
        * value is displayed
        */
       for (int tourIndex = 0; tourIndex < validDataLength; tourIndex++) {
@@ -658,7 +658,7 @@ public class ConconiView extends ViewPart {
           * label: deflection point
           */
          label = new Label(container, SWT.NONE);
-         label.setText(Messages.Conconi_Chart_DeflactionPoint);
+         label.setText(Messages.Conconi_Chart_DeflectionPoint);
 
          final Composite deflContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(deflContainer);
@@ -678,12 +678,12 @@ public class ConconiView extends ViewPart {
             //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
             {
                // label: heartbeat value
-               _lblDeflactionPulse = new Label(containerValues, SWT.TRAIL);
+               _lblDeflectionPulse = new Label(containerValues, SWT.TRAIL);
                GridDataFactory
                      .fillDefaults()
                      .align(SWT.FILL, SWT.CENTER)
                      .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-                     .applyTo(_lblDeflactionPulse);
+                     .applyTo(_lblDeflectionPulse);
 
                // label: heartbeat unit
                label = new Label(containerValues, SWT.NONE);
@@ -691,12 +691,12 @@ public class ConconiView extends ViewPart {
                label.setText(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
 
                // label: power value
-               _lblDeflactionPower = new Label(containerValues, SWT.TRAIL);
+               _lblDeflectionPower = new Label(containerValues, SWT.TRAIL);
                GridDataFactory
                      .fillDefaults()
                      .align(SWT.FILL, SWT.CENTER)
                      .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-                     .applyTo(_lblDeflactionPower);
+                     .applyTo(_lblDeflectionPower);
 
                // label: power unit
                label = new Label(containerValues, SWT.NONE);
@@ -1137,8 +1137,8 @@ public class ConconiView extends ViewPart {
       final int pulseValue = (int) _conconiDataForSelectedTour.maxYValues.get(scaleIndex);
       final int powerValue = (int) _conconiDataForSelectedTour.maxXValues.get(scaleIndex);
 
-      _lblDeflactionPulse.setText(Integer.toString(pulseValue));
-      _lblDeflactionPower.setText(Integer.toString(powerValue));
+      _lblDeflectionPulse.setText(Integer.toString(pulseValue));
+      _lblDeflectionPower.setText(Integer.toString(powerValue));
 
       // update conconi layer
       _chartConconiTest.updateCustomLayers();

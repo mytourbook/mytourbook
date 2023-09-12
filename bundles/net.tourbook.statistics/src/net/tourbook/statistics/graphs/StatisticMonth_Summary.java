@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,9 +36,10 @@ public class StatisticMonth_Summary extends StatisticMonth {
 
    private IPropertyChangeListener _statMonth_PrefChangeListener;
 
-   private boolean                 _isShowAltitude;
    private boolean                 _isShowDistance;
    private boolean                 _isShowDuration;
+   private boolean                 _isShowElevationUp;
+   private boolean                 _isShowElevationDown;
    private boolean                 _isShowNumTours;
 
    private void addPrefListener(final Composite container) {
@@ -55,11 +56,14 @@ public class StatisticMonth_Summary extends StatisticMonth {
 
                   || property.equals(ITourbookPreferences.STAT_MONTH_DURATION_TIME)
 
-                  || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE)
                   || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE)
                   || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION)
+                  || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP)
+                  || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_DOWN)
                   || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS)
-                  || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR)) {
+                  || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR)
+
+            ) {
 
                if (property.equals(ITourbookPreferences.STAT_MONTH_DURATION_TIME)) {
                   _isDuration_ReloadData = true;
@@ -111,8 +115,11 @@ public class StatisticMonth_Summary extends StatisticMonth {
          createYData_Distance(chartDataModel);
       }
 
-      if (_isShowAltitude) {
-         createYData_Elevation(chartDataModel);
+      if (_isShowElevationUp) {
+         createYData_ElevationUp(chartDataModel);
+      }
+      if (_isShowElevationDown) {
+         createYData_ElevationDown(chartDataModel);
       }
 
       if (_isShowDuration) {
@@ -133,7 +140,8 @@ public class StatisticMonth_Summary extends StatisticMonth {
 
    private void getPreferences() {
 
-      _isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE);
+      _isShowElevationUp = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP);
+      _isShowElevationDown = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_DOWN);
       _isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE);
       _isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION);
       _isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS);

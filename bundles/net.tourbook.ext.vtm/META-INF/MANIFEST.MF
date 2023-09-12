@@ -12,7 +12,7 @@ Bundle-ClassPath: libs/vtm-desktop-lwjgl.jar,libs/vtm-desktop.jar,libs
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Vector map from Mapsforge
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: MyTourbook
 Bundle-Version: 22.11.0.v20221126-0735

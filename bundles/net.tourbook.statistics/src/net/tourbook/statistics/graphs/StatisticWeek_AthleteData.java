@@ -34,6 +34,6 @@ public class StatisticWeek_AthleteData extends StatisticWeek {
 
    @Override
    protected String getGridPrefPrefix() {
-      return GRID_WEEK_ATHLETEDATA;
+      return GRID_WEEK_ATHLETE_DATA;
    }
 }

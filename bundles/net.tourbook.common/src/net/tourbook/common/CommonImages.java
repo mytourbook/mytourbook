@@ -42,6 +42,7 @@ public class CommonImages {
    public static final String App_Save_Disabled            = "app-save-disabled.png";                     //$NON-NLS-1$
    public static final String App_SaveAndNext              = "app-save-and-next.png";                     //$NON-NLS-1$
    public static final String App_SaveAndNext_Disabled     = "app-save-and-next-disabled.png";            //$NON-NLS-1$
+   public static final String App_ScrambleData             = "app-scramble-data.png";                     //$NON-NLS-1$
    public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
    public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
    public static final String App_Undo                     = "app-undo.png";                              //$NON-NLS-1$

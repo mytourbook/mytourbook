@@ -1049,7 +1049,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       if (urlString == null) {
          final Exception e = new Exception();
          StatusUtil.log(NLS.bind(//
-               Messages.DBG041_Error_InvalidUrlNull,
+               Messages.Error__InvalidUrlNull_DBG041,
                this.getClass().getName() + UI.DASH_WITH_SPACE + tile.getTileKey()), e);
          throw e;
       }
@@ -1067,7 +1067,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
          url = new URL(encodedUrl);
 
       } catch (final MalformedURLException e) {
-         StatusUtil.log(NLS.bind(Messages.DBG042_Error_InvalidUrl, urlString, tile.getTileKey()), e);
+         StatusUtil.log(NLS.bind(Messages.Error__InvalidUrl_DBG042, urlString, tile.getTileKey()), e);
          throw e;
       }
 

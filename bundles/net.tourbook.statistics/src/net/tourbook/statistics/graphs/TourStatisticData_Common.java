@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,6 +52,11 @@ public abstract class TourStatisticData_Common {
    float[][] elevationUp_High;
    float[][] elevationUp_High_Resorted;
 
+   float[][] elevationDown_Low;
+   float[][] elevationDown_Low_Resorted;
+   float[][] elevationDown_High;
+   float[][] elevationDown_High_Resorted;
+
    float[][] numTours_Low;
    float[][] numTours_Low_Resorted;
    float[][] numTours_High;
@@ -91,6 +96,8 @@ public abstract class TourStatisticData_Common {
 
          elevationUp_Low_Resorted      = new float[1][1];
          elevationUp_High_Resorted     = new float[1][1];
+         elevationDown_Low_Resorted    = new float[1][1];
+         elevationDown_High_Resorted   = new float[1][1];
          distance_Low_Resorted         = new float[1][1];
          distance_High_Resorted        = new float[1][1];
          numTours_Low_Resorted         = new float[1][1];
@@ -116,6 +123,8 @@ public abstract class TourStatisticData_Common {
 
       elevationUp_Low_Resorted         = new float[numBars][];
       elevationUp_High_Resorted        = new float[numBars][];
+      elevationDown_Low_Resorted       = new float[numBars][];
+      elevationDown_High_Resorted      = new float[numBars][];
       distance_Low_Resorted            = new float[numBars][];
       distance_High_Resorted           = new float[numBars][];
 
@@ -232,6 +241,8 @@ public abstract class TourStatisticData_Common {
 
       elevationUp_Low_Resorted[resortedIndex]      = elevationUp_Low[serieIndex];
       elevationUp_High_Resorted[resortedIndex]     = elevationUp_High[serieIndex];
+      elevationDown_Low_Resorted[resortedIndex]    = elevationDown_Low[serieIndex];
+      elevationDown_High_Resorted[resortedIndex]   = elevationDown_High[serieIndex];
 
       numTours_Low_Resorted[resortedIndex]         = numTours_Low[serieIndex];
       numTours_High_Resorted[resortedIndex]        = numTours_High[serieIndex];

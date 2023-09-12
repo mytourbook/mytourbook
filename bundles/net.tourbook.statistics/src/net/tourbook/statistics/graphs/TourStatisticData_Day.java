@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,6 +56,9 @@ public class TourStatisticData_Day {
    float[]                        allElevationUp;
    float[]                        allElevationUp_Low;
    float[]                        allElevationUp_High;
+   float[]                        allElevationDown;
+   float[]                        allElevationDown_Low;
+   float[]                        allElevationDown_High;
 
    float[]                        allAvgPace;
    float[]                        allAvgPace_Low;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ public class ChartDrawingData {
    public int                          devVisibleChartWidth;
 
    /**
-    * Contains the painted chart titles and their positons.
+    * Contains the painted chart titles and their positions.
     */
    public ArrayList<ChartTitleSegment> chartTitleSegments = new ArrayList<>();
 

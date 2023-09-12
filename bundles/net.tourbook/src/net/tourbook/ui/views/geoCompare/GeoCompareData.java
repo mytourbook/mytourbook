@@ -32,11 +32,22 @@ public class GeoCompareData {
    /**
     * Entity ID of the {@link TourReference}, is -1 when not available
     */
-   public long                  refId               = -1;
+   public long                  refTour_RefId       = -1;
 
-   public long                  tourId              = -1;
+   /**
+    * Reference tour ID which is compared
+    */
+   public long                  refTour_TourId      = -1;
 
-   public String                tourTitle;
+   public int                   refTour_FirstIndex;
+   public int                   refTour_LastIndex;
+
+   /**
+    * Title of the original reference tour
+    */
+   String                       refTour_OriginalTitle;
+
+   public String                comparedTour_TourTitle;
 
    long                         executorId;
 
@@ -86,8 +97,8 @@ public class GeoCompareData {
                          final int[] geoParts,
                          final NormalizedGeoData normalizedTourPart,
                          final boolean useAppFilter,
-                         final String tourTitle,
-                         final long tourId) {
+                         final String comparedTour_TourTitle,
+                         final long refTour_TourId) {
 
       this.executorId = executorId;
 
@@ -96,8 +107,8 @@ public class GeoCompareData {
 
       this.isUseAppFilter = useAppFilter;
 
-      this.tourId = tourId;
-      this.tourTitle = tourTitle;
+      this.refTour_TourId = refTour_TourId;
+      this.comparedTour_TourTitle = comparedTour_TourTitle;
    }
 
    @Override
@@ -115,7 +126,7 @@ public class GeoCompareData {
 
             + "[" + NL //                                               //$NON-NLS-1$
 
-            + "refId                = " + refId + NL //                 //$NON-NLS-1$
+            + "refId                = " + refTour_RefId + NL //                 //$NON-NLS-1$
             + "executorId           = " + executorId + NL //            //$NON-NLS-1$
             + "isUseAppFilter       = " + isUseAppFilter + NL //        //$NON-NLS-1$
             + "isReselectedInUI     = " + isReselectedInUI + NL //      //$NON-NLS-1$

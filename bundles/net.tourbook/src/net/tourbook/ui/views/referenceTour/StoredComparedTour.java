@@ -24,7 +24,9 @@ class StoredComparedTour {
    int   startIndex;
    int   endIndex;
 
-   float tourSpeed;
    int   tourElapsedTime;
+
+   float tourSpeed;
+   float tourPace;
 
 }

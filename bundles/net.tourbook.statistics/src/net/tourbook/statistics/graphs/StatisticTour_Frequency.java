@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -282,7 +282,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          final int typeColorIndex = statData_Day.allTypeColorIndices[tourIndex];
 
          final int diffDistance = (int) ((statData_Day.allDistance_High[tourIndex] - statData_Day.allDistance_Low[tourIndex] + 500) / 1000);
-         final int diffElevation = (int) (statData_Day.allElevationUp_High[tourIndex] - statData_Day.allElevationUp_Low[tourIndex]);
+         final int diffElevationUp = (int) (statData_Day.allElevationUp_High[tourIndex] - statData_Day.allElevationUp_Low[tourIndex]);
          final int diffDurationTime = (int) (statData_Day.getDurationHighFloat()[tourIndex] - statData_Day.getDurationLowFloat()[tourIndex]);
 
          // distance
@@ -295,9 +295,9 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          _statDistance_NumTours_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
          _statDistance_Sum_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
 
-         // elevation
+         // elevation up
          groupIndex = createTourStatData(
-               diffElevation,
+               diffElevationUp,
                _statElevation_GroupValues,
                _statElevation_NumTours_High[typeColorIndex],
                _statElevation_Sum_High[typeColorIndex]);
@@ -756,7 +756,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
             _statElevation_NumTours_High,
             _statElevation_NumTours_ColorIndex,
             Messages.NUMBERS_UNIT,
-            Messages.LABEL_GRAPH_ALTITUDE);
+            Messages.LABEL_GRAPH_ELEVATION_UP);
 
       updateChartElevation(
             _chartElevation_Values,
@@ -765,7 +765,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
             _statElevation_Sum_High,
             _statElevation_Sum_ColorIndex,
             UI.UNIT_LABEL_ELEVATION,
-            Messages.LABEL_GRAPH_ALTITUDE);
+            Messages.LABEL_GRAPH_ELEVATION_UP);
 
       updateChartTime(
             _chartDuration_NumTours,

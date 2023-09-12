@@ -38,7 +38,7 @@ class ActionCompareByElevation_AllTours extends Action {
 
       setText(Messages.Elevation_Compare_Action_CompareAllTours);
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_CompareWizard));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_ElevationCompare_Tool));
    }
 
    @Override

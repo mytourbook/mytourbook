@@ -90,7 +90,7 @@
             <simpleType>
                <restriction base="string">
                   <enumeration value="Other"/>
-                  <enumeration value="Altitude"/>
+                  <enumeration value="Elevation"/>
                   <enumeration value="AthleteData"/>
                   <enumeration value="Battery"/>
                   <enumeration value="Distance"/>

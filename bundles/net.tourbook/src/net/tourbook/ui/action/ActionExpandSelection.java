@@ -88,22 +88,27 @@ public class ActionExpandSelection extends Action {
 
       final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
-      if (selection.isEmpty()) {
+      treeViewer.expandAll(true);
 
-         if (_isExpandAllWhenNoSelection) {
-
-            treeViewer.expandAll(true);
-         }
-
-      } else {
-
-         tree.setRedraw(false);
-         {
-            for (final Object name : selection) {
-               treeViewer.expandToLevel(name, _expandLevels);
-            }
-         }
-         tree.setRedraw(true);
-      }
+// TODO customize expand "all"      
+//
+//
+//      if (selection.isEmpty()) {
+//
+//         if (_isExpandAllWhenNoSelection) {
+//
+//            treeViewer.expandAll(true);
+//         }
+//
+//      } else {
+//
+//         tree.setRedraw(false);
+//         {
+//            for (final Object name : selection) {
+//               treeViewer.expandToLevel(name, _expandLevels);
+//            }
+//         }
+//         tree.setRedraw(true);
+//      }
    }
 }

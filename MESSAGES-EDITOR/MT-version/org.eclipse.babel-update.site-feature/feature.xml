@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.babel_update.site_feature"
       label="org.eclipse.babel plugins"
-      version="1.0.3.2020-09-21-MT"
+      version="1.0.6.2023-08-19-MT"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">

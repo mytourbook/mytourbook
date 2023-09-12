@@ -1029,7 +1029,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
       // check layers
       if (_allMtLayers.isEmpty()) {
          StatusUtil.showStatus(
-               NLS.bind(Messages.DBG034_Wms_Error_LayersAreNotAvailable, _mpWms.getName()),
+               NLS.bind(Messages.Error_Wms_LayersAreNotAvailable_DBG034, _mpWms.getName()),
                new Exception());
          return;
       }

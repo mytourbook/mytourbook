@@ -494,6 +494,11 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
    @Override
    public Menu getMenu(final Control parent) {
 
+      // fix: https://github.com/mytourbook/mytourbook/issues/1154
+      if (parent == null) {
+         return null;
+      }
+
       _isAdvancedMenu = true;
 
       dispose();

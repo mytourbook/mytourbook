@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -196,6 +196,7 @@ public abstract class TreeViewerItem {
       final boolean isRemoved = getFetchedChildren().remove(treeItem);
 
       if (isRemoved) {
+
          // remove parent from the child
          treeItem.setParentItem(null);
       }
@@ -223,6 +224,7 @@ public abstract class TreeViewerItem {
     * @param parentItem
     */
    public void setParentItem(final TreeViewerItem parentItem) {
+
       _parentItem = parentItem;
    }
 }

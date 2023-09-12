@@ -5,24 +5,28 @@
    <modelVersion>4.0.0</modelVersion>
    
    <artifactId>feature.net.tourbook.jre</artifactId>           <groupId>net.tourbook</groupId>
-                                                               <version>11.0.13-SNAPSHOT</version>
+                                                               <version>17.0.8-SNAPSHOT</version>
    <packaging>eclipse-feature</packaging>
 
    <parent>
       <artifactId>mytourbook-app</artifactId>                  <groupId>net.tourbook</groupId>
-                                                               <version>23.5.1-SNAPSHOT</version>
+                                                               <version>23.8.0-SNAPSHOT</version>
       <relativePath>../..</relativePath>
    </parent>
 
    <properties>
 <!-- 
-      <url.linux.x86_64>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_linux_hotspot_11.0.7_10.tar.gz</url.linux.x86_64>
+      <url.linux.x86_64> https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_linux_hotspot_11.0.7_10.tar.gz</url.linux.x86_64>
       <url.macosx.x86_64>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_mac_hotspot_11.0.7_10.tar.gz</url.macosx.x86_64>
+      <url.win32.x86_64> https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jre_x64_windows_hotspot_11.0.13_8.zip</url.win32.x86_64>
+
+      These file url's are retrieved from the adoptium download site by closing the download save dialog
+      
  -->
 
-      <url.win32.x86_64>https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jre_x64_windows_hotspot_11.0.13_8.zip</url.win32.x86_64>
+      <url.win32.x86_64>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8%2B7/OpenJDK17U-jre_x64_windows_hotspot_17.0.8_7.zip</url.win32.x86_64>
       
-      <dir-version>11.0.13+8</dir-version>
+      <dir-version>17.0.8+7</dir-version>
    </properties>
 
    <build>

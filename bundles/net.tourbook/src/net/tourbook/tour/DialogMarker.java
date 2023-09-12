@@ -153,10 +153,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    /*
     * UI controls
     */
+   private Sash                _sashInner;
    private SashLeftFixedForm   _sashOuterForm;
    private SashBottomFixedForm _sashInnerForm;
-   private Composite           _outerFixedPart;
-   private Composite           _innerFixedPart;
+   private Composite           _sashOuterFixedPart;
+   private Composite           _sashInnerFixedPart;
 
    private TableViewer         _markerViewer;
 
@@ -523,7 +524,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          GridLayoutFactory.swtDefaults().applyTo(sashContainer);
          {
             // left part
-            _outerFixedPart = createUI_10_LeftPart(sashContainer);
+            _sashOuterFixedPart = createUI_10_LeftPart(sashContainer);
 
             // sash
             final Sash sash = new Sash(sashContainer, SWT.VERTICAL);
@@ -534,7 +535,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
             _sashOuterForm = new SashLeftFixedForm(
                   sashContainer,
-                  _outerFixedPart,
+                  _sashOuterFixedPart,
                   sash,
                   chartContainer,
                   50);
@@ -570,17 +571,17 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             final Composite flexiblePart = createUI_40_MarkerList(sashContainer);
 
             // sash
-            final Sash sash = new Sash(sashContainer, SWT.HORIZONTAL);
-            UI.addSashColorHandler(sash);
+            _sashInner = new Sash(sashContainer, SWT.HORIZONTAL);
+            UI.addSashColorHandler(_sashInner);
 
             // bottom part
-            _innerFixedPart = createUI_50_MarkerDetails(sashContainer);
+            _sashInnerFixedPart = createUI_50_MarkerDetails(sashContainer);
 
             _sashInnerForm = new SashBottomFixedForm(
                   sashContainer,
                   flexiblePart,
-                  sash,
-                  _innerFixedPart);
+                  _sashInner,
+                  _sashInnerFixedPart);
          }
       }
 
@@ -1481,9 +1482,12 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    private void saveState() {
 
+      final int sashInnerFixedHeight = _sashInnerFixedPart.getSize().y;
+      final int sashInnerHeight = _sashInner.getSize().y;
+
       _state.put(DIALOG_SETTINGS_POSITION, _comboLabelPosition.getSelectionIndex());
-      _state.put(STATE_OUTER_SASH_WIDTH, _outerFixedPart.getSize().x);
-      _state.put(STATE_INNER_SASH_HEIGHT, _innerFixedPart.getSize().y);
+      _state.put(STATE_OUTER_SASH_WIDTH, _sashOuterFixedPart.getSize().x);
+      _state.put(STATE_INNER_SASH_HEIGHT, sashInnerFixedHeight - sashInnerHeight);
    }
 
    @Override

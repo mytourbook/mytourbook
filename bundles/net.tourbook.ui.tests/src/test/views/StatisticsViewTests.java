@@ -40,7 +40,7 @@ public class StatisticsViewTests extends UITest {
       bot.sleep(3000);
 
       final SWTBotCombo statisticsTypeComboBox = statisticsViewBot.comboBox(0);
-      assertEquals(27, statisticsTypeComboBox.itemCount());
+      assertEquals(31, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
       statisticsTypeComboBox.setSelection(0);
       assertEquals("Daytime", statisticsTypeComboBox.selection()); //$NON-NLS-1$
@@ -55,11 +55,11 @@ public class StatisticsViewTests extends UITest {
       numYearComboBox.setSelection("9"); //$NON-NLS-1$
       assertEquals("9", numYearComboBox.selection()); //$NON-NLS-1$
 
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_MonthSummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_YearSummary);
-      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_TourFrequency);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_DaySummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_WeekSummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_MonthSummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_YearSummary);
+      statisticsTypeComboBox.setSelection(Messages.Slideout_StatisticOptions_Group_TourFrequency);
       statisticsTypeComboBox.setSelection("HR Zones - Week"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("HR Zones - Month"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Training - Line"); //$NON-NLS-1$
@@ -72,10 +72,14 @@ public class StatisticsViewTests extends UITest {
       statisticsTypeComboBox.setSelection("Distance - Week"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Distance - Month"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Distance - Year"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation - Day"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation - Week"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation - Month"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Up - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Up - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Up - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Up - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Down - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Down - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Down - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Down - Year"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Day"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Week"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Month"); //$NON-NLS-1$

@@ -454,7 +454,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
          final TourData tourData = TourManager.getInstance().getTourData(tourItem.tourId);
 
          // set altitude visible
-         final TourChartConfiguration chartConfig = new TourChartConfiguration(true, _state);
+         final TourChartConfiguration chartConfig = new TourChartConfiguration(_state);
          chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
          final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);

@@ -45,6 +45,7 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
     */
    long            tourTypeId;
    String          tourTitle;
+   boolean         hasGeoData;
 
    LocalDate       tourDate;
    int             year;
@@ -52,8 +53,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    float           avgAltimeter;
    float           avgPulse;
-   float           avgSpeed;
    float           maxPulse;
+
+   float           avgSpeed;
+   float           avgPace;
 
    ArrayList<Long> tagIds;
 
@@ -99,7 +102,7 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
    /**
     * @return Returns the Id for {@link TourCompared} entity
     */
-   public long getCompId() {
+   public long getCompareId() {
       return compareId;
    }
 
@@ -121,6 +124,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
    public int getStartIndex() {
       return startIndex;
+   }
+
+   public float getTourPace() {
+      return avgPace;
    }
 
    public float getTourSpeed() {
@@ -177,6 +184,10 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
       this.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
    }
 
+   void setTourPace(final float tourPace) {
+      this.avgPace = tourPace;
+   }
+
    void setTourSpeed(final float tourSpeed) {
       this.avgSpeed = tourSpeed;
    }
@@ -190,8 +201,8 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
 
             + "[" + NL //$NON-NLS-1$
 
-//          + " compareId = " + compareId + NL //$NON-NLS-1$
-//          + " refId     = " + refId + NL //$NON-NLS-1$
+            + " compareId = " + compareId + NL //$NON-NLS-1$
+            + " refId     = " + refId + NL //$NON-NLS-1$
             + " tourDate  = " + tourDate + NL //$NON-NLS-1$
             + " tourTitle = " + tourTitle + NL //$NON-NLS-1$
 

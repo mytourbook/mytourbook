@@ -216,7 +216,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
             final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
 
             int devYSegment = 0;
-            if (yData.isYAxisDirection()) {
+            if (yData.isYAxis_Bottom2Top()) {
                devYSegment = devYBottom - devYGraph;
             } else {
                devYSegment = devYTop + devYGraph;

@@ -143,6 +143,12 @@ public class StatisticTooltipUI_CategorizedData {
    private Label     _lblElevationUp_Summary_Unit;
    private Label     _lblElevationUp_Percentage;
 
+   private Label     _lblElevationDown;
+   private Label     _lblElevationDown_Unit;
+   private Label     _lblElevationDown_Summary;
+   private Label     _lblElevationDown_Summary_Unit;
+   private Label     _lblElevationDown_Percentage;
+
    private Label     _lblNumberOfTours;
    private Label     _lblNumberOfTours_Percentage;
    private Label     _lblNumberOfTours_Summary;
@@ -564,7 +570,7 @@ public class StatisticTooltipUI_CategorizedData {
       }
       {
          /*
-          * Elevation up
+          * Elevation gain
           */
          createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
 
@@ -579,6 +585,25 @@ public class StatisticTooltipUI_CategorizedData {
             _lblElevationUp_Summary = createUI_LabelValue(container, SWT.TRAIL);
             _lblElevationUp_Summary_Unit = createUI_LabelValue(container, SWT.LEAD);
             _columnGridData.applyTo(_lblElevationUp_Summary);
+         }
+      }
+      {
+         /*
+          * Elevation loss
+          */
+         createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeDown);
+
+         _lblElevationDown = createUI_LabelValue(container, SWT.TRAIL);
+         _lblElevationDown_Unit = createUI_LabelValue(container, SWT.LEAD);
+
+         if (_isShowPercentage) {
+            _lblElevationDown_Percentage = createUI_LabelValue(container, SWT.TRAIL);
+         }
+
+         if (_isShowSummary) {
+            _lblElevationDown_Summary = createUI_LabelValue(container, SWT.TRAIL);
+            _lblElevationDown_Summary_Unit = createUI_LabelValue(container, SWT.LEAD);
+            _columnGridData.applyTo(_lblElevationDown_Summary);
          }
       }
    }
@@ -750,17 +775,23 @@ public class StatisticTooltipUI_CategorizedData {
       final float computedTime_Moving_Percentage         = computedTime_Moving_Summary == 0 ? 0 : (float) computedTime_Moving / computedTime_Moving_Summary * 100;
       final float computedTime_Break_Percentage          = computedTime_Break_Summary  == 0 ? 0 : (float) computedTime_Break  / computedTime_Break_Summary  * 100;
 
-      final float distance                               = _tourData_Common.distance_High_Resorted    [_serieIndex][_valueIndex];
-      final float elevationUp                            = _tourData_Common.elevationUp_High_Resorted [_serieIndex][_valueIndex];
-      final float numTours                               = _tourData_Common.numTours_High_Resorted    [_serieIndex][_valueIndex] ;
+      final float distance                               = _tourData_Common.distance_High_Resorted       [_serieIndex][_valueIndex];
+      final float numTours                               = _tourData_Common.numTours_High_Resorted       [_serieIndex][_valueIndex];
+
+      final float elevationUp                            = _tourData_Common.elevationUp_High_Resorted    [_serieIndex][_valueIndex];
+      final float elevationDown                          = _tourData_Common.elevationDown_High_Resorted  [_serieIndex][_valueIndex];
 
       final float distance_Summary                       = computeSummary(_tourData_Common.distance_High_Resorted,      _valueIndex);
-      final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
       final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex);
 
+      final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
+      final float elevationDown_Summary                  = computeSummary(_tourData_Common.elevationDown_High_Resorted, _valueIndex);
+
       final float distance_Percentage                    = distance_Summary    == 0 ? 0 : distance    / distance_Summary      * 100;
-      final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
       final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
+
+      final float elevationUp_Percentage                 = elevationUp_Summary   == 0 ? 0 : elevationUp   / elevationUp_Summary     * 100;
+      final float elevationDown_Percentage               = elevationDown_Summary == 0 ? 0 : elevationDown / elevationDown_Summary   * 100;
 
       final String deviceTime_Elapsed_Percentage_Text    = deviceTime_Elapsed_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Elapsed_Percentage);
       final String deviceTime_Recorded_Percentage_Text   = deviceTime_Recorded_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Recorded_Percentage);
@@ -769,7 +800,9 @@ public class StatisticTooltipUI_CategorizedData {
       final String computedTime_Break_Percentage_Text    = computedTime_Break_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(computedTime_Break_Percentage);
 
       final String distance_Percentage_Text              = distance_Percentage            == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(distance_Percentage);
+
       final String elevationUp_Percentage_Text           = elevationUp_Percentage         == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(elevationUp_Percentage);
+      final String elevationDown_Percentage_Text         = elevationDown_Percentage       == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(elevationDown_Percentage);
 
       final String deviceTime_Elapsed_UnitText           = deviceTime_Elapsed             == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
       final String deviceTime_Recorded_UnitText          = deviceTime_Recorded            == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
@@ -803,6 +836,8 @@ public class StatisticTooltipUI_CategorizedData {
 
       _lblElevationUp                        .setText(elevationUp    == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp));
       _lblElevationUp_Unit                   .setText(elevationUp    == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+      _lblElevationDown                      .setText(elevationDown  == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationDown));
+      _lblElevationDown_Unit                 .setText(elevationDown  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
       _lblNumberOfTours                      .setText(Integer.toString((int) (numTours + 0.5)));
 
@@ -820,11 +855,13 @@ public class StatisticTooltipUI_CategorizedData {
          _lblComputedTime_Break_Summary      .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break_Summary));
          _lblComputedTime_Break_Summary_Unit .setText(computedTime_Break_Summary_UnitText);
 
-         _lblDistance_Summary                .setText(distance_Summary     == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary  (distance_Summary / 1000.0));
-         _lblDistance_Summary_Unit           .setText(distance_Summary     == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+         _lblDistance_Summary                .setText(distance_Summary        == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary  (distance_Summary / 1000.0));
+         _lblDistance_Summary_Unit           .setText(distance_Summary        == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-         _lblElevationUp_Summary             .setText(elevationUp_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp_Summary));
-         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+         _lblElevationUp_Summary             .setText(elevationUp_Summary     == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationUp_Summary));
+         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary     == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
+         _lblElevationDown_Summary           .setText(elevationDown_Summary   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary (elevationDown_Summary));
+         _lblElevationDown_Summary_Unit      .setText(elevationDown_Summary   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
          _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
       }
@@ -839,7 +876,9 @@ public class StatisticTooltipUI_CategorizedData {
          _lblComputedTime_Break_Percentage   .setText(computedTime_Break_Percentage_Text);
 
          _lblDistance_Percentage             .setText(distance_Percentage_Text);
+
          _lblElevationUp_Percentage          .setText(elevationUp_Percentage_Text);
+         _lblElevationDown_Percentage        .setText(elevationDown_Percentage_Text);
 
          _lblNumberOfTours_Percentage        .setText(Integer.toString((int) (numTours_Percentage + 0.5)));
       }

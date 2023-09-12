@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -130,7 +131,10 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String           HREF_MARKER_ITEM = "#MarkerItem";                //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM = "#MarkerItem";                                                    //$NON-NLS-1$
+
+   private static final Pattern          HTTP_PATTERN     = Pattern.compile("(http|https|ftp):\\/\\/(\\S*)", Pattern.DOTALL); //$NON-NLS-1$
+   private static final String           HTTP_REPLACEMENT = "<a href=\"$1://$2\">$1://$2</a>";                                //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore       = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state           = TourbookPlugin.getState(ID);
@@ -467,6 +471,8 @@ public class TourBlogView extends ViewPart {
                 * Description
                 */
                if (isDescription) {
+
+                  tourDescription = HTTP_PATTERN.matcher(tourDescription).replaceAll(HTTP_REPLACEMENT);
 
                   if (UI.IS_SCRAMBLE_DATA) {
                      tourDescription = UI.scrambleText(tourDescription);

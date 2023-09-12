@@ -61,21 +61,25 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  */
 public class SlideoutTourChartOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private final IPreferenceStore  _prefStore           = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
-   private SelectionListener       _defaultSelectionListener;
-   private MouseWheelListener      _defaultMouseWheelListener;
-   private FocusListener           _keepOpenListener;
+   private SelectionListener      _defaultSelectionListener;
+   private MouseWheelListener     _defaultMouseWheelListener;
+   private FocusListener          _keepOpenListener;
 
-   private ActionOpenPrefDialog    _actionPrefDialog;
-   private ActionResetToDefaults   _actionRestoreDefaults;
+   private ActionOpenPrefDialog   _actionPrefDialog;
+   private ActionResetToDefaults  _actionRestoreDefaults;
 
-   private ChartOptions_Grid       _gridUI;
+   private ChartOptions_Grid      _gridUI;
+
+   private boolean                _isNeededToRecomputeValues;
+
+   private int                    _speedDistanceIntervalBackup;
 
    /**
     * Pulse graph values MUST be in sync with pulse graph labels
     */
-   private PulseGraph[]            _allPulseGraph_Value = {
+   private PulseGraph[]           _allPulseGraph_Value = {
 
          PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE,
          PulseGraph.DEVICE_BPM_ONLY,
@@ -90,7 +94,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    /**
     * Pulse graph labels MUST be in sync with pulse graph values
     */
-   private String[]                _allPulseGraph_Label = {
+   private String[]               _allPulseGraph_Label = {
 
          Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRAverage,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
@@ -101,7 +105,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
          Messages.TourChart_PulseGraph_RRAverage_2nd_DeviceBpm,
    };
 
-   private ArrayList<PulseGraph>   _possiblePulseGraph_Values;
+   private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
 
    /*
     * UI controls
@@ -125,6 +129,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
    private Spinner   _spinnerGraphLineOpacity;
    private Spinner   _spinnerNightSectionsOpacity;
+   private Spinner   _spinnerSpeedDistanceInterval;
 
    private Combo     _comboPulseValueGraph;
 
@@ -359,7 +364,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
             .grab(true, false)
             .applyTo(group);
       GridLayoutFactory.swtDefaults()
-            .numColumns(2)
+            .numColumns(3)
             .applyTo(group);
 //      group.setBackground(UI.SYS_COLOR_BLUE);
       {
@@ -367,7 +372,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
           * Put into separate container to reduce slideout width
           */
          final Composite container = new Composite(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
             {
@@ -392,13 +397,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
          }
          {
             /*
-             * Pace graph
+             * Invert pace graph
              */
             _chkInvertPaceGraph = new Button(group, SWT.CHECK);
             _chkInvertPaceGraph.setText(Messages.Slideout_TourChartOptions_Checkbox_InvertPaceGraph);
             _chkInvertPaceGraph.setToolTipText(Messages.Slideout_TourChartOptions_Checkbox_InvertPaceGraph_Tooltip);
             _chkInvertPaceGraph.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkInvertPaceGraph);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkInvertPaceGraph);
          }
          {
             /*
@@ -408,34 +413,66 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
             _chkGraphAntialiasing.setText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing);
             _chkGraphAntialiasing.setToolTipText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip);
             _chkGraphAntialiasing.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkGraphAntialiasing);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkGraphAntialiasing);
+         }
+         {
+            /*
+             * Speed/pace graph distance interval
+             */
+            {
+               // Label
+               final Label label = new Label(group, SWT.NONE);
+               label.setText(Messages.Slideout_TourChartOptions_Label_SpeedAndPaceDistanceInterval);
+            }
+            {
+               // Spinner: Distance 0.1 ... 100.0 km/mi
+               _spinnerSpeedDistanceInterval = new Spinner(group, SWT.BORDER);
+               _spinnerSpeedDistanceInterval.setMinimum(1);
+               _spinnerSpeedDistanceInterval.setMaximum(1000);
+               _spinnerSpeedDistanceInterval.setDigits(1);
+               _spinnerSpeedDistanceInterval.setPageIncrement(10);
+               _spinnerSpeedDistanceInterval.addSelectionListener(_defaultSelectionListener);
+               _spinnerSpeedDistanceInterval.addMouseWheelListener(_defaultMouseWheelListener);
+            }
+            {
+               // Label: Distance unit
+               final Label label = new Label(group, SWT.NONE);
+               label.setText(UI.UNIT_LABEL_DISTANCE);
+            }
          }
          {
             /*
              * Graph line transparency
              */
+
             final String tooltipText = NLS.bind(
                   Messages.Pref_Graphs_Label_GraphTransparencyLine_Tooltip,
                   UI.TRANSFORM_OPACITY_MAX);
 
-            final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Graphs_Label_GraphTransparencyLine);
-            label.setToolTipText(tooltipText);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
-
-            _spinnerGraphLineOpacity = new Spinner(group, SWT.BORDER);
-            _spinnerGraphLineOpacity.setMinimum(0);
-            _spinnerGraphLineOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
-            _spinnerGraphLineOpacity.setIncrement(1);
-            _spinnerGraphLineOpacity.setPageIncrement(10);
-            _spinnerGraphLineOpacity.setToolTipText(tooltipText);
-            _spinnerGraphLineOpacity.addMouseWheelListener(_defaultMouseWheelListener);
-            _spinnerGraphLineOpacity.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerGraphLineOpacity);
+            {
+               final Label label = new Label(group, SWT.NONE);
+               label.setText(Messages.Pref_Graphs_Label_GraphTransparencyLine);
+               label.setToolTipText(tooltipText);
+               GridDataFactory.fillDefaults()
+                     .align(SWT.FILL, SWT.CENTER)
+                     .applyTo(label);
+            }
+            {
+               _spinnerGraphLineOpacity = new Spinner(group, SWT.BORDER);
+               _spinnerGraphLineOpacity.setMinimum(0);
+               _spinnerGraphLineOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
+               _spinnerGraphLineOpacity.setIncrement(1);
+               _spinnerGraphLineOpacity.setPageIncrement(10);
+               _spinnerGraphLineOpacity.setToolTipText(tooltipText);
+               _spinnerGraphLineOpacity.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinnerGraphLineOpacity.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults()
+                     .applyTo(_spinnerGraphLineOpacity);
+            }
+            {
+               final Label spacer = UI.createSpacer_Horizontal(group, 1);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(spacer);
+            }
          }
       }
    }
@@ -463,11 +500,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       _rdoShowSrtm1Values.setEnabled(isShowSRTMValues);
       _rdoShowSrtm3Values.setEnabled(isShowSRTMValues);
-   }
-
-   private PulseGraph getSelectedPulseGraph() {
-
-      return _allPulseGraph_Value[_comboPulseValueGraph.getSelectionIndex()];
    }
 
    private void initUI() {
@@ -506,7 +538,16 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       enableControls();
 
       // update chart with new settings
-      _tourChart.updateTourChart();
+      if (_isNeededToRecomputeValues) {
+
+         _isNeededToRecomputeValues = false;
+
+         _tourChart.updateTourChart(true, true);
+
+      } else {
+
+         _tourChart.updateTourChart();
+      }
    }
 
    private void onSelectSRTM() {
@@ -587,6 +628,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       final int nightSectionsOpacity               = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY);
       final int graphLineOpacity                   = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
 
+      final float speedDistanceInterval            = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL);
+
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
             : X_AXIS_START_TIME.START_WITH_0;
@@ -613,6 +656,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       _spinnerGraphLineOpacity      .setSelection(UI.transformOpacity_WhenRestored(graphLineOpacity));
       _spinnerNightSectionsOpacity  .setSelection(UI.transformOpacity_WhenRestored(nightSectionsOpacity));
+      _spinnerSpeedDistanceInterval .setSelection((int) (UI.convertSpeed_FromMetric(speedDistanceInterval) / 100));
 
       setSelection_PulseGraph(TourChart.PULSE_GRAPH_DEFAULT,
             tcc.canShowPulseSerie,
@@ -636,14 +680,18 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
          return;
       }
 
-      final boolean isShowSrtm1Values  = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_SRTM_1_VALUES);
-      final int nightSectionsOpacity   = _prefStore.getInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY);
-      final int graphLineOpacity       = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      final boolean isShowSrtm1Values     = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_SRTM_1_VALUES);
+      final int nightSectionsOpacity      = _prefStore.getInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY);
+      final int graphLineOpacity          = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+
+      final float speedDistanceInterval   = _prefStore.getInt(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL);
+      _speedDistanceIntervalBackup  = (int) (UI.convertSpeed_FromMetric(speedDistanceInterval) / 100);
 
       _chkInvertPaceGraph           .setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
       _chkShowNightSections         .setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS));
 
       _spinnerNightSectionsOpacity  .setSelection(UI.transformOpacity_WhenRestored(nightSectionsOpacity));
+      _spinnerSpeedDistanceInterval .setSelection(_speedDistanceIntervalBackup);
 
       _chkShowSrtmData              .setSelection(tcc.isSRTMDataVisible);
       _chkShowStartTimeOnXAxis      .setSelection(tcc.xAxisTime == X_AXIS_START_TIME.TOUR_START_TIME);
@@ -687,11 +735,22 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       final int graphLineOpacity                   = _spinnerGraphLineOpacity.getSelection();
       final int nightSectionsOpacity               = _spinnerNightSectionsOpacity.getSelection();
 
+      final int speedDistanceIntervalSelection     = _spinnerSpeedDistanceInterval.getSelection() * 100;
+      final int speedDistanceInterval              = (int) UI.convertSpeed_ToMetric(speedDistanceIntervalSelection);
+
+      if (speedDistanceIntervalSelection != _speedDistanceIntervalBackup) {
+
+         _isNeededToRecomputeValues = true;
+
+         // update backup value
+         _speedDistanceIntervalBackup = speedDistanceIntervalSelection;
+      }
+
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
             : X_AXIS_START_TIME.START_WITH_0;
 
-      final PulseGraph pulseGraph = getSelectedPulseGraph();
+      final PulseGraph pulseGraph = _allPulseGraph_Value[_comboPulseValueGraph.getSelectionIndex()];
 
       /*
        * Update pref store
@@ -706,6 +765,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SHOW_SRTM_1_VALUES,            isShowSrtm1Values);
       _prefStore.setValue(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY,           UI.transformOpacity_WhenSaved(nightSectionsOpacity));
       _prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES,               pulseGraph.name());
+      _prefStore.setValue(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL,     speedDistanceInterval);
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,                UI.transformOpacity_WhenSaved(graphLineOpacity));
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,                 isTourStartTime);
 

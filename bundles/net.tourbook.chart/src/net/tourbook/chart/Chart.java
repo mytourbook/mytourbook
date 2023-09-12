@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,10 +55,6 @@ public class Chart extends ViewForm {
 
    public static final String                        CUSTOM_DATA_TOUR_ID              = "tourId";                           //$NON-NLS-1$
 
-   public static final int                           SYNCH_MODE_NO                    = 0;
-   public static final int                           SYNCH_MODE_BY_SCALE              = 1;
-   public static final int                           SYNCH_MODE_BY_SIZE               = 2;
-
    private static final int                          MouseMove                        = 10;
    private static final int                          MouseDown                        = 20;
    private static final int                          MouseUp                          = 30;
@@ -111,7 +107,7 @@ public class Chart extends ViewForm {
    private int                                       _barSelectionSerieIndex;
    private int                                       _barSelectionValueIndex;
 
-   int                                               _synchMode;
+   ChartSyncMode                                     chartSynchMode;
 
    /**
     * <code>true</code> to start the bar chart at the bottom of the chart
@@ -1249,8 +1245,8 @@ public class Chart extends ViewForm {
       _synchedChart = chartWidget;
    }
 
-   protected void setSynchMode(final int synchMode) {
-      _synchMode = synchMode;
+   protected void setSynchMode(final ChartSyncMode chartSyncMode) {
+      chartSynchMode = chartSyncMode;
    }
 
    /**
@@ -1335,7 +1331,7 @@ public class Chart extends ViewForm {
       final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
 
       _action_ZoomIn.setEnabled(canZoomIn && isEnabled);
-      _action_ZoomOut.setEnabled(canZoomOut);
+      _action_ZoomOut.setEnabled(canZoomOut && isEnabled);
 
       _allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(isEnabled);
    }
@@ -1353,7 +1349,15 @@ public class Chart extends ViewForm {
          return;
       }
 
-      getDisplay().asyncExec(() -> _synchedChart.setSynchConfig(_chartComponents.synchConfigOut));
+      getDisplay().asyncExec(() -> {
+
+         // it needs another check to fix a NPE
+
+         if (_synchedChart != null) {
+
+            _synchedChart.setSynchConfig(_chartComponents.synchConfigOut);
+         }
+      });
    }
 
    /**
@@ -1385,12 +1389,11 @@ public class Chart extends ViewForm {
                            final boolean isResetSelection,
                            final boolean isShowAllData) {
 
-      if (chartDataModel == null || //
-            (chartDataModel.getYData().isEmpty() //
+      if (chartDataModel == null
+            || (chartDataModel.getYData().isEmpty()
 
-                  // history do not have Y values
-                  && chartDataModel.getChartType() != ChartType.HISTORY) //
-      ) {
+                  // the history graph do not have Y values
+                  && chartDataModel.getChartType() != ChartType.HISTORY)) {
 
          final ChartDataModel emptyModel = new ChartDataModel(ChartType.LINE);
 

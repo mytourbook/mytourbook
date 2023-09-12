@@ -73,7 +73,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
 
             + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
+
             + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
+            + STAT_VALUE_ELEVATION_DOWN.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead1()
 
@@ -94,7 +96,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getHead2()
 
             + STAT_VALUE_MOTION_DISTANCE.getHead2()
+
             + STAT_VALUE_ELEVATION_UP.getHead2()
+            + STAT_VALUE_ELEVATION_DOWN.getHead2()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead2()
 
@@ -115,7 +119,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getValueFormatting()
 
             + STAT_VALUE_MOTION_DISTANCE.getValueFormatting()
+
             + STAT_VALUE_ELEVATION_UP.getValueFormatting()
+            + STAT_VALUE_ELEVATION_DOWN.getValueFormatting()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getValueFormatting()
 
@@ -190,7 +196,9 @@ public class DataProvider_Tour_Year extends DataProvider {
                      _tourYearData.breakTime[tourTypeIndex][yearIndex],
 
                      _tourYearData.distance_High[tourTypeIndex][yearIndex] / 1000,
+
                      _tourYearData.elevationUp_High[tourTypeIndex][yearIndex],
+                     _tourYearData.elevationDown_High[tourTypeIndex][yearIndex],
 
                      _tourYearData.numTours_High[tourTypeIndex][yearIndex]
 
@@ -252,7 +260,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 
          String fromTourData;
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
 
@@ -279,7 +287,8 @@ public class DataProvider_Tour_Year extends DataProvider {
                   + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
 
                   + "      TourDistance," + NL //                                               //$NON-NLS-1$
-                  + "      TourAltUp," + NL //                                                   //$NON-NLS-1$
+                  + "      TourAltUp," + NL //                                                  //$NON-NLS-1$
+                  + "      TourAltDown," + NL //                                                //$NON-NLS-1$
 
                   + "      BodyWeight,         " + NL //       //$NON-NLS-1$
                   + "      BodyFat          " + NL //       //$NON-NLS-1$
@@ -326,11 +335,12 @@ public class DataProvider_Tour_Year extends DataProvider {
 
                + "   SUM(TourDistance)," + NL //                           8  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                              9  //$NON-NLS-1$
+               + "   SUM(TourAltDown)," + NL //                            10 //$NON-NLS-1$
 
-               + "   SUM(1)," + NL //                                       10 //$NON-NLS-1$
+               + "   SUM(1)," + NL //                                      11 //$NON-NLS-1$
 
-               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      11 //$NON-NLS-1$
-               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyWeight = 0    THEN NULL ELSE BodyWeight END)," + NL //  12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0       THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
                + fromTourData
 
@@ -344,12 +354,15 @@ public class DataProvider_Tour_Year extends DataProvider {
          numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
          final float[][] dbDistance = new float[numTourTypes][numYears];
-         final float[][] dbElevation = new float[numTourTypes][numYears];
+         final float[][] dbElevationUp = new float[numTourTypes][numYears];
+         final float[][] dbElevationDown = new float[numTourTypes][numYears];
          final float[][] dbNumTours = new float[numTourTypes][numYears];
+
          @SuppressWarnings("unchecked")
          final ArrayList<Float>[] dbBodyWeight = new ArrayList[numYears];
          @SuppressWarnings("unchecked")
          final ArrayList<Float>[] dbBodyFat = new ArrayList[numYears];
+
          // initializing
          for (int index = 0; index < numYears; index++) {
             dbBodyWeight[index] = new ArrayList<>();
@@ -400,11 +413,13 @@ public class DataProvider_Tour_Year extends DataProvider {
             final int dbValue_Duration             = result.getInt(7);
 
             final long dbValue_Distance            = (long) (result.getInt(8) / UI.UNIT_VALUE_DISTANCE);
-            final long dbValue_ElevationUp         = (long) (result.getInt(9) / UI.UNIT_VALUE_ELEVATION);
 
-            final int dbValue_NumTours             = result.getInt(10);
-            final float dbValue_BodyWeight         = result.getFloat(11) * UI.UNIT_VALUE_WEIGHT;
-            final float dbValue_BodyFat            = result.getFloat(12);
+            final long dbValue_ElevationUp         = (long) (result.getInt(9) / UI.UNIT_VALUE_ELEVATION);
+            final long dbValue_ElevationDown       = (long) (result.getInt(10) / UI.UNIT_VALUE_ELEVATION);
+
+            final int dbValue_NumTours             = result.getInt(11);
+            final float dbValue_BodyWeight         = result.getFloat(12) * UI.UNIT_VALUE_WEIGHT;
+            final float dbValue_BodyFat            = result.getFloat(13);
 
 // SET_FORMATTING_ON
 
@@ -440,7 +455,10 @@ public class DataProvider_Tour_Year extends DataProvider {
             dbTypeIds[colorIndex][yearIndex] = dbTypeId;
 
             dbDistance[colorIndex][yearIndex] = dbValue_Distance;
-            dbElevation[colorIndex][yearIndex] = dbValue_ElevationUp;
+
+            dbElevationUp[colorIndex][yearIndex] = dbValue_ElevationUp;
+            dbElevationDown[colorIndex][yearIndex] = dbValue_ElevationDown;
+
             dbNumTours[colorIndex][yearIndex] = dbValue_NumTours;
             if (dbValue_BodyWeight > 0) {
                dbBodyWeight[yearIndex].add(dbValue_BodyWeight);
@@ -473,7 +491,8 @@ public class DataProvider_Tour_Year extends DataProvider {
           */
          final ArrayList<Object> allTypeIds_WithData = new ArrayList<>();
 
-         final ArrayList<Object> allElevation_WithData = new ArrayList<>();
+         final ArrayList<Object> allElevationUp_WithData = new ArrayList<>();
+         final ArrayList<Object> allElevationDown_WithData = new ArrayList<>();
          final ArrayList<Object> allDistance_WithData = new ArrayList<>();
          final ArrayList<Object> allDuration_WithData = new ArrayList<>();
          final ArrayList<Object> allNumTours_WithData = new ArrayList<>();
@@ -492,7 +511,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 
                allTypeIds_WithData.add(dbTypeIds[tourTypeIndex]);
 
-               allElevation_WithData.add(dbElevation[tourTypeIndex]);
+               allElevationUp_WithData.add(dbElevationUp[tourTypeIndex]);
+               allElevationDown_WithData.add(dbElevationDown[tourTypeIndex]);
                allDistance_WithData.add(dbDistance[tourTypeIndex]);
                allDuration_WithData.add(dbDurationTime[tourTypeIndex]);
                allNumTours_WithData.add(dbNumTours[tourTypeIndex]);
@@ -519,6 +539,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 
             _tourYearData.elevationUp_Low = new float[1][numYears];
             _tourYearData.elevationUp_High = new float[1][numYears];
+            _tourYearData.elevationDown_Low = new float[1][numYears];
+            _tourYearData.elevationDown_High = new float[1][numYears];
 
             _tourYearData.distance_Low = new float[1][numYears];
             _tourYearData.distance_High = new float[1][numYears];
@@ -544,7 +566,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 
             final long[][] usedTypeIds = new long[numTourTypes_WithData][];
 
-            final float[][] usedElevation = new float[numTourTypes_WithData][];
+            final float[][] usedElevationUp = new float[numTourTypes_WithData][];
+            final float[][] usedElevationDown = new float[numTourTypes_WithData][];
             final float[][] usedDistance = new float[numTourTypes_WithData][];
             final int[][] usedDuration = new int[numTourTypes_WithData][];
             final int[][] usedElapsedTime = new int[numTourTypes_WithData][];
@@ -558,7 +581,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 
                usedTypeIds[index] = (long[]) allTypeIds_WithData.get(index);
 
-               usedElevation[index] = (float[]) allElevation_WithData.get(index);
+               usedElevationUp[index] = (float[]) allElevationUp_WithData.get(index);
+               usedElevationDown[index] = (float[]) allElevationDown_WithData.get(index);
                usedDistance[index] = (float[]) allDistance_WithData.get(index);
 
                usedDuration[index] = (int[]) allDuration_WithData.get(index);
@@ -575,7 +599,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             _tourYearData.usedTourTypeIds = usedTourTypeIds;
 
             _tourYearData.elevationUp_Low = new float[numTourTypes_WithData][numYears];
-            _tourYearData.elevationUp_High = usedElevation;
+            _tourYearData.elevationUp_High = usedElevationUp;
+            _tourYearData.elevationDown_Low = new float[numTourTypes_WithData][numYears];
+            _tourYearData.elevationDown_High = usedElevationDown;
 
             _tourYearData.distance_Low = new float[numTourTypes_WithData][numYears];
             _tourYearData.distance_High = usedDistance;

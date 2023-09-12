@@ -68,7 +68,7 @@ public class TVIRefTour_YearItem extends TVIRefTour_Item {
       final TreeViewerItem parentItem = getParentItem();
       if (parentItem instanceof TVIRefTour_RefTourItem) {
 
-         ((TVIRefTour_RefTourItem) parentItem).fetchComparedTours(this, children, year);
+         ((TVIRefTour_RefTourItem) parentItem).fetchChildren_WithoutSubCategories(this, children, year);
       }
    }
 

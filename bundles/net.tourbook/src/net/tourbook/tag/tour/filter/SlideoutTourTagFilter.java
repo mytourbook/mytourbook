@@ -1079,7 +1079,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
                final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
 
-               styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.TAG_STYLER);
+               styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
                cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
 
             } else if (element instanceof TVIPrefTagCategory) {
@@ -1089,11 +1089,11 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
                cell.setImage(_imgTagCategory);
 
-               styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+               styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                // get number of categories
-               final int categoryCounter = tourTagCategory.getCategoryCounter();
-               final int tagCounter = tourTagCategory.getTagCounter();
+               final int categoryCounter = tourTagCategory.getNumberOfCategories();
+               final int tagCounter = tourTagCategory.getNumberOfTags();
                if (categoryCounter == -1 && tagCounter == -1) {
 
 //                  styledString.append("  ...", StyledString.COUNTER_STYLER);

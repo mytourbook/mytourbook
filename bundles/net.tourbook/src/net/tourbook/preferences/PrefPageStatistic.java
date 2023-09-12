@@ -115,7 +115,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
       _sortingByCategoryData.put("Training",    3); //$NON-NLS-1$
       _sortingByCategoryData.put("Time",        20); //$NON-NLS-1$
       _sortingByCategoryData.put("Distance",    21); //$NON-NLS-1$
-      _sortingByCategoryData.put("Altitude",    22); //$NON-NLS-1$
+      _sortingByCategoryData.put("Elevation",   22); //$NON-NLS-1$
       _sortingByCategoryData.put("AthleteData", 30); //$NON-NLS-1$
       _sortingByCategoryData.put("Battery",     40); //$NON-NLS-1$
       _sortingByCategoryData.put("Sensor",      42); //$NON-NLS-1$
@@ -173,7 +173,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
    private Composite createUI(final Composite parent) {
 
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.pref_statistic_lbl_info);
+      label.setText(Messages.Pref_Statistic_Label_Info);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);

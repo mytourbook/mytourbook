@@ -45,9 +45,11 @@ import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.graphics.Color;
 
 class TourBook_ColumnFactory {
 
@@ -88,6 +90,11 @@ class TourBook_ColumnFactory {
    private boolean              _isShowToolTipIn_WeekDay;
 
    private PixelConverter       _pc;
+
+   private Color                _colorDate_Category;
+   private Color                _colorDate_SubCategory;
+   private Color                _colorTour;
+   private Color                _colorTotal;
 
    TourBook_ColumnFactory(final ColumnManager columnManager_NatTable, final ColumnManager columnManager_Tree, final PixelConverter pc) {
 
@@ -319,8 +326,9 @@ class TourBook_ColumnFactory {
             }
 
             final Object element = cell.getElement();
-            if ((element instanceof TVITourBookTour)) {
-               return ((TVITourBookItem) element).getTourId();
+
+            if ((element instanceof final TVITourBookTour tourItem)) {
+               return tourItem.getTourId();
             }
 
             return null;
@@ -332,14 +340,14 @@ class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             final TVITourBookItem tviItem = (TVITourBookItem) element;
 
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
                // tour item
 
-               final TVITourBookTour tourItem = (TVITourBookTour) tviItem;
-
                // show day only
                cell.setText(tourItem.treeColumn);
+
+               setCellColor(cell, element);
 
             } else {
 
@@ -348,6 +356,7 @@ class TourBook_ColumnFactory {
                final StyledString styledString = new StyledString();
 
                boolean isShowSummaryRow = false;
+
                if (element instanceof TVITourBookYear && _isShowSummaryRow) {
                   isShowSummaryRow = ((TVITourBookYear) element).isRowSummary;
                }
@@ -357,12 +366,14 @@ class TourBook_ColumnFactory {
                   // show summary row
 
                   styledString.append(Messages.Tour_Book_Label_Total);
+
                } else {
+
                   styledString.append(tviItem.treeColumn);
                }
 
                styledString.append(UI.SPACE3);
-               styledString.append(Long.toString(tviItem.colCounter), StyledString.QUALIFIER_STYLER);
+               styledString.append(Long.toString(tviItem.colCounter), net.tourbook.ui.UI.TOTAL_STYLER);
 
                cell.setText(styledString.getString());
                cell.setStyleRanges(styledString.getStyleRanges());
@@ -493,9 +504,10 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
 
-               final long dbPersonId = ((TVITourBookTour) element).colPersonId;
+            if (element instanceof final TVITourBookTour tourItem) {
+
+               final long dbPersonId = tourItem.colPersonId;
 
                cell.setText(PersonManager.getPersonName(dbPersonId));
             }
@@ -645,9 +657,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               cell.setText(((TVITourBookTour) element).col_ImportFileName);
+               cell.setText(tourItem.col_ImportFileName);
 
                setCellColor(cell, element);
             }
@@ -676,9 +688,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               cell.setText(((TVITourBookTour) element).col_ImportFilePath);
+               cell.setText(tourItem.col_ImportFilePath);
                setCellColor(cell, element);
             }
          }
@@ -744,9 +756,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final short dbTimeInterval = ((TVITourBookTour) element).getColumnTimeInterval();
+               final short dbTimeInterval = tourItem.getColumnTimeInterval();
                if (dbTimeInterval == 0) {
                   cell.setText(UI.EMPTY_STRING);
                } else {
@@ -786,9 +798,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final long dbValue = ((TVITourBookTour) element).tourId;
+               final long dbValue = tourItem.tourId;
                if (dbValue == 0) {
                   cell.setText(UI.EMPTY_STRING);
                } else {
@@ -907,9 +919,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
+               final long dbStartDistance = tourItem.getColumnStartDistance();
                final double value = dbStartDistance / UI.UNIT_VALUE_DISTANCE;
 
                colDef_Tree.printValue_0(cell, value);
@@ -2743,9 +2755,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final String timeZoneId = ((TVITourBookTour) element).colTimeZoneId;
+               final String timeZoneId = tourItem.colTimeZoneId;
                cell.setText(timeZoneId == null ? UI.EMPTY_STRING : timeZoneId);
 
                setCellColor(cell, element);
@@ -2765,9 +2777,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
+               final TourDateTime tourDateTime = tourItem.colTourDateTime;
 
                cell.setText(tourDateTime.timeZoneOffsetLabel);
 
@@ -2794,11 +2806,19 @@ class TourBook_ColumnFactory {
 
             final ValueFormat valueFormatter = colDef_NatTable.getValueFormat_Detail();
 
+            String tourStartTime;
+
             if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
-               return tourStartDateTime.format(TimeTools.Formatter_Time_M);
+               tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_M);
             } else {
-               return tourStartDateTime.format(TimeTools.Formatter_Time_S);
+               tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_S);
             }
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourStartTime = UI.scrambleText(tourStartTime);
+            }
+
+            return tourStartTime;
          }
 
          @Override
@@ -2819,8 +2839,8 @@ class TourBook_ColumnFactory {
             }
 
             final Object element = cell.getElement();
-            if ((element instanceof TVITourBookTour)) {
-               return ((TVITourBookTour) element).getTourId();
+            if ((element instanceof final TVITourBookTour tourItem)) {
+               return tourItem.getTourId();
             }
 
             return null;
@@ -2830,18 +2850,26 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
+               final TourDateTime tourDateTime = tourItem.colTourDateTime;
                final ZonedDateTime tourStartDateTime = tourDateTime.tourZonedDateTime;
 
                final ValueFormat valueFormatter = colDef_Tree.getValueFormat_Detail();
 
+               String tourStartTime;
+
                if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
-                  cell.setText(tourStartDateTime.format(TimeTools.Formatter_Time_M));
+                  tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_M);
                } else {
-                  cell.setText(tourStartDateTime.format(TimeTools.Formatter_Time_S));
+                  tourStartTime = tourStartDateTime.format(TimeTools.Formatter_Time_S);
                }
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourStartTime = UI.scrambleText(tourStartTime);
+               }
+
+               cell.setText(tourStartTime);
 
                setCellColor(cell, element);
             }
@@ -2882,8 +2910,8 @@ class TourBook_ColumnFactory {
             }
 
             final Object element = cell.getElement();
-            if ((element instanceof TVITourBookTour)) {
-               return ((TVITourBookTour) element).getTourId();
+            if ((element instanceof final TVITourBookTour tourItem)) {
+               return tourItem.getTourId();
             }
 
             return null;
@@ -2893,9 +2921,9 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               cell.setText(((TVITourBookTour) element).colWeekDay);
+               cell.setText(tourItem.colWeekDay);
                setCellColor(cell, element);
             }
          }
@@ -3214,8 +3242,8 @@ class TourBook_ColumnFactory {
             }
 
             final Object element = cell.getElement();
-            if ((element instanceof TVITourBookTour)) {
-               return ((TVITourBookTour) element).getTourId();
+            if (element instanceof final TVITourBookTour tourItem) {
+               return tourItem.getTourId();
             }
 
             return null;
@@ -3224,9 +3252,9 @@ class TourBook_ColumnFactory {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).getTagIds()));
+               cell.setText(TourDatabase.getTagNames(tourItem.getTagIds()));
                setCellColor(cell, element);
             }
          }
@@ -3274,8 +3302,8 @@ class TourBook_ColumnFactory {
             }
 
             final Object element = cell.getElement();
-            if ((element instanceof TVITourBookTour)) {
-               return ((TVITourBookTour) element).getTourId();
+            if ((element instanceof final TVITourBookTour tourItem)) {
+               return tourItem.getTourId();
             }
 
             return null;
@@ -3284,9 +3312,9 @@ class TourBook_ColumnFactory {
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
-            if (element instanceof TVITourBookTour) {
+            if (element instanceof final TVITourBookTour tourItem) {
 
-               final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
+               final String colTourTitle = tourItem.colTourTitle;
 
                if (colTourTitle == null) {
                   cell.setText(UI.EMPTY_STRING);
@@ -4119,23 +4147,42 @@ class TourBook_ColumnFactory {
 
       if (isShowSummaryRow) {
 
-         // show no other color
+         cell.setForeground(_colorTotal);
 
       } else {
 
          if (element instanceof TVITourBookYear) {
-            cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY));
+
+            cell.setForeground(_colorDate_Category);
+
          } else if (element instanceof TVITourBookYearCategorized) {
-            cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY));
-//         } else if (element instanceof TVITourBookTour) {
-//            cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+
+            cell.setForeground(_colorDate_SubCategory);
+
+         } else if (element instanceof TVITourBookTour) {
+
+            cell.setForeground(_colorTour);
          }
       }
    }
 
    void setIsShowSummaryRow(final boolean isShowSummaryRow) {
 
-      this._isShowSummaryRow = isShowSummaryRow;
+      _isShowSummaryRow = isShowSummaryRow;
+   }
+
+   void updateColors() {
+
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+// SET_FORMATTING_OFF
+
+      _colorDate_Category     = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY);
+      _colorDate_SubCategory  = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY);
+      _colorTour              = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_TOUR);
+      _colorTotal             = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_TOTAL);
+
+// SET_FORMATTING_ON
    }
 
    void updateToolTipState() {

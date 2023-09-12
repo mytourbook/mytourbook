@@ -198,7 +198,7 @@ public class DataProvider_Battery extends DataProvider {
          final ArrayList<TourType> allActiveTourTypes = TourDatabase.getActiveTourTypes();
          final TourType[] allTourTypes = allActiveTourTypes.toArray(new TourType[allActiveTourTypes.size()]);
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 

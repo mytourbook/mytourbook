@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -320,12 +320,11 @@ public class TourChartConfiguration {
    /**
     * @param keepMinMaxValues
     *           set <code>true</code> to keep min/max values when tour data will change
+    * @param state
     */
-   public TourChartConfiguration(final boolean keepMinMaxValues, final IDialogSettings state) {
+   public TourChartConfiguration(final IDialogSettings state) {
 
-      if (keepMinMaxValues) {
-         setMinMaxKeeper(true);
-      }
+      setMinMaxKeeper();
 
 // SET_FORMATTING_OFF
 
@@ -454,21 +453,9 @@ public class TourChartConfiguration {
       this.isShowTimeOnXAxis = isShowTimeOnXAxisBackup = isShowTimeOnXAxis;
    }
 
-   /**
-    * <code>true</code> indicates to keep the min/max values in the chart configuration when the
-    * data model was changed, this has the higher priority than keeping the min/max values in the
-    * chart widget
-    *
-    * @param keepMinMaxValues
-    *           the keepMinMaxValues to set
-    */
-   public void setMinMaxKeeper(final boolean keepMinMaxValues) {
+   public void setMinMaxKeeper() {
 
-      if (keepMinMaxValues) {
-         _minMaxKeeper = new ChartYDataMinMaxKeeper();
-      } else {
-         _minMaxKeeper = null;
-      }
+      _minMaxKeeper = new ChartYDataMinMaxKeeper();
    }
 
    public void updateStateValues(final IDialogSettings state) {

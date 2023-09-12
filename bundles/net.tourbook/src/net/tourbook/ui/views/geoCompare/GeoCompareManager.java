@@ -47,7 +47,10 @@ public class GeoCompareManager {
    private static final LinkedBlockingDeque<GeoComparedTour> _compareWaitingQueue  = new LinkedBlockingDeque<>();
    private static final ListenerList<IGeoCompareListener>    _geoCompareListeners  = new ListenerList<>(ListenerList.IDENTITY);
 
-   private static boolean                                    _isGeoComparingOn;
+   /**
+    * It is confusing when the tool geo comparing is ON on app start
+    */
+   private static boolean                                    _isGeoComparingOn     = false;
    private static boolean                                    IS_LOG_TOUR_COMPARING = false;
 
    static {
@@ -244,8 +247,8 @@ public class GeoCompareManager {
 
          final ElevationGainLoss elevationGainLoss = tourData.computeAltitudeUpDown(origStartIndex, origEndIndex);
          if (elevationGainLoss != null) {
-            geoComparedTour.elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
-            geoComparedTour.elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+            geoComparedTour.elevationGainAbsolute = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+            geoComparedTour.elevationLossAbsolute = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
          }
 
          final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
@@ -258,9 +261,12 @@ public class GeoCompareManager {
          final float distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
          geoComparedTour.distance = distance;
 
-         final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-         final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
-         geoComparedTour.avgPace = distance == 0 ? 0 : time * 1000 / distance;
+         final long time = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)
+               ? recordedTime
+               : movingTime;
+         geoComparedTour.avgPace = distance == 0
+               ? 0
+               : time * 1000 / distance;
       }
 
       geoComparedTour.minDiffValue = (long) (normMinDiffIndex < 0 ? -1 : normLatLonDiff[normMinDiffIndex]);

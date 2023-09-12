@@ -870,7 +870,7 @@ public class TourMapPainter extends Map2Painter {
          final Color systemColorBlue = gcTile.getDevice().getSystemColor(SWT.COLOR_BLUE);
 
          TourData prevTourData = null;
-         final long geoCompareRefTourId = ReferenceTourManager.getGeoCompareReferenceTourId();
+         final long geoCompareRefTourId = ReferenceTourManager.getGeoCompare_RefTour_TourId();
 
          final int numTours = allTourData.size();
 
@@ -911,7 +911,7 @@ public class TourMapPainter extends Map2Painter {
 
                } else {
 
-                  final TourReference refTour = ReferenceTourManager.getGeoCompareReferenceTour();
+                  final TourReference refTour = ReferenceTourManager.getGeoCompare_RefTour();
 
                   refTourStartIndex = refTour.getStartValueIndex();
                   refTourEndIndex = refTour.getEndValueIndex();

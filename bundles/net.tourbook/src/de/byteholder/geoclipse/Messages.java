@@ -4,7 +4,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "de.byteholder.geoclipse.messages";   //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "de.byteholder.geoclipse.messages";             //$NON-NLS-1$
 
    public static String        geoclipse_extensions_loading;
    public static String        geoclipse_extensions_loading_failed;
@@ -126,6 +126,67 @@ public class Messages extends NLS {
    public static String        Dialog_WmsConfig_Label_ImageSize;
    public static String        Dialog_WmsConfig_Label_Layers;
 
+   public static String        Error__Custom_InvalidPartType_DBG006;
+   public static String        Error__FileIsNotAvailable_DBG007;
+   public static String        Error__FileIsNotExported_DBG039;
+   public static String        Error__InvalidFactoryId_DBG003;
+   public static String        Error__InvalidOfflineFolder_DBG004;
+   public static String        Error__InvalidUrlNull_DBG041;
+   public static String        Error__InvalidUrl_DBG042;
+
+   public static String        Error_CustomMapProvider_InvalidPropertied_DBG011;
+
+   public static String        Error_Loading_CannotCreateParent_DBG050;
+   public static String        Error_Loading_DefaultException_DBG048;
+   public static String        Error_Loading_EmptyImageData_DBG051;
+   public static String        Error_Loading_FileNotFoundException_DBG052;
+   public static String        Error_Loading_FromUrl_DBG054;
+   public static String        Error_Loading_ImageIsInvalid_DBG049;
+   public static String        Error_Loading_PaintingError_DBG045;
+   public static String        Error_Loading_UnknownHostException_DBG053;
+
+   public static String        Error_MapProvider_MapProfileDuplicate_DBG009;
+   public static String        Error_MapProvider_InvalidMPType_DBG014;
+   public static String        Error_MapProvider_InvalidType_DBG010;
+   public static String        Error_MapProvider_TagIsInvalid_DBG008;
+
+   public static String        Error_MapProfile_DuplicateLayer_DBG017;
+   public static String        Error_MapProfile_DuplicateMP_DBG013;
+   public static String        Error_MapProfile_InvalidAttributes_DBG012;
+   public static String        Error_MapProfile_InvalidMapProvider_DBG055;
+   public static String        Error_MapProfile_LayerInvalidProperties_DBG015;
+   public static String        Error_MapProfile_OfflineLayerInvalidProperties_DBG016;
+   public static String        Error_MapProfile_WrongClassForMapProvider_DBG056;
+
+   public static String        Error_Import_DifferentClass_DBG025;
+   public static String        Error_Import_DuplicateId_DBG021;
+   public static String        Error_Import_DuplicateOfflineFolder_DBG022;
+   public static String        Error_Import_InvalidPlugin_DBG027;
+   public static String        Error_Import_ProfileDuplicateOfflineFolder_DBG024;
+   public static String        Error_Import_ProfileDuplicateOfflineFolder_DBG026;
+   public static String        Error_Import_PluginMPIsNotAvailable_DBG040;
+   public static String        Error_Import_WrappedMpIsNotDefined_DBG023;
+
+   public static String        Error_Wms_DialogMessage_InvalidLayers_DBG002;
+   public static String        Error_Wms_DuplicateLayer_DBG020;
+   public static String        Error_Wms_InvalidAttributes_DBG018;
+   public static String        Error_Wms_InvalidLayer_DBG019;
+   public static String        Error_Wms_LayersAreNotAvailable_DBG034;
+   public static String        Error_Wms_LatLonBboxIsNotDefined_DBG001;
+
+   public static String        Error_WmsServer_CannotConnectToServer_DBG030;
+   public static String        Error_WmsServer_CannotConnectToServer_DBG035;
+   public static String        Error_WmsServer_CannotConnectToServer_DBG043;
+   public static String        Error_WmsServer_CannotLoadImage_DBG038;
+   public static String        Error_WmsServer_FileNotFound_DBG029;
+   public static String        Error_WmsServer_IoException_DBG031;
+   public static String        Error_WmsServer_IoException_DBG036;
+   public static String        Error_WmsServer_MalformedUrl_DBG028;
+   public static String        Error_WmsServer_OtherException_DBG033;
+   public static String        Error_WmsServer_ServiceException_DBG032;
+   public static String        Error_WmsServer_ServiceException_DBG037;
+
+
    public static String        Import_Error_Dialog_Title;
 
    public static String        Map_Action_ZoomIn_Tooltip;
@@ -151,59 +212,6 @@ public class Messages extends NLS {
    public static String        MP_Manager_DeleteOfflineImages_CannotDeleteFolder;
    public static String        MP_Manager_Label_ImportFrom;
    public static String        MP_Manager_Task_GetWms;
-
-   public static String        DBG001_Error_Wms_LatLonBboxIsNotDefined;
-   public static String        DBG002_Error_Wms_DialogMessage_InvalidLayers;
-   public static String        DBG003_Error_InvalidFactoryId;
-   public static String        DBG004_Error_InvalidOfflineFolder;
-   public static String        DBG006_Error_Custom_InvalidPartType;
-   public static String        DBG007_Error_FileIsNotAvailable;
-   public static String        DBG008_Error_TagIsInvalid;
-   public static String        DBG009_Error_MapProfileDuplicate;
-   public static String        DBG010_Error_InvalidType;
-   public static String        DBG011_Error_Custom_InvalidPropertied;
-   public static String        DBG012_Error_Profile_InvalidAttributes;
-   public static String        DBG013_Error_Profile_DuplicateMP;
-   public static String        DBG014_Error_Profile_InvalidMPType;
-   public static String        DBG015_Error_Profile_LayerInvalidProperties;
-   public static String        DBG016_Error_Profile_OfflineLayerInvalidProperties;
-   public static String        DBG017_Error_Profile_DuplicateLayer;
-   public static String        DBG018_Error_Wms_InvalidAttributes;
-   public static String        DBG019_Error_Wms_InvalidLayer;
-   public static String        DBG020_Error_Wms_DuplicateLayer;
-   public static String        DBG021_Import_Error_DuplicateId;
-   public static String        DBG022_Import_Error_DuplicateOfflineFolder;
-   public static String        DBG023_Import_Error_WrappedMpIsNotDefined;
-   public static String        DBG024_Import_Error_ProfileDuplicateOfflineFolder;
-   public static String        DBG025_Import_Error_DifferentClass;
-   public static String        DBG026_Import_Error_ProfileDuplicateOfflineFolder;
-   public static String        DBG027_ImportError_InvalidPlugin;
-   public static String        DBG028_Wms_Server_Error_MalformedUrl;
-   public static String        DBG029_Wms_Server_Error_FileNotFound;
-   public static String        DBG030_Wms_Server_Error_CannotConnectToServer;
-   public static String        DBG031_Wms_Server_Error_IoException;
-   public static String        DBG032_Wms_Server_Error_ServiceException;
-   public static String        DBG033_Wms_Server_Error_OtherException;
-   public static String        DBG034_Wms_Error_LayersAreNotAvailable;
-   public static String        DBG035_Wms_Server_Error_CannotConnectToServer;
-   public static String        DBG036_Wms_Server_Error_IoException;
-   public static String        DBG037_Wms_Server_Error_ServiceException;
-   public static String        DBG038_Wms_Server_Error_CannotLoadImage;
-   public static String        DBG039_Error_FileIsNotExported;
-   public static String        DBG040_Import_Error_PluginMPIsNotAvailable;
-   public static String        DBG041_Error_InvalidUrlNull;
-   public static String        DBG042_Error_InvalidUrl;
-   public static String        DBG043_Wms_Server_Error_CannotConnectToServer;
-   public static String        DBG045_Loading_Error_PaintingError;
-   public static String        DBG048_Loading_Error_DefaultException;
-   public static String        DBG049_Loading_Error_ImageIsInvalid;
-   public static String        DBG050_Loading_Error_CannotCreateParent;
-   public static String        DBG051_Loading_Error_EmptyImageData;
-   public static String        DBG052_Loading_Error_FileNotFoundException;
-   public static String        DBG053_Loading_Error_UnknownHostException;
-   public static String        DBG054_Loading_Error_FromUrl;
-   public static String        DBG055_MapProfile_InvalidMapProvider;
-   public static String        DBG056_MapProfile_WrongClassForMapProvider;
 
    public static String        Offline_Area_Label_AreaMarker;
    public static String        Offline_Area_Label_SelectInfo;

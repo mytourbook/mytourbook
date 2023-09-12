@@ -15,8 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -36,6 +39,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionDeletePausesDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -76,6 +80,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -84,37 +89,38 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPausesView extends ViewPart implements ITourProvider, ITourViewer {
 
-   public static final String      ID                              = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
+   public static final String       ID                              = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings    _state                          = TourbookPlugin.getState(ID);
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
+   private PostSelectionProvider    _postSelectionProvider;
+   private ISelectionListener       _postSelectionListener;
+   private IPropertyChangeListener  _prefChangeListener;
+   private IPropertyChangeListener  _prefChangeListener_Common;
+   private ITourEventListener       _tourEventListener;
+   private IPartListener2           _partListener;
 
-   private TourData                _tourData;
+   private TourData                 _tourData;
 
-   private MenuManager             _viewerMenuManager;
-   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager              _viewerMenuManager;
+   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private ColumnManager           _columnManager;
+   private ColumnManager            _columnManager;
 
-   private ArrayList<DevicePause>  _allDevicePauses;
+   private ArrayList<DevicePause>   _allDevicePauses;
 
-   private boolean                 _isInUpdate;
+   private boolean                  _isInUpdate;
 
-   private PixelConverter          _pc;
+   private PixelConverter           _pc;
 
-   private TableViewer             _pausesViewer;
+   private TableViewer              _pausesViewer;
 
-   private ZonedDateTime           _tourStartTime;
+   private ZonedDateTime            _tourStartTime;
 
-   private SubMenu_SetPausesType   _subMenu_SetPauseType;
+   private ActionDeletePausesDialog _actionDeleteTourPauses;
+   private SubMenu_SetPausesType    _subMenu_SetPauseType;
 
    /*
     * UI controls
@@ -126,19 +132,19 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private Menu      _tableContextMenu;
 
-   public class DevicePause {
+   private class DevicePause {
 
-      long type;
+      private long type;
 
-      long relativeStartTime;
-      long relativeEndTime;
+      private long relativeStartTime;
+      private long relativeEndTime;
 
-      int  serieIndex;
+      private int  serieIndex;
 
-      public DevicePause(final long type,
-                         final long relativeStartTime,
-                         final long relativeEndTime,
-                         final int serieIndex) {
+      private DevicePause(final long type,
+                          final long relativeStartTime,
+                          final long relativeEndTime,
+                          final int serieIndex) {
 
          this.type = type;
 
@@ -302,9 +308,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             return;
          }
 
-         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
          } else {
 
@@ -312,9 +318,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
                if (modifiedTours != null) {
 
                   // update modified tour
@@ -338,9 +344,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                   }
                }
 
-            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof final SelectionTourPause pauseSelection) {
 
-               onTourEvent_TourPause((SelectionTourPause) eventData);
+               onTourEvent_TourPause(pauseSelection);
 
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -364,6 +370,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void createActions() {
 
       _subMenu_SetPauseType = new SubMenu_SetPausesType(this, false);
+      _actionDeleteTourPauses = new ActionDeletePausesDialog(this);
    }
 
    private void createMenuManager() {
@@ -433,6 +440,25 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
+
+         if (keyEvent.keyCode == SWT.DEL) {
+
+            if (!_actionDeleteTourPauses.isEnabled()) {
+               return;
+            }
+
+            final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+            if (selectedIndices.length == 0) {
+               return;
+            }
+
+            setupPausesToDelete(selectedIndices);
+
+            _actionDeleteTourPauses.run();
+         }
+      }));
+
       /*
        * create table viewer
        */
@@ -476,6 +502,40 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       return tableContextMenu;
    }
 
+   private String createUI_Pause_Absolute_EndTime(final DevicePause pause) {
+
+      return _tourStartTime.plusSeconds(pause.relativeEndTime).format(TimeTools.Formatter_Time_M);
+   }
+
+   private String createUI_Pause_Absolute_StartTime(final DevicePause pause) {
+
+      return _tourStartTime.plusSeconds(pause.relativeStartTime).format(TimeTools.Formatter_Time_M);
+   }
+
+   private String createUI_Pause_Duration(final DevicePause pause) {
+
+      return UI.format_hh_mm_ss(pause.relativeEndTime - pause.relativeStartTime);
+   }
+
+   private String createUI_Pause_Relative_EndTime(final DevicePause pause) {
+
+      return UI.format_hh_mm_ss(pause.relativeEndTime);
+   }
+
+   private String createUI_Pause_Relative_StartTime(final DevicePause pause) {
+
+      final long relativeStartTime = pause.relativeStartTime;
+
+      final String timePrefix = relativeStartTime < 0
+
+            // a pause can begin before the tour start time
+            ? UI.SYMBOL_MINUS
+
+            : UI.EMPTY_STRING;
+
+      return timePrefix + UI.format_hh_mm_ss(Math.abs(relativeStartTime));
+   }
+
    private void defineAllColumns() {
 
       defineColumn_PauseDuration();
@@ -489,7 +549,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * Column: Pause relative end time
+    * Column: Pause duration
     */
    private void defineColumn_PauseDuration() {
 
@@ -510,7 +570,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(UI.format_hh_mm_ss(pause.relativeEndTime - pause.relativeStartTime));
+            cell.setText(createUI_Pause_Duration(pause));
          }
       });
    }
@@ -537,7 +597,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(pause.type == 0 ? Messages.Tour_Pauses_Column_TypeValue_Manual : Messages.Tour_Pauses_Column_TypeValue_Automatic);
+            cell.setText(pause.type == 0
+                  ? Messages.Tour_Pauses_Column_TypeValue_Manual
+                  : Messages.Tour_Pauses_Column_TypeValue_Automatic);
          }
       });
    }
@@ -563,7 +625,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(_tourStartTime.plusSeconds(pause.relativeEndTime).format(TimeTools.Formatter_Time_M));
+            cell.setText(createUI_Pause_Absolute_EndTime(pause));
          }
       });
    }
@@ -589,7 +651,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(_tourStartTime.plusSeconds(pause.relativeStartTime).format(TimeTools.Formatter_Time_M));
+            cell.setText(createUI_Pause_Absolute_StartTime(pause));
          }
       });
    }
@@ -616,8 +678,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(UI.format_hh_mm_ss(pause.relativeEndTime));
+            cell.setText(createUI_Pause_Relative_EndTime(pause));
          }
+
       });
    }
 
@@ -643,17 +706,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            final long relativeStartTime = pause.relativeStartTime;
-
-            final String timePrefix = relativeStartTime < 0
-
-                  // a pause can begin before the tour start time
-                  ? UI.SYMBOL_MINUS
-
-                  : UI.EMPTY_STRING;
-
-            cell.setText(timePrefix + UI.format_hh_mm_ss(Math.abs(relativeStartTime)));
+            cell.setText(createUI_Pause_Relative_StartTime(pause));
          }
+
       });
    }
 
@@ -674,25 +729,28 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void enableActions() {
 
       final boolean isTourInDb = _tourData != null && _tourData.getTourPerson() != null;
+      final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
       _subMenu_SetPauseType.setEnabled(isTourInDb);
+      _actionDeleteTourPauses.setEnabled(isTourInDb && isSingleTour);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_subMenu_SetPauseType);
+      menuMgr.add(_actionDeleteTourPauses);
 
-      // set the pause currently selected by the user
       final int[] selectedIndices = _pausesViewer.getTable().getSelectionIndices();
+
       _subMenu_SetPauseType.setTourPauses(selectedIndices);
+
+      setupPausesToDelete(selectedIndices);
 
       enableActions();
    }
 
    /**
     * Select the chart/map slider(s) according to the selected slices
-    *
-    * @return
     */
    private void fireSliderPosition(final StructuredSelection selection) {
 
@@ -712,9 +770,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          // One slice is selected
 
-         if (slice1 instanceof DevicePause) {
+         if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = ((DevicePause) slice1).serieIndex;
+            final int serieIndexFirst = devicePause.serieIndex;
 
             /*
              * Position slider at the beginning of the slice so that each slice borders has an
@@ -732,9 +790,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          // Two or more slices are selected, set the 2 sliders to the first and last selected slices
 
-         if (slice1 instanceof DevicePause) {
+         if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = ((DevicePause) slice1).serieIndex;
+            final int serieIndexFirst = devicePause.serieIndex;
 
             /*
              * Position slider at the beginning of the first slice
@@ -826,20 +884,19 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          tourData = tourDataSelection.getTourData();
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         tourId = ((SelectionTourId) selection).getTourId();
+         tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
 
          if (tourIds != null && tourIds.size() > 0) {
 
@@ -850,22 +907,24 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             }
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+
+            tourId = tviRefTour_ComparedTour.getTourId();
+
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
+
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -955,6 +1014,26 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    public void setFocus() {
 
       _pausesViewer.getTable().setFocus();
+   }
+
+   private void setupPausesToDelete(final int[] selectedPausesIndices) {
+
+      _actionDeleteTourPauses.setTourPauses(selectedPausesIndices);
+
+      final List<String> tourPausesViewSelectedPausesStartEndTimes = new ArrayList<>();
+      final TableItem[] items = _pausesViewer.getTable().getItems();
+      for (final int selectedIndex : selectedPausesIndices) {
+
+         final TableItem item = items[selectedIndex];
+         final DevicePause devicePause = (DevicePause) item.getData();
+
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Duration(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Relative_StartTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Relative_EndTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Absolute_StartTime(devicePause));
+         tourPausesViewSelectedPausesStartEndTimes.add(createUI_Pause_Absolute_EndTime(devicePause));
+      }
+      _actionDeleteTourPauses.setTourPausesStartEndTimes(tourPausesViewSelectedPausesStartEndTimes);
    }
 
    private void setupViewerContent(final TourData tourData) {

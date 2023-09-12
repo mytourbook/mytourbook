@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -109,7 +109,9 @@ public class MessageDialogWithRadioOptions extends MessageDialog {
          return null;
       }
 
-      final int iconWidth = imageLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+      final int iconWidth = imageLabel == null
+            ? 0
+            : imageLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()

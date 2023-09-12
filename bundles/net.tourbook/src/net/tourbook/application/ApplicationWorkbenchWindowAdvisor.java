@@ -58,7 +58,6 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeManager;
-//import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
 import net.tourbook.web.WebContentServer;
@@ -516,6 +515,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       ModelPlayerManager.restoreState();
 
       FormatManager.updateDisplayFormats();
+
+      // read texts from plugin.properties
+      PluginProperties.getInstance().populate(TourbookPlugin.getBundleContext().getBundle());
 
       ThemeUtil.setupTheme();
 

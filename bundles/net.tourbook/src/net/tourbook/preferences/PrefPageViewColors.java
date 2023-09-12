@@ -54,16 +54,28 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
    public static final String            STATE_VIEW_COLOR_DATE_CATEGORY_DARK                  = "STATE_VIEW_COLOR_DATE_CATEGORY_DARK";          //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT            = "STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT";    //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK              = "STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK";      //$NON-NLS-1$
+   public static final String            STATE_VIEW_COLOR_TOUR_BRIGHT                         = "STATE_VIEW_COLOR_TOUR_BRIGHT";                 //$NON-NLS-1$
+   public static final String            STATE_VIEW_COLOR_TOUR_DARK                           = "STATE_VIEW_COLOR_TOUR_DARK";                   //$NON-NLS-1$
+   public static final String            STATE_VIEW_COLOR_TOTAL_BRIGHT                        = "STATE_VIEW_COLOR_TOTAL_BRIGHT";                //$NON-NLS-1$
+   public static final String            STATE_VIEW_COLOR_TOTAL_DARK                          = "STATE_VIEW_COLOR_TOTAL_DARK";                  //$NON-NLS-1$
 
    public static final RGB               STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_BRIGHT     = new RGB(0x3c, 0x3c, 0x3c);
    public static final RGB               STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_BRIGHT = new RGB(0xf2, 0x5b, 0x0);
+
    public static final RGB               STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_BRIGHT        = new RGB(0x3c, 0x3c, 0x3c);
    public static final RGB               STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT    = new RGB(0xf2, 0x5b, 0x0);
 
+   public static final RGB               STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT                 = new RGB(0x00, 0x00, 0x00);
+   public static final RGB               STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT                = new RGB(0x64, 0xa6, 0x0);
+
    public static final RGB               STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_DARK       = new RGB(0xe8, 0xe8, 0xe8);
-   public static final RGB               STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK   = new RGB(0xff, 0x7a, 0x2b);
+   public static final RGB               STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK   = new RGB(0xff, 0x85, 0x3c);
+
    public static final RGB               STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_DARK          = new RGB(0xe8, 0xe8, 0xe8);
-   public static final RGB               STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK      = new RGB(0xff, 0x7a, 0x2b);
+   public static final RGB               STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK      = new RGB(0xff, 0x85, 0x3c);
+
+   public static final RGB               STATE_VIEW_COLOR_TOUR_DEFAULT_DARK                   = new RGB(0xf0, 0xf0, 0xf0);
+   public static final RGB               STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK                  = new RGB(0xff, 0xf0, 0x6c);
 
    private boolean                       _isUIModified;
 
@@ -73,14 +85,18 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
    private Button                _chkLiveUpdate;
    private Button                _chkViewGridLines;
 
-   private ColorSelectorExtended _colorSelector_ContentCategory_Bright;
-   private ColorSelectorExtended _colorSelector_ContentCategory_Dark;
-   private ColorSelectorExtended _colorSelector_ContentSubCategory_Bright;
-   private ColorSelectorExtended _colorSelector_ContentSubCategory_Dark;
-   private ColorSelectorExtended _colorSelector_DateCategory_Bright;
-   private ColorSelectorExtended _colorSelector_DateCategory_Dark;
-   private ColorSelectorExtended _colorSelector_DateSubCategory_Bright;
-   private ColorSelectorExtended _colorSelector_DateSubCategory_Dark;
+   private ColorSelectorExtended _colorSelector_Content_Category_Bright;
+   private ColorSelectorExtended _colorSelector_Content_Category_Dark;
+   private ColorSelectorExtended _colorSelector_Content_SubCategory_Bright;
+   private ColorSelectorExtended _colorSelector_Content_SubCategory_Dark;
+   private ColorSelectorExtended _colorSelector_Date_Category_Bright;
+   private ColorSelectorExtended _colorSelector_Date_Category_Dark;
+   private ColorSelectorExtended _colorSelector_Date_SubCategory_Bright;
+   private ColorSelectorExtended _colorSelector_Date_SubCategory_Dark;
+   private ColorSelectorExtended _colorSelector_Tour_Bright;
+   private ColorSelectorExtended _colorSelector_Tour_Dark;
+   private ColorSelectorExtended _colorSelector_Total_Bright;
+   private ColorSelectorExtended _colorSelector_Total_Dark;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -140,13 +156,13 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             GridDataFactory.fillDefaults().applyTo(label);
             label.setText(Messages.pref_view_layout_label_category);
 
-            _colorSelector_ContentCategory_Bright = new ColorSelectorExtended(group);
-            _colorSelector_ContentCategory_Bright.addListener(event -> onModify(_colorSelector_ContentCategory_Bright));
-            setButtonLayoutData(_colorSelector_ContentCategory_Bright.getButton());
+            _colorSelector_Content_Category_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Content_Category_Bright.addListener(event -> onModify(_colorSelector_Content_Category_Bright));
+            setButtonLayoutData(_colorSelector_Content_Category_Bright.getButton());
 
-            _colorSelector_ContentCategory_Dark = new ColorSelectorExtended(group);
-            _colorSelector_ContentCategory_Dark.addListener(event -> onModify(_colorSelector_ContentCategory_Dark));
-            setButtonLayoutData(_colorSelector_ContentCategory_Dark.getButton());
+            _colorSelector_Content_Category_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Content_Category_Dark.addListener(event -> onModify(_colorSelector_Content_Category_Dark));
+            setButtonLayoutData(_colorSelector_Content_Category_Dark.getButton());
          }
          {
             /*
@@ -156,13 +172,13 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             GridDataFactory.fillDefaults().applyTo(label);
             label.setText(Messages.pref_view_layout_label_title);
 
-            _colorSelector_ContentSubCategory_Bright = new ColorSelectorExtended(group);
-            _colorSelector_ContentSubCategory_Bright.addListener(event -> onModify(_colorSelector_ContentSubCategory_Bright));
-            setButtonLayoutData(_colorSelector_ContentSubCategory_Bright.getButton());
+            _colorSelector_Content_SubCategory_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Content_SubCategory_Bright.addListener(event -> onModify(_colorSelector_Content_SubCategory_Bright));
+            setButtonLayoutData(_colorSelector_Content_SubCategory_Bright.getButton());
 
-            _colorSelector_ContentSubCategory_Dark = new ColorSelectorExtended(group);
-            _colorSelector_ContentSubCategory_Dark.addListener(event -> onModify(_colorSelector_ContentSubCategory_Dark));
-            setButtonLayoutData(_colorSelector_ContentSubCategory_Dark.getButton());
+            _colorSelector_Content_SubCategory_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Content_SubCategory_Dark.addListener(event -> onModify(_colorSelector_Content_SubCategory_Dark));
+            setButtonLayoutData(_colorSelector_Content_SubCategory_Dark.getButton());
          }
          {
             /*
@@ -172,13 +188,13 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             GridDataFactory.fillDefaults().applyTo(label);
             label.setText(Messages.pref_view_layout_label_sub);
 
-            _colorSelector_DateCategory_Bright = new ColorSelectorExtended(group);
-            _colorSelector_DateCategory_Bright.addListener(event -> onModify(_colorSelector_DateCategory_Bright));
-            setButtonLayoutData(_colorSelector_DateCategory_Bright.getButton());
+            _colorSelector_Date_Category_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Date_Category_Bright.addListener(event -> onModify(_colorSelector_Date_Category_Bright));
+            setButtonLayoutData(_colorSelector_Date_Category_Bright.getButton());
 
-            _colorSelector_DateCategory_Dark = new ColorSelectorExtended(group);
-            _colorSelector_DateCategory_Dark.addListener(event -> onModify(_colorSelector_DateCategory_Dark));
-            setButtonLayoutData(_colorSelector_DateCategory_Dark.getButton());
+            _colorSelector_Date_Category_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Date_Category_Dark.addListener(event -> onModify(_colorSelector_Date_Category_Dark));
+            setButtonLayoutData(_colorSelector_Date_Category_Dark.getButton());
          }
          {
             /*
@@ -188,13 +204,45 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             GridDataFactory.fillDefaults().applyTo(label);
             label.setText(Messages.pref_view_layout_label_sub_sub);
 
-            _colorSelector_DateSubCategory_Bright = new ColorSelectorExtended(group);
-            _colorSelector_DateSubCategory_Bright.addListener(event -> onModify(_colorSelector_DateSubCategory_Bright));
-            setButtonLayoutData(_colorSelector_DateSubCategory_Bright.getButton());
+            _colorSelector_Date_SubCategory_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Date_SubCategory_Bright.addListener(event -> onModify(_colorSelector_Date_SubCategory_Bright));
+            setButtonLayoutData(_colorSelector_Date_SubCategory_Bright.getButton());
 
-            _colorSelector_DateSubCategory_Dark = new ColorSelectorExtended(group);
-            _colorSelector_DateSubCategory_Dark.addListener(event -> onModify(_colorSelector_DateSubCategory_Dark));
-            setButtonLayoutData(_colorSelector_DateSubCategory_Dark.getButton());
+            _colorSelector_Date_SubCategory_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Date_SubCategory_Dark.addListener(event -> onModify(_colorSelector_Date_SubCategory_Dark));
+            setButtonLayoutData(_colorSelector_Date_SubCategory_Dark.getButton());
+         }
+         {
+            /*
+             * Color: Tour
+             */
+            final Label label = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Pref_View_Layout_Label_Tour);
+
+            _colorSelector_Tour_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Tour_Bright.addListener(event -> onModify(_colorSelector_Tour_Bright));
+            setButtonLayoutData(_colorSelector_Tour_Bright.getButton());
+
+            _colorSelector_Tour_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Tour_Dark.addListener(event -> onModify(_colorSelector_Tour_Dark));
+            setButtonLayoutData(_colorSelector_Tour_Dark.getButton());
+         }
+         {
+            /*
+             * Color: Total
+             */
+            final Label label = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Pref_View_Layout_Label_Total);
+
+            _colorSelector_Total_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Total_Bright.addListener(event -> onModify(_colorSelector_Total_Bright));
+            setButtonLayoutData(_colorSelector_Total_Bright.getButton());
+
+            _colorSelector_Total_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Total_Dark.addListener(event -> onModify(_colorSelector_Total_Dark));
+            setButtonLayoutData(_colorSelector_Total_Dark.getButton());
          }
       }
    }
@@ -315,14 +363,20 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
 
    private void restoreDefaults() {
 
-      _colorSelector_ContentCategory_Bright     .setColorValue(STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_BRIGHT);
-      _colorSelector_ContentCategory_Dark       .setColorValue(STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_DARK);
-      _colorSelector_ContentSubCategory_Bright  .setColorValue(STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_BRIGHT);
-      _colorSelector_ContentSubCategory_Dark    .setColorValue(STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK);
-      _colorSelector_DateCategory_Bright        .setColorValue(STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_BRIGHT);
-      _colorSelector_DateCategory_Dark          .setColorValue(STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_DARK);
-      _colorSelector_DateSubCategory_Bright     .setColorValue(STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT);
-      _colorSelector_DateSubCategory_Dark       .setColorValue(STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK);
+      _colorSelector_Content_Category_Bright     .setColorValue(STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_BRIGHT);
+      _colorSelector_Content_Category_Dark       .setColorValue(STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_DARK);
+      _colorSelector_Content_SubCategory_Bright  .setColorValue(STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_BRIGHT);
+      _colorSelector_Content_SubCategory_Dark    .setColorValue(STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK);
+
+      _colorSelector_Date_Category_Bright        .setColorValue(STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_BRIGHT);
+      _colorSelector_Date_Category_Dark          .setColorValue(STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_DARK);
+      _colorSelector_Date_SubCategory_Bright     .setColorValue(STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT);
+      _colorSelector_Date_SubCategory_Dark       .setColorValue(STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK);
+
+      _colorSelector_Tour_Bright                .setColorValue(STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT);
+      _colorSelector_Tour_Dark                  .setColorValue(STATE_VIEW_COLOR_TOUR_DEFAULT_DARK);
+      _colorSelector_Total_Bright               .setColorValue(STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT);
+      _colorSelector_Total_Dark                 .setColorValue(STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK);
 
       _chkLiveUpdate       .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
       _chkViewGridLines    .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -332,46 +386,53 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
 
    private void restoreState() {
 
-      _colorSelector_ContentCategory_Bright     .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Content_Category_Bright             .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_CONTENT_CATEGORY_BRIGHT,
             STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_BRIGHT));
 
-      _colorSelector_ContentCategory_Dark       .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Content_Category_Dark               .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_CONTENT_CATEGORY_DARK,
             STATE_VIEW_COLOR_CONTENT_CATEGORY_DEFAULT_DARK));
 
-      _colorSelector_ContentSubCategory_Bright  .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Content_SubCategory_Bright          .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_BRIGHT,
             STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_BRIGHT));
 
-      _colorSelector_ContentSubCategory_Dark    .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Content_SubCategory_Dark            .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DARK,
             STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DEFAULT_DARK));
 
-      _colorSelector_DateCategory_Bright        .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Date_Category_Bright                .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_DATE_CATEGORY_BRIGHT,
             STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_BRIGHT));
 
-      _colorSelector_DateCategory_Dark          .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Date_Category_Dark                  .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_DATE_CATEGORY_DARK,
             STATE_VIEW_COLOR_DATE_CATEGORY_DEFAULT_DARK));
 
-      _colorSelector_DateSubCategory_Bright     .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Date_SubCategory_Bright             .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT,
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT));
 
-      _colorSelector_DateSubCategory_Dark       .setColorValue(Util.getStateRGB(_state,
+      _colorSelector_Date_SubCategory_Dark               .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK));
 
-      _colorSelector_ContentCategory_Bright     .restoreCustomColors(_state);
-      _colorSelector_ContentCategory_Dark       .restoreCustomColors(_state);
-      _colorSelector_ContentSubCategory_Bright  .restoreCustomColors(_state);
-      _colorSelector_ContentSubCategory_Dark    .restoreCustomColors(_state);
-      _colorSelector_DateCategory_Bright        .restoreCustomColors(_state);
-      _colorSelector_DateCategory_Dark          .restoreCustomColors(_state);
-      _colorSelector_DateSubCategory_Bright     .restoreCustomColors(_state);
-      _colorSelector_DateSubCategory_Dark       .restoreCustomColors(_state);
+      _colorSelector_Tour_Bright                         .setColorValue(Util.getStateRGB(_state,
+            STATE_VIEW_COLOR_TOUR_BRIGHT,
+            STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT));
+
+      _colorSelector_Tour_Dark                           .setColorValue(Util.getStateRGB(_state,
+            STATE_VIEW_COLOR_TOUR_DARK,
+            STATE_VIEW_COLOR_TOUR_DEFAULT_DARK));
+
+      _colorSelector_Total_Bright                        .setColorValue(Util.getStateRGB(_state,
+            STATE_VIEW_COLOR_TOTAL_BRIGHT,
+            STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT));
+
+      _colorSelector_Total_Dark                          .setColorValue(Util.getStateRGB(_state,
+            STATE_VIEW_COLOR_TOTAL_DARK,
+            STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK));
 
       _chkLiveUpdate    .setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
       _chkViewGridLines .setSelection(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -379,17 +440,21 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
 
    private void saveState() {
 
-      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_CATEGORY_BRIGHT,      _colorSelector_ContentCategory_Bright    .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_CATEGORY_DARK,        _colorSelector_ContentCategory_Dark      .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_BRIGHT,  _colorSelector_ContentSubCategory_Bright .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DARK,    _colorSelector_ContentSubCategory_Dark   .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_DATE_CATEGORY_BRIGHT,         _colorSelector_DateCategory_Bright       .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_DATE_CATEGORY_DARK,           _colorSelector_DateCategory_Dark         .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT,     _colorSelector_DateSubCategory_Bright    .getColorValue());
-      Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,       _colorSelector_DateSubCategory_Dark      .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_CATEGORY_BRIGHT,      _colorSelector_Content_Category_Bright    .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_CATEGORY_DARK,        _colorSelector_Content_Category_Dark      .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_BRIGHT,  _colorSelector_Content_SubCategory_Bright .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_CONTENT_SUB_CATEGORY_DARK,    _colorSelector_Content_SubCategory_Dark   .getColorValue());
 
-      // all color selectors have the same custom colors
-      _colorSelector_ContentCategory_Bright.saveCustomColors(_state);
+      Util.setState(_state, STATE_VIEW_COLOR_DATE_CATEGORY_BRIGHT,         _colorSelector_Date_Category_Bright       .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_DATE_CATEGORY_DARK,           _colorSelector_Date_Category_Dark         .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT,     _colorSelector_Date_SubCategory_Bright    .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,       _colorSelector_Date_SubCategory_Dark      .getColorValue());
+
+      Util.setState(_state, STATE_VIEW_COLOR_TOUR_BRIGHT,                  _colorSelector_Tour_Bright                .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_TOUR_DARK,                    _colorSelector_Tour_Dark                  .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_TOTAL_BRIGHT,                 _colorSelector_Total_Bright               .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_TOTAL_DARK,                   _colorSelector_Total_Dark                 .getColorValue());
+
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE,   _chkLiveUpdate.getSelection());
       _prefStore.setValue(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES,              _chkViewGridLines.getSelection());
@@ -410,26 +475,6 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
 
          // log selected color as Java code
          System.out.println(UI.logRGB(colorSelectorExtended.getColorValue()));
-
-         final RGB[] customColors = colorSelectorExtended.getCustomColors();
-
-         if (customColors != null) {
-
-            // update all color selectors with the same custom colors
-
-// SET_FORMATTING_OFF
-
-            _colorSelector_ContentCategory_Bright     .setCustomColors(customColors);
-            _colorSelector_ContentCategory_Dark       .setCustomColors(customColors);
-            _colorSelector_ContentSubCategory_Bright  .setCustomColors(customColors);
-            _colorSelector_ContentSubCategory_Dark    .setCustomColors(customColors);
-            _colorSelector_DateCategory_Bright        .setCustomColors(customColors);
-            _colorSelector_DateCategory_Dark          .setCustomColors(customColors);
-            _colorSelector_DateSubCategory_Bright     .setCustomColors(customColors);
-            _colorSelector_DateSubCategory_Dark       .setCustomColors(customColors);
-
-// SET_FORMATTING_ON
-         }
       }
    }
 
