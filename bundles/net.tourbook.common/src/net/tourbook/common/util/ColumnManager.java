@@ -255,7 +255,7 @@ public class ColumnManager {
       restoreState(viewState);
    }
 
-   public static IValueFormatter getDefaultDefaultValueFormatter() {
+   static IValueFormatter getDefaultDefaultValueFormatter() {
       return _defaultDefaultValueFormatter;
    }
 
@@ -490,7 +490,7 @@ public class ColumnManager {
       viewportLayer.doCommand(new TurnViewportOnCommand());
    }
 
-   public void addColumn(final ColumnDefinition colDef) {
+   void addColumn(final ColumnDefinition colDef) {
       _allDefinedColumnDefinitions.add(colDef);
    }
 
