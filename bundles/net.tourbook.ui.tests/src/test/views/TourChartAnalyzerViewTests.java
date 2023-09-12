@@ -26,15 +26,6 @@ import utils.Utils;
 
 public class TourChartAnalyzerViewTests extends UITest {
 
-//   @AfterAll
-//   @Override
-//   public void cleanUp() {
-//      // empty or add your implementation
-//      final var toto = 2;
-//      final SWTBotView tourAnalyzerView = getTourAnalyzerView();
-//      tourAnalyzerView.close();
-//   }
-
    private SWTBotView getTourAnalyzerView() {
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURANALYZER_VIEW_NAME);
