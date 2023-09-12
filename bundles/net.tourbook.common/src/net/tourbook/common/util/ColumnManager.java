@@ -1040,103 +1040,100 @@ public class ColumnManager {
       final Menu[] headerContextMenu = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the tree viewer
-      _tree_MenuDetect_Listener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      _tree_MenuDetect_Listener = event -> {
 
-            final Decorations shell = tree.getShell();
-            final Display display = shell.getDisplay();
+         final Decorations shell = tree.getShell();
+         final Display display = shell.getDisplay();
 
-            final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
+         final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
 
-            final Rectangle clientArea = tree.getClientArea();
+         final Rectangle clientArea = tree.getClientArea();
 
-            final int headerHeight = tree.getHeaderHeight();
-            final int headerBottom = clientArea.y + headerHeight;
+         final int headerHeight = tree.getHeaderHeight();
+         final int headerBottom = clientArea.y + headerHeight;
 
-            final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;
+         final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;
 
-            _headerColumnItem = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
+         _headerColumnItem = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
-            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+         Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-            if (contextMenu != null) {
+         if (contextMenu != null) {
 
-               // can be null when context menu is not set
+            // can be null when context menu is not set
 
-               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
+            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
 
-                  /**
-                   * java.lang.IllegalArgumentException: Widget has the wrong parent
-                   * <p>
-                   * When a view is minimized, then the context menu is already created
-                   * but has the wrong parent when the view is displayed lateron.
-                   */
-
-                  headerContextMenu[0].dispose();
-
-                  headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
-
-                  contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
-
-                  StatusUtil.logError("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
-
-               } else if (defaultContextMenuProvider != null
-                     && contextMenu == defaultContextMenuProvider.getContextMenu()
-                     && contextMenu.getShell() != tree.getShell()) {
-
-                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
-
-                  StatusUtil.logError("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
-               }
-            }
-
-            try {
-
-               tree.setMenu(contextMenu);
-
-            } catch (final IllegalArgumentException e) {
-
-               // This occurred: Widget has the wrong parent
-
-               // after some debugging, could not find the reason, this view is very similar to the tourbook view
-
-               /*
-                * The problem can occur when tours are compared with 2 different perspectives (ref
-                * tour and compare result), the system measurement is changed and the context menu
-                * for the ref tours will be opened
+               /**
+                * java.lang.IllegalArgumentException: Widget has the wrong parent
+                * <p>
+                * When a view is minimized, then the context menu is already created
+                * but has the wrong parent when the view is displayed lateron.
                 */
 
-               StatusUtil.showStatus(e);
+               headerContextMenu[0].dispose();
+
+               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
+
+               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+               StatusUtil.logError("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+
+            } else if (defaultContextMenuProvider != null
+                  && contextMenu == defaultContextMenuProvider.getContextMenu()
+                  && contextMenu.getShell() != tree.getShell()) {
+
+               contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+               StatusUtil.logError("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+            }
+         }
+
+         try {
+
+            tree.setMenu(contextMenu);
+
+         } catch (final IllegalArgumentException e) {
+
+            // This occurred: Widget has the wrong parent
+
+            // after some debugging, could not find the reason, this view is very similar to the tourbook view
+
+            /*
+             * The problem can occur when tours are compared with 2 different perspectives (ref
+             * tour and compare result), the system measurement is changed and the context menu
+             * for the ref tours will be opened
+             */
+
+            StatusUtil.showStatus(e);
+         }
+
+         /*
+          * Set context menu position to the right border of the column
+          */
+         if (_headerColumnItem != null) {
+
+            int posX = _headerColumnItem.columnRightBorder;
+            int xOffset = 0;
+
+            final ScrollBar hBar = tree.getHorizontalBar();
+
+            if (hBar != null) {
+               xOffset = hBar.getSelection();
             }
 
             /*
-             * Set context menu position to the right border of the column
+             * It is possible that the context menu is outside of the tree, this occurs when the
+             * column is very wide and horizontal scrolled.
              */
-            if (_headerColumnItem != null) {
-
-               int posX = _headerColumnItem.columnRightBorder;
-               int xOffset = 0;
-
-               final ScrollBar hBar = tree.getHorizontalBar();
-
-               if (hBar != null) {
-                  xOffset = hBar.getSelection();
-               }
-
-               /*
-                * It is possible that the context menu is outside of the tree, this occurs when the
-                * column is very wide and horizontal scrolled.
-                */
-               if (posX - xOffset > clientArea.width) {
-                  posX = xOffset + clientArea.width;
-               }
-
-               final Point displayPosition = tree.toDisplay(posX, headerBottom);
-
-               event.x = displayPosition.x - 1;
-               event.y = displayPosition.y - 2;
+            if (posX - xOffset > clientArea.width) {
+               posX = xOffset + clientArea.width;
             }
+
+            final Point displayPosition = tree.toDisplay(posX, headerBottom);
+
+            event.x = displayPosition.x - 1;
+            event.y = displayPosition.y - 2;
          }
       };
 
