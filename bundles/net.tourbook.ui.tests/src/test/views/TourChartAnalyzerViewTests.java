@@ -35,8 +35,7 @@ public class TourChartAnalyzerViewTests extends UITest {
    @Test
    void testAnalyzerView_Basic() {
 
-      //switch back and forth from 1 tour to another as otherwise, the training view doesn't necessarily detect that a tour is selected
-     // wait, it might be working now  Utils.getTour(bot);
+      // It's important to select the tour first, as otherwise, the Tour Analyzer view might not detect the tour
       
  final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
