@@ -1580,8 +1580,9 @@ public class TourManager {
             for (final IViewReference viewRef : viewRefs) {
 
                final IViewPart view = viewRef.getView(false);
-               if (view instanceof final ITourProvider tourProvider) {
+               if (view instanceof ITourProvider) {
 
+                  final ITourProvider tourProvider = (ITourProvider) view;
                   final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
                   if (selectedTours != null) {
