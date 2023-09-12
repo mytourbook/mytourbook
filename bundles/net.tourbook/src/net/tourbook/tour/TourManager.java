@@ -384,8 +384,8 @@ public class TourManager {
           * VERY IMPORTANT
           * <p>
           * When cache size is 0, each time when the same tour is requested from the tour manager, a
-          * new TourData entity is created. So each opened view gets a new tourdata for the same
-          * tour which causes LOTs of troubles.
+          * new TourData entity is created. So each opened view gets a new {@link TourData} for the
+          * same tour which causes LOTs of troubles.
           */
          _tourDataCache = new TourDataCache(10);
       }
@@ -4080,7 +4080,7 @@ public class TourManager {
       }
 
       /*
-       * Don't draw a (visible) line when a break occures, break time can be minutes, hours or days.
+       * Don't draw a (visible) line when a break occurs, break time can be minutes, hours or days.
        * This feature prevents to draw triangles between 2 value points
        */
       xDataTime.setNoLine(tourData.getBreakTimeSerie());
@@ -4900,7 +4900,7 @@ public class TourManager {
 
                   } else if (xAxisRRTime > xAxisTime) {
 
-                     // this occured when bpm < 60
+                     // this occurred when bpm < 60
 
                      while (rrIndex < numRRTimes // check array bounds
 
