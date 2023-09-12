@@ -6189,7 +6189,8 @@ public class TourManager {
       ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
       if (selectedTours.isEmpty()) {
 
-         if (tourProvider instanceof final ITourProviderAll allTourProvider) {
+         if (tourProvider instanceof ITourProviderAll) {
+            final ITourProviderAll allTourProvider = (ITourProviderAll) tourProvider;
             selectedTours = allTourProvider.getAllSelectedTours();
 
             if (selectedTours.isEmpty()) {
