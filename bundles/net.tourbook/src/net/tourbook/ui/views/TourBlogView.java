@@ -133,15 +133,15 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String           HREF_MARKER_ITEM = "#MarkerItem";                                                    //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                                                    //$NON-NLS-1$
 
-   private static final Pattern          HTTP_PATTERN     = Pattern.compile("(http|https|ftp):\\/\\/(\\S*)", Pattern.DOTALL); //$NON-NLS-1$
-   private static final String           HTTP_REPLACEMENT = "<a href=\"$1://$2\">$1://$2</a>";                                //$NON-NLS-1$
+   private static final Pattern          HTTP_PATTERN      = Pattern.compile("(http|https|ftp):\\/\\/(\\S*)", Pattern.DOTALL); //$NON-NLS-1$
+   private static final String           HTTP_REPLACEMENT  = "<a href=\"$1://$2\">$1://$2</a>";                                //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore       = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state           = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _state_WEB       = WEB.getState();
+   private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_WEB        = WEB.getState();
 
    private PostSelectionProvider         _postSelectionProvider;
    private ISelectionListener            _postSelectionListener;
