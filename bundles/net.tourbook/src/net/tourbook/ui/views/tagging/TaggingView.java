@@ -1949,10 +1949,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       // tags are filtered
 
       if (false
-            || item instanceof final TVITaggingView_TagCategory
-            || item instanceof final TVITaggingView_Tag
-            || item instanceof final TVITaggingView_Year
-            || item instanceof final TVITaggingView_Month) {
+            || item instanceof TVITaggingView_TagCategory
+            || item instanceof TVITaggingView_Tag
+            || item instanceof TVITaggingView_Year
+            || item instanceof TVITaggingView_Month) {
 
          final boolean hasTour = ((TVITaggingView_Item) item).numTours > 0;
          final boolean hasTagsNoTours = ((TVITaggingView_Item) item).numTags_NoTours > 0;
