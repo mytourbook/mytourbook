@@ -17,7 +17,10 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +49,18 @@ public class TaggedToursViewTests extends UITest {
       assertNotNull(item);
       final SWTBotTreeItem node = item.getNode("5/31/2015").select(); //$NON-NLS-1$
       assertNotNull(node);
+
+      // Looping across the tag filters
+      for (final SWTBotToolbarButton button : taggedToursView.getToolbarButtons()) {
+
+         if (Messages.Tour_Tags_Action_ToggleTagFilter_Tooltip.equals(button.getToolTipText())) {
+
+            button.click();
+            button.click();
+            button.click();
+            break;
+         }
+      }
 
       taggedToursView.close();
    }
