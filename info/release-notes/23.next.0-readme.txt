@@ -80,10 +80,10 @@ Improvements
   - Support macOS ARM platform    
     https://github.com/mytourbook/mytourbook/discussions/1174
 
-* Tour Blog View & Tour Analyzer View
+* Tour Blog View & Tour Analyzer View (Frederic)
   - Refreshing each view when the measurement system is changed
 
-* Tour Print
+* Tour Print (Frederic)
   - Added recorded and paused time values. Rounded values (elevation gain, distance...)
 
 Changes
@@ -99,7 +99,7 @@ Bugfix
   - Reimport a renamed tcx file does not change the importfilename in my tourbook anymore
     https://github.com/mytourbook/mytourbook/issues/1171
 
-* Tour Analyzer View
+* Tour Analyzer View (Frederic)
   - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
 
 
