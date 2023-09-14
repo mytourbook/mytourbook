@@ -17,6 +17,10 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.Messages;
+
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -34,16 +38,30 @@ public class TaggedToursViewTests extends UITest {
 
       //Open the Tagged Tours view
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode("Tagged Tours").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(Utils.TAGGEDTOURS_VIEW_NAME).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
       Utils.getTour(bot);
 
-      Utils.showView(bot, "Tagged Tours"); //$NON-NLS-1$
+      final SWTBotView taggedToursView = Utils.showView(bot, Utils.TAGGEDTOURS_VIEW_NAME);
 
       final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   9").select(); //$NON-NLS-1$
       assertNotNull(item);
       final SWTBotTreeItem node = item.getNode("5/31/2015").select(); //$NON-NLS-1$
       assertNotNull(node);
+
+      // Looping across the tag filters
+      for (final SWTBotToolbarButton button : taggedToursView.getToolbarButtons()) {
+
+         if (Messages.Tour_Tags_Action_ToggleTagFilter_Tooltip.equals(button.getToolTipText())) {
+
+            button.click();
+            button.click();
+            button.click();
+            break;
+         }
+      }
+
+      taggedToursView.close();
    }
 }

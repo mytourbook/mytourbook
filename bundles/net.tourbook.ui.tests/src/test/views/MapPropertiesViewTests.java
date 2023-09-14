@@ -17,6 +17,7 @@ package views;
 
 import net.tourbook.map2.Messages;
 
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -25,18 +26,20 @@ import utils.Utils;
 public class MapPropertiesViewTests extends UITest {
 
    @Test
-   void testTourTagsView() {
+   void testMapPropertiesView_Basic() {
 
       Utils.getTour(bot);
 
       //Open the Map Properties view
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.SYSTEM).expand().getNode("Map Properties").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(WorkbenchTests.SYSTEM).expand().getNode(Utils.MAPPROPERTIES_VIEW_NAME).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Map Properties"); //$NON-NLS-1$
+      final SWTBotView mapPropertiesView = Utils.showView(bot, Utils.MAPPROPERTIES_VIEW_NAME);
 
       bot.checkBox(Messages.Map_Properties_ShowTileInfo).select();
       bot.checkBox(Messages.Map_Properties_ShowTileBorder).select();
       bot.checkBox(Messages.Map_Properties_ShowGeoGrid).select();
+
+      mapPropertiesView.close();
    }
 }
