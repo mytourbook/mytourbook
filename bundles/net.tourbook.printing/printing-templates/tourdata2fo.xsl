@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format"
-	exclude-result-prefixes="fo"
->
-
+<xsl:stylesheet version="1.1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" exclude-result-prefixes="fo">
 	<xsl:output method="xml" version="1.0" omit-xml-declaration="no" indent="yes"/>
-
 	<!-- translations -->
 	<xsl:param name="lang.Tour_Print_PageTitle" select="''"/>
 	<xsl:param name="lang.Tour_Print_Tour" select="''"/>
@@ -13,8 +9,10 @@
 	<xsl:param name="lang.Tour_Print_End_Location" select="''"/>
 	<xsl:param name="lang.Tour_Print_Time_Distance_Speed" select="''"/>
 	<xsl:param name="lang.Tour_Print_Tour_Time" select="''"/>
-	<xsl:param name="lang.Tour_Print_Tour_Pausing_Time" select="''"/>
+	<xsl:param name="lang.Tour_Print_Tour_Break_Time" select="''"/>
 	<xsl:param name="lang.Tour_Print_Tour_Moving_Time" select="''"/>
+	<xsl:param name="lang.Tour_Print_Tour_Paused_Time" select="''"/>
+	<xsl:param name="lang.Tour_Print_Tour_Recorded_Time" select="''"/>
 	<xsl:param name="lang.Tour_Print_Distance" select="''"/>
 	<xsl:param name="lang.Tour_Print_Maximum_Speed" select="''"/>
 	<xsl:param name="lang.Tour_Print_Personal" select="''"/>
@@ -29,7 +27,6 @@
 	<xsl:param name="lang.Tour_Print_Meters_Down" select="''"/>
 	<xsl:param name="lang.Tour_Print_Tour_Markers" select="''"/>
 	<xsl:param name="lang.Tour_Print_No_Markers_Found" select="''"/>
-
 	<!-- parameters passed from java code into the TransFormer, useful for pre-formatting data in java or configuring i18n -->
 	<xsl:param name="paperSize" select="''"/>
 	<xsl:param name="paperOrientation" select="''"/>
@@ -46,7 +43,6 @@
 	<xsl:param name="unitLabelHeartBeat" select="''"/>
 	<xsl:param name="unitLabelCadence" select="''"/>
 	<xsl:param name="unitLabelCalories" select="''"/>
-
 	<xsl:template name="FormatTime">
 		<xsl:param name="theTime"/>
 		<xsl:variable name="hh">
@@ -70,64 +66,38 @@
 		</xsl:if>
 		<xsl:value-of select="$ss"/>
 	</xsl:template>
-
 	<!-- ========================= -->
 	<!-- root element: TourData -->
 	<!-- ========================= -->
 	<xsl:template match="TourData">
 		<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
 			<fo:layout-master-set>
-
-
-				<fo:simple-page-master master-name="simplePaper" margin-top="2cm" margin-bottom="2cm"
-					margin-left="2cm" margin-right="2cm"
-				>
+				<fo:simple-page-master master-name="simplePaper" margin-top="2cm" margin-bottom="2cm" margin-left="2cm" margin-right="2cm">
 					<xsl:if test="$paperSize = 'A4'">
-						<xsl:attribute name="page-width">
-							<xsl:if test="$paperOrientation = 'Portrait'">21cm</xsl:if>
-							<xsl:if test="$paperOrientation = 'Landscape'">29.7cm</xsl:if>
-	  					</xsl:attribute>
-						<xsl:attribute name="page-height">
-							<xsl:if test="$paperOrientation = 'Portrait'">29.7cm</xsl:if>
-							<xsl:if test="$paperOrientation = 'Landscape'">21cm</xsl:if>
-	  					</xsl:attribute>
+						<xsl:attribute name="page-width"><xsl:if test="$paperOrientation = 'Portrait'">21cm</xsl:if><xsl:if test="$paperOrientation = 'Landscape'">29.7cm</xsl:if></xsl:attribute>
+						<xsl:attribute name="page-height"><xsl:if test="$paperOrientation = 'Portrait'">29.7cm</xsl:if><xsl:if test="$paperOrientation = 'Landscape'">21cm</xsl:if></xsl:attribute>
 					</xsl:if>
 					<xsl:if test="$paperSize = 'Letter'">
-						<xsl:attribute name="page-width">
-							<xsl:if test="$paperOrientation = 'Portrait'">8.5in</xsl:if>
-							<xsl:if test="$paperOrientation = 'Landscape'">11in</xsl:if>
-	  					</xsl:attribute>
-						<xsl:attribute name="page-height">
-							<xsl:if test="$paperOrientation = 'Portrait'">11in</xsl:if>
-							<xsl:if test="$paperOrientation = 'Landscape'">8.5in</xsl:if>
-	  					</xsl:attribute>
+						<xsl:attribute name="page-width"><xsl:if test="$paperOrientation = 'Portrait'">8.5in</xsl:if><xsl:if test="$paperOrientation = 'Landscape'">11in</xsl:if></xsl:attribute>
+						<xsl:attribute name="page-height"><xsl:if test="$paperOrientation = 'Portrait'">11in</xsl:if><xsl:if test="$paperOrientation = 'Landscape'">8.5in</xsl:if></xsl:attribute>
 					</xsl:if>
 					<fo:region-body/>
 				</fo:simple-page-master>
-
-
 			</fo:layout-master-set>
 			<fo:page-sequence master-reference="simplePaper">
 				<fo:flow flow-name="xsl-region-body">
-
-					<fo:block border-color="black" border-style="solid" border-width=".3mm" margin-bottom="5pt" font-size="16pt"
-						font-weight="bold" background-color="#E1E1E1" text-align="center"
-					>
+					<fo:block border-color="black" border-style="solid" border-width=".3mm" margin-bottom="5pt" font-size="16pt" font-weight="bold" background-color="#E1E1E1" text-align="center">
 						<xsl:value-of select="$lang.Tour_Print_PageTitle"/>
 						:
 						<xsl:value-of select="tourTitle"/>
 					</fo:block>
-
-
 					<fo:block margin-bottom="5pt" font-size="10pt">
 						<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
 							<fo:table-column column-width="25%"/>
 							<fo:table-column column-width="75%"/>
 							<fo:table-header>
 								<fo:table-row>
-									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center"
-										vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1"
-									>
+									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
 										<fo:block text-align="center" vertical-align="middle">
 											<xsl:value-of select="$lang.Tour_Print_Tour"/>
 										</fo:block>
@@ -190,21 +160,17 @@
 							</fo:table-body>
 						</fo:table>
 					</fo:block>
-
 					<!-- insert TourMarker content if needed -->
 					<xsl:if test="$isPrintMarkers">
 						<xsl:apply-templates select="//TourMarkers"/>
 					</xsl:if>
-
 					<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 						<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
 							<fo:table-column column-width="25%"/>
 							<fo:table-column column-width="75%"/>
 							<fo:table-header>
 								<fo:table-row>
-									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center"
-										vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1"
-									>
+									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
 										<fo:block text-align="center" vertical-align="middle">
 											<xsl:value-of select="$lang.Tour_Print_Time_Distance_Speed"/>
 										</fo:block>
@@ -232,7 +198,23 @@
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
-											<xsl:value-of select="$lang.Tour_Print_Tour_Pausing_Time"/>
+											<xsl:value-of select="$lang.Tour_Print_Tour_Moving_Time"/>
+											:
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="left">
+											<xsl:call-template name="FormatTime">
+												<xsl:with-param name="theTime" select="tourComputedTime_Moving"/>
+											</xsl:call-template>
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+								<!-- tour break time -->
+								<fo:table-row>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="right" vertical-align="top">
+											<xsl:value-of select="$lang.Tour_Print_Tour_Break_Time"/>
 											:
 										</fo:block>
 									</fo:table-cell>
@@ -244,18 +226,34 @@
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								<!-- tour moving time -->
+								<!-- tour recorded time -->
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
-											<xsl:value-of select="$lang.Tour_Print_Tour_Moving_Time"/>
+											<xsl:value-of select="$lang.Tour_Print_Tour_Recorded_Time"/>
 											:
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
 											<xsl:call-template name="FormatTime">
-												<xsl:with-param name="theTime" select="tourComputedTime_Moving"/>
+												<xsl:with-param name="theTime" select="tourDeviceTime_Recorded"/>
+											</xsl:call-template>
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+								<!-- tour paused time -->
+								<fo:table-row>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="right" vertical-align="top">
+											<xsl:value-of select="$lang.Tour_Print_Tour_Paused_Time"/>
+											:
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
+										<fo:block text-align="left">
+											<xsl:call-template name="FormatTime">
+												<xsl:with-param name="theTime" select="tourDeviceTime_Paused"/>
 											</xsl:call-template>
 										</fo:block>
 									</fo:table-cell>
@@ -270,7 +268,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left" white-space-collapse="false" white-space="pre">
-											<xsl:value-of select="format-number(tourDistance div 1000 div $unitDistance, '#.00')"/>
+											<xsl:value-of select="format-number(tourDistance div 1000 div $unitDistance, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelDistance"/>
 										</fo:block>
@@ -286,7 +284,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(maxSpeed div $unitDistance, '#.00')"/>
+											<xsl:value-of select="format-number(maxSpeed div $unitDistance, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelSpeed"/>
 										</fo:block>
@@ -295,30 +293,21 @@
 							</fo:table-body>
 						</fo:table>
 					</fo:block>
-
-
 					<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 						<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
-						
 							<fo:table-column column-width="25%"/>
 							<fo:table-column column-width="75%"/>
-							
 							<fo:table-header>
 								<fo:table-row>
-									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center"
-										vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1"
-									>
+									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
 										<fo:block text-align="center" vertical-align="middle">
 											<xsl:value-of select="$lang.Tour_Print_Personal"/>
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-header>
-							
 							<fo:table-body>
-							
 								<!-- rest pulse -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -334,9 +323,7 @@
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
 								<!-- maximum pulse -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -352,9 +339,7 @@
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
 								<!-- average pulse -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -364,15 +349,13 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(avgPulse, '#.0')"/>
+											<xsl:value-of select="format-number(avgPulse, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelHeartBeat"/>
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
 								<!-- calories -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -388,9 +371,7 @@
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
 								<!-- average cadence -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -400,7 +381,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(avgCadence, '#.0')"/>
+											<xsl:value-of select="format-number(avgCadence, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelCadence"/>
 										</fo:block>
@@ -409,17 +390,13 @@
 							</fo:table-body>
 						</fo:table>
 					</fo:block>
-
-
 					<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 						<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
 							<fo:table-column column-width="25%"/>
 							<fo:table-column column-width="75%"/>
 							<fo:table-header>
 								<fo:table-row>
-									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center"
-										vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1"
-									>
+									<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="2" background-color="#E1E1E1">
 										<fo:block text-align="center" vertical-align="middle">
 											<xsl:value-of select="$lang.Tour_Print_Altitude"/>
 										</fo:block>
@@ -427,9 +404,7 @@
 								</fo:table-row>
 							</fo:table-header>
 							<fo:table-body>
-							
 								<!-- highest altitude -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -439,15 +414,13 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(maxAltitude div $unitAltitude, '#.##')"/>
+											<xsl:value-of select="format-number(maxAltitude div $unitAltitude, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelAltitude"/>
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
 								<!-- tour meters up -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -457,15 +430,13 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(tourAltUp div $unitAltitude, '#.##')"/>
+											<xsl:value-of select="format-number(tourAltUp div $unitAltitude, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelAltitude"/>
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
 								<!-- tour meters down -->
-								
 								<fo:table-row>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="right" vertical-align="top">
@@ -475,7 +446,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
-											<xsl:value-of select="format-number(tourAltDown div $unitAltitude, '#.##')"/>
+											<xsl:value-of select="format-number(tourAltDown div $unitAltitude, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelAltitude"/>
 										</fo:block>
@@ -484,18 +455,14 @@
 							</fo:table-body>
 						</fo:table>
 					</fo:block>
-
-
 				</fo:flow>
 			</fo:page-sequence>
 		</fo:root>
 	</xsl:template>
-
 	<!-- ========================= -->
 	<!-- element: TourMarkers -->
 	<!-- ========================= -->
 	<xsl:template match="TourMarkers">
-
 		<fo:block padding="0pt" margin-bottom="5pt" font-size="10pt">
 			<fo:table border-style="solid" border-width="0.5pt" border-color="black" table-layout="fixed" width="100%">
 				<fo:table-column column-width="15%"/>
@@ -503,9 +470,7 @@
 				<fo:table-column column-width="70%"/>
 				<fo:table-header>
 					<fo:table-row>
-						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center"
-							vertical-align="middle" number-columns-spanned="3" background-color="#E1E1E1"
-						>
+						<fo:table-cell border-style="solid" border-width="0.5pt" border-color="black" text-align="center" vertical-align="middle" number-columns-spanned="3" background-color="#E1E1E1">
 							<fo:block text-align="center" vertical-align="middle">
 								<xsl:value-of select="$lang.Tour_Print_Tour_Markers"/>
 							</fo:block>
@@ -515,7 +480,6 @@
 				<fo:table-body>
 					<xsl:choose>
 						<xsl:when test="count(TourMarker) > 0">
-
 							<xsl:for-each select="TourMarker">
 								<xsl:sort select="distance20" data-type="number" order="ascending"/>
 								<!-- tour marker -->
@@ -529,7 +493,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left" vertical-align="top" white-space-collapse="false" white-space="pre">
-											<xsl:value-of select="format-number(distance20 div 1000 div $unitDistance, '#.00')"/>
+											<xsl:value-of select="format-number(distance20 div 1000 div $unitDistance, '#')"/>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:value-of select="$unitLabelDistance"/>
 										</fo:block>
@@ -541,7 +505,6 @@
 									</fo:table-cell>
 								</fo:table-row>
 							</xsl:for-each>
-
 						</xsl:when>
 						<xsl:otherwise>
 							<fo:table-row>
@@ -556,7 +519,5 @@
 				</fo:table-body>
 			</fo:table>
 		</fo:block>
-
 	</xsl:template>
-
 </xsl:stylesheet>

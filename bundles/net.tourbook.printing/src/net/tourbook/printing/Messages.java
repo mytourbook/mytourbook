@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,7 +76,9 @@ public class Messages extends NLS {
    public static String        Tour_Print_Time_Distance_Speed;
    public static String        Tour_Print_Tour;
    public static String        Tour_Print_Tour_Moving_Time;
-   public static String        Tour_Print_Tour_Pausing_Time;
+   public static String        Tour_Print_Tour_Break_Time;
+   public static String        Tour_Print_Tour_Paused_Time;
+   public static String        Tour_Print_Tour_Recorded_Time;
    public static String        Tour_Print_Tour_Time;
    public static String        Tour_Print_Tour_Markers;
 

@@ -98,9 +98,6 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView tourDataView = Utils.showView(bot, Utils.VIEW_NAME_TOURDATA);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TOURANALYZER);
-      final SWTBotView tourAnalyzerView = Utils.showView(bot, Utils.VIEW_NAME_TOURANALYZER);
-
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Compare Geo Tour"); //$NON-NLS-1$
       final SWTBotView geoCompareView = Utils.showView(bot, Utils.VIEW_NAME_GEOCOMPARE);
 
@@ -173,7 +170,6 @@ public class WorkbenchTests extends UITest {
       tourMarkerView.close();
       waypointsView.close();
       tourDataView.close();
-      tourAnalyzerView.close();
       geoCompareView.close();
       collatedToursView.close();
       referenceToursView.close();

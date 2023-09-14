@@ -46,6 +46,7 @@ public class TourPausesViewTests extends UITest {
 
       // Triggering the deletion but not acting yet
       pausesViewTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
+      bot.sleep(1000);
       Utils.clickNoButton(bot);
 
       // Triggering the deletion and performing it

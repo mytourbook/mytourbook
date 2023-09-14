@@ -115,7 +115,6 @@
                   <enumeration value="Week"/>
                   <enumeration value="Month"/>
                   <enumeration value="Year"/>
-                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>
