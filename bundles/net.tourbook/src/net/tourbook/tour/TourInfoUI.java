@@ -236,12 +236,12 @@ public class TourInfoUI {
    private CLabel           _lblTourType_Image;
 
    private Label            _lblAirQuality;
-   private Label            _lblAltitudeUp;
-   private Label            _lblAltitudeUpUnit;
-   private Label            _lblAltitudeDown;
-   private Label            _lblAltitudeDownUnit;
+   private Label            _lblElevationUp;
+   private Label            _lblElevationUp_Unit;
+   private Label            _lblElevationDown;
+   private Label            _lblElevationDown_Unit;
    private Label            _lblAvgElevationChange;
-   private Label            _lblAvgElevationChangeUnit;
+   private Label            _lblAvgElevationChange_Unit;
    private Label            _lblAvgSpeed;
    private Label            _lblAvgSpeedUnit;
    private Label            _lblAvgPace;
@@ -266,19 +266,19 @@ public class TourInfoUI {
    private Label            _lblDateTimeModified;
    private Label            _lblDescription;
    private Label            _lblDistance;
-   private Label            _lblDistanceUnit;
+   private Label            _lblDistance_Unit;
    private Label            _lblGear;
    private Label            _lblGear_Spacer;
    private Label            _lblGear_GearShifts;
    private Label            _lblGear_GearShifts_Spacer;
-   private Label            _lblMaxAltitude;
-   private Label            _lblMaxAltitudeUnit;
+   private Label            _lblMaxElevation;
+   private Label            _lblMaxElevation_Unit;
    private Label            _lblMaxPace;
-   private Label            _lblMaxPaceUnit;
+   private Label            _lblMaxPace_Unit;
    private Label            _lblMaxPulse;
-   private Label            _lblMaxPulseUnit;
+   private Label            _lblMaxPulse_Unit;
    private Label            _lblMaxSpeed;
-   private Label            _lblMaxSpeedUnit;
+   private Label            _lblMaxSpeed_Unit;
    private Label            _lblMovingTime;
    private Label            _lblMovingTime_Unit;
    private Label            _lblElapsedTime;
@@ -288,6 +288,12 @@ public class TourInfoUI {
    private Label            _lblRecordedTime;
    private Label            _lblRecordedTime_Unit;
    private Label            _lblRestPulse;
+   private Label            _lblHillSpeed_Flat;
+   private Label            _lblHillSpeed_Flat_Unit;
+   private Label            _lblHillSpeed_Up;
+   private Label            _lblHillSpeed_Up_Unit;
+   private Label            _lblHillSpeed_Down;
+   private Label            _lblHillSpeed_Down_Unit;
    private Label            _lblTemperature_Part1;
    private Label            _lblTemperature_Part2;
    private Label            _lblTimeZone_Value;
@@ -298,6 +304,10 @@ public class TourInfoUI {
    private Label            _lblTourTags_Value;
    private Label            _lblTourType;
    private Label            _lblTourType_Value;
+   private Label            _lblAltimeter_Up;
+   private Label            _lblAltimeter_Up_Unit;
+   private Label            _lblAltimeter_Down;
+   private Label            _lblAltimeter_Down_Unit;
    private Label            _lblWeather;
    private Label            _lblWindSpeed;
    private Label            _lblWindSpeedUnit;
@@ -615,10 +625,10 @@ public class TourInfoUI {
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          createUI_32_Time(container);
-         createUI_34_DistanceAltitude(container);
+         createUI_34_DistanceElevation(container);
          createUI_36_Misc(container);
          createUI_37_HeartRateZones(container);
 
@@ -716,33 +726,33 @@ public class TourInfoUI {
       }
    }
 
-   private void createUI_34_DistanceAltitude(final Composite container) {
+   private void createUI_34_DistanceElevation(final Composite container) {
 
       createUI_Spacer(container);
 
       /*
-       * distance
+       * Distance
        */
       createUI_Label(container, Messages.Tour_Tooltip_Label_Distance);
 
       _lblDistance = createUI_LabelValue(container, SWT.TRAIL);
-      _lblDistanceUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblDistance_Unit = createUI_LabelValue(container, SWT.LEAD);
 
       /*
-       * altitude up
+       * Elevation up
        */
       createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
 
-      _lblAltitudeUp = createUI_LabelValue(container, SWT.TRAIL);
-      _lblAltitudeUpUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblElevationUp = createUI_LabelValue(container, SWT.TRAIL);
+      _lblElevationUp_Unit = createUI_LabelValue(container, SWT.LEAD);
 
       /*
-       * altitude up
+       * Elevation down
        */
       createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeDown);
 
-      _lblAltitudeDown = createUI_LabelValue(container, SWT.TRAIL);
-      _lblAltitudeDownUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblElevationDown = createUI_LabelValue(container, SWT.TRAIL);
+      _lblElevationDown_Unit = createUI_LabelValue(container, SWT.LEAD);
 
       /*
        * Average elevation change
@@ -750,7 +760,7 @@ public class TourInfoUI {
       createUI_Label(container, Messages.Tour_Tooltip_Label_AvgElevationChange);
 
       _lblAvgElevationChange = createUI_LabelValue(container, SWT.TRAIL);
-      _lblAvgElevationChangeUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblAvgElevationChange_Unit = createUI_LabelValue(container, SWT.LEAD);
 
       createUI_Spacer(container);
    }
@@ -851,7 +861,7 @@ public class TourInfoUI {
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          createUI_42_Avg(container);
 
@@ -859,10 +869,13 @@ public class TourInfoUI {
          createUI_43_Max(container);
 
          createUI_Spacer(container);
-         createUI_44_Weather(container);
+         createUI_44_HillSpeed(container);
+
+         createUI_Spacer(container);
+         createUI_47_Weather(container);
 
          _lblBattery_Spacer = createUI_Spacer(container);
-         createUI_45_Battery(container);
+         createUI_48_Battery(container);
       }
    }
 
@@ -909,42 +922,86 @@ public class TourInfoUI {
       _lblAvg_PowerUnit = createUI_LabelValue(parent, SWT.LEAD);
    }
 
-   private void createUI_43_Max(final Composite container) {
+   private void createUI_43_Max(final Composite parent) {
 
       /*
        * max pulse
        */
-      createUI_Label(container, Messages.Tour_Tooltip_Label_MaxPulse);
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_MaxPulse);
 
-      _lblMaxPulse = createUI_LabelValue(container, SWT.TRAIL);
-      _lblMaxPulseUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblMaxPulse = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblMaxPulse_Unit = createUI_LabelValue(parent, SWT.LEAD);
 
       /*
        * max speed
        */
-      createUI_Label(container, Messages.Tour_Tooltip_Label_MaxSpeed);
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_MaxSpeed);
 
-      _lblMaxSpeed = createUI_LabelValue(container, SWT.TRAIL);
-      _lblMaxSpeedUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblMaxSpeed = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblMaxSpeed_Unit = createUI_LabelValue(parent, SWT.LEAD);
 
       /*
        * max pace
        */
-      createUI_Label(container, Messages.Tour_Tooltip_Label_MaxPace);
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_MaxPace);
 
-      _lblMaxPace = createUI_LabelValue(container, SWT.TRAIL);
-      _lblMaxPaceUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblMaxPace = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblMaxPace_Unit = createUI_LabelValue(parent, SWT.LEAD);
 
       /*
        * max altitude
        */
-      createUI_Label(container, Messages.Tour_Tooltip_Label_MaxAltitude);
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_MaxAltitude);
 
-      _lblMaxAltitude = createUI_LabelValue(container, SWT.TRAIL);
-      _lblMaxAltitudeUnit = createUI_LabelValue(container, SWT.LEAD);
+      _lblMaxElevation = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblMaxElevation_Unit = createUI_LabelValue(parent, SWT.LEAD);
    }
 
-   private void createUI_44_Weather(final Composite parent) {
+   private void createUI_44_HillSpeed(final Composite parent) {
+      // TODO Auto-generated method stub
+
+      /*
+       * Speed flat
+       */
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_HillSpeed + UI.SPACE + UI.SYMBOL_ARROW_RIGHT);
+
+      _lblHillSpeed_Flat = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblHillSpeed_Flat_Unit = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Speed uphill
+       */
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_HillSpeed + UI.SPACE + UI.SYMBOL_ARROW_UP);
+
+      _lblHillSpeed_Up = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblHillSpeed_Up_Unit = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Speed downhill
+       */
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_HillSpeed + UI.SPACE + UI.SYMBOL_ARROW_DOWN);
+
+      _lblHillSpeed_Down = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblHillSpeed_Down_Unit = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Altimeter up
+       */
+      createUI_Label(parent, Messages.Segmenter_Tooltip_Label_Altimeter + UI.SPACE + UI.SYMBOL_ARROW_UP);
+
+      _lblAltimeter_Up = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblAltimeter_Up_Unit = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Altimeter down
+       */
+      createUI_Label(parent, Messages.Segmenter_Tooltip_Label_Altimeter + UI.SPACE + UI.SYMBOL_ARROW_DOWN);
+
+      _lblAltimeter_Down = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblAltimeter_Down_Unit = createUI_LabelValue(parent, SWT.LEAD);
+   }
+
+   private void createUI_47_Weather(final Composite parent) {
 
       /*
        * Clouds
@@ -993,7 +1050,7 @@ public class TourInfoUI {
       _lblAirQuality = createUI_LabelValue(parent, SWT.TRAIL);
    }
 
-   private void createUI_45_Battery(final Composite parent) {
+   private void createUI_48_Battery(final Composite parent) {
 
       {
          /*
@@ -1883,7 +1940,7 @@ public class TourInfoUI {
       }
 
       /*
-       * Column: left
+       * Column: Left
        */
       final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
       final long recordedTime = _tourData.getTourDeviceTime_Recorded();
@@ -1969,6 +2026,9 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
+      /*
+       * Weather
+       */
       final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
       final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
       if (windSpeed > 0 && weatherWindDirectionDegree != -1) {
@@ -2062,24 +2122,104 @@ public class TourInfoUI {
       _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
       _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
 
+      final String speedTooltipText =
+            """
+                  Time\t\t%s %s
+                  Distance\t\t%s %s
+
+                  """;
+
+// SET_FORMATTING_OFF
+
       /*
-       * column: right
+       * Column: Distance/elevation
        */
       final float distance = _tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
 
-      _lblDistance.setText(FormatManager.formatDistance(distance / 1000.0));
-      _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+      _lblDistance               .setText(FormatManager.formatDistance(distance / 1000.0));
+      _lblDistance_Unit          .setText(UI.UNIT_LABEL_DISTANCE);
 
-      _lblAltitudeUp.setText(Integer.toString((int) (_tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION)));
-      _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ELEVATION);
+      _lblElevationUp            .setText(Integer.toString((int) (_tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION)));
+      _lblElevationUp_Unit       .setText(UI.UNIT_LABEL_ELEVATION);
 
-      _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
-      _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ELEVATION);
+      _lblElevationDown          .setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
+      _lblElevationDown_Unit     .setText(UI.UNIT_LABEL_ELEVATION);
 
       final int averageElevationChange = Math.round(UI.convertAverageElevationChangeFromMetric(_tourData.getAvgAltitudeChange()));
-      _lblAvgElevationChange.setText(Integer.toString(averageElevationChange));
-      _lblAvgElevationChangeUnit.setText(UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
+      _lblAvgElevationChange     .setText(Integer.toString(averageElevationChange));
+      _lblAvgElevationChange_Unit.setText(UI.UNIT_LABEL_ELEVATION + UI.SLASH + UI.UNIT_LABEL_DISTANCE);
 
+      // ensure that data are available
+      _tourData.computeHillSpeed();
+
+      final int   hillSpeed_Flat_Time        = _tourData.hillSpeed_Flat_Time;
+      final float hillSpeed_Flat_Distance    = _tourData.hillSpeed_Flat_Distance;
+
+      final int   hillSpeed_Up_Time          = _tourData.hillSpeed_Uphill_Time;
+      final float hillSpeed_Up_Distance      = _tourData.hillSpeed_Uphill_Distance;
+      final float hillSpeed_Up_Elevation     = _tourData.hillSpeed_Uphill_Elevation;
+
+      final int   hillSpeed_Down_Time        = _tourData.hillSpeed_Downhill_Time;
+      final float hillSpeed_Down_Distance    = _tourData.hillSpeed_Downhill_Distance;
+      final float hillSpeed_Down_Elevation   = _tourData.hillSpeed_Downhill_Elevation;
+
+      final float hillSpeed_Flat = hillSpeed_Flat_Time   == 0 ? 0 : 3.6f * hillSpeed_Flat_Distance / hillSpeed_Flat_Time;
+      final float hillSpeed_Up   = hillSpeed_Up_Time     == 0 ? 0 : 3.6f * hillSpeed_Up_Distance   / hillSpeed_Up_Time;
+      final float hillSpeed_Down = hillSpeed_Down_Time   == 0 ? 0 : 3.6f * hillSpeed_Down_Distance / hillSpeed_Down_Time;
+
+      final float altimeter_Up   = hillSpeed_Up_Elevation   / hillSpeed_Up_Time   * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float altimeter_Down = hillSpeed_Down_Elevation / hillSpeed_Down_Time * 3600  / UI.UNIT_VALUE_ELEVATION;
+
+      final String hillSpeed_Flat_Tooltip = speedTooltipText.formatted(
+
+            FormatManager.formatMovingTime(hillSpeed_Flat_Time),
+            Messages.Tour_Tooltip_Label_Hour,
+
+            FormatManager.formatDistance(hillSpeed_Flat_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
+            UI.UNIT_LABEL_DISTANCE);
+
+      final String hillSpeed_Up_Tooltip = speedTooltipText.formatted(
+
+            FormatManager.formatMovingTime(hillSpeed_Up_Time),
+            Messages.Tour_Tooltip_Label_Hour,
+
+            FormatManager.formatDistance(hillSpeed_Up_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
+            UI.UNIT_LABEL_DISTANCE);
+
+      final String hillSpeed_Down_Tooltip = speedTooltipText.formatted(
+
+            FormatManager.formatMovingTime(hillSpeed_Down_Time),
+            Messages.Tour_Tooltip_Label_Hour,
+
+            FormatManager.formatDistance(hillSpeed_Down_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
+            UI.UNIT_LABEL_DISTANCE);
+
+      _lblHillSpeed_Flat      .setText(FormatManager.formatSpeed(hillSpeed_Flat  / UI.UNIT_VALUE_DISTANCE));
+      _lblHillSpeed_Up        .setText(FormatManager.formatSpeed(hillSpeed_Up    / UI.UNIT_VALUE_DISTANCE));
+      _lblHillSpeed_Down      .setText(FormatManager.formatSpeed(hillSpeed_Down  / UI.UNIT_VALUE_DISTANCE));
+
+      _lblAltimeter_Up        .setText(Integer.toString((int)(altimeter_Up   + .5)));
+      _lblAltimeter_Down      .setText(Integer.toString((int)(altimeter_Down + .5)));
+
+      _lblHillSpeed_Flat      .setToolTipText(hillSpeed_Flat_Tooltip);
+      _lblHillSpeed_Flat_Unit .setToolTipText(hillSpeed_Flat_Tooltip);
+      _lblHillSpeed_Up        .setToolTipText(hillSpeed_Up_Tooltip);
+      _lblHillSpeed_Up_Unit   .setToolTipText(hillSpeed_Up_Tooltip);
+      _lblHillSpeed_Down      .setToolTipText(hillSpeed_Down_Tooltip);
+      _lblHillSpeed_Down_Unit .setToolTipText(hillSpeed_Down_Tooltip);
+
+      _lblHillSpeed_Flat_Unit .setText(UI.UNIT_LABEL_SPEED);
+      _lblHillSpeed_Up_Unit   .setText(UI.UNIT_LABEL_SPEED);
+      _lblHillSpeed_Down_Unit .setText(UI.UNIT_LABEL_SPEED);
+
+      _lblAltimeter_Up_Unit   .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
+      _lblAltimeter_Down_Unit .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
+
+// SET_FORMATTING_ON
+
+      /*
+       * Column: Right
+       */
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
       final float avgSpeed = time == 0 ? 0 : 3.6f * distance / time;
@@ -2100,10 +2240,9 @@ public class TourInfoUI {
       // avg cadence
       final double avgCadence = _tourData.getAvgCadence() * _tourData.getCadenceMultiplier();
       _lblAvgCadence.setText(FormatManager.formatCadence(avgCadence));
-      _lblAvgCadenceUnit.setText(
-            _tourData.isCadenceSpm()
-                  ? Messages.Value_Unit_Cadence_Spm
-                  : Messages.Value_Unit_Cadence);
+      _lblAvgCadenceUnit.setText(_tourData.isCadenceSpm()
+            ? Messages.Value_Unit_Cadence_Spm
+            : Messages.Value_Unit_Cadence);
 
       // avg power
       final double avgPower = _tourData.getPower_Avg();
@@ -2115,24 +2254,26 @@ public class TourInfoUI {
       _lblCalories.setText(FormatManager.formatNumber_0(calories / 1000));
 
       // body
-      _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
       final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+      _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
       _lblBodyWeight.setText(_nf1.format(bodyWeight));
+
+// SET_FORMATTING_OFF
 
       /*
        * Max values
        */
-      _lblMaxAltitude.setText(Integer.toString((int) (_tourData.getMaxAltitude() / UI.UNIT_VALUE_ELEVATION)));
-      _lblMaxAltitudeUnit.setText(UI.UNIT_LABEL_ELEVATION);
+      _lblMaxElevation        .setText(Integer.toString((int) (_tourData.getMaxAltitude() / UI.UNIT_VALUE_ELEVATION)));
+      _lblMaxElevation_Unit   .setText(UI.UNIT_LABEL_ELEVATION);
 
-      _lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
-      _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
+      _lblMaxPulse            .setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
+      _lblMaxPulse_Unit       .setText(Messages.Value_Unit_Pulse);
 
-      _lblMaxPace.setText(UI.format_mm_ss((long) (_tourData.getMaxPace() * UI.UNIT_VALUE_DISTANCE)));
-      _lblMaxPaceUnit.setText(UI.UNIT_LABEL_PACE);
+      _lblMaxPace             .setText(UI.format_mm_ss((long) (_tourData.getMaxPace() * UI.UNIT_VALUE_DISTANCE)));
+      _lblMaxPace_Unit        .setText(UI.UNIT_LABEL_PACE);
 
-      _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / UI.UNIT_VALUE_DISTANCE));
-      _lblMaxSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+      _lblMaxSpeed            .setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / UI.UNIT_VALUE_DISTANCE));
+      _lblMaxSpeed_Unit       .setText(UI.UNIT_LABEL_SPEED);
 
       /*
        * Gears
@@ -2144,11 +2285,10 @@ public class TourInfoUI {
                _tourData.getRearShiftCount()));
       }
 
-      UI.showHideControl(_lblGear_Spacer, _hasGears);
-
-      UI.showHideControl(_lblGear, _hasGears);
-      UI.showHideControl(_lblGear_GearShifts, _hasGears);
-      UI.showHideControl(_lblGear_GearShifts_Spacer, _hasGears);
+      UI.showHideControl(_lblGear_Spacer,             _hasGears);
+      UI.showHideControl(_lblGear,                    _hasGears);
+      UI.showHideControl(_lblGear_GearShifts,         _hasGears);
+      UI.showHideControl(_lblGear_GearShifts_Spacer,  _hasGears);
 
       /*
        * Battery
@@ -2157,11 +2297,17 @@ public class TourInfoUI {
          _lblBattery_Start.setText(Short.toString(_tourData.getBattery_Percentage_Start()));
          _lblBattery_End.setText(String.format(BATTERY_FORMAT, _tourData.getBattery_Percentage_End()));
       }
-      UI.showHideControl(_linkBattery, _hasRecordingDeviceBattery);
-      UI.showHideControl(_lblBattery_Spacer, _hasRecordingDeviceBattery);
-      UI.showHideControl(_lblBattery_Start, _hasRecordingDeviceBattery);
-      UI.showHideControl(_lblBattery_End, _hasRecordingDeviceBattery);
 
+      UI.showHideControl(_linkBattery,       _hasRecordingDeviceBattery);
+      UI.showHideControl(_lblBattery_Spacer, _hasRecordingDeviceBattery);
+      UI.showHideControl(_lblBattery_Start,  _hasRecordingDeviceBattery);
+      UI.showHideControl(_lblBattery_End,    _hasRecordingDeviceBattery);
+
+// SET_FORMATTING_ON
+
+      /*
+       * Sensor
+       */
       updateUI_SensorValues();
 
       /*

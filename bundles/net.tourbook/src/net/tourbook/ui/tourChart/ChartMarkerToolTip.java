@@ -408,7 +408,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
                if (elevationGainLoss != null) {
 
-                  final float value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+                  final float value = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
 
                   createUI_72_ValueField(
                         container,

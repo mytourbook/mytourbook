@@ -478,8 +478,8 @@ public class ElevationCompareManager {
       final ElevationGainLoss elevationGainLoss = compareTourData.computeAltitudeUpDown(compareStartIndex, compareEndIndex);
       if (elevationGainLoss != null) {
 
-         elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
-         elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+         elevationGain = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
+         elevationLoss = elevationGainLoss.elevationLoss / UI.UNIT_VALUE_ELEVATION;
       }
 
       compareResult.compareMovingTime = movingTime;

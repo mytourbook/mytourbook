@@ -247,8 +247,8 @@ public class GeoCompareManager {
 
          final ElevationGainLoss elevationGainLoss = tourData.computeAltitudeUpDown(origStartIndex, origEndIndex);
          if (elevationGainLoss != null) {
-            geoComparedTour.elevationGainAbsolute = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
-            geoComparedTour.elevationLossAbsolute = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+            geoComparedTour.elevationGainAbsolute = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
+            geoComparedTour.elevationLossAbsolute = elevationGainLoss.elevationLoss / UI.UNIT_VALUE_ELEVATION;
          }
 
          final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];

@@ -80,10 +80,12 @@ Improvements
   - Support macOS ARM platform    
     https://github.com/mytourbook/mytourbook/discussions/1174
 
+
 Changes
 =======
 
-* 
+* Tour Segmenter
+  - The tour segmenter color for total values is used for the foreground color and not for the background color
 
 
 Bugfix

@@ -405,7 +405,7 @@ public interface ITourbookPreferences {
    public static final String BREAK_TIME_SLICE_DIFF                   = "BreakTime_SliceDiff";                        //$NON-NLS-1$
 
    /**
-    * DP tolerance when computing altitude up/down
+    * DP tolerance when computing elevation gain/loss
     */
    public static final String COMPUTED_ALTITUDE_DP_TOLERANCE          = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
 

@@ -664,7 +664,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
                colDef.printValue_0(cell, value);
             }
          }
@@ -693,7 +693,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.elevationLoss / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
             }

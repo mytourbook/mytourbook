@@ -597,6 +597,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_Description;
    public static String        Tour_Tooltip_Label_Distance;
    public static String        Tour_Tooltip_Label_GearShifts;
+   public static String        Tour_Tooltip_Label_HillSpeed;
    public static String        Tour_Tooltip_Label_Hour;
    public static String        Tour_Tooltip_Label_MaxAltitude;
    public static String        Tour_Tooltip_Label_MaxPace;

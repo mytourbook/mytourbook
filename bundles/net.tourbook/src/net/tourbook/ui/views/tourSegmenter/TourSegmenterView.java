@@ -684,7 +684,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
 
          /*
-          * get break time values: time/distance & speed
+          * Get break time values: time/distance & speed
           */
          final BreakTimeTool btConfig;
 
@@ -1400,6 +1400,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     * Create Douglas-Peucker segments from distance and altitude. All segments are merged which have
     * the same vertical direction.
     *
+    * @param forcedIndices
+    *           Is used when multiple tours are computed, otherwise it is <code>null</code>
     * @return
     */
    private int[] createSegmentsBy_AltitudeWithDPMerged(final int[] forcedIndices) {
@@ -4229,6 +4231,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return forcedIndices.toArray();
    }
 
+   /**
+    * @return Returns indices when multiple tours are computed, otherwise <code>null</code> is
+    *         returned.
+    */
    private int[] getTourIndices() {
 
       final boolean isMultipleTours = _tourData.isMultipleTours();
@@ -5582,7 +5588,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void setStyle_ColumnTotal(final ViewerCell cell) {
 
-      cell.setBackground(IS_DARK_THEME
+      cell.setForeground(IS_DARK_THEME
             ? _colorCache.get(STATE_COLOR_TOTALS_DARK)
             : _colorCache.get(STATE_COLOR_TOTALS));
    }
