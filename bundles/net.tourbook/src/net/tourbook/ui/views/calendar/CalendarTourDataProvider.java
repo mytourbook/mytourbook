@@ -784,7 +784,8 @@ class CalendarTourDataProvider {
                   + "      calories," + NL //                                          //$NON-NLS-1$
                   + "      cadenceZone_SlowTime," + NL //                              //$NON-NLS-1$
                   + "      cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
-                  + "      TourDeviceTime_Recorded" + NL //                            //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
+                  + "      power_TrainingStressScore" + NL //                          //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
