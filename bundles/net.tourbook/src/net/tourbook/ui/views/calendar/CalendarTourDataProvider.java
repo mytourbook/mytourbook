@@ -421,8 +421,6 @@ class CalendarTourDataProvider {
 
          ArrayList<String> dbTourWeatherClouds = null;
 
-         ArrayList<Float> dbTourTrainingStressScore = null;
-
          ArrayList<Integer> dbCalories = null;
          FloatArrayList dbPowerAvg = null;
          FloatArrayList dbPulseAvg = null;
@@ -470,8 +468,7 @@ class CalendarTourDataProvider {
                + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
                + "   Power_Avg," + NL //                          20 //$NON-NLS-1$
                + "   TourDeviceTime_Recorded" + UI.SYMBOL_COMMA + NL // 21 //$NON-NLS-1$
-               + "   weather_Clouds" + UI.SYMBOL_COMMA + NL //          22 //$NON-NLS-1$
-               + "   power_TrainingStressScore" + NL //                 23 //$NON-NLS-1$
+               + "   weather_Clouds" + NL //                     22 //$NON-NLS-1$
 
                + NL
 
@@ -541,8 +538,6 @@ class CalendarTourDataProvider {
                   dbTourMovingTime = new ArrayList<>();
 
                   dbTourWeatherClouds = new ArrayList<>();
-
-                  dbTourTrainingStressScore = new ArrayList<>();
 
                   dbCalories = new ArrayList<>();
                   dbPowerAvg = new FloatArrayList();
@@ -625,9 +620,6 @@ class CalendarTourDataProvider {
 
                   dbTourWeatherClouds.add(result.getString(22));
 
-                  final var toto = result.getFloat(23);
-                  dbTourTrainingStressScore.add(result.getFloat(23));
-
                   /*
                    * convert type id to the type index in the tour type array, this is also
                    * the color index for the tour type
@@ -695,8 +687,6 @@ class CalendarTourDataProvider {
                data.tourDescription = dbTourDescription.get(tourIndex);
 
                data.weatherClouds = dbTourWeatherClouds.get(tourIndex);
-
-               data.trainingLoad_Tss = dbTourTrainingStressScore.get(tourIndex);
 
                final LocalDate tourDate = LocalDate.of(year, month, data.day);
                data.tourDate = tourDate;
@@ -839,7 +829,9 @@ class CalendarTourDataProvider {
                + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
                + " SUM(cadenceZone_FastTime)," + NL //                              9  //$NON-NLS-1$
 
-               + " SUM(TourDeviceTime_Recorded)" + NL //                            10 //$NON-NLS-1$
+               + " SUM(TourDeviceTime_Recorded)," + NL //                           10 //$NON-NLS-1$
+
+               + " SUM(power_TrainingStressScore)" + NL //                          11 //$NON-NLS-1$
 
                + sqlFromTourData;
 
@@ -877,6 +869,8 @@ class CalendarTourDataProvider {
 
             weekData.recordedTime = result.getInt(10);
 
+            weekData.trainingLoad_Tss = result.getInt(11);
+
             if (UI.IS_SCRAMBLE_DATA) {
 
                weekData.elevationGain = UI.scrambleNumbers(weekData.elevationGain);
@@ -888,6 +882,8 @@ class CalendarTourDataProvider {
 
                weekData.calories = UI.scrambleNumbers(weekData.calories);
                weekData.recordedTime = UI.scrambleNumbers(weekData.recordedTime);
+
+               weekData.trainingLoad_Tss = UI.scrambleNumbers(weekData.trainingLoad_Tss);
             }
          }
 
