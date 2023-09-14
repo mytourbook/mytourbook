@@ -467,8 +467,8 @@ class CalendarTourDataProvider {
                + "   TourAltDown," + NL //                        18 //$NON-NLS-1$
                + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
                + "   Power_Avg," + NL //                          20 //$NON-NLS-1$
-               + "   TourDeviceTime_Recorded" + UI.SYMBOL_COMMA + NL // 21 //$NON-NLS-1$
-               + "   weather_Clouds" + NL //                     22 //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded," + NL //            21 //$NON-NLS-1$
+               + "   weather_Clouds" + NL //                      22 //$NON-NLS-1$
 
                + NL
 
