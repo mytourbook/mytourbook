@@ -43,7 +43,8 @@ Experimental
 New
 ===
 
-* 
+* Calendar - Weekly summary (Frederic)
+  - Training Stress Score (TSS)
 
 
 Improvements
