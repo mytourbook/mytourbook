@@ -1785,14 +1785,8 @@ class CalendarProfileManager {
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
             final float trainingLoad_Tss = data.trainingLoad_Tss;
-            if (trainingLoad_Tss > 0) {
 
-               return String.valueOf(trainingLoad_Tss);
-
-            } else {
-
-               return UI.EMPTY_STRING;
-            }
+            return trainingLoad_Tss > 0 ? String.valueOf(trainingLoad_Tss) : UI.EMPTY_STRING;
          }
 
          @Override
