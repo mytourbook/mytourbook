@@ -3954,7 +3954,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   // link: set default
 
                   _linkDefaultTimeZone = new Link(actionContainer, SWT.NONE);
-                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
+                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefaultTimeZone);
                   _linkDefaultTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetDefault()));
                   _tk.adapt(_linkDefaultTimeZone, true, true);
                }
@@ -9599,7 +9599,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _linkDefaultTimeZone.setToolTipText(
             NLS.bind(
-                  Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
+                  Messages.Tour_Editor_Link_SetDefaultTimeZone_Tooltip,
                   TimeTools.getDefaultTimeZoneId()));
 
       updateUI_TimeZone();
