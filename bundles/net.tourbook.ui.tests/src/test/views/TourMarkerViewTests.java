@@ -48,7 +48,7 @@ public class TourMarkerViewTests extends UITest {
       final SWTBotTable timeSlicesTable = tourEditorView.bot().table();
       assertEquals(16775, timeSlicesTable.rowCount());
       timeSlicesTable.select(0);
-      timeSlicesTable.contextMenu(Messages.RefTour_Action_CreaateMarker).click();
+      timeSlicesTable.contextMenu(Messages.RefTour_Action_CreateMarker).click();
       bot.button("Save ").click(); //$NON-NLS-1$
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
