@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,27 +15,35 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class TourBlogViewTests extends UITest {
+public class TourChartAnalyzerViewTests extends UITest {
 
-   private SWTBotView getTourBlogView() {
+   private SWTBotView getTourAnalyzerView() {
 
-      Utils.showViewFromMenu(bot, "Tour", Utils.TOURBLOG_VIEW_NAME); //$NON-NLS-1$
-      return Utils.showView(bot, Utils.TOURBLOG_VIEW_NAME);
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURANALYZER_VIEW_NAME);
+      return Utils.showView(bot, Utils.TOURANALYZER_VIEW_NAME);
    }
 
    @Test
-   void testBlogView_Basic() {
+   void testAnalyzerView_Basic() {
 
-      Utils.getTour(bot);
+      // It's important to select the tour first, as otherwise, the Tour Analyzer
+      // view might not detect the tour
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
 
-      final SWTBotView tourBlogView = getTourBlogView();
-      tourBlogView.show();
+      Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
+
+      final SWTBotView tourAnalyzerView = getTourAnalyzerView();
 
       //Change the measurement system to imperial
       Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
@@ -45,6 +53,6 @@ public class TourBlogViewTests extends UITest {
       //Change back the measurement system to metric
       Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
 
-      tourBlogView.close();
+      tourAnalyzerView.close();
    }
 }

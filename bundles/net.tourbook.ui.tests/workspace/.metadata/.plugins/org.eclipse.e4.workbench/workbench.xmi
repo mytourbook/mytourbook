@@ -94,8 +94,9 @@
               </children>
               <children xsi:type="advanced:Placeholder" xmi:id="_nYIByOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.editorss" toBeRendered="false" containerData="4000" ref="_nX70cOKKEeyB59fpdb3pkQ"/>
             </children>
-            <children xsi:type="basic:PartSashContainer" xmi:id="_nYIByeKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIBz-KKEeyB59fpdb3pkQ">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_nYIByeKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIByuKKEeyB59fpdb3pkQ">
               <children xsi:type="basic:PartStack" xmi:id="_nYIByuKKEeyB59fpdb3pkQ" elementId="map" containerData="5000" selectedElement="_nYIBzuKKEeyB59fpdb3pkQ">
+                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_nYIBy-KKEeyB59fpdb3pkQ" elementId="net.tourbook.map2.view.Map2ViewId" ref="_nYB7EOKKEeyB59fpdb3pkQ" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:6. Map</tags>
@@ -112,11 +113,14 @@
                   <tags>View</tags>
                   <tags>categoryTag:3. Tools</tags>
                 </children>
+                <children xsi:type="advanced:Placeholder" xmi:id="_4aAtMFDzEe6KH4rFHKjpqg" elementId="net.tourbook.views.TourChartAnalyzer" toBeRendered="false" ref="_4aAGIFDzEe6KH4rFHKjpqg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:3. Tools</tags>
+                </children>
               </children>
               <children xsi:type="basic:PartStack" xmi:id="_nYIBz-KKEeyB59fpdb3pkQ" elementId="chart" containerData="5000" selectedElement="_nYIB0OKKEeyB59fpdb3pkQ">
                 <tags>7. Equipment</tags>
                 <tags>3. Tools</tags>
-                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_nYIB0OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.TourChartView" ref="_nYB7FOKKEeyB59fpdb3pkQ" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:2. Tour Properties</tags>
@@ -185,6 +189,8 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:3. Tools</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
       <menus xmi:id="_qWpoUOKKEeyB59fpdb3pkQ" elementId="net.tourbook.tour.TourLogView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -197,8 +203,6 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:2. Tour Properties</tags>
-      <tags>active</tags>
-      <tags>activeOnClose</tags>
       <menus xmi:id="_nnQp4OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.TourChartView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -354,6 +358,18 @@
         <tags>menuContribution:menu</tags>
       </menus>
       <toolbar xmi:id="_TP8YgFGFEe2JXuX0m9xQ3Q" elementId="net.tourbook.views.TourSegmenter" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_4aAGIFDzEe6KH4rFHKjpqg" elementId="net.tourbook.views.TourChartAnalyzer" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Tour Analyzer" iconURI="platform:/plugin/net.tourbook/icons/tour-analyzer.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourChartAnalyzerView"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:3. Tools</tags>
+      <menus xmi:id="_4aJQEFDzEe6KH4rFHKjpqg" elementId="net.tourbook.views.TourChartAnalyzer">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_4aJQEVDzEe6KH4rFHKjpqg" elementId="net.tourbook.views.TourChartAnalyzer" visible="false"/>
     </sharedElements>
     <trimBars xmi:id="_mdMqg-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.main.toolbar" contributorURI="platform:/plugin/org.eclipse.ui.workbench">
       <children xsi:type="menu:ToolBar" xmi:id="_mr4mwOKKEeyB59fpdb3pkQ" elementId="people">
