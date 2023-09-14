@@ -489,6 +489,7 @@ class CalendarProfileManager {
          // repeat continuously -> is more handier
          new ColumnLayout_ComboData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Profile_ColumnLayout_Continuously),
       };
+
    private static final DayHeaderDateFormat_ComboData[] _allDateHeaderDateFormat_ComboData =
 
       new DayHeaderDateFormat_ComboData[] {
@@ -502,6 +503,7 @@ class CalendarProfileManager {
          new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH_YEAR,       TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
          new DayHeaderDateFormat_ComboData(DayDateFormat.AUTOMATIC,            Messages.Calendar_Profile_DayHeaderDateFormat_Automatic),
       };
+
    private static final TourBackground_ComboData[] _allTourBackground_ComboData =
 
       new TourBackground_ComboData[] {
