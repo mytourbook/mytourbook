@@ -625,6 +625,7 @@ class CalendarTourDataProvider {
 
                   dbTourWeatherClouds.add(result.getString(22));
 
+                  final var toto = result.getFloat(23);
                   dbTourTrainingStressScore.add(result.getFloat(23));
 
                   /*

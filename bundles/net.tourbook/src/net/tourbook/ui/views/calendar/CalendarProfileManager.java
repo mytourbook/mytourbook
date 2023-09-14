@@ -315,13 +315,13 @@ class CalendarProfileManager {
 
 // SET_FORMATTING_OFF
 
-   private static final IValueFormatter   _valueFormatter_Number_1_0 = new ValueFormatter_Number_1_0(false);
-   private static final IValueFormatter   _valueFormatter_Number_1_1            = new ValueFormatter_Number_1_1(false);
-   private static final IValueFormatter   _valueFormatter_Number_1_2            = new ValueFormatter_Number_1_2(false);
-   private static final IValueFormatter   _valueFormatter_Number_1_3            = new ValueFormatter_Number_1_3(false);
-   private static final IValueFormatter   _valueFormatter_Time_HH               = new ValueFormatter_Time_HH();
-   private static final IValueFormatter   _valueFormatter_Time_HHMM             = new ValueFormatter_Time_HHMM();
-   private static final IValueFormatter   _valueFormatter_Time_HHMMSS           = new ValueFormatter_Time_HHMMSS();
+   private static final IValueFormatter   _valueFormatter_Number_1_0  = new ValueFormatter_Number_1_0(false);
+   private static final IValueFormatter   _valueFormatter_Number_1_1  = new ValueFormatter_Number_1_1(false);
+   private static final IValueFormatter   _valueFormatter_Number_1_2  = new ValueFormatter_Number_1_2(false);
+   private static final IValueFormatter   _valueFormatter_Number_1_3  = new ValueFormatter_Number_1_3(false);
+   private static final IValueFormatter   _valueFormatter_Time_HH     = new ValueFormatter_Time_HH();
+   private static final IValueFormatter   _valueFormatter_Time_HHMM   = new ValueFormatter_Time_HHMM();
+   private static final IValueFormatter   _valueFormatter_Time_HHMMSS = new ValueFormatter_Time_HHMMSS();
    static {
 
       /*
@@ -451,6 +451,7 @@ class CalendarProfileManager {
          new FormatterData(true,      FormatterID.PACE,                 _weekFormatter_Pace.getDefaultFormat()),
          new FormatterData(true,      FormatterID.CADENCE_ZONES_TIMES,  _weekFormatter_CadenceZones_TimePercentages.getDefaultFormat()),
          new FormatterData(true,      FormatterID.TIME_MOVING,          _weekFormatter_Time_Recorded.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.TRAININGLOAD_TSS,     _weekFormatter_TrainingLoad_Tss.getDefaultFormat()),
          new FormatterData(false,     FormatterID.EMPTY,                ValueFormat.DUMMY_VALUE),
       };
 
@@ -765,10 +766,10 @@ class CalendarProfileManager {
       boolean        isColor2;
 
       private TourBackground_ComboData(final TourBackground tourBackground,
-                                      final String label,
-                                      final boolean isColor1,
-                                      final boolean isColor2,
-                                      final boolean isWidth) {
+                                       final String label,
+                                       final boolean isColor1,
+                                       final boolean isColor2,
+                                       final boolean isWidth) {
 
          this.tourBackground = tourBackground;
          this.label = label;
@@ -788,9 +789,9 @@ class CalendarProfileManager {
       boolean    isWidth;
 
       private TourBorder_ComboData(final TourBorder tourBorder,
-                                  final String label,
-                                  final boolean isColor,
-                                  final boolean isWidth) {
+                                   final String label,
+                                   final boolean isColor,
+                                   final boolean isWidth) {
 
          this.tourBorder = tourBorder;
          this.label = label;
