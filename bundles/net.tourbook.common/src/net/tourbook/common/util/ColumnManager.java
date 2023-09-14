@@ -2415,7 +2415,11 @@ public class ColumnManager {
    private void setColumnIdAndWidth(final ArrayList<String> columnIdsAndWidth, final String columnId, int columnWidth) {
 
       final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
       if (colDef == null) {
+
+         StatusUtil.log(new Throwable(String.format("\"colDef\" is null for columnId = \"%s\"", columnId))); //$NON-NLS-1$
+
          return;
       }
 
