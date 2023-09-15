@@ -96,10 +96,13 @@ class TourBook_ColumnFactory {
    private Color                _colorTour;
    private Color                _colorTotal;
 
-   TourBook_ColumnFactory(final ColumnManager columnManager_NatTable, final ColumnManager columnManager_Tree, final PixelConverter pc) {
+   TourBook_ColumnFactory(final ColumnManager columnManager_NatTable,
+                          final ColumnManager columnManager_Tree,
+                          final PixelConverter pc) {
 
       _columnManager_NatTable = columnManager_NatTable;
       _columnManager_Tree = columnManager_Tree;
+
       _pc = pc;
    }
 
