@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -7200,10 +7199,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start)
                   .boxed()
-                  .collect(Collectors.toList());
+                  .toList();
             final List<Long> listPausedTime_End = Arrays.stream(_tourData.getPausedTime_End())
                   .boxed()
-                  .collect(Collectors.toList());
+                  .toList();
 
             List<Long> listPausedTime_Data = null;
             final long[] pausedTime_Data = _tourData.getPausedTime_Data();
@@ -7212,7 +7211,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                listPausedTime_Data = Arrays.stream(_tourData.getPausedTime_Data())
                      .boxed()
-                     .collect(Collectors.toList());
+                     .toList();
             }
 
             _tourData.finalizeTour_TimerPauses(listPausedTime_Start,
