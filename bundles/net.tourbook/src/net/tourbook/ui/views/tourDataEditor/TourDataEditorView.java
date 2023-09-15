@@ -6851,7 +6851,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          case 1: // Good - green
 
-            backgroundColor = isDarkTheme ? new Color(0, 175, 0) : new Color(0, 175, 0);
+            backgroundColor = new Color(0, 175, 0);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
 
             break;
@@ -6865,19 +6865,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          case 3: // Moderate - orange
 
-            backgroundColor = isDarkTheme ? new Color(255, 128, 0) : new Color(255, 128, 0);
+            backgroundColor = new Color(255, 128, 0);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
          case 4: // Poor - red
 
-            backgroundColor = isDarkTheme ? new Color(230, 0, 0) : new Color(230, 0, 0);
+            backgroundColor = new Color(230, 0, 0);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
          case 5: // Very poor - pink
 
-            backgroundColor = isDarkTheme ? new Color(227, 0, 227) : new Color(227, 0, 227);
+            backgroundColor = new Color(227, 0, 227);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
