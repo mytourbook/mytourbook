@@ -8063,16 +8063,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             selectedTourData = tourData;
          }
 
-      } else if (selection instanceof SelectionChartInfo) {
+      } else if (selection instanceof final SelectionChartInfo chartInfo) {
 
-         final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
          final ChartDataModel chartDataModel = chartInfo.chartDataModel;
          if (chartDataModel != null) {
 
             final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-            if (tourId instanceof Long) {
+            if (tourId instanceof final Long tourIdLong) {
 
-               final TourData tourData = getTourData((Long) tourId);
+               final TourData tourData = getTourData(tourIdLong);
                if (tourData != null) {
 
                   _selectionTourId = tourData.getTourId();
@@ -8088,9 +8087,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
          }
 
-      } else if (selection instanceof SelectionChartXSliderPosition) {
-
-         final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
+      } else if (selection instanceof final SelectionChartXSliderPosition xSliderPosition) {
 
          final Chart chart = xSliderPosition.getChart();
          if (chart != null) {
@@ -8099,9 +8096,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             if (chartDataModel != null) {
 
                final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-               if (tourId instanceof Long) {
+               if (tourId instanceof final Long tourIdLong) {
 
-                  final TourData tourData = getTourData((Long) tourId);
+                  final TourData tourData = getTourData(tourIdLong);
                   if (tourData != null) {
 
                      _selectionTourId = tourData.getTourId();
