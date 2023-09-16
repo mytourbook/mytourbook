@@ -1983,37 +1983,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /** Time in seconds for the flat area speed, <code>-1</code> indicates that this value is not yet computed */
    @Transient
-   public int           hillSpeed_Flat_Time              = -1;
+   public int           verticalSpeed_Flat_Time              = -1;
 
    /** Distance in meters for the flat area speed */
    @Transient
-   public float         hillSpeed_Flat_Distance;
+   public float         verticalSpeed_Flat_Distance;
 
 
    /** Time in seconds for the uphill area speed */
    @Transient
-   public int           hillSpeed_Uphill_Time;
+   public int           verticalSpeed_Up_Time;
 
    /** Distance in meters for the uphill area speed */
    @Transient
-   public float         hillSpeed_Uphill_Distance;
+   public float         verticalSpeed_Up_Distance;
 
    /** Elevation in meters for the uphill area speed */
    @Transient
-   public float         hillSpeed_Uphill_Elevation;
+   public float         verticalSpeed_Up_Elevation;
 
 
    /** Time in seconds for the downhill area speed */
    @Transient
-   public int           hillSpeed_Downhill_Time;
+   public int           verticalSpeed_Down_Time;
 
    /** Distance in meters for the downhill area speed */
    @Transient
-   public float         hillSpeed_Downhill_Distance;
+   public float         verticalSpeed_Down_Distance;
 
    /** Elevation in meters for the downhill area speed*/
    @Transient
-   public float         hillSpeed_Downhill_Elevation;
+   public float         verticalSpeed_Down_Elevation;
 
 
 // SET_FORMATTING_ON
@@ -2347,7 +2347,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       speedSerie_Summarized_Mile = null;
       speedSerie_Summarized_NauticalMile = null;
 
-      hillSpeed_Flat_Time = -1;
+      verticalSpeed_Flat_Time = -1;
 
       if (isPowerSerieFromDevice == false) {
          powerSerie = null;
@@ -3047,17 +3047,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       float prevElevation = elevationSerie[startIndex];
       float prevDistance = distanceSerie[startIndex];
 
-      System.out.println();
-      System.out.println();
-      System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       /*
        * Get elevation up/down values from the tour altitude values which are found by DP
        */
-      for (int dbIndex = 1; dbIndex < allSimplifiedPoints.length; dbIndex++) {
+      for (int dpIndex = 1; dpIndex < allSimplifiedPoints.length; dpIndex++) {
 
-         final DPPoint dpPoint = allSimplifiedPoints[dbIndex];
+         final DPPoint dpPoint = allSimplifiedPoints[dpIndex];
 
          final int serieIndex = startIndex + dpPoint.serieIndex;
 
@@ -3073,14 +3073,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          final boolean isMovingTime = breakTimeSerie[serieIndex] == false;
 
-         System.out.println(String.format("%5d  %6.0f  %6.1f     %6.1f",
-               timeDiff,
-               distanceDiff,
-               elevationDiff,
-               gradient
-
-         ));
-// TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println(String.format("%5d  %6.0f  %6.1f     %6.1f",
+//               timeDiff,
+//               distanceDiff,
+//               elevationDiff,
+//               gradient
+//
+//         ));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
          if (isComputeFlatValues) {
 
@@ -5980,9 +5980,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     *
     */
-   public void computeHillSpeed() {
+   public void computeVerticalSpeed() {
 
-      if (hillSpeed_Flat_Time == -1) {
+      if (verticalSpeed_Flat_Time == -1) {
 
          final float dpTolerance = 2;
          final float flatGradient = 1;
@@ -5996,16 +5996,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          if (computedElevationUpDown != null) {
 
-            hillSpeed_Flat_Time = computedElevationUpDown.timeFlat;
-            hillSpeed_Flat_Distance = computedElevationUpDown.distanceFlat;
+            verticalSpeed_Flat_Time = computedElevationUpDown.timeFlat;
+            verticalSpeed_Flat_Distance = computedElevationUpDown.distanceFlat;
 
-            hillSpeed_Uphill_Time = computedElevationUpDown.timeGain;
-            hillSpeed_Uphill_Distance = computedElevationUpDown.distanceGain;
-            hillSpeed_Uphill_Elevation = computedElevationUpDown.elevationGain;
+            verticalSpeed_Up_Time = computedElevationUpDown.timeGain;
+            verticalSpeed_Up_Distance = computedElevationUpDown.distanceGain;
+            verticalSpeed_Up_Elevation = computedElevationUpDown.elevationGain;
 
-            hillSpeed_Downhill_Time = computedElevationUpDown.timeLoss;
-            hillSpeed_Downhill_Distance = computedElevationUpDown.distanceLoss;
-            hillSpeed_Downhill_Elevation = computedElevationUpDown.elevationLoss;
+            verticalSpeed_Down_Time = computedElevationUpDown.timeLoss;
+            verticalSpeed_Down_Distance = computedElevationUpDown.distanceLoss;
+            verticalSpeed_Down_Elevation = computedElevationUpDown.elevationLoss;
          }
       }
    }

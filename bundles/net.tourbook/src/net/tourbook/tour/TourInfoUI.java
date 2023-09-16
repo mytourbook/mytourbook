@@ -958,7 +958,6 @@ public class TourInfoUI {
    }
 
    private void createUI_44_HillSpeed(final Composite parent) {
-      // TODO Auto-generated method stub
 
       /*
        * Speed flat
@@ -2150,53 +2149,53 @@ public class TourInfoUI {
       _lblAvgElevationChange_Unit.setText(UI.UNIT_LABEL_ELEVATION + UI.SLASH + UI.UNIT_LABEL_DISTANCE);
 
       // ensure that data are available
-      _tourData.computeHillSpeed();
+      _tourData.computeVerticalSpeed();
 
-      final int   hillSpeed_Flat_Time        = _tourData.hillSpeed_Flat_Time;
-      final float hillSpeed_Flat_Distance    = _tourData.hillSpeed_Flat_Distance;
+      final int   verticalSpeed_Flat_Time        = _tourData.verticalSpeed_Flat_Time;
+      final float verticalSpeed_Flat_Distance    = _tourData.verticalSpeed_Flat_Distance;
 
-      final int   hillSpeed_Up_Time          = _tourData.hillSpeed_Uphill_Time;
-      final float hillSpeed_Up_Distance      = _tourData.hillSpeed_Uphill_Distance;
-      final float hillSpeed_Up_Elevation     = _tourData.hillSpeed_Uphill_Elevation;
+      final int   verticalSpeed_Up_Time          = _tourData.verticalSpeed_Up_Time;
+      final float verticalSpeed_Up_Distance      = _tourData.verticalSpeed_Up_Distance;
+      final float verticalSpeed_Up_Elevation     = _tourData.verticalSpeed_Up_Elevation;
 
-      final int   hillSpeed_Down_Time        = _tourData.hillSpeed_Downhill_Time;
-      final float hillSpeed_Down_Distance    = _tourData.hillSpeed_Downhill_Distance;
-      final float hillSpeed_Down_Elevation   = _tourData.hillSpeed_Downhill_Elevation;
+      final int   verticalSpeed_Down_Time        = _tourData.verticalSpeed_Down_Time;
+      final float verticalSpeed_Down_Distance    = _tourData.verticalSpeed_Down_Distance;
+      final float verticalSpeed_Down_Elevation   = _tourData.verticalSpeed_Down_Elevation;
 
-      final float hillSpeed_Flat = hillSpeed_Flat_Time   == 0 ? 0 : 3.6f * hillSpeed_Flat_Distance / hillSpeed_Flat_Time;
-      final float hillSpeed_Up   = hillSpeed_Up_Time     == 0 ? 0 : 3.6f * hillSpeed_Up_Distance   / hillSpeed_Up_Time;
-      final float hillSpeed_Down = hillSpeed_Down_Time   == 0 ? 0 : 3.6f * hillSpeed_Down_Distance / hillSpeed_Down_Time;
+      final float verticalSpeed_Flat = verticalSpeed_Flat_Time   == 0 ? 0 : 3.6f * verticalSpeed_Flat_Distance / verticalSpeed_Flat_Time;
+      final float verticalSpeed_Up   = verticalSpeed_Up_Time     == 0 ? 0 : 3.6f * verticalSpeed_Up_Distance   / verticalSpeed_Up_Time;
+      final float verticalSpeed_Down = verticalSpeed_Down_Time   == 0 ? 0 : 3.6f * verticalSpeed_Down_Distance / verticalSpeed_Down_Time;
 
-      final float altimeter_Up   = hillSpeed_Up_Elevation   / hillSpeed_Up_Time   * 3600  / UI.UNIT_VALUE_ELEVATION;
-      final float altimeter_Down = hillSpeed_Down_Elevation / hillSpeed_Down_Time * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float altimeter_Up   = verticalSpeed_Up_Elevation   / verticalSpeed_Up_Time   * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float altimeter_Down = verticalSpeed_Down_Elevation / verticalSpeed_Down_Time * 3600  / UI.UNIT_VALUE_ELEVATION;
 
       final String hillSpeed_Flat_Tooltip = speedTooltipText.formatted(
 
-            FormatManager.formatMovingTime(hillSpeed_Flat_Time),
+            FormatManager.formatMovingTime(verticalSpeed_Flat_Time),
             Messages.Tour_Tooltip_Label_Hour,
 
-            FormatManager.formatDistance(hillSpeed_Flat_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
+            FormatManager.formatDistance(verticalSpeed_Flat_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
             UI.UNIT_LABEL_DISTANCE);
 
       final String hillSpeed_Up_Tooltip = speedTooltipText.formatted(
 
-            FormatManager.formatMovingTime(hillSpeed_Up_Time),
+            FormatManager.formatMovingTime(verticalSpeed_Up_Time),
             Messages.Tour_Tooltip_Label_Hour,
 
-            FormatManager.formatDistance(hillSpeed_Up_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
+            FormatManager.formatDistance(verticalSpeed_Up_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
             UI.UNIT_LABEL_DISTANCE);
 
       final String hillSpeed_Down_Tooltip = speedTooltipText.formatted(
 
-            FormatManager.formatMovingTime(hillSpeed_Down_Time),
+            FormatManager.formatMovingTime(verticalSpeed_Down_Time),
             Messages.Tour_Tooltip_Label_Hour,
 
-            FormatManager.formatDistance(hillSpeed_Down_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
+            FormatManager.formatDistance(verticalSpeed_Down_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
             UI.UNIT_LABEL_DISTANCE);
 
-      _lblHillSpeed_Flat      .setText(FormatManager.formatSpeed(hillSpeed_Flat  / UI.UNIT_VALUE_DISTANCE));
-      _lblHillSpeed_Up        .setText(FormatManager.formatSpeed(hillSpeed_Up    / UI.UNIT_VALUE_DISTANCE));
-      _lblHillSpeed_Down      .setText(FormatManager.formatSpeed(hillSpeed_Down  / UI.UNIT_VALUE_DISTANCE));
+      _lblHillSpeed_Flat      .setText(FormatManager.formatSpeed(verticalSpeed_Flat  / UI.UNIT_VALUE_DISTANCE));
+      _lblHillSpeed_Up        .setText(FormatManager.formatSpeed(verticalSpeed_Up    / UI.UNIT_VALUE_DISTANCE));
+      _lblHillSpeed_Down      .setText(FormatManager.formatSpeed(verticalSpeed_Down  / UI.UNIT_VALUE_DISTANCE));
 
       _lblAltimeter_Up        .setText(Integer.toString((int)(altimeter_Up   + .5)));
       _lblAltimeter_Down      .setText(Integer.toString((int)(altimeter_Down + .5)));
