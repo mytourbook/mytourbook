@@ -3165,8 +3165,12 @@ public class Messages extends NLS {
    public static String        tour_segmenter_label_createSegmentsWith;
    public static String        Tour_Segmenter_Label_DPTolerance;
    public static String        Tour_Segmenter_Label_DPTolerance_Tooltip;
+   public static String        Tour_Segmenter_Label_Gradient;
    public static String        Tour_Segmenter_Label_no_chart;
    public static String        Tour_Segmenter_Label_NumberOfSegments_Tooltip;
+   public static String        Tour_Segmenter_Label_VerticalSpeed_Ascent;
+   public static String        Tour_Segmenter_Label_VerticalSpeed_Descent;
+   public static String        Tour_Segmenter_Label_VerticalSpeed_Flat;
    public static String        tour_segmenter_segType_byDistance_defaultDistance;
    public static String        tour_segmenter_segType_byDistance_label;
    public static String        tour_segmenter_segType_byUpDownAlti_label;

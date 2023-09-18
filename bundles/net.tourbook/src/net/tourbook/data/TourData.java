@@ -1495,15 +1495,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Transient
    private float[]            segmentSerie_Distance_Total;
    @Transient
-   public float[]             segmentSerie_Altitude_Diff;
+   public float[]             segmentSerie_Elevation_Diff;
    @Transient
-   public float[]             segmentSerie_Altitude_Diff_Computed;
+   public float[]             segmentSerie_Elevation_Diff_Computed;
    @Transient
-   public float[]             segmentSerie_Altitude_UpDown_Hour;
+   public float[]             segmentSerie_Elevation_GainLoss_Hour;
    @Transient
-   public float               segmentSerieTotal_Altitude_Down;
+   public float               segmentSerieTotal_Elevation_Gain;
    @Transient
-   public float               segmentSerieTotal_Altitude_Up;
+   public float               segmentSerieTotal_Elevation_Loss;
+   @Transient
+   public float               segmentSerie_FlatGainLoss_Gradient;
 
    @Transient
    public float[]             segmentSerie_Speed;
@@ -6494,9 +6496,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Create the tour segment list from the segment index array
     *
     * @param breakTimeConfig
+    * @param flatGainLoss_Gradient
     * @return
     */
-   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool breakTimeConfig) {
+   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool breakTimeConfig, final float flatGainLoss_Gradient) {
 
       if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 
@@ -6558,8 +6561,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       segmentSerie_Distance_Diff = new float[segmentSerieLength];
       segmentSerie_Distance_Total = new float[segmentSerieLength];
 
-      segmentSerie_Altitude_Diff = new float[segmentSerieLength];
-      segmentSerie_Altitude_UpDown_Hour = new float[segmentSerieLength];
+      segmentSerie_Elevation_Diff = new float[segmentSerieLength];
+      segmentSerie_Elevation_GainLoss_Hour = new float[segmentSerieLength];
+
+      segmentSerie_FlatGainLoss_Gradient = flatGainLoss_Gradient;
 
       segmentSerie_Speed = new float[segmentSerieLength];
       segmentSerie_Pace = new float[segmentSerieLength];
@@ -6673,8 +6678,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   ? 0
                   : (altitudeDiff / UI.UNIT_VALUE_ELEVATION) / segmentMovingTime * 3600;
 
-            segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
-            segmentSerie_Altitude_UpDown_Hour[segmentIndex] = altiUpDownHour;
+            segmentSerie_Elevation_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
+            segmentSerie_Elevation_GainLoss_Hour[segmentIndex] = altiUpDownHour;
 
             if (altitudeDiff > 0) {
                segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder += altitudeDiff;
@@ -6687,10 +6692,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                segment.altitude_Segment_Down = altitudeDiff;
             }
 
-            if ((segmentSerie_Altitude_Diff_Computed != null)
-                  && (segmentIndex < segmentSerie_Altitude_Diff_Computed.length)) {
+            if ((segmentSerie_Elevation_Diff_Computed != null)
+                  && (segmentIndex < segmentSerie_Elevation_Diff_Computed.length)) {
 
-               final float segmentDiff = segmentSerie_Altitude_Diff_Computed[segmentIndex];
+               final float segmentDiff = segmentSerie_Elevation_Diff_Computed[segmentIndex];
 
                segment.altitude_Segment_Computed_Diff = segmentDiff;
 
@@ -6826,8 +6831,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       tourSegments.add(totalSegment);
 
-      segmentSerieTotal_Altitude_Up = totalAltitude_Up;
-      segmentSerieTotal_Altitude_Down = totalAltitude_Down;
+      segmentSerieTotal_Elevation_Gain = totalAltitude_Up;
+      segmentSerieTotal_Elevation_Loss = totalAltitude_Down;
 
       return tourSegments;
    }

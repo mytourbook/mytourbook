@@ -159,6 +159,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final String  STATE_DP_TOLERANCE_FLAT_GAIN_LOSS                  = "STATE_DP_TOLERANCE_FLAT_GAIN_LOSS";          //$NON-NLS-1$
    private static final String  STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
    private static final String  STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                   //$NON-NLS-1$
+   private static final String  STATE_FLAT_GAIN_LOSS_GRADIENT                      = "STATE_FLAT_GAIN_LOSS_GRADIENT";              //$NON-NLS-1$
    private static final String  STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
    private static final String  STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
    private static final String  STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
@@ -421,9 +422,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private boolean                        _isTourDirty        = false;
    //
    private int                            _selectedSurfingFilter;
-   private float                          _altitudeUp;
-   private float                          _altitudeDown;
-   private float                          _flatGradient;
+   private float                          _elevationGain;
+   private float                          _elevationLoss;
+   private float                          _flatGainLoss_Gradient;
    //
    private ArrayList<TourSegmenter>       _availableSegmenter = new ArrayList<>();
    //
@@ -456,6 +457,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private boolean                        _isGetInitialTours;
    private ArrayList<TourSegment>         _allTourSegments;
    //
+   /**
+    * {@link TourChart} contains the chart for the tour, this is necessary to move the slider in the
+    * chart to a selected segment
+    */
+   private TourChart                      _tourChart;
+   //
    /*
     * UI resources
     */
@@ -486,10 +493,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Composite       _pageSegType_ByBreakTime;
    private Composite       _pageSegType_ByDistance;
    private Composite       _pageSegType_ByMarker;
-   private Composite       _pageSegType_DPElevation;
-   private Composite       _pageSegType_DPElevation_FlatGainLoss;
-   private Composite       _pageSegType_DPPower;
-   private Composite       _pageSegType_DPPulse;
+   private Composite       _pageSegType_DP_Elevation;
+   private Composite       _pageSegType_DP_FlatGainLoss;
+   private Composite       _pageSegType_DP_Power;
+   private Composite       _pageSegType_DP_Pulse;
    private Composite       _pageSegType_Surfing;
    //
    private Button          _btnSurfing_DeleteTourSegments;
@@ -513,10 +520,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    //
    private Label           _lblBreakDistanceUnit;
    private Label           _lblDistanceValue;
-   private Label           _lblElevation_FlatGainLoss;
-   private Label           _lblElevation_Up;
-   private Label           _lblElevation_UpMin;
-   private Label           _lblMinAltitude;
+   private Label           _lblElevation_Gain;
+   private Label           _lblElevation_Gain_Min;
+   private Label           _lblMinElevation;
    private Label           _lblNumSegments;
    private Label           _lblSurfing_MinStartStopSpeed;
    private Label           _lblSurfing_MinStartStopSpeed_Unit;
@@ -526,6 +532,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblSurfing_MinSurfingTimeDuration;
    private Label           _lblSurfing_MinSurfingTimeDuration_Unit;
    private Label           _lblTourBreakTime;
+   private Label           _lblVerticalSpeed_Elevation_Flat;
+   private Label           _lblVerticalSpeed_Elevation_Flat_Unit;
+   private Label           _lblVerticalSpeed_Elevation_Gain;
+   private Label           _lblVerticalSpeed_Elevation_Gain_Unit;
+   private Label           _lblVerticalSpeed_Elevation_Loss;
+   private Label           _lblVerticalSpeed_Elevation_Loss_Unit;
    //
    private Spinner         _spinnerBreak_MinAvgSpeedAS;
    private Spinner         _spinnerBreak_MinSliceSpeedAS;
@@ -540,17 +552,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Spinner         _spinnerDPTolerance_FlatGainLoss;
    private Spinner         _spinnerDPTolerance_Power;
    private Spinner         _spinnerDPTolerance_Pulse;
+   private Spinner         _spinnerFlatGainLoss_Gradient;
    private Spinner         _spinnerMinAltitude;
    private Spinner         _spinnerSurfing_MinSurfingDistance;
    private Spinner         _spinnerSurfing_MinSpeed_Surfing;
    private Spinner         _spinnerSurfing_MinTimeDuration;
    private Spinner         _spinnerSurfing_MinSpeed_StartStop;
    //
-   /**
-    * {@link TourChart} contains the chart for the tour, this is necessary to move the slider in the
-    * chart to a selected segment
-    */
-   private TourChart       _tourChart;
 
    private class SegmenterComparator extends ViewerComparator {
 
@@ -720,7 +728,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             btConfig = BreakTimeTool.getPrefValues();
          }
 
-         _allTourSegments = _tourData.createSegmenterSegments(btConfig);
+         _allTourSegments = _tourData.createSegmenterSegments(btConfig, _flatGainLoss_Gradient);
 
          return _allTourSegments == null //
                ? new Object[0]
@@ -734,12 +742,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       public Object[] getElements(final Object parent) {
 
          if (_tourData == null) {
+
             return new Object[0];
+
          } else {
 
             final Object[] tourSegments = createSegmenterContent();
 
-            updateUI_Altitude();
+            updateUI_Elevation();
             updateUI_BreakTime();
             updateUI_SegmenterInfo(tourSegments);
 
@@ -1014,7 +1024,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   : _spinnerMinAltitude
                         .getSelection() / UI.UNIT_FOOT;
             _spinnerMinAltitude.setSelection(Math.round(convertedSelectedMinAltiDiff));
-            _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
+            _lblMinElevation.setText(UI.UNIT_LABEL_ELEVATION);
 
             updateUI_Surfing_MeasurementValues();
 
@@ -1295,7 +1305,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       // disable computed altitude
-      _tourData.segmentSerie_Altitude_Diff_Computed = null;
+      _tourData.segmentSerie_Elevation_Diff_Computed = null;
 
       // reset other indices
       _tourData.segmentSerieIndex2nd = null;
@@ -1330,7 +1340,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          forcedIndices = getTourIndices();
 
-         createSegmentsBy_Elevation_FlatGainLoss(forcedIndices);
+         final int flatGainLossGradient = _spinnerFlatGainLoss_Gradient.getSelection();
+         _flatGainLoss_Gradient = flatGainLossGradient / 10f;
+         _state.put(STATE_FLAT_GAIN_LOSS_GRADIENT, flatGainLossGradient);
+
+         createSegmentsBy_FlatGainLoss(forcedIndices);
 
          break;
 
@@ -1557,12 +1571,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       int serieIndex = 0;
       final int segmentLength = tourSegments.size();
       final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[segmentLength];
-      final float[] altitudeDiff = _tourData.segmentSerie_Altitude_Diff_Computed = new float[segmentLength];
+      final float[] elevationDiff = _tourData.segmentSerie_Elevation_Diff_Computed = new float[segmentLength];
 
       for (final AltitudeUpDownSegment altitudeUpDownSegment : tourSegments) {
 
          segmentSerieIndex[serieIndex] = altitudeUpDownSegment.serieIndex;
-         altitudeDiff[serieIndex] = altitudeUpDownSegment.computedAltitudeDiff;
+         elevationDiff[serieIndex] = altitudeUpDownSegment.computedAltitudeDiff;
 
          serieIndex++;
       }
@@ -1712,9 +1726,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     *           Is used when multiple tours are computed, otherwise it is <code>null</code>
     * @return
     */
-   private void createSegmentsBy_Elevation_FlatGainLoss(final int[] allForcedIndices) {
-
-// TODO Auto-generated method stub
+   private void createSegmentsBy_FlatGainLoss(final int[] allForcedIndices) {
 
 //    final int[] timeSerie = _tourData.timeSerie;
       final float[] distanceSerie = _tourData.getMetricDistanceSerie();
@@ -1763,8 +1775,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       boolean isPrevElevationGain = false;
       boolean isPrevElevationLoss = false;
 
-      _flatGradient = 1.0f;
-
       for (int dpIndex = 1; dpIndex < allSimplifiedPoints.length; dpIndex++) {
 
          final DPPoint currentDpPoint = allSimplifiedPoints[dpIndex];
@@ -1802,8 +1812,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
 
          final boolean isFlatArea = false
-               || currentGradient > 0 && currentGradient < _flatGradient
-               || currentGradient < 0 && currentGradient > -_flatGradient;
+               || currentGradient > 0 && currentGradient < _flatGainLoss_Gradient
+               || currentGradient < 0 && currentGradient > -_flatGainLoss_Gradient;
 
          if (dpIndex == 1) {
 
@@ -2319,48 +2329,119 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                .applyTo(_pageBookSegmenter);
 // SET_FORMATTING_OFF
          {
-            _pageSegType_DPElevation               = createUI_30_SegmenterBy_DPElevation(             _pageBookSegmenter);
-            _pageSegType_DPElevation_FlatGainLoss  = createUI_32_SegmenterBy_DPElevation_FlatGainLoss(_pageBookSegmenter);
-            _pageSegType_DPPulse                   = createUI_36_SegmenterBy_DPPulse(                 _pageBookSegmenter);
-            _pageSegType_DPPower                   = createUI_38_SegmenterBy_DPPower(                 _pageBookSegmenter);
-            _pageSegType_ByMarker                  = createUI_45_SegmenterBy_Marker(                  _pageBookSegmenter);
-            _pageSegType_ByDistance                = createUI_46_SegmenterBy_Distance(                _pageBookSegmenter);
-            _pageSegType_ByAltiUpDown              = createUI_48_SegmenterBy_MinAltitude(             _pageBookSegmenter);
-            _pageSegType_ByBreakTime               = createUI_50_SegmenterBy_BreakTime(               _pageBookSegmenter);
-            _pageSegType_Surfing                   = createUI_60_SegmenterBy_Surfing(                 _pageBookSegmenter);
+            _pageSegType_DP_Elevation     = createUI_30_SegmenterBy_DP_Elevation(      _pageBookSegmenter);
+            _pageSegType_DP_FlatGainLoss  = createUI_32_SegmenterBy_DP_FlatGainLoss(   _pageBookSegmenter);
+            _pageSegType_DP_Pulse         = createUI_36_SegmenterBy_DP_Pulse(          _pageBookSegmenter);
+            _pageSegType_DP_Power         = createUI_38_SegmenterBy_DP_Power(          _pageBookSegmenter);
+            _pageSegType_ByMarker         = createUI_45_SegmenterBy_Marker(            _pageBookSegmenter);
+            _pageSegType_ByDistance       = createUI_46_SegmenterBy_Distance(          _pageBookSegmenter);
+            _pageSegType_ByAltiUpDown     = createUI_48_SegmenterBy_MinAltitude(       _pageBookSegmenter);
+            _pageSegType_ByBreakTime      = createUI_50_SegmenterBy_BreakTime(         _pageBookSegmenter);
+            _pageSegType_Surfing          = createUI_60_SegmenterBy_Surfing(           _pageBookSegmenter);
          }
 // SET_FORMATTING_ON
       }
    }
 
-   private Composite createUI_30_SegmenterBy_DPElevation(final Composite parent) {
+   private Composite createUI_30_SegmenterBy_DP_Elevation(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          _spinnerDPTolerance_Elevation = createUI_DP_Tolerance(container);
-         _lblElevation_Up = createUI_DP_Info(container);
+         _lblElevation_Gain = createUI_DP_Info(container);
          _btnSaveTourDP = createUI_DB_SaveTour(container);
       }
 
       return container;
    }
 
-   private Composite createUI_32_SegmenterBy_DPElevation_FlatGainLoss(final Composite parent) {
+   private Composite createUI_32_SegmenterBy_DP_FlatGainLoss(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          _spinnerDPTolerance_FlatGainLoss = createUI_DP_Tolerance(container);
-         _lblElevation_FlatGainLoss = createUI_DP_Info(container);
+         UI.createSpacer_Horizontal(container, 1);
+
+         {
+            /*
+             * Gradient
+             */
+            // label
+            Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Tour_Segmenter_Label_Gradient);
+
+            // spinner
+            _spinnerFlatGainLoss_Gradient = new Spinner(container, SWT.BORDER);
+            _spinnerFlatGainLoss_Gradient.setMinimum(0); //    0.0 %
+            _spinnerFlatGainLoss_Gradient.setMaximum(100); // 10.0 %
+            _spinnerFlatGainLoss_Gradient.setDigits(1);
+            _spinnerFlatGainLoss_Gradient.addMouseWheelListener(_defaultCreateSegments_MouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerFlatGainLoss_Gradient);
+
+            // label: %
+            label = new Label(container, SWT.NONE);
+            label.setText(UI.SYMBOL_PERCENTAGE);
+         }
+         final Composite dataContainer = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(dataContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(dataContainer);
+         {
+            {
+               /*
+                * Vertical speed: Flat
+                */
+               // label
+               final Label label = new Label(dataContainer, SWT.NONE);
+               label.setText(Messages.Tour_Segmenter_Label_VerticalSpeed_Flat);
+
+               // value
+               _lblVerticalSpeed_Elevation_Flat = new Label(dataContainer, SWT.NONE);
+               _lblVerticalSpeed_Elevation_Flat.setText(UI.SPACE1);
+
+               // unit
+               _lblVerticalSpeed_Elevation_Flat_Unit = new Label(dataContainer, SWT.NONE);
+            }
+            {
+               /*
+                * Vertical speed: Ascent
+                */
+               // label
+               final Label label = new Label(dataContainer, SWT.NONE);
+               label.setText(Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent);
+
+               // value
+               _lblVerticalSpeed_Elevation_Gain = new Label(dataContainer, SWT.NONE);
+               _lblVerticalSpeed_Elevation_Gain.setText(UI.SPACE1);
+
+               // unit
+               _lblVerticalSpeed_Elevation_Gain_Unit = new Label(dataContainer, SWT.NONE);
+            }
+            {
+               /*
+                * Vertical speed: Descent
+                */
+               // label
+               final Label label = new Label(dataContainer, SWT.NONE);
+               label.setText(Messages.Tour_Segmenter_Label_VerticalSpeed_Descent);
+
+               // value
+               _lblVerticalSpeed_Elevation_Loss = new Label(dataContainer, SWT.NONE);
+               _lblVerticalSpeed_Elevation_Loss.setText(UI.SPACE1);
+
+               // unit
+               _lblVerticalSpeed_Elevation_Loss_Unit = new Label(dataContainer, SWT.NONE);
+            }
+         }
       }
 
       return container;
    }
 
-   private Composite createUI_36_SegmenterBy_DPPulse(final Composite parent) {
+   private Composite createUI_36_SegmenterBy_DP_Pulse(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -2371,7 +2452,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return container;
    }
 
-   private Composite createUI_38_SegmenterBy_DPPower(final Composite parent) {
+   private Composite createUI_38_SegmenterBy_DP_Power(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -2449,10 +2530,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _spinnerMinAltitude.addMouseWheelListener(_defaultCreateSegments_MouseWheelListener);
 
          // label: unit
-         _lblMinAltitude = new Label(container, SWT.NONE);
-         _lblMinAltitude.setText(UI.UNIT_LABEL_ELEVATION);
+         _lblMinElevation = new Label(container, SWT.NONE);
+         _lblMinElevation.setText(UI.UNIT_LABEL_ELEVATION);
 
-         _lblElevation_UpMin = createUI_DP_Info(container);
+         _lblElevation_Gain_Min = createUI_DP_Info(container);
          _btnSaveTourMin = createUI_DB_SaveTour(container);
       }
 
@@ -2568,10 +2649,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         /*
-          * minimum average speed
-          */
          {
+            /*
+             * Minimum average speed
+             */
             // label: minimum speed
             Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Compute_BreakTime_Label_MinimumAvgSpeed);
@@ -2588,11 +2669,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             label = new Label(container, SWT.NONE);
             label.setText(UI.UNIT_LABEL_SPEED);
          }
-
-         /*
-          * minimum slice speed
-          */
          {
+            /*
+             * Minimum slice speed
+             */
             // label: minimum speed
             Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Compute_BreakTime_Label_MinimumSliceSpeed);
@@ -2609,11 +2689,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             label = new Label(container, SWT.NONE);
             label.setText(UI.UNIT_LABEL_SPEED);
          }
-
-         /*
-          * minimum slice time
-          */
          {
+            /*
+             * Minimum slice time
+             */
             // label: minimum slice time
             Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Compute_BreakTime_Label_MinimumSliceTime);
@@ -3171,7 +3250,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
-//            .grab(true, false)
             .hint(_pc.convertWidthInCharsToPixels(18), SWT.DEFAULT)
             .applyTo(label);
 
@@ -3181,25 +3259,28 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Spinner createUI_DP_Tolerance(final Composite parent) {
 
       {
-         // label: DP Tolerance
-         final Link linkDP = new Link(parent, SWT.NONE);
-         linkDP.setText(Messages.Tour_Segmenter_Label_DPTolerance);
-         linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
-         linkDP.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
-            }
-         });
+         /*
+          * Label: DP Tolerance
+          */
+         final Link link = new Link(parent, SWT.NONE);
+         link.setText(Messages.Tour_Segmenter_Label_DPTolerance);
+         link.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
+
+         link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+            WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM);
+         }));
       }
 
       Spinner spinner;
       {
-         // spinner: DP tolerance
+         /*
+          * Spinner: DP tolerance
+          */
          spinner = new Spinner(parent, SWT.BORDER);
-         spinner.setMinimum(1); // 0.1
+         spinner.setMinimum(1); //        0.1
          spinner.setMaximum(10000); // 1000
          spinner.setDigits(1);
+
          spinner.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Tolerance()));
          spinner.addMouseWheelListener(event -> {
             UI.adjustSpinnerValueOnMouseScroll(event);
@@ -3339,13 +3420,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             boolean isShowColor = true;
 
             if (_isShowFlatGradient) {
-               
+
                // do not show a color for flat areas
 
                final float gradient = segment.gradient;
 
-               if (gradient >= 0 && gradient < _flatGradient
-                     || gradient < 0 && gradient > -_flatGradient) {
+               if (gradient >= 0 && gradient < _flatGainLoss_Gradient
+                     || gradient < 0 && gradient > -_flatGainLoss_Gradient) {
 
                   isShowColor = false;
                }
@@ -4526,6 +4607,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void initUI(final Composite parent) {
 
       _parent = parent;
+
       _pc = new PixelConverter(parent);
       _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
@@ -4615,8 +4697,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
-      _tourData.setTourAltUp(_altitudeUp);
-      _tourData.setTourAltDown(_altitudeDown);
+      _tourData.setTourAltUp(_elevationGain);
+      _tourData.setTourAltDown(_elevationLoss);
 
       // update tolerance into the tour data
       _tourData.setDpTolerance((short) (_dpToleranceElevation * 10));
@@ -4632,7 +4714,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          // create segments with newly saved tour that it can be displayed in the tour chart
          createSegments(false);
-         updateUI_Altitude();
+         updateUI_Elevation();
       }
    }
 
@@ -4800,21 +4882,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             || selectedSegmenterType == SegmenterType.ByElevationWithDP_Merged
             || selectedSegmenterType == SegmenterType.ByElevationWithMarker) {
 
-         _pageBookSegmenter.showPage(_pageSegType_DPElevation);
+         _pageBookSegmenter.showPage(_pageSegType_DP_Elevation);
 
       } else if (selectedSegmenterType == SegmenterType.ByElevationWithDP_FlatGainLoss) {
 
-         _pageBookSegmenter.showPage(_pageSegType_DPElevation_FlatGainLoss);
+         _pageBookSegmenter.showPage(_pageSegType_DP_FlatGainLoss);
 
          _isShowFlatGradient = true;
 
       } else if (selectedSegmenterType == SegmenterType.ByPowerWithDP) {
 
-         _pageBookSegmenter.showPage(_pageSegType_DPPower);
+         _pageBookSegmenter.showPage(_pageSegType_DP_Power);
 
       } else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
 
-         _pageBookSegmenter.showPage(_pageSegType_DPPulse);
+         _pageBookSegmenter.showPage(_pageSegType_DP_Pulse);
 
       } else if (selectedSegmenterType == SegmenterType.ByMarker) {
 
@@ -5329,27 +5411,34 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _dpTolerancePulse = stateDPTolerancePulse / 10.0f;
       _spinnerDPTolerance_Pulse.setSelection(stateDPTolerancePulse);
 
-      final int stateDPToleranceFlatGainLoss = Util.getStateInt(_state, STATE_DP_TOLERANCE_FLAT_GAIN_LOSS, 50);
-      _dpToleranceElevation_FlatGainLoss = stateDPToleranceFlatGainLoss / 10.0f;
-      _spinnerDPTolerance_FlatGainLoss.setSelection(stateDPToleranceFlatGainLoss);
-
       final int stateDPToleranceMultipleTours = Util.getStateInt(_state,
             STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS,
             STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
       _dpToleranceElevation_MultipleTours = (float) (stateDPToleranceMultipleTours / 10.0);
 
       /*
-       * break time
+       * Elevation flat, gain and loss
+       */
+      final int stateDPToleranceFlatGainLoss = Util.getStateInt(_state, STATE_DP_TOLERANCE_FLAT_GAIN_LOSS, 50);
+      _dpToleranceElevation_FlatGainLoss = stateDPToleranceFlatGainLoss / 10.0f;
+      _spinnerDPTolerance_FlatGainLoss.setSelection(stateDPToleranceFlatGainLoss);
+
+      final int stateFlatGainLoss_Gradient = Util.getStateInt(_state, STATE_FLAT_GAIN_LOSS_GRADIENT, 10);
+      _flatGainLoss_Gradient = stateFlatGainLoss_Gradient / 10.0f;
+      _spinnerFlatGainLoss_Gradient.setSelection(stateFlatGainLoss_Gradient);
+
+      /*
+       * Break time
        */
       final BreakTimeTool btConfig = BreakTimeTool.getPrefValues();
 
       /*
-       * break method
+       * Break method
        */
       selectBreakMethod(Util.getStateString(_state, STATE_SELECTED_BREAK_METHOD2, BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED));
 
       /*
-       * break by avg + slice speed
+       * Break by avg + slice speed
        */
       final float stateAvgSpeedAS = Util.getStateFloat(_state, STATE_BREAK_TIME_MIN_AVG_SPEED_AS, btConfig.breakMinAvgSpeedAS);
       final float stateSliceSpeedAS = Util.getStateFloat(_state, STATE_BREAK_TIME_MIN_SLICE_SPEED_AS, btConfig.breakMinSliceSpeedAS);
@@ -5360,7 +5449,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerBreak_MinSliceTimeAS.setSelection(stateSliceTimeAS);
 
       /*
-       * break by slice speed
+       * Break by slice speed
        */
       final float stateSliceSpeed = Util.getStateFloat(_state,
             STATE_BREAK_TIME_MIN_SLICE_SPEED,
@@ -5369,7 +5458,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerBreak_MinSliceSpeed.setSelection((int) (stateSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
 
       /*
-       * break by avg speed
+       * Break by avg speed
        */
       final float stateAvgSpeed = Util.getStateFloat(_state,
             STATE_BREAK_TIME_MIN_AVG_SPEED,
@@ -5378,7 +5467,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerBreak_MinAvgSpeed.setSelection((int) (stateAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
 
       /*
-       * break time by time/distance
+       * Break time by time/distance
        */
       _spinnerBreak_ShortestTime.setSelection(Util.getStateInt(_state,
             STATE_BREAK_TIME_MIN_TIME_VALUE,
@@ -5592,14 +5681,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _columnManager.saveState(_state);
 
-      _state.put(STATE_SELECTED_SEGMENTER_BY_USER, _userSelectedSegmenterType.name());
-      _state.put(STATE_SELECTED_DISTANCE, _spinnerDistance.getSelection());
-      _state.put(STATE_MINIMUM_ALTITUDE, _spinnerMinAltitude.getSelection());
-      _state.put(STATE_DP_TOLERANCE_POWER, _spinnerDPTolerance_Power.getSelection());
-      _state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerance_Pulse.getSelection());
-      _state.put(STATE_DP_TOLERANCE_FLAT_GAIN_LOSS, _spinnerDPTolerance_FlatGainLoss.getSelection());
+// SET_FORMATTING_OFF
 
-      _state.put(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS, (int) (_dpToleranceElevation_MultipleTours * 10));
+      _state.put(STATE_DP_TOLERANCE_POWER,                     _spinnerDPTolerance_Power.getSelection());
+      _state.put(STATE_DP_TOLERANCE_PULSE,                     _spinnerDPTolerance_Pulse.getSelection());
+      _state.put(STATE_DP_TOLERANCE_FLAT_GAIN_LOSS,            _spinnerDPTolerance_FlatGainLoss.getSelection());
+      _state.put(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS,   (int) (_dpToleranceElevation_MultipleTours * 10));
+      _state.put(STATE_MINIMUM_ALTITUDE,                       _spinnerMinAltitude.getSelection());
+      _state.put(STATE_SELECTED_SEGMENTER_BY_USER,             _userSelectedSegmenterType.name());
+      _state.put(STATE_SELECTED_DISTANCE,                      _spinnerDistance.getSelection());
+
+// SET_FORMATTING_ON
 
       /*
        * Surfing
@@ -5999,108 +6091,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   /**
-    * Update ascending altitude computed value
-    */
-   private void updateUI_Altitude() {
-
-      final TourSegmenter selectedSegmenter = getSelectedSegmenter();
-      if (selectedSegmenter == null) {
-         clearView();
-         return;
-      }
-
-      Label lblInfo;
-      float[] altitudeSegments = null;
-
-      // compute total alti up/down from the segments
-      _altitudeUp = 0;
-      _altitudeDown = 0;
-
-      if (selectedSegmenter.segmenterType == SegmenterType.ByComputedAltiUpDown) {
-
-         // Minimum altitude
-
-         altitudeSegments = _tourData.segmentSerie_Altitude_Diff_Computed;
-         lblInfo = _lblElevation_UpMin;
-
-      } else {
-
-         // DP tolerance
-
-         if (selectedSegmenter.segmenterType == SegmenterType.ByElevationWithMarker) {
-
-            _altitudeDown = _tourData.segmentSerieTotal_Altitude_Down;
-            _altitudeUp = _tourData.segmentSerieTotal_Altitude_Up;
-
-         } else {
-            altitudeSegments = _tourData.segmentSerie_Altitude_Diff;
-         }
-
-         lblInfo = _lblElevation_Up;
-      }
-
-      if (altitudeSegments == null && _altitudeDown == 0 && _altitudeUp == 0) {
-
-         lblInfo.setText(UI.EMPTY_STRING);
-         lblInfo.setToolTipText(UI.EMPTY_STRING);
-
-         return;
-      }
-
-      if (altitudeSegments != null) {
-
-         for (final float altitude : altitudeSegments) {
-            if (altitude > 0) {
-               _altitudeUp += altitude;
-            } else {
-               _altitudeDown += -altitude;
-            }
-         }
-      }
-
-      /*
-       * Show altitude values not as negative values because the values are displayed left aligned
-       * and it's easier to compare them visually when a minus sign is not displayed.
-       */
-      final float compAltiUp = _altitudeUp / UI.UNIT_VALUE_ELEVATION;
-      final float compAltiDown = _altitudeDown / UI.UNIT_VALUE_ELEVATION;
-
-      final int tourAltiUp = Math.round(_tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
-      final int tourAltiDown = Math.round(_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
-
-      lblInfo.setText(String.format(
-            FORMAT_ALTITUDE_DIFF,
-            Math.round(compAltiUp),
-            tourAltiUp,
-            UI.UNIT_LABEL_ELEVATION));
-
-      lblInfo.setToolTipText(NLS.bind(Messages.Tour_Segmenter_Label_AltitudeUpDown_Tooltip,
-
-            new Object[] {
-
-                  // Up
-                  _nf_1_1.format(compAltiUp),
-                  tourAltiUp,
-                  UI.UNIT_LABEL_ELEVATION,
-                  //
-                  // Down
-                  _nf_1_1.format(compAltiDown),
-                  tourAltiDown,
-                  UI.UNIT_LABEL_ELEVATION,
-                  //
-                  // Diff
-                  _nf_1_1.format(compAltiUp - compAltiDown),
-                  tourAltiUp - tourAltiDown,
-                  UI.UNIT_LABEL_ELEVATION,
-
-                  // DP
-                  _nf_1_1.format(_dpToleranceElevation),
-                  _nf_1_1.format(_tourData.getDpTolerance() / 10.0f),
-            //
-            }));
-   }
-
    private void updateUI_Distance() {
 
       float spinnerDistance = getDistance() / UI.UNIT_VALUE_DISTANCE;
@@ -6157,6 +6147,109 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          // update UI, the spinner already displays the correct value
          _lblDistanceValue.setText(UI.UNIT_LABEL_DISTANCE);
       }
+   }
+
+   /**
+    * Update ascending altitude computed value
+    */
+   private void updateUI_Elevation() {
+
+      final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+      if (selectedSegmenter == null) {
+         clearView();
+         return;
+      }
+
+      Label lblInfo;
+      float[] allElevationSegments = null;
+
+      // compute total elevation gain/loss from the segments
+      _elevationGain = 0;
+      _elevationLoss = 0;
+
+      if (selectedSegmenter.segmenterType == SegmenterType.ByComputedAltiUpDown) {
+
+         // Minimum altitude
+
+         allElevationSegments = _tourData.segmentSerie_Elevation_Diff_Computed;
+         lblInfo = _lblElevation_Gain_Min;
+
+      } else {
+
+         // DP tolerance
+
+         if (selectedSegmenter.segmenterType == SegmenterType.ByElevationWithMarker) {
+
+            _elevationLoss = _tourData.segmentSerieTotal_Elevation_Loss;
+            _elevationGain = _tourData.segmentSerieTotal_Elevation_Gain;
+
+         } else {
+
+            allElevationSegments = _tourData.segmentSerie_Elevation_Diff;
+         }
+
+         lblInfo = _lblElevation_Gain;
+      }
+
+      if (allElevationSegments == null && _elevationLoss == 0 && _elevationGain == 0) {
+
+         lblInfo.setText(UI.EMPTY_STRING);
+         lblInfo.setToolTipText(UI.EMPTY_STRING);
+
+         return;
+      }
+
+      if (allElevationSegments != null) {
+
+         for (final float elevation : allElevationSegments) {
+            if (elevation > 0) {
+               _elevationGain += elevation;
+            } else {
+               _elevationLoss += -elevation;
+            }
+         }
+      }
+
+      /*
+       * Show altitude values not as negative values because the values are displayed left aligned
+       * and it's easier to compare them visually when a minus sign is not displayed.
+       */
+      final float computed_ElevationGain = _elevationGain / UI.UNIT_VALUE_ELEVATION;
+      final float computed_ElevationLoss = _elevationLoss / UI.UNIT_VALUE_ELEVATION;
+
+      final int tour_ElevationGain = Math.round(_tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
+      final int tour_ElevationLoss = Math.round(_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
+
+      lblInfo.setText(String.format(
+            FORMAT_ALTITUDE_DIFF,
+            Math.round(computed_ElevationGain),
+            tour_ElevationGain,
+            UI.UNIT_LABEL_ELEVATION));
+
+      lblInfo.setToolTipText(NLS.bind(Messages.Tour_Segmenter_Label_AltitudeUpDown_Tooltip,
+
+            new Object[] {
+
+                  // Up
+                  _nf_1_1.format(computed_ElevationGain),
+                  tour_ElevationGain,
+                  UI.UNIT_LABEL_ELEVATION,
+                  //
+                  // Down
+                  _nf_1_1.format(computed_ElevationLoss),
+                  tour_ElevationLoss,
+                  UI.UNIT_LABEL_ELEVATION,
+                  //
+                  // Diff
+                  _nf_1_1.format(computed_ElevationGain - computed_ElevationLoss),
+                  tour_ElevationGain - tour_ElevationLoss,
+                  UI.UNIT_LABEL_ELEVATION,
+
+                  // DP
+                  _nf_1_1.format(_dpToleranceElevation),
+                  _nf_1_1.format(_tourData.getDpTolerance() / 10.0f),
+            //
+            }));
    }
 
    private void updateUI_SegmenterBackground() {
