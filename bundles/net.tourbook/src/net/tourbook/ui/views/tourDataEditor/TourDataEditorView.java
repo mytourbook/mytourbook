@@ -224,7 +224,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //todo fb // linux async event when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa
 //see exampled UI.isLinuxAsyncEvent
-
+// add average elevation to tour info tooltip
    public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";    //$NON-NLS-1$
    //
    private static final char             NL                                               = UI.NEW_LINE;
