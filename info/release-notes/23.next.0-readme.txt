@@ -46,6 +46,9 @@ New
 * Calendar - Weekly summary (Frederic)
   - Training Stress Score (TSS)
 
+* Tour Info Tooltip (Frederic)
+  - Added the average elevation
+
 
 Improvements
 ============
