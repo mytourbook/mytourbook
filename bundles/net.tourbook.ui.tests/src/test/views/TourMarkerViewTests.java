@@ -54,7 +54,7 @@ public class TourMarkerViewTests extends UITest {
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOUREDITOR).select();
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOURMARKERS).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
       final SWTBotTable tableMarkers = bot.table();
