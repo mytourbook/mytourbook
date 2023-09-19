@@ -125,8 +125,8 @@ public class WorkbenchTests extends UITest {
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
       final SWTBotView searchToursView = Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Tour Marker"); //$NON-NLS-1$
-      final SWTBotView tourMarkerView = Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "All Tour Markers"); //$NON-NLS-1$
+      final SWTBotView tourMarkerView = Utils.showView(bot, "All Tour Markers"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
       final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
