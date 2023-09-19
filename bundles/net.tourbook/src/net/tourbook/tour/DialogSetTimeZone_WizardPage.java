@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -149,9 +149,9 @@ class DialogSetTimeZone_WizardPage extends WizardPage {
                   // link: set default
 
                   _linkDefaultTimeZone = new Link(setContainer, SWT.NONE);
-                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
+                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefaultTimeZone);
                   _linkDefaultTimeZone.setToolTipText(NLS.bind(
-                        Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
+                        Messages.Tour_Editor_Link_SetDefaultTimeZone_Tooltip,
                         TimeTools.getDefaultTimeZoneId()));
                   _linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
                      @Override
