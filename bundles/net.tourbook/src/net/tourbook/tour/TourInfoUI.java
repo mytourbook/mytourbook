@@ -703,10 +703,8 @@ public class TourInfoUI {
              */
             createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
 
-            _lblTimeZone_Value = createUI_LabelValue(container, SWT.TRAIL);
-
-            // spacer
-            createUI_LabelValue(container, SWT.TRAIL);
+            _lblTimeZone_Value = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblTimeZone_Value);
          }
          {
             /*
@@ -716,7 +714,7 @@ public class TourInfoUI {
             _lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
 
             // set layout that the decoration is correctly layouted
-//            GridDataFactory.fillDefaults().applyTo(_lblTimeZoneDifference);
+//          GridDataFactory.fillDefaults().applyTo(_lblTimeZoneDifference);
 
             _lblTimeZoneDifference_Value = createUI_LabelValue(container, SWT.TRAIL);
 
@@ -2123,6 +2121,9 @@ public class TourInfoUI {
 
       final String speedTooltipText =
             """
+                  DP tolerance\t%s
+                  Flat gradient\t%s %%
+
                   Time\t\t%s %s
                   Distance\t\t%s %s
 
@@ -2169,7 +2170,13 @@ public class TourInfoUI {
       final float altimeter_Up   = verticalSpeed_Up_Elevation   / verticalSpeed_Up_Time   * 3600  / UI.UNIT_VALUE_ELEVATION;
       final float altimeter_Down = verticalSpeed_Down_Elevation / verticalSpeed_Down_Time * 3600  / UI.UNIT_VALUE_ELEVATION;
 
+      final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
+      final float prefFlatGainLoss_FlatGradient     = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
+
       final String hillSpeed_Flat_Tooltip = speedTooltipText.formatted(
+
+            _nf2.format(prefFlatGainLoss_DPTolerance),
+            _nf1.format(prefFlatGainLoss_FlatGradient),
 
             FormatManager.formatMovingTime(verticalSpeed_Flat_Time),
             Messages.Tour_Tooltip_Label_Hour,
@@ -2179,6 +2186,9 @@ public class TourInfoUI {
 
       final String hillSpeed_Up_Tooltip = speedTooltipText.formatted(
 
+            _nf2.format(prefFlatGainLoss_DPTolerance),
+            _nf1.format(prefFlatGainLoss_FlatGradient),
+
             FormatManager.formatMovingTime(verticalSpeed_Up_Time),
             Messages.Tour_Tooltip_Label_Hour,
 
@@ -2186,6 +2196,9 @@ public class TourInfoUI {
             UI.UNIT_LABEL_DISTANCE);
 
       final String hillSpeed_Down_Tooltip = speedTooltipText.formatted(
+
+            _nf2.format(prefFlatGainLoss_DPTolerance),
+            _nf1.format(prefFlatGainLoss_FlatGradient),
 
             FormatManager.formatMovingTime(verticalSpeed_Down_Time),
             Messages.Tour_Tooltip_Label_Hour,

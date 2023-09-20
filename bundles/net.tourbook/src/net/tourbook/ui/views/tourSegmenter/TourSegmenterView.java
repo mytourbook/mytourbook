@@ -35,6 +35,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -50,6 +51,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourSegment;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.preferences.PrefPageComputedValues;
 import net.tourbook.tour.BreakTimeMethod;
 import net.tourbook.tour.BreakTimeResult;
@@ -157,10 +159,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final String  STATE_CSV_EXPORT_PATH                              = "STATE_CSV_EXPORT_PATH";                      //$NON-NLS-1$
    private static final String  STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
    private static final int     STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT = 100;
-   private static final String  STATE_DP_TOLERANCE_FLAT_GAIN_LOSS                  = "STATE_DP_TOLERANCE_FLAT_GAIN_LOSS";          //$NON-NLS-1$
    private static final String  STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
    private static final String  STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                   //$NON-NLS-1$
-   private static final String  STATE_FLAT_GAIN_LOSS_GRADIENT                      = "STATE_FLAT_GAIN_LOSS_GRADIENT";              //$NON-NLS-1$
    private static final String  STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
    private static final String  STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
    private static final String  STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
@@ -463,6 +463,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private final ArrayList<Control>       _firstColBreakTime  = new ArrayList<>();
    //
    private ActionExportViewCSV            _actionExportViewCSV;
+   private ActionOpenPrefDialog           _actionPrefDialog;
    private ActionTourChartSegmenterConfig _actionTourChartSegmenterConfig;
    //
    private boolean                        _isGetInitialTours;
@@ -543,42 +544,36 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblSurfing_MinSurfingTimeDuration;
    private Label           _lblSurfing_MinSurfingTimeDuration_Unit;
    private Label           _lblTourBreakTime;
+
+   private Label           _lblVerticalSpeed_Distance_Header;
    private Label           _lblVerticalSpeed_Distance_Flat;
-   private Label           _lblVerticalSpeed_Distance_Flat_Unit;
-   private Label           _lblVerticalSpeed_Distance_Flat_Relative;
-   private Label           _lblVerticalSpeed_Distance_Flat_Relative_Unit;
    private Label           _lblVerticalSpeed_Distance_Gain;
-   private Label           _lblVerticalSpeed_Distance_Gain_Unit;
-   private Label           _lblVerticalSpeed_Distance_Gain_Relative;
-   private Label           _lblVerticalSpeed_Distance_Gain_Relative_Unit;
    private Label           _lblVerticalSpeed_Distance_Loss;
-   private Label           _lblVerticalSpeed_Distance_Loss_Unit;
-   private Label           _lblVerticalSpeed_Distance_Loss_Relative;
-   private Label           _lblVerticalSpeed_Distance_Loss_Relative_Unit;
+
+   private Label           _lblVerticalSpeed_Distance_Relative_Header;
+   private Label           _lblVerticalSpeed_Distance_Relative_Flat;
+   private Label           _lblVerticalSpeed_Distance_Relative_Gain;
+   private Label           _lblVerticalSpeed_Distance_Relative_Loss;
+
+   private Label           _lblVerticalSpeed_Elevation_Header;
    private Label           _lblVerticalSpeed_Elevation_Flat;
-   private Label           _lblVerticalSpeed_Elevation_Flat_Unit;
    private Label           _lblVerticalSpeed_Elevation_Gain;
-   private Label           _lblVerticalSpeed_Elevation_Gain_Unit;
    private Label           _lblVerticalSpeed_Elevation_Loss;
-   private Label           _lblVerticalSpeed_Elevation_Loss_Unit;
+
+   private Label           _lblVerticalSpeed_Speed_Header;
    private Label           _lblVerticalSpeed_Speed_Flat;
-   private Label           _lblVerticalSpeed_Speed_Flat_Unit;
    private Label           _lblVerticalSpeed_Speed_Gain;
-   private Label           _lblVerticalSpeed_Speed_Gain_Unit;
    private Label           _lblVerticalSpeed_Speed_Loss;
-   private Label           _lblVerticalSpeed_Speed_Loss_Unit;
+
+   private Label           _lblVerticalSpeed_Time_Header;
    private Label           _lblVerticalSpeed_Time_Flat;
-   private Label           _lblVerticalSpeed_Time_Flat_Unit;
-   private Label           _lblVerticalSpeed_Time_Flat_Relative;
-   private Label           _lblVerticalSpeed_Time_Flat_Relative_Unit;
    private Label           _lblVerticalSpeed_Time_Gain;
-   private Label           _lblVerticalSpeed_Time_Gain_Unit;
-   private Label           _lblVerticalSpeed_Time_Gain_Relative;
-   private Label           _lblVerticalSpeed_Time_Gain_Relative_Unit;
    private Label           _lblVerticalSpeed_Time_Loss;
-   private Label           _lblVerticalSpeed_Time_Loss_Unit;
-   private Label           _lblVerticalSpeed_Time_Loss_Relative;
-   private Label           _lblVerticalSpeed_Time_Loss_Relative_Unit;
+
+   private Label           _lblVerticalSpeed_Time_Relative_Header;
+   private Label           _lblVerticalSpeed_Time_Relative_Flat;
+   private Label           _lblVerticalSpeed_Time_Relative_Gain;
+   private Label           _lblVerticalSpeed_Time_Relative_Loss;
    //
    private Spinner         _spinnerBreak_MinAvgSpeedAS;
    private Spinner         _spinnerBreak_MinSliceSpeedAS;
@@ -599,6 +594,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Spinner         _spinnerSurfing_MinSpeed_Surfing;
    private Spinner         _spinnerSurfing_MinTimeDuration;
    private Spinner         _spinnerSurfing_MinSpeed_StartStop;
+
    //
    private class SegmenterComparator extends ViewerComparator {
 
@@ -1306,6 +1302,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _actionExportViewCSV = new ActionExportViewCSV(this);
       _actionTourChartSegmenterConfig = new ActionTourChartSegmenterConfig(this, _parent);
+
+      _actionPrefDialog = new ActionOpenPrefDialog(
+            OtherMessages.TOUR_TOOLTIP_ACTION_EDIT_FORMAT_PREFERENCES,
+            PrefPageAppearanceDisplayFormat.ID,
+
+            // set index for the tab folder which should be selected when dialog is opened and applied
+            // in net.tourbook.preferences.PrefPageAppearanceDisplayFormat.applyData(Object)
+            // -> select single tour formatting
+            Integer.valueOf(1));
    }
 
    @Override
@@ -1395,9 +1400,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          forcedIndices = getTourIndices();
 
-         final int flatGainLossGradient = _spinnerFlatGainLoss_Gradient.getSelection();
-         _flatGainLoss_Gradient = flatGainLossGradient / 10f;
-         _state.put(STATE_FLAT_GAIN_LOSS_GRADIENT, flatGainLossGradient);
+         _flatGainLoss_Gradient = _spinnerFlatGainLoss_Gradient.getSelection() / 10f;
+
+         _prefStore.setValue(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT, _flatGainLoss_Gradient);
 
          createSegmentsBy_DP_FlatGainLoss(forcedIndices);
          updateUI_FlatGainLoss();
@@ -2488,59 +2493,74 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }
          }
 
-         final int columnSpacing = 15;
+         final int columnSpacing = 10;
 
          final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
-         final GridDataFactory gdUnit = GridDataFactory.fillDefaults().grab(true, false)
-               .indent(-columnSpacing + 2, 0);
 
          final Composite speedContainer = new Composite(pageContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()
-               .numColumns(13)
+               .numColumns(7)
                .spacing(columnSpacing, 0)
                .applyTo(speedContainer);
 //         speedContainer.setBackground(UI.SYS_COLOR_GREEN);
          {
             {
                /*
+                * Vertical speed: Header
+                */
+               UI.createSpacer_Horizontal(speedContainer, 1);
+
+               // elevation
+               _lblVerticalSpeed_Elevation_Header = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Elevation_Header);
+
+               // speed
+               _lblVerticalSpeed_Speed_Header = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Speed_Header);
+
+               // distance
+               _lblVerticalSpeed_Distance_Header = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Distance_Header);
+
+               _lblVerticalSpeed_Distance_Relative_Header = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Distance_Relative_Header);
+
+               // time
+               _lblVerticalSpeed_Time_Header = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Time_Header);
+
+               _lblVerticalSpeed_Time_Relative_Header = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Time_Relative_Header);
+            }
+            {
+               /*
                 * Vertical speed: Flat
                 */
                UI.createLabel(speedContainer, Messages.Tour_Segmenter_Label_VerticalSpeed_Flat);
-//               label.setBackground(UI.SYS_COLOR_RED);
 
                // elevation
                _lblVerticalSpeed_Elevation_Flat = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Elevation_Flat_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Elevation_Flat);
-               gdUnit.applyTo(_lblVerticalSpeed_Elevation_Flat_Unit);
 
                // speed
                _lblVerticalSpeed_Speed_Flat = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Speed_Flat_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Speed_Flat);
-               gdUnit.applyTo(_lblVerticalSpeed_Speed_Flat_Unit);
 
                // distance
                _lblVerticalSpeed_Distance_Flat = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Distance_Flat_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Distance_Flat);
-               gdUnit.applyTo(_lblVerticalSpeed_Distance_Flat_Unit);
 
-               _lblVerticalSpeed_Distance_Flat_Relative = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Distance_Flat_Relative_Unit = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE);
-               gd.applyTo(_lblVerticalSpeed_Distance_Flat_Relative);
-               gdUnit.applyTo(_lblVerticalSpeed_Distance_Flat_Relative_Unit);
+               // distance relative
+               _lblVerticalSpeed_Distance_Relative_Flat = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Distance_Relative_Flat);
 
                // time
                _lblVerticalSpeed_Time_Flat = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Time_Flat_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Time_Flat);
-               gdUnit.applyTo(_lblVerticalSpeed_Time_Flat_Unit);
 
-               _lblVerticalSpeed_Time_Flat_Relative = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Time_Flat_Relative_Unit = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE);
-               gd.applyTo(_lblVerticalSpeed_Time_Flat_Relative);
-               gdUnit.applyTo(_lblVerticalSpeed_Time_Flat_Relative_Unit);
+               // time relative
+               _lblVerticalSpeed_Time_Relative_Flat = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Time_Relative_Flat);
             }
             {
                /*
@@ -2550,37 +2570,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // elevation
                _lblVerticalSpeed_Elevation_Gain = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Elevation_Gain_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Elevation_Gain);
-               gdUnit.applyTo(_lblVerticalSpeed_Elevation_Gain_Unit);
 
                // speed
                _lblVerticalSpeed_Speed_Gain = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Speed_Gain_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Speed_Gain);
-               gdUnit.applyTo(_lblVerticalSpeed_Speed_Gain_Unit);
 
                // distance
                _lblVerticalSpeed_Distance_Gain = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Distance_Gain_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Distance_Gain);
-               gdUnit.applyTo(_lblVerticalSpeed_Distance_Gain_Unit);
 
-               _lblVerticalSpeed_Distance_Gain_Relative = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Distance_Gain_Relative_Unit = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE);
-               gd.applyTo(_lblVerticalSpeed_Distance_Gain_Relative);
-               gdUnit.applyTo(_lblVerticalSpeed_Distance_Gain_Relative_Unit);
+               // distance relative
+               _lblVerticalSpeed_Distance_Relative_Gain = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Distance_Relative_Gain);
 
                // time
                _lblVerticalSpeed_Time_Gain = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Time_Gain_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Time_Gain);
-               gdUnit.applyTo(_lblVerticalSpeed_Time_Gain_Unit);
 
-               _lblVerticalSpeed_Time_Gain_Relative = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Time_Gain_Relative_Unit = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE);
-               gd.applyTo(_lblVerticalSpeed_Time_Gain_Relative);
-               gdUnit.applyTo(_lblVerticalSpeed_Time_Gain_Relative_Unit);
+               // time relative
+               _lblVerticalSpeed_Time_Relative_Gain = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Time_Relative_Gain);
             }
             {
                /*
@@ -2590,37 +2600,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // elevation
                _lblVerticalSpeed_Elevation_Loss = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Elevation_Loss_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Elevation_Loss);
-               gdUnit.applyTo(_lblVerticalSpeed_Elevation_Loss_Unit);
 
                // speed
                _lblVerticalSpeed_Speed_Loss = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Speed_Loss_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Speed_Loss);
-               gdUnit.applyTo(_lblVerticalSpeed_Speed_Loss_Unit);
 
                // distance
                _lblVerticalSpeed_Distance_Loss = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Distance_Loss_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Distance_Loss);
-               gdUnit.applyTo(_lblVerticalSpeed_Distance_Loss_Unit);
 
-               _lblVerticalSpeed_Distance_Loss_Relative = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Distance_Loss_Relative_Unit = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE);
-               gd.applyTo(_lblVerticalSpeed_Distance_Loss_Relative);
-               gdUnit.applyTo(_lblVerticalSpeed_Distance_Loss_Relative_Unit);
+               // distance relative
+               _lblVerticalSpeed_Distance_Relative_Loss = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Distance_Relative_Loss);
 
                // time
                _lblVerticalSpeed_Time_Loss = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Time_Loss_Unit = new Label(speedContainer, SWT.NONE);
                gd.applyTo(_lblVerticalSpeed_Time_Loss);
-               gdUnit.applyTo(_lblVerticalSpeed_Time_Loss_Unit);
 
-               _lblVerticalSpeed_Time_Loss_Relative = new Label(speedContainer, SWT.TRAIL);
-               _lblVerticalSpeed_Time_Loss_Relative_Unit = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE);
-               gd.applyTo(_lblVerticalSpeed_Time_Loss_Relative);
-               gdUnit.applyTo(_lblVerticalSpeed_Time_Loss_Relative_Unit);
+               // time relative
+               _lblVerticalSpeed_Time_Relative_Loss = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Time_Relative_Loss);
             }
          }
       }
@@ -4473,16 +4473,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void fillToolbar() {
 
       /*
-       * fill view menu
-       */
-//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      /*
-       * fill view toolbar
+       * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
       tbm.add(_actionTourChartSegmenterConfig);
       tbm.add(_actionExportViewCSV);
+      tbm.add(_actionPrefDialog);
 
       tbm.update(true);
    }
@@ -4587,7 +4584,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          return (float) (_tourData.getDpTolerance() / 10.0);
       }
-
    }
 
    private BreakTimeMethod getSelectedBreakMethod() {
@@ -5606,13 +5602,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * Elevation flat, gain and loss
        */
-      final int stateDPToleranceFlatGainLoss = Util.getStateInt(_state, STATE_DP_TOLERANCE_FLAT_GAIN_LOSS, 500);
-      _dpToleranceElevation_FlatGainLoss = stateDPToleranceFlatGainLoss / 100.0f;
-      _spinnerDPTolerance_FlatGainLoss.setSelection(stateDPToleranceFlatGainLoss);
+      final float prefFlatGainLoss_DPTolerance = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
+      final float prefFlatGainLoss_Gradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
 
-      final int stateFlatGainLoss_Gradient = Util.getStateInt(_state, STATE_FLAT_GAIN_LOSS_GRADIENT, 10);
-      _flatGainLoss_Gradient = stateFlatGainLoss_Gradient / 10f;
-      _spinnerFlatGainLoss_Gradient.setSelection(stateFlatGainLoss_Gradient);
+      _dpToleranceElevation_FlatGainLoss = prefFlatGainLoss_DPTolerance;
+      _spinnerDPTolerance_FlatGainLoss.setSelection((int) (prefFlatGainLoss_DPTolerance * 100));
+
+      _flatGainLoss_Gradient = prefFlatGainLoss_Gradient;
+      _spinnerFlatGainLoss_Gradient.setSelection((int) (prefFlatGainLoss_Gradient * 10));
 
       /*
        * Break time
@@ -5872,13 +5869,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _state.put(STATE_DP_TOLERANCE_POWER,                     _spinnerDPTolerance_Power.getSelection());
       _state.put(STATE_DP_TOLERANCE_PULSE,                     _spinnerDPTolerance_Pulse.getSelection());
-      _state.put(STATE_DP_TOLERANCE_FLAT_GAIN_LOSS,            _spinnerDPTolerance_FlatGainLoss.getSelection());
       _state.put(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS,   (int) (_dpToleranceElevation_MultipleTours * 10));
       _state.put(STATE_MINIMUM_ALTITUDE,                       _spinnerMinAltitude.getSelection());
       _state.put(STATE_SELECTED_SEGMENTER_BY_USER,             _userSelectedSegmenterType.name());
       _state.put(STATE_SELECTED_DISTANCE,                      _spinnerDistance.getSelection());
 
 // SET_FORMATTING_ON
+
+      _prefStore.setValue(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE, _spinnerDPTolerance_FlatGainLoss.getSelection() / 100f);
 
       /*
        * Surfing
@@ -6455,45 +6453,33 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
+      _lblVerticalSpeed_Time_Header             .setText(UI.UNIT_LABEL_TIME);
       _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime_Summary(_vertSpeed_TimeFlat, false, true));
       _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime_Summary(_vertSpeed_TimeGain, false, true));
       _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime_Summary(_vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Flat_Relative      .setText(_nf_1_0.format(_vertSpeed_TimeFlat / sumTime * 100f));
-      _lblVerticalSpeed_Time_Gain_Relative      .setText(_nf_1_0.format(_vertSpeed_TimeGain / sumTime * 100f));
-      _lblVerticalSpeed_Time_Loss_Relative      .setText(_nf_1_0.format(_vertSpeed_TimeLoss / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative_Summary(_vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative_Summary(_vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative_Summary(_vertSpeed_TimeLoss / sumTime * 100f));
 
+      _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
       _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance_Summary(_vertSpeed_DistanceFlat / 1000));
       _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance_Summary(_vertSpeed_DistanceGain / 1000));
       _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance_Summary(_vertSpeed_DistanceLoss / 1000));
 
-      _lblVerticalSpeed_Distance_Flat_Relative  .setText(_nf_1_0.format(_vertSpeed_DistanceFlat / sumDistance * 100f));
-      _lblVerticalSpeed_Distance_Gain_Relative  .setText(_nf_1_0.format(_vertSpeed_DistanceGain / sumDistance * 100f));
-      _lblVerticalSpeed_Distance_Loss_Relative  .setText(_nf_1_0.format(_vertSpeed_DistanceLoss / sumDistance * 100f));
+      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceFlat / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceGain / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceLoss / sumDistance * 100));
 
+      _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
       _lblVerticalSpeed_Elevation_Flat          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationFlat));
       _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationGain));
       _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationLoss));
 
+      _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
       _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
       _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
       _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
-
-      _lblVerticalSpeed_Time_Flat_Unit          .setText(UI.UNIT_LABEL_TIME);
-      _lblVerticalSpeed_Time_Gain_Unit          .setText(UI.UNIT_LABEL_TIME);
-      _lblVerticalSpeed_Time_Loss_Unit          .setText(UI.UNIT_LABEL_TIME);
-
-      _lblVerticalSpeed_Distance_Flat_Unit      .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Gain_Unit      .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Loss_Unit      .setText(UI.UNIT_LABEL_DISTANCE);
-
-      _lblVerticalSpeed_Elevation_Flat_Unit     .setText(UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_RIGHT);
-      _lblVerticalSpeed_Elevation_Gain_Unit     .setText(UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP);
-      _lblVerticalSpeed_Elevation_Loss_Unit     .setText(UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN);
-
-      _lblVerticalSpeed_Speed_Flat_Unit         .setText(UI.UNIT_LABEL_SPEED);
-      _lblVerticalSpeed_Speed_Gain_Unit         .setText(UI.UNIT_LABEL_SPEED);
-      _lblVerticalSpeed_Speed_Loss_Unit         .setText(UI.UNIT_LABEL_SPEED);
 
 // SET_FORMATTING_ON
 

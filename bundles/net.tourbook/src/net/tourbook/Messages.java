@@ -1545,6 +1545,7 @@ public class Messages extends NLS {
    public static String        Pref_DisplayFormat_Label_Info;
    public static String        Pref_DisplayFormat_Label_Power;
    public static String        Pref_DisplayFormat_Label_Pulse;
+   public static String        Pref_DisplayFormat_Label_Relative;
    public static String        Pref_DisplayFormat_Label_Speed;
    public static String        Pref_DisplayFormat_Label_Temperature;
    public static String        Pref_DisplayFormat_Tab_MultipleTours;
