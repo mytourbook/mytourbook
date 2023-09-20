@@ -281,7 +281,10 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
          RGB paintedRGB;
 
          final float segmentGradient = segmentSerie_Gradient[segmentIndex];
-         if (segmentGradient > 0 && segmentGradient < segmentSerie_FlatGainLoss_Gradient) {
+
+         final boolean isApplyFlatColor = segmentSerie_FlatGainLoss_Gradient != -1;
+
+         if (isApplyFlatColor && segmentGradient > 0 && segmentGradient < segmentSerie_FlatGainLoss_Gradient) {
 
             textAndLineColor = flatColor;
             paintedRGB = flatRGB;

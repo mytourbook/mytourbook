@@ -523,6 +523,10 @@ public class UI {
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+   /**
+    * m (meter) or ft (feet)
+    */
    public static String       UNIT_LABEL_ELEVATION;
    public static String       UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
@@ -1418,6 +1422,24 @@ public class UI {
    public static Label createLabel(final Composite parent, final String text) {
 
       final Label label = new Label(parent, SWT.NONE);
+      
+      label.setText(text);
+
+      return label;
+   }
+
+   /**
+    * Creates a {@link Label} with text and style
+    *
+    * @param parent
+    * @param text
+    * @param style
+    * @return
+    */
+   public static Label createLabel(final Composite parent, final String text, final int style) {
+
+      final Label label = new Label(parent, style);
+
       label.setText(text);
 
       return label;

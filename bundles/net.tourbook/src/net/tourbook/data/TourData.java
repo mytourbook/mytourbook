@@ -1504,8 +1504,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public float               segmentSerieTotal_Elevation_Gain;
    @Transient
    public float               segmentSerieTotal_Elevation_Loss;
-   @Transient
-   public float               segmentSerie_FlatGainLoss_Gradient;
 
    @Transient
    public float[]             segmentSerie_Speed;
@@ -1521,6 +1519,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public float[]             segmentSerie_Gradient;
    @Transient
    public float[]             segmentSerie_Pulse;
+
+   /**
+    * <code>-1</code> indicate, that this value is not set
+    */
+   @Transient
+   public float               segmentSerie_FlatGainLoss_Gradient     = -1;
 
    /**
     * Keep original import file path, this is used when the tour file should be deleted.
@@ -6499,7 +6503,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param flatGainLoss_Gradient
     * @return
     */
-   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool breakTimeConfig, final float flatGainLoss_Gradient) {
+   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool breakTimeConfig,
+                                                         final float flatGainLoss_Gradient) {
 
       if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 
