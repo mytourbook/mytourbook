@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package dialogs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.Test;
