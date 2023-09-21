@@ -34,8 +34,8 @@ public class TourSegmenterViewTests extends UITest {
 
    private SWTBotView getTourSegmenterView() {
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      return Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TOURSEGMENTER);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURSEGMENTER);
    }
 
    @Test
@@ -108,8 +108,8 @@ public class TourSegmenterViewTests extends UITest {
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      final SWTBotView tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TOURSEGMENTER);
+      final SWTBotView tourSegmenterView = Utils.showView(bot, Utils.VIEW_NAME_TOURSEGMENTER);
 
       final SWTBotTable tableSegments = tourSegmenterView.bot().table();
       tableSegments.select(0);

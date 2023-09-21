@@ -554,7 +554,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    /**
     * Adjust start and max at the same time
     * <p>
-    * it took me several days to figure out this algorithim, 10.4.2007 Wolfgang
+    * it took me several days to figure out this algorithm, 10.4.2007 Wolfgang
     */
    private void computeElevation_StartAndMax(final float[] altiSrc,
                                              final float[] altiDest,
@@ -1499,7 +1499,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    }
 
    /**
-    * @return the adjustment type which is selected in the combox
+    * @return the adjustment type which is selected in the combobox
     */
    private AdjustmentType getSelectedAdjustmentType() {
 
@@ -1621,7 +1621,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
    private void onChangeAltitude() {
 
-      // calcuate new altitude values
+      // calculate new altitude values
       computeElevation_WithoutSRTM();
 
       enableFieldsWithoutSRTM();
@@ -2521,7 +2521,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       final float dev1Y = (float) (_firstTimeSlice_ElevationDiff * scaleY);
 
       /*
-       * Creat a new points
+       * Create a new point
        */
       final float posXRelative = dev1X == 0 ? 0 : (newPoint_DevX - dev0X) / (dev1X - dev0X);
       final float posYRelative = dev1Y == 0 ? 0 : newPoint_DevY / dev1Y;

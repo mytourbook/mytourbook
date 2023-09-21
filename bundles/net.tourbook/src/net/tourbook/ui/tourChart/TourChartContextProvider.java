@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -103,7 +103,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
       _actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
             this,
-            Messages.RefTour_Action_CreaateMarker,
+            Messages.RefTour_Action_CreateMarker,
             true);
 
       _actionCreateMarkerFromSliderLeft = new ActionCreateMarkerFromSlider(
@@ -118,7 +118,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
       _actionCreateMarkerFromValuePoint = new ActionCreateMarkerFromValuePoint(
             this,
-            Messages.RefTour_Action_CreaateMarker);
+            Messages.RefTour_Action_CreateMarker);
 
       _actionDeleteMarker = new ActionDeleteMarker(tourChart);
       _actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);

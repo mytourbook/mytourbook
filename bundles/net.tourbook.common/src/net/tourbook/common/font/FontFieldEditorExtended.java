@@ -81,7 +81,7 @@ public class FontFieldEditorExtended extends FieldEditor {
    private FontData[]       chosenFont;
 
    /**
-    * Editor lable.
+    * Editor label.
     */
    private Label            _lblEditor;
 
@@ -636,7 +636,7 @@ public class FontFieldEditorExtended extends FieldEditor {
     * @param font
     *           The FontData[] to update with.
     */
-   private void updateFont(final FontData font[]) {
+   private void updateFont(final FontData[] font) {
 
       FontData[] bestFont = JFaceResources.getFontRegistry().filterData(font, _lblSelectedFont.getDisplay());
 

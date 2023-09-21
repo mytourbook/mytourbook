@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -28,8 +30,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -149,18 +149,15 @@ class DialogSetTimeZone_WizardPage extends WizardPage {
                   // link: set default
 
                   _linkDefaultTimeZone = new Link(setContainer, SWT.NONE);
-                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
+                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefaultTimeZone);
                   _linkDefaultTimeZone.setToolTipText(NLS.bind(
-                        Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
+                        Messages.Tour_Editor_Link_SetDefaultTimeZone_Tooltip,
                         TimeTools.getDefaultTimeZoneId()));
-                  _linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
+                  _linkDefaultTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                        // select default time zone
-                        _comboTimeZone.select(TimeTools.getTimeZoneIndex_Default());
-                     }
-                  });
+                     // select default time zone
+                     _comboTimeZone.select(TimeTools.getTimeZoneIndex_Default());
+                  }));
                }
             }
             {

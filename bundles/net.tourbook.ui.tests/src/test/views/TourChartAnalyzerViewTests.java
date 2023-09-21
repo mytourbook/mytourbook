@@ -28,8 +28,8 @@ public class TourChartAnalyzerViewTests extends UITest {
 
    private SWTBotView getTourAnalyzerView() {
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURANALYZER_VIEW_NAME);
-      return Utils.showView(bot, Utils.TOURANALYZER_VIEW_NAME);
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.VIEW_NAME_TOURANALYZER);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURANALYZER);
    }
 
    @Test
