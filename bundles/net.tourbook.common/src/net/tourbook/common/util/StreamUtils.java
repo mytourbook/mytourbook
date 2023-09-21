@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
-import java.util.Arrays;
 import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
@@ -61,8 +60,7 @@ public final class StreamUtils {
          return averageValue;
       }
 
-      final double[] serieDouble = IntStream.range(startIndex, endIndex).mapToDouble(i -> serie[i]).toArray();
-      final OptionalDouble averageDouble = Arrays.stream(serieDouble).average();
+      final OptionalDouble averageDouble = IntStream.range(startIndex, endIndex).mapToDouble(i -> serie[i]).average();
 
       if (averageDouble.isPresent()) {
          averageValue = averageDouble.getAsDouble();
