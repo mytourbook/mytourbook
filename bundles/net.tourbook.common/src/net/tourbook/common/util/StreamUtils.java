@@ -22,15 +22,10 @@ import java.util.stream.IntStream;
 public final class StreamUtils {
 
    /**
-    * Computes the average value for a given tour serie array of floats,
-    * start index and end index
+    * Computes the average value for a given tour serie array of floats
     *
     * @param serie
     *           The Tour serie
-    * @param startIndex
-    *           The start index
-    * @param endIndex
-    *           The end index
     * @return The average value as a {@link Double}
     */
    public static double computeAverage(final float[] serie) {
