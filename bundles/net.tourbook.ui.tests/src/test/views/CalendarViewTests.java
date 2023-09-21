@@ -15,10 +15,13 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -37,14 +40,17 @@ public class CalendarViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       final SWTBotView calendarView = Utils.showView(bot, "Calendar"); //$NON-NLS-1$
 
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Default));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_II));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_III));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_II));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_III));
-      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
+      final SWTBotCombo comboBoxCalendarProfile = bot.comboBox(2);
+      assertNotNull(comboBoxCalendarProfile);
+
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Default));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_II));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_III));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_II));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_III));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
 
       calendarView.close();
    }
