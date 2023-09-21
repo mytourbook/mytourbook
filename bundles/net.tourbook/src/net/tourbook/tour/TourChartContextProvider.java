@@ -66,7 +66,6 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
    /**
     * @param tourEditor
-    * @param tourChartView
     */
    TourChartContextProvider(final TourEditor tourEditor) {
 

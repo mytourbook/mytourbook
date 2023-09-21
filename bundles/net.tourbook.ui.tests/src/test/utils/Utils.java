@@ -66,7 +66,7 @@ public class Utils {
    public static final String VIEW_NAME_TOUREDITOR             = PluginProperties.getText("command_view_tourEditor");             //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP25              = PluginProperties.getText("View_Name_TourMap25");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP3               = PluginProperties.getText("View_Name_TourMap3");                  //$NON-NLS-1$
-   public static final String VIEW_NAME_TOURMARKERALL          = PluginProperties.getText("View_Name_TourMarkerAll");             //$NON-NLS-1$
+   public static final String VIEW_NAME_ALLTOURMARKERS         = PluginProperties.getText("View_Name_AllTourMarkers");            //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMARKERS            = PluginProperties.getText("view_name_Marker");                    //$NON-NLS-1$
    public static final String VIEW_NAME_TOURPAUSES             = PluginProperties.getText("View_Name_TourPauses");                //$NON-NLS-1$
    public static final String VIEW_NAME_TOURSEGMENTER          = PluginProperties.getText("view_name_Segmenter");                 //$NON-NLS-1$
