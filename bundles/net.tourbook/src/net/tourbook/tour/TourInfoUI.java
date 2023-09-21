@@ -240,18 +240,20 @@ public class TourInfoUI {
    private Label            _lblAltitudeUpUnit;
    private Label            _lblAltitudeDown;
    private Label            _lblAltitudeDownUnit;
-   private Label            _lblAvgElevationChange;
-   private Label            _lblAvgElevationChangeUnit;
-   private Label            _lblAvgSpeed;
-   private Label            _lblAvgSpeedUnit;
-   private Label            _lblAvgPace;
-   private Label            _lblAvgPaceUnit;
-   private Label            _lblAvgPulse;
-   private Label            _lblAvgPulseUnit;
    private Label            _lblAvgCadence;
    private Label            _lblAvgCadenceUnit;
+   private Label            _lblAvgElevation;
+   private Label            _lblAvgElevationUnit;
+   private Label            _lblAvgElevationChange;
+   private Label            _lblAvgElevationChangeUnit;
+   private Label            _lblAvgPace;
+   private Label            _lblAvgPaceUnit;
    private Label            _lblAvg_Power;
    private Label            _lblAvg_PowerUnit;
+   private Label            _lblAvgPulse;
+   private Label            _lblAvgPulseUnit;
+   private Label            _lblAvgSpeed;
+   private Label            _lblAvgSpeedUnit;
    private Label            _lblBattery_Spacer;
    private Label            _lblBattery_Start;
    private Label            _lblBattery_End;
@@ -907,6 +909,14 @@ public class TourInfoUI {
 
       _lblAvg_Power = createUI_LabelValue(parent, SWT.TRAIL);
       _lblAvg_PowerUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Average elevation
+       */
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgElevation);
+
+      _lblAvgElevation = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblAvgElevationUnit = createUI_LabelValue(parent, SWT.LEAD);
    }
 
    private void createUI_43_Max(final Composite container) {
@@ -2109,6 +2119,11 @@ public class TourInfoUI {
       final double avgPower = _tourData.getPower_Avg();
       _lblAvg_Power.setText(FormatManager.formatPower(avgPower));
       _lblAvg_PowerUnit.setText(UI.UNIT_POWER);
+
+      // Average elevation
+      final double avgElevation = _tourData.getElevation_Avg();
+      _lblAvgElevation.setText(Integer.toString((int) avgElevation));
+      _lblAvgElevationUnit.setText(UI.UNIT_LABEL_ELEVATION);
 
       // calories
       final double calories = _tourData.getCalories();
