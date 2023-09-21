@@ -51,7 +51,9 @@ public class DouglasPeuckerSimplifier {
     */
    private int[]     _forcedSegmentsIndices;
 
-   public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints, final int[] forcedSegmentIndices) {
+   public DouglasPeuckerSimplifier(final float tolerance,
+                                   final DPPoint[] graphPoints,
+                                   final int[] forcedSegmentIndices) {
 
       _tolerance = tolerance;
       _graphPoints = graphPoints;

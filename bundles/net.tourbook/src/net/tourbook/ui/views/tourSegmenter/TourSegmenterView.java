@@ -544,32 +544,32 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblSurfing_MinSurfingTimeDuration;
    private Label           _lblSurfing_MinSurfingTimeDuration_Unit;
    private Label           _lblTourBreakTime;
-
+   //
    private Label           _lblVerticalSpeed_Distance_Header;
    private Label           _lblVerticalSpeed_Distance_Flat;
    private Label           _lblVerticalSpeed_Distance_Gain;
    private Label           _lblVerticalSpeed_Distance_Loss;
-
+   //
    private Label           _lblVerticalSpeed_Distance_Relative_Header;
    private Label           _lblVerticalSpeed_Distance_Relative_Flat;
    private Label           _lblVerticalSpeed_Distance_Relative_Gain;
    private Label           _lblVerticalSpeed_Distance_Relative_Loss;
-
+   //
    private Label           _lblVerticalSpeed_Elevation_Header;
    private Label           _lblVerticalSpeed_Elevation_Flat;
    private Label           _lblVerticalSpeed_Elevation_Gain;
    private Label           _lblVerticalSpeed_Elevation_Loss;
-
+   //
    private Label           _lblVerticalSpeed_Speed_Header;
    private Label           _lblVerticalSpeed_Speed_Flat;
    private Label           _lblVerticalSpeed_Speed_Gain;
    private Label           _lblVerticalSpeed_Speed_Loss;
-
+   //
    private Label           _lblVerticalSpeed_Time_Header;
    private Label           _lblVerticalSpeed_Time_Flat;
    private Label           _lblVerticalSpeed_Time_Gain;
    private Label           _lblVerticalSpeed_Time_Loss;
-
+   //
    private Label           _lblVerticalSpeed_Time_Relative_Header;
    private Label           _lblVerticalSpeed_Time_Relative_Flat;
    private Label           _lblVerticalSpeed_Time_Relative_Gain;
@@ -764,14 +764,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             btConfig = BreakTimeTool.getPrefValues();
          }
 
-         final float gradient = _isShowFlatGradient
-
-               ? _flatGainLoss_Gradient
-
-               // -1 indicate to not show the flat gradient color
-               : -1;
-
-         _allTourSegments = _tourData.createSegmenterSegments(btConfig, gradient);
+         _allTourSegments = _tourData.createSegmenterSegments(btConfig);
 
          return _allTourSegments == null
                ? new Object[0]
@@ -1246,7 +1239,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(false);
       final float[] powerSerie = tourData.getPowerSerie();
-      final float[] metricDistanceSerie = tourData.getMetricDistanceSerie();
+      final float[] metricDistanceSerie = tourData.distanceSerie;
       final float[] pulseSerie = tourData.pulseSerie;
 
       final Object[] markerSerie;
@@ -1367,6 +1360,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       // disable computed altitude
       _tourData.segmentSerie_Elevation_Diff_Computed = null;
 
+      // -1 indicate to not show the flat gradient color
+      _tourData.segmentSerie_FlatGainLoss_Gradient = -1;
+
       // reset other indices
       _tourData.segmentSerieIndex2nd = null;
       _tourData.segmentSerieFilter = null;
@@ -1401,10 +1397,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          forcedIndices = getTourIndices();
 
          _flatGainLoss_Gradient = _spinnerFlatGainLoss_Gradient.getSelection() / 10f;
-
          _prefStore.setValue(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT, _flatGainLoss_Gradient);
 
-         createSegmentsBy_DP_FlatGainLoss(forcedIndices);
+         _tourData.segmentSerieIndex = createSegmentsBy_DP_FlatGainLoss(forcedIndices);
+         _tourData.segmentSerie_FlatGainLoss_Gradient = _flatGainLoss_Gradient;
+
          updateUI_FlatGainLoss();
 
          break;
@@ -1564,7 +1561,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void createSegmentsBy_Distance() {
 
-      final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+      final float[] distanceSerie = _tourData.distanceSerie;
       final int lastDistanceSerieIndex = distanceSerie.length - 1;
 
       final float segmentDistance = getDistance();
@@ -1605,7 +1602,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     */
    private void createSegmentsBy_DP_Elevation() {
 
-      final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+      final float[] distanceSerie = _tourData.distanceSerie;
       final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
 
       // convert data series into dp points
@@ -1641,7 +1638,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     */
    private int[] createSegmentsBy_DP_Elevation_Merged(final int[] forcedIndices) {
 
-      final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+      final float[] distanceSerie = _tourData.distanceSerie;
       final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
 
       final int serieSize = distanceSerie.length;
@@ -1760,10 +1757,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     *           Is used when multiple tours are computed, otherwise it is <code>null</code>
     * @return
     */
-   private void createSegmentsBy_DP_FlatGainLoss(final int[] allForcedIndices) {
+   private int[] createSegmentsBy_DP_FlatGainLoss(final int[] allForcedIndices) {
 
       final int[] timeSerie = _tourData.timeSerie;
-      final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+      final float[] distanceSerie = _tourData.distanceSerie;
       final float[] elevationSerie = _tourData.getAltitudeSmoothedSerie(false);
 
       final int serieSize = distanceSerie.length;
@@ -1784,9 +1781,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             allForcedIndices).simplify();
 
       /*
-       * copies the data index for the simplified points into the tour data
+       * Copies the data index for the simplified points into the tour data
        */
-
       int forcedIndex = 0;
       int forcedIndexIndex = 0;
       if (allForcedIndices != null && allForcedIndices.length > 0) {
@@ -1799,7 +1795,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       // set first point
       segmentSerieIndex.add(0);
 
-      DPPoint prevDpPoint = allSimplifiedPoints[0];
+      DPPoint segmentStartDpPoint = allSimplifiedPoints[0];
 
       _vertSpeed_TimeFlat = 0;
       _vertSpeed_TimeGain = 0;
@@ -1813,33 +1809,56 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _vertSpeed_ElevationGain = 0;
       _vertSpeed_ElevationLoss = 0;
 
-      int prevTime = timeSerie[0];
-      float prevDistance = distanceSerie[0];
-      float prevElevation = elevationSerie[0];
+      int segmentStartTime = timeSerie[0];
+      float segmentStartDistance = distanceSerie[0];
+      float segmentStartElevation = elevationSerie[0];
 
       boolean isPrevElevationFlat = false;
       boolean isPrevElevationGain = false;
       boolean isPrevElevationLoss = false;
 
+      final BreakTimeTool breakTimeConfig = BreakTimeTool.getPrefValues();
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+
+      int segmentStartIndex = 0;
+
       for (int dpIndex = 1; dpIndex < allSimplifiedPoints.length; dpIndex++) {
 
-         final DPPoint currentDpPoint = allSimplifiedPoints[dpIndex];
+         final DPPoint segmentEndDpPoint = allSimplifiedPoints[dpIndex];
 
-         final int serieIndex = currentDpPoint.serieIndex;
+         final int serieIndex = segmentEndDpPoint.serieIndex;
+         final int segmentEndIndex = serieIndex;
 
-         final int currentTime = timeSerie[serieIndex];
-         final float currentElevation = elevationSerie[serieIndex];
-         final float currentDistance = distanceSerie[serieIndex];
+         final int segmentEndTime = timeSerie[serieIndex];
+         final float segmentElevation = elevationSerie[serieIndex];
+         final float segmentEndDistance = distanceSerie[serieIndex];
 
-         final int timeDiff = currentTime - prevTime;
-         final float distanceDiff = currentDistance - prevDistance;
-         final float elevationDiff = currentElevation - prevElevation;
+         final float distanceDiff = segmentEndDistance - segmentStartDistance;
+         final float elevationDiff = segmentElevation - segmentStartElevation;
 
          final float currentGradient = elevationDiff * 100 / distanceDiff;
 
+         final int segmentFullTime = segmentEndTime - segmentStartTime;
+         int segmentTime;
+
+         if (isPaceAndSpeedFromRecordedTime) {
+
+            final int segmentPausedTime = _tourData.getPausedTime(segmentStartIndex, segmentEndIndex);
+            final int segmentRecordedTime = segmentFullTime - segmentPausedTime;
+
+            segmentTime = segmentRecordedTime;
+
+         } else {
+
+            final int segmentBreakTime = _tourData.getBreakTime(segmentStartIndex, segmentEndIndex, breakTimeConfig);
+            final int segmentMovingTime = segmentFullTime - segmentBreakTime;
+
+            segmentTime = segmentMovingTime;
+         }
+
          boolean isAddPoint = false;
 
-         if (allForcedIndices != null && forcedIndex == prevDpPoint.serieIndex) {
+         if (allForcedIndices != null && forcedIndex == segmentStartDpPoint.serieIndex) {
 
             // this is a forced point
 
@@ -1863,13 +1882,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          if (isFlatGradient) {
 
-            _vertSpeed_TimeFlat += timeDiff;
+            _vertSpeed_TimeFlat += segmentTime;
             _vertSpeed_DistanceFlat += distanceDiff;
             _vertSpeed_ElevationFlat += elevationDiff >= 0 ? elevationDiff : -elevationDiff;
 
          } else if (isGainGradient) {
 
-            _vertSpeed_TimeGain += timeDiff;
+            _vertSpeed_TimeGain += segmentTime;
             _vertSpeed_DistanceGain += distanceDiff;
             _vertSpeed_ElevationGain += elevationDiff;
 
@@ -1877,7 +1896,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             // loss gradient
 
-            _vertSpeed_TimeLoss += timeDiff;
+            _vertSpeed_TimeLoss += segmentTime;
             _vertSpeed_DistanceLoss += distanceDiff;
             _vertSpeed_ElevationLoss += elevationDiff;
          }
@@ -1892,8 +1911,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             } else {
 
-               isPrevElevationGain = (currentElevation - prevElevation) >= 0;
-               isPrevElevationLoss = (currentElevation - prevElevation) < 0;
+               isPrevElevationGain = (segmentElevation - segmentStartElevation) >= 0;
+               isPrevElevationLoss = (segmentElevation - segmentStartElevation) < 0;
             }
 
          } else {
@@ -1910,8 +1929,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             } else {
 
-               isCurrentElevationGain = (currentElevation - prevElevation) >= 0;
-               isCurrentElevationLoss = (currentElevation - prevElevation) < 0;
+               isCurrentElevationGain = (segmentElevation - segmentStartElevation) >= 0;
+               isCurrentElevationLoss = (segmentElevation - segmentStartElevation) < 0;
             }
 
             if (true
@@ -1934,20 +1953,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
 
          if (isAddPoint) {
-            segmentSerieIndex.add(prevDpPoint.serieIndex);
+            segmentSerieIndex.add(segmentStartDpPoint.serieIndex);
          }
 
-         prevDpPoint = currentDpPoint;
-
-         prevTime = currentTime;
-         prevDistance = currentDistance;
-         prevElevation = currentElevation;
+         segmentStartDpPoint = segmentEndDpPoint;
+         segmentStartIndex = segmentEndIndex;
+         segmentStartTime = segmentEndTime;
+         segmentStartDistance = segmentEndDistance;
+         segmentStartElevation = segmentElevation;
       }
 
       // add last point
       segmentSerieIndex.add(serieSize - 1);
 
-      _tourData.segmentSerieIndex = segmentSerieIndex.toArray();
+      return segmentSerieIndex.toArray();
    }
 
    /**
@@ -2073,7 +2092,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       // set first segment at tour start
       segmenterIndices.add(prevSerieIndex);
 
-      final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+      final float[] distanceSerie = _tourData.distanceSerie;
       final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
 
       // ensure required data are available
@@ -2169,7 +2188,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private void createSegmentsBy_Surfing() {
 
       final int[] timeSerie = _tourData.timeSerie;
-      final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+      final float[] distanceSerie = _tourData.distanceSerie;
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
 
       final int lastSerieIndex = timeSerie.length - 1;
@@ -2493,7 +2512,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }
          }
 
-         final int columnSpacing = 10;
+         final int columnSpacing = 20;
 
          final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
 
@@ -2514,10 +2533,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                _lblVerticalSpeed_Elevation_Header = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Elevation_Header);
 
-               // speed
-               _lblVerticalSpeed_Speed_Header = new Label(speedContainer, SWT.TRAIL);
-               gd.applyTo(_lblVerticalSpeed_Speed_Header);
-
                // distance
                _lblVerticalSpeed_Distance_Header = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Distance_Header);
@@ -2531,6 +2546,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                _lblVerticalSpeed_Time_Relative_Header = UI.createLabel(speedContainer, UI.SYMBOL_PERCENTAGE, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Time_Relative_Header);
+
+               // speed
+               _lblVerticalSpeed_Speed_Header = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Speed_Header);
             }
             {
                /*
@@ -2541,10 +2560,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // elevation
                _lblVerticalSpeed_Elevation_Flat = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Elevation_Flat);
-
-               // speed
-               _lblVerticalSpeed_Speed_Flat = new Label(speedContainer, SWT.TRAIL);
-               gd.applyTo(_lblVerticalSpeed_Speed_Flat);
 
                // distance
                _lblVerticalSpeed_Distance_Flat = new Label(speedContainer, SWT.TRAIL);
@@ -2561,6 +2576,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // time relative
                _lblVerticalSpeed_Time_Relative_Flat = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Time_Relative_Flat);
+
+               // speed
+               _lblVerticalSpeed_Speed_Flat = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Speed_Flat);
             }
             {
                /*
@@ -2571,10 +2590,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // elevation
                _lblVerticalSpeed_Elevation_Gain = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Elevation_Gain);
-
-               // speed
-               _lblVerticalSpeed_Speed_Gain = new Label(speedContainer, SWT.TRAIL);
-               gd.applyTo(_lblVerticalSpeed_Speed_Gain);
 
                // distance
                _lblVerticalSpeed_Distance_Gain = new Label(speedContainer, SWT.TRAIL);
@@ -2591,6 +2606,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // time relative
                _lblVerticalSpeed_Time_Relative_Gain = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Time_Relative_Gain);
+
+               // speed
+               _lblVerticalSpeed_Speed_Gain = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Speed_Gain);
             }
             {
                /*
@@ -2601,10 +2620,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // elevation
                _lblVerticalSpeed_Elevation_Loss = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Elevation_Loss);
-
-               // speed
-               _lblVerticalSpeed_Speed_Loss = new Label(speedContainer, SWT.TRAIL);
-               gd.applyTo(_lblVerticalSpeed_Speed_Loss);
 
                // distance
                _lblVerticalSpeed_Distance_Loss = new Label(speedContainer, SWT.TRAIL);
@@ -2621,6 +2636,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // time relative
                _lblVerticalSpeed_Time_Relative_Loss = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Time_Relative_Loss);
+
+               // speed
+               _lblVerticalSpeed_Speed_Loss = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_Speed_Loss);
             }
          }
       }

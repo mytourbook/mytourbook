@@ -1987,37 +1987,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private short[]      battery_Percentage;
 
 
-   /** Time in seconds for the flat area speed, <code>-1</code> indicates that this value is not yet computed */
+   /**
+    * Vertical speed parameters
+    */
    @Transient
-   public int           verticalSpeed_Flat_Time              = -1;
+   private float        verticalSpeed_DPTolerance;
+   @Transient
+   private float        verticalSpeed_FlatGradient;
 
-   /** Distance in meters for the flat area speed */
+   /** Time in seconds for the flat area */
+   @Transient
+   public int           verticalSpeed_Flat_Time;
+
+   /** Distance in meters for the flat area  */
    @Transient
    public float         verticalSpeed_Flat_Distance;
 
+   /** Elevation in meters for the flat area */
+   @Transient
+   public float         verticalSpeed_Flat_Elevation;
 
-   /** Time in seconds for the uphill area speed */
+
+   /** Time in seconds for the uphill area  */
    @Transient
    public int           verticalSpeed_Up_Time;
 
-   /** Distance in meters for the uphill area speed */
+   /** Distance in meters for the uphill area  */
    @Transient
    public float         verticalSpeed_Up_Distance;
 
-   /** Elevation in meters for the uphill area speed */
+   /** Elevation in meters for the uphill area  */
    @Transient
    public float         verticalSpeed_Up_Elevation;
 
 
-   /** Time in seconds for the downhill area speed */
+   /** Time in seconds for the downhill area  */
    @Transient
    public int           verticalSpeed_Down_Time;
 
-   /** Distance in meters for the downhill area speed */
+   /** Distance in meters for the downhill area  */
    @Transient
    public float         verticalSpeed_Down_Distance;
 
-   /** Elevation in meters for the downhill area speed*/
+   /** Elevation in meters for the downhill area */
    @Transient
    public float         verticalSpeed_Down_Elevation;
 
@@ -2353,7 +2365,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       speedSerie_Summarized_Mile = null;
       speedSerie_Summarized_NauticalMile = null;
 
-      verticalSpeed_Flat_Time = -1;
+      verticalSpeed_DPTolerance = -1;
 
       if (isPowerSerieFromDevice == false) {
          powerSerie = null;
@@ -2834,8 +2846,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return computeAltitudeUpDown(true);
    }
 
-   public ElevationGainLoss computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-                                                  final float selectedMinAltiDiff) {
+   public FlatGainLoss computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+                                             final float selectedMinAltiDiff) {
 
       return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
    }
@@ -2884,7 +2896,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return false;
       }
 
-      final ElevationGainLoss altiUpDown = computeAltitudeUpDown(elevationSerie);
+      final FlatGainLoss altiUpDown = computeAltitudeUpDown(elevationSerie);
 
       if (altiUpDown != null) {
          setTourAltUp(altiUpDown.elevationGain);
@@ -2900,7 +2912,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param elevationSerie
     * @return
     */
-   public ElevationGainLoss computeAltitudeUpDown(final float[] elevationSerie) {
+   public FlatGainLoss computeAltitudeUpDown(final float[] elevationSerie) {
 
       float prefDPTolerance;
 
@@ -2914,13 +2926,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      ElevationGainLoss elevationGainLoss;
+      FlatGainLoss flatGainLoss;
 
       if (distanceSerie != null && elevationSerie != null) {
 
          // DP needs distance
 
-         elevationGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
+         flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
                0,
                elevationSerie.length - 1,
                elevationSerie,
@@ -2932,10 +2944,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       } else {
 
-         elevationGainLoss = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
+         flatGainLoss = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
       }
 
-      return elevationGainLoss;
+      return flatGainLoss;
    }
 
    /**
@@ -2948,7 +2960,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @return Returns an <code>AltitudeUpDown</code> when altitude was computed otherwise
     *         <code>null</code>
     */
-   public ElevationGainLoss computeAltitudeUpDown(final int startIndex, final int endIndex) {
+   public FlatGainLoss computeAltitudeUpDown(final int startIndex, final int endIndex) {
 
       float prefDPTolerance;
 
@@ -2959,13 +2971,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      ElevationGainLoss elevationGainLoss;
+      FlatGainLoss flatGainLoss;
 
       if (distanceSerie != null) {
 
          // DP needs distance
 
-         elevationGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
+         flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
                startIndex,
                endIndex,
                altitudeSerie,
@@ -2977,10 +2989,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       } else {
 
-         elevationGainLoss = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
+         flatGainLoss = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
       }
 
-      return elevationGainLoss;
+      return flatGainLoss;
    }
 
    /**
@@ -2997,13 +3009,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param flatGradient
     *           Gradient when an elevation is put into the flat values, 0 will ignore this and will
     *           put all values into the gain or loss values
-    * @return Returns <code>null</code> when altitude up/down cannot be computed
+    * @return Returns <code>null</code> when elevation gain/loss cannot be computed
     */
-   private ElevationGainLoss computeAltitudeUpDown_20_Algorithm_DP(final int startIndex,
-                                                                   final int endIndex,
-                                                                   final float[] elevationSerie,
-                                                                   final float dpTolerance,
-                                                                   final float flatGradient) {
+   private FlatGainLoss computeAltitudeUpDown_20_Algorithm_DP(final int startIndex,
+                                                              final int endIndex,
+                                                              final float[] elevationSerie,
+                                                              final float dpTolerance,
+                                                              final float flatGradient) {
 
       // check if all necessary data are available
       if (false
@@ -3030,7 +3042,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          forcedIndices = multipleTourStartIndex;
       }
 
-      final DPPoint[] allSimplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, allDPPoints, forcedIndices).simplify();
+      final DPPoint[] allSimplifiedPoints = new DouglasPeuckerSimplifier(
+            dpTolerance,
+            allDPPoints,
+            forcedIndices).simplify();
 
       // set break time when not yet set
       if (breakTimeSerie == null) {
@@ -3040,8 +3055,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final BreakTimeTool breakTimeConfig = BreakTimeTool.getPrefValues();
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
 
-      final boolean isComputeFlatValues = flatGradient != 0;
-
       int timeFlatTotal = 0;
       int timeGainTotal = 0;
       int timeLossTotal = 0;
@@ -3050,6 +3063,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       float distanceGainTotal = 0;
       float distanceLossTotal = 0;
 
+      float elevationFlatTotal = 0;
       float elevationGainTotal = 0;
       float elevationLossTotal = 0;
 
@@ -3064,7 +3078,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 //// TODO remove SYSTEM.OUT.PRINTLN
 
       /*
-       * Get elevation up/down values from the tour altitude values which are found by DP
+       * Get all flat/gain/loss values which were found by DP
        */
       for (int segmentIndex = 1; segmentIndex < allSimplifiedPoints.length; segmentIndex++) {
 
@@ -3077,109 +3091,66 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          final float segmentEndDistance = distanceSerie[serieIndex];
          final float segmentEndElevation = elevationSerie[serieIndex];
 
-         final int segmentElapsedTime = segmentEndTime - segmentStartTime;
+         final int segmentFullTime = segmentEndTime - segmentStartTime;
          final float segmentDistance = segmentEndDistance - segmentStartDistance;
          final float segmentElevation = segmentEndElevation - segmentStartElevation;
          final float segmentGradient = segmentElevation * 100 / segmentDistance;
 
+//         System.out.println("#%d".formatted(
+//
+//               segmentIndex + 1
+//
+//         ));
+//// TODO remove SYSTEM.OUT.PRINTLN
+
          int segmentTime;
 
+         /*
+          * Get moving time which is excluding paused/break times
+          */
          if (isPaceAndSpeedFromRecordedTime) {
 
             final int segmentPausedTime = getPausedTime(segmentStartIndex, segmentEndIndex);
-            final int segmentRecordedTime = segmentElapsedTime - segmentPausedTime;
+            final int segmentRecordedTime = segmentFullTime - segmentPausedTime;
 
             segmentTime = segmentRecordedTime;
 
          } else {
 
             final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, breakTimeConfig);
-            final int segmentMovingTime = segmentElapsedTime - segmentBreakTime;
+            final int segmentMovingTime = segmentFullTime - segmentBreakTime;
 
             segmentTime = segmentMovingTime;
          }
 
-         final boolean isMovingTime = segmentTime > 0;
+         /*
+          * Collect flat/gain/loss values
+          */
+         if (false
+               || segmentGradient > 0 && segmentGradient < flatGradient
+               || segmentGradient < 0 && segmentGradient > -flatGradient) {
 
-//         System.out.println(String.format("%5d  %6.0f  %6.1f     %6.1f",
-//               timeDiff,
-//               distanceDiff,
-//               elevationDiff,
-//               gradient
-//
-//         ));
-//// TODO remove SYSTEM.OUT.PRINTLN
+            // this is a flat area
 
-         if (isComputeFlatValues) {
+            timeFlatTotal += segmentTime;
+            distanceFlatTotal += segmentDistance;
+            elevationFlatTotal += segmentElevation >= 0 ? segmentElevation : -segmentElevation;
 
-            /*
-             * Compute flat values
-             */
+         } else if (segmentElevation > 0) {
 
-            if (segmentGradient > 0 && segmentGradient < flatGradient
-                  || segmentGradient < 0 && segmentGradient > -flatGradient) {
+            // elevation gain
 
-               // flat value
-
-               if (isMovingTime) {
-
-                  timeFlatTotal += segmentTime;
-                  distanceFlatTotal += segmentDistance;
-               }
-
-            } else if (segmentElevation > 0) {
-
-               // elevation gain
-
-               elevationGainTotal += segmentElevation;
-
-               if (isMovingTime) {
-
-                  timeGainTotal += segmentTime;
-                  distanceGainTotal += segmentDistance;
-               }
-
-            } else {
-
-               // elevation loss
-
-               elevationLossTotal += segmentElevation;
-
-               if (isMovingTime) {
-
-                  timeLossTotal += segmentTime;
-                  distanceLossTotal += segmentDistance;
-               }
-            }
+            timeGainTotal += segmentTime;
+            distanceGainTotal += segmentDistance;
+            elevationGainTotal += segmentElevation;
 
          } else {
 
-            /*
-             * Ignore flat values
-             */
+            // elevation loss
 
-            if (segmentElevation > 0) {
-
-               // elevation gain
-
-               elevationGainTotal += segmentElevation;
-
-               if (isMovingTime) {
-
-                  timeGainTotal += segmentTime;
-               }
-
-            } else {
-
-               // elevation loss
-
-               elevationLossTotal += segmentElevation;
-
-               if (isMovingTime) {
-
-                  timeLossTotal += segmentTime;
-               }
-            }
+            timeLossTotal += segmentTime;
+            distanceLossTotal += segmentDistance;
+            elevationLossTotal += segmentElevation;
          }
 
          // end point of current segment is the start of the next segment
@@ -3189,20 +3160,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          segmentStartElevation = segmentEndElevation;
       }
 
-      final ElevationGainLoss elevationGainLoss = new ElevationGainLoss();
+      final FlatGainLoss flatGainLoss = new FlatGainLoss();
 
-      elevationGainLoss.timeFlat = timeFlatTotal;
-      elevationGainLoss.timeGain = timeGainTotal;
-      elevationGainLoss.timeLoss = timeLossTotal;
+      flatGainLoss.timeFlat = timeFlatTotal;
+      flatGainLoss.timeGain = timeGainTotal;
+      flatGainLoss.timeLoss = timeLossTotal;
 
-      elevationGainLoss.distanceFlat = distanceFlatTotal;
-      elevationGainLoss.distanceGain = distanceGainTotal;
-      elevationGainLoss.distanceLoss = distanceLossTotal;
+      flatGainLoss.distanceFlat = distanceFlatTotal;
+      flatGainLoss.distanceGain = distanceGainTotal;
+      flatGainLoss.distanceLoss = distanceLossTotal;
 
-      elevationGainLoss.elevationGain = elevationGainTotal;
-      elevationGainLoss.elevationLoss = elevationLossTotal;
+      flatGainLoss.elevationFlat = elevationFlatTotal;
+      flatGainLoss.elevationGain = elevationGainTotal;
+      flatGainLoss.elevationLoss = elevationLossTotal;
 
-      return elevationGainLoss;
+      return flatGainLoss;
    }
 
    /**
@@ -3218,8 +3190,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param minAltiDiff
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private ElevationGainLoss computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
-                                                                     final float minAltiDiff) {
+   private FlatGainLoss computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
+                                                                final float minAltiDiff) {
 
       // check if all necessary data are available
       if (altitudeSerie == null || timeSerie == null || timeSerie.length < 2) {
@@ -3392,7 +3364,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          prevAltitude = altitude;
       }
 
-      final ElevationGainLoss elevationGainLoss = new ElevationGainLoss();
+      final FlatGainLoss elevationGainLoss = new FlatGainLoss();
 
       elevationGainLoss.elevationGain = elevationGainTotal;
       elevationGainLoss.elevationLoss = -elevationLossTotal;
@@ -3404,7 +3376,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @return Returns elevation up/down values from SRTM data or <code>null</code> when not
     *         available
     */
-   public ElevationGainLoss computeAltitudeUpDown_FromSRTM() {
+   public FlatGainLoss computeAltitudeUpDown_FromSRTM() {
 
       final float[] srtmSerie = getSRTMSerie(true);
 
@@ -3413,7 +3385,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return null;
       }
 
-      final ElevationGainLoss elevationUpDown = computeAltitudeUpDown(srtmSerie);
+      final FlatGainLoss elevationUpDown = computeAltitudeUpDown(srtmSerie);
 
       setTourAltUp(elevationUpDown.elevationGain);
       setTourAltDown(elevationUpDown.elevationLoss);
@@ -3464,7 +3436,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          forcedIndices = multipleTourStartIndex;
       }
 
-      final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance / 10.0f, dpPoints, forcedIndices).simplify();
+      final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(
+            dpTolerance / 10.0f,
+            dpPoints,
+            forcedIndices).simplify();
 
       float altitudeUpTotal = 0;
       float altitudeDownTotal = 0;
@@ -6008,32 +5983,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    *
+    * Compute vertical speed values for the current vertical speed parameters
     */
    public void computeVerticalSpeed() {
 
-      final float prefFlatGainLoss_DPTolerance = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
-      final float prefFlatGainLoss_Gradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
+      final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
+      final float prefFlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
 
-      final ElevationGainLoss computedElevationGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
+      if (prefDPTolerance == verticalSpeed_DPTolerance
+            && prefFlatGradient == verticalSpeed_FlatGradient) {
+
+         // vertical speed is already computed for the current vertical speed parameters
+
+         return;
+      }
+
+      final float[] altitudeSmoothedSerie = getAltitudeSmoothedSerie(false);
+
+      final FlatGainLoss flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
             0,
-            altitudeSerie.length - 1,
-            altitudeSerie,
-            prefFlatGainLoss_DPTolerance,
-            prefFlatGainLoss_Gradient);
+            altitudeSmoothedSerie.length - 1,
+            altitudeSmoothedSerie,
+            prefDPTolerance,
+            prefFlatGradient);
 
-      if (computedElevationGainLoss != null) {
+      if (flatGainLoss != null) {
 
-         verticalSpeed_Flat_Time = computedElevationGainLoss.timeFlat;
-         verticalSpeed_Flat_Distance = computedElevationGainLoss.distanceFlat;
+         verticalSpeed_DPTolerance = prefDPTolerance;
+         verticalSpeed_FlatGradient = prefFlatGradient;
 
-         verticalSpeed_Up_Time = computedElevationGainLoss.timeGain;
-         verticalSpeed_Up_Distance = computedElevationGainLoss.distanceGain;
-         verticalSpeed_Up_Elevation = computedElevationGainLoss.elevationGain;
+         verticalSpeed_Flat_Time = flatGainLoss.timeFlat;
+         verticalSpeed_Flat_Distance = flatGainLoss.distanceFlat;
+         verticalSpeed_Flat_Elevation = flatGainLoss.elevationFlat;
 
-         verticalSpeed_Down_Time = computedElevationGainLoss.timeLoss;
-         verticalSpeed_Down_Distance = computedElevationGainLoss.distanceLoss;
-         verticalSpeed_Down_Elevation = computedElevationGainLoss.elevationLoss;
+         verticalSpeed_Up_Time = flatGainLoss.timeGain;
+         verticalSpeed_Up_Distance = flatGainLoss.distanceGain;
+         verticalSpeed_Up_Elevation = flatGainLoss.elevationGain;
+
+         verticalSpeed_Down_Time = flatGainLoss.timeLoss;
+         verticalSpeed_Down_Distance = flatGainLoss.distanceLoss;
+         verticalSpeed_Down_Elevation = flatGainLoss.elevationLoss;
       }
    }
 
@@ -6518,14 +6507,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Create the tour segment list from the segment index array
+    * Create the tour segment list from the segment index array {@link #segmentSerieIndex}
     *
     * @param breakTimeConfig
     * @param flatGainLoss_Gradient
     * @return
     */
-   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool breakTimeConfig,
-                                                         final float flatGainLoss_Gradient) {
+   public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool breakTimeConfig) {
 
       if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 
@@ -6589,8 +6577,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       segmentSerie_Elevation_Diff = new float[segmentSerieLength];
       segmentSerie_Elevation_GainLoss_Hour = new float[segmentSerieLength];
-
-      segmentSerie_FlatGainLoss_Gradient = flatGainLoss_Gradient;
 
       segmentSerie_Speed = new float[segmentSerieLength];
       segmentSerie_Pace = new float[segmentSerieLength];
@@ -8332,7 +8318,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param breakTimeTool
     * @return Returns the break time in seconds
     */
-   private int getBreakTime(final int startIndex, final int endIndex, final BreakTimeTool breakTimeTool) {
+   public int getBreakTime(final int startIndex, final int endIndex, final BreakTimeTool breakTimeTool) {
 
       // check required data
       if (timeSerie == null || distanceSerie == null) {

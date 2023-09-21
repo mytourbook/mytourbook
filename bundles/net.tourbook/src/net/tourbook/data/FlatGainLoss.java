@@ -17,7 +17,7 @@ package net.tourbook.data;
 
 import net.tourbook.common.UI;
 
-public class ElevationGainLoss {
+public class FlatGainLoss {
 
    private static final String NL = UI.NEW_LINE1;
 
@@ -29,10 +29,11 @@ public class ElevationGainLoss {
    public float                distanceGain;
    public float                distanceLoss;
 
+   public float                elevationFlat;
    public float                elevationGain;
    public float                elevationLoss;
 
-   public ElevationGainLoss() {}
+   public FlatGainLoss() {}
 
    @Override
    public String toString() {
@@ -43,6 +44,7 @@ public class ElevationGainLoss {
 
             + "[" + NL //                                      //$NON-NLS-1$
 
+            + "  elevationFlat = " + elevationFlat + NL //     //$NON-NLS-1$
             + "  elevationGain = " + elevationGain + NL //     //$NON-NLS-1$
             + "  elevationLoss = " + elevationLoss + NL //     //$NON-NLS-1$
 

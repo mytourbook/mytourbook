@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -76,6 +74,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
@@ -288,12 +287,6 @@ public class TourInfoUI {
    private Label            _lblRecordedTime;
    private Label            _lblRecordedTime_Unit;
    private Label            _lblRestPulse;
-   private Label            _lblHillSpeed_Flat;
-   private Label            _lblHillSpeed_Flat_Unit;
-   private Label            _lblHillSpeed_Up;
-   private Label            _lblHillSpeed_Up_Unit;
-   private Label            _lblHillSpeed_Down;
-   private Label            _lblHillSpeed_Down_Unit;
    private Label            _lblTemperature_Part1;
    private Label            _lblTemperature_Part2;
    private Label            _lblTimeZone_Value;
@@ -344,6 +337,36 @@ public class TourInfoUI {
    private Label            _lblRunDyn_VerticalRatio_Max_Unit;
    private Label            _lblRunDyn_VerticalRatio_Avg;
    private Label            _lblRunDyn_VerticalRatio_Avg_Unit;
+   //
+   private Label            _lblVerticalSpeed_Distance_Header;
+   private Label            _lblVerticalSpeed_Distance_Flat;
+   private Label            _lblVerticalSpeed_Distance_Gain;
+   private Label            _lblVerticalSpeed_Distance_Loss;
+   //
+   private Label            _lblVerticalSpeed_Distance_Relative_Header;
+   private Label            _lblVerticalSpeed_Distance_Relative_Flat;
+   private Label            _lblVerticalSpeed_Distance_Relative_Gain;
+   private Label            _lblVerticalSpeed_Distance_Relative_Loss;
+   //
+   private Label            _lblVerticalSpeed_Elevation_Header;
+   private Label            _lblVerticalSpeed_Elevation_Flat;
+   private Label            _lblVerticalSpeed_Elevation_Gain;
+   private Label            _lblVerticalSpeed_Elevation_Loss;
+   //
+   private Label            _lblVerticalSpeed_Speed_Header;
+   private Label            _lblVerticalSpeed_Speed_Flat;
+   private Label            _lblVerticalSpeed_Speed_Gain;
+   private Label            _lblVerticalSpeed_Speed_Loss;
+   //
+   private Label            _lblVerticalSpeed_Time_Header;
+   private Label            _lblVerticalSpeed_Time_Flat;
+   private Label            _lblVerticalSpeed_Time_Gain;
+   private Label            _lblVerticalSpeed_Time_Loss;
+   //
+   private Label            _lblVerticalSpeed_Time_Relative_Header;
+   private Label            _lblVerticalSpeed_Time_Relative_Flat;
+   private Label            _lblVerticalSpeed_Time_Relative_Gain;
+   private Label            _lblVerticalSpeed_Time_Relative_Loss;
 
    private Link             _linkBattery;
    private ArrayList<Link>  _allSensorValue_Link;
@@ -958,30 +981,6 @@ public class TourInfoUI {
    private void createUI_44_HillSpeed(final Composite parent) {
 
       /*
-       * Speed flat
-       */
-      createUI_Label(parent, Messages.Tour_Tooltip_Label_HillSpeed + UI.SPACE + UI.SYMBOL_ARROW_RIGHT);
-
-      _lblHillSpeed_Flat = createUI_LabelValue(parent, SWT.TRAIL);
-      _lblHillSpeed_Flat_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-      /*
-       * Speed uphill
-       */
-      createUI_Label(parent, Messages.Tour_Tooltip_Label_HillSpeed + UI.SPACE + UI.SYMBOL_ARROW_UP);
-
-      _lblHillSpeed_Up = createUI_LabelValue(parent, SWT.TRAIL);
-      _lblHillSpeed_Up_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-      /*
-       * Speed downhill
-       */
-      createUI_Label(parent, Messages.Tour_Tooltip_Label_HillSpeed + UI.SPACE + UI.SYMBOL_ARROW_DOWN);
-
-      _lblHillSpeed_Down = createUI_LabelValue(parent, SWT.TRAIL);
-      _lblHillSpeed_Down_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-      /*
        * Altimeter up
        */
       createUI_Label(parent, Messages.Segmenter_Tooltip_Label_Altimeter + UI.SPACE + UI.SYMBOL_ARROW_UP);
@@ -996,6 +995,150 @@ public class TourInfoUI {
 
       _lblAltimeter_Down = createUI_LabelValue(parent, SWT.TRAIL);
       _lblAltimeter_Down_Unit = createUI_LabelValue(parent, SWT.LEAD);
+
+      createUI_Spacer(parent);
+
+      /*
+       * Vertical speed
+       */
+      final int columnSpacing = 15;
+
+      final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
+
+      final Composite speedContainer = new Composite(parent, SWT.NONE);
+      speedContainer.setForeground(_fgColor);
+      speedContainer.setBackground(_bgColor);
+//    speedContainer.setBackground(UI.SYS_COLOR_GREEN);
+      GridDataFactory.fillDefaults().span(3, 1).applyTo(speedContainer);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(7)
+            .spacing(columnSpacing, 0)
+            .applyTo(speedContainer);
+
+      {
+         {
+            /*
+             * Vertical speed: Header
+             */
+            final Label label = createUI_Label(speedContainer, UI.SPACE1);
+            gd.applyTo(label);
+
+            // elevation
+            _lblVerticalSpeed_Elevation_Header = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Elevation_Header);
+
+            // distance
+            _lblVerticalSpeed_Distance_Header = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Header);
+
+            _lblVerticalSpeed_Distance_Relative_Header = createUI_Label_Trailing(speedContainer, UI.SYMBOL_PERCENTAGE);
+            gd.applyTo(_lblVerticalSpeed_Distance_Relative_Header);
+
+            // time
+            _lblVerticalSpeed_Time_Header = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Header);
+
+            _lblVerticalSpeed_Time_Relative_Header = createUI_Label_Trailing(speedContainer, UI.SYMBOL_PERCENTAGE);
+            gd.applyTo(_lblVerticalSpeed_Time_Relative_Header);
+
+            // speed
+            _lblVerticalSpeed_Speed_Header = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Speed_Header);
+         }
+         {
+            /*
+             * Vertical speed: Flat
+             */
+            final Label label = createUI_Label(speedContainer, OtherMessages.TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT);
+            gd.applyTo(label);
+
+            // elevation
+            _lblVerticalSpeed_Elevation_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Elevation_Flat);
+
+            // distance
+            _lblVerticalSpeed_Distance_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Flat);
+
+            // distance relative
+            _lblVerticalSpeed_Distance_Relative_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Relative_Flat);
+
+            // time
+            _lblVerticalSpeed_Time_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Flat);
+
+            // time relative
+            _lblVerticalSpeed_Time_Relative_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Relative_Flat);
+
+            // speed
+            _lblVerticalSpeed_Speed_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Speed_Flat);
+         }
+         {
+            /*
+             * Vertical speed: Ascent
+             */
+            final Label label = createUI_Label(speedContainer, OtherMessages.TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT);
+            gd.applyTo(label);
+
+            // elevation
+            _lblVerticalSpeed_Elevation_Gain = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Elevation_Gain);
+
+            // distance
+            _lblVerticalSpeed_Distance_Gain = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Gain);
+
+            // distance relative
+            _lblVerticalSpeed_Distance_Relative_Gain = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Relative_Gain);
+
+            // time
+            _lblVerticalSpeed_Time_Gain = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Gain);
+
+            // time relative
+            _lblVerticalSpeed_Time_Relative_Gain = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Relative_Gain);
+
+            // speed
+            _lblVerticalSpeed_Speed_Gain = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Speed_Gain);
+         }
+         {
+            /*
+             * Vertical speed: Descent
+             */
+            final Label label = createUI_Label(speedContainer, OtherMessages.TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_DESCENT);
+            gd.applyTo(label);
+
+            // elevation
+            _lblVerticalSpeed_Elevation_Loss = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Elevation_Loss);
+
+            // distance
+            _lblVerticalSpeed_Distance_Loss = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Loss);
+
+            // distance relative
+            _lblVerticalSpeed_Distance_Relative_Loss = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Distance_Relative_Loss);
+
+            // time
+            _lblVerticalSpeed_Time_Loss = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Loss);
+
+            // time relative
+            _lblVerticalSpeed_Time_Relative_Loss = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Time_Relative_Loss);
+
+            // speed
+            _lblVerticalSpeed_Speed_Loss = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
+            gd.applyTo(_lblVerticalSpeed_Speed_Loss);
+         }
+      }
    }
 
    private void createUI_47_Weather(final Composite parent) {
@@ -1055,7 +1198,7 @@ public class TourInfoUI {
           */
          _linkBattery = createUI_Link(parent, Messages.Tour_Tooltip_Label_Battery);
          _linkBattery.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
-         _linkBattery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Battery()));
+         _linkBattery.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Battery()));
 
          _lblBattery_Start = createUI_LabelValue(parent, SWT.TRAIL);
          _lblBattery_Start.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
@@ -1392,7 +1535,7 @@ public class TourInfoUI {
          // sensor label/link
          final Link link = createUI_Link(parent, sensor.getLabel());
          link.setData(sensor);
-         link.addSelectionListener(widgetSelectedAdapter(this::onSelect_Sensor));
+         link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
          _allSensorValue_Link.add(link);
 
          _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
@@ -1478,7 +1621,7 @@ public class TourInfoUI {
                   _comboUIWidth_Size = new Combo(containerTextWidth, SWT.READ_ONLY | SWT.BORDER);
                   _comboUIWidth_Size.setVisibleItemCount(10);
                   _comboUIWidth_Size.setToolTipText(Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
-                  _comboUIWidth_Size.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
+                  _comboUIWidth_Size.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
 //                  _comboUIWidth_Size.addFocusListener(_keepOpenListener);
 
                   GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboUIWidth_Size);
@@ -1493,7 +1636,7 @@ public class TourInfoUI {
                   _spinnerUIWidth_Pixel.setIncrement(10);
                   _spinnerUIWidth_Pixel.setPageIncrement(50);
                   _spinnerUIWidth_Pixel.setToolTipText(Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
-                  _spinnerUIWidth_Pixel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_2_Value()));
+                  _spinnerUIWidth_Pixel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_2_Value()));
                   _spinnerUIWidth_Pixel.addMouseWheelListener(mouseEvent -> {
 
                      UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
@@ -1510,6 +1653,19 @@ public class TourInfoUI {
    private Label createUI_Label(final Composite parent, final String labelText) {
 
       final Label label = new Label(parent, SWT.NONE);
+      label.setForeground(_fgColor);
+      label.setBackground(_bgColor);
+
+      if (labelText != null) {
+         label.setText(labelText);
+      }
+
+      return label;
+   }
+
+   private Label createUI_Label_Trailing(final Composite parent, final String labelText) {
+
+      final Label label = new Label(parent, SWT.TRAIL);
       label.setForeground(_fgColor);
       label.setBackground(_bgColor);
 
@@ -2124,9 +2280,6 @@ public class TourInfoUI {
                   DP tolerance\t%s
                   Flat gradient\t%s %%
 
-                  Time\t\t%s %s
-                  Distance\t\t%s %s
-
                   """;
 
 // SET_FORMATTING_OFF
@@ -2152,82 +2305,105 @@ public class TourInfoUI {
       // ensure that data are available
       _tourData.computeVerticalSpeed();
 
-      final int   verticalSpeed_Flat_Time        = _tourData.verticalSpeed_Flat_Time;
-      final float verticalSpeed_Flat_Distance    = _tourData.verticalSpeed_Flat_Distance;
+      final int   vertSpeed_TimeFlat      = _tourData.verticalSpeed_Flat_Time;
+      final int   vertSpeed_TimeGain      = _tourData.verticalSpeed_Up_Time;
+      final int   vertSpeed_TimeLoss      = _tourData.verticalSpeed_Down_Time;
 
-      final int   verticalSpeed_Up_Time          = _tourData.verticalSpeed_Up_Time;
-      final float verticalSpeed_Up_Distance      = _tourData.verticalSpeed_Up_Distance;
-      final float verticalSpeed_Up_Elevation     = _tourData.verticalSpeed_Up_Elevation;
+      final float vertSpeed_DistanceFlat  = _tourData.verticalSpeed_Flat_Distance;
+      final float vertSpeed_DistanceGain  = _tourData.verticalSpeed_Up_Distance;
+      final float vertSpeed_DistanceLoss  = _tourData.verticalSpeed_Down_Distance;
 
-      final int   verticalSpeed_Down_Time        = _tourData.verticalSpeed_Down_Time;
-      final float verticalSpeed_Down_Distance    = _tourData.verticalSpeed_Down_Distance;
-      final float verticalSpeed_Down_Elevation   = _tourData.verticalSpeed_Down_Elevation;
+      final float vertSpeed_ElevationFlat = _tourData.verticalSpeed_Flat_Elevation;
+      final float vertSpeed_ElevationGain = _tourData.verticalSpeed_Up_Elevation;
+      final float vertSpeed_ElevationLoss = _tourData.verticalSpeed_Down_Elevation;
 
-      final float verticalSpeed_Flat = verticalSpeed_Flat_Time   == 0 ? 0 : 3.6f * verticalSpeed_Flat_Distance / verticalSpeed_Flat_Time;
-      final float verticalSpeed_Up   = verticalSpeed_Up_Time     == 0 ? 0 : 3.6f * verticalSpeed_Up_Distance   / verticalSpeed_Up_Time;
-      final float verticalSpeed_Down = verticalSpeed_Down_Time   == 0 ? 0 : 3.6f * verticalSpeed_Down_Distance / verticalSpeed_Down_Time;
+      final float verticalSpeed_Flat = vertSpeed_TimeFlat == 0 ? 0 : 3.6f * vertSpeed_DistanceFlat / vertSpeed_TimeFlat;
+      final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
+      final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
 
-      final float altimeter_Up   = verticalSpeed_Up_Elevation   / verticalSpeed_Up_Time   * 3600  / UI.UNIT_VALUE_ELEVATION;
-      final float altimeter_Down = verticalSpeed_Down_Elevation / verticalSpeed_Down_Time * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss;
+      final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
+
+      final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float altimeter_Loss = vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600  / UI.UNIT_VALUE_ELEVATION;
 
       final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
-      final float prefFlatGainLoss_FlatGradient     = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
+      final float prefFlatGainLoss_FlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
 
-      final String hillSpeed_Flat_Tooltip = speedTooltipText.formatted(
-
-            _nf2.format(prefFlatGainLoss_DPTolerance),
-            _nf1.format(prefFlatGainLoss_FlatGradient),
-
-            FormatManager.formatMovingTime(verticalSpeed_Flat_Time),
-            Messages.Tour_Tooltip_Label_Hour,
-
-            FormatManager.formatDistance(verticalSpeed_Flat_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
-            UI.UNIT_LABEL_DISTANCE);
-
-      final String hillSpeed_Up_Tooltip = speedTooltipText.formatted(
+      final String tooltip = speedTooltipText.formatted(
 
             _nf2.format(prefFlatGainLoss_DPTolerance),
-            _nf1.format(prefFlatGainLoss_FlatGradient),
+            _nf1.format(prefFlatGainLoss_FlatGradient)
 
-            FormatManager.formatMovingTime(verticalSpeed_Up_Time),
-            Messages.Tour_Tooltip_Label_Hour,
+            );
 
-            FormatManager.formatDistance(verticalSpeed_Up_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
-            UI.UNIT_LABEL_DISTANCE);
+// SET_FORMATTING_OFF
 
-      final String hillSpeed_Down_Tooltip = speedTooltipText.formatted(
+      _lblVerticalSpeed_Time_Header             .setText(UI.UNIT_LABEL_TIME);
+      _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime_Summary(vertSpeed_TimeFlat, false, true));
+      _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime_Summary(vertSpeed_TimeGain, false, true));
+      _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime_Summary(vertSpeed_TimeLoss, false, true));
 
-            _nf2.format(prefFlatGainLoss_DPTolerance),
-            _nf1.format(prefFlatGainLoss_FlatGradient),
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative_Summary(vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative_Summary(vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative_Summary(vertSpeed_TimeLoss / sumTime * 100f));
 
-            FormatManager.formatMovingTime(verticalSpeed_Down_Time),
-            Messages.Tour_Tooltip_Label_Hour,
+      _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
+      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance_Summary(vertSpeed_DistanceFlat / 1000));
+      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance_Summary(vertSpeed_DistanceGain / 1000));
+      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance_Summary(vertSpeed_DistanceLoss / 1000));
 
-            FormatManager.formatDistance(verticalSpeed_Down_Distance / 1000 / UI.UNIT_VALUE_DISTANCE),
-            UI.UNIT_LABEL_DISTANCE);
+      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceFlat / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceGain / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceLoss / sumDistance * 100));
 
-      _lblHillSpeed_Flat      .setText(FormatManager.formatSpeed(verticalSpeed_Flat  / UI.UNIT_VALUE_DISTANCE));
-      _lblHillSpeed_Up        .setText(FormatManager.formatSpeed(verticalSpeed_Up    / UI.UNIT_VALUE_DISTANCE));
-      _lblHillSpeed_Down      .setText(FormatManager.formatSpeed(verticalSpeed_Down  / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
+      _lblVerticalSpeed_Elevation_Flat          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationFlat));
+      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationGain));
+      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationLoss));
 
-      _lblAltimeter_Up        .setText(Integer.toString((int)(altimeter_Up   + .5)));
-      _lblAltimeter_Down      .setText(Integer.toString((int)(altimeter_Down + .5)));
+      _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
+      _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
 
-      _lblHillSpeed_Flat      .setToolTipText(hillSpeed_Flat_Tooltip);
-      _lblHillSpeed_Flat_Unit .setToolTipText(hillSpeed_Flat_Tooltip);
-      _lblHillSpeed_Up        .setToolTipText(hillSpeed_Up_Tooltip);
-      _lblHillSpeed_Up_Unit   .setToolTipText(hillSpeed_Up_Tooltip);
-      _lblHillSpeed_Down      .setToolTipText(hillSpeed_Down_Tooltip);
-      _lblHillSpeed_Down_Unit .setToolTipText(hillSpeed_Down_Tooltip);
+      _lblVerticalSpeed_Time_Header             .setToolTipText(tooltip);
+      _lblVerticalSpeed_Time_Flat               .setToolTipText(tooltip);
+      _lblVerticalSpeed_Time_Gain               .setToolTipText(tooltip);
+      _lblVerticalSpeed_Time_Loss               .setToolTipText(tooltip);
 
-      _lblHillSpeed_Flat_Unit .setText(UI.UNIT_LABEL_SPEED);
-      _lblHillSpeed_Up_Unit   .setText(UI.UNIT_LABEL_SPEED);
-      _lblHillSpeed_Down_Unit .setText(UI.UNIT_LABEL_SPEED);
+      _lblVerticalSpeed_Time_Relative_Flat      .setToolTipText(tooltip);
+      _lblVerticalSpeed_Time_Relative_Gain      .setToolTipText(tooltip);
+      _lblVerticalSpeed_Time_Relative_Loss      .setToolTipText(tooltip);
+
+      _lblVerticalSpeed_Distance_Header         .setToolTipText(tooltip);
+      _lblVerticalSpeed_Distance_Flat           .setToolTipText(tooltip);
+      _lblVerticalSpeed_Distance_Gain           .setToolTipText(tooltip);
+      _lblVerticalSpeed_Distance_Loss           .setToolTipText(tooltip);
+
+      _lblVerticalSpeed_Distance_Relative_Flat  .setToolTipText(tooltip);
+      _lblVerticalSpeed_Distance_Relative_Gain  .setToolTipText(tooltip);
+      _lblVerticalSpeed_Distance_Relative_Loss  .setToolTipText(tooltip);
+
+      _lblVerticalSpeed_Elevation_Header        .setToolTipText(tooltip);
+      _lblVerticalSpeed_Elevation_Flat          .setToolTipText(tooltip);
+      _lblVerticalSpeed_Elevation_Gain          .setToolTipText(tooltip);
+      _lblVerticalSpeed_Elevation_Loss          .setToolTipText(tooltip);
+
+      _lblVerticalSpeed_Speed_Header            .setToolTipText(tooltip);
+      _lblVerticalSpeed_Speed_Flat              .setToolTipText(tooltip);
+      _lblVerticalSpeed_Speed_Gain              .setToolTipText(tooltip);
+      _lblVerticalSpeed_Speed_Loss              .setToolTipText(tooltip);
+
+      _lblAltimeter_Up        .setText(Integer.toString((int) (altimeter_Gain + .5)));
+      _lblAltimeter_Down      .setText(Integer.toString((int) (altimeter_Loss + .5)));
 
       _lblAltimeter_Up_Unit   .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
       _lblAltimeter_Down_Unit .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
 
 // SET_FORMATTING_ON
+
+      // SET_FORMATTING_ON
 
       /*
        * Column: Right
