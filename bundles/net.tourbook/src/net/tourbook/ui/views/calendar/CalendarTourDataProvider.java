@@ -883,8 +883,6 @@ class CalendarTourDataProvider {
 
                weekData.calories = UI.scrambleNumbers(weekData.calories);
                weekData.recordedTime = UI.scrambleNumbers(weekData.recordedTime);
-
-               weekData.trainingLoad_Tss = UI.scrambleNumbers(weekData.trainingLoad_Tss);
             }
          }
 
