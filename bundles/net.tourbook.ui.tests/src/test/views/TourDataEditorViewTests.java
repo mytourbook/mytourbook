@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,7 +47,7 @@ public class TourDataEditorViewTests extends UITest {
       bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
+      Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
@@ -68,7 +68,7 @@ public class TourDataEditorViewTests extends UITest {
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
 
@@ -94,7 +94,7 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testViewTabs() {
 
-      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
+      Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       bot.cTabItem(Messages.Tour_Editor_TabLabel_SwimSlices).activate();

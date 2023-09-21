@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,13 +31,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionCreateTourMarker extends Action {
+class ActionCreateTourMarker extends Action {
 
    private TourDataEditorView _tourDataEditor;
 
-   public ActionCreateTourMarker(final TourDataEditorView tourDataEditorView) {
+   ActionCreateTourMarker(final TourDataEditorView tourDataEditorView) {
 
-      super(Messages.RefTour_Action_CreaateMarker);
+      super(Messages.RefTour_Action_CreateMarker);
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
 
       _tourDataEditor = tourDataEditorView;
@@ -54,10 +54,10 @@ public class ActionCreateTourMarker extends Action {
       final StructuredSelection selection = (StructuredSelection) _tourDataEditor.getSliceViewer().getSelection();
       final Object firstElement = selection.getFirstElement();
 
-      if (firstElement instanceof TimeSlice && tourData.timeSerie != null) {
+      if (firstElement instanceof final TimeSlice timeSlice && tourData.timeSerie != null) {
 
          // create a new marker
-         final int serieIndex = ((TimeSlice) firstElement).serieIndex;
+         final int serieIndex = timeSlice.serieIndex;
          final int relativeTourTime = tourData.timeSerie[serieIndex];
          final float[] altitudeSerie = tourData.altitudeSerie;
          final float[] distSerie = tourData.getMetricDistanceSerie();

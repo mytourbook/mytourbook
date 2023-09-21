@@ -45,7 +45,7 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    @Test
-   void adustTourValues_RetrieveWeatherData_OpenWeatherMap() {
+   void adjustTourValues_RetrieveWeatherData_OpenWeatherMap() {
 
       // Select OpenWeatherMap to make sure the air quality is retrieved
 
@@ -76,7 +76,7 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
-   void adustTourValues_SetTimeZone_AllChoices() {
+   void adjustTourValues_SetTimeZone_AllChoices() {
 
       //Select a tour
       SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$

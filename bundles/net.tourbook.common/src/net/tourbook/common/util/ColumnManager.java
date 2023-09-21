@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -122,7 +122,7 @@ public class ColumnManager {
    private static final String ATTR_VISIBLE_COLUMN_IDS                   = "visibleColumnIds";                  //$NON-NLS-1$
    private static final String ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH         = "visibleColumnIdsAndWidth";          //$NON-NLS-1$
    //
-   static final String         COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
+   private static final String COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
    static final String         COLUMN_TEXT_SEPARATOR                     = "   \u00B7   ";                      //$NON-NLS-1$
 
    /**
@@ -214,12 +214,7 @@ public class ColumnManager {
    private IValueFormatter                   _valueFormatter_Time_SSS      = new ValueFormatter_Time_SSS();
 
    {
-      _colMenuItem_Listener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            onSelectColumnItem(event);
-         }
-      };
+      _colMenuItem_Listener = event -> onSelectColumnItem(event);
 
       _profileSorter = new Comparator<>() {
          @Override
@@ -255,7 +250,7 @@ public class ColumnManager {
       restoreState(viewState);
    }
 
-   public static IValueFormatter getDefaultDefaultValueFormatter() {
+   static IValueFormatter getDefaultDefaultValueFormatter() {
       return _defaultDefaultValueFormatter;
    }
 
@@ -490,12 +485,12 @@ public class ColumnManager {
       viewportLayer.doCommand(new TurnViewportOnCommand());
    }
 
-   public void addColumn(final ColumnDefinition colDef) {
+   void addColumn(final ColumnDefinition colDef) {
       _allDefinedColumnDefinitions.add(colDef);
    }
 
    /**
-    * @return Returns <code>true</code> when at least one column is freezed.
+    * @return Returns <code>true</code> when at least one column is frozen.
     */
    private boolean areColumnFreezed() {
 
@@ -764,15 +759,12 @@ public class ColumnManager {
        * IMPORTANT: Dispose the menus (only the current menu, when menu is set with setMenu() it
        * will be disposed automatically)
        */
-      composite.addListener(SWT.Dispose, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      composite.addListener(SWT.Dispose, event -> {
 
-            headerContextMenu.dispose();
+         headerContextMenu.dispose();
 
-            if (defaultContextMenuProvider != null) {
-               defaultContextMenuProvider.disposeContextMenu();
-            }
+         if (defaultContextMenuProvider != null) {
+            defaultContextMenuProvider.disposeContextMenu();
          }
       });
 
@@ -789,7 +781,7 @@ public class ColumnManager {
       }
 
       final Shell contextMenuShell = natTable.getShell();
-      final Menu headerContextMenu[] = { createHCM_0_Menu(natTable, contextMenuShell, defaultContextMenuProvider) };
+      final Menu[] headerContextMenu = { createHCM_0_Menu(natTable, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the table
       _table_MenuDetect_Listener = new Listener() {
@@ -823,7 +815,7 @@ public class ColumnManager {
                    * java.lang.IllegalArgumentException: Widget has the wrong parent
                    * <p>
                    * When a view is minimized, then the context menu is already created
-                   * but has the wrong parent when the view is displayed lateron.
+                   * but has the wrong parent when the view is displayed later on.
                    */
 
                   headerContextMenu[0].dispose();
@@ -868,8 +860,8 @@ public class ColumnManager {
                }
 
                /*
-                * It is possible that the context menu is outside of the tree, this occures when the
-                * column is very wide and horizonal scrolled.
+                * It is possible that the context menu is outside of the tree, this occurs when the
+                * column is very wide and horizontal scrolled.
                 */
                if (posX - xOffset > clientArea.width) {
                   posX = xOffset + clientArea.width;
@@ -918,7 +910,7 @@ public class ColumnManager {
          table.removeListener(SWT.MenuDetect, _table_MenuDetect_Listener);
       }
 
-      final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenuProvider) };
+      final Menu[] headerContextMenu = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the table
       _table_MenuDetect_Listener = new Listener() {
@@ -996,8 +988,8 @@ public class ColumnManager {
                }
 
                /*
-                * It is possible that the context menu is outside of the tree, this occures when the
-                * column is very wide and horizonal scrolled.
+                * It is possible that the context menu is outside of the tree, this occurs when the
+                * column is very wide and horizontal scrolled.
                 */
                if (posX - xOffset > clientArea.width) {
                   posX = xOffset + clientArea.width;
@@ -1045,106 +1037,103 @@ public class ColumnManager {
          tree.removeListener(SWT.MenuDetect, _tree_MenuDetect_Listener);
       }
 
-      final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenuProvider) };
+      final Menu[] headerContextMenu = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the tree viewer
-      _tree_MenuDetect_Listener = new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      _tree_MenuDetect_Listener = event -> {
 
-            final Decorations shell = tree.getShell();
-            final Display display = shell.getDisplay();
+         final Decorations shell = tree.getShell();
+         final Display display = shell.getDisplay();
 
-            final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
+         final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
 
-            final Rectangle clientArea = tree.getClientArea();
+         final Rectangle clientArea = tree.getClientArea();
 
-            final int headerHeight = tree.getHeaderHeight();
-            final int headerBottom = clientArea.y + headerHeight;
+         final int headerHeight = tree.getHeaderHeight();
+         final int headerBottom = clientArea.y + headerHeight;
 
-            final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;
+         final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;
 
-            _headerColumnItem = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
+         _headerColumnItem = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
-            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+         Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-            if (contextMenu != null) {
+         if (contextMenu != null) {
 
-               // can be null when context menu is not set
+            // can be null when context menu is not set
 
-               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
+            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
 
-                  /**
-                   * java.lang.IllegalArgumentException: Widget has the wrong parent
-                   * <p>
-                   * When a view is minimized, then the context menu is already created
-                   * but has the wrong parent when the view is displayed lateron.
-                   */
-
-                  headerContextMenu[0].dispose();
-
-                  headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
-
-                  contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
-
-                  StatusUtil.logError("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
-
-               } else if (defaultContextMenuProvider != null
-                     && contextMenu == defaultContextMenuProvider.getContextMenu()
-                     && contextMenu.getShell() != tree.getShell()) {
-
-                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
-
-                  StatusUtil.logError("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
-               }
-            }
-
-            try {
-
-               tree.setMenu(contextMenu);
-
-            } catch (final IllegalArgumentException e) {
-
-               // This occured: Widget has the wrong parent
-
-               // after some debugging, could not find the reason, this view is very similar to the tourbook view
-
-               /*
-                * The problem can occure when tours are compared with 2 different perspectives (ref
-                * tour and compare result), the system measurement is changed and the context menu
-                * for the ref tours will be opened
+               /**
+                * java.lang.IllegalArgumentException: Widget has the wrong parent
+                * <p>
+                * When a view is minimized, then the context menu is already created
+                * but has the wrong parent when the view is displayed lateron.
                 */
 
-               StatusUtil.showStatus(e);
+               headerContextMenu[0].dispose();
+
+               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
+
+               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+               StatusUtil.logError("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+
+            } else if (defaultContextMenuProvider != null
+                  && contextMenu == defaultContextMenuProvider.getContextMenu()
+                  && contextMenu.getShell() != tree.getShell()) {
+
+               contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+               StatusUtil.logError("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+            }
+         }
+
+         try {
+
+            tree.setMenu(contextMenu);
+
+         } catch (final IllegalArgumentException e) {
+
+            // This occurred: Widget has the wrong parent
+
+            // after some debugging, could not find the reason, this view is very similar to the tourbook view
+
+            /*
+             * The problem can occur when tours are compared with 2 different perspectives (ref
+             * tour and compare result), the system measurement is changed and the context menu
+             * for the ref tours will be opened
+             */
+
+            StatusUtil.showStatus(e);
+         }
+
+         /*
+          * Set context menu position to the right border of the column
+          */
+         if (_headerColumnItem != null) {
+
+            int posX = _headerColumnItem.columnRightBorder;
+            int xOffset = 0;
+
+            final ScrollBar hBar = tree.getHorizontalBar();
+
+            if (hBar != null) {
+               xOffset = hBar.getSelection();
             }
 
             /*
-             * Set context menu position to the right border of the column
+             * It is possible that the context menu is outside of the tree, this occurs when the
+             * column is very wide and horizontal scrolled.
              */
-            if (_headerColumnItem != null) {
-
-               int posX = _headerColumnItem.columnRightBorder;
-               int xOffset = 0;
-
-               final ScrollBar hBar = tree.getHorizontalBar();
-
-               if (hBar != null) {
-                  xOffset = hBar.getSelection();
-               }
-
-               /*
-                * It is possible that the context menu is outside of the tree, this occures when the
-                * column is very wide and horizonal scrolled.
-                */
-               if (posX - xOffset > clientArea.width) {
-                  posX = xOffset + clientArea.width;
-               }
-
-               final Point displayPosition = tree.toDisplay(posX, headerBottom);
-
-               event.x = displayPosition.x - 1;
-               event.y = displayPosition.y - 2;
+            if (posX - xOffset > clientArea.width) {
+               posX = xOffset + clientArea.width;
             }
+
+            final Point displayPosition = tree.toDisplay(posX, headerBottom);
+
+            event.x = displayPosition.x - 1;
+            event.y = displayPosition.y - 2;
          }
       };
 
@@ -1180,7 +1169,7 @@ public class ColumnManager {
 
       final ColumnDefinition colDef = getColDef_FromHeaderColumn();
       if (colDef == null) {
-         // this should not occure
+         // this should not occur
          return;
       }
 
@@ -1324,12 +1313,7 @@ public class ColumnManager {
          final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
          configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
          configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
-         configMenuItem.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               openColumnDialog();
-            }
-         });
+         configMenuItem.addListener(SWT.Selection, event -> openColumnDialog());
       }
 
       createMenuSeparator(contextMenu);
@@ -2303,6 +2287,17 @@ public class ColumnManager {
       final ArrayList<String> allOrderedColumnIds = new ArrayList<>();
       final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
+// TODO
+      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
+      System.out.println();
+
+      for (final ColumnDefinition colDefLog : _allDefinedColumnDefinitions) {
+         System.out.println("  \"" + colDefLog.getColumnId() + "\"");
+      }
+
+      System.out.println();
+      System.out.println();
+
       for (int uiColumnPos = 0; uiColumnPos < numColumns; uiColumnPos++) {
 
          /*
@@ -2428,9 +2423,27 @@ public class ColumnManager {
       }
    }
 
+   /**
+    * @param columnIdsAndWidth
+    *           Columns are in the format: id/width ...
+    * @param columnId
+    * @param columnWidth
+    */
    private void setColumnIdAndWidth(final ArrayList<String> columnIdsAndWidth, final String columnId, int columnWidth) {
 
       final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+      if (colDef == null) {
+
+         final String errorMessage = String.format("\"colDef\" is null for columnId = \"%s\"", columnId); //$NON-NLS-1$
+
+         System.out.println(errorMessage);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+//         StatusUtil.log(new Throwable(errorMessage));
+
+         return;
+      }
 
       if (colDef.isColumnHidden()) {
 
@@ -3133,7 +3146,7 @@ public class ColumnManager {
    /**
     * Read the sorting order and column width from the viewer/nattable.
     */
-   public void setVisibleColumnIds_FromViewer() {
+   private void setVisibleColumnIds_FromViewer() {
 
       final String[] visibleColumnIds = getColumns_FromViewer_Ids();
 

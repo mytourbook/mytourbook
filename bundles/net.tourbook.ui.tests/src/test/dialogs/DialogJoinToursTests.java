@@ -129,7 +129,7 @@ public class DialogJoinToursTests extends UITest {
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURMARKERS_VIEW_NAME).select();
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOURMARKERS).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
       final SWTBotTable tableMarkers = bot.table();
@@ -167,7 +167,7 @@ public class DialogJoinToursTests extends UITest {
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURMARKERS_VIEW_NAME).select();
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOURMARKERS).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
       final SWTBotTable tableMarkers = bot.table();
@@ -177,7 +177,7 @@ public class DialogJoinToursTests extends UITest {
 
       //Open the Tour Pauses View
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURPAUSES_VIEW_NAME).select();
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOURPAUSES).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
       final SWTBotTable tablePauses = bot.table();

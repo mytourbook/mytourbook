@@ -28,10 +28,7 @@ import net.tourbook.ui.CustomControlContribution;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -45,7 +42,7 @@ public class ContributionItem_MeasurementSystem extends CustomControlContributio
 
    private static final char             NL                    = UI.NEW_LINE;
 
-   private final static IPreferenceStore _prefStore_Common     = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common     = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener       _prefChangeListener_Common;
 
@@ -66,22 +63,18 @@ public class ContributionItem_MeasurementSystem extends CustomControlContributio
     */
    private void addPrefListener() {
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               _isFireSelectionEvent = false;
-               {
-                  updateUI_MeasurementSystem();
-               }
-               _isFireSelectionEvent = true;
+            _isFireSelectionEvent = false;
+            {
+               updateUI_MeasurementSystem();
             }
+            _isFireSelectionEvent = true;
          }
-
       };
 
       // register the listener
@@ -126,12 +119,7 @@ public class ContributionItem_MeasurementSystem extends CustomControlContributio
       _combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
       _combo.setToolTipText(Messages.App_measurement_tooltip);
 
-      _combo.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
-         }
-      });
+      _combo.addDisposeListener(disposeEvent -> _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common));
 
       _combo.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -211,7 +199,7 @@ public class ContributionItem_MeasurementSystem extends CustomControlContributio
          _combo.add(systemProfile.getName());
       }
 
-      // the names could have a different lenght -> show the whole system name
+      // the names could have a different length -> show the whole system name
       _combo.getParent().layout(true, true);
 
       // select saved system

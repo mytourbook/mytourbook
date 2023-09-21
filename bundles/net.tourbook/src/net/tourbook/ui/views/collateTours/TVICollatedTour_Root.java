@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -216,7 +216,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
             prevStart[0] = eventEnd;
 
             /*
-             * This is a highly complicated algorithim that the eventStart is overwritten again
+             * This is a highly complicated algorithm that the eventStart is overwritten again
              */
             collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
             collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
@@ -277,7 +277,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
                            prevStart[0] = eventEnd;
 
                            /*
-                            * This is a highly complicated algorithim that the eventStart
+                            * This is a highly complicated algorithm that the eventStart
                             * is overwritten again
                             */
                            collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
