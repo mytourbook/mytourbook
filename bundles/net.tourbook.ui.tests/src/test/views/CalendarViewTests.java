@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package views;
 
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.Test;
 
@@ -23,13 +26,25 @@ import utils.Utils;
 
 public class CalendarViewTests extends UITest {
 
+   private String getCalendarProfileName(final String profileName) {
+
+      return Messages.Slideout_CalendarOptions_Label_AppPrefix + UI.SPACE + UI.SYMBOL_COLON + UI.SPACE + profileName;
+   }
+
    @Test
    void openCalendarView() {
 
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       final SWTBotView calendarView = Utils.showView(bot, "Calendar"); //$NON-NLS-1$
 
-      bot.comboBox(2).setSelection("App : Classic"); //$NON-NLS-1$
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Default));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_II));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_III));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_II));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_III));
+      bot.comboBox(2).setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
 
       calendarView.close();
    }
