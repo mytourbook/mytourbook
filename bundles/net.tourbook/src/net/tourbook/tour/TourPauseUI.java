@@ -151,14 +151,6 @@ public class TourPauseUI implements IColorSelectorListener {
          _spinner = spinner;
       }
 
-      private void onResetValue(final Spinner spinner) {
-
-         spinner.setSelection(0);
-         spinner.setFocus();
-
-         onChangeUI();
-      }
-
       @Override
       public void run() {
 
@@ -493,6 +485,14 @@ public class TourPauseUI implements IColorSelectorListener {
       enableControls();
 
       _changeUIListener.onChangeUI_External();
+   }
+
+   private void onResetValue(final Spinner spinner) {
+
+      spinner.setSelection(0);
+      spinner.setFocus();
+
+      onChangeUI();
    }
 
    public void resetToDefaults() {
