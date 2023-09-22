@@ -704,16 +704,12 @@ public class TourFilterManager {
 //
       allConfigs.add(new TourFilterFieldConfig(OtherMessages.COLUMN_FACTORY_CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
 
-      final TourFilterFieldOperator[] fieldOperators = new TourFilterFieldOperator[2];
-      fieldOperators[0] = TourFilterFieldOperator.LESS_THAN;
-      fieldOperators[1] = TourFilterFieldOperator.GREATER_THAN;
-
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_AirQuality)
                   .fieldId(TourFilterFieldId.WEATHER_AIRQUALITY)
                   .fieldType(TourFilterFieldType.ENUMERATION)
-                  .fieldOperators(fieldOperators)
+                  .fieldOperators(new TourFilterFieldOperator[] { TourFilterFieldOperator.EQUALS, TourFilterFieldOperator.NOT_EQUALS })
                   .values(VALUES_AIRQUALITY));
 
       allConfigs.add(
