@@ -728,7 +728,6 @@ public class TourFilterManager {
                   .numDigits(1)
                   .fieldValueProvider(_fieldValueProvider_Temperature));
 
-
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Temperature_FromDevice)
