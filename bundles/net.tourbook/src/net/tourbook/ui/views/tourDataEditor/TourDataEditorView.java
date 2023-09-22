@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -3951,7 +3950,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   // link: set default
 
                   _linkDefaultTimeZone = new Link(actionContainer, SWT.NONE);
-                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
+                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefaultTimeZone);
                   _linkDefaultTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetDefault()));
                   _tk.adapt(_linkDefaultTimeZone, true, true);
                }
@@ -6848,7 +6847,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          case 1: // Good - green
 
-            backgroundColor = isDarkTheme ? new Color(0, 175, 0) : new Color(0, 175, 0);
+            backgroundColor = new Color(0, 175, 0);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
 
             break;
@@ -6862,19 +6861,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          case 3: // Moderate - orange
 
-            backgroundColor = isDarkTheme ? new Color(255, 128, 0) : new Color(255, 128, 0);
+            backgroundColor = new Color(255, 128, 0);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
          case 4: // Poor - red
 
-            backgroundColor = isDarkTheme ? new Color(230, 0, 0) : new Color(230, 0, 0);
+            backgroundColor = new Color(230, 0, 0);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
          case 5: // Very poor - pink
 
-            backgroundColor = isDarkTheme ? new Color(227, 0, 227) : new Color(227, 0, 227);
+            backgroundColor = new Color(227, 0, 227);
             foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
@@ -7197,10 +7196,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start)
                   .boxed()
-                  .collect(Collectors.toList());
+                  .toList();
             final List<Long> listPausedTime_End = Arrays.stream(_tourData.getPausedTime_End())
                   .boxed()
-                  .collect(Collectors.toList());
+                  .toList();
 
             List<Long> listPausedTime_Data = null;
             final long[] pausedTime_Data = _tourData.getPausedTime_Data();
@@ -7209,7 +7208,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                listPausedTime_Data = Arrays.stream(_tourData.getPausedTime_Data())
                      .boxed()
-                     .collect(Collectors.toList());
+                     .toList();
             }
 
             _tourData.finalizeTour_TimerPauses(listPausedTime_Start,
@@ -8061,16 +8060,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             selectedTourData = tourData;
          }
 
-      } else if (selection instanceof SelectionChartInfo) {
+      } else if (selection instanceof final SelectionChartInfo chartInfo) {
 
-         final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
          final ChartDataModel chartDataModel = chartInfo.chartDataModel;
          if (chartDataModel != null) {
 
             final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-            if (tourId instanceof Long) {
+            if (tourId instanceof final Long tourIdLong) {
 
-               final TourData tourData = getTourData((Long) tourId);
+               final TourData tourData = getTourData(tourIdLong);
                if (tourData != null) {
 
                   _selectionTourId = tourData.getTourId();
@@ -8086,9 +8084,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
          }
 
-      } else if (selection instanceof SelectionChartXSliderPosition) {
-
-         final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
+      } else if (selection instanceof final SelectionChartXSliderPosition xSliderPosition) {
 
          final Chart chart = xSliderPosition.getChart();
          if (chart != null) {
@@ -8097,9 +8093,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             if (chartDataModel != null) {
 
                final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-               if (tourId instanceof Long) {
+               if (tourId instanceof final Long tourIdLong) {
 
-                  final TourData tourData = getTourData((Long) tourId);
+                  final TourData tourData = getTourData(tourIdLong);
                   if (tourData != null) {
 
                      _selectionTourId = tourData.getTourId();
@@ -9596,7 +9592,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _linkDefaultTimeZone.setToolTipText(
             NLS.bind(
-                  Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
+                  Messages.Tour_Editor_Link_SetDefaultTimeZone_Tooltip,
                   TimeTools.getDefaultTimeZoneId()));
 
       updateUI_TimeZone();

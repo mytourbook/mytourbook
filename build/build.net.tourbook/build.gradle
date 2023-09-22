@@ -56,6 +56,7 @@ sonarqube {
     property 'sonar.java.binaries',                  '.'
     property 'sonar.java.libraries',                 'bundles/net.tourbook.ext.jars/**/*.jar'
     property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml, ../../mytourbook-BUILD-autocreated/core/net.tourbook.ui.tests/target/site/jacoco-aggregate/jacoco.xml'
+    property 'sonar.java.source',                    '17'
   }
 }
 

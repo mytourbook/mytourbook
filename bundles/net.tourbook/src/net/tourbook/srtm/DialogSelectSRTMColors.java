@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -317,7 +317,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(nameContainer);
          {
             /*
-             * lable: profile name
+             * Label: profile name
              */
             Label label = new Label(nameContainer, SWT.NONE);
             label.setText(Messages.dialog_adjust_srtm_colors_label_profile_name);
@@ -329,7 +329,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtProfileName);
 
             /*
-             * lable: tile path
+             * Label: tile path
              */
             label = new Label(nameContainer, SWT.NONE);
             label.setText(Messages.dialog_adjust_srtm_colors_label_tile_path);
@@ -397,7 +397,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(shadowContainer);
          {
             /*
-             * lable: shadow info
+             * Label: shadow info
              */
             _lblShadowValue = new Label(shadowContainer, SWT.NONE);
             GridDataFactory.swtDefaults().indent(20, 0).applyTo(_lblShadowValue);

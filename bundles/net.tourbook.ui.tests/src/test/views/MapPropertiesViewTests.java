@@ -32,9 +32,9 @@ public class MapPropertiesViewTests extends UITest {
 
       //Open the Map Properties view
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.SYSTEM).expand().getNode(Utils.MAPPROPERTIES_VIEW_NAME).select();
+      bot.tree().getTreeItem(WorkbenchTests.SYSTEM).expand().getNode(Utils.VIEW_NAME_MAPPROPERTIES).select();
       bot.button("Open").click(); //$NON-NLS-1$
-      final SWTBotView mapPropertiesView = Utils.showView(bot, Utils.MAPPROPERTIES_VIEW_NAME);
+      final SWTBotView mapPropertiesView = Utils.showView(bot, Utils.VIEW_NAME_MAPPROPERTIES);
 
       bot.checkBox(Messages.Map_Properties_ShowTileInfo).select();
       bot.checkBox(Messages.Map_Properties_ShowTileBorder).select();

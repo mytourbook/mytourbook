@@ -611,8 +611,8 @@
                <command
                   commandId   ="command.net.tourbook.ui.views.TourMarkerAllView"
                   icon        ="icons/tour-marker-all.png"
-                  label       ="%View_Name_TourMarkerAll"
-                  mnemonic    ="%View_Name_TourMarkerAll_Mnemonic"/>
+                  label       ="%View_Name_AllTourMarkers"
+                  mnemonic    ="%View_Name_AllTourMarkers_Mnemonic"/>
 
                
             <!-- GROUP: Sensors -->
@@ -1303,7 +1303,7 @@
 
       <command
          id             ="command.net.tourbook.ui.views.TourMarkerAllView"
-         name           ="%View_Name_TourMarkerAll"
+         name           ="%View_Name_AllTourMarkers"
          defaultHandler ="net.tourbook.ui.views.tourMarker.ActionHandler_OpenView_TourMarkerAll"
       />
 
@@ -1702,7 +1702,7 @@
             id          ="net.tourbook.ui.views.TourMarkerAllView"
             class       ="net.tourbook.ui.views.tourMarker.TourMarkerAllView"
             icon        ="icons/tour-marker-all.png"
-            name        ="%View_Name_TourMarkerAll"/>
+            name        ="%View_Name_AllTourMarkers"/>
 
 
       <!-- 2. Tour Properties -->

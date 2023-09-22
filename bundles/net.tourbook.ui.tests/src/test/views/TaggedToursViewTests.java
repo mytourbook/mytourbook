@@ -38,12 +38,12 @@ public class TaggedToursViewTests extends UITest {
 
       //Open the Tagged Tours view
       Utils.openOtherMenu(bot);
-      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(Utils.TAGGEDTOURS_VIEW_NAME).select();
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_DIRECTORIES).expand().getNode(Utils.VIEW_NAME_TAGGEDTOURS).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
       Utils.getTour(bot);
 
-      final SWTBotView taggedToursView = Utils.showView(bot, Utils.TAGGEDTOURS_VIEW_NAME);
+      final SWTBotView taggedToursView = Utils.showView(bot, Utils.VIEW_NAME_TAGGEDTOURS);
 
       final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   9").select(); //$NON-NLS-1$
       assertNotNull(item);

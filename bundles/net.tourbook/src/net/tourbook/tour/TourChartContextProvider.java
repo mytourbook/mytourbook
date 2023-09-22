@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,188 +46,187 @@ import org.eclipse.swt.widgets.Display;
  */
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-	private TourEditor						_tourEditor;
+   private TourEditor                     _tourEditor;
 
-	private ActionEditQuick					_actionQuickEdit;
-	private ActionEditTour					_actionEditTour;
-	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	_actionAdjustAltitude;
+   private ActionEditQuick                _actionQuickEdit;
+   private ActionEditTour                 _actionEditTour;
+   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
+   private ActionOpenAdjustAltitudeDialog _actionAdjustAltitude;
 
-	private ActionCreateRefTour				_actionCreateRefTour;
-	private ActionCreateMarkerFromSlider				_actionCreateMarker;
-	private ActionCreateMarkerFromSlider				_actionCreateMarkerLeft;
-	private ActionCreateMarkerFromSlider				_actionCreateMarkerRight;
+   private ActionCreateRefTour            _actionCreateRefTour;
+   private ActionCreateMarkerFromSlider   _actionCreateMarker;
+   private ActionCreateMarkerFromSlider   _actionCreateMarkerLeft;
+   private ActionCreateMarkerFromSlider   _actionCreateMarkerRight;
 
-	private ActionSetTourTypeMenu			_actionSetTourType;
-	private TagMenuManager					_tagMenuMgr;
+   private ActionSetTourTypeMenu          _actionSetTourType;
+   private TagMenuManager                 _tagMenuMgr;
 
-	private ChartXSlider					_leftSlider;
-	private ChartXSlider					_rightSlider;
+   private ChartXSlider                   _leftSlider;
+   private ChartXSlider                   _rightSlider;
 
-	/**
-	 * @param tourEditor
-	 * @param tourChartView
-	 */
-	TourChartContextProvider(final TourEditor tourEditor) {
+   /**
+    * @param tourEditor
+    */
+   TourChartContextProvider(final TourEditor tourEditor) {
 
-		_tourEditor = tourEditor;
-		final TourChart tourChart = _tourEditor.getTourChart();
+      _tourEditor = tourEditor;
+      final TourChart tourChart = _tourEditor.getTourChart();
 
-		_actionQuickEdit = new ActionEditQuick(this);
-		_actionEditTour = new ActionEditTour(this);
+      _actionQuickEdit = new ActionEditQuick(this);
+      _actionEditTour = new ActionEditTour(this);
 
-		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		_actionOpenMarkerDialog.setEnabled(true);
+      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+      _actionOpenMarkerDialog.setEnabled(true);
 
-		_actionAdjustAltitude = new ActionOpenAdjustAltitudeDialog(this);
-		_actionAdjustAltitude.setEnabled(true);
+      _actionAdjustAltitude = new ActionOpenAdjustAltitudeDialog(this);
+      _actionAdjustAltitude.setEnabled(true);
 
-		_actionCreateRefTour = new ActionCreateRefTour(tourChart);
+      _actionCreateRefTour = new ActionCreateRefTour(tourChart);
 
-		_actionCreateMarker = new ActionCreateMarkerFromSlider(this, //
-				Messages.RefTour_Action_CreaateMarker,
-				true);
+      _actionCreateMarker = new ActionCreateMarkerFromSlider(this, //
+            Messages.RefTour_Action_CreateMarker,
+            true);
 
-		_actionCreateMarkerLeft = new ActionCreateMarkerFromSlider(
-				this,
-				Messages.RefTour_Action_CreateLeftMarker,
-				true);
+      _actionCreateMarkerLeft = new ActionCreateMarkerFromSlider(
+            this,
+            Messages.RefTour_Action_CreateLeftMarker,
+            true);
 
-		_actionCreateMarkerRight = new ActionCreateMarkerFromSlider(
-				this,
-				Messages.RefTour_Action_CreateRightMarker,
-				false);
+      _actionCreateMarkerRight = new ActionCreateMarkerFromSlider(
+            this,
+            Messages.RefTour_Action_CreateRightMarker,
+            false);
 
-		_actionSetTourType = new ActionSetTourTypeMenu(this);
+      _actionSetTourType = new ActionSetTourTypeMenu(this);
 
-		_tagMenuMgr = new TagMenuManager(this, true);
-	}
+      _tagMenuMgr = new TagMenuManager(this, true);
+   }
 
-	/**
-	 * enable actions
-	 */
-	private void enableActions() {
+   /**
+    * enable actions
+    */
+   private void enableActions() {
 
-		final TourData tourData = _tourEditor.getTourData();
-		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
-		final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
+      final TourData tourData = _tourEditor.getTourData();
+      final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
+      final Set<TourTag> tourTags = tourData == null ? null : tourData.getTourTags();
 
-		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		if (tourData != null) {
-			final TourType tourType = tourData.getTourType();
-			existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-		}
+      long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      if (tourData != null) {
+         final TourType tourType = tourData.getTourType();
+         existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+      }
 
-		_actionQuickEdit.setEnabled(isDataAvailable);
-		_actionEditTour.setEnabled(isDataAvailable);
+      _actionQuickEdit.setEnabled(isDataAvailable);
+      _actionEditTour.setEnabled(isDataAvailable);
 
-		_tagMenuMgr.enableTagActions(//
-				isDataAvailable,
-				isDataAvailable && tourTags.size() > 0,
-				tourTags);
+      _tagMenuMgr.enableTagActions(//
+            isDataAvailable,
+            isDataAvailable && tourTags.size() > 0,
+            tourTags);
 
-		TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
-	}
+      TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
+   }
 
-	@Override
-	public void fillBarChartContextMenu(final IMenuManager menuMgr,
-										final int hoveredBarSerieIndex,
-										final int hoveredBarValueIndex) {}
+   @Override
+   public void fillBarChartContextMenu(final IMenuManager menuMgr,
+                                       final int hoveredBarSerieIndex,
+                                       final int hoveredBarValueIndex) {}
 
-	@Override
-	public void fillContextMenu(final IMenuManager menuMgr,
-								final int mouseDownDevPositionX,
-								final int mouseDownDevPositionY) {
+   @Override
+   public void fillContextMenu(final IMenuManager menuMgr,
+                               final int mouseDownDevPositionX,
+                               final int mouseDownDevPositionY) {
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionQuickEdit);
-		menuMgr.add(_actionEditTour);
-		menuMgr.add(_actionOpenMarkerDialog);
-		menuMgr.add(_actionAdjustAltitude);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionQuickEdit);
+      menuMgr.add(_actionEditTour);
+      menuMgr.add(_actionOpenMarkerDialog);
+      menuMgr.add(_actionAdjustAltitude);
 
-		// tour tag actions
+      // tour tag actions
       _tagMenuMgr.fillTagMenu(menuMgr, false);
 
-		// tour type actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      // tour type actions
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionSetTourType);
+      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	@Override
-	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
-										final ChartXSlider leftSlider,
-										final ChartXSlider rightSlider) {
+   @Override
+   public void fillXSliderContextMenu(final IMenuManager menuMgr,
+                                      final ChartXSlider leftSlider,
+                                      final ChartXSlider rightSlider) {
 
-		_leftSlider = leftSlider;
-		_rightSlider = rightSlider;
+      _leftSlider = leftSlider;
+      _rightSlider = rightSlider;
 
-		if (leftSlider != null || rightSlider != null) {
+      if (leftSlider != null || rightSlider != null) {
 
-			// marker actions
-			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(_actionCreateMarker);
-			} else {
-				menuMgr.add(_actionCreateMarkerLeft);
-				menuMgr.add(_actionCreateMarkerRight);
-			}
+         // marker actions
+         if (leftSlider != null && rightSlider == null) {
+            menuMgr.add(_actionCreateMarker);
+         } else {
+            menuMgr.add(_actionCreateMarkerLeft);
+            menuMgr.add(_actionCreateMarkerRight);
+         }
 
-			menuMgr.add(_actionCreateRefTour);
-			menuMgr.add(new Separator());
+         menuMgr.add(_actionCreateRefTour);
+         menuMgr.add(new Separator());
 
-			// action: create reference tour
-			final TourData tourData = _tourEditor.getTourChart().getTourData();
-			final boolean canCreateRefTours = tourData.altitudeSerie != null && tourData.distanceSerie != null;
+         // action: create reference tour
+         final TourData tourData = _tourEditor.getTourChart().getTourData();
+         final boolean canCreateRefTours = tourData.altitudeSerie != null && tourData.distanceSerie != null;
 
-			_actionCreateRefTour.setEnabled(canCreateRefTours);
+         _actionCreateRefTour.setEnabled(canCreateRefTours);
 
-		}
-	}
+      }
+   }
 
-	@Override
-	public Chart getChart() {
-		return _tourEditor.getTourChart();
-	}
+   @Override
+   public Chart getChart() {
+      return _tourEditor.getTourChart();
+   }
 
-	@Override
-	public ChartXSlider getLeftSlider() {
-		return _leftSlider;
-	}
+   @Override
+   public ChartXSlider getLeftSlider() {
+      return _leftSlider;
+   }
 
-	@Override
-	public ChartXSlider getRightSlider() {
-		return _rightSlider;
-	}
+   @Override
+   public ChartXSlider getRightSlider() {
+      return _rightSlider;
+   }
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> tourList = new ArrayList<>();
-		tourList.add(_tourEditor.getTourData());
+      final ArrayList<TourData> tourList = new ArrayList<>();
+      tourList.add(_tourEditor.getTourData());
 
-		return tourList;
-	}
+      return tourList;
+   }
 
-	@Override
-	public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
-		_tagMenuMgr.onHideMenu();
-	}
+   @Override
+   public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+      _tagMenuMgr.onHideMenu();
+   }
 
-	@Override
-	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
+   @Override
+   public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
 
-		_tagMenuMgr.onShowMenu(//
-				menuEvent,
-				menuParentControl,
-				Display.getCurrent().getCursorLocation(),
-				null);
-	}
+      _tagMenuMgr.onShowMenu(//
+            menuEvent,
+            menuParentControl,
+            Display.getCurrent().getCursorLocation(),
+            null);
+   }
 
-	@Override
-	public boolean showOnlySliderContextMenu() {
-		return false;
-	}
+   @Override
+   public boolean showOnlySliderContextMenu() {
+      return false;
+   }
 
 }
