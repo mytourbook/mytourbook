@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * Chart context provider for the tour viewer (which is currently the TourEditor)
  */
-class TourChartContextProvider implements IChartContextProvider, ITourProvider {
+public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
    private TourEditor                     _tourEditor;
 
