@@ -2121,7 +2121,7 @@ public class TourInfoUI {
       _lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
       // Average elevation
-      final float avgElevation = (float) _tourData.getElevation_Avg() / UI.UNIT_VALUE_ELEVATION;
+      final double avgElevation = _tourData.getElevation_Avg();
       _lblAvgElevation.setText(Integer.toString((int) avgElevation));
       _lblAvgElevationUnit.setText(UI.UNIT_LABEL_ELEVATION);
 

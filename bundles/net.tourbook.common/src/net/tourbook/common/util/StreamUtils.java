@@ -15,25 +15,16 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
-import java.util.Arrays;
 import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
-/**
- * Stream utilities.
- */
 public final class StreamUtils {
 
    /**
-    * Computes the average value for a given tour serie array of floats,
-    * start index and end index
+    * Computes the average value for a given tour serie array of floats
     *
     * @param serie
     *           The Tour serie
-    * @param startIndex
-    *           The start index
-    * @param endIndex
-    *           The end index
     * @return The average value as a {@link Double}
     */
    public static double computeAverage(final float[] serie) {
@@ -69,8 +60,7 @@ public final class StreamUtils {
          return averageValue;
       }
 
-      final double[] serieDouble = IntStream.range(startIndex, endIndex).mapToDouble(i -> serie[i]).toArray();
-      final OptionalDouble averageDouble = Arrays.stream(serieDouble).average();
+      final OptionalDouble averageDouble = IntStream.range(startIndex, endIndex).mapToDouble(i -> serie[i]).average();
 
       if (averageDouble.isPresent()) {
          averageValue = averageDouble.getAsDouble();

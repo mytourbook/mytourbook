@@ -8425,7 +8425,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public double getElevation_Avg() {
 
-      return StreamUtils.computeAverage(altitudeSerie);
+      return StreamUtils.computeAverage(getAltitudeSerie());
    }
 
    /**
