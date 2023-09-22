@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -199,7 +199,7 @@ public class FormatManager {
       return _temperatureFormatter_Summary.printDouble(value);
    }
 
-   private static IValueFormatter getNumberFormatter(final String formatName) {
+   public static IValueFormatter getNumberFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
 
@@ -223,7 +223,7 @@ public class FormatManager {
       }
    }
 
-   private static IValueFormatter getTimeFormatter(final String formatName) {
+   public static IValueFormatter getTimeFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.TIME_HH.name())) {
 

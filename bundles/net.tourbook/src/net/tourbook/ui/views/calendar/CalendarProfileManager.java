@@ -27,15 +27,8 @@ import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
-import net.tourbook.common.formatter.ValueFormatter_Time_HH;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -315,13 +308,6 @@ class CalendarProfileManager {
 
 // SET_FORMATTING_OFF
 
-   private static final IValueFormatter   _valueFormatter_Number_1_0  = new ValueFormatter_Number_1_0(false);
-   private static final IValueFormatter   _valueFormatter_Number_1_1  = new ValueFormatter_Number_1_1(false);
-   private static final IValueFormatter   _valueFormatter_Number_1_2  = new ValueFormatter_Number_1_2(false);
-   private static final IValueFormatter   _valueFormatter_Number_1_3  = new ValueFormatter_Number_1_3(false);
-   private static final IValueFormatter   _valueFormatter_Time_HH     = new ValueFormatter_Time_HH();
-   private static final IValueFormatter   _valueFormatter_Time_HHMM   = new ValueFormatter_Time_HHMM();
-   private static final IValueFormatter   _valueFormatter_Time_HHMMSS = new ValueFormatter_Time_HHMMSS();
    static {
 
       /*
@@ -911,7 +897,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -968,7 +954,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1024,7 +1010,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1121,7 +1107,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1183,7 +1169,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1289,7 +1275,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1340,7 +1326,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1406,7 +1392,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
+            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1457,7 +1443,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Time(valueFormat.name());
+            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
          }
       };
 
@@ -1514,7 +1500,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Time(valueFormat.name());
+            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
          }
       };
 
@@ -1570,7 +1556,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Time(valueFormat.name());
+            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
          }
       };
 
@@ -1626,7 +1612,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Time(valueFormat.name());
+            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
          }
       };
 
@@ -1683,7 +1669,7 @@ class CalendarProfileManager {
          void setValueFormat(final ValueFormat valueFormat) {
 
             valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Time(valueFormat.name());
+            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
          }
       };
 
@@ -3045,54 +3031,6 @@ class CalendarProfileManager {
 
    static DayContentColor_ComboData[] getAllTourContentColor_ComboData() {
       return _allTourContentColor_ComboData;
-   }
-
-   private static IValueFormatter getFormatter_Number(final String formatName) {
-
-      if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
-
-         return _valueFormatter_Number_1_0;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_1.name())) {
-
-         return _valueFormatter_Number_1_1;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_2.name())) {
-
-         return _valueFormatter_Number_1_2;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_3.name())) {
-
-         return _valueFormatter_Number_1_3;
-
-      } else {
-
-         // default
-
-         return _valueFormatter_Number_1_0;
-      }
-   }
-
-   private static IValueFormatter getFormatter_Time(final String formatName) {
-
-      if (formatName.equals(ValueFormat.TIME_HH.name())) {
-
-         return _valueFormatter_Time_HH;
-
-      } else if (formatName.equals(ValueFormat.TIME_HH_MM.name())) {
-
-         return _valueFormatter_Time_HHMM;
-
-      } else if (formatName.equals(ValueFormat.TIME_HH_MM_SS.name())) {
-
-         return _valueFormatter_Time_HHMMSS;
-
-      } else {
-
-         // default
-
-         return _valueFormatter_Time_HHMMSS;
-      }
    }
 
    private static CalendarProfile getProfile_Calendar() {
