@@ -3776,10 +3776,6 @@ class CalendarProfileManager {
             _tourFormatter_Time_Break.setValueFormat(valueFormat);
             break;
 
-         case TRAININGLOAD_TSS:
-            _tourFormatter_Time_Recorded.setValueFormat(valueFormat);
-            break;
-
          case WEATHER_ICON:
             _tourFormatter_Weather_Icon.setValueFormat(valueFormat);
             break;
