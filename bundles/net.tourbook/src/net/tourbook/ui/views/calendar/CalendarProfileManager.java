@@ -1404,7 +1404,7 @@ class CalendarProfileManager {
 
    private static DataFormatter createFormatter_Time_Break() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final TimeDataFormatter dataFormatter = new TimeDataFormatter(
             FormatterID.TIME_BREAK,
             Messages.Calendar_Profile_Value_BreakTime,
             GraphColorManager.PREF_GRAPH_TIME) {
@@ -1424,27 +1424,6 @@ class CalendarProfileManager {
                return UI.EMPTY_STRING;
             }
          }
-
-         @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.TIME_HH_MM;
-         }
-
-         @Override
-         public ValueFormat[] getValueFormats() {
-
-            return new ValueFormat[] {
-                  ValueFormat.TIME_HH,
-                  ValueFormat.TIME_HH_MM,
-                  ValueFormat.TIME_HH_MM_SS };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
-         }
       };
 
       // setup default formatter
@@ -1460,7 +1439,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Time_Elapsed() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final TimeDataFormatter dataFormatter = new TimeDataFormatter(
             FormatterID.TIME_ELAPSED,
             Messages.Calendar_Profile_Value_ElapsedTime,
             GraphColorManager.PREF_GRAPH_TIME) {
@@ -1481,27 +1460,6 @@ class CalendarProfileManager {
                return UI.EMPTY_STRING;
             }
          }
-
-         @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.TIME_HH_MM;
-         }
-
-         @Override
-         public ValueFormat[] getValueFormats() {
-
-            return new ValueFormat[] {
-                  ValueFormat.TIME_HH,
-                  ValueFormat.TIME_HH_MM,
-                  ValueFormat.TIME_HH_MM_SS };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
-         }
       };
 
       // setup default formatter
@@ -1517,7 +1475,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Time_Moving() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final TimeDataFormatter dataFormatter = new TimeDataFormatter(
             FormatterID.TIME_MOVING,
             Messages.Calendar_Profile_Value_MovingTime,
             GraphColorManager.PREF_GRAPH_TIME) {
@@ -1537,27 +1495,6 @@ class CalendarProfileManager {
                return UI.EMPTY_STRING;
             }
          }
-
-         @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.TIME_HH_MM;
-         }
-
-         @Override
-         public ValueFormat[] getValueFormats() {
-
-            return new ValueFormat[] {
-                  ValueFormat.TIME_HH,
-                  ValueFormat.TIME_HH_MM,
-                  ValueFormat.TIME_HH_MM_SS };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
-         }
       };
 
       // setup default formatter
@@ -1573,7 +1510,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Time_Paused() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final TimeDataFormatter dataFormatter = new TimeDataFormatter(
             FormatterID.TIME_PAUSED,
             Messages.Calendar_Profile_Value_PausedTime,
             GraphColorManager.PREF_GRAPH_TIME) {
@@ -1593,27 +1530,6 @@ class CalendarProfileManager {
                return UI.EMPTY_STRING;
             }
          }
-
-         @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.TIME_HH_MM;
-         }
-
-         @Override
-         public ValueFormat[] getValueFormats() {
-
-            return new ValueFormat[] {
-                  ValueFormat.TIME_HH,
-                  ValueFormat.TIME_HH_MM,
-                  ValueFormat.TIME_HH_MM_SS };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
-         }
       };
 
       // setup default formatter
@@ -1629,7 +1545,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Time_Recorded() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final TimeDataFormatter dataFormatter = new TimeDataFormatter(
             FormatterID.TIME_RECORDED,
             Messages.Calendar_Profile_Value_RecordedTime,
             GraphColorManager.PREF_GRAPH_TIME) {
@@ -1649,27 +1565,6 @@ class CalendarProfileManager {
 
                return UI.EMPTY_STRING;
             }
-         }
-
-         @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.TIME_HH_MM;
-         }
-
-         @Override
-         public ValueFormat[] getValueFormats() {
-
-            return new ValueFormat[] {
-                  ValueFormat.TIME_HH,
-                  ValueFormat.TIME_HH_MM,
-                  ValueFormat.TIME_HH_MM_SS };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getTimeFormatter(valueFormat.name());
          }
       };
 
