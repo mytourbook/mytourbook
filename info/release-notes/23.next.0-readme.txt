@@ -46,6 +46,9 @@ New
 * Calendar - Weekly summary (Frederic)
   - Training Stress Score (TSS)
 
+* Tour Filter (Frederic)
+  - Added a property to filter tours based on their measured air quality
+
 * Tour Info Tooltip (Frederic)
   - Added the average elevation
 
