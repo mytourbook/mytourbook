@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourInfo_View extends ViewPart {
+public class TourInfoView extends ViewPart {
 
    public static final String            ID         = "net.tourbook.ui.views.TourInfo_View"; //$NON-NLS-1$
 
@@ -106,7 +106,7 @@ public class TourInfo_View extends ViewPart {
       _postSelectionListener = new ISelectionListener() {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourInfo_View.this) {
+            if (part == TourInfoView.this) {
                return;
             }
             onSelectionChanged(selection);
@@ -117,74 +117,74 @@ public class TourInfo_View extends ViewPart {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-            if (part == TourInfo_View.this) {
-               return;
-            }
+         if (part == TourInfoView.this) {
+            return;
+         }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 
-               if (!modifiedTours.isEmpty()) {
+            if (!modifiedTours.isEmpty()) {
 
-                  // update modified tour
+               // update modified tour
 
-                  if (_tourData == null) {
+               if (_tourData == null) {
 
-                     // this happens when tour is opened/edited from the tour tooltip and saved
+                  // this happens when tour is opened/edited from the tour tooltip and saved
 
-                     _tourData = modifiedTours.get(0);
+                  _tourData = modifiedTours.get(0);
 
-                     updateUI();
+                  updateUI();
 
-                  } else {
+               } else {
 
-                     final long viewTourId = _tourData.getTourId();
+                  final long viewTourId = _tourData.getTourId();
 
-                     for (final TourData tourData : modifiedTours) {
-                        if (tourData.getTourId() == viewTourId) {
+                  for (final TourData tourData : modifiedTours) {
+                     if (tourData.getTourId() == viewTourId) {
 
-                           // get modified tour
-                           _tourData = tourData;
+                        // get modified tour
+                        _tourData = tourData;
 
-                           // remove old tour data from the selection provider
-                           _postSelectionProvider.clearSelection();
+                        // remove old tour data from the selection provider
+                        _postSelectionProvider.clearSelection();
 
-                           updateUI();
+                        updateUI();
 
-                           // nothing more to do, the view contains only one tour
-                           return;
-                        }
+                        // nothing more to do, the view contains only one tour
+                        return;
                      }
                   }
                }
-
-            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-               clearView();
-
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-               if (eventData instanceof SelectionTourMarker) {
-
-                  final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
-
-                  if (tourData != _tourData) {
-
-                     _tourData = tourData;
-
-                     updateUI();
-                  }
-               }
             }
+
+         } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
+         } else if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
+
+            onSelectionChanged(selection);
+
+         } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof final SelectionTourMarker selectionTourMarker) {
+
+            final TourData tourData = selectionTourMarker.getTourData();
+
+            if (tourData != _tourData) {
+
+               _tourData = tourData;
+
+               updateUI();
+            }
+
+         } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED && eventData instanceof final TourData tourData) {
+
+            _tourData = tourData;
+
+            updateUI();
          }
       };
 

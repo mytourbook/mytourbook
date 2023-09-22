@@ -351,7 +351,6 @@ public class TourInfoUI {
    private Label            _lblVerticalSpeed_Distance_Relative_Loss;
    //
    private Label            _lblVerticalSpeed_Elevation_Header;
-   private Label            _lblVerticalSpeed_Elevation_Flat;
    private Label            _lblVerticalSpeed_Elevation_Gain;
    private Label            _lblVerticalSpeed_Elevation_Loss;
    //
@@ -1062,9 +1061,9 @@ public class TourInfoUI {
             final Label label = createUI_Label(speedContainer, OtherMessages.TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT);
             gd.applyTo(label);
 
-            // elevation
-            _lblVerticalSpeed_Elevation_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
-            gd.applyTo(_lblVerticalSpeed_Elevation_Flat);
+            // a flat elevation does not make sense
+            final Label labelElevation_Flat = createUI_Label_Trailing(speedContainer, UI.SPACE1);
+            gd.applyTo(labelElevation_Flat);
 
             // distance
             _lblVerticalSpeed_Distance_Flat = createUI_Label_Trailing(speedContainer, UI.EMPTY_STRING);
@@ -2323,7 +2322,6 @@ public class TourInfoUI {
       final float vertSpeed_DistanceGain  = _tourData.verticalSpeed_Up_Distance;
       final float vertSpeed_DistanceLoss  = _tourData.verticalSpeed_Down_Distance;
 
-      final float vertSpeed_ElevationFlat = _tourData.verticalSpeed_Flat_Elevation;
       final float vertSpeed_ElevationGain = _tourData.verticalSpeed_Up_Elevation;
       final float vertSpeed_ElevationLoss = _tourData.verticalSpeed_Down_Elevation;
 
@@ -2368,7 +2366,6 @@ public class TourInfoUI {
       _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceLoss / sumDistance * 100));
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Flat          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationFlat));
       _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationGain));
       _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationLoss));
 
@@ -2396,7 +2393,6 @@ public class TourInfoUI {
       _lblVerticalSpeed_Distance_Relative_Loss  .setToolTipText(tooltip);
 
       _lblVerticalSpeed_Elevation_Header        .setToolTipText(tooltip);
-      _lblVerticalSpeed_Elevation_Flat          .setToolTipText(tooltip);
       _lblVerticalSpeed_Elevation_Gain          .setToolTipText(tooltip);
       _lblVerticalSpeed_Elevation_Loss          .setToolTipText(tooltip);
 

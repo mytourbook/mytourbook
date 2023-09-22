@@ -449,7 +449,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private float                          _vertSpeed_DistanceFlat;
    private float                          _vertSpeed_DistanceGain;
    private float                          _vertSpeed_DistanceLoss;
-   private float                          _vertSpeed_ElevationFlat;
    private float                          _vertSpeed_ElevationGain;
    private float                          _vertSpeed_ElevationLoss;
    //
@@ -556,7 +555,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblVerticalSpeed_Distance_Relative_Loss;
    //
    private Label           _lblVerticalSpeed_Elevation_Header;
-   private Label           _lblVerticalSpeed_Elevation_Flat;
    private Label           _lblVerticalSpeed_Elevation_Gain;
    private Label           _lblVerticalSpeed_Elevation_Loss;
    //
@@ -1805,7 +1803,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _vertSpeed_DistanceGain = 0;
       _vertSpeed_DistanceLoss = 0;
 
-      _vertSpeed_ElevationFlat = 0;
       _vertSpeed_ElevationGain = 0;
       _vertSpeed_ElevationLoss = 0;
 
@@ -1822,36 +1819,41 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       int segmentStartIndex = 0;
 
-      for (int dpIndex = 1; dpIndex < allSimplifiedPoints.length; dpIndex++) {
+      System.out.println();
+      System.out.println("Segmenter");
+      System.out.println();
+// TODO remove SYSTEM.OUT.PRINTLN
 
-         final DPPoint segmentEndDpPoint = allSimplifiedPoints[dpIndex];
+      for (int segmentIndex = 1; segmentIndex < allSimplifiedPoints.length; segmentIndex++) {
+
+         final DPPoint segmentEndDpPoint = allSimplifiedPoints[segmentIndex];
 
          final int serieIndex = segmentEndDpPoint.serieIndex;
          final int segmentEndIndex = serieIndex;
 
          final int segmentEndTime = timeSerie[serieIndex];
-         final float segmentElevation = elevationSerie[serieIndex];
+         final float segmentEndElevation = elevationSerie[serieIndex];
          final float segmentEndDistance = distanceSerie[serieIndex];
 
-         final float distanceDiff = segmentEndDistance - segmentStartDistance;
-         final float elevationDiff = segmentElevation - segmentStartElevation;
+         final float segmentDistance = segmentEndDistance - segmentStartDistance;
+         final float segmentElevation = segmentEndElevation - segmentStartElevation;
 
-         final float currentGradient = elevationDiff * 100 / distanceDiff;
+         final float segmentGradient = segmentElevation * 100 / segmentDistance;
 
-         final int segmentFullTime = segmentEndTime - segmentStartTime;
+         final int segmentWholeTime = segmentEndTime - segmentStartTime;
          int segmentTime;
 
          if (isPaceAndSpeedFromRecordedTime) {
 
             final int segmentPausedTime = _tourData.getPausedTime(segmentStartIndex, segmentEndIndex);
-            final int segmentRecordedTime = segmentFullTime - segmentPausedTime;
+            final int segmentRecordedTime = segmentWholeTime - segmentPausedTime;
 
             segmentTime = segmentRecordedTime;
 
          } else {
 
             final int segmentBreakTime = _tourData.getBreakTime(segmentStartIndex, segmentEndIndex, breakTimeConfig);
-            final int segmentMovingTime = segmentFullTime - segmentBreakTime;
+            final int segmentMovingTime = segmentWholeTime - segmentBreakTime;
 
             segmentTime = segmentMovingTime;
          }
@@ -1876,32 +1878,42 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          }
 
-         final boolean isGainGradient = currentGradient > 0 && currentGradient >= _flatGainLoss_Gradient;
-         final boolean isLossGradient = currentGradient < 0 && currentGradient < -_flatGainLoss_Gradient;
-         final boolean isFlatGradient = isGainGradient == false && isLossGradient == false;
+         final boolean isGainGradient = segmentGradient > 0 && segmentGradient > _flatGainLoss_Gradient;
+         final boolean isLossGradient = segmentGradient < 0 && segmentGradient < -_flatGainLoss_Gradient;
+         final boolean isFlatGradient = isGainGradient == false && isLossGradient == false
+
+               || segmentGradient == 0 && _flatGainLoss_Gradient == 0;
+
+         System.out.println("%-3d  %6.2f  %6d".formatted(
+
+               segmentIndex + 1,
+               segmentElevation,
+               serieIndex
+
+         ));
+// TODO remove SYSTEM.OUT.PRINTLN
 
          if (isFlatGradient) {
 
             _vertSpeed_TimeFlat += segmentTime;
-            _vertSpeed_DistanceFlat += distanceDiff;
-            _vertSpeed_ElevationFlat += elevationDiff >= 0 ? elevationDiff : -elevationDiff;
+            _vertSpeed_DistanceFlat += segmentDistance;
 
          } else if (isGainGradient) {
 
             _vertSpeed_TimeGain += segmentTime;
-            _vertSpeed_DistanceGain += distanceDiff;
-            _vertSpeed_ElevationGain += elevationDiff;
+            _vertSpeed_DistanceGain += segmentDistance;
+            _vertSpeed_ElevationGain += segmentElevation;
 
          } else {
 
             // loss gradient
 
             _vertSpeed_TimeLoss += segmentTime;
-            _vertSpeed_DistanceLoss += distanceDiff;
-            _vertSpeed_ElevationLoss += elevationDiff;
+            _vertSpeed_DistanceLoss += segmentDistance;
+            _vertSpeed_ElevationLoss += segmentElevation;
          }
 
-         if (dpIndex == 1) {
+         if (segmentIndex == 1) {
 
             // first point
 
@@ -1911,8 +1923,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             } else {
 
-               isPrevElevationGain = (segmentElevation - segmentStartElevation) >= 0;
-               isPrevElevationLoss = (segmentElevation - segmentStartElevation) < 0;
+               isPrevElevationGain = segmentElevation >= 0;
+               isPrevElevationLoss = segmentElevation < 0;
             }
 
          } else {
@@ -1929,8 +1941,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             } else {
 
-               isCurrentElevationGain = (segmentElevation - segmentStartElevation) >= 0;
-               isCurrentElevationLoss = (segmentElevation - segmentStartElevation) < 0;
+               isCurrentElevationGain = segmentElevation >= 0;
+               isCurrentElevationLoss = segmentElevation < 0;
             }
 
             if (true
@@ -1960,7 +1972,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          segmentStartIndex = segmentEndIndex;
          segmentStartTime = segmentEndTime;
          segmentStartDistance = segmentEndDistance;
-         segmentStartElevation = segmentElevation;
+         segmentStartElevation = segmentEndElevation;
       }
 
       // add last point
@@ -2557,9 +2569,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                 */
                UI.createLabel(speedContainer, Messages.Tour_Segmenter_Label_VerticalSpeed_Flat);
 
-               // elevation
-               _lblVerticalSpeed_Elevation_Flat = new Label(speedContainer, SWT.TRAIL);
-               gd.applyTo(_lblVerticalSpeed_Elevation_Flat);
+               // a flat elevation does not make sense
+               new Label(speedContainer, SWT.NONE);
+//               final Label labelFlatElevation = new Label(speedContainer, SWT.TRAIL);
+//               gd.applyTo(labelFlatElevation);
 
                // distance
                _lblVerticalSpeed_Distance_Flat = new Label(speedContainer, SWT.TRAIL);
@@ -5169,6 +5182,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _dpToleranceElevation_MultipleTours = dpTolerance_Elevation;
       }
 
+      _prefStore.setValue(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE, _spinnerDPTolerance_FlatGainLoss.getSelection() / 100f);
+
       setTourDirty();
 
       createSegments(true);
@@ -5895,8 +5910,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_ON
 
-      _prefStore.setValue(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE, _spinnerDPTolerance_FlatGainLoss.getSelection() / 100f);
-
       /*
        * Surfing
        */
@@ -6491,7 +6504,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceLoss / sumDistance * 100));
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Flat          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationFlat));
       _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationGain));
       _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationLoss));
 

@@ -1756,7 +1756,7 @@
          <view
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.ui.views.TourInfo_View"
-            class       ="net.tourbook.ui.views.TourInfo_View"
+            class       ="net.tourbook.ui.views.TourInfoView"
             icon        ="icons/tour-info.png"
             name        ="%View_Name_TourInfo"/>
 

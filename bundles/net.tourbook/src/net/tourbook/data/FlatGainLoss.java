@@ -29,7 +29,6 @@ public class FlatGainLoss {
    public float                distanceGain;
    public float                distanceLoss;
 
-   public float                elevationFlat;
    public float                elevationGain;
    public float                elevationLoss;
 
@@ -44,7 +43,6 @@ public class FlatGainLoss {
 
             + "[" + NL //                                      //$NON-NLS-1$
 
-            + "  elevationFlat = " + elevationFlat + NL //     //$NON-NLS-1$
             + "  elevationGain = " + elevationGain + NL //     //$NON-NLS-1$
             + "  elevationLoss = " + elevationLoss + NL //     //$NON-NLS-1$
 

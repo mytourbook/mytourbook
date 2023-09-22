@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,8 +37,8 @@ public class TourSegment {
    public float   altitude_Segment_Down;
    public float   altitude_Segment_Border_Diff;
    public float   altitude_Segment_Computed_Diff;
-   public float   altitude_Summarized_Border_Up;
 
+   public float   altitude_Summarized_Border_Up;
    public float   altitude_Summarized_Border_Down;
    public float   altitude_Summarized_Computed_Up;
    public float   altitude_Summarized_Computed_Down;
