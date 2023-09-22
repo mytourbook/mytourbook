@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -151,6 +151,14 @@ public class TourPauseUI implements IColorSelectorListener {
          _spinner = spinner;
       }
 
+      private void onResetValue(final Spinner spinner) {
+
+         spinner.setSelection(0);
+         spinner.setFocus();
+
+         onChangeUI();
+      }
+
       @Override
       public void run() {
 
@@ -222,7 +230,7 @@ public class TourPauseUI implements IColorSelectorListener {
       {
          {
             /*
-             * Fiter tour pauses
+             * Filter tour pauses
              */
             _chkIsFilter_TourPauses = new Button(container, SWT.CHECK);
             _chkIsFilter_TourPauses.setText(Messages.Tour_Pauses_Checkbox_TourPauseFilter);
@@ -485,14 +493,6 @@ public class TourPauseUI implements IColorSelectorListener {
       enableControls();
 
       _changeUIListener.onChangeUI_External();
-   }
-
-   private void onResetValue(final Spinner spinner) {
-
-      spinner.setSelection(0);
-      spinner.setFocus();
-
-      onChangeUI();
    }
 
    public void resetToDefaults() {
