@@ -2929,11 +2929,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          // DP needs distance
 
          flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
-               0,
-               elevationSerie.length - 1,
+               -1,
+               -1,
                elevationSerie,
                prefDPTolerance,
-               0);
+               -1);
 
          // keep this value to see in the UI (tour segmenter) the value and how it is computed
          dpTolerance = (short) (prefDPTolerance * 10);
@@ -2978,7 +2978,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                endIndex,
                altitudeSerie,
                prefDPTolerance,
-               0);
+               -1);
 
          // keep this value to see in the UI (tour segmenter) the value and how it is computed
          dpTolerance = (short) (prefDPTolerance * 10);
@@ -2995,34 +2995,60 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Compute elevation up/down values with Douglas Peucker algorithm which needs also distance
     * values in {@link #distanceSerie}
     *
-    * @param startIndex
+    * @param dataSerieStartIndex
     *           The start of the section for which to compute the elevation gain/loss
-    * @param endIndex
+    *           <p>
+    *           when <code>-1</code> then the whole data serie is used
+    * @param dataSerieEndIndex
     *           The end of the section for which to compute the elevation gain/loss
     * @param elevationSerie
     * @param dpTolerance
     *           The Douglas-Peucker tolerance value
     * @param flatGradient
-    *           Gradient when an elevation is put into the flat values, 0 will ignore this and will
-    *           put all values into the gain or loss values
+    *           Gradient when an elevation is put into the flat values
+    *           <p>
+    *           <code>-1</code> will ignore this and will put all values into the gain or loss
+    *           values
     * @return Returns <code>null</code> when elevation gain/loss cannot be computed
     */
-   private FlatGainLoss computeAltitudeUpDown_20_Algorithm_DP(final int startIndex,
-                                                              final int endIndex,
+   private FlatGainLoss computeAltitudeUpDown_20_Algorithm_DP(final int dataSerieStartIndex,
+                                                              final int dataSerieEndIndex,
                                                               final float[] elevationSerie,
                                                               final float dpTolerance,
                                                               final float flatGradient) {
 
-      // check if all necessary data are available
-      if (false
-            || distanceSerie == null
-            || elevationSerie == null
-            || elevationSerie.length < 2
-            || startIndex > elevationSerie.length
-            || endIndex >= elevationSerie.length
-            || startIndex >= endIndex) {
+      int startIndex;
+      int endIndex;
 
-         return null;
+      // check if all necessary data are available
+      if (dataSerieStartIndex == -1) {
+
+         // ignore start/end index parameters
+
+         if (distanceSerie == null
+               || elevationSerie == null
+               || elevationSerie.length < 2) {
+
+            return null;
+         }
+
+         startIndex = 0;
+         endIndex = elevationSerie.length;
+
+      } else {
+
+         startIndex = dataSerieStartIndex;
+         endIndex = dataSerieEndIndex;
+
+         if (distanceSerie == null
+               || elevationSerie == null
+               || elevationSerie.length < 2
+               || startIndex > elevationSerie.length
+               || endIndex >= elevationSerie.length
+               || startIndex >= endIndex) {
+
+            return null;
+         }
       }
 
       // convert data series into DP points
@@ -3051,6 +3077,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final BreakTimeTool breakTimeConfig = BreakTimeTool.getPrefValues();
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
 
+      final boolean isUseFlatGradient = flatGradient != -1;
+
       int timeFlatTotal = 0;
       int timeGainTotal = 0;
       int timeLossTotal = 0;
@@ -3066,11 +3094,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       int segmentStartTime = timeSerie[startIndex];
       float segmentStartDistance = distanceSerie[startIndex];
       float segmentStartElevation = elevationSerie[startIndex];
-
-      System.out.println();
-      System.out.println("Tour Info - %d".formatted(elevationSerie.length));
-      System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
 
       /*
        * Get all flat/gain/loss values which were found by DP
@@ -3089,16 +3112,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          final int segmentFullTime = segmentEndTime - segmentStartTime;
          final float segmentDistance = segmentEndDistance - segmentStartDistance;
          final float segmentElevation = segmentEndElevation - segmentStartElevation;
-         final float segmentGradient = segmentElevation * 100 / segmentDistance;
 
-         System.out.println("%-3d  %6.2f  %6d".formatted(
-
-               segmentIndex + 1,
-               segmentElevation,
-               serieIndex
-
-         ));
-// TODO remove SYSTEM.OUT.PRINTLN
+         final float segmentGradient = segmentDistance == 0
+               ? 0
+               : segmentElevation * 100 / segmentDistance;
 
          int segmentTime;
 
@@ -3123,12 +3140,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          /*
           * Collect flat/gain/loss values
           */
-         final boolean isGainGradient = segmentGradient > 0 && segmentGradient > flatGradient;
-         final boolean isLossGradient = segmentGradient < 0 && segmentGradient < -flatGradient;
-         final boolean isFlatGradient = isGainGradient == false && isLossGradient == false
-               || segmentGradient == 0 && flatGradient == 0;
 
-         if (isFlatGradient) {
+         boolean isGradientFlat = false;
+
+         if (isUseFlatGradient) {
+
+            final boolean isGainGradient = segmentGradient > 0 && segmentGradient > flatGradient;
+            final boolean isLossGradient = segmentGradient < 0 && segmentGradient < -flatGradient;
+
+            isGradientFlat = isGainGradient == false && isLossGradient == false
+                  || segmentGradient == 0 && flatGradient == 0;
+         }
+
+         if (isGradientFlat) {
 
             // this is a flat area
 
@@ -5999,8 +6023,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final float[] altitudeSmoothedSerie = getAltitudeSmoothedSerie(false);
 
       final FlatGainLoss flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
-            0,
-            altitudeSmoothedSerie.length - 1,
+            -1,
+            -1,
             altitudeSmoothedSerie,
             prefDPTolerance,
             prefFlatGradient);

@@ -451,6 +451,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private float                          _vertSpeed_DistanceLoss;
    private float                          _vertSpeed_ElevationGain;
    private float                          _vertSpeed_ElevationLoss;
+   private int                            _vertSpeed_NumSegments_Flat;
+   private int                            _vertSpeed_NumSegments_Gain;
+   private int                            _vertSpeed_NumSegments_Loss;
    //
    private PixelConverter                 _pc;
    private int                            _spinnerWidth;
@@ -572,6 +575,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Label           _lblVerticalSpeed_Time_Relative_Flat;
    private Label           _lblVerticalSpeed_Time_Relative_Gain;
    private Label           _lblVerticalSpeed_Time_Relative_Loss;
+   //
+   private Label           _lblVerticalSpeed_NumSegments_Header;
+   private Label           _lblVerticalSpeed_NumSegments_Flat;
+   private Label           _lblVerticalSpeed_NumSegments_Gain;
+   private Label           _lblVerticalSpeed_NumSegments_Loss;
    //
    private Spinner         _spinnerBreak_MinAvgSpeedAS;
    private Spinner         _spinnerBreak_MinSliceSpeedAS;
@@ -1761,11 +1769,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final float[] distanceSerie = _tourData.distanceSerie;
       final float[] elevationSerie = _tourData.getAltitudeSmoothedSerie(false);
 
-      final int serieSize = distanceSerie.length;
+      final int numTimeSlices = timeSerie.length;
 
       // convert data series into dp points
-      final DPPoint[] graphPoints = new DPPoint[serieSize];
-      for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
+      final DPPoint[] graphPoints = new DPPoint[numTimeSlices];
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
 
          graphPoints[serieIndex] = new DPPoint(
                distanceSerie[serieIndex],
@@ -1806,6 +1814,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _vertSpeed_ElevationGain = 0;
       _vertSpeed_ElevationLoss = 0;
 
+      _vertSpeed_NumSegments_Flat = 0;
+      _vertSpeed_NumSegments_Gain = 0;
+      _vertSpeed_NumSegments_Loss = 0;
+
       int segmentStartTime = timeSerie[0];
       float segmentStartDistance = distanceSerie[0];
       float segmentStartElevation = elevationSerie[0];
@@ -1818,11 +1830,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
 
       int segmentStartIndex = 0;
-
-      System.out.println();
-      System.out.println("Segmenter");
-      System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
 
       for (int segmentIndex = 1; segmentIndex < allSimplifiedPoints.length; segmentIndex++) {
 
@@ -1838,7 +1845,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          final float segmentDistance = segmentEndDistance - segmentStartDistance;
          final float segmentElevation = segmentEndElevation - segmentStartElevation;
 
-         final float segmentGradient = segmentElevation * 100 / segmentDistance;
+         final float segmentGradient = segmentDistance == 0
+               ? 0
+               : segmentElevation * 100 / segmentDistance;
 
          final int segmentWholeTime = segmentEndTime - segmentStartTime;
          int segmentTime;
@@ -1878,20 +1887,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          }
 
-         final boolean isGainGradient = segmentGradient > 0 && segmentGradient > _flatGainLoss_Gradient;
-         final boolean isLossGradient = segmentGradient < 0 && segmentGradient < -_flatGainLoss_Gradient;
-         final boolean isFlatGradient = isGainGradient == false && isLossGradient == false
+         boolean isGainGradient = segmentGradient > 0 && segmentGradient > _flatGainLoss_Gradient;
+         boolean isLossGradient = segmentGradient < 0 && segmentGradient < -_flatGainLoss_Gradient;
+         boolean isFlatGradient = isGainGradient == false && isLossGradient == false
 
                || segmentGradient == 0 && _flatGainLoss_Gradient == 0;
-
-         System.out.println("%-3d  %6.2f  %6d".formatted(
-
-               segmentIndex + 1,
-               segmentElevation,
-               serieIndex
-
-         ));
-// TODO remove SYSTEM.OUT.PRINTLN
 
          if (isFlatGradient) {
 
@@ -1925,6 +1925,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                isPrevElevationGain = segmentElevation >= 0;
                isPrevElevationLoss = segmentElevation < 0;
+            }
+
+            if (isFlatGradient) {
+               _vertSpeed_NumSegments_Flat++;
+            } else if (isGainGradient) {
+               _vertSpeed_NumSegments_Gain++;
+            } else {
+               _vertSpeed_NumSegments_Loss++;
             }
 
          } else {
@@ -1965,7 +1973,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          }
 
          if (isAddPoint) {
+
             segmentSerieIndex.add(segmentStartDpPoint.serieIndex);
+
+            if (isFlatGradient) {
+               _vertSpeed_NumSegments_Flat++;
+            } else if (isGainGradient) {
+               _vertSpeed_NumSegments_Gain++;
+            } else {
+               _vertSpeed_NumSegments_Loss++;
+            }
          }
 
          segmentStartDpPoint = segmentEndDpPoint;
@@ -1976,7 +1993,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       // add last point
-      segmentSerieIndex.add(serieSize - 1);
+      segmentSerieIndex.add(numTimeSlices - 1);
 
       return segmentSerieIndex.toArray();
    }
@@ -2530,7 +2547,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          final Composite speedContainer = new Composite(pageContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()
-               .numColumns(7)
+               .numColumns(8)
                .spacing(columnSpacing, 0)
                .applyTo(speedContainer);
 //         speedContainer.setBackground(UI.SYS_COLOR_GREEN);
@@ -2562,6 +2579,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // speed
                _lblVerticalSpeed_Speed_Header = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Speed_Header);
+
+               // #
+               _lblVerticalSpeed_NumSegments_Header = UI.createLabel(speedContainer, UI.SYMBOL_NUMBER_SIGN, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_NumSegments_Header);
             }
             {
                /*
@@ -2571,8 +2592,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // a flat elevation does not make sense
                new Label(speedContainer, SWT.NONE);
-//               final Label labelFlatElevation = new Label(speedContainer, SWT.TRAIL);
-//               gd.applyTo(labelFlatElevation);
 
                // distance
                _lblVerticalSpeed_Distance_Flat = new Label(speedContainer, SWT.TRAIL);
@@ -2593,6 +2612,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // speed
                _lblVerticalSpeed_Speed_Flat = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Speed_Flat);
+
+               // #
+               _lblVerticalSpeed_NumSegments_Flat = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_NumSegments_Flat);
             }
             {
                /*
@@ -2623,6 +2646,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // speed
                _lblVerticalSpeed_Speed_Gain = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Speed_Gain);
+
+               // #
+               _lblVerticalSpeed_NumSegments_Gain = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_NumSegments_Gain);
             }
             {
                /*
@@ -2653,6 +2680,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // speed
                _lblVerticalSpeed_Speed_Loss = new Label(speedContainer, SWT.TRAIL);
                gd.applyTo(_lblVerticalSpeed_Speed_Loss);
+
+               // #
+               _lblVerticalSpeed_NumSegments_Loss = new Label(speedContainer, SWT.TRAIL);
+               gd.applyTo(_lblVerticalSpeed_NumSegments_Loss);
             }
          }
       }
@@ -3642,11 +3673,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // do not show a color for flat areas
 
-               final float gradient = segment.gradient;
+               final float segmentGradient = segment.gradient;
 
-               if (gradient >= 0 && gradient < _flatGainLoss_Gradient
-                     || gradient < 0 && gradient > -_flatGainLoss_Gradient) {
+               final boolean isGainGradient = segmentGradient > 0 && segmentGradient > _flatGainLoss_Gradient;
+               final boolean isLossGradient = segmentGradient < 0 && segmentGradient < -_flatGainLoss_Gradient;
+               final boolean isFlatGradient = isGainGradient == false && isLossGradient == false
 
+                     || segmentGradient == 0 && _flatGainLoss_Gradient == 0;
+
+               if (isFlatGradient) {
                   isShowColor = false;
                }
             }
@@ -6511,6 +6546,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
       _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
       _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
+
+      _lblVerticalSpeed_NumSegments_Flat        .setText(Integer.toString(_vertSpeed_NumSegments_Flat));
+      _lblVerticalSpeed_NumSegments_Gain        .setText(Integer.toString(_vertSpeed_NumSegments_Gain));
+      _lblVerticalSpeed_NumSegments_Loss        .setText(Integer.toString(_vertSpeed_NumSegments_Loss));
 
 // SET_FORMATTING_ON
 

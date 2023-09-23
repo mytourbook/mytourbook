@@ -158,7 +158,9 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
       final float[] segmentSerie_ElevationDiff = _tourData.segmentSerie_Elevation_Diff;
       final float[] segmentSerie_ElevationDiff_Computed = _tourData.segmentSerie_Elevation_Diff_Computed;
       final float[] segmentSerie_Gradient = _tourData.segmentSerie_Gradient;
+
       final float segmentSerie_FlatGainLoss_Gradient = _tourData.segmentSerie_FlatGainLoss_Gradient;
+      final boolean canApplyFlatColor = segmentSerie_FlatGainLoss_Gradient != -1;
 
       final LineAttributes defaultLineAttributes = gc.getLineAttributes();
       final LineAttributes markerLineAttribute = new LineAttributes(5);
@@ -282,11 +284,11 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
          final float segmentGradient = segmentSerie_Gradient[segmentIndex];
 
-         final boolean canApplyFlatColor = segmentSerie_FlatGainLoss_Gradient != -1;
-
          if (canApplyFlatColor
-               && segmentGradient >= 0
-               && segmentGradient <= segmentSerie_FlatGainLoss_Gradient) {
+               && (segmentGradient >= 0 && segmentGradient <= segmentSerie_FlatGainLoss_Gradient
+                     || segmentGradient < 0 && segmentGradient >= -segmentSerie_FlatGainLoss_Gradient)
+
+         ) {
 
             textAndLineColor = flatColor;
             paintedRGB = flatRGB;
