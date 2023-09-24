@@ -42,9 +42,15 @@ Experimental
 
 New
 ===
+  
+* Tour Segmenter
+  - New segmenter "By Elevation - Flat, Gain & Loss"
+    https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
 
-* Tour Info Tooltip (Frederic)
-  - Added the average elevation
+* Tour Info Tooltip
+  - Show flat/gain/loss values
+    https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
+  - Added the average elevation (Frederic)
 
 
 Improvements
