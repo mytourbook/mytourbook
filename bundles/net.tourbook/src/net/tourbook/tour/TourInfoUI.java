@@ -2284,13 +2284,6 @@ public class TourInfoUI {
       _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
       _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
 
-      final String speedTooltipText =
-            """
-                  DP tolerance\t%s
-                  Flat gradient\t%s %%
-
-                  """;
-
 // SET_FORMATTING_OFF
 
       /*
@@ -2338,41 +2331,36 @@ public class TourInfoUI {
       final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
       final float prefFlatGainLoss_FlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
 
-      final String tooltip = speedTooltipText.formatted(
-
+      final String tooltip = Messages.Tour_Tooltip_FlatGainLoss_Tooltip.formatted(
             _nf2.format(prefFlatGainLoss_DPTolerance),
-            _nf1.format(prefFlatGainLoss_FlatGradient)
-
-            );
-
-// SET_FORMATTING_OFF
+            _nf1.format(prefFlatGainLoss_FlatGradient));
 
       _lblVerticalSpeed_Time_Header             .setText(UI.UNIT_LABEL_TIME);
-      _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime_Summary(vertSpeed_TimeFlat, false, true));
-      _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime_Summary(vertSpeed_TimeGain, false, true));
-      _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime_Summary(vertSpeed_TimeLoss, false, true));
+      _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime(vertSpeed_TimeFlat, false, true));
+      _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
+      _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative_Summary(vertSpeed_TimeFlat / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative_Summary(vertSpeed_TimeGain / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative_Summary(vertSpeed_TimeLoss / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance_Summary(vertSpeed_DistanceFlat / 1000));
-      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance_Summary(vertSpeed_DistanceGain / 1000));
-      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance_Summary(vertSpeed_DistanceLoss / 1000));
+      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000));
+      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(vertSpeed_DistanceGain / 1000));
+      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(vertSpeed_DistanceLoss / 1000));
 
-      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceFlat / sumDistance * 100));
-      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceGain / sumDistance * 100));
-      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative_Summary(vertSpeed_DistanceLoss / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative(vertSpeed_DistanceFlat / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative(vertSpeed_DistanceGain / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative(vertSpeed_DistanceLoss / sumDistance * 100));
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationGain));
-      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation_Summary(vertSpeed_ElevationLoss));
+      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(vertSpeed_ElevationGain));
+      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(vertSpeed_ElevationLoss));
 
       _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
-      _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
 
       _lblVerticalSpeed_Time_Header             .setToolTipText(tooltip);
       _lblVerticalSpeed_Time_Flat               .setToolTipText(tooltip);

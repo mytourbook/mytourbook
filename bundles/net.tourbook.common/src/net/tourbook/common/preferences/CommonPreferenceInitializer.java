@@ -85,6 +85,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE,               ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE,              ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER,                 ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RELATIVE,              ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE,           ValueFormat.NUMBER_1_0.name());
@@ -100,7 +101,6 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE_SUMMARY,      ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY,         ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY,         ValueFormat.NUMBER_1_0.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RELATIVE_SUMMARY,      ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY,         ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY,   ValueFormat.NUMBER_1_0.name());
 

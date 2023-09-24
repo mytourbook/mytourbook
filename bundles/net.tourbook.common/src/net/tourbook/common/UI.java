@@ -255,6 +255,12 @@ public class UI {
    public static final String       ELLIPSIS                             = "...";                                       //$NON-NLS-1$
    public static final String       ELLIPSIS_WITH_SPACE                  = " ... ";                                     //$NON-NLS-1$
 
+   public static final String       INCREMENTER_0_1                      = "0.1";                                       //$NON-NLS-1$
+   public static final String       INCREMENTER_0_01                     = "0.01";                                      //$NON-NLS-1$
+   public static final String       INCREMENTER_1                        = "1";                                         //$NON-NLS-1$
+   public static final String       INCREMENTER_10                       = "10";                                        //$NON-NLS-1$
+   public static final String       INCREMENTER_100                      = "100";                                       //$NON-NLS-1$
+
    private static final char[]      INVALID_FILENAME_CHARS               = new char[] {
          '\\',
          '/',
@@ -1422,7 +1428,7 @@ public class UI {
    public static Label createLabel(final Composite parent, final String text) {
 
       final Label label = new Label(parent, SWT.NONE);
-      
+
       label.setText(text);
 
       return label;

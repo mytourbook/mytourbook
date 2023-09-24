@@ -162,6 +162,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final String  STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
    private static final String  STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                   //$NON-NLS-1$
    private static final String  STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
+   private static final String  STATE_MOUSE_WHEEL_INCREMENTER_DP                   = "STATE_MOUSE_WHEEL_INCREMENTER_DP";           //$NON-NLS-1$
+   private static final String  STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT             = "STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT";     //$NON-NLS-1$
    private static final String  STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
    private static final String  STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
    //
@@ -430,7 +432,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private ArrayList<TourSegmenter>       _availableSegmenter = new ArrayList<>();
    //
    /**
-    * segmenter type which the user has selected
+    * Segmenter type which the user has selected
     */
    private SegmenterType                  _userSelectedSegmenterType;
    private long                           _tourBreakTime;
@@ -470,6 +472,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    //
    private boolean                        _isGetInitialTours;
    private ArrayList<TourSegment>         _allTourSegments;
+   //
+   private int                            _mouseWheelIncrementer_DP;
+   private int                            _mouseWheelIncrementer_Gradient;
    //
    /**
     * {@link TourChart} contains the chart for the tour, this is necessary to move the slider in the
@@ -522,6 +527,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private Button          _chkIsShowOnlySelectedSegments;
    //
    private Combo           _comboBreakMethod;
+   private Combo           _comboMouseWheelIncrementer_DP;
+   private Combo           _comboMouseWheelIncrementer_Gradient;
    private Combo           _comboSegmenterType;
    private Combo           _comboSurfing_SegmenterFilter;
    //
@@ -1309,7 +1316,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             // set index for the tab folder which should be selected when dialog is opened and applied
             // in net.tourbook.preferences.PrefPageAppearanceDisplayFormat.applyData(Object)
             // -> select single tour formatting
-            Integer.valueOf(1));
+            Integer.valueOf(0));
    }
 
    @Override
@@ -1319,13 +1326,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       setMaxDistanceSpinner();
 
+      restoreState_BeforeUI();
+
       // define all columns
       _columnManager = new ColumnManager(this, _state);
       _columnManager.setIsCategoryAvailable(true);
       defineAllColumns();
 
       createActions();
+
       createUI(parent);
+
+      fillUI();
       fillToolbar();
 
       addSelectionListener();
@@ -1887,9 +1899,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          }
 
-         boolean isGainGradient = segmentGradient > 0 && segmentGradient > _flatGainLoss_Gradient;
-         boolean isLossGradient = segmentGradient < 0 && segmentGradient < -_flatGainLoss_Gradient;
-         boolean isFlatGradient = isGainGradient == false && isLossGradient == false
+         final boolean isGainGradient = segmentGradient > 0 && segmentGradient > _flatGainLoss_Gradient;
+         final boolean isLossGradient = segmentGradient < 0 && segmentGradient < -_flatGainLoss_Gradient;
+         final boolean isFlatGradient = isGainGradient == false && isLossGradient == false
 
                || segmentGradient == 0 && _flatGainLoss_Gradient == 0;
 
@@ -2504,18 +2516,32 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //      pageContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          final Composite dpContainer = new Composite(pageContainer, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(dpContainer);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(dpContainer);
 //         dpContainer.setBackground(UI.SYS_COLOR_YELLOW);
          {
             {
                /*
                 * DP
                 */
-               _spinnerDPTolerance_FlatGainLoss = createUI_DP_Tolerance(dpContainer);
+               _spinnerDPTolerance_FlatGainLoss = createUI_DP_Tolerance(dpContainer, false);
                _spinnerDPTolerance_FlatGainLoss.setMinimum(1); //      0.01
                _spinnerDPTolerance_FlatGainLoss.setMaximum(10000); //100.00
                _spinnerDPTolerance_FlatGainLoss.setDigits(2);
+               _spinnerDPTolerance_FlatGainLoss.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, _mouseWheelIncrementer_DP);
+                  onSelect_Tolerance();
+               });
+
                UI.createSpacer_Horizontal(dpContainer, 1);
+
+               // combo: Mouse wheel incrementer
+               _comboMouseWheelIncrementer_DP = new Combo(dpContainer, SWT.READ_ONLY | SWT.BORDER);
+               _comboMouseWheelIncrementer_DP.setVisibleItemCount(10);
+               _comboMouseWheelIncrementer_DP.setToolTipText(Messages.Tour_Segmenter_Combo_MouseWheelIncrementer_DP_Tooltip);
+               _comboMouseWheelIncrementer_DP.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_MouseWheelIncrementer_DP()));
+
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer_DP);
             }
             {
                /*
@@ -2532,12 +2558,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                _spinnerFlatGainLoss_Gradient.setMaximum(1000); //    100.0 %
                _spinnerFlatGainLoss_Gradient.setDigits(1);
                _spinnerFlatGainLoss_Gradient.addSelectionListener(_defaultCreateSegments_SelectionListener);
-               _spinnerFlatGainLoss_Gradient.addMouseWheelListener(_defaultCreateSegments_MouseWheelListener);
+               _spinnerFlatGainLoss_Gradient.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, _mouseWheelIncrementer_Gradient);
+                  onSelect_CreateSegments();
+               });
                GridDataFactory.fillDefaults().applyTo(_spinnerFlatGainLoss_Gradient);
 
                // label: %
                label = new Label(dpContainer, SWT.NONE);
                label.setText(UI.SYMBOL_PERCENTAGE);
+
+               // combo: Mouse wheel incrementer
+               _comboMouseWheelIncrementer_Gradient = new Combo(dpContainer, SWT.READ_ONLY | SWT.BORDER);
+               _comboMouseWheelIncrementer_Gradient.setVisibleItemCount(10);
+               _comboMouseWheelIncrementer_Gradient.setToolTipText(Messages.Tour_Segmenter_Combo_MouseWheelIncrementer_Gradient_Tooltip);
+               _comboMouseWheelIncrementer_Gradient.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_MouseWheelIncrementer_Gradient()));
+
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer_Gradient);
             }
          }
 
@@ -3506,7 +3544,21 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return label;
    }
 
+   /**
+    * @param parent
+    * @return
+    */
    private Spinner createUI_DP_Tolerance(final Composite parent) {
+
+      return createUI_DP_Tolerance(parent, true);
+   }
+
+   /**
+    * @param parent
+    * @param isSetMouseWheelListener
+    * @return
+    */
+   private Spinner createUI_DP_Tolerance(final Composite parent, final boolean isSetMouseWheelListener) {
 
       {
          /*
@@ -3532,10 +3584,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          spinner.setDigits(1);
 
          spinner.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Tolerance()));
-         spinner.addMouseWheelListener(event -> {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onSelect_Tolerance();
-         });
+
+         if (isSetMouseWheelListener) {
+
+            spinner.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               onSelect_Tolerance();
+            });
+         }
       }
 
       return spinner;
@@ -4551,6 +4607,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       tbm.update(true);
    }
 
+   private void fillUI() {
+
+      /*
+       * Fill in the same order as the mouse wheel is increasing/decreasing the spinner value,
+       * otherwise it is in the opposite direction which is confusing !!!
+       */
+      _comboMouseWheelIncrementer_DP.add(UI.INCREMENTER_10);
+      _comboMouseWheelIncrementer_DP.add(UI.INCREMENTER_1);
+      _comboMouseWheelIncrementer_DP.add(UI.INCREMENTER_0_1);
+      _comboMouseWheelIncrementer_DP.add(UI.INCREMENTER_0_01);
+
+      _comboMouseWheelIncrementer_Gradient.add(UI.INCREMENTER_10);
+      _comboMouseWheelIncrementer_Gradient.add(UI.INCREMENTER_1);
+      _comboMouseWheelIncrementer_Gradient.add(UI.INCREMENTER_0_1);
+   }
+
    /**
     * Notify listeners to show/hide the segments.
     */
@@ -4651,6 +4723,50 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          return (float) (_tourData.getDpTolerance() / 10.0);
       }
+   }
+
+   private int getMouseWheelIncrementerIndex_DP() {
+
+      if (_mouseWheelIncrementer_DP == 1) {
+
+         // 1 -> 0.01
+
+         return 3;
+
+      } else if (_mouseWheelIncrementer_DP == 10) {
+
+         // 10 -> 0.1
+
+         return 2;
+
+      } else if (_mouseWheelIncrementer_DP == 100) {
+
+         // 100 -> 1.0
+
+         return 1;
+      }
+
+      // 1000 -> 10.0
+      return 0;
+   }
+
+   private int getMouseWheelIncrementerIndex_Gradient() {
+
+      if (_mouseWheelIncrementer_Gradient == 1) {
+
+         // 1 -> 0.1
+
+         return 2;
+
+      } else if (_mouseWheelIncrementer_Gradient == 10) {
+
+         // 10 -> 1.0
+
+         return 1;
+      }
+
+      // 100 -> 10.0
+      return 0;
    }
 
    private BreakTimeMethod getSelectedBreakMethod() {
@@ -5009,6 +5125,54 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       updateUI_Distance();
 
       createSegments(true);
+   }
+
+   private void onSelect_MouseWheelIncrementer_DP() {
+
+      final int selectionIndex = _comboMouseWheelIncrementer_DP.getSelectionIndex();
+
+      if (selectionIndex == 0) {
+
+         _mouseWheelIncrementer_DP = 1000;
+
+      } else if (selectionIndex == 1) {
+
+         _mouseWheelIncrementer_DP = 100;
+
+      } else if (selectionIndex == 2) {
+
+         _mouseWheelIncrementer_DP = 10;
+
+      } else {
+
+         // selectionIndex == 3
+
+         _mouseWheelIncrementer_DP = 1;
+      }
+
+      _spinnerDPTolerance_FlatGainLoss.setPageIncrement(_mouseWheelIncrementer_DP);
+   }
+
+   private void onSelect_MouseWheelIncrementer_Gradient() {
+
+      final int selectionIndex = _comboMouseWheelIncrementer_Gradient.getSelectionIndex();
+
+      if (selectionIndex == 0) {
+
+         _mouseWheelIncrementer_Gradient = 100;
+
+      } else if (selectionIndex == 1) {
+
+         _mouseWheelIncrementer_Gradient = 10;
+
+      } else {
+
+         // selectionIndex == 2
+
+         _mouseWheelIncrementer_Gradient = 1;
+      }
+
+      _spinnerFlatGainLoss_Gradient.setPageIncrement(_mouseWheelIncrementer_Gradient);
    }
 
    private void onSelect_Segment(final SelectionChangedEvent event) {
@@ -5676,9 +5840,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       _dpToleranceElevation_FlatGainLoss = prefFlatGainLoss_DPTolerance;
       _spinnerDPTolerance_FlatGainLoss.setSelection((int) (prefFlatGainLoss_DPTolerance * 100));
+      _spinnerDPTolerance_FlatGainLoss.setPageIncrement(_mouseWheelIncrementer_DP);
+      _comboMouseWheelIncrementer_DP.select(getMouseWheelIncrementerIndex_DP());
 
       _flatGainLoss_Gradient = prefFlatGainLoss_Gradient;
       _spinnerFlatGainLoss_Gradient.setSelection((int) (prefFlatGainLoss_Gradient * 10));
+      _spinnerFlatGainLoss_Gradient.setPageIncrement(_mouseWheelIncrementer_Gradient);
+      _comboMouseWheelIncrementer_Gradient.select(getMouseWheelIncrementerIndex_Gradient());
 
       /*
        * Break time
@@ -5812,6 +5980,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerSurfing_MinSurfingDistance.setSelection(Math.round(stateMinDistance / UI.UNIT_VALUE_DISTANCE_SMALL));
    }
 
+   private void restoreState_BeforeUI() {
+
+      _mouseWheelIncrementer_DP = Util.getStateInt(_state, STATE_MOUSE_WHEEL_INCREMENTER_DP, 100); // 1.00
+      _mouseWheelIncrementer_Gradient = Util.getStateInt(_state, STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT, 10); // 0.1
+   }
+
    private void restoreState_FromTour() {
 
       /*
@@ -5942,6 +6116,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _state.put(STATE_MINIMUM_ALTITUDE,                       _spinnerMinAltitude.getSelection());
       _state.put(STATE_SELECTED_SEGMENTER_BY_USER,             _userSelectedSegmenterType.name());
       _state.put(STATE_SELECTED_DISTANCE,                      _spinnerDistance.getSelection());
+
+      _state.put(STATE_MOUSE_WHEEL_INCREMENTER_DP,             _mouseWheelIncrementer_DP);
+      _state.put(STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT,       _mouseWheelIncrementer_Gradient);
 
 // SET_FORMATTING_ON
 
@@ -6521,31 +6698,31 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 // SET_FORMATTING_OFF
 
       _lblVerticalSpeed_Time_Header             .setText(UI.UNIT_LABEL_TIME);
-      _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime_Summary(_vertSpeed_TimeFlat, false, true));
-      _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime_Summary(_vertSpeed_TimeGain, false, true));
-      _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime_Summary(_vertSpeed_TimeLoss, false, true));
+      _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime(_vertSpeed_TimeFlat, false, true));
+      _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(_vertSpeed_TimeGain, false, true));
+      _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(_vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative_Summary(_vertSpeed_TimeFlat / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative_Summary(_vertSpeed_TimeGain / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative_Summary(_vertSpeed_TimeLoss / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(_vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(_vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(_vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance_Summary(_vertSpeed_DistanceFlat / 1000));
-      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance_Summary(_vertSpeed_DistanceGain / 1000));
-      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance_Summary(_vertSpeed_DistanceLoss / 1000));
+      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(_vertSpeed_DistanceFlat / 1000));
+      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(_vertSpeed_DistanceGain / 1000));
+      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(_vertSpeed_DistanceLoss / 1000));
 
-      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceFlat / sumDistance * 100));
-      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceGain / sumDistance * 100));
-      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative_Summary(_vertSpeed_DistanceLoss / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative(_vertSpeed_DistanceFlat / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative(_vertSpeed_DistanceGain / sumDistance * 100));
+      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative(_vertSpeed_DistanceLoss / sumDistance * 100));
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationGain));
-      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation_Summary(_vertSpeed_ElevationLoss));
+      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(_vertSpeed_ElevationGain));
+      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(_vertSpeed_ElevationLoss));
 
       _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
-      _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed_Summary(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
 
       _lblVerticalSpeed_NumSegments_Flat        .setText(Integer.toString(_vertSpeed_NumSegments_Flat));
       _lblVerticalSpeed_NumSegments_Gain        .setText(Integer.toString(_vertSpeed_NumSegments_Gain));

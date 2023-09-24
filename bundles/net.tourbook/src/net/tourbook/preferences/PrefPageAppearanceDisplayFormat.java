@@ -108,8 +108,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    private Button     _rdoPower_1_1_Summary;
    private Button     _rdoPulse_1_0_Summary;
    private Button     _rdoPulse_1_1_Summary;
-   private Button     _rdoRelative_1_0_Summary;
-   private Button     _rdoRelative_1_1_Summary;
+   private Button     _rdoRelative_1_0;
+   private Button     _rdoRelative_1_1;
    private Button     _rdoSpeed_1_0_Summary;
    private Button     _rdoSpeed_1_1_Summary;
    private Button     _rdoSpeed_1_2_Summary;
@@ -523,6 +523,25 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             _rdoDistance_1_3.addSelectionListener(_defaultSelectionListener);
          }
       }
+      {
+         /*
+          * Relative %
+          */
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Pref_DisplayFormat_Label_Relative);
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+            _rdoRelative_1_0 = new Button(container, SWT.RADIO);
+            _rdoRelative_1_0.setText(formatName_1_0);
+            _rdoRelative_1_0.addSelectionListener(_defaultSelectionListener);
+
+            _rdoRelative_1_1 = new Button(container, SWT.RADIO);
+            _rdoRelative_1_1.setText(formatName_1_1);
+            _rdoRelative_1_1.addSelectionListener(_defaultSelectionListener);
+         }
+      }
    }
 
    private Control createUI_30_Formats_Summary(final Composite parent) {
@@ -848,25 +867,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             _rdoDistance_1_3_Summary.addSelectionListener(_defaultSelectionListener);
          }
       }
-      {
-         /*
-          * Relative %
-          */
-         final Label label = new Label(parent, SWT.NONE);
-         label.setText(Messages.Pref_DisplayFormat_Label_Relative);
-
-         final Composite container = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-         {
-            _rdoRelative_1_0_Summary = new Button(container, SWT.RADIO);
-            _rdoRelative_1_0_Summary.setText(formatName_1_0);
-            _rdoRelative_1_0_Summary.addSelectionListener(_defaultSelectionListener);
-
-            _rdoRelative_1_1_Summary = new Button(container, SWT.RADIO);
-            _rdoRelative_1_1_Summary.setText(formatName_1_1);
-            _rdoRelative_1_1_Summary.addSelectionListener(_defaultSelectionListener);
-         }
-      }
    }
 
    private void createUI_99_LiveUpdate(final Composite parent) {
@@ -945,6 +945,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final String elevation                    = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
       final String power                        = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_POWER);
       final String pulse                        = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+      final String relative                     = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE);
       final String speed                        = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
       final String temperature                  = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
 
@@ -959,7 +960,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final String elevation_Summary            = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY);
       final String power_Summary                = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
       final String pulse_Summary                = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
-      final String relative_Summary             = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE_SUMMARY);
       final String speed_Summary                = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
       final String temperature_Summary          = _prefStore_Common.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY);
 
@@ -994,7 +994,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isPulse_1_0                 = ValueFormat.NUMBER_1_0.name()     .equals(pulse);
       final boolean isPulse_1_0_Summary         = ValueFormat.NUMBER_1_0.name()     .equals(pulse_Summary);
 
-      final boolean isRelative_1_0_Summary      = ValueFormat.NUMBER_1_0.name()     .equals(relative_Summary);
+      final boolean isRelative_1_0              = ValueFormat.NUMBER_1_0.name()     .equals(relative);
 
       final boolean isSpeed_1_0                 = ValueFormat.NUMBER_1_0.name()     .equals(speed);
       final boolean isSpeed_1_1                 = ValueFormat.NUMBER_1_1.name()     .equals(speed);
@@ -1069,6 +1069,9 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          _rdoPulse_1_0                          .setSelection(isPulse_1_0);
          _rdoPulse_1_1                          .setSelection(!isPulse_1_0);
 
+         _rdoRelative_1_0                       .setSelection(isRelative_1_0);
+         _rdoRelative_1_1                       .setSelection(!isRelative_1_0);
+
          _rdoSpeed_1_0                          .setSelection(isSpeed_1_0);
          _rdoSpeed_1_1                          .setSelection(isSpeed_1_1);
          _rdoSpeed_1_2                          .setSelection(isSpeed_1_2);
@@ -1119,9 +1122,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
          _rdoPulse_1_0_Summary                  .setSelection(isPulse_1_0_Summary);
          _rdoPulse_1_1_Summary                  .setSelection(!isPulse_1_0_Summary);
-
-         _rdoRelative_1_0_Summary               .setSelection(isRelative_1_0_Summary);
-         _rdoRelative_1_1_Summary               .setSelection(!isRelative_1_0_Summary);
 
          _rdoSpeed_1_0_Summary                  .setSelection(isSpeed_1_0_Summary);
          _rdoSpeed_1_1_Summary                  .setSelection(isSpeed_1_1_Summary);
@@ -1178,6 +1178,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final String elevation                    = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
       final String power                        = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
       final String pulse                        = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+      final String relative                     = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE);
       final String speed                        = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
       final String temperature                  = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
 
@@ -1192,7 +1193,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final String elevation_Summary            = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY);
       final String power_Summary                = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
       final String pulse_Summary                = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
-      final String relative_Summary             = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE_SUMMARY);
       final String speed_Summary                = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
       final String temperature_Summary          = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY);
 
@@ -1227,7 +1227,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isPulse_1_0                 = ValueFormat.NUMBER_1_0.name()     .equals(pulse);
       final boolean isPulse_1_0_Summary         = ValueFormat.NUMBER_1_0.name()     .equals(pulse_Summary);
 
-      final boolean isRelative_1_0_Summary      = ValueFormat.NUMBER_1_0.name()     .equals(relative_Summary);
+      final boolean isRelative_1_0              = ValueFormat.NUMBER_1_0.name()     .equals(relative);
 
       final boolean isSpeed_1_0                 = ValueFormat.NUMBER_1_0.name()     .equals(speed);
       final boolean isSpeed_1_1                 = ValueFormat.NUMBER_1_1.name()     .equals(speed);
@@ -1309,8 +1309,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _rdoPulse_1_0_Summary                     .setSelection(isPulse_1_0_Summary);
       _rdoPulse_1_1_Summary                     .setSelection(!isPulse_1_0_Summary);
 
-      _rdoRelative_1_0_Summary                  .setSelection(isRelative_1_0_Summary);
-      _rdoRelative_1_1_Summary                  .setSelection(!isRelative_1_0_Summary);
+      _rdoRelative_1_0                          .setSelection(isRelative_1_0);
+      _rdoRelative_1_1                          .setSelection(!isRelative_1_0);
 
       _rdoSpeed_1_0                             .setSelection(isSpeed_1_0);
       _rdoSpeed_1_1                             .setSelection(isSpeed_1_1);
@@ -1470,7 +1470,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             ? ValueFormat.NUMBER_1_0.name()
             : ValueFormat.NUMBER_1_1.name();
 
-      final String relativeFormat_Summary = _rdoRelative_1_0_Summary.getSelection()
+      final String relativeFormat_Summary = _rdoRelative_1_0.getSelection()
             ? ValueFormat.NUMBER_1_0.name()
             : ValueFormat.NUMBER_1_1.name();
 
@@ -1537,7 +1537,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY,      elevationFormat_Summary);
       _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY,         powerFormat_Summary);
       _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY,         pulseFormat_Summary);
-      _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_RELATIVE_SUMMARY,      relativeFormat_Summary);
+      _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_RELATIVE,              relativeFormat_Summary);
       _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY,         speedFormat_Summary);
       _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY,   temperatureFormat_Summary);
 

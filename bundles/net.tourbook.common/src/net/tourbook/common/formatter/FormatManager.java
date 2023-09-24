@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,6 +43,7 @@ public class FormatManager {
    private static IValueFormatter        _elevationFormatter;
    private static IValueFormatter        _powerFormatter;
    private static IValueFormatter        _pulseFormatter;
+   private static IValueFormatter        _relativeFormatter;
    private static IValueFormatter        _speedFormatter;
    private static IValueFormatter        _temperatureFormatter;
 
@@ -57,7 +58,6 @@ public class FormatManager {
    private static IValueFormatter        _elevationFormatter_Summary;
    private static IValueFormatter        _powerFormatter_Summary;
    private static IValueFormatter        _pulseFormatter_Summary;
-   private static IValueFormatter        _relativeFormatter_Summary;
    private static IValueFormatter        _speedFormatter_Summary;
    private static IValueFormatter        _temperatureFormatter_Summary;
 
@@ -117,6 +117,10 @@ public class FormatManager {
 
    public static String formatMovingTime(final long value) {
       return _movingTimeFormatter.printLong(value);
+   }
+
+   public static String formatMovingTime(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _movingTimeFormatter.printLong(value, isHide0Value, isShowBiggerThan0);
    }
 
    public static String formatMovingTime_Summary(final long value) {
@@ -184,8 +188,8 @@ public class FormatManager {
       return _recordedTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
    }
 
-   public static String formatRelative_Summary(final double value) {
-      return _relativeFormatter_Summary.printDouble(value);
+   public static String formatRelative(final double value) {
+      return _relativeFormatter.printDouble(value);
    }
 
    public static String formatSpeed(final double value) {
@@ -301,6 +305,7 @@ public class FormatManager {
       final String elevation              = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
       final String power                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
       final String pulse                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+      final String relative               = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE);
       final String speed                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
       final String temperature            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
 
@@ -315,7 +320,6 @@ public class FormatManager {
       final String elevation_Summary      = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY);
       final String power_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
       final String pulse_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
-      final String relative_Summary       = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE_SUMMARY);
       final String speed_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
       final String temperature_Summary    = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY);
 
@@ -330,6 +334,7 @@ public class FormatManager {
       _elevationFormatter                 = getNumberFormatter(elevation);
       _powerFormatter                     = getNumberFormatter(power);
       _pulseFormatter                     = getNumberFormatter(pulse);
+      _relativeFormatter                  = getNumberFormatter(relative);
       _speedFormatter                     = getNumberFormatter(speed);
       _temperatureFormatter               = getNumberFormatter(temperature);
 
@@ -344,7 +349,6 @@ public class FormatManager {
       _elevationFormatter_Summary         = getNumberFormatter(elevation_Summary);
       _powerFormatter_Summary             = getNumberFormatter(power_Summary);
       _pulseFormatter_Summary             = getNumberFormatter(pulse_Summary);
-      _relativeFormatter_Summary          = getNumberFormatter(relative_Summary);
       _speedFormatter_Summary             = getNumberFormatter(speed_Summary);
       _temperatureFormatter_Summary       = getNumberFormatter(temperature_Summary);
 

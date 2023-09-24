@@ -50,8 +50,8 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
-   private static final RGB            FLAT_GAIN_LOSS_DARK_RGB   = new RGB(144, 0, 178);
-   private static final RGB            FLAT_GAIN_LOSS_BRIGHT_RGB = new RGB(0xFF, 0xff, 0xff);
+   private static final RGB            FLAT_GAIN_LOSS_BRIGHT_RGB = new RGB(0, 0, 0);
+   private static final RGB            FLAT_GAIN_LOSS_DARK_RGB   = new RGB(0xFF, 0xff, 0xff);
 
    private TourChart                   _tourChart;
    private TourData                    _tourData;
@@ -182,7 +182,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
       final RGB segmentRGB = segmentConfig.segmentLineRGB;
       final RGB gainRGB = new RGB(0xff, 0x5e, 0x62);
-      final RGB flatRGB = UI.IS_DARK_THEME ? FLAT_GAIN_LOSS_BRIGHT_RGB : FLAT_GAIN_LOSS_DARK_RGB;
+      final RGB flatRGB = UI.IS_DARK_THEME ? FLAT_GAIN_LOSS_DARK_RGB : FLAT_GAIN_LOSS_BRIGHT_RGB;
 
       final Color segmentColor = new Color(segmentRGB);
       final Color gainColor = new Color(gainRGB);
