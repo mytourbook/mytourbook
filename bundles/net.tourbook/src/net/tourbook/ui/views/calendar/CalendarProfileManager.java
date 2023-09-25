@@ -2196,7 +2196,6 @@ class CalendarProfileManager {
       profile.defaultId                     = DefaultId.YEAR;
 
       // layout
-      //todo fb this is all duplicated
       profile.isToggleMonthColor            = false;
       profile.isWeekRowHeight               = true;
       profile.useDraggedScrolling           = false;

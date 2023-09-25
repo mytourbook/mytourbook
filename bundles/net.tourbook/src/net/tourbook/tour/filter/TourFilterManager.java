@@ -713,7 +713,6 @@ public class TourFilterManager {
                   .values(VALUES_AIRQUALITY));
 
       // TODO FB not defined doesnt work
-      // it also doesn't remember the last one selected when reopening the filter
 
       allConfigs.add(
             TourFilterFieldConfig
@@ -1659,7 +1658,11 @@ public class TourFilterManager {
             readXml_Number_Float(xmlProperty, filterProperty, 1);
             break;
 
-         case TEXT, SEASON, CATEGORY, ENUMERATION:
+         case ENUMERATION:
+            readXml_Text(xmlProperty, filterProperty, 1);
+            break;
+
+         case TEXT, SEASON, CATEGORY:
             break;
          }
 
@@ -1888,9 +1891,6 @@ public class TourFilterManager {
       getFieldConfig(TourFilterFieldId.ALTITUDE_MAX).unitLabel(UI.UNIT_LABEL_ELEVATION);
    }
 
-   /**
-    * @return
-    */
    private static XMLMemento writeFilterProfile() {
 
       XMLMemento xmlRoot = null;
@@ -1996,7 +1996,11 @@ public class TourFilterManager {
             writeXml_Number_Float(xmlProperty, doubleValue1, 1);
             break;
 
-         case TEXT, SEASON, CATEGORY, ENUMERATION:
+         case ENUMERATION:
+            writeXml_Text(xmlProperty, textValue1, 1);
+            break;
+
+         case TEXT, SEASON, CATEGORY:
             break;
          }
 
