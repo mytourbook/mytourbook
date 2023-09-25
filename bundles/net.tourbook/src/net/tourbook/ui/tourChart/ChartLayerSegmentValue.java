@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -296,7 +296,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                segmenterSegment.paintedX2 = devXSegment;
                segmenterSegment.paintedY2 = devYSegment;
 
-               segmenterSegment.hoveredLineRect = new Rectangle(//
+               segmenterSegment.hoveredLineRect = new Rectangle(
                      devXPrev,
                      devYSegment - SegmenterSegment.EXPANDED_HOVER_SIZE2,
                      segmentWidth,
@@ -347,7 +347,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                   /*
                    * Ensure the value text do not overlap, if possible :-)
                    */
-                  final Rectangle textRect = new Rectangle(//
+                  final Rectangle textRect = new Rectangle(
                         devXText - borderWidth2,
                         devYText - borderHeight,
                         textWidth + borderWidth2,
@@ -367,7 +367,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                         overlapChecker.setupNext(validRect);
 
                         gc.setAlpha(0xff);
-                        gc.drawText(//
+                        gc.drawText(
                               valueText,
                               devXText,
                               validRect.y,
@@ -380,7 +380,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                      segmenterSegment.paintedLabel = validRect;
 
                      // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
-//                     final Rectangle hoveredRect = new Rectangle(//
+//                     final Rectangle hoveredRect = new Rectangle(
 //                           (validRect.x + borderWidth),
 //                           (validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
 //                           (validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),

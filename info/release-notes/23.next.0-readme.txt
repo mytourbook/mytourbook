@@ -42,6 +42,10 @@ Experimental
 
 New
 ===
+  
+* Tour Segmenter
+  - New segmenter "By Elevation - Flat, Gain & Loss"
+    https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
 
 * Calendar - Weekly summary (Frederic)
   - Training Stress Score (TSS)
@@ -49,8 +53,10 @@ New
 * Tour Filter (Frederic)
   - Added a property to filter tours based on their measured air quality
 
-* Tour Info Tooltip (Frederic)
-  - Added the average elevation
+* Tour Info Tooltip
+  - Show flat/gain/loss values
+    https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
+  - Added the average elevation (Frederic)
 
 
 Improvements
@@ -87,6 +93,7 @@ Improvements
   - Support macOS ARM platform    
     https://github.com/mytourbook/mytourbook/discussions/1174
 
+
 * Tour Blog View & Tour Analyzer View (Frederic)
   - Refreshing each view when the measurement system is changed
 
@@ -96,7 +103,8 @@ Improvements
 Changes
 =======
 
-* 
+* Tour Segmenter
+  - The tour segmenter color for total values is used for the foreground color and not for the background color
 
 
 Bugfix

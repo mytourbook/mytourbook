@@ -46,6 +46,7 @@ public interface ICommonPreferences {
    public static final String DISPLAY_FORMAT_DISTANCE              = "DISPLAY_FORMAT_DISTANCE";              //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_POWER                 = "DISPLAY_FORMAT_POWER";                 //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_PULSE                 = "DISPLAY_FORMAT_PULSE";                 //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_RELATIVE              = "DISPLAY_FORMAT_RELATIVE";              //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_SPEED                 = "DISPLAY_FORMAT_SPEED";                 //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_TEMPERATURE           = "DISPLAY_FORMAT_TEMPERATURE";           //$NON-NLS-1$
 

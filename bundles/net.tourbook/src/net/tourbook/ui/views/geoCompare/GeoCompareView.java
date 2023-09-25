@@ -167,11 +167,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private static final int              TOUR_FILTER_ELEVATION_DIFF_DEFAULT           = 10;
    private static final int              TOUR_FILTER_MAX_RESULTS_DEFAULT              = 100;
 
-   private static final String           INCREMENTER_0_1                              = "0.1";                                             //$NON-NLS-1$
-   private static final String           INCREMENTER_1                                = "1";                                               //$NON-NLS-1$
-   private static final String           INCREMENTER_10                               = "10";                                              //$NON-NLS-1$
-   private static final String           INCREMENTER_100                              = "100";                                             //$NON-NLS-1$
-
    private static final String           COLUMN_AVG_PACE                              = "avgPace";                                         //$NON-NLS-1$
    private static final String           COLUMN_AVG_PULSE                             = "avgPulse";                                        //$NON-NLS-1$
    private static final String           COLUMN_AVG_SPEED                             = "avgSpeed";                                        //$NON-NLS-1$
@@ -2505,17 +2500,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        * Fill in the same order as the mouse wheel is increasing/decreasing the spinner value,
        * otherwise it is in the opposite direction which is confusing !!!
        */
-      _comboMouseWheelIncrementer_GeoDiff.add(INCREMENTER_10);
-      _comboMouseWheelIncrementer_GeoDiff.add(INCREMENTER_1);
-      _comboMouseWheelIncrementer_GeoDiff.add(INCREMENTER_0_1);
+      _comboMouseWheelIncrementer_GeoDiff.add(UI.INCREMENTER_10);
+      _comboMouseWheelIncrementer_GeoDiff.add(UI.INCREMENTER_1);
+      _comboMouseWheelIncrementer_GeoDiff.add(UI.INCREMENTER_0_1);
 
-      _comboMouseWheelIncrementer_ElevationDiff.add(INCREMENTER_100);
-      _comboMouseWheelIncrementer_ElevationDiff.add(INCREMENTER_10);
-      _comboMouseWheelIncrementer_ElevationDiff.add(INCREMENTER_1);
+      _comboMouseWheelIncrementer_ElevationDiff.add(UI.INCREMENTER_100);
+      _comboMouseWheelIncrementer_ElevationDiff.add(UI.INCREMENTER_10);
+      _comboMouseWheelIncrementer_ElevationDiff.add(UI.INCREMENTER_1);
 
-      _comboMouseWheelIncrementer_MaxResults.add(INCREMENTER_100);
-      _comboMouseWheelIncrementer_MaxResults.add(INCREMENTER_10);
-      _comboMouseWheelIncrementer_MaxResults.add(INCREMENTER_1);
+      _comboMouseWheelIncrementer_MaxResults.add(UI.INCREMENTER_100);
+      _comboMouseWheelIncrementer_MaxResults.add(UI.INCREMENTER_10);
+      _comboMouseWheelIncrementer_MaxResults.add(UI.INCREMENTER_1);
    }
 
    /**

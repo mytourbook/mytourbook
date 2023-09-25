@@ -255,6 +255,12 @@ public class UI {
    public static final String       ELLIPSIS                             = "...";                                       //$NON-NLS-1$
    public static final String       ELLIPSIS_WITH_SPACE                  = " ... ";                                     //$NON-NLS-1$
 
+   public static final String       INCREMENTER_0_1                      = "0.1";                                       //$NON-NLS-1$
+   public static final String       INCREMENTER_0_01                     = "0.01";                                      //$NON-NLS-1$
+   public static final String       INCREMENTER_1                        = "1";                                         //$NON-NLS-1$
+   public static final String       INCREMENTER_10                       = "10";                                        //$NON-NLS-1$
+   public static final String       INCREMENTER_100                      = "100";                                       //$NON-NLS-1$
+
    private static final char[]      INVALID_FILENAME_CHARS               = new char[] {
          '\\',
          '/',
@@ -523,6 +529,10 @@ public class UI {
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+   /**
+    * m (meter) or ft (feet)
+    */
    public static String       UNIT_LABEL_ELEVATION;
    public static String       UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
@@ -1418,6 +1428,24 @@ public class UI {
    public static Label createLabel(final Composite parent, final String text) {
 
       final Label label = new Label(parent, SWT.NONE);
+
+      label.setText(text);
+
+      return label;
+   }
+
+   /**
+    * Creates a {@link Label} with text and style
+    *
+    * @param parent
+    * @param text
+    * @param style
+    * @return
+    */
+   public static Label createLabel(final Composite parent, final String text, final int style) {
+
+      final Label label = new Label(parent, style);
+
       label.setText(text);
 
       return label;

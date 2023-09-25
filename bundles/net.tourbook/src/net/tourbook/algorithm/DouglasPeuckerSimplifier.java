@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,18 @@ import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
 
+/**
+ * The main part of this code was found somewhere in the internet but cannot remember after 15
+ * years but it seems to be from this source
+ * <p>
+ * http://softsurfer.com/Archive/algorithm_0205/algorithm_0205.htm
+ * <p>
+ * Copyright 2002, softSurfer (www.softsurfer.com)
+ * This code may be freely used and modified for any purpose providing that this copyright notice is
+ * included with it. SoftSurfer makes no warranty for this code, and cannot be held liable for any
+ * real or imagined damage resulting from its use. Users of this code must verify correctness for
+ * their application.
+ */
 public class DouglasPeuckerSimplifier {
 
    /**
@@ -39,7 +51,9 @@ public class DouglasPeuckerSimplifier {
     */
    private int[]     _forcedSegmentsIndices;
 
-   public DouglasPeuckerSimplifier(final float tolerance, final DPPoint[] graphPoints, final int[] forcedSegmentIndices) {
+   public DouglasPeuckerSimplifier(final float tolerance,
+                                   final DPPoint[] graphPoints,
+                                   final int[] forcedSegmentIndices) {
 
       _tolerance = tolerance;
       _graphPoints = graphPoints;

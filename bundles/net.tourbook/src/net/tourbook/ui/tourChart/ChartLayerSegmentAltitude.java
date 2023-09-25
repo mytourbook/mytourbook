@@ -28,6 +28,7 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.graphics.Line2D;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -49,6 +50,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
+   private static final RGB            FLAT_GAIN_LOSS_BRIGHT_RGB = new RGB(0, 0, 0);
+   private static final RGB            FLAT_GAIN_LOSS_DARK_RGB   = new RGB(0xFF, 0xff, 0xff);
+
    private TourChart                   _tourChart;
    private TourData                    _tourData;
 
@@ -56,7 +60,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
     * Contains only chart labels which are painted (visible) all hidden labels are NOT in this
     * list.
     */
-   private ArrayList<SegmenterSegment> _paintedSegments = new ArrayList<>();
+   private ArrayList<SegmenterSegment> _paintedSegments          = new ArrayList<>();
 
    // hide small values
    private boolean _isHideSmallValues;
@@ -151,8 +155,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
       int devXPrev = Integer.MIN_VALUE;
       int devYPrev = Integer.MIN_VALUE;
 
-      final float[] segmentSerieAltitudeDiff = _tourData.segmentSerie_Altitude_Diff;
-      final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerie_Altitude_Diff_Computed;
+      final float[] segmentSerie_ElevationDiff = _tourData.segmentSerie_Elevation_Diff;
+      final float[] segmentSerie_ElevationDiff_Computed = _tourData.segmentSerie_Elevation_Diff_Computed;
+      final float[] segmentSerie_Gradient = _tourData.segmentSerie_Gradient;
+
+      final float segmentSerie_FlatGainLoss_Gradient = _tourData.segmentSerie_FlatGainLoss_Gradient;
+      final boolean canApplyFlatColor = segmentSerie_FlatGainLoss_Gradient != -1;
 
       final LineAttributes defaultLineAttributes = gc.getLineAttributes();
       final LineAttributes markerLineAttribute = new LineAttributes(5);
@@ -173,9 +181,12 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
       gc.setTextAntialias(chart.graphAntialiasing);
 
       final RGB segmentRGB = segmentConfig.segmentLineRGB;
-      final RGB upRGB = new RGB(0xff, 0x5e, 0x62);
+      final RGB gainRGB = new RGB(0xff, 0x5e, 0x62);
+      final RGB flatRGB = UI.IS_DARK_THEME ? FLAT_GAIN_LOSS_DARK_RGB : FLAT_GAIN_LOSS_BRIGHT_RGB;
+
       final Color segmentColor = new Color(segmentRGB);
-      final Color upColor = new Color(upRGB);
+      final Color gainColor = new Color(gainRGB);
+      final Color flatColor = new Color(flatRGB);
 
       // loop: all segments
       for (int segmentIndex = 0; segmentIndex < numSegments; segmentIndex++) {
@@ -223,14 +234,14 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
          final int segmentHeight = devYSegment - devYPrev;
 
          /*
-          * Get up/down value
+          * Get gain/loss value
           */
          float altiDiff = 0;
          if (segmentIndex > 0) {
-            if (segmentSerieComputedAltitudeDiff != null) {
-               altiDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
+            if (segmentSerie_ElevationDiff_Computed != null) {
+               altiDiff = segmentSerie_ElevationDiff_Computed[segmentIndex];
             } else {
-               altiDiff = segmentSerieAltitudeDiff[segmentIndex];
+               altiDiff = segmentSerie_ElevationDiff[segmentIndex];
             }
          }
          final boolean isValueUp = altiDiff >= 0;
@@ -270,12 +281,27 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
          Color textAndLineColor;
          RGB paintedRGB;
-         if (altiDiff < 0) {
+
+         final float segmentGradient = segmentSerie_Gradient[segmentIndex];
+
+         if (canApplyFlatColor
+               && (segmentGradient >= 0 && segmentGradient <= segmentSerie_FlatGainLoss_Gradient
+                     || segmentGradient < 0 && segmentGradient >= -segmentSerie_FlatGainLoss_Gradient)
+
+         ) {
+
+            textAndLineColor = flatColor;
+            paintedRGB = flatRGB;
+
+         } else if (altiDiff < 0) {
+
             textAndLineColor = segmentColor;
             paintedRGB = segmentRGB;
+
          } else {
-            textAndLineColor = upColor;
-            paintedRGB = upRGB;
+
+            textAndLineColor = gainColor;
+            paintedRGB = gainRGB;
          }
 
          final SegmenterSegment segmenterSegment = new SegmenterSegment();

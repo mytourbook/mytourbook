@@ -5665,7 +5665,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          final IValueLabelProvider labelProviderMMSS = TourManager.getLabelProviderMMSS();
 
          cfgAltitude = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTITUDE);
-         cfgAltitude.segmentDataSerie = _tourData.segmentSerie_Altitude_Diff;
+         cfgAltitude.segmentDataSerie = _tourData.segmentSerie_Elevation_Diff;
          cfgAltitude.labelProvider = labelProviderInt;
          cfgAltitude.canHaveNegativeValues = true;
          cfgAltitude.minValueAdjustment = 0.1;
@@ -5701,7 +5701,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          cfgGradient.minValueAdjustment = 1.6;
 
          cfgAltimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
-         cfgAltimeter.segmentDataSerie = _tourData.segmentSerie_Altitude_UpDown_Hour;
+         cfgAltimeter.segmentDataSerie = _tourData.segmentSerie_Elevation_GainLoss_Hour;
          cfgAltimeter.labelProvider = labelProviderInt;
          cfgAltimeter.canHaveNegativeValues = true;
          cfgAltimeter.minValueAdjustment = 1.0;
