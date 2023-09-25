@@ -79,7 +79,6 @@ public class TourFilterFieldConfig {
     * Create a field category configuration.
     *
     * @param name
-    * @param fieldType
     * @param categoryDefaultFieldId
     */
    public TourFilterFieldConfig(final String name, final TourFilterFieldId categoryDefaultFieldId) {
