@@ -1583,8 +1583,7 @@ class CalendarProfileManager {
       final TextDataFormatter dataFormatter = new TextDataFormatter(
             FormatterID.TRAININGLOAD_TSS,
             Messages.Calendar_Profile_Value_TrainingStress_Tss,
-            //TODO FB UI.EMPTY_STRING
-            GraphColorManager.PREF_GRAPH_TIME) {
+            UI.EMPTY_STRING) {
 
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {

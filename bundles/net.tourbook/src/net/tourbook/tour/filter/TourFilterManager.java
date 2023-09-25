@@ -38,6 +38,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -206,7 +207,7 @@ public class TourFilterManager {
 
    private static final String[]                  VALUES_AIRQUALITY               = {
 
-         net.tourbook.common.Messages.Weather_AirQuality_0_IsNotDefined,
+         IWeather.airQualityIsNotDefined,
          net.tourbook.common.Messages.Weather_AirQuality_1_Good,
          net.tourbook.common.Messages.Weather_AirQuality_2_Fair,
          net.tourbook.common.Messages.Weather_AirQuality_3_Moderate,
@@ -712,8 +713,6 @@ public class TourFilterManager {
                   .fieldOperators(new TourFilterFieldOperator[] { TourFilterFieldOperator.EQUALS, TourFilterFieldOperator.NOT_EQUALS })
                   .values(VALUES_AIRQUALITY));
 
-      // TODO FB not defined doesnt work
-
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Temperature)
@@ -1029,7 +1028,11 @@ public class TourFilterManager {
 
          case WEATHER_AIRQUALITY:
             sql = TOUR_DATA_WEATHER_AIRQUALITY;
-            getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            if (text1.equals(IWeather.airQualityIsNotDefined)) {
+               getSQL__FieldOperators_Text(sqlWhere, TourFilterFieldOperator.IS_EMPTY, sql);
+            } else {
+               getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            }
             break;
 
          case WEATHER_TEMPERATURE:
