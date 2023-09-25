@@ -24,7 +24,6 @@ import java.text.DateFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import net.tourbook.Messages;
@@ -1073,10 +1072,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             .align(SWT.END, SWT.CENTER)
             .applyTo(combo);
 
-      final int indexToSelect = Arrays.asList(fieldConfig.values).indexOf(filterProperty.textValue1);
-
       filterProperty.uiCombo_Enumeration = combo;
-      filterProperty.uiCombo_Enumeration.select(indexToSelect);
+      filterProperty.uiCombo_Enumeration.select(filterProperty.comboSelectedIndex);
 
       return 1;
    }
@@ -1590,7 +1587,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       final Combo combo = (Combo) (selectionEvent.widget);
 
       final TourFilterProperty filterProperty = (TourFilterProperty) combo.getData();
-      filterProperty.textValue1 = combo.getText();
+      filterProperty.comboSelectedIndex = combo.getSelectionIndex();
 
       fireModifyEvent();
    }

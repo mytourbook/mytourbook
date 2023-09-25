@@ -71,6 +71,8 @@ public class TourFilterProperty implements Cloneable {
    String        textValue1 = UI.EMPTY_STRING;
    String        textValue2 = UI.EMPTY_STRING;
 
+   int           comboSelectedIndex;
+
    /*
     * UI controls, not all of them are used, it depends on the selected field type and operator
     */

@@ -87,6 +87,7 @@ public class TourFilterManager {
    private static final String TAG_PROPERTY                     = "Property";                                    //$NON-NLS-1$
    private static final String TAG_ROOT                         = "TourFilterProfiles";                          //$NON-NLS-1$
 
+   private static final String ATTR_COMBOSELECTEDINDEX          = "comboSelectedIndex";                          //$NON-NLS-1$
    private static final String ATTR_IS_ENABLED                  = "isEnabled";                                   //$NON-NLS-1$
    private static final String ATTR_IS_SELECTED                 = "isSelected";                                  //$NON-NLS-1$
    private static final String ATTR_FIELD_ID                    = "fieldId";                                     //$NON-NLS-1$
@@ -915,7 +916,7 @@ public class TourFilterManager {
          }
 
          final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-         final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
+         TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
 
          final TourFilterFieldId fieldId = fieldConfig.fieldId;
 
@@ -927,8 +928,9 @@ public class TourFilterManager {
          final Double double1 = truncateValue(filterProperty.doubleValue1);
          final Double double2 = truncateValue(filterProperty.doubleValue2);
 
-         final String text1 = filterProperty.textValue1;
          final String text2 = filterProperty.textValue2;
+
+         final int selectedIndex = filterProperty.comboSelectedIndex;
 
          String sql;
 
@@ -1028,9 +1030,17 @@ public class TourFilterManager {
 
          case WEATHER_AIRQUALITY:
             sql = TOUR_DATA_WEATHER_AIRQUALITY;
-            if (text1.equals(IWeather.airQualityIsNotDefined)) {
-               getSQL__FieldOperators_Text(sqlWhere, TourFilterFieldOperator.IS_EMPTY, sql);
+            if (selectedIndex == 0) { // IWeather.airQualityIsNotDefined
+
+               if (fieldOperator == TourFilterFieldOperator.NOT_EQUALS) {
+                  fieldOperator = TourFilterFieldOperator.IS_NOT_EMPTY;
+               } else {
+                  fieldOperator = TourFilterFieldOperator.IS_EMPTY;
+               }
+
+               getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             } else {
+               final String text1 = VALUES_AIRQUALITY[selectedIndex];
                getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
             }
             break;
@@ -1662,7 +1672,7 @@ public class TourFilterManager {
             break;
 
          case ENUMERATION:
-            readXml_Text(xmlProperty, filterProperty, 1);
+            readXml_Enumeration(xmlProperty, filterProperty);
             break;
 
          case TEXT, SEASON, CATEGORY:
@@ -1741,6 +1751,14 @@ public class TourFilterManager {
       } else {
          filterProperty.dateTime2 = date;
       }
+   }
+
+   private static void readXml_Enumeration(final IMemento xmlProperty,
+                                           final TourFilterProperty filterProperty) {
+
+      final int value = Util.getXmlInteger(xmlProperty, ATTR_COMBOSELECTEDINDEX, 0);
+
+      filterProperty.comboSelectedIndex = value;
    }
 
    private static void readXml_Number_Float(final IMemento xmlProperty,
@@ -1978,6 +1996,8 @@ public class TourFilterManager {
 
       final String textValue1 = filterProperty.textValue1;
 
+      final int selectedIndex = filterProperty.comboSelectedIndex;
+
       switch (fieldOperator) {
 
       case GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL, EQUALS, NOT_EQUALS:
@@ -2000,7 +2020,7 @@ public class TourFilterManager {
             break;
 
          case ENUMERATION:
-            writeXml_Text(xmlProperty, textValue1, 1);
+            writeXml_Enumeration(xmlProperty, selectedIndex);
             break;
 
          case TEXT, SEASON, CATEGORY:
@@ -2063,6 +2083,11 @@ public class TourFilterManager {
       xmlProperty.putInteger(ATTR_DATE_YEAR + fieldNo, dateTime.getYear());
       xmlProperty.putInteger(ATTR_DATE_MONTH + fieldNo, dateTime.getMonthValue());
       xmlProperty.putInteger(ATTR_DATE_DAY + fieldNo, dateTime.getDayOfMonth());
+   }
+
+   private static void writeXml_Enumeration(final IMemento xmlProperty, final int value) {
+
+      xmlProperty.putInteger(ATTR_COMBOSELECTEDINDEX, value);
    }
 
    private static void writeXml_Number_Float(final IMemento xmlProperty, final double value, final int fieldNo) {
