@@ -1779,7 +1779,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final int[] timeSerie = _tourData.timeSerie;
       final float[] distanceSerie = _tourData.distanceSerie;
-      final float[] elevationSerie = _tourData.getAltitudeSmoothedSerie(false);
+      final float[] elevationSerie = _tourData.getAltitudeSmoothedSerieMetric();
 
       final int numTimeSlices = timeSerie.length;
 
@@ -3720,8 +3720,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment segment = (TourSegment) cell.getElement();
 
-            final double altitudeDiff = segment.altitude_Segment_Border_Diff;
-            final double value = altitudeDiff / UI.UNIT_VALUE_ELEVATION;
+            final float altitudeDiff = segment.altitude_Segment_Border_Diff;
+            final float value = altitudeDiff / UI.UNIT_VALUE_ELEVATION;
 
             boolean isShowColor = true;
 
@@ -6707,17 +6707,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(_vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(_vertSpeed_DistanceFlat / 1000));
-      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(_vertSpeed_DistanceGain / 1000));
-      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(_vertSpeed_DistanceLoss / 1000));
+      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(_vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(_vertSpeed_DistanceGain / 1000 / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(_vertSpeed_DistanceLoss / 1000 / UI.UNIT_VALUE_DISTANCE));
 
       _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative(_vertSpeed_DistanceFlat / sumDistance * 100));
       _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative(_vertSpeed_DistanceGain / sumDistance * 100));
       _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative(_vertSpeed_DistanceLoss / sumDistance * 100));
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(_vertSpeed_ElevationGain));
-      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(_vertSpeed_ElevationLoss));
+      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(_vertSpeed_ElevationGain / UI.UNIT_VALUE_ELEVATION));
+      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(_vertSpeed_ElevationLoss / UI.UNIT_VALUE_ELEVATION));
 
       _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
       _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));

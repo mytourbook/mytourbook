@@ -5092,6 +5092,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    private void computeMaxSpeed() {
+
       if (distanceSerie != null) {
          computeDataSeries_Smoothed();
       }
@@ -8273,6 +8274,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             return altitudeSerieSmoothed;
          }
       }
+   }
+
+   /**
+    * @return Returns smoothed elevation metric values or <code>null</code> when not available
+    */
+   public float[] getAltitudeSmoothedSerieMetric() {
+
+      if (altitudeSerie == null) {
+         return null;
+      }
+
+      if (altitudeSerieSmoothed == null) {
+         computeDataSeries_Smoothed();
+      }
+
+      return altitudeSerieSmoothed;
    }
 
    /**
