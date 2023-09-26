@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
@@ -75,7 +76,7 @@ class Suunto9_DeviceDataReaderTests {
 
          return lastTourData;
       } catch (final NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       return null;
