@@ -2324,7 +2324,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
       } catch (final IOException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
    }
 
@@ -7860,7 +7860,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          try {
             TourManager.checkTourData(_tourData, getTourData(_tourData.getTourId()));
          } catch (final MyTourbookException e) {
-            e.printStackTrace();
+            StatusUtil.log(e);
          }
       }
 
@@ -8331,7 +8331,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       try {
          getSite().getPage().showView(ID, null, IWorkbenchPage.VIEW_VISIBLE);
       } catch (final PartInitException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       // confirm save/discard/cancel
