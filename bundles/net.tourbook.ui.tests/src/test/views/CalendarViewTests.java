@@ -22,6 +22,7 @@ import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -48,7 +49,14 @@ public class CalendarViewTests extends UITest {
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
 
       // Activate the "Link with other views"
-      bot.toolbarButtonWithTooltip(Messages.Calendar_View_Action_LinkWithOtherViews).click();
+      for (final SWTBotToolbarButton button : calendarView.getToolbarButtons()) {
+
+         if (Messages.Calendar_View_Action_LinkWithOtherViews.equals(button.getToolTipText())) {
+
+            button.click();
+            break;
+         }
+      }
 
       // Open the Tour Book View to put a tour in focus on the calendar view
       Utils.showTourBookView(bot);
