@@ -20,10 +20,6 @@ import net.tourbook.common.formatter.ValueFormat;
 
 abstract class NumberDataFormatter extends DataFormatter {
 
-   NumberDataFormatter(final FormatterID id) {
-      super(id);
-   }
-
    NumberDataFormatter(final FormatterID id, final String name, final String colorName) {
       super(id, name, colorName);
    }
