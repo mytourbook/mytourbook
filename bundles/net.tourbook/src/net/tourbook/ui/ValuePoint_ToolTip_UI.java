@@ -1696,7 +1696,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                // update UI delayed
                if (__runnableCounter != _updateCounter[0]) {
 
-                  // a new update UI occured
+                  // a new update UI occurred
 
                   return;
                }
