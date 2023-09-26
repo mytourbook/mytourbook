@@ -117,6 +117,9 @@ Bugfix
 * Tour Analyzer View (Frederic)
   - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
 
+* Calendar View (Frederic)
+  - Fix for a regression that caused the "Link with other views" button to be not persisted. The regression appeared in v18.9.0
+
 
 Translation    
 ===========
