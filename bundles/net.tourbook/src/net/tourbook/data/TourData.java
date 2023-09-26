@@ -3194,7 +3194,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       flatGainLoss.distanceLoss = distanceLossTotal;
 
       flatGainLoss.elevationGain = elevationGainTotal;
-      flatGainLoss.elevationLoss = elevationLossTotal;
+      flatGainLoss.elevationLoss = -elevationLossTotal;
 
       return flatGainLoss;
    }
