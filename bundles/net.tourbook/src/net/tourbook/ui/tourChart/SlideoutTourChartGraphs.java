@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 
@@ -36,8 +38,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -55,7 +56,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    private ActionOpenPrefDialog   _actionPrefDialog;
    private ActionResetToDefaults  _actionRestoreDefaults;
 
-   private SelectionAdapter       _defaultSelectionListener;
+   private SelectionListener      _defaultSelectionListener;
 
    /*
     * UI controls
@@ -82,8 +83,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    private Button    _chkShowInChartToolbar_Power_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Pulse;
    private Button    _chkShowInChartToolbar_Pulse_DefaultWhenOpened;
-   private Button    _chkShowInChartToolbar_Tempterature;
-   private Button    _chkShowInChartToolbar_Tempterature_DefaultWhenOpened;
+   private Button    _chkShowInChartToolbar_Temperature;
+   private Button    _chkShowInChartToolbar_Temperature_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Speed;
    private Button    _chkShowInChartToolbar_Speed_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Speed_Interval;
@@ -133,7 +134,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
@@ -218,7 +219,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             _chkShowInChartToolbar_Pace_Interval_DefaultWhenOpened      = createUI_DefaulWhenOpened(container);
             _chkShowInChartToolbar_Pace_Summarized_DefaultWhenOpened    = createUI_DefaulWhenOpened(container);
             _chkShowInChartToolbar_Power_DefaultWhenOpened              = createUI_DefaulWhenOpened(container);
-            _chkShowInChartToolbar_Tempterature_DefaultWhenOpened       = createUI_DefaulWhenOpened(container);
+            _chkShowInChartToolbar_Temperature_DefaultWhenOpened       = createUI_DefaulWhenOpened(container);
             _chkShowInChartToolbar_Gradient_DefaultWhenOpened           = createUI_DefaulWhenOpened(container);
             _chkShowInChartToolbar_Altimeter_DefaultWhenOpened          = createUI_DefaulWhenOpened(container);
             _chkShowInChartToolbar_Cadence_DefaultWhenOpened            = createUI_DefaulWhenOpened(container);
@@ -282,7 +283,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             _chkShowInChartToolbar_Pace_Interval      = createUI_ShowActionInToolbar(container);
             _chkShowInChartToolbar_Pace_Summarized    = createUI_ShowActionInToolbar(container);
             _chkShowInChartToolbar_Power              = createUI_ShowActionInToolbar(container);
-            _chkShowInChartToolbar_Tempterature       = createUI_ShowActionInToolbar(container);
+            _chkShowInChartToolbar_Temperature       = createUI_ShowActionInToolbar(container);
             _chkShowInChartToolbar_Gradient           = createUI_ShowActionInToolbar(container);
             _chkShowInChartToolbar_Altimeter          = createUI_ShowActionInToolbar(container);
             _chkShowInChartToolbar_Cadence            = createUI_ShowActionInToolbar(container);
@@ -343,14 +344,9 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
       return checkbox;
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
    }
 
    @Override
@@ -421,7 +417,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 		_chkShowInChartToolbar_Gradient.setSelection(							Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT,								TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT));
 		_chkShowInChartToolbar_Power.setSelection(								Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER_DEFAULT));
 		_chkShowInChartToolbar_Pulse.setSelection(								Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE_DEFAULT));
-		_chkShowInChartToolbar_Tempterature.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT));
+		_chkShowInChartToolbar_Temperature.setSelection(						Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT));
 
 		_chkShowInChartToolbar_Pace.setSelection(									Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE,									TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT));
 		_chkShowInChartToolbar_Pace_Interval.setSelection(					   Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL,						TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL_DEFAULT));
@@ -501,7 +497,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          }
 
          if (graphIdValue == TourManager.GRAPH_TEMPERATURE) {
-            _chkShowInChartToolbar_Tempterature_DefaultWhenOpened.setSelection(true);
+            _chkShowInChartToolbar_Temperature_DefaultWhenOpened.setSelection(true);
          }
 
          /*
@@ -557,7 +553,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED, 									 _chkShowInChartToolbar_Speed.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL, 						 _chkShowInChartToolbar_Speed_Interval.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED, 					 _chkShowInChartToolbar_Speed_Summarized.getSelection());
-		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							 _chkShowInChartToolbar_Tempterature.getSelection());
+		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE,							 _chkShowInChartToolbar_Temperature.getSelection());
 
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME, 				 _chkShowInChartToolbar_RunDyn_StanceTime.getSelection());
 		_state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED, 	 _chkShowInChartToolbar_RunDyn_StanceTimeBalance.getSelection());
@@ -627,7 +623,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_SPEED_SUMMARIZED));
       }
 
-      if (_chkShowInChartToolbar_Tempterature_DefaultWhenOpened.getSelection()) {
+      if (_chkShowInChartToolbar_Temperature_DefaultWhenOpened.getSelection()) {
          allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_TEMPERATURE));
       }
 
