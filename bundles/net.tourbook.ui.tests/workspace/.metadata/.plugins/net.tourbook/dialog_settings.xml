@@ -242,7 +242,7 @@
 	<section name="TourStatisticsView">
 	</section>
 	<section name="TourCalendarView">
-		<item key="STATE_IS_LINKED" value="false"/>
+		<item key="STATE_IS_LINKED" value="true"/>
 		<item key="STATE_IS_SHOW_TOUR_INFO" value="true"/>
 		<item key="STATE_FIRST_DISPLAYED_EPOCH_DAY" value="15824"/>
 		<item key="STATE_SELECTED_TOURS" value="-1"/>
