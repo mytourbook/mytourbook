@@ -96,10 +96,14 @@ public class UI {
    public static final String            EMPTY_STRING                    = "";                                //$NON-NLS-1$
    public static final String            SPACE                           = " ";                               //$NON-NLS-1$
    public static final String            SPACE2                          = "  ";                              //$NON-NLS-1$
+   public static final String            SPACE4                          = "    ";                            //$NON-NLS-1$
    public static final String            COLON_SPACE                     = ": ";                              //$NON-NLS-1$
    public static final String            COMMA_SPACE                     = ", ";                              //$NON-NLS-1$
+   public static final String            UNDERSCORE                      = "_";                               //$NON-NLS-1$
    public static final String            DASH                            = "-";                               //$NON-NLS-1$
+   public static final String            DASH_WITH_SPACE                 = " - ";                             //$NON-NLS-1$
    public static final String            DASH_WITH_DOUBLE_SPACE          = "   -   ";                         //$NON-NLS-1$
+   public static final String            SLASH_WITH_SPACE                = " / ";                             //$NON-NLS-1$
    public static final String            EMPTY_STRING_FORMAT             = "%s";                              //$NON-NLS-1$
 
    /**
@@ -164,10 +168,13 @@ public class UI {
    public static final String            SYMBOL_SUM_WITH_SPACE           = "\u2211 ";                         //$NON-NLS-1$
    public static final String            SYMBOL_TAU                      = "\u03c4";                          //$NON-NLS-1$
 
+   public static final String            SYMBOL_BRACKET_LEFT             = "(";                               //$NON-NLS-1$
    public static final String            SYMBOL_BRACKET_RIGHT            = ")";                               //$NON-NLS-1$
    public static final String            SYMBOL_COLON                    = ":";                               //$NON-NLS-1$
    public static final String            SYMBOL_DOT                      = ".";                               //$NON-NLS-1$
    public static final String            SYMBOL_EQUAL                    = "=";                               //$NON-NLS-1$
+   public static final String            SYMBOL_GREATER_THAN             = ">";                               //$NON-NLS-1$
+   public static final String            SYMBOL_LESS_THAN                = "<";                               //$NON-NLS-1$
    public static final String            SYMBOL_PERCENTAGE               = "%";                               //$NON-NLS-1$
    public static final String            SYMBOL_WIND_WITH_SPACE          = "W ";                              //$NON-NLS-1$
    public static final String            SYMBOL_EXCLAMATION_POINT        = "!";                               //$NON-NLS-1$
