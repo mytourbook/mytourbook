@@ -222,9 +222,6 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   //todo fb // linux async event when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa
-//see exampled UI.isLinuxAsyncEvent
-// add average elevation to tour info tooltip
    public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";    //$NON-NLS-1$
    //
    private static final char             NL                                               = UI.NEW_LINE;
@@ -3136,7 +3133,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _selectionListener = widgetSelectedAdapter(
             selectionEvent -> {
 
-               if (_isSetField || _isSavingInProgress) {
+               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
                   return;
                }
 
@@ -3160,7 +3157,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       _tourTimeListener = widgetSelectedAdapter(selectionEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
             return;
          }
 
@@ -3172,7 +3169,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _verifyFloatValue = modifyEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(modifyEvent.widget) || _isSetField || _isSavingInProgress) {
             return;
          }
 
@@ -3223,7 +3220,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _verifyIntValue = modifyEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(modifyEvent.widget) || _isSetField || _isSavingInProgress) {
             return;
          }
 
