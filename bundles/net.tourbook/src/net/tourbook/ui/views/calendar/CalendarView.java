@@ -314,7 +314,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          _actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
             @Override
             public void run() {
+               _stateIsLinked = _actionSetLinked.isChecked();
                _calendarGraph.setLinked(_stateIsLinked);
+
             }
          };
          _actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
