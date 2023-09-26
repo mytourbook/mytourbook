@@ -45,6 +45,7 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileLis
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -309,11 +310,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          /*
           * Link with other views
           */
-         _actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
+         _actionSetLinked = new Action(null, IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
                _calendarGraph.setLinked(_actionSetLinked.isChecked());
-
             }
          };
          _actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
