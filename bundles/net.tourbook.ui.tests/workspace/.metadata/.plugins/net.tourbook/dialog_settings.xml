@@ -221,7 +221,7 @@
 		<item key="STATE_SELECTED_YEAR" value="2015"/>
 		<item key="STATE_SELECTED_MONTH" value="5"/>
 		<item key="STATE_IS_SELECT_YEAR_MONTH_TOURS" value="false"/>
-		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
+		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="true"/>
 		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
 		<list key="STATE_SELECTED_TOURS">
 			<item value="201553195142998"/>
