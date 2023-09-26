@@ -29,13 +29,8 @@ import utils.Utils;
 
 public class CalendarViewTests extends UITest {
 
-   private String getCalendarProfileName(final String profileName) {
-
-      return Messages.Slideout_CalendarOptions_Label_AppPrefix + UI.SPACE + UI.SYMBOL_COLON + UI.SPACE + profileName;
-   }
-
    @Test
-   void openCalendarView() {
+   void calendarView_Basic() {
 
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       final SWTBotView calendarView = Utils.showView(bot, "Calendar"); //$NON-NLS-1$
@@ -52,6 +47,20 @@ public class CalendarViewTests extends UITest {
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_III));
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
 
+      // Activate the "Link with other views"
+      bot.toolbarButtonWithTooltip(Messages.Calendar_View_Action_LinkWithOtherViews).click();
+
+      // Open the Tour Book View to put a tour in focus on the calendar view
+      Utils.showTourBookView(bot);
+      Utils.getTour(bot);
+
+      calendarView.show();
+
       calendarView.close();
+   }
+
+   private String getCalendarProfileName(final String profileName) {
+
+      return Messages.Slideout_CalendarOptions_Label_AppPrefix + UI.SPACE + UI.SYMBOL_COLON + UI.SPACE + profileName;
    }
 }
