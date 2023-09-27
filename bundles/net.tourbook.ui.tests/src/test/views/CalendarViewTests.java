@@ -36,6 +36,7 @@ public class CalendarViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       final SWTBotView calendarView = Utils.showView(bot, "Calendar"); //$NON-NLS-1$
 
+      // Select the calendar profiles combo box
       final SWTBotCombo comboBoxCalendarProfile = bot.comboBox(2);
       assertNotNull(comboBoxCalendarProfile);
 
