@@ -1121,9 +1121,7 @@ public class TourFilterManager {
             getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
-         case TRAINING_INTENSITY_FACTOR:
-         case TRAINING_POWER_TO_WEIGHT_RATIO:
-         case TRAINING_STRESS_SCORE:
+         case TRAINING_INTENSITY_FACTOR, TRAINING_POWER_TO_WEIGHT_RATIO, TRAINING_STRESS_SCORE:
             break;
          }
       }
