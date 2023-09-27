@@ -2324,7 +2324,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
       } catch (final IOException e) {
-         StatusUtil.log(e);
+         e.printStackTrace();
       }
    }
 
