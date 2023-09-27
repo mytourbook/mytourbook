@@ -26,6 +26,7 @@ import net.tourbook.Messages;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotSpinner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -44,18 +45,22 @@ public class TourDataEditorViewTests extends UITest {
 
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
-      bot.comboBox().setText(newTourTitle);
+      final SWTBot tourDataEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
+
+      tourDataEditorViewBot.comboBox(0).setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
-
-      final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
+      final SWTBotCombo titleCombo = tourDataEditorViewBot.comboBox(0);
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
 
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
       assertNotNull(tourDateTime);
       tourDateTime.setDate(Date.from(Instant.now()));
+
+      final SWTBotSpinner tourRestPulse = bot.spinnerWithLabel(Messages.tour_editor_label_rest_pulse);
+      assertNotNull(tourRestPulse);
+      tourRestPulse.setSelection(60);
 
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
    }
