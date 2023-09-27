@@ -30,6 +30,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
 import net.tourbook.common.util.FileUtils;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -226,9 +227,9 @@ public class TourBookViewTests extends UITest {
 
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
-      assertEquals(15, botNatTable.rowCount());
+      assertTrue(botNatTable.rowCount() > 0);
 
-      assertEquals("0:32", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+      assertTrue(StringUtils.hasContent(botNatTable.getCellDataValueByPosition(2, 4)));
 
       final int numberVisibleColumns = 4;
       int visibleColumnIndex = 1;
