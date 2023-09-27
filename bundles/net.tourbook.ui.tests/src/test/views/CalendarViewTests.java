@@ -49,14 +49,9 @@ public class CalendarViewTests extends UITest {
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
 
       // Activate the "Link with other views"
-      for (final SWTBotToolbarButton button : calendarView.getToolbarButtons()) {
-
-         if (Messages.Calendar_View_Action_LinkWithOtherViews.equals(button.getToolTipText())) {
-
-            button.click();
-            break;
-         }
-      }
+      final SWTBotToolbarButton linkWithOtherViewsButton = Utils.getToolbarButton(calendarView, Messages.Calendar_View_Action_LinkWithOtherViews);
+      assertNotNull(linkWithOtherViewsButton);
+      linkWithOtherViewsButton.click();
 
       // Open the Tour Book View to put a tour in focus on the calendar view
       Utils.showTourBookView(bot);
