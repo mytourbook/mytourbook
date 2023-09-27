@@ -34,6 +34,7 @@ import net.tourbook.tour.TourLogManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.viewport.command.ShowColumnInViewportCommand;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -270,9 +271,11 @@ public class TourBookViewTests extends UITest {
    void testTourFilter() {
 
       // Activate the tour filter
-      bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip).click();
+      final SWTBotToolbarToggleButton tourFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip);
+      assertNotNull(tourFilterButton);
+      tourFilterButton.click();
 
       // Deactivate the tour filter
-      bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip).click();
+      tourFilterButton.click();
    }
 }
