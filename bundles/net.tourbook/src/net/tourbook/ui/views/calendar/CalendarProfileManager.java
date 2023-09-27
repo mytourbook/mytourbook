@@ -27,7 +27,6 @@ import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
@@ -842,7 +841,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Distance() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final NumberDataFormatter dataFormatter = new NumberDataFormatter(
             FormatterID.DISTANCE,
             Messages.Calendar_Profile_Value_Distance,
             GraphColorManager.PREF_GRAPH_DISTANCE) {
@@ -866,11 +865,6 @@ class CalendarProfileManager {
          }
 
          @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.NUMBER_1_0;
-         }
-
-         @Override
          public ValueFormat[] getValueFormats() {
 
             return new ValueFormat[] {
@@ -878,13 +872,6 @@ class CalendarProfileManager {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_2,
                   ValueFormat.NUMBER_1_3 };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -901,7 +888,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Elevation() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final NumberDataFormatter dataFormatter = new NumberDataFormatter(
             FormatterID.ELEVATION,
             Messages.Calendar_Profile_Value_Altitude,
             GraphColorManager.PREF_GRAPH_ALTITUDE) {
@@ -924,24 +911,12 @@ class CalendarProfileManager {
          }
 
          @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.NUMBER_1_0;
-         }
-
-         @Override
          public ValueFormat[] getValueFormats() {
 
             return new ValueFormat[] {
 
                   ValueFormat.NUMBER_1_0,
                   ValueFormat.NUMBER_1_1 };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -956,7 +931,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Elevation_Change() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final NumberDataFormatter dataFormatter = new NumberDataFormatter(
             FormatterID.ELEVATION_CHANGE,
             Messages.Calendar_Profile_Value_Elevation_Change,
             GraphColorManager.PREF_GRAPH_ALTITUDE) {
@@ -980,24 +955,12 @@ class CalendarProfileManager {
          }
 
          @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.NUMBER_1_0;
-         }
-
-         @Override
          public ValueFormat[] getValueFormats() {
 
             return new ValueFormat[] {
 
                   ValueFormat.NUMBER_1_0,
                   ValueFormat.NUMBER_1_1 };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1050,7 +1013,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Energy_kcal() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final NumberDataFormatter dataFormatter = new NumberDataFormatter(
             FormatterID.ENERGY_KCAL,
             Messages.Calendar_Profile_Value_Energy_kcal,
             GraphColorManager.PREF_GRAPH_POWER) {
@@ -1076,11 +1039,6 @@ class CalendarProfileManager {
          }
 
          @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.NUMBER_1_0;
-         }
-
-         @Override
          public ValueFormat[] getValueFormats() {
 
             return new ValueFormat[] {
@@ -1088,13 +1046,6 @@ class CalendarProfileManager {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_2,
                   ValueFormat.NUMBER_1_3 };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
@@ -1111,7 +1062,7 @@ class CalendarProfileManager {
     */
    private static DataFormatter createFormatter_Energy_MJ() {
 
-      final DataFormatter dataFormatter = new DataFormatter(
+      final NumberDataFormatter dataFormatter = new NumberDataFormatter(
             FormatterID.ENERGY_MJ,
             Messages.Calendar_Profile_Value_Energy_MJ,
             GraphColorManager.PREF_GRAPH_POWER) {
@@ -1138,11 +1089,6 @@ class CalendarProfileManager {
          }
 
          @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.NUMBER_1_0;
-         }
-
-         @Override
          public ValueFormat[] getValueFormats() {
 
             return new ValueFormat[] {
@@ -1150,13 +1096,6 @@ class CalendarProfileManager {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_2,
                   ValueFormat.NUMBER_1_3 };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = FormatManager.getNumberFormatter(valueFormat.name());
          }
       };
 
