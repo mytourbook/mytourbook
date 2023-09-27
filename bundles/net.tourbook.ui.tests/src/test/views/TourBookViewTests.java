@@ -226,7 +226,7 @@ public class TourBookViewTests extends UITest {
 
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
-      assertEquals(10, botNatTable.rowCount());
+      assertEquals(15, botNatTable.rowCount());
 
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
