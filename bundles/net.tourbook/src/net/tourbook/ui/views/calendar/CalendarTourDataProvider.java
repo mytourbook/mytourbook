@@ -558,8 +558,8 @@ class CalendarTourDataProvider {
                if (tourId == lastTourId) {
 
                   // get additional tags from outer join
-                  if (dbTagId instanceof final Long tagId) {
-                     tagIds.add(tagId);
+                  if (dbTagId instanceof Long) {
+                     tagIds.add((Long) dbTagId);
                   }
 
                } else {
