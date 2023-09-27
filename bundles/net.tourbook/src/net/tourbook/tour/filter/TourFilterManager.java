@@ -1170,9 +1170,6 @@ public class TourFilterManager {
       case NOT_BETWEEN:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
          break;
-
-      default:
-         break;
       }
    }
 
@@ -1255,9 +1252,6 @@ public class TourFilterManager {
          break;
       case NOT_BETWEEN:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
-         break;
-
-      default:
          break;
       }
    }
@@ -1387,9 +1381,6 @@ public class TourFilterManager {
          sqlParameters.add(dateValue1);
          sqlParameters.add(dateValue2);
          break;
-
-      default:
-         break;
       }
    }
 
@@ -1404,9 +1395,6 @@ public class TourFilterManager {
          break;
       case IS_NOT_EMPTY:
          getSQL_Empty(sqlWhere, sqlField, false);
-         break;
-
-      default:
          break;
 
       }
