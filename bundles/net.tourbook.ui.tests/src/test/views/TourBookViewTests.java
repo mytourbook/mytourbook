@@ -265,4 +265,14 @@ public class TourBookViewTests extends UITest {
       tour = Utils.getTourWithSRTM(bot);
       assertEquals("1,008", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
    }
+
+   @Test
+   void testTourFilter() {
+
+      // Activate the tour filter
+      bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip).click();
+
+      // Deactivate the tour filter
+      bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip).click();
+   }
 }
