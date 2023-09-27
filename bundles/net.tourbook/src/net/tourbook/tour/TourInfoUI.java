@@ -2345,17 +2345,17 @@ public class TourInfoUI {
       _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000));
-      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(vertSpeed_DistanceGain / 1000));
-      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(vertSpeed_DistanceLoss / 1000));
+      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(vertSpeed_DistanceGain / 1000 / UI.UNIT_VALUE_DISTANCE));
+      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(vertSpeed_DistanceLoss / 1000 / UI.UNIT_VALUE_DISTANCE));
 
       _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative(vertSpeed_DistanceFlat / sumDistance * 100));
       _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative(vertSpeed_DistanceGain / sumDistance * 100));
       _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative(vertSpeed_DistanceLoss / sumDistance * 100));
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(vertSpeed_ElevationGain));
-      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(vertSpeed_ElevationLoss));
+      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(vertSpeed_ElevationGain / UI.UNIT_VALUE_ELEVATION));
+      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(vertSpeed_ElevationLoss / UI.UNIT_VALUE_ELEVATION));
 
       _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
       _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));

@@ -4,6 +4,12 @@
 TODO's
 ======               
 
+* Remove debug code in ColumnManager.java
+   // TODO
+      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
+      System.out.println();
+
+
 * TRANSLATION
 
   - Inform translators to update the Messages editor by using the install procedure from
