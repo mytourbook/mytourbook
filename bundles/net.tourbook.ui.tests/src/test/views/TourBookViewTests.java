@@ -268,7 +268,7 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
-   void testTourFilter() {
+   void testTourFilters() {
 
       // Activate the tour filter
       final SWTBotToolbarToggleButton tourFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip);
@@ -277,5 +277,13 @@ public class TourBookViewTests extends UITest {
 
       // Deactivate the tour filter
       tourFilterButton.click();
+
+      // Activate the tour geo filter
+      final SWTBotToolbarToggleButton tourGeoFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_GeoFilter_Action_Tooltip);
+      assertNotNull(tourGeoFilterButton);
+      tourGeoFilterButton.click();
+
+      // Deactivate the tour geo filter
+      tourGeoFilterButton.click();
    }
 }
