@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.application.PluginProperties;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
@@ -286,12 +287,21 @@ public class TourBookViewTests extends UITest {
       // Deactivate the tour geo filter
       tourGeoFilterButton.click();
 
-      // Deactivate the tour tag filter (by default, it is activated in the UI Tests)
+      // Activate the tour tag filter
       final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Tag_Filter_Action_Tooltip);
       assertNotNull(tourTagFilterButton);
       tourTagFilterButton.click();
 
-      // Activate the tour tag filter
+      // Deactivate the tour tag filter
       tourTagFilterButton.click();
+
+      // Activate the tour photo filter
+      final SWTBotToolbarToggleButton tourPhotoFilterButton = bot.toolbarToggleButtonWithTooltip(PluginProperties.getText(
+            "Action_TourPhotoFilter_Tooltip"));
+      assertNotNull(tourPhotoFilterButton);
+      tourPhotoFilterButton.click();
+
+      // Deactivate the tour photo filter
+      tourPhotoFilterButton.click();
    }
 }
