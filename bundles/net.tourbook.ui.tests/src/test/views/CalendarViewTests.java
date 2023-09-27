@@ -40,7 +40,6 @@ public class CalendarViewTests extends UITest {
       final SWTBotCombo comboBoxCalendarProfile = bot.comboBox(2);
       assertNotNull(comboBoxCalendarProfile);
 
-      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Default));
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact));
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_II));
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Compact_III));
@@ -48,6 +47,7 @@ public class CalendarViewTests extends UITest {
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_II));
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Year_III));
       comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Classic));
+      comboBoxCalendarProfile.setSelection(getCalendarProfileName(Messages.Calendar_Profile_Name_Default));
 
       // Activate the "Link with other views"
       final SWTBotToolbarButton linkWithOtherViewsButton = Utils.getToolbarButton(calendarView, Messages.Calendar_View_Action_LinkWithOtherViews);
