@@ -563,8 +563,13 @@ public class ReferenceTourView extends ViewPart implements
 
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-               // update tourbook viewer
+               // update viewer
                _tourViewer.refresh();
+
+            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+               // reload data from database
+               reloadViewer();
 
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 

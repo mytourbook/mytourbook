@@ -48,6 +48,11 @@ Experimental
 
 New
 ===
+
+* Reference Tours
+  - Implemented feature request #1 from 2007 "Tourmap view is not using the person or tour type filter"
+    "Tourmap" was renamed to "Tour Catalog" which was renamed to "Reference Tours"
+    https://github.com/mytourbook/mytourbook/issues/651
   
 * Tour Segmenter
   - New segmenter "By Elevation - Flat, Gain & Loss"
