@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-class ContributionItem_MeasurementSystem extends CustomControlContribution {
+public class ContributionItem_MeasurementSystem extends CustomControlContribution {
 
    private static final String           ID                    = "net.tourbook.measurementSelector"; //$NON-NLS-1$
 
@@ -54,7 +54,7 @@ class ContributionItem_MeasurementSystem extends CustomControlContribution {
       this(ID);
    }
 
-   private ContributionItem_MeasurementSystem(final String id) {
+   protected ContributionItem_MeasurementSystem(final String id) {
       super(id);
    }
 
