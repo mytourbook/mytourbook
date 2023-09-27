@@ -84,7 +84,6 @@ public class DialogExtractToursTests extends UITest {
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
       final Predicate<SWTBotTreeItem> yearTwentyTwentyOne = e -> e.getText().equals("2021   3");
-
       assertTrue(Arrays.asList(allItems).stream().anyMatch(yearTwentyTwentyOne));
    }
 }
