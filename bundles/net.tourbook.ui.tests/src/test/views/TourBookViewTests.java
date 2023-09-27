@@ -228,7 +228,7 @@ public class TourBookViewTests extends UITest {
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
       assertEquals(15, botNatTable.rowCount());
 
-      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+      assertEquals("0:32", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       final int numberVisibleColumns = 4;
       int visibleColumnIndex = 1;
