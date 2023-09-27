@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
 
 import net.tourbook.Messages;
 import net.tourbook.tour.TourLogManager;
@@ -83,7 +82,6 @@ public class DialogExtractToursTests extends UITest {
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      final Predicate<SWTBotTreeItem> yearTwentyTwentyOne = e -> e.getText().equals("2021   3");
-      assertTrue(Arrays.asList(allItems).stream().anyMatch(yearTwentyTwentyOne));
+      assertTrue(Arrays.asList(allItems).stream().anyMatch(item -> item.getText().equals("2021   3")));
    }
 }
