@@ -58,9 +58,9 @@ public class TourDataEditorViewTests extends UITest {
       assertNotNull(tourDateTime);
       tourDateTime.setDate(Date.from(Instant.now()));
 
-      final SWTBotSpinner tourHoursPulse = bot.spinnerWithTooltip(Messages.Tour_Editor_Label_Hours_Tooltip);
-      assertNotNull(tourHoursPulse);
-      tourHoursPulse.setSelection(2);
+      final SWTBotSpinner tourHours = bot.spinnerWithTooltip(Messages.Tour_Editor_Label_Hours_Tooltip);
+      assertNotNull(tourHours);
+      tourHours.setSelection(2);
 
       final SWTBotSpinner tourRestPulse = bot.spinnerWithLabel(Messages.tour_editor_label_rest_pulse);
       assertNotNull(tourRestPulse);
