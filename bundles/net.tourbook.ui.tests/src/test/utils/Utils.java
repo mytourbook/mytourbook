@@ -33,6 +33,7 @@ import net.tourbook.common.util.StatusUtil;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -121,11 +122,10 @@ public class Utils {
    }
 
    /**
-    * Because the SWTBot function doesn't appear to work in every case, this function
-    * will find a toolbar button for a given bot view based on the tooltip text of the button.
+    * Because the SWTBot function {@link SWTBot#buttonWithTooltip} doesn't appear
+    * to work in every case, this function will find a toolbar button for a given
+    * bot view based on the tooltip text of the button.
     *
-    * @param tooltipText
-    * @return
     */
    public static SWTBotToolbarButton getToolbarButton(final SWTBotView botView, final String tooltipText)
    {
