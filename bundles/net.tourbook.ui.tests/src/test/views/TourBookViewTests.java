@@ -287,7 +287,7 @@ public class TourBookViewTests extends UITest {
       tourGeoFilterButton.click();
 
       // Deactivate the tour tag filter (by default, it is activated in the UI Tests)
-      final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Tag_Filter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButton(2);
       assertNotNull(tourTagFilterButton);
       tourTagFilterButton.click();
 
