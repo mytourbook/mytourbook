@@ -61,7 +61,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -1530,7 +1529,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
       _pc = new PixelConverter(parent);
 
-      _defaultModifyListener = modifyEvent -> onProfile_Modify(modifyEvent);
+      _defaultModifyListener = modifyEvent -> onProfile_Modify();
 
       _fieldSelectionListener_DateTime = widgetSelectedAdapter(selectionEvent -> onField_Select_DateTime(selectionEvent));
       _fieldSelectionListener_Combo = widgetSelectedAdapter(selectionEvent -> onField_Select_Enumeration(selectionEvent));
@@ -1864,7 +1863,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _profileViewer.getTable().setFocus();
    }
 
-   private void onProfile_Modify(final ModifyEvent modifyEvent) {
+   private void onProfile_Modify() {
 
       if (_selectedProfile == null) {
          return;
