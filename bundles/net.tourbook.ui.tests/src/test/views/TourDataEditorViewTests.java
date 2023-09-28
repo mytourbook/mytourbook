@@ -110,8 +110,11 @@ public class TourDataEditorViewTests extends UITest {
 
       final SWTBotTable timeSlicesTable = tourEditorViewBot.table();
 
-      //Sort the time slices by pace
+      // Sort the time slices by pace
       timeSlicesTable.header(UI.UNIT_LABEL_PACE).click();
+
+      // Revert the time slices sorting by index
+      timeSlicesTable.header(UI.SYMBOL_NUMBER_SIGN).click();
    }
 
    @Test
