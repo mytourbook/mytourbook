@@ -796,7 +796,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       final TourFilterFieldType fieldType = fieldConfig.fieldType;
 
       switch (filterProperty.fieldOperator) {
-      case GREATER_THAN,GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL, EQUALS, NOT_EQUALS:
+      case GREATER_THAN:
+      case GREATER_THAN_OR_EQUAL:
+      case LESS_THAN:
+      case LESS_THAN_OR_EQUAL:
+      case EQUALS:
+      case NOT_EQUALS:
 
          switch (fieldType) {
          case DATE:
@@ -820,10 +825,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case ENUMERATION:
-            numColumns += createUI_Field_Enumeration     (uiFieldContainer, filterProperty, fieldConfig);
-            break;
+             numColumns += createUI_Field_Enumeration     (uiFieldContainer, filterProperty, fieldConfig);
+             break;
 
-         case TEXT, SEASON, CATEGORY:
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
             break;
          }
 
@@ -870,7 +877,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             numColumns += createUI_Field_SeasonMonth     (uiFieldContainer, filterProperty, 2);
             break;
 
-         case TEXT, CATEGORY, ENUMERATION:
+         case TEXT:
+         case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -891,23 +900,37 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       case EXCLUDE_ALL:
          break;
 
-      case IS_EMPTY,IS_NOT_EMPTY:
+      case IS_EMPTY:
+      case IS_NOT_EMPTY:
 
          switch (fieldType) {
          case TEXT:
             numColumns += createUI_Field_Text            (uiFieldContainer);
             break;
 
-         case SEASON,TIME, CATEGORY, NUMBER_INTEGER, NUMBER_FLOAT, DATE, DURATION, ENUMERATION:
+         case SEASON:
+         case TIME:
+         case CATEGORY:
+         case NUMBER_INTEGER:
+         case NUMBER_FLOAT:
+         case DATE:
+         case DURATION:
+         case ENUMERATION:
             break;
          }
 
          break;
 
-      case LIKE, NOT_LIKE:
+      case LIKE:
+      case NOT_LIKE:
          break;
 
-      case SEASON_UNTIL_TODAY_FROM_YEAR_START, SEASON_TODAY_UNTIL_YEAR_END,SEASON_CURRENT_DAY,SEASON_CURRENT_MONTH, IS_AVAILABLE, IS_NOT_AVAILABLE:
+      case SEASON_UNTIL_TODAY_FROM_YEAR_START:
+      case SEASON_TODAY_UNTIL_YEAR_END:
+      case SEASON_CURRENT_DAY:
+      case SEASON_CURRENT_MONTH:
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
          // no additional controls
          break;
 
@@ -915,7 +938,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          numColumns += createUI_Field_SeasonMonth        (uiFieldContainer, filterProperty, 1);
          break;
 
-      case SEASON_UNTIL_TODAY_FROM_DATE, SEASON_TODAY_UNTIL_DATE:
+      case SEASON_UNTIL_TODAY_FROM_DATE:
+      case SEASON_TODAY_UNTIL_DATE:
          numColumns += createUI_Field_SeasonDay          (uiFieldContainer, filterProperty, 1);
          numColumns += createUI_Field_SeasonMonth        (uiFieldContainer, filterProperty, 1);
          break;
@@ -1417,7 +1441,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
    private int getMonthMaxDays(final int month) {
 
       switch (month) {
-      case 4, 6, 9, 11:
+      case 4:
+      case 6:
+      case 9:
+      case 11:
          return 30;
 
       case 2:
@@ -2124,7 +2151,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
       switch (filterProperty.fieldOperator) {
 
-      case GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL, EQUALS, NOT_EQUALS:
+      case GREATER_THAN:
+      case GREATER_THAN_OR_EQUAL:
+      case LESS_THAN:
+      case LESS_THAN_OR_EQUAL:
+      case EQUALS:
+      case NOT_EQUALS:
 
          switch (fieldType) {
          case DATE:
@@ -2147,13 +2179,17 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             updateUI_PropertyDetail_Number_Float(filterProperty, 1);
             break;
 
-         case TEXT, SEASON, CATEGORY, ENUMERATION:
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
          break;
 
-      case BETWEEN, NOT_BETWEEN:
+      case BETWEEN:
+      case NOT_BETWEEN:
 
          switch (fieldType) {
          case DATE:
@@ -2189,7 +2225,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             updateUI_PropertyDetail_Season(filterProperty, 2);
             break;
 
-         case CATEGORY, ENUMERATION:
+         case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -2219,7 +2256,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       case NOT_LIKE:
          break;
 
-      case SEASON_UNTIL_TODAY_FROM_YEAR_START, SEASON_TODAY_UNTIL_YEAR_END, SEASON_CURRENT_DAY, SEASON_CURRENT_MONTH:
+      case SEASON_UNTIL_TODAY_FROM_YEAR_START:
+      case SEASON_TODAY_UNTIL_YEAR_END:
+      case SEASON_CURRENT_DAY:
+      case SEASON_CURRENT_MONTH:
          // no additional controls
          break;
 
@@ -2227,11 +2267,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          updateUI_PropertyDetail_Season_Month(filterProperty);
          break;
 
-      case SEASON_UNTIL_TODAY_FROM_DATE, SEASON_TODAY_UNTIL_DATE:
+      case SEASON_UNTIL_TODAY_FROM_DATE:
+      case SEASON_TODAY_UNTIL_DATE:
          updateUI_PropertyDetail_Season(filterProperty, 1);
          break;
 
-      case IS_AVAILABLE, IS_NOT_AVAILABLE:
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
          // no additional controls
          break;
       }
