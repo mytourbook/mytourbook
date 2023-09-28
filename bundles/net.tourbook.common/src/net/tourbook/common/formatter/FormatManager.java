@@ -287,7 +287,8 @@ public class FormatManager {
       case TIME_SSS:
          return Messages.Value_Formatter_Time_SSS;
 
-      case DEFAULT, DUMMY_VALUE:
+      case DEFAULT:
+      case DUMMY_VALUE:
       default:
          break;
       }
