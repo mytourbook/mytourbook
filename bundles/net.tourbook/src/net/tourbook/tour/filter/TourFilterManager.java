@@ -712,7 +712,7 @@ public class TourFilterManager {
                   .fieldId(TourFilterFieldId.WEATHER_AIRQUALITY)
                   .fieldType(TourFilterFieldType.ENUMERATION)
                   .fieldOperators(new TourFilterFieldOperator[] { TourFilterFieldOperator.EQUALS, TourFilterFieldOperator.NOT_EQUALS })
-                  .values(VALUES_AIRQUALITY));
+                  .setValues(VALUES_AIRQUALITY));
 
       allConfigs.add(
             TourFilterFieldConfig

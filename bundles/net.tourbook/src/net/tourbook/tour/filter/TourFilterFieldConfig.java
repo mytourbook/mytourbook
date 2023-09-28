@@ -226,6 +226,11 @@ public class TourFilterFieldConfig {
       return this;
    }
 
+   TourFilterFieldConfig setValues(final String[] values) {
+      this.values = values;
+      return this;
+   }
+
    @Override
    public String toString() {
 
@@ -258,11 +263,6 @@ public class TourFilterFieldConfig {
     */
    TourFilterFieldConfig unitLabel(final String unitLabel) {
       this.unitLabel = unitLabel;
-      return this;
-   }
-
-   TourFilterFieldConfig values(final String[] values) {
-      this.values = values;
       return this;
    }
 
