@@ -60,7 +60,7 @@ public class GraphColorManager {
    public static final String  PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
    public static final String  PREF_GRAPH_SENSOR                       = "Sensor";                     //$NON-NLS-1$
    public static final String  PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TEMPERATURE                  = "temperature";                //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TEMPERATURE                  = "tempterature";               //$NON-NLS-1$
    public static final String  PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
    public static final String  PREF_GRAPH_TOUR                         = "tour";                       //$NON-NLS-1$
    public static final String  PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                //$NON-NLS-1$
