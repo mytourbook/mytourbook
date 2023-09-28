@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.Date;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
@@ -98,6 +99,19 @@ public class TourDataEditorViewTests extends UITest {
 
       //Ensuring that the time slice was deleted
       assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
+   }
+
+   @Test
+   void testTimeSlicesTab() {
+
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
+
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+
+      final SWTBotTable timeSlicesTable = tourEditorViewBot.table();
+
+      //Sort the time slices by pace
+      timeSlicesTable.header(UI.UNIT_LABEL_PACE).click();
    }
 
    @Test
