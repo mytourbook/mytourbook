@@ -825,7 +825,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case ENUMERATION:
-             numColumns += createUI_Field_Enumeration     (uiFieldContainer, filterProperty, fieldConfig);
+             numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig);
              break;
 
          case TEXT:
