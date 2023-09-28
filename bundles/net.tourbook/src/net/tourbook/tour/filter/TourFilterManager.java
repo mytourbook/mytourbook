@@ -821,9 +821,7 @@ public class TourFilterManager {
    static TourFilterFieldOperator[] getFieldOperators(final TourFilterFieldId filterField) {
 
       for (final TourFilterFieldConfig fieldConfig : FILTER_FIELD_CONFIG) {
-
          if (filterField == fieldConfig.fieldId) {
-
             return fieldConfig.fieldOperators;
          }
       }
@@ -1131,6 +1129,7 @@ public class TourFilterManager {
       return tourFilterSQLData;
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_DateTime(final StringBuilder sqlWhere,
                                                        final ArrayList<Object> sqlParameters,
                                                        final TourFilterFieldOperator fieldOperator,
@@ -1218,6 +1217,7 @@ public class TourFilterManager {
 
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_Number(final StringBuilder sqlWhere,
                                                      final ArrayList<Object> sqlParameters,
                                                      final TourFilterFieldOperator fieldOperator,
@@ -1256,6 +1256,7 @@ public class TourFilterManager {
       }
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_SeasonDate(final StringBuilder sqlWhere,
                                                          final ArrayList<Object> sqlParameters,
                                                          final TourFilterProperty filterProperty,
@@ -1384,6 +1385,7 @@ public class TourFilterManager {
       }
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_Text(final StringBuilder sqlWhere,
                                                    final TourFilterFieldOperator fieldOperator,
                                                    final String sqlField) {
@@ -1635,7 +1637,12 @@ public class TourFilterManager {
 
       switch (fieldOperator) {
 
-      case GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL, EQUALS, NOT_EQUALS:
+      case GREATER_THAN:
+      case GREATER_THAN_OR_EQUAL:
+      case LESS_THAN:
+      case LESS_THAN_OR_EQUAL:
+      case EQUALS:
+      case NOT_EQUALS:
 
          switch (fieldType) {
          case DATE:
@@ -1662,13 +1669,16 @@ public class TourFilterManager {
             readXml_Enumeration(xmlProperty, filterProperty);
             break;
 
-         case TEXT, SEASON, CATEGORY:
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
             break;
          }
 
          break;
 
-      case BETWEEN, NOT_BETWEEN:
+      case BETWEEN:
+      case NOT_BETWEEN:
 
          switch (fieldType) {
          case DATE:
@@ -1681,7 +1691,8 @@ public class TourFilterManager {
             readXml_Time(xmlProperty, filterProperty, 2);
             break;
 
-         case DURATION, NUMBER_INTEGER:
+         case DURATION:
+         case NUMBER_INTEGER:
             readXml_Number_Integer(xmlProperty, filterProperty, 1);
             readXml_Number_Integer(xmlProperty, filterProperty, 2);
             break;
@@ -1699,22 +1710,21 @@ public class TourFilterManager {
             readXml_Season(xmlProperty, filterProperty, 2);
             break;
 
-         case CATEGORY, ENUMERATION:
+         case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
          break;
 
-      case SEASON_UNTIL_TODAY_FROM_DATE, SEASON_TODAY_UNTIL_DATE:
+      case SEASON_UNTIL_TODAY_FROM_DATE:
+      case SEASON_TODAY_UNTIL_DATE:
          readXml_Season(xmlProperty, filterProperty, 1);
          break;
 
       case MOST_RECENT:
          readXml_Number_Integer(xmlProperty, filterProperty, 1);
          readXml_Text(xmlProperty, filterProperty, 1);
-         break;
-
-      default:
          break;
       }
    }
@@ -1962,6 +1972,7 @@ public class TourFilterManager {
       return xmlRoot;
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void writeFilterProfile_20_PropertyDetail(final IMemento xmlProperty,
                                                             final TourFilterProperty filterProperty) {
 
@@ -1987,7 +1998,12 @@ public class TourFilterManager {
 
       switch (fieldOperator) {
 
-      case GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL, EQUALS, NOT_EQUALS:
+      case GREATER_THAN:
+      case GREATER_THAN_OR_EQUAL:
+      case LESS_THAN:
+      case LESS_THAN_OR_EQUAL:
+      case EQUALS:
+      case NOT_EQUALS:
 
          switch (fieldType) {
          case DATE:
@@ -1998,25 +2014,28 @@ public class TourFilterManager {
             writeXml_Time(xmlProperty, dateTime1, 1);
             break;
 
-         case DURATION, NUMBER_INTEGER:
+         case DURATION:
+         case NUMBER_INTEGER:
             writeXml_Number_Integer(xmlProperty, intValue1, 1);
             break;
 
          case NUMBER_FLOAT:
             writeXml_Number_Float(xmlProperty, doubleValue1, 1);
             break;
-
          case ENUMERATION:
             writeXml_Enumeration(xmlProperty, selectedIndex);
             break;
 
-         case TEXT, SEASON, CATEGORY:
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
             break;
          }
 
          break;
 
-      case BETWEEN, NOT_BETWEEN:
+      case BETWEEN:
+      case NOT_BETWEEN:
 
          switch (fieldType) {
          case DATE:
@@ -2029,7 +2048,8 @@ public class TourFilterManager {
             writeXml_Time(xmlProperty, dateTime2, 2);
             break;
 
-         case DURATION, NUMBER_INTEGER:
+         case DURATION:
+         case NUMBER_INTEGER:
             writeXml_Number_Integer(xmlProperty, intValue1, 1);
             writeXml_Number_Integer(xmlProperty, intValue2, 2);
             break;
@@ -2044,13 +2064,17 @@ public class TourFilterManager {
             writeXml_Season(xmlProperty, monthDay2, 2);
             break;
 
-         case TEXT, CATEGORY, ENUMERATION:
+         case TEXT:
+         case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
          break;
 
-      case SEASON_UNTIL_TODAY_FROM_DATE, SEASON_TODAY_UNTIL_DATE, SEASON_MONTH:
+      case SEASON_UNTIL_TODAY_FROM_DATE:
+      case SEASON_TODAY_UNTIL_DATE:
+      case SEASON_MONTH:
          writeXml_Season(xmlProperty, monthDay1, 1);
          break;
 
@@ -2058,9 +2082,7 @@ public class TourFilterManager {
 
          writeXml_Number_Integer(xmlProperty, intValue1, 1);
          writeXml_Text(xmlProperty, textValue1, 1);
-         break;
 
-      default:
          break;
       }
    }
