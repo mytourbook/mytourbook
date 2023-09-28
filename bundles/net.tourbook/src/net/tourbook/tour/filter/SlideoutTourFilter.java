@@ -836,7 +836,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          break;
 
-      case BETWEEN, NOT_BETWEEN:
+      case BETWEEN:
+      case NOT_BETWEEN:
 
          switch (fieldType) {
          case DATE:
