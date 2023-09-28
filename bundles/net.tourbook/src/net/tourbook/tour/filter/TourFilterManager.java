@@ -1625,6 +1625,7 @@ public class TourFilterManager {
       }
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void readFilterProfile_10_PropertyDetail(final XMLMemento xmlProperty,
                                                            final TourFilterProperty filterProperty) {
 
