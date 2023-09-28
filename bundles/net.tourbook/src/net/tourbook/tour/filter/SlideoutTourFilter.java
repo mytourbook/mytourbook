@@ -1529,10 +1529,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
       _pc = new PixelConverter(parent);
 
-      _defaultModifyListener = this::onProfile_Modify;
+      _defaultModifyListener = modifyEvent -> onProfile_Modify(modifyEvent);
 
-      _fieldSelectionListener_DateTime = widgetSelectedAdapter(this::onField_Select_DateTime);
-      _fieldSelectionListener_Combo = widgetSelectedAdapter(this::onField_Select_Enumeration);
+      _fieldSelectionListener_DateTime = widgetSelectedAdapter(selectionEvent -> onField_Select_DateTime(selectionEvent));
+      _fieldSelectionListener_Combo = widgetSelectedAdapter(selectionEvent -> onField_Select_Enumeration(selectionEvent));
 
       _keepOpenListener = new FocusListener() {
 
