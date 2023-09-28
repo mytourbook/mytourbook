@@ -209,11 +209,11 @@ public class TourFilterManager {
    private static final String[]                  VALUES_AIRQUALITY               = {
 
          IWeather.airQualityIsNotDefined,
-         net.tourbook.common.Messages.Weather_AirQuality_1_Good,
-         net.tourbook.common.Messages.Weather_AirQuality_2_Fair,
-         net.tourbook.common.Messages.Weather_AirQuality_3_Moderate,
-         net.tourbook.common.Messages.Weather_AirQuality_4_Poor,
-         net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor
+         OtherMessages.WEATHER_AIRQUAlITY_1_GOOD,
+         OtherMessages.WEATHER_AIRQUAlITY_1_FAIR,
+         OtherMessages.WEATHER_AIRQUAlITY_1_MODERATE,
+         OtherMessages.WEATHER_AIRQUAlITY_1_POOR,
+         OtherMessages.WEATHER_AIRQUAlITY_1_VERYPOOR
    };
 
    private static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {

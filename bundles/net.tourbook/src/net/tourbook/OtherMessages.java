@@ -185,5 +185,11 @@ public class OtherMessages {
    public static final String THEME_FONT_LOGGING_PREVIEW_TEXT             = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
    public static final String THEME_FONT_LOGGING                          = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
+   public static final String WEATHER_AIRQUAlITY_1_GOOD    = net.tourbook.common.Messages.Weather_AirQuality_1_Good;
+   public static final String WEATHER_AIRQUAlITY_1_FAIR    = net.tourbook.common.Messages.Weather_AirQuality_2_Fair;
+   public static final String WEATHER_AIRQUAlITY_1_MODERATE    = net.tourbook.common.Messages.Weather_AirQuality_3_Moderate;
+   public static final String WEATHER_AIRQUAlITY_1_POOR    = net.tourbook.common.Messages.Weather_AirQuality_4_Poor;
+   public static final String WEATHER_AIRQUAlITY_1_VERYPOOR    = net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor;
+
 // SET_FORMATTING_ON
 }
