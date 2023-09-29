@@ -235,10 +235,10 @@ public class TourInfoUI {
    private CLabel           _lblTourType_Image;
 
    private Label            _lblAirQuality;
-   private Label            _lblElevationUp;
-   private Label            _lblElevationUp_Unit;
-   private Label            _lblElevationDown;
-   private Label            _lblElevationDown_Unit;
+   private Label            _lblAltimeter_Up;
+   private Label            _lblAltimeter_Up_Unit;
+   private Label            _lblAltimeter_Down;
+   private Label            _lblAltimeter_Down_Unit;
    private Label            _lblAvgCadence;
    private Label            _lblAvgCadenceUnit;
    private Label            _lblAvgElevation;
@@ -268,6 +268,10 @@ public class TourInfoUI {
    private Label            _lblDescription;
    private Label            _lblDistance;
    private Label            _lblDistance_Unit;
+   private Label            _lblElevationUp;
+   private Label            _lblElevationUp_Unit;
+   private Label            _lblElevationDown;
+   private Label            _lblElevationDown_Unit;
    private Label            _lblGear;
    private Label            _lblGear_Spacer;
    private Label            _lblGear_GearShifts;
@@ -299,10 +303,6 @@ public class TourInfoUI {
    private Label            _lblTourTags_Value;
    private Label            _lblTourType;
    private Label            _lblTourType_Value;
-   private Label            _lblAltimeter_Up;
-   private Label            _lblAltimeter_Up_Unit;
-   private Label            _lblAltimeter_Down;
-   private Label            _lblAltimeter_Down_Unit;
    private Label            _lblWeather;
    private Label            _lblWindSpeed;
    private Label            _lblWindSpeedUnit;
@@ -2297,7 +2297,7 @@ public class TourInfoUI {
       _lblElevationUp            .setText(Integer.toString((int) (_tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION)));
       _lblElevationUp_Unit       .setText(UI.UNIT_LABEL_ELEVATION);
 
-      _lblElevationDown          .setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
+      _lblElevationDown          .setText(Integer.toString(-(int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
       _lblElevationDown_Unit     .setText(UI.UNIT_LABEL_ELEVATION);
 
       final int averageElevationChange = Math.round(UI.convertAverageElevationChangeFromMetric(_tourData.getAvgAltitudeChange()));
@@ -2355,7 +2355,7 @@ public class TourInfoUI {
 
       _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
       _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(vertSpeed_ElevationGain / UI.UNIT_VALUE_ELEVATION));
-      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(vertSpeed_ElevationLoss / UI.UNIT_VALUE_ELEVATION));
+      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(-vertSpeed_ElevationLoss / UI.UNIT_VALUE_ELEVATION));
 
       _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
       _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));

@@ -119,6 +119,10 @@
       <plugin id="org.eclipse.update.configurator"          autoStart="true" startLevel="4" />
    </configurations>
 
+   <repositories>
+      <repository location="https://mytourbook.github.io/update-sites/latest/" enabled="true" />
+   </repositories>
+
    <preferencesInfo>
       <targetfile overwrite="false"/>
    </preferencesInfo>
