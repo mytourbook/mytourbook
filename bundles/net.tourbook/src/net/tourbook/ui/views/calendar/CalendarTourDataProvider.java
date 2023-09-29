@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2022 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,7 @@ import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
-public class CalendarTourDataProvider {
+class CalendarTourDataProvider {
 
    private static final char                            NL                = UI.NEW_LINE;
 
@@ -165,7 +165,7 @@ public class CalendarTourDataProvider {
       return dt;
    }
 
-   public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay) {
+   CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay) {
 
       final WeekFields cw = TimeTools.calendarWeek;
 
@@ -606,10 +606,10 @@ public class CalendarTourDataProvider {
 
                   dbCalories.add(result.getInt(16));
 
-                  if (dbTagId instanceof Long) {
+                  if (dbTagId instanceof final Long tagId) {
 
                      tagIds = new ArrayList<>();
-                     tagIds.add((Long) dbTagId);
+                     tagIds.add(tagId);
 
                      dbTagIds.put(tourId, tagIds);
                   }
@@ -784,7 +784,8 @@ public class CalendarTourDataProvider {
                   + "      calories," + NL //                                          //$NON-NLS-1$
                   + "      cadenceZone_SlowTime," + NL //                              //$NON-NLS-1$
                   + "      cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
-                  + "      TourDeviceTime_Recorded" + NL //                            //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
+                  + "      power_TrainingStressScore" + NL //                          //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
@@ -829,7 +830,9 @@ public class CalendarTourDataProvider {
                + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
                + " SUM(cadenceZone_FastTime)," + NL //                              9  //$NON-NLS-1$
 
-               + " SUM(TourDeviceTime_Recorded)" + NL //                            10 //$NON-NLS-1$
+               + " SUM(TourDeviceTime_Recorded)," + NL //                           10 //$NON-NLS-1$
+
+               + " SUM(power_TrainingStressScore)" + NL //                          11 //$NON-NLS-1$
 
                + sqlFromTourData;
 
@@ -866,6 +869,8 @@ public class CalendarTourDataProvider {
             weekData.cadenceZone_FastTime = result.getInt(9);
 
             weekData.recordedTime = result.getInt(10);
+
+            weekData.trainingLoad_Tss = result.getInt(11);
 
             if (UI.IS_SCRAMBLE_DATA) {
 

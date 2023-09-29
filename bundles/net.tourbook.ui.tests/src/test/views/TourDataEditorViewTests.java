@@ -22,10 +22,12 @@ import java.time.Instant;
 import java.util.Date;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotSpinner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -44,18 +46,26 @@ public class TourDataEditorViewTests extends UITest {
 
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
-      bot.comboBox().setText(newTourTitle);
+      final SWTBot tourDataEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
+
+      tourDataEditorViewBot.comboBox(0).setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
-
-      final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
+      final SWTBotCombo titleCombo = tourDataEditorViewBot.comboBox(0);
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
 
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
       assertNotNull(tourDateTime);
       tourDateTime.setDate(Date.from(Instant.now()));
+
+      final SWTBotSpinner tourHours = bot.spinnerWithTooltip(Messages.Tour_Editor_Label_Hours_Tooltip);
+      assertNotNull(tourHours);
+      tourHours.setSelection(2);
+
+      final SWTBotSpinner tourRestPulse = bot.spinnerWithLabel(Messages.tour_editor_label_rest_pulse);
+      assertNotNull(tourRestPulse);
+      tourRestPulse.setSelection(60);
 
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
    }
@@ -89,6 +99,22 @@ public class TourDataEditorViewTests extends UITest {
 
       //Ensuring that the time slice was deleted
       assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
+   }
+
+   @Test
+   void testTimeSlicesTab() {
+
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
+
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+
+      final SWTBotTable timeSlicesTable = tourEditorViewBot.table();
+
+      // Sort the time slices by pace
+      timeSlicesTable.header(UI.UNIT_LABEL_PACE).click();
+
+      // Revert the time slices sorting by index
+      timeSlicesTable.header(UI.SYMBOL_NUMBER_SIGN).click();
    }
 
    @Test

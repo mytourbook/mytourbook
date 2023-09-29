@@ -5729,7 +5729,7 @@ public class TourManager {
             yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColors(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+         setGraphColors(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPERATURE);
          chartDataModel.addXyData(yDataTemperature);
 
          // adjust min/max values when it's defined in the pref store

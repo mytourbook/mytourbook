@@ -50,17 +50,11 @@ public class TaggedToursViewTests extends UITest {
       final SWTBotTreeItem node = item.getNode("5/31/2015").select(); //$NON-NLS-1$
       assertNotNull(node);
 
-      // Looping across the tag filters
-      for (final SWTBotToolbarButton button : taggedToursView.getToolbarButtons()) {
-
-         if (Messages.Tour_Tags_Action_ToggleTagFilter_Tooltip.equals(button.getToolTipText())) {
-
-            button.click();
-            button.click();
-            button.click();
-            break;
-         }
-      }
+      final SWTBotToolbarButton toggleTagFilterButton = Utils.getToolbarButton(taggedToursView, Messages.Tour_Tags_Action_ToggleTagFilter_Tooltip);
+      assertNotNull(toggleTagFilterButton);
+      toggleTagFilterButton.click();
+      toggleTagFilterButton.click();
+      toggleTagFilterButton.click();
 
       taggedToursView.close();
    }

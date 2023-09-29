@@ -328,6 +328,7 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_ShowNothing;
    public static String        Calendar_Profile_Value_Speed;
    public static String        Calendar_Profile_Value_Title;
+   public static String        Calendar_Profile_Value_TrainingStress_Tss;
    public static String        Calendar_Profile_Value_WeatherIcon;
    public static String        Calendar_View_Action_Back;
    public static String        Calendar_View_Action_Back_Tooltip;
@@ -3020,6 +3021,7 @@ public class Messages extends NLS {
    public static String        Tour_Filter_Field_ManualTour;
    public static String        Tour_Filter_Field_Photos;
    public static String        Tour_Filter_Field_Season;
+   public static String        Tour_Filter_Field_AirQuality;
    public static String        Tour_Filter_Field_Temperature;
    public static String        Tour_Filter_Field_Temperature_FromDevice;
    public static String        Tour_Filter_Field_TourDate;

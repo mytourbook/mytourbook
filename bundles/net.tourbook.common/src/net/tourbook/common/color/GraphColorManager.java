@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,7 +60,7 @@ public class GraphColorManager {
    public static final String  PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
    public static final String  PREF_GRAPH_SENSOR                       = "Sensor";                     //$NON-NLS-1$
    public static final String  PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TEMPTERATURE                 = "tempterature";               //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TEMPERATURE                  = "tempterature";               //$NON-NLS-1$
    public static final String  PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
    public static final String  PREF_GRAPH_TOUR                         = "tour";                       //$NON-NLS-1$
    public static final String  PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                //$NON-NLS-1$
@@ -388,7 +388,7 @@ public class GraphColorManager {
 
             MAP_COLOR_POWER));
 
-      allColorDef.add(new ColorDefinition(PREF_GRAPH_TEMPTERATURE,
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_TEMPERATURE,
             Messages.Graph_Label_Temperature,
 
             new RGB(0xc1, 0xf9, 0xff),

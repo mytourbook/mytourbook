@@ -32,6 +32,7 @@ import net.tourbook.cloud.oauth2.LocalHostServer;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.web.WEB;
 
@@ -253,7 +254,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          messageDigest.update(bytes, 0, bytes.length);
          digest = messageDigest.digest();
       } catch (final NoSuchAlgorithmException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       return digest == null ? null : Base64.getUrlEncoder().withoutPadding().encodeToString(digest);

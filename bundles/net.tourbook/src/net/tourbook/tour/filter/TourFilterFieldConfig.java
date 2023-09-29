@@ -57,6 +57,7 @@ public class TourFilterFieldConfig {
 
    int                             minValue;
    int                             maxValue              = Integer.MAX_VALUE;
+   String[]                        values;
 
    int                             pageIncrement         = 10;
 
@@ -78,7 +79,6 @@ public class TourFilterFieldConfig {
     * Create a field category configuration.
     *
     * @param name
-    * @param fieldType
     * @param categoryDefaultFieldId
     */
    public TourFilterFieldConfig(final String name, final TourFilterFieldId categoryDefaultFieldId) {
@@ -223,6 +223,11 @@ public class TourFilterFieldConfig {
 
    TourFilterFieldConfig pageIncrement(final int pageIncrement) {
       this.pageIncrement = pageIncrement;
+      return this;
+   }
+
+   TourFilterFieldConfig setValues(final String[] values) {
+      this.values = values;
       return this;
    }
 

@@ -208,7 +208,7 @@ public class FormatManager {
       return _temperatureFormatter_Summary.printDouble(value);
    }
 
-   private static IValueFormatter getNumberFormatter(final String formatName) {
+   public static IValueFormatter getNumberFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
 
@@ -232,7 +232,7 @@ public class FormatManager {
       }
    }
 
-   private static IValueFormatter getTimeFormatter(final String formatName) {
+   public static IValueFormatter getTimeFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.TIME_HH.name())) {
 

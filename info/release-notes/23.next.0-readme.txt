@@ -58,6 +58,12 @@ New
   - New segmenter "By Elevation - Flat, Gain & Loss"
     https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
 
+* Calendar - Weekly summary (Frederic)
+  - Training Stress Score (TSS)
+
+* Tour Filter (Frederic)
+  - Added a property to filter tours based on their measured air quality
+
 * Tour Info Tooltip
   - Show flat/gain/loss values
     https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
@@ -121,6 +127,12 @@ Bugfix
 
 * Tour Analyzer View (Frederic)
   - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
+
+* Calendar View (Frederic)
+  - Fix for a regression that caused the "Link with other views" button to be not persisted. The regression appeared in v18.9.0
+
+* Tour Editor (Frederic)
+  - Fix for linux async event (when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa)
 
 
 Translation    

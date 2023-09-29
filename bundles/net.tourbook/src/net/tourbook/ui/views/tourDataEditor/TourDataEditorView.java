@@ -2324,7 +2324,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
       } catch (final IOException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
    }
 
@@ -2651,7 +2651,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                _isPartVisible = true;
 
-               Display.getCurrent().asyncExec(TourDataEditorView.this::updateUI_FromModelRunnable);
+               Display.getCurrent().asyncExec(() -> updateUI_FromModelRunnable());
             }
          }
       };
@@ -3133,7 +3133,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _selectionListener = widgetSelectedAdapter(
             selectionEvent -> {
 
-               if (_isSetField || _isSavingInProgress) {
+               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
                   return;
                }
 
@@ -3157,7 +3157,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       _tourTimeListener = widgetSelectedAdapter(selectionEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
             return;
          }
 
@@ -3169,7 +3169,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _verifyFloatValue = modifyEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(modifyEvent.widget) || _isSetField || _isSavingInProgress) {
             return;
          }
 
@@ -3220,7 +3220,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _verifyIntValue = modifyEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(modifyEvent.widget) || _isSetField || _isSavingInProgress) {
             return;
          }
 
@@ -3278,7 +3278,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _swimViewer_MenuManager = new MenuManager();
 
       _swimViewer_MenuManager.setRemoveAllWhenShown(true);
-      _swimViewer_MenuManager.addMenuListener(this::fillContextMenu_SwimSlice);
+      _swimViewer_MenuManager.addMenuListener(menuManager -> fillContextMenu_SwimSlice(menuManager));
 
       /*
        * Time slice viewer
@@ -3286,7 +3286,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeViewer_MenuManager = new MenuManager();
 
       _timeViewer_MenuManager.setRemoveAllWhenShown(true);
-      _timeViewer_MenuManager.addMenuListener(this::fillContextMenu_TimeSlice);
+      _timeViewer_MenuManager.addMenuListener(menuManager -> fillContextMenu_TimeSlice(menuManager));
    }
 
    /**
@@ -5076,7 +5076,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeSlice_Viewer.setContentProvider(new TimeSlice_ViewerContentProvider());
       _timeSlice_Viewer.setComparator(_timeSlice_Comparator);
       _timeSlice_Viewer.setUseHashlookup(true);
-      _timeSlice_Viewer.addSelectionChangedListener(this::onSelect_Slice);
+      _timeSlice_Viewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_Slice(selectionChangedEvent));
 
       // hide first column, this is a hack to align the "first" visible column to right
       table.getColumn(0).setWidth(0);
@@ -5177,7 +5177,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _swimSlice_Viewer.setContentProvider(new SwimSlice_ViewerContentProvider());
       _swimSlice_Viewer.setUseHashlookup(true);
-      _swimSlice_Viewer.addSelectionChangedListener(this::onSelect_Slice);
+      _swimSlice_Viewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_Slice(selectionChangedEvent));
 
       createUI_Tab_34_SwimSliceViewerContextMenu();
 
@@ -6890,43 +6890,43 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
+   private void fillContextMenu_SwimSlice(final IMenuManager menuManager) {
 
-      menuMgr.add(_action_SetSwimStyle_Header);
+      menuManager.add(_action_SetSwimStyle_Header);
 
       for (final Action_SetSwimStyle swimStyleAction : _allSwimStyleActions) {
-         menuMgr.add(swimStyleAction);
+         menuManager.add(swimStyleAction);
       }
 
-      menuMgr.add(_action_RemoveSwimStyle);
+      menuManager.add(_action_RemoveSwimStyle);
 
       enableActions_SwimSlices();
    }
 
-   private void fillContextMenu_TimeSlice(final IMenuManager menuMgr) {
+   private void fillContextMenu_TimeSlice(final IMenuManager menuManager) {
 
-      menuMgr.add(_actionEditTimeSlicesValues);
-      menuMgr.add(new Separator());
+      menuManager.add(_actionEditTimeSlicesValues);
+      menuManager.add(new Separator());
 
-      menuMgr.add(_actionCreateTourMarker);
-      menuMgr.add(_actionOpenMarkerDialog);
+      menuManager.add(_actionCreateTourMarker);
+      menuManager.add(_actionOpenMarkerDialog);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionDeleteTimeSlices_RemoveTime);
-      menuMgr.add(_actionDeleteTimeSlices_KeepTime);
-      menuMgr.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
-      menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime);
+      menuManager.add(new Separator());
+      menuManager.add(_actionDeleteTimeSlices_RemoveTime);
+      menuManager.add(_actionDeleteTimeSlices_KeepTime);
+      menuManager.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
+      menuManager.add(_actionDeleteTimeSlices_AdjustTourStartTime);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSetStartDistanceTo_0);
-      menuMgr.add(_actionDeleteDistanceValues);
-      menuMgr.add(_actionComputeDistanceValues);
+      menuManager.add(new Separator());
+      menuManager.add(_actionSetStartDistanceTo_0);
+      menuManager.add(_actionDeleteDistanceValues);
+      menuManager.add(_actionComputeDistanceValues);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSplitTour);
-      menuMgr.add(_actionExtractTour);
-      menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionCsvTimeSliceExport);
+      menuManager.add(new Separator());
+      menuManager.add(_actionSplitTour);
+      menuManager.add(_actionExtractTour);
+      menuManager.add(_actionExportTour);
+      menuManager.add(_actionCsvTimeSliceExport);
 
       enableActions_TimeSlices();
    }
@@ -7438,7 +7438,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
-      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
+      _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
 
       parent.addDisposeListener(e -> onDispose());
    }
@@ -7723,7 +7723,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void onSelect_SortColumn(final SelectionEvent e) {
+   private void onSelect_SortColumn(final SelectionEvent selectionEvent) {
 
       _timeSlice_Viewer.getTable().setRedraw(false);
       {
@@ -7731,7 +7731,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          final ISelection selectionBackup = _timeSlice_Viewer.getSelection();
 
          // toggle sorting
-         _timeSlice_Comparator.setSortColumn(e.widget);
+         _timeSlice_Comparator.setSortColumn(selectionEvent.widget);
          _timeSlice_Viewer.refresh();
 
          // reselect selection
@@ -7860,7 +7860,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          try {
             TourManager.checkTourData(_tourData, getTourData(_tourData.getTourId()));
          } catch (final MyTourbookException e) {
-            e.printStackTrace();
+            StatusUtil.log(e);
          }
       }
 
@@ -8331,7 +8331,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       try {
          getSite().getPage().showView(ID, null, IWorkbenchPage.VIEW_VISIBLE);
       } catch (final PartInitException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       // confirm save/discard/cancel
