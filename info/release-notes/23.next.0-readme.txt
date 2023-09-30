@@ -96,6 +96,16 @@ Improvements
   - Detect http links in the tour description to make them clickable
     https://github.com/mytourbook/mytourbook/issues/1102
 
+* Tour Blog View & Tour Analyzer View (Frederic)
+  - Refreshing each view when the measurement system is changed
+  
+* Tour Print (Frederic)
+  - Added recorded and paused time values. Rounded values (elevation gain, distance...)
+
+* Tour Data
+  - Scroll field content with mouse wheel, page up/down or arrow up/down keys
+    https://github.com/mytourbook/mytourbook/issues/1189
+
 * Color Selector
   - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
     https://github.com/mytourbook/mytourbook/issues/1169
@@ -104,18 +114,11 @@ Improvements
   - Support macOS ARM platform    
     https://github.com/mytourbook/mytourbook/discussions/1174
 
-
-* Tour Blog View & Tour Analyzer View (Frederic)
-  - Refreshing each view when the measurement system is changed
-
-* Tour Print (Frederic)
-  - Added recorded and paused time values. Rounded values (elevation gain, distance...)
-
 Changes
 =======
 
 * Reference Tours
-  - These tours are now filtered by the selected person and tour type in the app toolbar
+  - Reference tours are now filtered by the selected person and tour type in the app toolbar
 
 * Tour Segmenter
   - The tour segmenter color for total values is used for the foreground color and not for the background color

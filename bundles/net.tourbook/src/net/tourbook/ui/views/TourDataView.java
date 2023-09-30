@@ -70,7 +70,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -674,12 +678,13 @@ public class TourDataView extends ViewPart {
                   | SWT.BORDER);
 
       _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
+      _txtAllFields.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+      _txtAllFields.addMouseWheelListener(mouseEvent -> onAllFields_MouseWheel(mouseEvent));
+      _txtAllFields.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> onAllFields_Key(keyEvent)));
 
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(_txtAllFields);
-
-      _txtAllFields.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
    }
 
@@ -751,6 +756,51 @@ public class TourDataView extends ViewPart {
 
          UI.copyTextIntoClipboard(logText, Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
       }
+   }
+
+   private void onAllFields_Key(final KeyEvent keyEvent) {
+
+      final Rectangle containerBounds = _scrolledContainer.getBounds();
+
+      final int lineSize = UI.getDialogFontMetrics().getHeight();
+      final int pageSize = containerBounds.height / 3;
+
+      int verticalScoll = Integer.MIN_VALUE;
+
+// SET_FORMATTING_OFF
+
+      switch (keyEvent.keyCode) {
+
+      case SWT.PAGE_UP ->     verticalScoll = -pageSize;
+      case SWT.PAGE_DOWN ->   verticalScoll = pageSize;
+
+      case SWT.ARROW_UP ->    verticalScoll = -lineSize;
+      case SWT.ARROW_DOWN ->  verticalScoll = lineSize;
+
+      }
+
+// SET_FORMATTING_ON
+
+      if (verticalScoll != Integer.MIN_VALUE) {
+
+         final Point scrolledOrigin = _scrolledContainer.getOrigin();
+
+         _scrolledContainer.setOrigin(scrolledOrigin.x, scrolledOrigin.y + verticalScoll);
+      }
+   }
+
+   private void onAllFields_MouseWheel(final MouseEvent mouseEvent) {
+
+      final int fontHeight = UI.getDialogFontMetrics().getHeight();
+      final int mouseValue = mouseEvent.count * fontHeight;
+
+      final int diffY = UI.getAcceleratorFromMouseWheel(mouseEvent, mouseValue);
+
+      final Point scrolledOrigin = _scrolledContainer.getOrigin();
+
+      _scrolledContainer.setOrigin(
+            scrolledOrigin.x,
+            scrolledOrigin.y - diffY);
    }
 
    private void onResize() {
