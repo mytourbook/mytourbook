@@ -1,0 +1,160 @@
+23.next.0                                                 ?. March 2023
+
+
+TODO's
+======               
+
+* Remove debug code in ColumnManager.java
+   // TODO
+      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
+      System.out.println();
+
+
+* TRANSLATION
+
+  - Inform translators to update the Messages editor by using the install procedure from
+    https://mytourbook.sourceforge.io/mytourbook/index.php/development/translation/install-resource-editor
+  - The internal newline char is now forced to Unix that different translators create the same output
+  - The headerline shows the used messages editor and version
+  - I'm using this https://github.com/mytourbook/eclipse-rbe messages editor which is faster when many languages are edited but it has the major disadvantage that new texts are not displayed in the "Problems" view
+
+
+* Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
+  Code should always ask the workbench for the display rather than rely on Display.getDefault()
+  
+
+* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
+                    Released: 23.3
+
+
+* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+
+
+Issues
+======
+
+*
+
+
+Experimental
+============
+
+* 
+
+
+New
+===
+
+* Reference Tours
+  - Implemented feature request #1 from 2007 "Tourmap view is not using the person or tour type filter"
+    "Tourmap" was renamed into "Tour Catalog" which was renamed into "Reference Tours"
+    https://github.com/mytourbook/mytourbook/issues/651
+  
+* Tour Segmenter
+  - New segmenter "By Elevation - Flat, Gain & Loss"
+    https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
+
+* Calendar - Weekly summary (Frederic)
+  - Training Stress Score (TSS)
+
+* Tour Filter (Frederic)
+  - Added a property to filter tours based on their measured air quality
+
+* Tour Info Tooltip
+  - Show flat/gain/loss values
+    https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
+  - Added the average elevation (Frederic)
+
+
+Improvements
+============
+
+* Tour Book
+  - Use custom colors for tour and total values
+  - New action: Go to last tour
+    https://github.com/mytourbook/mytourbook/issues/1173
+  - New action: One click to expand only one item and collapse any others
+  - New action: One click to expand/collapse an item when selected with mouse
+
+* Statistics
+  - Show elevation loss values
+    https://github.com/mytourbook/mytourbook/issues/1034
+    
+* Tagged Tours
+  - Show number of items in the collapsed tags and tag categories
+    https://github.com/mytourbook/mytourbook/issues/1180    
+    
+* Reference Tours
+  - Show tour type for the reference tour
+  - Show geo flag for the compared tour
+  
+* Tour Blog
+  - Detect http links in the tour description to make them clickable
+    https://github.com/mytourbook/mytourbook/issues/1102
+
+* Tour Blog View & Tour Analyzer View (Frederic)
+  - Refreshing each view when the measurement system is changed
+  
+* Tour Print (Frederic)
+  - Added recorded and paused time values. Rounded values (elevation gain, distance...)
+
+* Tour Data
+  - Scroll field content with mouse wheel, page up/down or arrow up/down keys
+    https://github.com/mytourbook/mytourbook/issues/1189
+
+* Color Selector
+  - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
+    https://github.com/mytourbook/mytourbook/issues/1169
+    
+* macOS ARM
+  - Support macOS ARM platform    
+    https://github.com/mytourbook/mytourbook/discussions/1174
+
+Changes
+=======
+
+* Reference Tours
+  - Reference tours are now filtered by the selected person and tour type in the app toolbar
+
+* Tour Segmenter
+  - The tour segmenter color for total values is used for the foreground color and not for the background color
+
+
+Bugfix
+======
+
+* Import
+  - Reimport a renamed tcx file does not change the importfilename in my tourbook anymore
+    https://github.com/mytourbook/mytourbook/issues/1171
+
+* Tour Analyzer View (Frederic)
+  - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
+
+* Calendar View (Frederic)
+  - Fix for a regression that caused the "Link with other views" button to be not persisted. The regression appeared in v18.9.0
+
+* Tour Editor (Frederic)
+  - Fix for linux async event (when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa)
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.?   https://github.com/mytourbook/mytourbook/milestone/12?closed=1
+* Eclipse 2023-09 (4.29)
+* NatTable 2.10               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.120.2
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
