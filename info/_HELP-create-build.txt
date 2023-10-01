@@ -178,9 +178,14 @@ Copy/Merge app files to build folder
 Build Product
 --------------
    Open cmd
+   
       - Select folder "C:\DAT\MT\mytourbook"
+   
       - Run "mvn verify -P build-release"
-      - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
+   
+      - Run "mvn verify -P build-release -X --log-file ../log.txt"      this will log into a file
+
+        OR run "build-MT-with-log-file.cmd" in "C:\DAT\MT\mytourbook\build\build.net.tourbook"
 
 
 #################
