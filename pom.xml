@@ -70,9 +70,9 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.29</id>                                 <layout>p2</layout>
+         <id>eclipse.platform.4.28</id>                                 <layout>p2</layout>
          
-         <url>https://download.eclipse.org/releases/2023-09</url>
+         <url>https://download.eclipse.org/releases/2023-06</url>
          
 <!-- 
          <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
