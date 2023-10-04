@@ -164,10 +164,10 @@
       />
 
 
-      <!-- ELEVATION UP -->
+      <!-- ELEVATION GAIN / UP -->
 
       <statistic
-         name           ="%Pref_Day_Summary_Elevation_Up"
+         name           ="%Pref_Day_Summary_Elevation_Gain"
          class          ="net.tourbook.statistics.graphs.StatisticDay_Elevation_Up"
          id             ="net.tourbook.statistics.StatisticSummary_Day_Elevation_Up"
          category-data  ="Elevation"
@@ -175,7 +175,7 @@
       />
 
       <statistic
-         name           ="%Pref_Week_Summary_Elevation_Up"
+         name           ="%Pref_Week_Summary_Elevation_Gain"
          class          ="net.tourbook.statistics.graphs.StatisticWeek_Elevation_Up"
          id             ="net.tourbook.statistics.StatisticSummary_Week_Elevation_Up"
          category-data  ="Elevation"
@@ -183,7 +183,7 @@
       />
 
       <statistic
-         name           ="%Pref_Month_Summary_Elevation_Up"
+         name           ="%Pref_Month_Summary_Elevation_Gain"
          class          ="net.tourbook.statistics.graphs.StatisticMonth_Elevation_Up"
          id             ="net.tourbook.statistics.StatisticSummary_Month_Elevation_Up"
          category-data  ="Elevation"
@@ -191,7 +191,7 @@
       />
 
       <statistic
-         name           ="%Pref_Year_Summary_Elevation_Up"
+         name           ="%Pref_Year_Summary_Elevation_Gain"
          class          ="net.tourbook.statistics.graphs.StatisticYear_Elevation_Up"
          id             ="net.tourbook.statistics.StatisticSummary_Year_Elevation_Up"
          category-data  ="Elevation"
@@ -199,10 +199,10 @@
       />
 
 
-      <!-- ELEVATION DOWN -->
+      <!-- ELEVATION LOSS / DOWN -->
 
       <statistic
-         name           ="%Pref_Day_Summary_Elevation_Down"
+         name           ="%Pref_Day_Summary_Elevation_Loss"
          class          ="net.tourbook.statistics.graphs.StatisticDay_Elevation_Down"
          id             ="net.tourbook.statistics.StatisticSummary_Day_Elevation_Down"
          category-data  ="Elevation"
@@ -210,7 +210,7 @@
       />
 
       <statistic
-         name           ="%Pref_Week_Summary_Elevation_Down"
+         name           ="%Pref_Week_Summary_Elevation_Loss"
          class          ="net.tourbook.statistics.graphs.StatisticWeek_Elevation_Down"
          id             ="net.tourbook.statistics.StatisticSummary_Week_Elevation_Down"
          category-data  ="Elevation"
@@ -218,7 +218,7 @@
       />
 
       <statistic
-         name           ="%Pref_Month_Summary_Elevation_Down"
+         name           ="%Pref_Month_Summary_Elevation_Loss"
          class          ="net.tourbook.statistics.graphs.StatisticMonth_Elevation_Down"
          id             ="net.tourbook.statistics.StatisticSummary_Month_Elevation_Down"
          category-data  ="Elevation"
@@ -226,7 +226,7 @@
       />
 
       <statistic
-         name           ="%Pref_Year_Summary_Elevation_Down"
+         name           ="%Pref_Year_Summary_Elevation_Loss"
          class          ="net.tourbook.statistics.graphs.StatisticYear_Elevation_Down"
          id             ="net.tourbook.statistics.StatisticSummary_Year_Elevation_Down"
          category-data  ="Elevation"
