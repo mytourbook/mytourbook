@@ -49,6 +49,10 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1126#issuecomment-1732513808
   - Added the average elevation (Frederic)
   
+* Tour Editor
+  - Keeping the user's weather input and append weather retrieval to the end
+    https://github.com/mytourbook/mytourbook/discussions/1069  
+
 * Tour Blog
   - Detect http links in the tour description to make them clickable
     https://github.com/mytourbook/mytourbook/issues/1102
@@ -80,8 +84,14 @@ Changes
 * Reference Tours
   - Reference tours are now filtered by the selected person and tour type in the app toolbar
 
+* Statistics
+  - The year in the week start date are now displayed with 4 digits instead of 2 when the statistic values are copied into the clipboard
+
 * Tour Segmenter
   - The tour segmenter color for total values is used for the foreground color and not for the background color
+
+* Weather
+  - Weather retrieval is appended to the existing weather text and do not replace it
 
 
 Bugfix

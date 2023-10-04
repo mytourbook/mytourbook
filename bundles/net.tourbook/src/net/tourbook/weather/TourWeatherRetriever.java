@@ -77,15 +77,12 @@ public final class TourWeatherRetriever {
          }
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION)) {
 
-            String tourDataWeather = tourData.getWeather();
-            if (StringUtils.hasContent(tourDataWeather)) {
-               tourDataWeather += UI.SYSTEM_NEW_LINE;
-            }
-
             final String detailedWeatherLog = historicalWeatherRetriever.buildDetailedWeatherLog(true);
-            tourData.setWeather(tourDataWeather + detailedWeatherLog);
+            tourData.appendWeather(detailedWeatherLog);
          }
+
       } else {
+
          TourLogManager.subLog_INFO(String.format(
                Messages.Log_RetrieveWeatherData_003_NoWeatherData,
                TourManager.getTourDateTimeShort(tourData)));
