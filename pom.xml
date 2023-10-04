@@ -23,7 +23,7 @@
 <dependency>
     <artifactId>hamcrest-core</artifactId>
     <groupId>org.hamcrest</groupId>
-    <version>2.2.0</version>
+    <version>1.3</version>
     <scope>test</scope>
 </dependency>
       
