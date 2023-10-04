@@ -84,6 +84,9 @@ Changes
 * Reference Tours
   - Reference tours are now filtered by the selected person and tour type in the app toolbar
 
+* Statistics
+  - The year in the week start date are now displayed with 4 digits instead of 2 when the statistic values are copied into the clipboard
+
 * Tour Segmenter
   - The tour segmenter color for total values is used for the foreground color and not for the background color
 

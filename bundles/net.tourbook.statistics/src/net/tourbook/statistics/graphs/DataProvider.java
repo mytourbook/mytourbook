@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ public abstract class DataProvider {
    private static final String VALUE_FORMAT_10_3F  = "%10.3f";                       //$NON-NLS-1$
 
    static final String         VALUE_FORMAT_S      = "%s";                           //$NON-NLS-1$
-   private static final String VALUE_FORMAT_8_8S   = "%8.8s";                        //$NON-NLS-1$
+   private static final String VALUE_FORMAT_10_10S = "%10.10s";                      //$NON-NLS-1$
    private static final String VALUE_FORMAT_13S    = "%13s";                         //$NON-NLS-1$
    private static final String VALUE_FORMAT_20_20S = "%-20.20s";                     //$NON-NLS-1$
 
@@ -68,7 +68,7 @@ public abstract class DataProvider {
    static final StatisticValue STAT_VALUE_DATE_YEAR            = new StatisticValue(Messages.Statistic_Value_Date_Year_Header1,              null,    null,    VALUE_FORMAT_4D,   4).withNoSpaceBefore();
 
    static final StatisticValue STAT_VALUE_DATE_WEEK            = new StatisticValue(Messages.Statistic_Value_Date_Week_Header1,              null,    null,    VALUE_FORMAT_2D,   2);
-   static final StatisticValue STAT_VALUE_DATE_WEEK_START      = new StatisticValue(Messages.Statistic_Value_Date_FirstDay_Header1,          Messages.Statistic_Value_Date_FirstDay_Header2,   null,    VALUE_FORMAT_8_8S, 8);
+   static final StatisticValue STAT_VALUE_DATE_WEEK_START      = new StatisticValue(Messages.Statistic_Value_Date_FirstDay_Header1,          Messages.Statistic_Value_Date_FirstDay_Header2,   null,    VALUE_FORMAT_10_10S, 10);
 
    /*
     * Time
@@ -205,6 +205,7 @@ public abstract class DataProvider {
    /**
     * @param finalYear
     * @param numberOfYears
+    *
     * @return Returns a list with all years
     */
    static String getYearList(final int finalYear, final int numberOfYears) {
@@ -226,6 +227,7 @@ public abstract class DataProvider {
    /**
     * @param currentYear
     * @param numberOfYears
+    *
     * @return Returns the number of days between {@link #statistic_LastYear} and currentYear
     */
    int getYearDOYs(final int selectedYear) {
