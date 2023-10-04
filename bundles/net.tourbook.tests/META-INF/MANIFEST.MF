@@ -11,7 +11,8 @@ Require-Bundle: net.tourbook,
  net.tourbook.common,
  org.opentest4j,
  junit-jupiter-api,
- hamcrest-core
+ hamcrest-core,
+ org.hamcrest.library
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
