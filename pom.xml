@@ -33,11 +33,22 @@
     <version>2.2</version>
     <scope>test</scope>
 </dependency>
+
+
+
+<!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all -->
+<dependency>
+    <groupId>org.hamcrest</groupId>
+    <artifactId>hamcrest-all</artifactId>
+    <version>1.3</version>
+    <scope>test</scope>
+    
+</dependency>
       
    </dependencies>	
 
    <properties>
-      <tycho.version>3.0.5</tycho.version>
+      <tycho.version>4.0.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -135,6 +146,11 @@
                <compilerArgument>-err:none</compilerArgument>
             </configuration>
          </plugin>
+	   <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>target-platform-validation-plugin</artifactId>
+          <version>4.0.3</version>
+        </plugin>
 
          <plugin>
             <artifactId>tycho-packaging-plugin</artifactId>          <groupId>org.eclipse.tycho</groupId>
