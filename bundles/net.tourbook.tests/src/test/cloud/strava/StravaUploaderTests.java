@@ -15,7 +15,7 @@
  *******************************************************************************/
 package cloud.strava;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
@@ -39,7 +39,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
