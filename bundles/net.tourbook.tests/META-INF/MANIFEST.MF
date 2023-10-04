@@ -10,7 +10,8 @@ Require-Bundle: net.tourbook,
  org.eclipse.ui,
  net.tourbook.common,
  org.opentest4j,
- junit-jupiter-api
+ junit-jupiter-api,
+ hamcrest-core
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
@@ -47,6 +48,5 @@ Import-Package: com.fasterxml.jackson.core.type,
  org.eclipse.jface.preference,
  org.eclipse.swt,
  org.eclipse.swt.widgets,
- org.hamcrest,
  org.json
 Automatic-Module-Name: net.tourbook.tests
