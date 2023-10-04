@@ -87,7 +87,7 @@ task mt_20_BuildProduct() {
 
          workingDir  "../.."
 
-         commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
+         commandLine 'cmd', '/c', 'mvn -e clean verify -P build-release'
       }
    }
 }
