@@ -18,7 +18,8 @@ Require-Bundle: net.tourbook,
  org.opentest4j,
  org.slf4j.api,
  org.eclipse.nebula.widgets.nattable.core,
- junit-jupiter-api
+ junit-jupiter-api,
+ org.hamcrest.core
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
