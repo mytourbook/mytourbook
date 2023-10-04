@@ -40,10 +40,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.nebula.widgets.nattable.core,
  net.tourbook.ext.jars,
  net.tourbook.ext.worldwind,
- org.opentest4j,
- org.hamcrest.core,
- org.hamcrest,
- org.hamcrest.library
+ org.opentest4j
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,
