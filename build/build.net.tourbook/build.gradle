@@ -59,6 +59,7 @@ sonarqube {
     property 'sonar.java.source',                    '17'
     property 'sonar.cpd.exclusions',                 'bundles/net.tourbook.web/WebContent-rel/tourbook/search/**/*.*,bundles/net.tourbook.web/WebContent-dev/tourbook/search/nls/**/*.js'
     property 'sonar.projectVersion',                 _mtVersion
+    property 'sonar.projectName',                    'MyTourbook'
   }
 }
 
