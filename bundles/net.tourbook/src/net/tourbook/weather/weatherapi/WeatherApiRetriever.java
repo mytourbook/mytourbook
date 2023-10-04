@@ -273,7 +273,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
 // SET_FORMATTING_OFF
 
-      tour.setWeather(                       historyResult.getWeatherDescription());
+      tour.appendWeather(                    historyResult.getWeatherDescription());
       tour.setWeather_Clouds(                historyResult.getWeatherType());
 
       tour.setWeather_Temperature_Average(   historyResult.getTemperatureAverage());

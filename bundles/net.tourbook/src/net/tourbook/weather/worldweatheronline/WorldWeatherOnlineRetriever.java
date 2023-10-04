@@ -363,7 +363,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       //We look for the weather data in the middle of the tour to populate the weather conditions
       weatherData.findMiddleHourly(tourMiddleTime);
-      tour.setWeather(                       weatherData.getWeatherDescription());
+      tour.appendWeather(                    weatherData.getWeatherDescription());
       tour.setWeather_Clouds(                weatherData.getWeatherType());
 
       tour.setWeather_Temperature_Average(   weatherData.getTemperatureAverage());

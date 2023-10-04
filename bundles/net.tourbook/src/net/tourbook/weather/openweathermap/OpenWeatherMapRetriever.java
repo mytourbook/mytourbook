@@ -421,7 +421,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
 // SET_FORMATTING_OFF
 
-      tour.setWeather(                       currentWeather.getWeatherDescription());
+      tour.appendWeather(                    currentWeather.getWeatherDescription());
       tour.setWeather_Clouds(                currentWeather.getWeatherClouds());
       tour.setWeather_Temperature_Average(   currentWeather.getTemp());
       tour.setWeather_Humidity((short)       currentWeather.getHumidity());
@@ -441,7 +441,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       //We look for the weather data in the middle of the tour to populate the weather conditions
       timeMachineResult.findMiddleHourly(    tourMiddleTime);
-      tour.setWeather(                       timeMachineResult.getWeatherDescription());
+      tour.appendWeather(                    timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(                timeMachineResult.getWeatherClouds());
 
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
