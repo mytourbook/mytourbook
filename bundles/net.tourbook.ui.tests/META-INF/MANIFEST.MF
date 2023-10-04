@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: GUI tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
 Bundle-Version: 23.10.0.qualifier
-Import-Package: org.eclipse.nebula.widgets.nattable,
- org.hamcrest.core
+Import-Package: org.eclipse.nebula.widgets.nattable
 Require-Bundle: net.tourbook,
  net.tourbook.common,
  net.tourbook.export,
@@ -19,8 +18,7 @@ Require-Bundle: net.tourbook,
  org.opentest4j,
  org.slf4j.api,
  org.eclipse.nebula.widgets.nattable.core,
- junit-jupiter-api,
- org.hamcrest.core
+ junit-jupiter-api
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
