@@ -19,7 +19,6 @@
                                                                         <version>5.10.0</version>
          <scope>test</scope>
       </dependency>
-
    </dependencies>	
 
    <properties>
@@ -121,11 +120,6 @@
                <compilerArgument>-err:none</compilerArgument>
             </configuration>
          </plugin>
-	   <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>target-platform-validation-plugin</artifactId>
-          <version>4.0.3</version>
-        </plugin>
 
          <plugin>
             <artifactId>tycho-packaging-plugin</artifactId>          <groupId>org.eclipse.tycho</groupId>
