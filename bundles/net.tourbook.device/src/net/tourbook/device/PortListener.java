@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,232 +35,234 @@ import net.tourbook.ui.UI;
 
 public class PortListener implements SerialPortEventListener {
 
-	private SerialParameters	fPortParams;
-	private SerialPort			fSerialPort;
+   private SerialParameters fPortParams;
+   private SerialPort       fSerialPort;
 
-	private InputStream			fInStream;
-	private OutputStream		fOutStream;
+   private InputStream      fInStream;
+   private OutputStream     fOutStream;
 
-	private boolean				fIsPortOpen;
+   private boolean          fIsPortOpen;
 
-	private IDataListener		fDataListener;
+   private IDataListener    fDataListener;
 
-	/**
-	 * Class Constructor
-	 *
-	 * @param portParams
-	 * @param dataNotification
-	 */
-	public PortListener(SerialParameters portParams, IDataListener dataListener) {
+   /**
+    * Class Constructor
+    *
+    * @param portParams
+    * @param dataNotification
+    */
+   public PortListener(final SerialParameters portParams, final IDataListener dataListener) {
 
-		fPortParams = portParams;
-		fDataListener = dataListener;
+      fPortParams = portParams;
+      fDataListener = dataListener;
 
-		fIsPortOpen = false;
-	}
+      fIsPortOpen = false;
+   }
 
-	/**
-	 * Attempts to open a serial connection and streams using the parameters in the SerialParameters
-	 * object. If it is unsuccesfull at any step it returns the port to a closed state, throws a
-	 * <code>SerialConnectionException</code>, and returns. Gives a timeout of 5 seconds on the
-	 * portOpen to allow other applications to reliquish the port if have it open and no longer need
-	 * it.
-	 *
-	 * @throws SerialConnectionException
-	 */
-	public void openConnection() throws SerialConnectionException {
+   /**
+    * Close the port and clean up associated elements.
+    */
+   public void closeConnection() {
 
-		// Enumeration ports = CommPortIdentifier.getPortIdentifiers();
+      // If port is already closed just return.
+      if (fIsPortOpen == false) {
+         return;
+      }
 
-		// dump available ports
-		// while (ports.hasMoreElements()) {
-		// CommPortIdentifier port = (CommPortIdentifier) ports.nextElement();
-		// System.out.println(port.getPortType() +" - "+port.getName());
-		// }
+      // Check to make sure sPort has reference to avoid a NPE.
+      if (fSerialPort != null) {
 
-		CommPortIdentifier portId;
+         // System.out.println("close port");
 
-		// Obtain a CommPortIdentifier object for the port you want to open.
-		try {
-			portId = CommPortIdentifier.getPortIdentifier(fPortParams.getPortName());
-		} catch (NoSuchPortException e) {
-			throw new SerialConnectionException(e.getMessage());
-		}
+         // cleanup the port
+         fSerialPort.notifyOnDataAvailable(false);
+         fSerialPort.removeEventListener();
+         // fSerialPort.disableReceiveTimeout();
+         // fSerialPort.
 
-		// Open the port represented by the CommPortIdentifier object. Give
-		// the open call a relatively long timeout of 30 seconds to allow
-		// a different application to reliquish the port if the user
-		// wants to.
-		try {
-			fSerialPort = (SerialPort) portId.open("net.tourbook.data.serial", 5000); //$NON-NLS-1$
-		} catch (PortInUseException e) {
+         try {
+            // close the i/o streams
+            fInStream.close();
+            fOutStream.close();
+         } catch (final IOException e) {
+            System.err.println(e);
+         }
 
-			UI.showMessageInfo(Messages.Port_Listener_Error_ntd001, Messages.Port_Listener_Error_ntd002);
+         // Close the port.
+         fSerialPort.close();
+      }
 
-			throw new SerialConnectionException(e.getMessage());
-		}
+      fSerialPort = null;
+      fIsPortOpen = false;
+   }
 
-		// Set the parameters of the connection. If they won't set, close the
-		// port before throwing an exception.
-		try {
-			setConnectionParameters();
-		} catch (SerialConnectionException e) {
-			fSerialPort.close();
-			throw e;
-		}
+   /**
+    * Attempts to open a serial connection and streams using the parameters in the SerialParameters
+    * object. If it is unsuccessful at any step it returns the port to a closed state, throws a
+    * <code>SerialConnectionException</code>, and returns. Gives a timeout of 5 seconds on the
+    * portOpen to allow other applications to relinquish the port if have it open and no longer need
+    * it.
+    *
+    * @throws SerialConnectionException
+    */
+   public void openConnection() throws SerialConnectionException {
 
-		// Open the input and output streams for the connection. If they won't
-		// open, close the port before throwing an exception.
-		try {
-			fInStream = fSerialPort.getInputStream();
-			fOutStream = fSerialPort.getOutputStream();
-			// fOutStreamIsOpen=true;
-		} catch (IOException e) {
-			fSerialPort.close();
-			throw new SerialConnectionException("Error opening i/o streams"); //$NON-NLS-1$
-		}
+      // Enumeration ports = CommPortIdentifier.getPortIdentifiers();
 
-		// Add this object as an event listener for the serial port.
-		try {
-			fSerialPort.addEventListener(this);
-		} catch (TooManyListenersException e) {
-			fSerialPort.close();
-			throw new SerialConnectionException("too many selectionListeners added"); //$NON-NLS-1$
-		}
+      // dump available ports
+      // while (ports.hasMoreElements()) {
+      // CommPortIdentifier port = (CommPortIdentifier) ports.nextElement();
+      // System.out.println(port.getPortType() +" - "+port.getName());
+      // }
 
-		// Set notifyOnDataAvailable to true to allow event driven input.
-		fSerialPort.notifyOnDataAvailable(true);
+      CommPortIdentifier portId;
 
-		// Set receive timeout to allow breaking out of polling loop during
-		// input handling.
-		try {
-			fSerialPort.enableReceiveTimeout(10);
-		} catch (UnsupportedCommOperationException e) {}
+      // Obtain a CommPortIdentifier object for the port you want to open.
+      try {
+         portId = CommPortIdentifier.getPortIdentifier(fPortParams.getPortName());
+      } catch (final NoSuchPortException e) {
+         throw new SerialConnectionException(e.getMessage());
+      }
 
-		fIsPortOpen = true;
-	}
+      // Open the port represented by the CommPortIdentifier object. Give
+      // the open call a relatively long timeout of 30 seconds to allow
+      // a different application to relinquish the port if the user
+      // wants to.
+      try {
+         fSerialPort = (SerialPort) portId.open("net.tourbook.data.serial", 5000); //$NON-NLS-1$
+      } catch (final PortInUseException e) {
 
-	/**
-	 * Close the port and clean up associated elements.
-	 */
-	public void closeConnection() {
+         UI.showMessageInfo(Messages.Port_Listener_Error_ntd001, Messages.Port_Listener_Error_ntd002);
 
-		// If port is alread closed just return.
-		if (fIsPortOpen == false) {
-			return;
-		}
+         throw new SerialConnectionException(e.getMessage());
+      }
 
-		// Check to make sure sPort has reference to avoid a NPE.
-		if (fSerialPort != null) {
+      // Set the parameters of the connection. If they won't set, close the
+      // port before throwing an exception.
+      try {
+         setConnectionParameters();
+      } catch (final SerialConnectionException e) {
+         fSerialPort.close();
+         throw e;
+      }
 
-			// System.out.println("close port");
+      // Open the input and output streams for the connection. If they won't
+      // open, close the port before throwing an exception.
+      try {
+         fInStream = fSerialPort.getInputStream();
+         fOutStream = fSerialPort.getOutputStream();
+         // fOutStreamIsOpen=true;
+      } catch (final IOException e) {
+         fSerialPort.close();
+         throw new SerialConnectionException("Error opening i/o streams"); //$NON-NLS-1$
+      }
 
-			// cleanup the port
-			fSerialPort.notifyOnDataAvailable(false);
-			fSerialPort.removeEventListener();
-			// fSerialPort.disableReceiveTimeout();
-			// fSerialPort.
+      // Add this object as an event listener for the serial port.
+      try {
+         fSerialPort.addEventListener(this);
+      } catch (final TooManyListenersException e) {
+         fSerialPort.close();
+         throw new SerialConnectionException("too many selectionListeners added"); //$NON-NLS-1$
+      }
 
-			try {
-				// close the i/o streams
-				fInStream.close();
-				fOutStream.close();
-			} catch (IOException e) {
-				System.err.println(e);
-			}
+      // Set notifyOnDataAvailable to true to allow event driven input.
+      fSerialPort.notifyOnDataAvailable(true);
 
-			// Close the port.
-			fSerialPort.close();
-		}
+      // Set receive timeout to allow breaking out of polling loop during
+      // input handling.
+      try {
+         fSerialPort.enableReceiveTimeout(10);
+      } catch (final UnsupportedCommOperationException e) {}
 
-		fSerialPort = null;
-		fIsPortOpen = false;
-	}
+      fIsPortOpen = true;
+   }
 
-	/**
-	 * Sets the connection parameters to the setting in the parameters object. If set fails return
-	 * the parameters object to origional settings and throw exception.
-	 */
-	public void setConnectionParameters() throws SerialConnectionException {
+   /**
+    * send data from the port
+    *
+    * @param data
+    *
+    * @return Returns <code>false</code> when an error occurred
+    */
+   public boolean sendData(final int data) {
+      try {
+         if (fOutStream == null) {
+            return false;
+         } else {
+            fOutStream.write(data);
+            return true;
+         }
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
+      return false;
+   }
 
-		// Save state of parameters before trying a set.
-		int oldBaudRate = fSerialPort.getBaudRate();
-		int oldDatabits = fSerialPort.getDataBits();
-		int oldStopbits = fSerialPort.getStopBits();
-		int oldParity = fSerialPort.getParity();
-		// Set connection parameters, if set fails return parameters object
-		// to original state.
-		try {
-			fSerialPort.setSerialPortParams(
-					fPortParams.getBaudRate(),
-					fPortParams.getDatabits(),
-					fPortParams.getStopbits(),
-					fPortParams.getParity());
-		} catch (UnsupportedCommOperationException e) {
-			fPortParams.setBaudRate(oldBaudRate);
-			fPortParams.setDatabits(oldDatabits);
-			fPortParams.setStopbits(oldStopbits);
-			fPortParams.setParity(oldParity);
-			throw new SerialConnectionException("Unsupported parameter"); //$NON-NLS-1$
-		}
+   /*
+    * @see javax.comm.SerialPortEventListener#serialEvent(javax.comm.SerialPortEvent)
+    */
+   @Override
+   public void serialEvent(final SerialPortEvent portEvent) {
 
-		// Set flow control.
-		try {
-			fSerialPort.setFlowControlMode(fPortParams.getFlowControlIn() | fPortParams.getFlowControlOut());
-		} catch (UnsupportedCommOperationException e) {
-			throw new SerialConnectionException("Unsupported flow control"); //$NON-NLS-1$
-		}
-	}
+      // Determine type of event
+      switch (portEvent.getEventType()) {
 
-	/*
-	 * @see javax.comm.SerialPortEventListener#serialEvent(javax.comm.SerialPortEvent)
-	 */
-	public void serialEvent(SerialPortEvent portEvent) {
+      case SerialPortEvent.DATA_AVAILABLE:
 
-		// Determine type of event
-		switch (portEvent.getEventType()) {
+         int iData = 0;
 
-		case SerialPortEvent.DATA_AVAILABLE:
+         // Read data until -1 is returned
+         while (iData != -1) {
+            try {
 
-			int iData = 0;
+               iData = fInStream.read();
 
-			// Read data until -1 is returned
-			while (iData != -1) {
-				try {
+               if (iData != -1) {
+                  fDataListener.dataArrived(iData & 0xff);
+               }
 
-					iData = fInStream.read();
+            } catch (final IOException ex) {
+               System.out.println(ex);
+               return;
+            }
+         }
 
-					if (iData != -1) {
-						fDataListener.dataArrived(iData & 0xff);
-					}
+         break;
+      }
+   }
 
-				} catch (IOException ex) {
-					System.out.println(ex);
-					return;
-				}
-			}
+   /**
+    * Sets the connection parameters to the setting in the parameters object. If set fails return
+    * the parameters object to original settings and throw exception.
+    */
+   public void setConnectionParameters() throws SerialConnectionException {
 
-			break;
-		}
-	}
+      // Save state of parameters before trying a set.
+      final int oldBaudRate = fSerialPort.getBaudRate();
+      final int oldDatabits = fSerialPort.getDataBits();
+      final int oldStopbits = fSerialPort.getStopBits();
+      final int oldParity = fSerialPort.getParity();
+      // Set connection parameters, if set fails return parameters object
+      // to original state.
+      try {
+         fSerialPort.setSerialPortParams(
+               fPortParams.getBaudRate(),
+               fPortParams.getDatabits(),
+               fPortParams.getStopbits(),
+               fPortParams.getParity());
+      } catch (final UnsupportedCommOperationException e) {
+         fPortParams.setBaudRate(oldBaudRate);
+         fPortParams.setDatabits(oldDatabits);
+         fPortParams.setStopbits(oldStopbits);
+         fPortParams.setParity(oldParity);
+         throw new SerialConnectionException("Unsupported parameter"); //$NON-NLS-1$
+      }
 
-	/**
-	 * send data from the port
-	 *
-	 * @param data
-	 * @return Returns <code>false</code> when an error occured
-	 */
-	public boolean sendData(int data) {
-		try {
-			if (fOutStream == null) {
-				return false;
-			} else {
-				fOutStream.write(data);
-				return true;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+      // Set flow control.
+      try {
+         fSerialPort.setFlowControlMode(fPortParams.getFlowControlIn() | fPortParams.getFlowControlOut());
+      } catch (final UnsupportedCommOperationException e) {
+         throw new SerialConnectionException("Unsupported flow control"); //$NON-NLS-1$
+      }
+   }
 }
