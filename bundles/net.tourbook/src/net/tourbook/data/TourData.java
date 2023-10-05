@@ -2052,13 +2052,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Append weather description
+    * Append or replace weather description
     *
-    * @param newWeather
+    * @param weatherDescription
     */
-   public void appendWeather(final String newWeather) {
+   public void appendOrReplaceWeather(final String weatherDescription) {
 
-      if (StringUtils.hasContent(weather)) {
+      final boolean isAppendWeatherDescription = _prefStore.getBoolean(ITourbookPreferences.WEATHER_IS_APPEND_WEATHER_DESCRIPTION);
+
+      if (isAppendWeatherDescription && StringUtils.hasContent(weather)) {
 
          // append weather
 
@@ -2066,17 +2068,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
 //             THIS DO NOT WORK IN THE TOUR EDITOR, it will not wrap the text in Win
 //
-//             UI.NEW_LINE2
+//             UI.NEW_LINE
 
-               UI.SYSTEM_NEW_LINE2
+               UI.SYSTEM_NEW_LINE
 
-                     + newWeather;
+                     + weatherDescription;
 
       } else {
 
-         // set weather
+         // replace weather description
 
-         weather = newWeather;
+         weather = weatherDescription;
       }
    }
 
