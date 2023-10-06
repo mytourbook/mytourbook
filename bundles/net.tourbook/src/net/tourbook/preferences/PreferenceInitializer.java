@@ -550,6 +550,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        */
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
       store.setDefault(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG, false);
+      store.setDefault(ITourbookPreferences.WEATHER_IS_APPEND_WEATHER_DESCRIPTION, false); // replace weather description is the default
       store.setDefault(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION, false);
       store.setDefault(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID, IWeatherProvider.Pref_Weather_Provider_None);
 

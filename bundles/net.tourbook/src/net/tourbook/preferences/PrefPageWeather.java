@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2022 Frédéric Bard
+ * Copyright (C) 2019, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
    public static final String ID = "net.tourbook.preferences.PrefPageWeather"; //$NON-NLS-1$
+
    private int                DEFAULT_DESCRIPTION_WIDTH;
 
    private WeatherProvidersUI _weatherProvidersUI;
