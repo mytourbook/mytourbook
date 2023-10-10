@@ -6,6 +6,9 @@ Bundle-Version: 23.10.0.qualifier
 Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
 Export-Package: cop.swt.widgets.viewers.table.celleditors,
+ net.sf.swtaddons.autocomplete,
+ net.sf.swtaddons.autocomplete.combo,
+ net.sf.swtaddons.autocomplete.text,
  net.tourbook.common,
  net.tourbook.common.action,
  net.tourbook.common.color,
