@@ -20,7 +20,8 @@ Bundle-ClassPath:
  jackson-databind-2.15.0.jar,
  jackson-annotations-2.15.0.jar,
  openfoodfacts-java-wrapper-0.9.3.jar,
- fit-21.120.2.jar
+ fit-21.120.2.jar,
+ commons-suncalc-3.4.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
  com.fasterxml.jackson.core.async,
