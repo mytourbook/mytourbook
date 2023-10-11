@@ -1088,7 +1088,12 @@ public class TourBlogView extends ViewPart {
 
       final boolean isTourAvailable = (tourId >= 0) && (_tourData != null);
       if (isTourAvailable && _browser != null) {
+
          updateUI();
+
+      } else if (_tourData == null) {
+
+         clearView();
       }
    }
 
