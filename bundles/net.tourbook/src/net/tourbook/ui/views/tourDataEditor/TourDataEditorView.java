@@ -3396,6 +3396,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _pageBook.showPage(_page_NoTourData);
 
       displaySelectedTour();
+      //todo fb aqui
    }
 
    private Section createSection(final Composite parent,
@@ -6292,7 +6293,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (_tourData == null) {
 
-         Display.getCurrent().asyncExec(() -> {
+         Display.getDefault().asyncExec(() -> {
 
             if (_pageBook.isDisposed()) {
                return;
@@ -6310,6 +6311,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                // get first tour, this view shows only one tour
                displayTour(selectedTours.get(0));
+
+               _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
 
                setTourClean();
             }
