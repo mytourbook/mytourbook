@@ -3396,7 +3396,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _pageBook.showPage(_page_NoTourData);
 
       displaySelectedTour();
-      //todo fb aqui
    }
 
    private Section createSection(final Composite parent,
