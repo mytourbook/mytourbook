@@ -19,9 +19,6 @@ import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.OptionalDouble;
-import java.util.stream.IntStream;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -34,7 +31,8 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.ElevationGainLoss;
+import net.tourbook.common.util.StreamUtils;
+import net.tourbook.data.FlatGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
@@ -387,36 +385,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * Computes the average value for a given tour serie array,
-    * start index and end index
-    *
-    * @param serie
-    *           The Tour serie
-    * @param startIndex
-    *           The start index
-    * @param endIndex
-    *           The end index
-    * @return The average value as a {@link Double}
-    */
-   private double computeAverage(final float[] serie, final int startIndex, final int endIndex) {
-
-      double averageValue = 0;
-
-      if (serie == null) {
-         return averageValue;
-      }
-
-      final double[] serieDouble = IntStream.range(startIndex, endIndex).mapToDouble(i -> serie[i]).toArray();
-      final OptionalDouble averageDouble = Arrays.stream(serieDouble).average();
-
-      if (averageDouble.isPresent()) {
-         averageValue = averageDouble.getAsDouble();
-      }
-
-      return averageValue;
-   }
-
-   /**
     * Computes the average speed between two markers (in km/h or mph)
     *
     * @param cell
@@ -636,7 +604,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final double averageSlope = computeAverage(_tourData.getGradientSerie(), previousMarkerIndex, currentMarkerIndex);
+            final double averageSlope = StreamUtils.computeAverage(_tourData.getGradientSerie(), previousMarkerIndex, currentMarkerIndex);
 
             colDef.printDetailValue(cell, averageSlope);
          }
@@ -658,13 +626,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
+            final FlatGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
 
             if (elevationGainLoss == null) {
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
                colDef.printValue_0(cell, value);
             }
          }
@@ -685,7 +653,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(
+            final FlatGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(
                   previousMarkerIndex,
                   currentMarkerIndex);
 
@@ -693,7 +661,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.elevationLoss / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
             }

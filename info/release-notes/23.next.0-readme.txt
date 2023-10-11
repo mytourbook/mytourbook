@@ -4,6 +4,12 @@
 TODO's
 ======               
 
+* Remove debug code in ColumnManager.java
+   // TODO
+      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
+      System.out.println();
+
+
 * TRANSLATION
 
   - Inform translators to update the Messages editor by using the install procedure from
@@ -49,42 +55,8 @@ New
 Improvements
 ============
 
-* Tour Book
-  - Use custom colors for tour and total values
-  - New action: Go to last tour
-    https://github.com/mytourbook/mytourbook/issues/1173
-  - New action: One click to expand only one item and collapse any others
-  - New action: One click to expand/collapse an item when selected with mouse
+* 
 
-* Statistics
-  - Show elevation loss values
-    https://github.com/mytourbook/mytourbook/issues/1034
-    
-* Tagged Tours
-  - Show number of items in the collapsed tags and tag categories
-    https://github.com/mytourbook/mytourbook/issues/1180    
-    
-* Reference Tours
-  - Show tour type for the reference tour
-  - Show geo flag for the compared tour
-  
-* Tour Blog
-  - Detect http links in the tour description to make them clickable
-    https://github.com/mytourbook/mytourbook/issues/1102
-
-* Color Selector
-  - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
-    https://github.com/mytourbook/mytourbook/issues/1169
-    
-* macOS ARM
-  - Support macOS ARM platform    
-    https://github.com/mytourbook/mytourbook/discussions/1174
-
-* Tour Blog View & Tour Analyzer View (Frederic)
-  - Refreshing each view when the measurement system is changed
-
-* Tour Print (Frederic)
-  - Added recorded and paused time values. Rounded values (elevation gain, distance...)
 
 Changes
 =======
@@ -95,12 +67,7 @@ Changes
 Bugfix
 ======
 
-* Import
-  - Reimport a renamed tcx file does not change the importfilename in my tourbook anymore
-    https://github.com/mytourbook/mytourbook/issues/1171
-
-* Tour Analyzer View (Frederic)
-  - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
+* 
 
 
 Translation    
@@ -116,7 +83,7 @@ System
 ======
 
 * MyTourbook Milestone 23.?   https://github.com/mytourbook/mytourbook/milestone/12?closed=1
-* Eclipse 2023-06
+* Eclipse 2023-09 (4.29)
 * NatTable 2.10               https://www.eclipse.org/nattable/download.php
-* FIT SDK 21.115
+* FIT SDK 21.120.2
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

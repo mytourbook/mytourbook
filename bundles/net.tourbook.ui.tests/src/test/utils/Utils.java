@@ -33,8 +33,10 @@ import net.tourbook.common.util.StatusUtil;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
@@ -117,6 +119,25 @@ public class Utils {
    public static void clickYesButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.YES_LABEL, bot);
+   }
+
+   /**
+    * Because the SWTBot function {@link SWTBot#buttonWithTooltip} doesn't appear
+    * to work in every case, this function will find a toolbar button for a given
+    * bot view based on the tooltip text of the button.
+    *
+    */
+   public static SWTBotToolbarButton getToolbarButton(final SWTBotView botView, final String tooltipText)
+   {
+      for (final SWTBotToolbarButton button : botView.getToolbarButtons()) {
+
+         if (tooltipText.equals(button.getToolTipText())) {
+
+            return button;
+         }
+      }
+
+      return null;
    }
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLAppFilter;
+import net.tourbook.ui.SQLFilter;
 
 public class TVIRefTour_RootItem extends TVIRefTour_Item {
 
@@ -46,34 +48,47 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
 
       setChildren(children);
 
+      final SQLFilter sqlAppFilter = new SQLFilter(SQLAppFilter.Person, SQLAppFilter.TourType);
+
+      final String sqlFilterWhereClause = sqlAppFilter.getWhereClause().trim();
+      final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;
+
+      final String sqlWhereClause = isSqlWhereClause
+            ? "   WHERE 1=1 " + NL + sqlFilterWhereClause + NL //$NON-NLS-1$
+            : UI.EMPTY_STRING;
+
       final String sql = UI.EMPTY_STRING
 
-            + "SELECT" + NL //                                                            //$NON-NLS-1$
+            + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-            + " TourReference.label," + NL //                                          1  //$NON-NLS-1$
-            + " TourReference.refId," + NL //                                          2  //$NON-NLS-1$
-            + " TourReference.TourData_tourId," + NL //                                3  //$NON-NLS-1$
+            + "   TourReference.label," + NL //                                           1  //$NON-NLS-1$
+            + "   TourReference.refId," + NL //                                           2  //$NON-NLS-1$
+            + "   TourReference.TourData_tourId," + NL //                                 3  //$NON-NLS-1$
 
-            + " TourData.hasGeoData," + NL //                                          4  //$NON-NLS-1$
-            + " TourData.tourType_typeId," + NL //                                     5  //$NON-NLS-1$
+            + "   TourData.TourPerson_personId, " //                                      4  //$NON-NLS-1$
+            + "   TourData.TourType_typeId," + NL //                                      5  //$NON-NLS-1$
+            + "   TourData.hasGeoData," + NL //                                           6  //$NON-NLS-1$
 
             // get number of compared tours
-            + "(" + NL //                                                              6  //$NON-NLS-1$
-            + "   SELECT SUM(1)" + NL //                                                  //$NON-NLS-1$
-            + "      FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //                    //$NON-NLS-1$
+            + "(" + NL //                                                                 7  //$NON-NLS-1$
+            + "   SELECT SUM(1)" + NL //                                                     //$NON-NLS-1$
+            + "      FROM " + TourDatabase.TABLE_TOUR_COMPARED + NL //                       //$NON-NLS-1$
             + "      WHERE " + TourDatabase.TABLE_TOUR_COMPARED + ".reftourid=" + TourDatabase.TABLE_TOUR_REFERENCE + ".refid" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + ")" + NL //                                                                 //$NON-NLS-1$
+            + ")" + NL //                                                                    //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " TourReference" + NL //     //$NON-NLS-1$
+            + "   FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " TourReference" + NL //     //$NON-NLS-1$
 
             // get data for a tour
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourReference.TourData_tourId = TourData.tourId" + NL //               //$NON-NLS-1$
+            + "   LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "   ON TourReference.TourData_tourId = TourData.tourId" + NL //               //$NON-NLS-1$
+            + sqlWhereClause
 
-            + " ORDER BY label" + NL; //                                                  //$NON-NLS-1$
+            + "   ORDER BY label" + NL; //                                                  //$NON-NLS-1$
 
       try (Connection conn = TourDatabase.getInstance().getConnection();
             PreparedStatement statement = conn.prepareStatement(sql);) {
+
+         sqlAppFilter.setParameters(statement, 1);
 
          final ResultSet result = statement.executeQuery();
 
@@ -93,10 +108,11 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
             /*
              * From TourData
              */
-            refItem.hasGeoData = result.getBoolean(4);
+            // final Object tourPerson = result.getObject(4);
             final Object tourTypeId = result.getObject(5);
 
-            refItem.numTours = result.getInt(6);
+            refItem.hasGeoData = result.getBoolean(6);
+            refItem.numTours = result.getInt(7);
 
             // tour type
             refItem.tourTypeId = tourTypeId == null

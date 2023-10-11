@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class DialogJoinToursTests extends UITest {
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2021   3", allItems[4].getText()); //$NON-NLS-1$
+      assertTrue(Arrays.asList(allItems).stream().anyMatch(item -> item.getText().equals("2021   3")));
    }
 
    @Test

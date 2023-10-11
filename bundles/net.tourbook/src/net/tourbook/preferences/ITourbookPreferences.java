@@ -405,7 +405,13 @@ public interface ITourbookPreferences {
    public static final String BREAK_TIME_SLICE_DIFF                   = "BreakTime_SliceDiff";                        //$NON-NLS-1$
 
    /**
-    * DP tolerance when computing altitude up/down
+    * DP tolerance and gradient when computing flat, gain and loss areas
+    */
+   public static final String FLAT_GAIN_LOSS_DP_TOLERANCE             = "FlatGainLoss_DPTolerance";                   //$NON-NLS-1$
+   public static final String FLAT_GAIN_LOSS_FLAT_GRADIENT            = "FlatGainLoss_FlatGradient";                  //$NON-NLS-1$
+
+   /**
+    * DP tolerance when computing elevation gain/loss
     */
    public static final String COMPUTED_ALTITUDE_DP_TOLERANCE          = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
 
@@ -626,11 +632,12 @@ public interface ITourbookPreferences {
    /*
     * Weather
     */
-   //This is the api key for world weather online
+   /** This is the api key for world weather online */
    public static final String WEATHER_API_KEY                              = "WEATHER_API_KEY";                              //$NON-NLS-1$
-   public static final String WEATHER_WEATHER_PROVIDER_ID                  = "WEATHER_WEATHER_PROVIDER_ID";                  //$NON-NLS-1$
    public static final String WEATHER_DISPLAY_FULL_LOG                     = "WEATHER_DISPLAY_FULL_LOG";                     //$NON-NLS-1$
+   public static final String WEATHER_IS_APPEND_WEATHER_DESCRIPTION        = "WEATHER_IS_APPEND_WEATHER_DESCRIPTION";        //$NON-NLS-1$
    public static final String WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION = "WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION"; //$NON-NLS-1$
+   public static final String WEATHER_WEATHER_PROVIDER_ID                  = "WEATHER_WEATHER_PROVIDER_ID";                  //$NON-NLS-1$
 
    /*
     * Tour Marker View

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,7 +53,7 @@ public class MPWms extends MP implements ITileLoader {
     */
 //	private static final String			SRS_EPSG_3857		= "EPSG:3857";				//$NON-NLS-1$
 
-   // this is depricated
+   // this is deprecated
 //	private static final String			SRS_EPSG_3785		= "EPSG:3785";				//$NON-NLS-1$
 //	private static final String			SRS_EPSG_900913		= "EPSG:900913";			//$NON-NLS-1$
 
@@ -63,7 +63,7 @@ public class MPWms extends MP implements ITileLoader {
 
    /**
     * wms server {@link #_wmsServer} and wms caps {@link #_wmsCaps} are set when a connection to
-    * the server was successfull, otherwise they are <code>null</code>
+    * the server was successful, otherwise they are <code>null</code>
     */
    private WebMapServer                _wmsServer;
 

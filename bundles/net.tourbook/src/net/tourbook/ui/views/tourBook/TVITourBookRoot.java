@@ -55,7 +55,6 @@ public class TVITourBookRoot extends TVITourBookItem {
          setChildren(children);
 
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
-         String sqlFromTourData;
 
          final String sqlFilterWhereClause = sqlAppFilter.getWhereClause().trim();
          final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;
@@ -65,6 +64,8 @@ public class TVITourBookRoot extends TVITourBookItem {
                : UI.EMPTY_STRING;
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
+         String sqlFromTourData;
 
          if (TourTagFilterManager.isTourTagFilterEnabled()) {
 

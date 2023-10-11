@@ -72,14 +72,14 @@ public class StatisticsViewTests extends UITest {
       statisticsTypeComboBox.setSelection("Distance - Week"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Distance - Month"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Distance - Year"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Up - Day"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Up - Week"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Up - Month"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Up - Year"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Down - Day"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Down - Week"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Down - Month"); //$NON-NLS-1$
-      statisticsTypeComboBox.setSelection("Elevation Down - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Gain - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Gain - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Gain - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Gain - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Loss - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Loss - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Loss - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation Loss - Year"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Day"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Week"); //$NON-NLS-1$
       statisticsTypeComboBox.setSelection("Athlete's Data - Month"); //$NON-NLS-1$

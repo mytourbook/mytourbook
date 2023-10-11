@@ -85,6 +85,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE,               ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE,              ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER,                 ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RELATIVE,              ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE,           ValueFormat.NUMBER_1_0.name());

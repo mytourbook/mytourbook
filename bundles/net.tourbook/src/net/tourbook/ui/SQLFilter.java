@@ -189,6 +189,56 @@ public class SQLFilter {
    }
 
    /**
+    * Creates the WHERE statement for the provided app filters
+    *
+    * @param appFilters
+    */
+   public SQLFilter(final SQLAppFilter... appFilters) {
+
+      final StringBuilder sql = new StringBuilder();
+
+      for (final SQLAppFilter appFilter : appFilters) {
+
+         if (SQLAppFilter.Person.equals(appFilter)) {
+
+            /*
+             * App filter: Person
+             */
+            final TourPerson activePerson = TourbookPlugin.getActivePerson();
+            if (activePerson == null) {
+
+               // select all people
+
+            } else {
+
+               // select only one person
+
+               sql.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
+
+               _parameters.add(activePerson.getPersonId());
+            }
+
+         } else if (SQLAppFilter.TourType.equals(appFilter)) {
+
+            /*
+             * App filter: Tour type
+             */
+            final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+            if (activeTourTypeFilter != null) {
+
+               final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
+
+               sql.append(sqlData.getWhereString());
+
+               _parameters.addAll(sqlData.getParameters());
+            }
+         }
+      }
+
+      _sqlWhereClause = sql.toString();
+   }
+
+   /**
     * @return Returns the last parameter index +1 which was used for setting parameters in
     *         {@link #setParameters(PreparedStatement, int)}
     */

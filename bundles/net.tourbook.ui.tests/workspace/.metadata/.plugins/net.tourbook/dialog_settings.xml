@@ -158,6 +158,7 @@
 		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO" value="false"/>
 		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES" value="true"/>
 		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF" value="false"/>
+		<item key="ValuePoint_ToolTip_VisibleGraphs" value="11280"/>
 	</section>
 	<section name="net.tourbook.views.TourSegmenter">
 		<item key="STATE_IS_SEGMENTER_ACTIVE" value="false"/>
@@ -221,7 +222,7 @@
 		<item key="STATE_SELECTED_YEAR" value="2015"/>
 		<item key="STATE_SELECTED_MONTH" value="5"/>
 		<item key="STATE_IS_SELECT_YEAR_MONTH_TOURS" value="false"/>
-		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
+		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="true"/>
 		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
 		<list key="STATE_SELECTED_TOURS">
 			<item value="201553195142998"/>
@@ -242,7 +243,7 @@
 	<section name="TourStatisticsView">
 	</section>
 	<section name="TourCalendarView">
-		<item key="STATE_IS_LINKED" value="false"/>
+		<item key="STATE_IS_LINKED" value="true"/>
 		<item key="STATE_IS_SHOW_TOUR_INFO" value="true"/>
 		<item key="STATE_FIRST_DISPLAYED_EPOCH_DAY" value="15824"/>
 		<item key="STATE_SELECTED_TOURS" value="-1"/>

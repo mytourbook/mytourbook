@@ -70,7 +70,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -94,10 +100,14 @@ public class TourDataView extends ViewPart {
    private static final String            STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
 
    private PostSelectionProvider          _postSelectionProvider;
+
    private ISelectionListener             _postSelectionListener;
    private IPropertyChangeListener        _prefChangeListener;
    private IPropertyChangeListener        _prefChangeListener_Common;
    private ITourEventListener             _tourEventListener;
+
+   private KeyListener                    _defaultKeyListener;
+   private MouseWheelListener             _defaultMouseWheelListener;
 
    private boolean                        _isUIRestored;
 
@@ -116,7 +126,7 @@ public class TourDataView extends ViewPart {
    /**
     * With a label, the content can easily be scrolled but cannot be selected
     */
-//   private Label             _lblAllFields;
+// private Label             _lblAllFields;
    private Text              _txtAllFields;
 
    private Text              _txtDateTimeCreated;
@@ -674,12 +684,13 @@ public class TourDataView extends ViewPart {
                   | SWT.BORDER);
 
       _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
+      _txtAllFields.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+      _txtAllFields.addKeyListener(_defaultKeyListener);
+      _txtAllFields.addMouseWheelListener(_defaultMouseWheelListener);
 
       GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(_txtAllFields);
-
-      _txtAllFields.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
    }
 
@@ -687,6 +698,9 @@ public class TourDataView extends ViewPart {
 
       final Text txtField = new Text(parent, SWT.READ_ONLY);
       txtField.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+      txtField.addKeyListener(_defaultKeyListener);
+      txtField.addMouseWheelListener(_defaultMouseWheelListener);
+
       GridDataFactory.fillDefaults().grab(true, false).applyTo(txtField);
 
       return txtField;
@@ -736,8 +750,17 @@ public class TourDataView extends ViewPart {
       return printAllFields(tourData);
    }
 
+   private int getLineHeight() {
+
+      final FontData logFont = net.tourbook.ui.UI.getLogFont().getFontData()[0];
+
+      return (int) (logFont.getHeight() * 1.2); // this value is roughly estimated
+   }
+
    private void initUI() {
 
+      _defaultKeyListener = KeyListener.keyPressedAdapter(keyEvent -> onTextField_Key(keyEvent));
+      _defaultMouseWheelListener = mouseEvent -> onTextField_MouseWheel(mouseEvent);
    }
 
    /**
@@ -823,6 +846,53 @@ public class TourDataView extends ViewPart {
       }
 
       enableControls();
+   }
+
+   private void onTextField_Key(final KeyEvent keyEvent) {
+
+      final Rectangle containerBounds = _scrolledContainer.getBounds();
+
+      final int lineHeight = getLineHeight();
+      final int pageHeight = containerBounds.height / 3;
+
+      int verticalScoll = Integer.MIN_VALUE;
+
+// SET_FORMATTING_OFF
+
+      switch (keyEvent.keyCode) {
+      
+      case SWT.ARROW_UP ->    verticalScoll = -lineHeight;
+      case SWT.ARROW_DOWN ->  verticalScoll = lineHeight;
+
+      case SWT.PAGE_UP ->     verticalScoll = -pageHeight;
+      case SWT.PAGE_DOWN ->   verticalScoll = pageHeight;
+
+      }
+
+// SET_FORMATTING_ON
+
+      if (verticalScoll != Integer.MIN_VALUE) {
+
+         final Point scrolledOrigin = _scrolledContainer.getOrigin();
+
+         _scrolledContainer.setOrigin(
+               scrolledOrigin.x,
+               scrolledOrigin.y + verticalScoll);
+      }
+   }
+
+   private void onTextField_MouseWheel(final MouseEvent mouseEvent) {
+
+      final int lineHeight = getLineHeight();
+      final int mouseValue = mouseEvent.count * lineHeight;
+
+      final int diffY = UI.getAcceleratorFromMouseWheel(mouseEvent, mouseValue);
+
+      final Point scrolledOrigin = _scrolledContainer.getOrigin();
+
+      _scrolledContainer.setOrigin(
+            scrolledOrigin.x,
+            scrolledOrigin.y - diffY);
    }
 
    private void restoreState_UI() {

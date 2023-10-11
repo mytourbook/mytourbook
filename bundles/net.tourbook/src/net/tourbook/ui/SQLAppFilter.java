@@ -15,7 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-enum SQLAppFilter {
+public enum SQLAppFilter {
+
+   /**
+    *
+    */
+   Person,
+
+   /**
+    *
+    */
+   TourType,
 
    /**
     * Can be a slower app filter

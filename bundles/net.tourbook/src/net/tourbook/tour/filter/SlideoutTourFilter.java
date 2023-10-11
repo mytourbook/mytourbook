@@ -61,7 +61,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -93,7 +92,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private static final String                HIDE_ALLOWED_DATE_TIME = "DateTime";                     //$NON-NLS-1$
 
-   static final String                        FIELD_NO               = "fieldNo";                      //$NON-NLS-1$
+   private static final String                FIELD_NO               = "fieldNo";                      //$NON-NLS-1$
 
    private static final String                STATE_IS_LIVE_UPDATE   = "STATE_IS_LIVE_UPDATE";         //$NON-NLS-1$
    private static final String                STATE_SASH_WIDTH       = "STATE_SASH_WIDTH";             //$NON-NLS-1$
@@ -106,6 +105,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
    private IPropertyChangeListener            _prefChangeListener_Common;
 
    private SelectionListener                  _fieldSelectionListener_DateTime;
+   private SelectionListener                  _fieldSelectionListener_Combo;
 
    private PixelConverter                     _pc;
 
@@ -823,6 +823,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             numColumns += createUI_Field_Number_Float    (uiFieldContainer, filterProperty, fieldConfig, 1, true);
             break;
 
+         case ENUMERATION:
+             numColumns += createUI_Field_Enumeration    (uiFieldContainer, filterProperty, fieldConfig);
+             break;
+
          case TEXT:
          case SEASON:
          case CATEGORY:
@@ -875,6 +879,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
          case TEXT:
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -910,13 +915,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          case NUMBER_FLOAT:
          case DATE:
          case DURATION:
+         case ENUMERATION:
             break;
          }
 
          break;
 
       case LIKE:
-         break;
       case NOT_LIKE:
          break;
 
@@ -1071,6 +1076,28 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       } else {
          filterProperty.uiDuration2 = duration;
       }
+
+      return 1;
+   }
+
+   private int createUI_Field_Enumeration(final Composite parent,
+                                          final TourFilterProperty filterProperty,
+                                          final TourFilterFieldConfig fieldConfig) {
+
+      final Combo combo = new Combo(parent, SWT.NONE);
+      combo.setItems(fieldConfig.values);
+
+      combo.setData(filterProperty);
+
+      combo.addFocusListener(_keepOpenListener);
+      combo.addSelectionListener(_fieldSelectionListener_Combo);
+
+      GridDataFactory.fillDefaults()
+            .align(SWT.END, SWT.CENTER)
+            .applyTo(combo);
+
+      filterProperty.uiCombo_Enumeration = combo;
+      filterProperty.uiCombo_Enumeration.select(filterProperty.comboSelectedIndex);
 
       return 1;
    }
@@ -1502,9 +1529,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
       _pc = new PixelConverter(parent);
 
-      _defaultModifyListener = this::onProfile_Modify;
+      _defaultModifyListener = modifyEvent -> onProfile_Modify();
 
-      _fieldSelectionListener_DateTime = widgetSelectedAdapter(this::onField_Select_DateTime);
+      _fieldSelectionListener_DateTime = widgetSelectedAdapter(selectionEvent -> onField_Select_DateTime(selectionEvent));
+      _fieldSelectionListener_Combo = widgetSelectedAdapter(selectionEvent -> onField_Select_Enumeration(selectionEvent));
 
       _keepOpenListener = new FocusListener() {
 
@@ -1577,6 +1605,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       } else {
          filterProperty.intValue2 = durationTime;
       }
+
+      fireModifyEvent();
+   }
+
+   private void onField_Select_Enumeration(final SelectionEvent selectionEvent) {
+
+      final Combo combo = (Combo) (selectionEvent.widget);
+
+      final TourFilterProperty filterProperty = (TourFilterProperty) combo.getData();
+      filterProperty.comboSelectedIndex = combo.getSelectionIndex();
 
       fireModifyEvent();
    }
@@ -1825,7 +1863,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _profileViewer.getTable().setFocus();
    }
 
-   private void onProfile_Modify(final ModifyEvent modifyEvent) {
+   private void onProfile_Modify() {
 
       if (_selectedProfile == null) {
          return;
@@ -2144,6 +2182,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          case TEXT:
          case SEASON:
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -2187,6 +2226,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 

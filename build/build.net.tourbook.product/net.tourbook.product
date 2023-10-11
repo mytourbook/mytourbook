@@ -4,7 +4,7 @@
 <product 
 
    name              ="MyTourbook Product" 
-   version           ="23.8.0.qualifier" 
+   version           ="23.10.0.qualifier" 
 
    id                ="net.tourbook.productWithoutJRE" 
    uid               ="net.tourbook.productWithoutJRE" 
@@ -118,6 +118,10 @@
       <plugin id="org.eclipse.equinox.simpleconfigurator"   autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.update.configurator"          autoStart="true" startLevel="4" />
    </configurations>
+
+   <repositories>
+      <repository location="https://mytourbook.github.io/update-sites/latest/" enabled="true" />
+   </repositories>
 
    <preferencesInfo>
       <targetfile overwrite="false"/>

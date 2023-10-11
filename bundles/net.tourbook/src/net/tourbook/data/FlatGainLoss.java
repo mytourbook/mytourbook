@@ -17,37 +17,34 @@ package net.tourbook.data;
 
 import net.tourbook.common.UI;
 
-public class ElevationGainLoss {
+public class FlatGainLoss {
 
    private static final String NL = UI.NEW_LINE1;
+
+   public int                  timeFlat;
+   public int                  timeGain;
+   public int                  timeLoss;
+
+   public float                distanceFlat;
+   public float                distanceGain;
+   public float                distanceLoss;
 
    public float                elevationGain;
    public float                elevationLoss;
 
-   public ElevationGainLoss(final float elevationGain, final float elevationLoss) {
-
-      this.elevationGain = elevationGain;
-      this.elevationLoss = elevationLoss;
-   }
-
-   public float getElevationLoss() {
-      return elevationLoss;
-   }
-
-   public float getElevationGain() {
-      return elevationGain;
-   }
+   public FlatGainLoss() {}
 
    @Override
    public String toString() {
 
-      return "" //                                             //$NON-NLS-1$
+      return UI.EMPTY_STRING
+
             + "ElevationGainLoss" + NL //                      //$NON-NLS-1$
 
             + "[" + NL //                                      //$NON-NLS-1$
 
-            + "  elevationGain=" + elevationGain + NL //       //$NON-NLS-1$
-            + "  elevationLoss=" + elevationLoss + NL //       //$NON-NLS-1$
+            + "  elevationGain = " + elevationGain + NL //     //$NON-NLS-1$
+            + "  elevationLoss = " + elevationLoss + NL //     //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

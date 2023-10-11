@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ public class CalendarProfile implements Cloneable {
     * <p>
     * -> this is not a float !!!
     */
-   private final static NumberFormat _nf1 = NumberFormat.getNumberInstance(Locale.US);
+   private static final NumberFormat _nf1 = NumberFormat.getNumberInstance(Locale.US);
 
    static {
 
@@ -398,9 +398,9 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.tourValueRGB                  = " + dump_RGB(profile.tourValueRGB)             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
-        sb.append("profile.allTourFormatterData          = " + dump_Formatter(allTourFormatterData, "tour") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        sb.append("profile.allTourFormatterData          = " + dump_Formatter(allTourFormatterData) + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
-        sb.append("profile.allWeekFormatterData          = " + dump_Formatter(allWeekFormatterData, "week") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        sb.append("profile.allWeekFormatterData          = " + dump_Formatter(allWeekFormatterData) + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// SET_FORMATTING_ON");                                                                          //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
@@ -441,7 +441,7 @@ public class CalendarProfile implements Cloneable {
       return String.format("CalendarProfile.createFont(%sf, %s)", fontHeightText, fontStyleText); //$NON-NLS-1$
    }
 
-   private String dump_Formatter(final FormatterData[] allFormatterData, final String tourOrWeek) {
+   private String dump_Formatter(final FormatterData[] allFormatterData) {
 
       final StringBuilder sb = new StringBuilder();
 
@@ -453,7 +453,7 @@ public class CalendarProfile implements Cloneable {
 
          final String isEnabled = formatterData.isEnabled ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
 
-         String formatterID = UI.EMPTY_STRING;
+         String formatterID;
 
          switch (formatterData.id) {
 
@@ -503,6 +503,10 @@ public class CalendarProfile implements Cloneable {
 
          case TOUR_TITLE:
             formatterID = FormatterID.TOUR_TITLE.name();
+            break;
+
+         case TRAININGLOAD_TSS:
+            formatterID = FormatterID.TRAININGLOAD_TSS.name();
             break;
 
          case ENERGY_KCAL:

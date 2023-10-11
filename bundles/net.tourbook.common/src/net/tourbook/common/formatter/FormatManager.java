@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,6 +43,7 @@ public class FormatManager {
    private static IValueFormatter        _elevationFormatter;
    private static IValueFormatter        _powerFormatter;
    private static IValueFormatter        _pulseFormatter;
+   private static IValueFormatter        _relativeFormatter;
    private static IValueFormatter        _speedFormatter;
    private static IValueFormatter        _temperatureFormatter;
 
@@ -118,6 +119,10 @@ public class FormatManager {
       return _movingTimeFormatter.printLong(value);
    }
 
+   public static String formatMovingTime(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _movingTimeFormatter.printLong(value, isHide0Value, isShowBiggerThan0);
+   }
+
    public static String formatMovingTime_Summary(final long value) {
       return _movingTimeFormatter_Summary.printLong(value);
    }
@@ -183,6 +188,10 @@ public class FormatManager {
       return _recordedTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
    }
 
+   public static String formatRelative(final double value) {
+      return _relativeFormatter.printDouble(value);
+   }
+
    public static String formatSpeed(final double value) {
       return _speedFormatter.printDouble(value);
    }
@@ -199,7 +208,7 @@ public class FormatManager {
       return _temperatureFormatter_Summary.printDouble(value);
    }
 
-   private static IValueFormatter getNumberFormatter(final String formatName) {
+   public static IValueFormatter getNumberFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
 
@@ -223,7 +232,7 @@ public class FormatManager {
       }
    }
 
-   private static IValueFormatter getTimeFormatter(final String formatName) {
+   public static IValueFormatter getTimeFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.TIME_HH.name())) {
 
@@ -296,6 +305,7 @@ public class FormatManager {
       final String elevation              = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
       final String power                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
       final String pulse                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+      final String relative               = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE);
       final String speed                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
       final String temperature            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
 
@@ -324,6 +334,7 @@ public class FormatManager {
       _elevationFormatter                 = getNumberFormatter(elevation);
       _powerFormatter                     = getNumberFormatter(power);
       _pulseFormatter                     = getNumberFormatter(pulse);
+      _relativeFormatter                  = getNumberFormatter(relative);
       _speedFormatter                     = getNumberFormatter(speed);
       _temperatureFormatter               = getNumberFormatter(temperature);
 

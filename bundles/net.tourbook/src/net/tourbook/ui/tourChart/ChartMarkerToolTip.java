@@ -24,7 +24,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.data.ElevationGainLoss;
+import net.tourbook.data.FlatGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -404,11 +404,11 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             if (isShowElevation_Diff) {
 
                final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
-               final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex, _hoveredTourMarker.getSerieIndex());
+               final FlatGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex, _hoveredTourMarker.getSerieIndex());
 
                if (elevationGainLoss != null) {
 
-                  final float value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+                  final float value = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
 
                   createUI_72_ValueField(
                         container,

@@ -38,7 +38,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.ElevationGainLoss;
+import net.tourbook.data.FlatGainLoss;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -475,11 +475,11 @@ public class ElevationCompareManager {
       float elevationGain = 0;
       float elevationLoss = 0;
 
-      final ElevationGainLoss elevationGainLoss = compareTourData.computeAltitudeUpDown(compareStartIndex, compareEndIndex);
+      final FlatGainLoss elevationGainLoss = compareTourData.computeAltitudeUpDown(compareStartIndex, compareEndIndex);
       if (elevationGainLoss != null) {
 
-         elevationGain = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
-         elevationLoss = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
+         elevationGain = elevationGainLoss.elevationGain / UI.UNIT_VALUE_ELEVATION;
+         elevationLoss = elevationGainLoss.elevationLoss / UI.UNIT_VALUE_ELEVATION;
       }
 
       compareResult.compareMovingTime = movingTime;

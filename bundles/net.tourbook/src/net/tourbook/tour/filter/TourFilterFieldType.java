@@ -17,20 +17,22 @@ package net.tourbook.tour.filter;
 
 public enum TourFilterFieldType {
 
-	/**
+   /**
     * This is a dummy field type, it is used to identify a field category.
     */
-	CATEGORY, //
+   CATEGORY, //
 
-	TEXT, //
+   TEXT, //
 
-	NUMBER_INTEGER, //
-	NUMBER_FLOAT, //
+   NUMBER_INTEGER, //
+   NUMBER_FLOAT, //
 
-	DATE, //
-	TIME, //
-	DURATION, //
+   DATE, //
+   TIME, //
+   DURATION, //
 
-	SEASON, //
+   SEASON, //
+
+   ENUMERATION, //
 
 }

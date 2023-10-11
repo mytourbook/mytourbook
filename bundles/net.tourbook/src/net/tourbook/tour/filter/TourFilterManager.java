@@ -38,6 +38,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -69,6 +70,7 @@ public class TourFilterManager {
    private static final String TOUR_DATA_POWERTRAIN_FRONT_SHIFT = "TourData.frontShiftCount";                    //$NON-NLS-1$
    private static final String TOUR_DATA_POWERTRAIN_REAR_SHIFT  = "TourData.rearShiftCount";                     //$NON-NLS-1$
    private static final String TOUR_DATA_TRAINING_FTP           = "TourData.power_FTP";                          //$NON-NLS-1$
+   private static final String TOUR_DATA_WEATHER_AIRQUALITY     = "TourData.weather_AirQuality";                 //$NON-NLS-1$
 
    private static final String TOUR_DATA_TOUR_LOCATION_START    = "TourData.tourStartPlace";                     //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_LOCATION_END      = "TourData.tourEndPlace";                       //$NON-NLS-1$
@@ -85,6 +87,7 @@ public class TourFilterManager {
    private static final String TAG_PROPERTY                     = "Property";                                    //$NON-NLS-1$
    private static final String TAG_ROOT                         = "TourFilterProfiles";                          //$NON-NLS-1$
 
+   private static final String ATTR_COMBOSELECTEDINDEX          = "comboSelectedIndex";                          //$NON-NLS-1$
    private static final String ATTR_IS_ENABLED                  = "isEnabled";                                   //$NON-NLS-1$
    private static final String ATTR_IS_SELECTED                 = "isSelected";                                  //$NON-NLS-1$
    private static final String ATTR_FIELD_ID                    = "fieldId";                                     //$NON-NLS-1$
@@ -123,7 +126,7 @@ public class TourFilterManager {
 
 // SET_FORMATTING_OFF
 
-   public static final TourFilterFieldOperatorConfig[]   TOUR_FILTER_OPERATORS = {
+   private static final TourFilterFieldOperatorConfig[]   TOUR_FILTER_OPERATORS = {
 
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.STARTS_WITH,                          Messages.Tour_Filter_Operator_StartsWith),
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.ENDS_WITH,                            Messages.Tour_Filter_Operator_EndsWith),
@@ -203,6 +206,16 @@ public class TourFilterManager {
          TourFilterFieldOperator.NOT_BETWEEN,
    };
 
+   private static final String[]                  VALUES_AIRQUALITY               = {
+
+         IWeather.airQualityIsNotDefined,
+         OtherMessages.WEATHER_AIRQUAlITY_1_GOOD,
+         OtherMessages.WEATHER_AIRQUAlITY_1_FAIR,
+         OtherMessages.WEATHER_AIRQUAlITY_1_MODERATE,
+         OtherMessages.WEATHER_AIRQUAlITY_1_POOR,
+         OtherMessages.WEATHER_AIRQUAlITY_1_VERYPOOR
+   };
+
    private static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {
 
          TourFilterFieldOperator.IS_EMPTY,
@@ -222,7 +235,7 @@ public class TourFilterManager {
    /**
     * This is also the sequence how the fields are displayed in the UI
     */
-   public static final TourFilterFieldConfig[]    FILTER_FIELD_CONFIG;
+   static final TourFilterFieldConfig[]           FILTER_FIELD_CONFIG;
 
    static {
 
@@ -304,7 +317,7 @@ public class TourFilterManager {
    /**
     * Must be in sync with {@link #MOST_RECENT_UNITS}
     */
-   static final String                    MOST_RECENT_LABELS[] = {
+   static final String[]                  MOST_RECENT_LABELS = {
 
          Messages.Tour_Filter_MostRecent_Days,
          Messages.Tour_Filter_MostRecent_Weeks,
@@ -315,7 +328,7 @@ public class TourFilterManager {
    /**
     * Must be in sync with {@link #MOST_RECENT_LABELS}
     */
-   static final MostRecent                MOST_RECENT_UNITS[]  = {
+   static final MostRecent[]              MOST_RECENT_UNITS  = {
 
          MostRecent.DAYS,
          MostRecent.WEEKS,
@@ -323,11 +336,11 @@ public class TourFilterManager {
          MostRecent.YEARS
    };
 
-   private static final Bundle            _bundle              = TourbookPlugin.getDefault().getBundle();
-   private static final IPath             _stateLocation       = Platform.getStateLocation(_bundle);
+   private static final Bundle            _bundle            = TourbookPlugin.getDefault().getBundle();
+   private static final IPath             _stateLocation     = Platform.getStateLocation(_bundle);
 
-   private static final IPreferenceStore  _prefStore           = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore  _prefStore_Common    = CommonActivator.getPrefStore();
+   private static final IPreferenceStore  _prefStore         = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common  = CommonActivator.getPrefStore();
 
    private static IPropertyChangeListener _prefChangeListener_Common;
 
@@ -695,6 +708,14 @@ public class TourFilterManager {
 
       allConfigs.add(
             TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_AirQuality)
+                  .fieldId(TourFilterFieldId.WEATHER_AIRQUALITY)
+                  .fieldType(TourFilterFieldType.ENUMERATION)
+                  .fieldOperators(new TourFilterFieldOperator[] { TourFilterFieldOperator.EQUALS, TourFilterFieldOperator.NOT_EQUALS })
+                  .setValues(VALUES_AIRQUALITY));
+
+      allConfigs.add(
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Temperature)
                   .fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
                   .fieldType(TourFilterFieldType.NUMBER_FLOAT)
@@ -806,7 +827,7 @@ public class TourFilterManager {
       }
 
       // this should not happen
-      return null;
+      return new TourFilterFieldOperator[0];
    }
 
    /**
@@ -864,7 +885,7 @@ public class TourFilterManager {
    /**
     * @return Returns the selected profile or <code>null</code> when a profile is not selected.
     */
-   public static TourFilterProfile getSelectedProfile() {
+   static TourFilterProfile getSelectedProfile() {
       return _selectedProfile;
    }
 
@@ -893,7 +914,7 @@ public class TourFilterManager {
          }
 
          final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-         final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
+         TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
 
          final TourFilterFieldId fieldId = fieldConfig.fieldId;
 
@@ -905,8 +926,9 @@ public class TourFilterManager {
          final Double double1 = truncateValue(filterProperty.doubleValue1);
          final Double double2 = truncateValue(filterProperty.doubleValue2);
 
-         final String text1 = filterProperty.textValue1;
          final String text2 = filterProperty.textValue2;
+
+         final int selectedIndex = filterProperty.comboSelectedIndex;
 
          String sql;
 
@@ -943,7 +965,7 @@ public class TourFilterManager {
 
             if (fieldOperator.equals(TourFilterFieldOperator.MOST_RECENT)) {
 
-               getSQL__FieldOperators_MostRecent(sqlWhere, sqlParameters, fieldOperator, sql, filterProperty);
+               getSQL__FieldOperators_MostRecent(sqlWhere, sqlParameters, sql, filterProperty);
 
             } else {
 
@@ -1002,6 +1024,23 @@ public class TourFilterManager {
 
          case TOUR_MANUAL_TOUR:
             getSQL_ManualTour(sqlWhere, fieldOperator);
+            break;
+
+         case WEATHER_AIRQUALITY:
+            sql = TOUR_DATA_WEATHER_AIRQUALITY;
+            if (selectedIndex == 0) { // IWeather.airQualityIsNotDefined
+
+               if (fieldOperator == TourFilterFieldOperator.NOT_EQUALS) {
+                  fieldOperator = TourFilterFieldOperator.IS_NOT_EMPTY;
+               } else {
+                  fieldOperator = TourFilterFieldOperator.IS_EMPTY;
+               }
+
+               getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
+            } else {
+               final String text1 = VALUES_AIRQUALITY[selectedIndex];
+               getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            }
             break;
 
          case WEATHER_TEMPERATURE:
@@ -1067,22 +1106,20 @@ public class TourFilterManager {
 
          case TOUR_TITLE:
             sql = TOUR_DATA_TOUR_TITLE;
-            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
          case TOUR_LOCATION_START:
             sql = TOUR_DATA_TOUR_LOCATION_START;
-            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
          case TOUR_LOCATION_END:
             sql = TOUR_DATA_TOUR_LOCATION_END;
-            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             break;
 
-         case TRAINING_INTENSITY_FACTOR:
-         case TRAINING_POWER_TO_WEIGHT_RATIO:
-         case TRAINING_STRESS_SCORE:
+         case TRAINING_INTENSITY_FACTOR, TRAINING_POWER_TO_WEIGHT_RATIO, TRAINING_STRESS_SCORE:
             break;
          }
       }
@@ -1137,7 +1174,6 @@ public class TourFilterManager {
 
    private static void getSQL__FieldOperators_MostRecent(final StringBuilder sqlWhere,
                                                          final ArrayList<Object> sqlParameters,
-                                                         final TourFilterFieldOperator fieldOperator,
                                                          final String sqlField,
                                                          final TourFilterProperty filterProperty) {
 
@@ -1351,11 +1387,8 @@ public class TourFilterManager {
 
    @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_Text(final StringBuilder sqlWhere,
-                                                   final ArrayList<Object> sqlParameters,
                                                    final TourFilterFieldOperator fieldOperator,
-                                                   final String sqlField,
-                                                   final String value1,
-                                                   final String value2) {
+                                                   final String sqlField) {
 
       switch (fieldOperator) {
 
@@ -1632,6 +1665,10 @@ public class TourFilterManager {
             readXml_Number_Float(xmlProperty, filterProperty, 1);
             break;
 
+         case ENUMERATION:
+            readXml_Enumeration(xmlProperty, filterProperty);
+            break;
+
          case TEXT:
          case SEASON:
          case CATEGORY:
@@ -1655,10 +1692,6 @@ public class TourFilterManager {
             break;
 
          case DURATION:
-            readXml_Number_Integer(xmlProperty, filterProperty, 1);
-            readXml_Number_Integer(xmlProperty, filterProperty, 2);
-            break;
-
          case NUMBER_INTEGER:
             readXml_Number_Integer(xmlProperty, filterProperty, 1);
             readXml_Number_Integer(xmlProperty, filterProperty, 2);
@@ -1678,6 +1711,7 @@ public class TourFilterManager {
             break;
 
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -1714,6 +1748,14 @@ public class TourFilterManager {
       } else {
          filterProperty.dateTime2 = date;
       }
+   }
+
+   private static void readXml_Enumeration(final IMemento xmlProperty,
+                                           final TourFilterProperty filterProperty) {
+
+      final int value = Util.getXmlInteger(xmlProperty, ATTR_COMBOSELECTEDINDEX, 0);
+
+      filterProperty.comboSelectedIndex = value;
    }
 
    private static void readXml_Number_Float(final IMemento xmlProperty,
@@ -1867,9 +1909,6 @@ public class TourFilterManager {
       getFieldConfig(TourFilterFieldId.ALTITUDE_MAX).unitLabel(UI.UNIT_LABEL_ELEVATION);
    }
 
-   /**
-    * @return
-    */
    private static XMLMemento writeFilterProfile() {
 
       XMLMemento xmlRoot = null;
@@ -1955,6 +1994,8 @@ public class TourFilterManager {
 
       final String textValue1 = filterProperty.textValue1;
 
+      final int selectedIndex = filterProperty.comboSelectedIndex;
+
       switch (fieldOperator) {
 
       case GREATER_THAN:
@@ -1980,6 +2021,9 @@ public class TourFilterManager {
 
          case NUMBER_FLOAT:
             writeXml_Number_Float(xmlProperty, doubleValue1, 1);
+            break;
+         case ENUMERATION:
+            writeXml_Enumeration(xmlProperty, selectedIndex);
             break;
 
          case TEXT:
@@ -2022,6 +2066,7 @@ public class TourFilterManager {
 
          case TEXT:
          case CATEGORY:
+         case ENUMERATION:
             break;
          }
 
@@ -2047,6 +2092,11 @@ public class TourFilterManager {
       xmlProperty.putInteger(ATTR_DATE_YEAR + fieldNo, dateTime.getYear());
       xmlProperty.putInteger(ATTR_DATE_MONTH + fieldNo, dateTime.getMonthValue());
       xmlProperty.putInteger(ATTR_DATE_DAY + fieldNo, dateTime.getDayOfMonth());
+   }
+
+   private static void writeXml_Enumeration(final IMemento xmlProperty, final int value) {
+
+      xmlProperty.putInteger(ATTR_COMBOSELECTEDINDEX, value);
    }
 
    private static void writeXml_Number_Float(final IMemento xmlProperty, final double value, final int fieldNo) {

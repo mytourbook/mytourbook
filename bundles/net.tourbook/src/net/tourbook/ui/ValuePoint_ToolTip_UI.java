@@ -883,13 +883,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   SWT.TRAIL,
                   4,
                   OtherMessages.GRAPH_LABEL_TEMPERATURE,
-                  GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+                  GraphColorManager.PREF_GRAPH_TEMPERATURE);
 
             _lblTemperature_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_TEMPERATURE,
                   OtherMessages.GRAPH_LABEL_TEMPERATURE,
-                  GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+                  GraphColorManager.PREF_GRAPH_TEMPERATURE);
          }
       }
    }
@@ -1696,7 +1696,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                // update UI delayed
                if (__runnableCounter != _updateCounter[0]) {
 
-                  // a new update UI occured
+                  // a new update UI occurred
 
                   return;
                }
@@ -2035,8 +2035,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_Temperature) {
-         updateUI_Color(_lblTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
-         updateUI_Color(_lblTemperature_Unit, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+         updateUI_Color(_lblTemperature, GraphColorManager.PREF_GRAPH_TEMPERATURE);
+         updateUI_Color(_lblTemperature_Unit, GraphColorManager.PREF_GRAPH_TEMPERATURE);
       }
 
       if (_isVisible_And_Available_TimeDuration) {

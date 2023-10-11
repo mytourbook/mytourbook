@@ -565,6 +565,7 @@ public class Messages extends NLS {
 
    public static String        Tour_Tooltip_Action_EditFormatPreferences;
    public static String        Tour_Tooltip_Combo_UIWidthSize_Tooltip;
+   public static String        Tour_Tooltip_FlatGainLoss_Tooltip;
    public static String        Tour_Tooltip_Format_DateWeekTime;
    public static String        Tour_Tooltip_Format_HistoryDateTime;
    public static String        Tour_Tooltip_Format_Pace;
@@ -575,6 +576,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AltitudeUp;
    public static String        Tour_Tooltip_Label_AvgAltimeter;
    public static String        Tour_Tooltip_Label_AvgCadence;
+   public static String        Tour_Tooltip_Label_AvgElevation;
    public static String        Tour_Tooltip_Label_AvgElevationChange;
    public static String        Tour_Tooltip_Label_AvgPace;
    public static String        Tour_Tooltip_Label_AvgPower;

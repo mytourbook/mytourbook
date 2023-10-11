@@ -45,6 +45,7 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileLis
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -85,8 +86,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView"); //$NON-NLS-1$
-
-   private boolean                 _stateIsLinked;
 
    private ISelectionListener      _selectionListener;
    private IPartListener2          _partListener;
@@ -311,16 +310,15 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          /*
           * Link with other views
           */
-         _actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
+         _actionSetLinked = new Action(null, IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
-               _calendarGraph.setLinked(_stateIsLinked);
+               _calendarGraph.setLinked(_actionSetLinked.isChecked());
             }
          };
          _actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
 
          _actionSetLinked.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncViews));
-         _actionSetLinked.setChecked(true);
       }
       {
          /*
@@ -631,16 +629,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private void onSelectionChanged(final ISelection selection) {
 
       // show and select the selected tour
-      if (selection instanceof SelectionTourId) {
+      if (selection instanceof final SelectionTourId selectionTourId) {
 
-         final Long newTourId = ((SelectionTourId) selection).getTourId();
+         final Long newTourId = selectionTourId.getTourId();
          final Long oldTourId = _calendarGraph.getSelectedTourId();
 
-         if (newTourId != oldTourId) {
+         if (!newTourId.equals(oldTourId)) {
 
-            _stateIsLinked = _actionSetLinked.isChecked();
-
-            if (_stateIsLinked) {
+            if (_actionSetLinked.isChecked()) {
                _calendarGraph.gotoTour_Id(newTourId);
             } else {
                _calendarGraph.removeSelection();
@@ -686,16 +682,16 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       if (null != _calendarGraph) {
 
-         BusyIndicator.showWhile(Display.getCurrent(), _calendarGraph::refreshCalendar);
+         BusyIndicator.showWhile(Display.getCurrent(), () -> _calendarGraph.refreshCalendar());
       }
    }
 
    private void restoreState() {
 
-      _stateIsLinked = Util.getStateBoolean(_state, STATE_IS_LINKED, false);
+      final boolean stateIsLinked = Util.getStateBoolean(_state, STATE_IS_LINKED, true);
       final boolean stateIsShowTourInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true);
 
-      _actionSetLinked.setChecked(_stateIsLinked);
+      _actionSetLinked.setChecked(stateIsLinked);
       _actionTourInfo.setSelected(stateIsShowTourInfo);
 
       final long epochDay = Util.getStateLong(_state, STATE_FIRST_DISPLAYED_EPOCH_DAY, Long.MIN_VALUE);
@@ -721,7 +717,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    @PersistState
    private void saveState() {
 
-      _state.put(STATE_IS_LINKED, _stateIsLinked);
+      _state.put(STATE_IS_LINKED, _actionSetLinked.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_INFO, _actionTourInfo.isChecked());
 
       // save current date displayed
