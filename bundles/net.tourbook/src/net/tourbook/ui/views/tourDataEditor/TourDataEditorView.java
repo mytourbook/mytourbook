@@ -2602,7 +2602,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             if (partRef.getPart(false) == TourDataEditorView.this) {
 
-               _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
+               if (_tourData != null) {
+
+                  _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
+               }
 
                // update save icon
                final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
