@@ -6292,7 +6292,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (_tourData == null) {
 
-         Display.getDefault().asyncExec(() -> {
+         Display.getCurrent().asyncExec(() -> {
 
             if (_pageBook.isDisposed()) {
                return;
