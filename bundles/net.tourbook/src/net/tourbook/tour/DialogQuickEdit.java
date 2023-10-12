@@ -60,7 +60,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private static final boolean         _isOSX                         = UI.IS_OSX;
    private static final boolean         _isLinux                       = UI.IS_LINUX;
 
-   private static final IDialogSettings _tourDataEditorViewState       = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings _state_TourDataEditorView      = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private final TourData               _tourData;
    private final IDialogSettings        _state;
@@ -82,37 +82,41 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private int[]                        _unitValueWindSpeed;
    private float                        _unitValueDistance;
 
+   private MouseWheelListener           _mouseWheelListener;
+   {
+      _mouseWheelListener = mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+   }
+
    /*
     * UI controls
     */
-   private FormToolkit        _tk;
-   private Form               _formContainer;
+   private FormToolkit            _tk;
+   private Form                   _formContainer;
 
-   private CLabel             _lblWeather_CloudIcon;
+   private CLabel                 _lblWeather_CloudIcon;
 
-   private Combo              _comboLocation_Start;
-   private Combo              _comboLocation_End;
-   private Combo              _comboTitle;
-   private Combo              _comboWeather_Clouds;
-   private Combo              _comboWeather_Wind_DirectionText;
-   private Combo              _comboWeather_Wind_SpeedText;
+   private Combo                  _comboLocation_Start;
+   private Combo                  _comboLocation_End;
+   private Combo                  _comboTitle;
+   private Combo                  _comboWeather_Clouds;
+   private Combo                  _comboWeather_Wind_DirectionText;
+   private Combo                  _comboWeather_Wind_SpeedText;
 
-   private Spinner            _spinBodyWeight;
-   private Spinner            _spinFTP;
-   private Spinner            _spinRestPulse;
-   private Spinner            _spinCalories;
-   private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Wind_DirectionValue;
-   private Spinner            _spinWeather_Wind_SpeedValue;
+   private Spinner                _spinBodyWeight;
+   private Spinner                _spinFTP;
+   private Spinner                _spinRestPulse;
+   private Spinner                _spinCalories;
+   private Spinner                _spinWeather_Temperature_Average;
+   private Spinner                _spinWeather_Wind_DirectionValue;
+   private Spinner                _spinWeather_Wind_SpeedValue;
 
-   private Text               _txtDescription;
-   private Text               _txtWeather;
-   private Text               _txtWeather_Temperature_Average_Device;
+   private Text                   _txtDescription;
+   private Text                   _txtWeather;
+   private Text                   _txtWeather_Temperature_Average_Device;
 
-   private MouseWheelListener _mouseWheelListener;
-   {
-      _mouseWheelListener = Util::adjustSpinnerValueOnMouseScroll;
-   }
+   private AutocompleteComboInput _autocomplete_Location_End;
+   private AutocompleteComboInput _autocomplete_Location_Start;
+   private AutocompleteComboInput _autocomplete_Title;
 
    public DialogQuickEdit(final Shell parentShell, final TourData tourData) {
 
@@ -174,6 +178,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
       updateUIFromModel();
       enableControls();
 
+      resoreState();
+
       return dlgAreaContainer;
    }
 
@@ -181,6 +187,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
     * @param parent
     * @param title
     * @param isGrabVertical
+    *
     * @return
     */
    private Composite createSection(final Composite parent, final String title, final boolean isGrabVertical) {
@@ -280,7 +287,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                _comboTitle.add(title);
             }
 
-            new AutocompleteComboInput(_comboTitle);
+            _autocomplete_Title = new AutocompleteComboInput(_comboTitle);
          }
          {
             /*
@@ -331,7 +338,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   _comboLocation_Start.add(string);
                }
             }
-            new AutocompleteComboInput(_comboLocation_Start);
+
+            _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
          }
          {
             /*
@@ -358,7 +366,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   _comboLocation_End.add(string);
                }
             }
-            new AutocompleteComboInput(_comboLocation_End);
+
+            _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
          }
       }
    }
@@ -529,7 +538,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                UI.EMPTY_STRING,
                SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
          );
-         final int weatherDescriptionNumLines = Util.getStateInt(_tourDataEditorViewState,
+         final int weatherDescriptionNumLines = Util.getStateInt(_state_TourDataEditorView,
                TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
                TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
 
@@ -874,6 +883,16 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void onDispose() {
 
+      final IDialogSettings state = TourDataEditorView.getState();
+
+// SET_FORMATTING_OFF
+
+      _autocomplete_Title           .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
+      _autocomplete_Location_Start  .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
+      _autocomplete_Location_End    .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
+
+// SET_FORMATTING_ON
+
       if (_tk != null) {
          _tk.dispose();
       }
@@ -910,6 +929,19 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _comboWeather_Wind_SpeedText.select(getWindSpeedTextIndex(windSpeed));
       }
       _isUpdateUI = isBackup;
+   }
+
+   private void resoreState() {
+
+      final IDialogSettings state = TourDataEditorView.getState();
+
+// SET_FORMATTING_OFF
+
+      _autocomplete_Title           .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
+      _autocomplete_Location_Start  .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
+      _autocomplete_Location_End    .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
+
+// SET_FORMATTING_ON
    }
 
    /**

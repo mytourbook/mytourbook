@@ -226,79 +226,83 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";    //$NON-NLS-1$
+   public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
    //
    private static final char             NL                                               = UI.NEW_LINE;
    //
    private static final int              COLUMN_SPACING                                   = 20;
    //
-   private static final String           WIDGET_KEY                                       = "widgetKey";                                //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOUR_DISTANCE                         = "tourDistance";                             //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP                           = "altitudeUp";                               //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN                         = "altitudeDown";                             //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON                                = "tourPerson";                               //$NON-NLS-1$
+   private static final String           WIDGET_KEY                                       = "widgetKey";                                      //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOUR_DISTANCE                         = "tourDistance";                                   //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_UP                           = "altitudeUp";                                     //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_DOWN                         = "altitudeDown";                                   //$NON-NLS-1$
+   private static final String           WIDGET_KEY_PERSON                                = "tourPerson";                                     //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                    = "anotherSelection";                         //$NON-NLS-1$
+   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                    = "anotherSelection";                               //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
    private static final int              BUSY_INDICATOR_ITEMS                             = 5000;
    //
-   private static final String           STATE_SELECTED_TAB                               = "tourDataEditor.selectedTab";               //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE                              = "tourDataEditor.rowEditMode";               //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE                               = "tourDataEditor.isEditMode";                //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH                            = "tourDataEditor.csvExportPath";             //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB                               = "tourDataEditor.selectedTab";                     //$NON-NLS-1$
+   private static final String           STATE_ROW_EDIT_MODE                              = "tourDataEditor.rowEditMode";                     //$NON-NLS-1$
+   private static final String           STATE_IS_EDIT_MODE                               = "tourDataEditor.isEditMode";                      //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                            = "tourDataEditor.csvExportPath";                   //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS                    = "STATE_SECTION_CHARACTERISTICS";            //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME                          = "STATE_SECTION_DATE_TIME";                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL                           = "STATE_SECTION_PERSONAL";                   //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE                              = "STATE_SECTION_TITLE";                      //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER                            = "STATE_SECTION_WEATHER";                    //$NON-NLS-1$
+   private static final String           STATE_SECTION_CHARACTERISTICS                    = "STATE_SECTION_CHARACTERISTICS";                  //$NON-NLS-1$
+   private static final String           STATE_SECTION_DATE_TIME                          = "STATE_SECTION_DATE_TIME";                        //$NON-NLS-1$
+   private static final String           STATE_SECTION_PERSONAL                           = "STATE_SECTION_PERSONAL";                         //$NON-NLS-1$
+   private static final String           STATE_SECTION_TITLE                              = "STATE_SECTION_TITLE";                            //$NON-NLS-1$
+   private static final String           STATE_SECTION_WEATHER                            = "STATE_SECTION_WEATHER";                          //$NON-NLS-1$
    //
-   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";        //$NON-NLS-1$
+   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
    static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
-   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";            //$NON-NLS-1$
+   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
    static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
-   static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                //$NON-NLS-1$
+   static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
    static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
-   static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";           //$NON-NLS-1$
+   static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
    static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
-   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";     //$NON-NLS-1$
+   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$
    static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
-   static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                     //$NON-NLS-1$
+   static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                           //$NON-NLS-1$
    static final int                      STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
-   public static final String            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES"; //$NON-NLS-1$
+   public static final String            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";       //$NON-NLS-1$
    public static final int               STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
    //
-   public static final String            STATE_TAG_CONTENT_LAYOUT                         = "STATE_TAG_CONTENT_LAYOUT";                 //$NON-NLS-1$
+   public static final String            STATE_TAG_CONTENT_LAYOUT                         = "STATE_TAG_CONTENT_LAYOUT";                       //$NON-NLS-1$
    public static final TagContentLayout  STATE_TAG_CONTENT_LAYOUT_DEFAULT                 = TagContentLayout.IMAGE_AND_DATA;
-   public static final String            STATE_TAG_IMAGE_SIZE                             = "STATE_TAG_IMAGE_SIZE";                     //$NON-NLS-1$
+   public static final String            STATE_TAG_IMAGE_SIZE                             = "STATE_TAG_IMAGE_SIZE";                           //$NON-NLS-1$
    public static final int               STATE_TAG_IMAGE_SIZE_DEFAULT                     = 100;
    public static final int               STATE_TAG_IMAGE_SIZE_MIN                         = 10;
    public static final int               STATE_TAG_IMAGE_SIZE_MAX                         = 500;
-   public static final String            STATE_TAG_TEXT_WIDTH                             = "STATE_TAG_TEXT_WIDTH";                     //$NON-NLS-1$
+   public static final String            STATE_TAG_TEXT_WIDTH                             = "STATE_TAG_TEXT_WIDTH";                           //$NON-NLS-1$
    public static final int               STATE_TAG_TEXT_WIDTH_DEFAULT                     = 200;
    public static final int               STATE_TAG_TEXT_WIDTH_MIN                         = 20;
    public static final int               STATE_TAG_TEXT_WIDTH_MAX                         = 1000;
-   public static final String            STATE_TAG_NUM_CONTENT_COLUMNS                    = "STATE_TAG_NUM_CONTENT_COLUMNS";            //$NON-NLS-1$
+   public static final String            STATE_TAG_NUM_CONTENT_COLUMNS                    = "STATE_TAG_NUM_CONTENT_COLUMNS";                  //$NON-NLS-1$
    public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT            = 2;
    public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MIN                = 1;
    public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MAX                = 100;
    //
-   private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                        //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                       //$NON-NLS-1$
-   private static final String           COLUMN_DATA_SEQUENCE                             = "DATA_SEQUENCE";                            //$NON-NLS-1$
-   private static final String           COLUMN_POWER                                     = "POWER";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PACE                                      = "MOTION_PACE";                              //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                                     = "BODY_PULSE";                               //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                               = "WEATHER_TEMPERATURE";                      //$NON-NLS-1$
+   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE            = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE";          //$NON-NLS-1$
+   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START"; //$NON-NLS-1$
+   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END     = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";   //$NON-NLS-1$
+   //
+   private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                              //$NON-NLS-1$
+   private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                             //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                             = "DATA_SEQUENCE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_POWER                                     = "POWER";                                          //$NON-NLS-1$
+   private static final String           COLUMN_PACE                                      = "MOTION_PACE";                                    //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                                     = "BODY_PULSE";                                     //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                               = "WEATHER_TEMPERATURE";                            //$NON-NLS-1$
    //
    private static final IPreferenceStore _prefStore                                       = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                                = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                           = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateSwimSlice                                  = TourbookPlugin.getState(ID + ".swimSlice"); //$NON-NLS-1$
-   private static final IDialogSettings  _stateTimeSlice                                  = TourbookPlugin.getState(ID + ".slice");     //$NON-NLS-1$
+   private static final IDialogSettings  _stateSwimSlice                                  = TourbookPlugin.getState(ID + ".swimSlice");       //$NON-NLS-1$
+   private static final IDialogSettings  _stateTimeSlice                                  = TourbookPlugin.getState(ID + ".slice");           //$NON-NLS-1$
    //
    private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
    private static final boolean          IS_OSX                                           = UI.IS_OSX;
@@ -309,7 +313,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private static final int              _hintTextColumnWidth                             = IS_OSX ? 200 : 150;
    //
-   DecimalFormat                         _temperatureFormat                               = new DecimalFormat("###.0");                 //$NON-NLS-1$
+   DecimalFormat                         _temperatureFormat                               = new DecimalFormat("###.0");                       //$NON-NLS-1$
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -633,92 +637,95 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * Tab: Tour
     */
-   private Composite          _containerTags_Content;
-   private ScrolledComposite  _containerTags_Scrolled;
-   private PageBook           _pageBook_Tags;
+   private Composite              _containerTags_Content;
+   private ScrolledComposite      _containerTags_Scrolled;
+   private PageBook               _pageBook_Tags;
    //
-   private Combo              _comboTitle;
+   private ComboViewerCadence     _comboCadence;
    //
-   private ComboViewerCadence _comboCadence;
+   private CLabel                 _lblTourType;
    //
-   private CLabel             _lblTourType;
+   private ControlDecoration      _decoTimeZone;
    //
-   private ControlDecoration  _decoTimeZone;
+   private Combo                  _comboTitle;
+   private Combo                  _comboLocation_Start;
+   private Combo                  _comboLocation_End;
+   private Combo                  _comboTimeZone;
+   private Combo                  _comboWeather_Clouds;
+   private Combo                  _comboWeather_Wind_DirectionText;
+   private Combo                  _comboWeather_WindSpeedText;
    //
-   private Combo              _comboLocation_Start;
-   private Combo              _comboLocation_End;
-   private Combo              _comboTimeZone;
-   private Combo              _comboWeather_Clouds;
-   private Combo              _comboWeather_Wind_DirectionText;
-   private Combo              _comboWeather_WindSpeedText;
+   private DateTime               _dtStartTime;
+   private DateTime               _dtTourDate;
    //
-   private DateTime           _dtStartTime;
-   private DateTime           _dtTourDate;
+   private Label                  _lblAltitudeUpUnit;
+   private Label                  _lblAltitudeDownUnit;
+   private Label                  _lblCloudIcon;
+   private Label                  _lblDistanceUnit;
+   private Label                  _lblNoTags;
+   private Label                  _lblPerson_BodyWeightUnit;
+   private Label                  _lblPerson_BodyFatUnit;
+   private Label                  _lblSpeedUnit;
+   private Label                  _lblStartTime;
+   private Label                  _lblTags;
+   private Label                  _lblTimeZone;
+   private Label                  _lblWeather_PrecipitationUnit;
+   private Label                  _lblWeather_PressureUnit;
+   private Label                  _lblWeather_SnowfallUnit;
+   private Label                  _lblWeather_TemperatureUnit_Avg;
+   private Label                  _lblWeather_TemperatureUnit_Avg_Device;
+   private Label                  _lblWeather_TemperatureUnit_Max;
+   private Label                  _lblWeather_TemperatureUnit_Max_Device;
+   private Label                  _lblWeather_TemperatureUnit_Min;
+   private Label                  _lblWeather_TemperatureUnit_Min_Device;
+   private Label                  _lblWeather_TemperatureUnit_WindChill;
    //
-   private Label              _lblAltitudeUpUnit;
-   private Label              _lblAltitudeDownUnit;
-   private Label              _lblCloudIcon;
-   private Label              _lblDistanceUnit;
-   private Label              _lblNoTags;
-   private Label              _lblPerson_BodyWeightUnit;
-   private Label              _lblPerson_BodyFatUnit;
-   private Label              _lblSpeedUnit;
-   private Label              _lblStartTime;
-   private Label              _lblTags;
-   private Label              _lblTimeZone;
-   private Label              _lblWeather_PrecipitationUnit;
-   private Label              _lblWeather_PressureUnit;
-   private Label              _lblWeather_SnowfallUnit;
-   private Label              _lblWeather_TemperatureUnit_Avg;
-   private Label              _lblWeather_TemperatureUnit_Avg_Device;
-   private Label              _lblWeather_TemperatureUnit_Max;
-   private Label              _lblWeather_TemperatureUnit_Max_Device;
-   private Label              _lblWeather_TemperatureUnit_Min;
-   private Label              _lblWeather_TemperatureUnit_Min_Device;
-   private Label              _lblWeather_TemperatureUnit_WindChill;
+   private Link                   _linkDefaultTimeZone;
+   private Link                   _linkGeoTimeZone;
+   private Link                   _linkRemoveTimeZone;
+   private Link                   _linkTag;
+   private Link                   _linkTourType;
+   private Link                   _linkWeather;
    //
-   private Link               _linkDefaultTimeZone;
-   private Link               _linkGeoTimeZone;
-   private Link               _linkRemoveTimeZone;
-   private Link               _linkTag;
-   private Link               _linkTourType;
-   private Link               _linkWeather;
+   private Spinner                _spinPerson_BodyFat;
+   private Spinner                _spinPerson_BodyWeight;
+   private Spinner                _spinPerson_Calories;
+   private Spinner                _spinPerson_FTP;
+   private Spinner                _spinPerson_RestPulse;
+   private Spinner                _spinWeather_Humidity;
+   private Spinner                _spinWeather_PrecipitationValue;
+   private Spinner                _spinWeather_PressureValue;
+   private Spinner                _spinWeather_SnowfallValue;
+   private Spinner                _spinWeather_Temperature_Average;
+   private Spinner                _spinWeather_Temperature_Min;
+   private Spinner                _spinWeather_Temperature_Max;
+   private Spinner                _spinWeather_Temperature_WindChill;
+   private Spinner                _spinWeather_Wind_DirectionValue;
+   private Spinner                _spinWeather_Wind_SpeedValue;
    //
-   private Spinner            _spinPerson_BodyFat;
-   private Spinner            _spinPerson_BodyWeight;
-   private Spinner            _spinPerson_Calories;
-   private Spinner            _spinPerson_FTP;
-   private Spinner            _spinPerson_RestPulse;
-   private Spinner            _spinWeather_Humidity;
-   private Spinner            _spinWeather_PrecipitationValue;
-   private Spinner            _spinWeather_PressureValue;
-   private Spinner            _spinWeather_SnowfallValue;
-   private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Temperature_Min;
-   private Spinner            _spinWeather_Temperature_Max;
-   private Spinner            _spinWeather_Temperature_WindChill;
-   private Spinner            _spinWeather_Wind_DirectionValue;
-   private Spinner            _spinWeather_Wind_SpeedValue;
+   private TableCombo             _tableComboWeather_AirQuality;
    //
-   private TableCombo         _tableComboWeather_AirQuality;
+   private Text                   _txtAltitudeDown;
+   private Text                   _txtAltitudeUp;
+   private Text                   _txtDescription;
+   private Text                   _txtDistance;
+   private Text                   _txtWeather;
+   private Text                   _txtWeather_Temperature_Average_Device;
+   private Text                   _txtWeather_Temperature_Min_Device;
+   private Text                   _txtWeather_Temperature_Max_Device;
    //
-   private Text               _txtAltitudeDown;
-   private Text               _txtAltitudeUp;
-   private Text               _txtDescription;
-   private Text               _txtDistance;
-   private Text               _txtWeather;
-   private Text               _txtWeather_Temperature_Average_Device;
-   private Text               _txtWeather_Temperature_Min_Device;
-   private Text               _txtWeather_Temperature_Max_Device;
+   private TimeDuration           _deviceTime_Elapsed;                   // Total time of the activity
+   private TimeDuration           _deviceTime_Recorded;                  // Time recorded by the device = Total time - paused times
+   private TimeDuration           _deviceTime_Paused;                    // Time where the user deliberately paused the device
+   private TimeDuration           _computedTime_Moving;                  // Computed time moving
+   private TimeDuration           _computedTime_Break;                   // Computed time stopped
    //
-   private TimeDuration       _deviceTime_Elapsed;                   // Total time of the activity
-   private TimeDuration       _deviceTime_Recorded;                  // Time recorded by the device = Total time - paused times
-   private TimeDuration       _deviceTime_Paused;                    // Time where the user deliberately paused the device
-   private TimeDuration       _computedTime_Moving;                  // Computed time moving
-   private TimeDuration       _computedTime_Break;                   // Computed time stopped
-
-   private Menu               _swimViewer_ContextMenu;
-   private Menu               _timeViewer_ContextMenu;
+   private Menu                   _swimViewer_ContextMenu;
+   private Menu                   _timeViewer_ContextMenu;
+   //
+   private AutocompleteComboInput _autocomplete_Location_End;
+   private AutocompleteComboInput _autocomplete_Location_Start;
+   private AutocompleteComboInput _autocomplete_Title;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -1925,6 +1932,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          table.setSortColumn(tc);
          table.setSortDirection(direction);
       }
+   }
+
+   public static IDialogSettings getState() {
+
+      return _state;
    }
 
    public static void onSelect_WindDirection_Text(final Spinner spinWeather_Wind_DirectionValue,
@@ -3541,11 +3553,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
 
             // fill combobox
-            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourTitles();
-            arr.forEach(string -> _comboTitle.add(string));
-            new AutocompleteComboInput(_comboTitle);
-         }
+            final ConcurrentSkipListSet<String> allTourTitles = TourDatabase.getCachedFields_AllTourTitles();
 
+            if (UI.IS_SCRAMBLE_DATA) {
+
+               allTourTitles.forEach(tourTitle -> {
+                  _comboTitle.add(UI.scrambleText(tourTitle));
+               });
+
+            } else {
+
+               allTourTitles.forEach(tourTitle -> _comboTitle.add(tourTitle));
+            }
+
+            _autocomplete_Title = new AutocompleteComboInput(_comboTitle);
+         }
          {
             /*
              * Description
@@ -3608,7 +3630,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _comboLocation_Start.add(string);
                }
             }
-            new AutocompleteComboInput(_comboLocation_Start);
+
+            _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
          }
          {
             /*
@@ -3642,7 +3665,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _comboLocation_End.add(string);
                }
             }
-            new AutocompleteComboInput(_comboLocation_End);
+
+            _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
          }
       }
    }
@@ -8320,23 +8344,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //    _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
 //    _prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
+// SET_FORMATTING_OFF
+
       // expand/collapse sections
-      _sectionCharacteristics.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_CHARACTERISTICS, true));
-      _sectionDateTime.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_DATE_TIME, true));
-      _sectionPersonal.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PERSONAL, true));
-      _sectionTitle.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TITLE, true));
-      _sectionWeather.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_WEATHER, true));
+      _sectionCharacteristics .setExpanded(Util.getStateBoolean(_state, STATE_SECTION_CHARACTERISTICS,   true));
+      _sectionDateTime        .setExpanded(Util.getStateBoolean(_state, STATE_SECTION_DATE_TIME,         true));
+      _sectionPersonal        .setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PERSONAL,          true));
+      _sectionTitle           .setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TITLE,             true));
+      _sectionWeather         .setExpanded(Util.getStateBoolean(_state, STATE_SECTION_WEATHER,           true));
+
+      // auto complete controls
+      _autocomplete_Title           .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
+      _autocomplete_Location_Start  .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
+      _autocomplete_Location_End    .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
+
+// SET_FORMATTING_ON
    }
 
    @PersistState
    private void saveState() {
 
+// SET_FORMATTING_OFF
+
       // selected tab
-      _state.put(STATE_SELECTED_TAB, _tabFolder.getSelectionIndex());
+      _state.put(STATE_SELECTED_TAB,   _tabFolder.getSelectionIndex());
 
       // row/column edit mode
-      _state.put(STATE_IS_EDIT_MODE, _actionToggleReadEditMode.isChecked());
-      _state.put(STATE_ROW_EDIT_MODE, _actionToggleRowSelectMode.isChecked());
+      _state.put(STATE_IS_EDIT_MODE,   _actionToggleReadEditMode.isChecked());
+      _state.put(STATE_ROW_EDIT_MODE,  _actionToggleRowSelectMode.isChecked());
 
       // viewer state
       _timeSlice_ColumnManager.saveState(_stateTimeSlice);
@@ -8344,10 +8379,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // editor state
       _state.put(STATE_SECTION_CHARACTERISTICS, _sectionCharacteristics.isExpanded());
-      _state.put(STATE_SECTION_DATE_TIME, _sectionDateTime.isExpanded());
-      _state.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
-      _state.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
-      _state.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
+      _state.put(STATE_SECTION_DATE_TIME,       _sectionDateTime.isExpanded());
+      _state.put(STATE_SECTION_PERSONAL,        _sectionPersonal.isExpanded());
+      _state.put(STATE_SECTION_TITLE,           _sectionTitle.isExpanded());
+      _state.put(STATE_SECTION_WEATHER,         _sectionWeather.isExpanded());
+
+      // auto complete controls
+      _autocomplete_Title           .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
+      _autocomplete_Location_Start  .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
+      _autocomplete_Location_End    .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -8371,7 +8413,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // confirm save/discard/cancel
       final int returnCode = new MessageDialog(
-            Display.getCurrent().getActiveShell(),
+
+            _parent.getDisplay().getActiveShell(),
             Messages.tour_editor_dlg_save_tour_title,
             null,
             NLS.bind(Messages.tour_editor_dlg_save_tour_message, TourManager.getTourDateFull(_tourData)),
@@ -8380,8 +8423,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   Messages.Tour_Editor_Button_SaveTour,
                   Messages.Tour_Editor_Button_DiscardModifications,
                   IDialogConstants.CANCEL_LABEL },
-            0)
-                  .open();
+            0 // default index
+
+      ).open();
 
       if (returnCode == 0) {
 

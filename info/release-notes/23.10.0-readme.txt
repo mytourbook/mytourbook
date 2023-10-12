@@ -39,7 +39,13 @@ Improvements
   
 * Tour Editor
   - Append or replace the weather description
-    https://github.com/mytourbook/mytourbook/discussions/1069  
+    https://github.com/mytourbook/mytourbook/discussions/1069
+    
+* Tour Editor & Quick Edit Dialog    
+  - Autocomplete fields: Title, Start/End Location
+    - Increased default height for the popup proposals dialog
+    - Keep selected height when the tour editor is reopened
+   https://github.com/mytourbook/mytourbook/issues/1199
 
 * Tour Blog
   - Detect http links in the tour description to make them clickable
