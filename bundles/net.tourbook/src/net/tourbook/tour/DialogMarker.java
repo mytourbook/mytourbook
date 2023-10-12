@@ -507,6 +507,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _comboMarkerName.setFocus();
       });
 
+      restoreState_WithUI();
+
       return dlgContainer;
    }
 
@@ -1465,8 +1467,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       final int bottomPartHeight = Util.getStateInt(_state, STATE_INNER_SASH_HEIGHT, _pc.convertWidthInCharsToPixels(10));
       _sashInnerForm.setFixedHeight(bottomPartHeight);
-
-      _autocompleteMarkerName.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MARKER_NAME);
    }
 
    private void restoreState_Viewer() {
@@ -1484,6 +1484,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
 
       _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_DEFAULT);
+   }
+
+   private void restoreState_WithUI() {
+
+      _autocompleteMarkerName.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MARKER_NAME);
    }
 
    private void saveState() {
