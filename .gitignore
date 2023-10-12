@@ -26,3 +26,4 @@ repositories/
 
 *.hprof
 
+**/org.sonarlint.eclipse.core.prefs
