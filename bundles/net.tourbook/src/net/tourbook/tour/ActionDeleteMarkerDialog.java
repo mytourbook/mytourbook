@@ -39,8 +39,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteMarkerDialog extends Action {
 
-   private ITourProvider         _tourProvider;
-   private ArrayList<TourMarker> _tourMarkers;
+   private ITourProvider    _tourProvider;
+   private List<TourMarker> _tourMarkers;
 
    public ActionDeleteMarkerDialog(final ITourProvider tourProvider) {
 
@@ -58,6 +58,7 @@ public class ActionDeleteMarkerDialog extends Action {
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       // check if one tour is selected
+      //todo fb support the selectedtours > 1
       if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null ||
             _tourMarkers == null || _tourMarkers.isEmpty() || _tourMarkers.get(0) == null) {
          return;
@@ -116,6 +117,11 @@ public class ActionDeleteMarkerDialog extends Action {
    public void run() {
       BusyIndicator.showWhile(Display.getCurrent(), () -> doAction());
 
+   }
+
+   public void setTourMarkers(final List<TourMarker> tourMarkers) {
+
+      _tourMarkers = tourMarkers;
    }
 
    public void setTourMarkers(final Object[] tourMarkers) {
