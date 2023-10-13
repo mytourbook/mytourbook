@@ -344,34 +344,39 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                   final long viewTourId = _tourData.getTourId();
 
-                  final var multipleTourIds = _tourData.multipleTourIds;
+                  // The view contains multiple tours
                   if (_tourData.isMultipleTours()) {
-                     final List<Long> toto = new ArrayList<>();
-                     modifiedTours.forEach(t -> toto.add(t.getTourId()));
-                     _tourData = TourManager.createJoinedTourData(toto);
+
+                     final List<Long> tourIds = new ArrayList<>();
+
+                     modifiedTours.forEach(tour -> tourIds.add(tour.getTourId()));
+                     _tourData = TourManager.createJoinedTourData(tourIds);
                      _isMultipleTours = true;
 
                      updateUI_MarkerViewer();
 
                      // removed old tour data from the selection provider
                      _postSelectionProvider.clearSelection();
+
                   } else {
-                  for (final TourData tourData : modifiedTours) {
-                     if (tourData.getTourId() == viewTourId) {
 
-                        // get modified tour
-                        _tourData = tourData;
-                        _isMultipleTours = tourData.isMultipleTours();
+                     // The view contains a single tour
+                     for (final TourData tourData : modifiedTours) {
+                        if (tourData.getTourId() == viewTourId) {
 
-                        updateUI_MarkerViewer();
+                           // get modified tour
+                           _tourData = tourData;
+                           _isMultipleTours = tourData.isMultipleTours();
 
-                        // removed old tour data from the selection provider
-                        _postSelectionProvider.clearSelection();
+                           updateUI_MarkerViewer();
 
-                        // nothing more to do, the view contains only one tour
-                        return;
+                           // removed old tour data from the selection provider
+                           _postSelectionProvider.clearSelection();
+
+                           // nothing more to do, the view contains only one tour
+                           return;
+                        }
                      }
-                  }
                   }
 
                }
@@ -403,6 +408,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     * Computes the average speed between two markers (in km/h or mph)
     *
     * @param cell
+    *
     * @return
     */
    private double computeAverageSpeed(final ViewerCell cell) {
@@ -1098,6 +1104,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     * Retrieves the index of the marker currently selected.
     *
     * @param cell
+    *
     * @return
     */
    private int getCurrentMarkerIndex(final ViewerCell cell) {
@@ -1127,6 +1134,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     * Retrieves the index of the marker located before the current marker.
     *
     * @param cell
+    *
     * @return
     */
    private int getPreviousMarkerIndex(final ViewerCell cell) {
@@ -1237,9 +1245,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             }
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
