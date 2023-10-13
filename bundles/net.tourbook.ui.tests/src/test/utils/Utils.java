@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
@@ -149,7 +150,16 @@ public class Utils {
 
       // Duplicate the tour
       tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
-      Utils.clickOkButton(bot);
+      final var toto = bot.activeShell().getText();
+      final var titi = bot.shells();
+
+      if (Arrays.stream(titi).anyMatch(shell -> shell.getText().equals("Experimental Feature"))) {
+
+         Utils.clickOkButton(bot);
+      }
+//      if (bot.activeShell().getText().equals(tour).button(IDialogConstants.OK_LABEL) != null) {
+//         Utils.clickOkButton(bot);
+//      }
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
