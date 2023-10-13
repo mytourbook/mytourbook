@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -343,6 +344,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                   final long viewTourId = _tourData.getTourId();
 
+                  final var multipleTourIds = _tourData.multipleTourIds;
+                  if (_tourData.isMultipleTours()) {
+                     final List<Long> toto = new ArrayList<>();
+                     modifiedTours.forEach(t -> toto.add(t.getTourId()));
+                     _tourData = TourManager.createJoinedTourData(toto);
+                     _isMultipleTours = true;
+
+                     updateUI_MarkerViewer();
+
+                     // removed old tour data from the selection provider
+                     _postSelectionProvider.clearSelection();
+                  } else {
                   for (final TourData tourData : modifiedTours) {
                      if (tourData.getTourId() == viewTourId) {
 
@@ -359,6 +372,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                         return;
                      }
                   }
+                  }
+
                }
 
             } else if (tourEventId == TourEventId.MARKER_SELECTION) {
