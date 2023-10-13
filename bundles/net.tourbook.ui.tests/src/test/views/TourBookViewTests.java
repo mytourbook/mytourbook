@@ -199,9 +199,7 @@ public class TourBookViewTests extends UITest {
    void testMultiplyTourCalories() {
 
       //Select a tour that contains a calories value
-      SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
-            .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       //Check the original calories value
       assertEquals("1,073", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
@@ -211,10 +209,10 @@ public class TourBookViewTests extends UITest {
       bot.button(Messages.Tour_Action_MultiplyCaloriesBy1000_Apply).click();
 
       //Check the new calories value
-      tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
-            .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      tour = Utils.selectDuplicatedTour(bot);
       assertEquals("1,073,000", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
+
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
@@ -254,7 +252,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testSetElevationValuesFromSRTM() {
 
-      //todo fb use the duplicated tour
       SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       //Check the original elevation value
@@ -268,7 +265,7 @@ public class TourBookViewTests extends UITest {
       Utils.clickOkButton(bot);
 
       //Check the new elevation value
-      tour = Utils.getTourWithSRTM(bot);
+      tour = Utils.selectDuplicatedTour(bot);
       assertEquals("1,008", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
