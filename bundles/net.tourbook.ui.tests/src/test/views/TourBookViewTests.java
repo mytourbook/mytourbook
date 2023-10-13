@@ -254,10 +254,11 @@ public class TourBookViewTests extends UITest {
    @Test
    void testSetElevationValuesFromSRTM() {
 
-      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
+      //todo fb use the duplicated tour
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       //Check the original elevation value
-      assertEquals("2,577", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+      assertEquals("658", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
 
       //Set elevation from SRTM
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
@@ -269,6 +270,8 @@ public class TourBookViewTests extends UITest {
       //Check the new elevation value
       tour = Utils.getTourWithSRTM(bot);
       assertEquals("1,008", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
