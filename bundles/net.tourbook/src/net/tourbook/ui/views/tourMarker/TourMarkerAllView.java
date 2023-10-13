@@ -1796,8 +1796,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       final StructuredSelection selection = getViewerSelection();
       final Object firstItem = selection.getFirstElement();
 
-      if (firstItem instanceof TourMarkerItem) {
-         final TourMarkerItem markerItem = (TourMarkerItem) firstItem;
+      if (firstItem instanceof final TourMarkerItem markerItem) {
          markerId = markerItem.markerId;
       }
       _state.put(STATE_SELECTED_MARKER_ITEM, markerId);
