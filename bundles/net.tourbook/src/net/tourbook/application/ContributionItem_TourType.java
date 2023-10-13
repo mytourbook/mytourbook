@@ -429,6 +429,10 @@ public class ContributionItem_TourType extends CustomControlContribution {
 			@Override
 			public void run() {
 
+            if (_contextMenu.isDisposed()) {
+               return;
+            }
+
 				// check if a hide event has occured
 				if (_lastHideTime > _lastOpenTime) {
 					return;
