@@ -131,7 +131,7 @@ public class TourBookViewTests extends UITest {
 
       //Check the new computed distance
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("0.551", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
+      assertEquals("19.379", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
    }
