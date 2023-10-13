@@ -55,7 +55,8 @@ public class DialogExtractToursTests extends UITest {
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
-      tourStartTimeCalendar.set(2021, 0, 01);
+      //February 1, 2021
+      tourStartTimeCalendar.set(2021, 1, 1);
       tourDateTime.setDate(tourStartTimeCalendar.getTime());
       bot.comboBox(0).setSelection(0);
       Utils.clickOkButton(bot);
