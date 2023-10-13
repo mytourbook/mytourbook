@@ -121,6 +121,15 @@ public class Utils {
       clickButton(IDialogConstants.YES_LABEL, bot);
    }
 
+   public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour)
+   {
+      Utils.showTourBookView(bot);
+      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
+            Messages.Tour_Book_Action_delete_selected_tours).click();
+      Utils.clickOkButton(bot);
+      Utils.clickOkButton(bot);
+   }
+
    /**
     * Select a tour and duplicates it.
     * This is useful for tests that will modify a tour and need to unalter the

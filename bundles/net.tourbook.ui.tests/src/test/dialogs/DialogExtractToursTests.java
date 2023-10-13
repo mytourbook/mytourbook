@@ -70,11 +70,7 @@ public class DialogExtractToursTests extends UITest {
       bot.toolbarToggleButtonWithTooltip(Messages.app_action_edit_rows_tooltip).click();
 
       //Delete the tour
-      Utils.showTourBookView(bot);
-      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
-            Messages.Tour_Book_Action_delete_selected_tours).click();
-      Utils.clickOkButton(bot);
-      Utils.clickOkButton(bot);
+      Utils.deleteTour(bot, tour);
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
