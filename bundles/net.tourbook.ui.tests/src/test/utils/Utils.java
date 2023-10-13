@@ -150,6 +150,7 @@ public class Utils {
 
       // Duplicate the tour
       tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
+      bot.sleep(1000);
       final var toto = bot.activeShell().getText();
       final var titi = bot.shells();
 
