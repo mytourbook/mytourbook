@@ -23,7 +23,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.Date;
+import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
@@ -155,10 +155,12 @@ public class Utils {
       }
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      tourStartTimeCalendar.set(2009, 0, 01);
       // Set a different date than today's date
-      bot.dateTime(0).setDate(new Date(1230814800000L));
+      bot.dateTime(0).setDate(tourStartTimeCalendar.getTime());
       // Set a different time than the current's time
-      bot.dateTime(1).setDate(new Date(1230814800000L));
+      //   bot.dateTime(1).setDate(tourStartTimeCalendar.getTime());
 
       //Save the tour
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();

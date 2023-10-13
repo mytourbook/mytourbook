@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -54,7 +54,9 @@ public class DialogExtractToursTests extends UITest {
       bot.checkBox(Messages.Dialog_SplitTour_Checkbox_KeepTime).click();
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
-      tourDateTime.setDate(new Date(1612221767000L));
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      tourStartTimeCalendar.set(2021, 0, 01);
+      tourDateTime.setDate(tourStartTimeCalendar.getTime());
       bot.comboBox(0).setSelection(0);
       Utils.clickOkButton(bot);
 
@@ -73,7 +75,7 @@ public class DialogExtractToursTests extends UITest {
       Utils.deleteTour(bot, tour);
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "2/1/2021, 7:15 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
