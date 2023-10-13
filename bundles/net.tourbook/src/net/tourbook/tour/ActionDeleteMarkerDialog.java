@@ -57,17 +57,8 @@ public class ActionDeleteMarkerDialog extends Action {
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-      // check if one tour is selected
-      //todo fb support the selectedtours > 1
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null ||
-            _tourMarkers == null || _tourMarkers.isEmpty() || _tourMarkers.get(0) == null) {
-         return;
-      }
-
-      final TourData tourData = selectedTours.get(0);
-
-      if (tourData.isManualTour()) {
-         // a manually created tour does not have time slices -> no markers
+      if (selectedTours == null || selectedTours.isEmpty() ||
+            _tourMarkers == null || _tourMarkers.isEmpty()) {
          return;
       }
 
@@ -95,19 +86,26 @@ public class ActionDeleteMarkerDialog extends Action {
          return;
       }
 
-      final List<TourMarker> _originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
+      for (final TourData tourData : selectedTours) {
 
-      for (final TourMarker selectedTourMarker : _tourMarkers) {
-         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
+         if (tourData.isManualTour()) {
+            // a manually created tour does not have time slices -> no markers
+            return;
+         }
+         final List<TourMarker> originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
+
+         for (final TourMarker selectedTourMarker : _tourMarkers) {
+            originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
+         }
+
+         final Set<TourMarker> newTourMarkers = new HashSet<>();
+
+         for (final TourMarker tourMarker : originalTourMarkers) {
+            newTourMarkers.add(tourMarker.clone());
+         }
+
+         tourData.setTourMarkers(newTourMarkers);
       }
-
-      final Set<TourMarker> _newTourMarkers = new HashSet<>();
-
-      for (final TourMarker tourMarker : _originalTourMarkers) {
-         _newTourMarkers.add(tourMarker.clone());
-      }
-
-      tourData.setTourMarkers(_newTourMarkers);
 
       TourManager.saveModifiedTours(selectedTours);
 
