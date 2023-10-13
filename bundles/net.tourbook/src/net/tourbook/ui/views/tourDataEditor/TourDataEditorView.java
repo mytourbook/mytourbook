@@ -2056,7 +2056,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                            + NL
                            + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL //$NON-NLS-1$
                            + NL
-                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed " //$NON-NLS-1$
+                           + "One issue could be that when a duplicated tour is selected then its data are not displayed " //$NON-NLS-1$
                            + "because the original tour was selected before. " //$NON-NLS-1$
                            + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL //$NON-NLS-1$
                            + NL
