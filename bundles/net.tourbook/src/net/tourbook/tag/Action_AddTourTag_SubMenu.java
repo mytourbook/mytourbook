@@ -18,6 +18,7 @@ package net.tourbook.tag;
 import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.IAdvancedMenuForActions;
@@ -42,12 +44,9 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Add tag(s) from the selected tours
@@ -57,7 +56,6 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
    private static final String    SPACE_PRE_TAG     = "   ";          //$NON-NLS-1$
 
    private TagMenuManager         _tagMenuMgr;
-   private Menu                   _menu;
 
    /**
     * Contains all tags for all selected tours in the viewer
@@ -70,18 +68,23 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
     */
    private HashMap<Long, TourTag> _modifiedTags     = new HashMap<>();
 
-   private AdvancedMenuForActions _advancedMenuProvider;
-
-   private Action                 _actionAddTagTitle;
-   private ActionOK               _actionOK;
-   private ActionOpenPrefDialog   _actionOpenTagPrefs;
-   private Action                 _actionRecentTagsTitle;
-
    private boolean                _isAdvancedMenu;
 
-   private final class ActionCancel extends Action {
+   private AdvancedMenuForActions _advancedMenuProvider;
 
-      private ActionCancel() {
+   private Action                 _actionAdvanced_AddTagTitle;
+   private ActionAdvanced_OK      _actionAdvanced_OK;
+   private ActionOpenPrefDialog   _actionAdvanced_OpenTagPrefs;
+   private Action                 _actionAdvanced_RecentTagsTitle;
+
+   /*
+    * UI controls
+    */
+   private Menu _rootMenu;
+
+   private final class ActionAdvanced_Cancel extends Action {
+
+      private ActionAdvanced_Cancel() {
 
          super(Messages.Action_Tag_AutoOpenCancel);
 
@@ -94,11 +97,11 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       }
    }
 
-   private class ActionModifiedTag extends Action {
+   private class ActionAdvanced_ModifiedTag extends Action {
 
       private final TourTag __tourTag;
 
-      public ActionModifiedTag(final TourTag tourTag) {
+      public ActionAdvanced_ModifiedTag(final TourTag tourTag) {
 
          super(SPACE_PRE_TAG + tourTag.getTagName(), AS_CHECK_BOX);
 
@@ -119,9 +122,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       }
    }
 
-   private class ActionModifiedTags extends Action {
+   private class ActionAdvanced_ModifiedTags extends Action {
 
-      public ActionModifiedTags() {
+      public ActionAdvanced_ModifiedTags() {
 
          super(Messages.Action_Tag_Add_AutoOpen_ModifiedTags);
 
@@ -130,9 +133,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       }
    }
 
-   private final class ActionOK extends Action {
+   private final class ActionAdvanced_OK extends Action {
 
-      private ActionOK() {
+      private ActionAdvanced_OK() {
 
          super(Messages.Action_Tag_AutoOpenOK);
 
@@ -160,10 +163,17 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
          }
 
          __tourTag = tourTag;
+
+         System.out.println(UI.timeStamp() + " create Tag: " + tourTag);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       }
 
       @Override
       public void run() {
+
+         System.out.println(UI.timeStamp() + " run()");
+// TODO remove SYSTEM.OUT.PRINTLN
 
          if (_isAdvancedMenu == false) {
 
@@ -196,6 +206,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
          __actionAddTourTag = actionAddTourTag;
          __tagCategory = tagCategory;
 
+         System.out.println(UI.timeStamp() + " create Category: " + tagCategory.getCategoryName());
+// TODO remove SYSTEM.OUT.PRINTLN
+
          setMenuCreator(this);
       }
 
@@ -218,6 +231,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       public Menu getMenu(final Menu parent) {
 
          dispose();
+
          __categoryMenu = new Menu(parent);
 
          // Add listener to repopulate the menu each time
@@ -225,16 +239,16 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
             final Menu menu = (Menu) menuEvent.widget;
 
-            // dispose old items
-            final MenuItem[] items = menu.getItems();
-            for (final MenuItem item : items) {
-               item.dispose();
-            }
+            System.out.println(UI.NEW_LINE + UI.timeStamp() + " menuShown: " + menu);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+            // dispose old menu items
+            Arrays.stream(menu.getItems()).forEach(menuItem -> menuItem.dispose());
 
             final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
 
             // add actions
-            __actionAddTourTag.createCategoryActions(tagCollection, __categoryMenu);
+            __actionAddTourTag.createTagCategoryActions(tagCollection, __categoryMenu);
             __actionAddTourTag.createTagActions(tagCollection, __categoryMenu);
          }));
 
@@ -275,27 +289,19 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       item.fill(menu, -1);
    }
 
-   private void createCategoryActions(final TagCollection tagCollection, final Menu menu) {
-
-      // add tag categories
-      for (final TourTagCategory tagCategory : tagCollection.tourTagCategories) {
-         addActionToMenu(menu, new ActionTourTagCategory(this, tagCategory));
-      }
-   }
-
    private void createDefaultAction(final TagMenuManager tagMenuMgr) {
 
       _tagMenuMgr = tagMenuMgr;
 
-      _actionAddTagTitle = new Action(Messages.Action_Tag_Add_AutoOpen_Title) {};
-      _actionAddTagTitle.setEnabled(false);
+      _actionAdvanced_AddTagTitle = new Action(Messages.Action_Tag_Add_AutoOpen_Title) {};
+      _actionAdvanced_AddTagTitle.setEnabled(false);
 
-      _actionRecentTagsTitle = new Action(Messages.Action_Tag_Add_RecentTags) {};
-      _actionRecentTagsTitle.setEnabled(false);
+      _actionAdvanced_RecentTagsTitle = new Action(Messages.Action_Tag_Add_RecentTags) {};
+      _actionAdvanced_RecentTagsTitle.setEnabled(false);
 
-      _actionOK = new ActionOK();
+      _actionAdvanced_OK = new ActionAdvanced_OK();
 
-      _actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
+      _actionAdvanced_OpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
    }
 
    private void createTagActions(final TagCollection tagCollection, final Menu menu) {
@@ -308,13 +314,10 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       //Preload the tag images
       //Note that the hourglass is only displayed on Windows (it doesn't seem
       //to work on Linux)
-      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagManager.getTagImage(tourTag)));
+//      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagManager.getTagImage(tourTag)));
 
       // add tag items
       for (final TourTag menuTourTag : allTourTags) {
-
-         // check the tag when it's set in the tour
-         final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
 
          final boolean isModifiedTags = _modifiedTags.size() > 0;
          final boolean isSelectedTags = _selectedTourTags != null;
@@ -353,6 +356,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
          }
 
+         final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
+
+         // check the tag when it's set in the tour
          actionTourTag.setChecked(isTagChecked);
 
          // disable tags which are not tagged
@@ -368,27 +374,54 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       }
    }
 
+   private void createTagCategoryActions(final TagCollection tagCollection, final Menu menu) {
+
+      // add tag categories
+      for (final TourTagCategory tagCategory : tagCollection.tourTagCategories) {
+         addActionToMenu(menu, new ActionTourTagCategory(this, tagCategory));
+      }
+   }
+
    @Override
    public void dispose() {
 
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
+      disposeRootMenu();
+   }
+
+   private void disposeRootMenu() {
+
+      if (_rootMenu != null) {
+         _rootMenu.dispose();
+         _rootMenu = null;
       }
    }
 
    /**
-    * Fill the context menu and check/disable tags for the selected tours
+    * @param menu
+    */
+   private void fillRecentTags(final Menu menu) {
+
+      if ((TourDatabase.getAllTourTags().size() > 0)) {
+
+         // tags are available
+
+         (new Separator()).fill(menu, -1);
+         {
+            addActionToMenu(menu, _actionAdvanced_RecentTagsTitle);
+            _tagMenuMgr.fillMenuWithRecentTags(null, menu);
+         }
+      }
+   }
+
+   /**
+    * Fill the root context menu and check/disable tags for the selected tours
     *
     * @param menu
     */
-   private void fillMenu(final Menu menu) {
+   private void fillRootMenu(final Menu menu) {
 
-      // dispose old items
-      final MenuItem[] items = menu.getItems();
-      for (final MenuItem item : items) {
-         item.dispose();
-      }
+      // dispose old menu items
+      Arrays.stream(menu.getItems()).forEach(menuItem -> menuItem.dispose());
 
       // check if a tour is selected
       _selectedTours = _tagMenuMgr.getTourProvider().getSelectedTours();
@@ -412,7 +445,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
       if (_isAdvancedMenu == false) {
 
-         createCategoryActions(rootTagCollection, menu);
+         createTagCategoryActions(rootTagCollection, menu);
          createTagActions(rootTagCollection, menu);
 
       } else {
@@ -423,11 +456,11 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
          // create title menu items
 
-         addActionToMenu(menu, _actionAddTagTitle);
+         addActionToMenu(menu, _actionAdvanced_AddTagTitle);
 
          (new Separator()).fill(menu, -1);
          {
-            createCategoryActions(rootTagCollection, menu);
+            createTagCategoryActions(rootTagCollection, menu);
             createTagActions(rootTagCollection, menu);
          }
 
@@ -439,7 +472,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
          {
             // show newly added tags
 
-            addActionToMenu(menu, new ActionModifiedTags());
+            addActionToMenu(menu, new ActionAdvanced_ModifiedTags());
 
             if (isModifiedTags) {
 
@@ -448,87 +481,70 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
                Collections.sort(modifiedTags);
 
                for (final TourTag tourTag : modifiedTags) {
-                  addActionToMenu(menu, new ActionModifiedTag(tourTag));
+                  addActionToMenu(menu, new ActionAdvanced_ModifiedTag(tourTag));
                }
             }
          }
 
          (new Separator()).fill(menu, -1);
          {
-            addActionToMenu(menu, _actionOK);
-            addActionToMenu(menu, new ActionCancel());
+            addActionToMenu(menu, _actionAdvanced_OK);
+            addActionToMenu(menu, new ActionAdvanced_Cancel());
          }
 
          (new Separator()).fill(menu, -1);
          {
-            addActionToMenu(menu, _actionOpenTagPrefs);
+            addActionToMenu(menu, _actionAdvanced_OpenTagPrefs);
          }
 
          /*
           * enable actions
           */
-         _actionOK.setEnabled(isModifiedTags);
-         _actionOK.setImageDescriptor(isModifiedTags
+         _actionAdvanced_OK.setEnabled(isModifiedTags);
+         _actionAdvanced_OK.setImageDescriptor(isModifiedTags
                ? TourbookPlugin.getImageDescriptor(Images.App_OK)
                : null);
       }
    }
 
-   /**
-    * @param menu
-    */
-   private void fillRecentTags(final Menu menu) {
-
-      if ((TourDatabase.getAllTourTags().size() > 0)) {
-
-         // tags are available
-
-         (new Separator()).fill(menu, -1);
-         {
-            addActionToMenu(menu, _actionRecentTagsTitle);
-            _tagMenuMgr.fillMenuWithRecentTags(null, menu);
-         }
-      }
-   }
-
    @Override
-   public Menu getMenu(final Control parent) {
+   public Menu getMenu(final Control parentControl) {
 
       // fix: https://github.com/mytourbook/mytourbook/issues/1154
-      if (parent == null) {
+      if (parentControl == null) {
          return null;
       }
 
       _isAdvancedMenu = true;
 
-      dispose();
+      disposeRootMenu();
 
-      _menu = new Menu(parent);
+      _rootMenu = new Menu(parentControl);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> fillMenu((Menu) menuEvent.widget)));
+      _rootMenu.addMenuListener(menuShownAdapter(menuEvent -> fillRootMenu((Menu) menuEvent.widget)));
 
-      return _menu;
+      return _rootMenu;
    }
 
    @Override
-   public Menu getMenu(final Menu parent) {
+   public Menu getMenu(final Menu parentMenu) {
 
       _isAdvancedMenu = false;
 
-      dispose();
+      disposeRootMenu();
 
-      _menu = new Menu(parent);
+      _rootMenu = new Menu(parentMenu);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
+      _rootMenu.addMenuListener(menuShownAdapter(menuEvent -> {
 
          resetData();
 
-         fillMenu((Menu) menuEvent.widget);
+         fillRootMenu((Menu) menuEvent.widget);
       }));
 
-      return _menu;
+      return _rootMenu;
    }
 
    @Override
@@ -541,11 +557,13 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
    @Override
    public void resetData() {
+
       _modifiedTags.clear();
    }
 
    @Override
    public void run() {
+
       _advancedMenuProvider.openAdvancedMenu();
    }
 
@@ -572,6 +590,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
    private void saveTags() {
 
+      System.out.println(UI.timeStamp() + " saveTags() " + _modifiedTags);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       if (_modifiedTags.size() > 0) {
          _tagMenuMgr.saveTourTags(_modifiedTags, true);
       }
@@ -579,6 +600,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
    @Override
    public void setAdvancedMenuProvider(final AdvancedMenuForActions advancedMenuProvider) {
+
       _advancedMenuProvider = advancedMenuProvider;
    }
 
@@ -641,6 +663,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
    @Override
    public String toString() {
+
       return "ActionAddTourTag [getText()=" + getText() + ", hashCode()=" + hashCode() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
