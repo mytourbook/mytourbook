@@ -138,8 +138,7 @@ public class Utils {
     * tests database in order no to impact other tests and keep each test
     * independent from each other.
     */
-   public static SWTBotTreeItem duplicateAndGetTour(final SWTWorkbenchBot bot,
-                                                    final boolean clickOkExperimetalFeature) {
+   public static SWTBotTreeItem duplicateAndGetTour(final SWTWorkbenchBot bot) {
 
       showTourBookView(bot);
 
@@ -150,9 +149,6 @@ public class Utils {
 
       // Duplicate the tour
       tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
-      if (clickOkExperimetalFeature) {
-         Utils.clickOkButton(bot);
-      }
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();

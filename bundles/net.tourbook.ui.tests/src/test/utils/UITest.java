@@ -18,6 +18,9 @@ package utils;
 import net.tourbook.application.PluginProperties;
 import net.tourbook.application.TourbookPlugin;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.AfterAll;
@@ -50,5 +53,20 @@ public abstract class UITest {
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_TOURBOOK);
       tourBookView = Utils.showTourBookView(bot);
+
+      Display.getDefault().addFilter(SWT.Activate, event -> {
+         // Is this a Shell being activated?
+
+         if (event.widget instanceof final Shell shell) {
+
+            // Look at the shell title to see if it is the one we want
+
+            if ("Experimental Feature".equals(shell.getText())) {
+               // Close the shell after it has finished initializing
+
+               Display.getDefault().asyncExec(shell::close);
+            }
+         }
+      });
    }
 }
