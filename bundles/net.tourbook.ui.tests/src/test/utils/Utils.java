@@ -122,13 +122,29 @@ public class Utils {
    }
 
    /**
+    * Select a tour and duplicates it.
+    * This is useful for tests that will modify a tour and need to unalter the
+    * tests database in order no to impact other tests and keep each test
+    * independent from each other.
+    */
+   public static SWTBotTreeItem getDuplicatedTour(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
+   /**
     * Because the SWTBot function {@link SWTBot#buttonWithTooltip} doesn't appear
     * to work in every case, this function will find a toolbar button for a given
     * bot view based on the tooltip text of the button.
     *
     */
-   public static SWTBotToolbarButton getToolbarButton(final SWTBotView botView, final String tooltipText)
-   {
+   public static SWTBotToolbarButton getToolbarButton(final SWTBotView botView, final String tooltipText) {
       for (final SWTBotToolbarButton button : botView.getToolbarButtons()) {
 
          if (tooltipText.equals(button.getToolTipText())) {
