@@ -120,8 +120,9 @@ public class TourBookViewTests extends UITest {
    @Test
    void testComputeTourDistance() {
 
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+
       //Check the original distance
-      SWTBotTreeItem tour = Utils.getTour(bot);
       assertEquals("0.542", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
 
       //Compute the tour distance
@@ -129,8 +130,10 @@ public class TourBookViewTests extends UITest {
       Utils.clickOkButton(bot);
 
       //Check the new computed distance
-      tour = Utils.getTour(bot);
+      tour = Utils.selectDuplicatedTour(bot);
       assertEquals("0.551", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
+
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
@@ -165,6 +168,7 @@ public class TourBookViewTests extends UITest {
       Utils.clickOkButton(bot);
       Utils.clickOkButton(bot);
 
+      //todo fb to put in the utils function and remove this test now useless
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             "1/1/2015, 1:00 PM")));//$NON-NLS-1$
