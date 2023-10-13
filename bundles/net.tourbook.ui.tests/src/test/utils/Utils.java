@@ -122,8 +122,7 @@ public class Utils {
       clickButton(IDialogConstants.YES_LABEL, bot);
    }
 
-   public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour)
-   {
+   public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour) {
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
             Messages.Tour_Book_Action_delete_selected_tours).click();
       Utils.clickOkButton(bot);
