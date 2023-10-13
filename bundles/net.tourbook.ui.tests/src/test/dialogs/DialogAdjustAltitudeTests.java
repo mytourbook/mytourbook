@@ -27,9 +27,11 @@ import utils.Utils;
 
 public class DialogAdjustAltitudeTests extends UITest {
 
-   private void adjustAltitude(final String newElevationValue, final String adjustmentMethod) {
+   private void adjustAltitude(final String newElevationValue,
+                               final String adjustmentMethod,
+                               final boolean clickOkExperimetalFeature) {
 
-      Utils.getTourWithSRTM(bot);
+      Utils.duplicateAndGetTour(bot, clickOkExperimetalFeature);
 
       bot.viewByTitle(Utils.VIEW_NAME_TOUREDITOR).show();
       bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
@@ -50,8 +52,10 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      final SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
+      final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       assertEquals(newElevationValue, tour.cell(tourBookView_ElevationGain_Column_Index));
+
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
@@ -59,10 +63,10 @@ public class DialogAdjustAltitudeTests extends UITest {
 
       Utils.showTourBookView(bot);
 
-      adjustAltitude("658", Messages.adjust_altitude_type_adjust_whole_tour); //$NON-NLS-1$
-      adjustAltitude("687", Messages.adjust_altitude_type_start_and_end); //$NON-NLS-1$
-      adjustAltitude("2,960", Messages.adjust_altitude_type_adjust_height); //$NON-NLS-1$
-      adjustAltitude("2,577", Messages.adjust_altitude_type_adjust_end); //$NON-NLS-1$
+      adjustAltitude("658", Messages.adjust_altitude_type_adjust_whole_tour, true); //$NON-NLS-1$
+      adjustAltitude("687", Messages.adjust_altitude_type_start_and_end, false); //$NON-NLS-1$
+      adjustAltitude("635", Messages.adjust_altitude_type_adjust_height, false); //$NON-NLS-1$
+      adjustAltitude("692", Messages.adjust_altitude_type_adjust_end, false); //$NON-NLS-1$
 
       // This is necessary as otherwise the subsequent tests will fail with
       // org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException: Could not find menu bar for shell: Shell with text {}

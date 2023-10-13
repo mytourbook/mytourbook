@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Date;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
@@ -123,7 +124,6 @@ public class Utils {
 
    public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour)
    {
-      Utils.showTourBookView(bot);
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
             Messages.Tour_Book_Action_delete_selected_tours).click();
       Utils.clickOkButton(bot);
@@ -132,16 +132,39 @@ public class Utils {
 
    /**
     * Select a tour and duplicates it.
+    * The tour is duplicated to a specific date so that it can be retrieved any
+    * time if necessary.
+    *
     * This is useful for tests that will modify a tour and need to unalter the
     * tests database in order no to impact other tests and keep each test
     * independent from each other.
     */
-   public static SWTBotTreeItem getDuplicatedTour(final SWTWorkbenchBot bot) {
+   public static SWTBotTreeItem duplicateAndGetTour(final SWTWorkbenchBot bot,
+                                                    final boolean clickOkExperimetalFeature) {
 
       showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+      // Get a tour that can be duplicated
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      // Duplicate the tour
+      tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
+      if (clickOkExperimetalFeature) {
+         Utils.clickOkButton(bot);
+      }
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
+
+      // Set a different date than today's date
+      bot.dateTime(0).setDate(new Date(1230814800000L));
+      // Set a different time than the current's time
+      bot.dateTime(1).setDate(new Date(1230814800000L));
+
+      //Save the tour
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+
+      tour = selectDuplicatedTour(bot);
       assertNotNull(tour);
 
       return tour;
@@ -154,6 +177,7 @@ public class Utils {
     *
     */
    public static SWTBotToolbarButton getToolbarButton(final SWTBotView botView, final String tooltipText) {
+
       for (final SWTBotToolbarButton button : botView.getToolbarButtons()) {
 
          if (tooltipText.equals(button.getToolTipText())) {
@@ -236,6 +260,18 @@ public class Utils {
    public static void openVendorPage(final SWTBotTreeItem treeItem, final String vendorName) {
 
       treeItem.getNode(vendorName).select();
+   }
+
+   public static SWTBotTreeItem selectDuplicatedTour(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      // Get a tour that can be duplicated
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2009   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
    }
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
