@@ -123,7 +123,7 @@ public class TourBookViewTests extends UITest {
       SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       //Check the original distance
-      assertEquals("0.542", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
+      assertEquals("19.377", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
 
       //Compute the tour distance
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition).click();
