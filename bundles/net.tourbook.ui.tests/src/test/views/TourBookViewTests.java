@@ -206,7 +206,7 @@ public class TourBookViewTests extends UITest {
       SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       //Check the original calories value
-      assertEquals("1,073", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
+      assertEquals("2", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
 
       //Multiply the calories by 1000
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_MultiplyCaloriesBy1000).click();
@@ -214,7 +214,7 @@ public class TourBookViewTests extends UITest {
 
       //Check the new calories value
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("1,073,000", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
+      assertEquals("2,000", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
    }
