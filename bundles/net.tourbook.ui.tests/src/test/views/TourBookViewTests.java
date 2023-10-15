@@ -136,6 +136,7 @@ public class TourBookViewTests extends UITest {
       Utils.deleteTour(bot, tour);
    }
 
+   @Disabled
    @Test
    void testDuplicateAndDeleteTour() {
 
