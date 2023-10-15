@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,45 +42,55 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ArmEvent;
+import org.eclipse.swt.events.ArmListener;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.TypedListener;
 
 /**
  * Add tag(s) from the selected tours
  */
 class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
-   private static final String    SPACE_PRE_TAG     = "   ";          //$NON-NLS-1$
+   private static final String      SPACE_PRE_TAG       = "   ";                   //$NON-NLS-1$
 
-   private TagMenuManager         _tagMenuMgr;
+   private TagMenuManager           _tagMenuMgr;
 
    /**
     * Contains all tags for all selected tours in the viewer
     */
-   private Set<TourTag>           _selectedTourTags = new HashSet<>();
-   private ArrayList<TourData>    _selectedTours;
+   private Set<TourTag>             _selectedTourTags   = new HashSet<>();
+   private ArrayList<TourData>      _selectedTours;
 
    /**
     * Contains all tags which will be added
     */
-   private HashMap<Long, TourTag> _modifiedTags     = new HashMap<>();
+   private HashMap<Long, TourTag>   _modifiedTags       = new HashMap<>();
 
-   private boolean                _isAdvancedMenu;
+   private boolean                  _isAdvancedMenu;
 
-   private AdvancedMenuForActions _advancedMenuProvider;
+   private AdvancedMenuForActions   _advancedMenuProvider;
 
-   private Action                 _actionAdvanced_AddTagTitle;
-   private ActionAdvanced_OK      _actionAdvanced_OK;
-   private ActionOpenPrefDialog   _actionAdvanced_OpenTagPrefs;
-   private Action                 _actionAdvanced_RecentTagsTitle;
+   private final ContextArmListener _contextArmListener = new ContextArmListener();
+
+   private Action                   _actionAdvanced_AddTagTitle;
+   private ActionAdvanced_OK        _actionAdvanced_OK;
+   private ActionOpenPrefDialog     _actionAdvanced_OpenTagPrefs;
+   private Action                   _actionAdvanced_RecentTagsTitle;
 
    /*
     * UI controls
     */
    private Menu _rootMenu;
 
-   private final class ActionAdvanced_Cancel extends Action {
+   private class ActionAdvanced_Cancel extends Action {
 
       private ActionAdvanced_Cancel() {
 
@@ -133,7 +141,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       }
    }
 
-   private final class ActionAdvanced_OK extends Action {
+   private class ActionAdvanced_OK extends Action {
 
       private ActionAdvanced_OK() {
 
@@ -212,6 +220,33 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
          setMenuCreator(this);
       }
 
+      private void addArmListener(final Menu menu) {
+         // TODO Auto-generated method stub
+
+         // add arm listener to each menu item
+         for (final MenuItem menuItem : menu.getItems()) {
+
+            /*
+             * check if an arm listener is already set
+             */
+            final Listener[] itemArmListeners = menuItem.getListeners(SWT.Arm);
+            boolean isArmAvailable = false;
+
+            for (final Listener listener : itemArmListeners) {
+               if (listener instanceof TypedListener) {
+                  if (((TypedListener) listener).getEventListener() instanceof ContextArmListener) {
+                     isArmAvailable = true;
+                     break;
+                  }
+               }
+            }
+
+            if (isArmAvailable == false) {
+               menuItem.addArmListener(_contextArmListener);
+            }
+         }
+      }
+
       @Override
       public void dispose() {
 
@@ -235,24 +270,49 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
          __categoryMenu = new Menu(parent);
 
          // Add listener to repopulate the menu each time
-         __categoryMenu.addMenuListener(menuShownAdapter(menuEvent -> {
+         __categoryMenu.addMenuListener(new MenuListener() {
 
-            final Menu menu = (Menu) menuEvent.widget;
+            @Override
+            public void menuHidden(final MenuEvent menuEvent) {
+               // TODO Auto-generated method stub
 
-            System.out.println(UI.NEW_LINE + UI.timeStamp() + " menuShown: " + menu);
+               final Menu menu = (Menu) menuEvent.widget;
+
+               System.out.println(UI.NEW_LINE + UI.timeStamp() + " menuHidden: " + menu);
+// TODO remove SYSTEM.OUT.PRINTLN
+            }
+
+            @Override
+            public void menuShown(final MenuEvent menuEvent) {
+               // TODO Auto-generated method stub
+
+               final Menu menu = (Menu) menuEvent.widget;
+
+               System.out.println(UI.NEW_LINE + UI.timeStamp() + " menuShown: " + menu);
 // TODO remove SYSTEM.OUT.PRINTLN
 
-            // dispose old menu items
-            Arrays.stream(menu.getItems()).forEach(menuItem -> menuItem.dispose());
+               // dispose old menu items
+               Arrays.stream(menu.getItems()).forEach(menuItem -> menuItem.dispose());
 
-            final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
+               final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
 
-            // add actions
-            __actionAddTourTag.createTagCategoryActions(tagCollection, __categoryMenu);
-            __actionAddTourTag.createTagActions(tagCollection, __categoryMenu);
-         }));
+               // add actions
+               __actionAddTourTag.createTagCategoryActions(tagCollection, __categoryMenu);
+               __actionAddTourTag.createTagActions(tagCollection, __categoryMenu);
+
+               addArmListener(menu);
+            }
+         });
 
          return __categoryMenu;
+      }
+   }
+
+   private class ContextArmListener implements ArmListener {
+
+      @Override
+      public void widgetArmed(final ArmEvent event) {
+         onArmEvent(event);
       }
    }
 
@@ -522,7 +582,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       _rootMenu = new Menu(parentControl);
 
       // Add listener to repopulate the menu each time
-      _rootMenu.addMenuListener(menuShownAdapter(menuEvent -> fillRootMenu((Menu) menuEvent.widget)));
+      _rootMenu.addMenuListener(MenuListener.menuShownAdapter(menuEvent -> fillRootMenu((Menu) menuEvent.widget)));
 
       return _rootMenu;
    }
@@ -537,7 +597,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       _rootMenu = new Menu(parentMenu);
 
       // Add listener to repopulate the menu each time
-      _rootMenu.addMenuListener(menuShownAdapter(menuEvent -> {
+      _rootMenu.addMenuListener(MenuListener.menuShownAdapter(menuEvent -> {
 
          resetData();
 
@@ -545,6 +605,15 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       }));
 
       return _rootMenu;
+   }
+
+   private void onArmEvent(final ArmEvent event) {
+
+      final MenuItem menuItem = (MenuItem) event.widget;
+
+      System.out.println(UI.timeStamp() + " armEvent: " + menuItem.getText());
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    @Override

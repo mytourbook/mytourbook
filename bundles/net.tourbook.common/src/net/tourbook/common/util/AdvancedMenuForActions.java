@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -63,7 +63,7 @@ public class AdvancedMenuForActions {
    private boolean                  _isAnimating;
 
    private int                      _autoOpenDelay      = 500;
-   private final int                _animationDelay     = 50;                      //180; this is the same time as in BusyIndicator
+   private final int                _animationDelay     = 150;                     //180; this is the same time as in BusyIndicator
    private int                      _consumedAnimationTime;
 
    private Display                  _display;

@@ -108,6 +108,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -826,6 +827,7 @@ public class TourBookView extends ViewPart implements
        * Convert col def style -> nat table style
        *
        * @param columnStyle
+       *
        * @return
        */
       private HorizontalAlignmentEnum convertColumnAlignment(final int columnStyle) {
@@ -1221,6 +1223,7 @@ public class TourBookView extends ViewPart implements
     *
     * @param parentItem
     * @param allLastChildren
+    *
     * @return
     */
    private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem, final List<TreeViewerItem> allLastChildren) {
@@ -1587,11 +1590,15 @@ public class TourBookView extends ViewPart implements
 
       _viewerMenuManager_Tree = new MenuManager();
       _viewerMenuManager_Tree.setRemoveAllWhenShown(true);
-      _viewerMenuManager_Tree.addMenuListener(menuManager -> {
+      _viewerMenuManager_Tree.addMenuListener(new IMenuListener() {
 
-         _tourInfoToolTip_Tree.hideToolTip();
+         @Override
+         public void menuAboutToShow(final IMenuManager menuManager) {
 
-         fillContextMenu(menuManager, true);
+            _tourInfoToolTip_Tree.hideToolTip();
+
+            fillContextMenu(menuManager, true);
+         }
       });
    }
 
@@ -2457,6 +2464,7 @@ public class TourBookView extends ViewPart implements
 
    /**
     * @param event
+    *
     * @return Returns the {@link ColumnDefinition} of the currently selected row or
     *         <code>null</code> when nothing is selected.
     */
@@ -2673,6 +2681,7 @@ public class TourBookView extends ViewPart implements
    /**
     * @param yearSubItem
     * @param allTourIds
+    *
     * @return Return all tours for one yearSubItem
     */
    private void getYearSubTourIDs(final TVITourBookYearCategorized yearSubItem, final LinkedHashSet<Long> allTourIds) {
@@ -3797,10 +3806,12 @@ public class TourBookView extends ViewPart implements
          viewLayoutImage = Images.TourBook_NatTable;
          _isLayoutNatTable = true;
          break;
+
       case CATEGORY_MONTH:
          viewLayoutImage = Images.TourBook_Month;
          _isLayoutNatTable = false;
          break;
+
       case CATEGORY_WEEK:
          viewLayoutImage = Images.TourBook_Week;
          _isLayoutNatTable = false;

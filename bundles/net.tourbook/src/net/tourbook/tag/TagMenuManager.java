@@ -99,11 +99,13 @@ public class TagMenuManager {
    private boolean                        _isSaveTour;
    private ITourProvider                  _tourProvider;
 
-   private ActionContributionItem         _actionAddTagAdvanced;
    private Action_AddTourTag_SubMenu      _actionAddTag;
+   private ActionContributionItem         _actionAddTagAdvanced;
    private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
    private Action_RemoveAllTags           _actionRemoveAllTags;
    private Action_SetTags                 _actionSetTags;
+
+   private TEST_Action_Root               _actionAddTag_TEST;
 
    private AdvancedMenuForActions         _advancedMenuToAddTags;
 
@@ -118,7 +120,8 @@ public class TagMenuManager {
 
       @Override
       public void run() {
-         BusyIndicator.showWhile(Display.getCurrent(), TagMenuManager.this::runnableRemoveAllTags);
+
+         BusyIndicator.showWhile(Display.getCurrent(), () -> runnableRemoveAllTags());
       }
    }
 
@@ -224,6 +227,7 @@ public class TagMenuManager {
       _actionAddTagAdvanced.setId(ICommandIds.ACTION_ADD_TAG);
 
       _actionAddTag = new Action_AddTourTag_SubMenu(this);
+      _actionAddTag_TEST = new TEST_Action_Root();
       _actionRemoveTag = new Action_RemoveTourTag_SubMenu(this);
       _actionRemoveAllTags = new Action_RemoveAllTags();
       _actionSetTags = new Action_SetTags();
@@ -469,6 +473,7 @@ public class TagMenuManager {
 
       actionAddTagAdvanced.setEnabled(isAddTagEnabled);
       _actionAddTag.setEnabled(isAddTagEnabled);
+      _actionAddTag_TEST.setEnabled(isAddTagEnabled);
 
       _actionRemoveTag.setEnabled(isRemoveTagEnabled);
       _actionRemoveAllTags.setEnabled(isRemoveTagEnabled);
@@ -644,6 +649,7 @@ public class TagMenuManager {
 
          menuMgr.add(_actionAddTagAdvanced);
          menuMgr.add(_actionAddTag);
+         menuMgr.add(_actionAddTag_TEST);
 
          fillMenuWithRecentTags(menuMgr, null);
 
