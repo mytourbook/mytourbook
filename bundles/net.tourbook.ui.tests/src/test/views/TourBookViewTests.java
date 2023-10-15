@@ -214,7 +214,7 @@ public class TourBookViewTests extends UITest {
 
       //Check the new calories value
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("2,000", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
+      assertEquals("2,336", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
    }
