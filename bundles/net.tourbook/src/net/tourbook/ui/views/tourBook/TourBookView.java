@@ -289,7 +289,7 @@ public class TourBookView extends ViewPart implements
    private ColumnManager                      _columnManager_NatTable;
    private ColumnManager                      _columnManager_Tree;
    //
-   private OpenDialogManager                  _openDlgMgr                              = new OpenDialogManager();
+   private OpenDialogManager                  _openDlgMgr                         = new OpenDialogManager();
    //
    private PostSelectionProvider              _postSelectionProvider;
    //
@@ -307,8 +307,8 @@ public class TourBookView extends ViewPart implements
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                                _columnIndex_TourTypeImage               = -1;
-   private int                                _columnIndex_WeatherClouds               = -1;
+   private int                                _columnIndex_TourTypeImage          = -1;
+   private int                                _columnIndex_WeatherClouds          = -1;
    private int                                _columnWidth_TourTypeImage;
    private int                                _columnWidth_WeatherClouds;
    //
@@ -336,11 +336,11 @@ public class TourBookView extends ViewPart implements
     */
    private int                                _natTable_ContextMenuActivator;
    //
-   private int                                _selectedYear                            = -1;
-   private int                                _selectedYearSub                         = -1;
-   private final ArrayList<Long>              _selectedTourIds                         = new ArrayList<>();
+   private int                                _selectedYear                       = -1;
+   private int                                _selectedYearSub                    = -1;
+   private final ArrayList<Long>              _selectedTourIds                    = new ArrayList<>();
    //
-   private TourCollectionFilter               _tourCollectionFilter                    = TourCollectionFilter.COLLECTED_TOURS;
+   private TourCollectionFilter               _tourCollectionFilter               = TourCollectionFilter.COLLECTED_TOURS;
    //
    private boolean                            _isCollapseOthers;
    private boolean                            _isInFireSelection;
@@ -348,14 +348,15 @@ public class TourBookView extends ViewPart implements
    private boolean                            _isInStartup;
    private boolean                            _isLayoutNatTable;
    // auto expand/collapse
-   private boolean                            _isBehaviour_OnSelect_ExpandCollapse     = true;
-   private boolean                            _isBehaviour_SingleExpand_CollapseOthers = true;
+   private boolean                            _isBehaviour_OnSelect_ExpandCollapse;                                      // is disabled by default
+   private boolean                            _isBehaviour_SingleExpand_CollapseOthers;                                  // is disabled by default
    private boolean                            _isInCollapseAll;
    private boolean                            _isInExpandingSelection;
    private boolean                            _isSelectedWithKeyboard;
    private int                                _expandRunnableCounter;
+   private long                               _lastExpandSelectionTime;
    //
-   private final TourDoubleClickState         _tourDoubleClickState                    = new TourDoubleClickState();
+   private final TourDoubleClickState         _tourDoubleClickState               = new TourDoubleClickState();
    //
    private NatTableViewer_TourInfo_ToolTip    _tourInfoToolTip_NatTable;
    private TreeViewerTourInfoToolTip          _tourInfoToolTip_Tree;
@@ -363,8 +364,8 @@ public class TourBookView extends ViewPart implements
    private TagMenuManager                     _tagMenuManager;
    private MenuManager                        _viewerMenuManager_NatTable;
    private MenuManager                        _viewerMenuManager_Tree;
-   private IContextMenuProvider               _viewerContextMenuProvider_NatTable      = new ContextMenuProvider_NatTable();
-   private IContextMenuProvider               _viewerContextMenuProvider_Tree          = new ContextMenuProvider_Tree();
+   private IContextMenuProvider               _viewerContextMenuProvider_NatTable = new ContextMenuProvider_NatTable();
+   private IContextMenuProvider               _viewerContextMenuProvider_Tree     = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues           _subMenu_AdjustTourValues;
    //
@@ -826,6 +827,7 @@ public class TourBookView extends ViewPart implements
        * Convert col def style -> nat table style
        *
        * @param columnStyle
+       *
        * @return
        */
       private HorizontalAlignmentEnum convertColumnAlignment(final int columnStyle) {
@@ -1221,6 +1223,7 @@ public class TourBookView extends ViewPart implements
     *
     * @param parentItem
     * @param allLastChildren
+    *
     * @return
     */
    private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem, final List<TreeViewerItem> allLastChildren) {
@@ -2457,6 +2460,7 @@ public class TourBookView extends ViewPart implements
 
    /**
     * @param event
+    *
     * @return Returns the {@link ColumnDefinition} of the currently selected row or
     *         <code>null</code> when nothing is selected.
     */
@@ -2673,6 +2677,7 @@ public class TourBookView extends ViewPart implements
    /**
     * @param yearSubItem
     * @param allTourIds
+    *
     * @return Return all tours for one yearSubItem
     */
    private void getYearSubTourIDs(final TVITourBookYearCategorized yearSubItem, final LinkedHashSet<Long> allTourIds) {
@@ -3059,6 +3064,9 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
+      /*
+       * Ensure that the selection is valid
+       */
       final TreePath[] selectedTreePaths = treeSelection.getPaths();
       if (selectedTreePaths.length == 0) {
          return;
@@ -3069,7 +3077,7 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
-      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection, selectedTreePath);
+      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection);
    }
 
    /**
@@ -3080,8 +3088,7 @@ public class TourBookView extends ViewPart implements
     * @param treeSelection
     * @param selectedTreePath
     */
-   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection,
-                                                            final TreePath selectedTreePath) {
+   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection) {
 
       if (_isInCollapseAll) {
 
@@ -3101,7 +3108,6 @@ public class TourBookView extends ViewPart implements
             private long           __expandRunnableCounter = ++_expandRunnableCounter;
 
             private ITreeSelection __treeSelection         = treeSelection;
-            private TreePath       __selectedTreePath      = selectedTreePath;
 
             @Override
             public void run() {
@@ -3115,7 +3121,17 @@ public class TourBookView extends ViewPart implements
                   return;
                }
 
-               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(__treeSelection, __selectedTreePath);
+               /*
+                * With Linux the selection event is fired twice when a subcategory, e.g. month is
+                * selected which causes an endless loop !!!
+                */
+               final long now = System.currentTimeMillis();
+               final long timeDiff = now - _lastExpandSelectionTime;
+               if (timeDiff < 200) {
+                  return;
+               }
+
+               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(__treeSelection);
             }
          });
 
@@ -3124,6 +3140,9 @@ public class TourBookView extends ViewPart implements
          if (_isBehaviour_OnSelect_ExpandCollapse) {
 
             // expand folder with one mouse click but not with the keyboard
+
+            final TreePath selectedTreePath = treeSelection.getPaths()[0];
+
             expandCollapseItem((TreeViewerItem) selectedTreePath.getLastSegment());
          }
       }
@@ -3135,8 +3154,20 @@ public class TourBookView extends ViewPart implements
     * @param treeSelection
     * @param selectedTreePath
     */
-   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection,
-                                                                     final TreePath selectedTreePath) {
+   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection) {
+
+      /*
+       * Create expanded elements from the tree selection
+       */
+      final TreePath selectedTreePath = treeSelection.getPaths()[0];
+      final int numSegments = selectedTreePath.getSegmentCount();
+
+      final Object[] expandedElements = new Object[numSegments];
+
+      for (int segmentIndex = 0; segmentIndex < numSegments; segmentIndex++) {
+         expandedElements[segmentIndex] = selectedTreePath.getSegment(segmentIndex);
+      }
+
       _isInExpandingSelection = true;
       {
          final Tree tree = _tourViewer_Tree.getTree();
@@ -3158,7 +3189,7 @@ public class TourBookView extends ViewPart implements
             /*
              * Expand and select selected folder
              */
-            _tourViewer_Tree.setExpandedTreePaths(selectedTreePath);
+            _tourViewer_Tree.setExpandedElements(expandedElements);
             _tourViewer_Tree.setSelection(treeSelection, true);
 
             if (_isBehaviour_OnSelect_ExpandCollapse && isExpanded) {
@@ -3171,7 +3202,7 @@ public class TourBookView extends ViewPart implements
              * Set top item to the previous top item, otherwise the expanded/collapse item is
              * positioned at the bottom and the UI is jumping all the time
              * <p>
-             * Win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * Win behaviour: When an item is set to top which was collapsed before, it will be
              * expanded
              */
             if (topItem.isDisposed() == false) {
@@ -3181,6 +3212,7 @@ public class TourBookView extends ViewPart implements
          tree.setRedraw(true);
       }
       _isInExpandingSelection = false;
+      _lastExpandSelectionTime = System.currentTimeMillis();
    }
 
    private void onSelect_NatTableItem(final SelectionChangedEvent event) {
@@ -3797,10 +3829,12 @@ public class TourBookView extends ViewPart implements
          viewLayoutImage = Images.TourBook_NatTable;
          _isLayoutNatTable = true;
          break;
+
       case CATEGORY_MONTH:
          viewLayoutImage = Images.TourBook_Month;
          _isLayoutNatTable = false;
          break;
+
       case CATEGORY_WEEK:
          viewLayoutImage = Images.TourBook_Week;
          _isLayoutNatTable = false;
