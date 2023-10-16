@@ -25,5 +25,3 @@ repositories/
 *.js.uncompressed.js
 
 *.hprof
-
-**/org.sonarlint.eclipse.core.prefs
