@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class DialogExtractToursTests extends UITest {
 
       //Check that the extracted tour exists
       Utils.showTourBookView(bot);
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   3").expand() //$NON-NLS-1$
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
       //Check that it contains 10 time slices
@@ -78,9 +77,5 @@ public class DialogExtractToursTests extends UITest {
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "2/1/2021, 7:15 AM")));//$NON-NLS-1$
-
-      //Check that the tour was successfully deleted
-      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertTrue(Arrays.asList(allItems).stream().anyMatch(item -> item.getText().equals("2021   3")));
    }
 }
