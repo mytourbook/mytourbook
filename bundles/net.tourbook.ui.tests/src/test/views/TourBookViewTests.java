@@ -23,8 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -134,49 +132,6 @@ public class TourBookViewTests extends UITest {
       assertEquals("19.379", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
-   }
-
-   @Disabled
-   @Test
-   void testDuplicateAndDeleteTour() {
-
-      // Get a tour that can be duplicated
-      SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
-            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
-
-      // Duplicate the tour
-      tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
-      Utils.clickOkButton(bot);
-      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
-
-      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
-      tourStartTimeCalendar.set(2015, 0, 01, 6, 0);
-      // Set a different date than today's date
-      bot.dateTime(0).setDate(tourStartTimeCalendar.getTime());
-      // Set a different time than the current's time
-      bot.dateTime(1).setDate(tourStartTimeCalendar.getTime());
-
-      //Save the tour
-      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
-
-      tour = bot.tree().getTreeItem("2015   2").expand() //$NON-NLS-1$
-            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
-
-      //Delete the tour
-      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
-            Messages.Tour_Book_Action_delete_selected_tours).click();
-      Utils.clickOkButton(bot);
-      Utils.clickOkButton(bot);
-
-      //todo fb to put in the utils function and remove this test now useless
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "1/1/2015, 1:00 PM")));//$NON-NLS-1$
-
-      //Check that the tour was successfully deleted
-      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertTrue(Arrays.asList(allItems).stream().anyMatch(treeItem -> treeItem.getText().equals("2015   1")));//$NON-NLS-1$
    }
 
    /**

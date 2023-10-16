@@ -15,6 +15,7 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
@@ -124,10 +125,22 @@ public class Utils {
    }
 
    public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour) {
+
+      SWTBotTreeItem[] allItems = bot.tree().getAllItems();
+      String[] totalSummary = allItems[allItems.length - 1].getText().split(UI.SPACE3);
+      final int initialTotalValue = Integer.parseInt(totalSummary[1]);
+
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
             Messages.Tour_Book_Action_delete_selected_tours).click();
       Utils.clickOkButton(bot);
       Utils.clickOkButton(bot);
+
+      //Check that the tour was successfully deleted
+      allItems = bot.tree().getAllItems();
+      totalSummary = allItems[allItems.length - 1].getText().split(UI.SPACE3);
+      final int newTotalValue = Integer.parseInt(totalSummary[1]);
+
+      assertEquals(initialTotalValue - 1, newTotalValue);
    }
 
    /**
@@ -150,25 +163,21 @@ public class Utils {
 
       // Duplicate the tour
       tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
-      bot.sleep(1000);
-      final var toto = bot.activeShell().getText();
-      final var titi = bot.shells();
 
-      if (Arrays.stream(titi).anyMatch(shell -> shell.getText().equals("Experimental Feature"))) {
+      bot.sleep(1000);
+
+      final var currentShells = bot.shells();
+      // The experimental dialog message only appears once
+      if (Arrays.stream(currentShells).anyMatch(shell -> shell.getText().equals("Experimental Feature"))) { //$NON-NLS-1$
 
          Utils.clickOkButton(bot);
       }
-//      if (bot.activeShell().getText().equals(tour).button(IDialogConstants.OK_LABEL) != null) {
-//         Utils.clickOkButton(bot);
-//      }
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
       tourStartTimeCalendar.set(2009, 0, 01);
       // Set a different date than today's date
       bot.dateTime(0).setDate(tourStartTimeCalendar.getTime());
-      // Set a different time than the current's time
-      //   bot.dateTime(1).setDate(tourStartTimeCalendar.getTime());
 
       //Save the tour
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
