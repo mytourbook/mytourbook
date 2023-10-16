@@ -70,9 +70,9 @@ public class TourBookViewTests extends UITest {
       bot.sleep(5000);
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "1/31/2021, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "1/31/2021, 7:15 AM: , ø 0°C, min. 0°C, max. 0°C, feels like 0°C, air quality Fair")));//$NON-NLS-1$
    }
 

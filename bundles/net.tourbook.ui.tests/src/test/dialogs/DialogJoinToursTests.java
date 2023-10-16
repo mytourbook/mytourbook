@@ -183,8 +183,8 @@ public class DialogJoinToursTests extends UITest {
       assertNotNull(tourDateTime);
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
-      //February 1, 2021, 6.02am
-      tourStartTimeCalendar.set(2021, 1, 1, 6, 2);
+      //February 1, 2021
+      tourStartTimeCalendar.set(2021, 1, 1);
       tourDateTime.setDate(tourStartTimeCalendar.getTime());
    }
 }

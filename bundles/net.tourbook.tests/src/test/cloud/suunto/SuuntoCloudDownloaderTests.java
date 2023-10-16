@@ -131,7 +131,7 @@ public class SuuntoCloudDownloaderTests {
             if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
-               Display.getDefault().asyncExec(shell::close);
+               Display.getDefault().asyncExec(() -> shell.close());
             }
          }
       });
@@ -190,11 +190,11 @@ public class SuuntoCloudDownloaderTests {
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
       final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             downloadedFilename)));
 
       net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(downloadedFilename));
@@ -214,7 +214,7 @@ public class SuuntoCloudDownloaderTests {
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "Action aborted due to invalid tokens"))); //$NON-NLS-1$
    }
 }
