@@ -55,7 +55,8 @@ New
 Improvements
 ============
 
-* 
+* Tour Concatenation (Frederic):
+  - Added the ability to retrieve the weather when concatenating a tour
 
 
 Changes
