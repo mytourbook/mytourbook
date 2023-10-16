@@ -175,7 +175,7 @@ public class Utils {
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
-      tourStartTimeCalendar.set(2009, 0, 01);
+      tourStartTimeCalendar.set(2009, 0, 1);
       // Set a different date than today's date
       bot.dateTime(0).setDate(tourStartTimeCalendar.getTime());
 
