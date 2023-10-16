@@ -33,7 +33,7 @@ public class DialogQuickEditTests extends UITest {
 
       bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
-      final SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       tour.contextMenu(Messages.app_action_quick_edit).click();
       bot.textWithLabel(Messages.Tour_Action_Weather).setText(OtherMessages.WEATHER_CLOUDS_SUNNY);
@@ -44,6 +44,7 @@ public class DialogQuickEditTests extends UITest {
       //subsequent tests.
       bot.sleep(3000);
 
+      tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
    }
 }
