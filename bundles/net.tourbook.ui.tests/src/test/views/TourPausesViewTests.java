@@ -68,7 +68,7 @@ public class TourPausesViewTests extends UITest {
 
       // arrange
       //todo fb need to reimport also to get the pauses !
-      // protocol => Reimport only the tour pauses and delete them at the end
+      // protocol => Reimport only the tour pauses and (maybe not: delete them at the end)
       Utils.getTourWithSeveralPauses(bot);
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
