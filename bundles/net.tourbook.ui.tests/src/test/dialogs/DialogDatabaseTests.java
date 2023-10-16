@@ -58,16 +58,16 @@ public class DialogDatabaseTests extends UITest {
             "✓" + UI.SPACE2 + "USER.TOURCOMPARED" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURBIKE" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURGEOPARTS" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
-            "✓" + UI.SPACE2 + "USER.DEVICESENSOR" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
-            "✓" + UI.SPACE2 + "USER.DEVICESENSORVALUE" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.DBVERSION" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
-            "✓" + UI.SPACE2 + "USER.DB_VERSION_DATA" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURTAG" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURDATA_TOURTAG" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURTAGCATEGORY" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURTAGCATEGORY_TOURTAG" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURTAGCATEGORY_TOURTAGCATEGORY" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
-            "✓" + UI.SPACE2 + "USER.TOURWAYPOINT" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
+            "✓" + UI.SPACE2 + "USER.TOURWAYPOINT" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
+            "✓" + UI.SPACE2 + "USER.DB_VERSION_DATA" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
+            "✓" + UI.SPACE2 + "USER.DEVICESENSOR" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
+            "✓" + UI.SPACE2 + "USER.DEVICESENSORVALUE" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 
       assertEquals(message, shell.bot().label(message).getText());
 
