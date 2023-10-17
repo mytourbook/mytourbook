@@ -17,6 +17,7 @@ package views;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -31,11 +32,13 @@ public class RawDataViewTests extends UITest {
 
       //Open the view
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
+      final SWTBotView tourImportView = Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
 
       //Switch between UIs
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+
+      tourImportView.close();
    }
 }
