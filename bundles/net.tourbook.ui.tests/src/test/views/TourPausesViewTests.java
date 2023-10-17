@@ -30,12 +30,12 @@ import utils.Utils;
 
 public class TourPausesViewTests extends UITest {
 
-   @Disabled
    @Test
    void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
 
       // arrange
-      Utils.getTourWithSeveralPauses(bot);
+      Utils.importTourWithPauses(bot);
+
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
@@ -60,6 +60,8 @@ public class TourPausesViewTests extends UITest {
       // assert new state
       pausesViewTable = bot.table();
       assertEquals(tableRowCount - 1, pausesViewTable.rowCount());
+
+      Utils.deleteTourWithPauses(bot);
    }
 
    @Disabled
@@ -96,8 +98,6 @@ public class TourPausesViewTests extends UITest {
       pausesViewTable = bot.table();
       assertEquals(Messages.Tour_Pauses_Column_TypeValue_Automatic, pausesViewTable.cell(0, 1));
    }
-
-   @Disabled
 
    @Test
    void testTourPausesView() {

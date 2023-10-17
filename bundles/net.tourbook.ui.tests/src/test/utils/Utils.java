@@ -145,6 +145,17 @@ public class Utils {
       assertEquals(initialTotalValue - 1, newTotalValue);
    }
 
+   public static void deleteTourWithPauses(final SWTWorkbenchBot bot) {
+
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2016   2").expand() //$NON-NLS-1$
+            .getNode("Feb   2").expand().select().getNode("4").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      //Delete the tour
+      Utils.deleteTour(bot, tour);
+   }
+
    public static void deleteTourWithSensors(final SWTWorkbenchBot bot) {
 
       Utils.showTourBookView(bot);
@@ -154,7 +165,6 @@ public class Utils {
 
       //Delete the tour
       Utils.deleteTour(bot, tour);
-
    }
 
    /**
@@ -257,7 +267,7 @@ public class Utils {
       return tour;
    }
 
-   public static void importTourWithSensors(final SWTWorkbenchBot bot) {
+   public static void importTour(final SWTWorkbenchBot bot, final String fileName) {
 
       Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
 
@@ -268,6 +278,7 @@ public class Utils {
 
       bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files");
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_CreateBackup).deselect();
+      bot.textWithLabel(Messages.Dialog_ImportConfig_Label_DeviceFiles).setText(fileName);
 
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_SaveTour).select();
@@ -283,6 +294,14 @@ public class Utils {
 
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+   }
+   public static void importTourWithPauses(final SWTWorkbenchBot bot) {
+
+      importTour(bot,"ParkCity.fitlogEx");
+   }
+
+   public static void importTourWithSensors(final SWTWorkbenchBot bot) {
+      importTour(bot, "2022-02-04-152754-UBERDROID8A2F-9-0.fit");
    }
 
    public static boolean isUrlReachable(final String url) {
