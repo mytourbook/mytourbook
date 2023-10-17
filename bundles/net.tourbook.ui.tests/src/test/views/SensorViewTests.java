@@ -36,6 +36,8 @@ public class SensorViewTests extends UITest {
    @BeforeAll
    static void initialize() {
 
+      // A tour with sensor needs to be imported because the sensors are supported
+      // since MT v21.12
       Utils.importTourWithSensors(bot);
    }
 

@@ -40,6 +40,8 @@ public class TourPausesViewTests extends UITest {
    @BeforeAll
    static void initialize() {
 
+      // A tour with pauses needs to be imported because the pauses are supported
+      // since MT v21.3
       Utils.getTourWithPauses(bot);
    }
 
