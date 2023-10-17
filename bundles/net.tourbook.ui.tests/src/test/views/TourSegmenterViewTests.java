@@ -25,7 +25,6 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -42,8 +41,6 @@ public class TourSegmenterViewTests extends UITest {
    @Test
    void testSegmenterAlgorithms_All() {
 
-     // final var toto = Utils.workingDirectory;
-     // assertEquals("0:06", toto); //$NON-NLS-1$
       Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
@@ -102,7 +99,6 @@ public class TourSegmenterViewTests extends UITest {
       tourSegmenterView.close();
    }
 
-   @Disabled
    @Test
    void testSelectSegments() {
 

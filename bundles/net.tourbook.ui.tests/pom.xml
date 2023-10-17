@@ -41,7 +41,6 @@
              <product>net.tourbook.productWithoutJRE</product>
              <application>net.tourbook.appWithoutJRE</application>
              <skipTests>true</skipTests>
-             <runOrder>random</runOrder>
 
              <!-- Not supported yet by Junit 5, see https://issues.apache.org/jira/browse/SUREFIRE-1710 -->
              <skipAfterFailureCount>1</skipAfterFailureCount> 
