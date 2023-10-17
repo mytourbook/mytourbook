@@ -34,14 +34,14 @@ public class TourPausesViewTests extends UITest {
    void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
 
       // arrange
-      Utils.importTourWithPauses(bot);
+      Utils.getTourWithPauses(bot);
 
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
 
       // assert initial state
-      final int tableRowCount = 5;
+      final int tableRowCount = 1;
       assertEquals(tableRowCount, pausesViewTable.rowCount());
 
       // act
@@ -71,7 +71,7 @@ public class TourPausesViewTests extends UITest {
       // arrange
       //todo fb need to reimport also to get the pauses !
       // protocol => Reimport only the tour pauses and (maybe not: delete them at the end)
-      Utils.getTourWithSeveralPauses(bot);
+      //Utils.getTourWithSeveralPauses(bot);
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);

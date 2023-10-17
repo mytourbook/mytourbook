@@ -242,12 +242,16 @@ public class Utils {
       return tour;
    }
 
-   public static SWTBotTreeItem getTourWithSeveralPauses(final SWTWorkbenchBot bot) {
+
+
+   public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
+
+      importTour(bot,"ParkCity.fitlogEx");
 
       showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2016   2").expand() //$NON-NLS-1$
+            .getNode("Sep   1").expand().select().getNode("19").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       return tour;
@@ -285,6 +289,8 @@ public class Utils {
 
       Utils.clickOkButton(bot);
 
+      bot.sleep(2000);
+
       // Launch the import
       bot.table().doubleClick(0, 0);
 
@@ -295,12 +301,9 @@ public class Utils {
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
    }
-   public static void importTourWithPauses(final SWTWorkbenchBot bot) {
-
-      importTour(bot,"ParkCity.fitlogEx");
-   }
 
    public static void importTourWithSensors(final SWTWorkbenchBot bot) {
+
       importTour(bot, "2022-02-04-152754-UBERDROID8A2F-9-0.fit");
    }
 
