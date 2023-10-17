@@ -41,6 +41,8 @@
              <product>net.tourbook.productWithoutJRE</product>
              <application>net.tourbook.appWithoutJRE</application>
              <skipTests>true</skipTests>
+            <runOrder>random</runOrder>
+            <!-- Not supported yet by Junit 5, see link-->
              <skipAfterFailureCount>1</skipAfterFailureCount> 
              <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
