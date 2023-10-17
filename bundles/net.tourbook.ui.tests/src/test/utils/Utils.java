@@ -243,7 +243,7 @@ public class Utils {
 
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
 
-      importTour(bot, "ParkCity.fitlogEx");
+      importTour(bot, "ParkCity.fitlogEx"); //$NON-NLS-1$
 
       showTourBookView(bot);
 
@@ -277,7 +277,7 @@ public class Utils {
 
       bot.toolbarButton(1).click();
 
-      bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files");
+      bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files"); //$NON-NLS-1$
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_CreateBackup).deselect();
       bot.textWithLabel(Messages.Dialog_ImportConfig_Label_DeviceFiles).setText(fileName);
 
@@ -301,7 +301,7 @@ public class Utils {
 
    public static void importTourWithSensors(final SWTWorkbenchBot bot) {
 
-      importTour(bot, "2022-02-04-152754-UBERDROID8A2F-9-0.fit");
+      importTour(bot, "2022-02-04-152754-UBERDROID8A2F-9-0.fit"); //$NON-NLS-1$
    }
 
    public static boolean isUrlReachable(final String url) {

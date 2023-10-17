@@ -30,7 +30,7 @@ public class TourInfoUITests extends UITest {
 
       //Open the Tour Info UI view
       bot.menu("Tour").menu("Tour Info").click(); //$NON-NLS-1$ //$NON-NLS-2$
-      final SWTBotView tourInfoView = bot.viewByTitle("Tour Info");
+      final SWTBotView tourInfoView = bot.viewByTitle("Tour Info"); //$NON-NLS-1$
       tourInfoView.show();
 
       tourInfoView.close();
