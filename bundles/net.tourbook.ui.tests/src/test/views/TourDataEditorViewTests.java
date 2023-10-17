@@ -18,8 +18,7 @@ package views;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.time.Instant;
-import java.util.Date;
+import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -57,7 +56,10 @@ public class TourDataEditorViewTests extends UITest {
 
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
       assertNotNull(tourDateTime);
-      tourDateTime.setDate(Date.from(Instant.now()));
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      //February 1, 2021
+      tourStartTimeCalendar.set(2021, 1, 1);
+      tourDateTime.setDate(tourStartTimeCalendar.getTime());
 
       final SWTBotSpinner tourHours = bot.spinnerWithTooltip(Messages.Tour_Editor_Label_Hours_Tooltip);
       assertNotNull(tourHours);
@@ -68,6 +70,15 @@ public class TourDataEditorViewTests extends UITest {
       tourRestPulse.setSelection(60);
 
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+
+      //Check that the extracted tour exists
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   3").expand() //$NON-NLS-1$
+            .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      //Delete the tour
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
