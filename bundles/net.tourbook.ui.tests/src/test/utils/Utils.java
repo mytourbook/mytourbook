@@ -49,7 +49,6 @@ public class Utils {
    public static final String SAVE_MODIFIED_TOUR               = "Save modified tour (Ctrl+S)";                                   //$NON-NLS-1$
    public static final String TOOLS                            = "Tools ";                                                        //$NON-NLS-1$
    public static final String VIEW_NAME_COLLATEDTOURS          = PluginProperties.getText("View_Name_CollatedTours");             //$NON-NLS-1$
-
    public static final String VIEW_NAME_ELEVATIONCOMPARE       = PluginProperties.getText("View_Name_Compare_ByElevation");       //$NON-NLS-1$
    public static final String VIEW_NAME_GEOCOMPARE             = PluginProperties.getText("View_Name_Compare_ByGeoParts");        //$NON-NLS-1$
    public static final String VIEW_NAME_HEARTRATEVARIABILITY   = PluginProperties.getText("View_Name_HeartRateVariabilityChart"); //$NON-NLS-1$
@@ -242,11 +241,9 @@ public class Utils {
       return tour;
    }
 
-
-
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
 
-      importTour(bot,"ParkCity.fitlogEx");
+      importTour(bot, "ParkCity.fitlogEx");
 
       showTourBookView(bot);
 
