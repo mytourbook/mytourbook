@@ -29,13 +29,16 @@ public class SensorViewTests extends UITest {
    @Test
    void selectSensors() {
 
-      Utils.importTourWithSensors(bot);
-
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
       final SWTBotView sensorChartView = Utils.showView(bot, "Sensor Chart"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Se&nsor"); //$NON-NLS-1$
       final SWTBotView sensorView = Utils.showView(bot, "Sensor"); //$NON-NLS-1$
+
+      Utils.importTourWithSensors(bot);
+
+      sensorChartView.show();
+      sensorView.show();
 
       final SWTBotTable sensorViewTable = sensorView.bot().table();
       assertEquals(4, sensorViewTable.rowCount());
