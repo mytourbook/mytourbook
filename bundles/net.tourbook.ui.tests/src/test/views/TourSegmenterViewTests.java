@@ -42,8 +42,8 @@ public class TourSegmenterViewTests extends UITest {
    @Test
    void testSegmenterAlgorithms_All() {
 
-      final var toto = Utils.workingDirectory;
-      assertEquals("0:06", toto); //$NON-NLS-1$
+     // final var toto = Utils.workingDirectory;
+     // assertEquals("0:06", toto); //$NON-NLS-1$
       Utils.showView(bot, "Tour Chart"); //$NON-NLS-1$
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
