@@ -145,6 +145,18 @@ public class Utils {
       assertEquals(initialTotalValue - 1, newTotalValue);
    }
 
+   public static void deleteTourWithSensors(final SWTWorkbenchBot bot) {
+
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2022   2").expand() //$NON-NLS-1$
+            .getNode("Feb   2").expand().select().getNode("4").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      //Delete the tour
+      Utils.deleteTour(bot, tour);
+
+   }
+
    /**
     * Select a tour and duplicates it.
     * The tour is duplicated to a specific date so that it can be retrieved any
@@ -324,7 +336,7 @@ public class Utils {
 
    public static SWTBotView showImportView(final SWTWorkbenchBot bot) {
 
-    //Open the view
+      //Open the view
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
       return Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
    }

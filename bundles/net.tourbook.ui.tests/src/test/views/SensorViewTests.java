@@ -51,7 +51,7 @@ public class SensorViewTests extends UITest {
       sensorChartView.close();
       sensorView.close();
 
-      //delete tourWithSensors();
+      Utils.deleteTourWithSensors(bot);
    }
 
 }
