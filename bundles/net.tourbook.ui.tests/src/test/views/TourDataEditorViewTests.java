@@ -132,6 +132,7 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testViewTabs() {
 
+      Utils.getTour(bot);
       Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
