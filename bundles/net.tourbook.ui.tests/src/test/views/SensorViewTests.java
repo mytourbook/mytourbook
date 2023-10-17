@@ -27,6 +27,7 @@ import utils.UITest;
 import utils.Utils;
 
 public class SensorViewTests extends UITest {
+
    @AfterAll
    static void cleanUp() {
 
