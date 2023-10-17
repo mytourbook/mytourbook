@@ -41,7 +41,11 @@
              <product>net.tourbook.productWithoutJRE</product>
              <application>net.tourbook.appWithoutJRE</application>
              <skipTests>true</skipTests>
-             <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
+
+             <!-- Not supported yet by Junit 5, see https://issues.apache.org/jira/browse/SUREFIRE-1710 -->
+             <skipAfterFailureCount>1</skipAfterFailureCount> 
+	     
+	     <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
              <argLine>${tycho.testArgLine} -Djunit.jupiter.extensions.autodetection.enabled=true -DsilentDatabaseUpdate -DlogCalendarProfile</argLine>
          </configuration>

@@ -22,6 +22,8 @@ import net.tourbook.Messages;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -29,17 +31,29 @@ import utils.Utils;
 
 public class TourPausesViewTests extends UITest {
 
+   @AfterAll
+   static void cleanUp() {
+
+      Utils.deleteTourWithPauses(bot);
+   }
+
+   @BeforeAll
+   static void initialize() {
+
+      // A tour with pauses needs to be imported because the pauses are supported
+      // since MT v21.3
+      Utils.getTourWithPauses(bot);
+   }
+
    @Test
    void Given_Pauses_When_DeletePause_Expect_PauseDeleted() {
 
-      // arrange
-      Utils.getTourWithSeveralPauses(bot);
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
 
       // assert initial state
-      final int tableRowCount = 5;
+      final int tableRowCount = 1;
       assertEquals(tableRowCount, pausesViewTable.rowCount());
 
       // act
@@ -63,8 +77,6 @@ public class TourPausesViewTests extends UITest {
    @Test
    void Given_PauseTypeAutomatic_When_ChangeToManual_Expect_PauseTypeManual() {
 
-      // arrange
-      Utils.getTourWithSeveralPauses(bot);
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
@@ -95,10 +107,8 @@ public class TourPausesViewTests extends UITest {
    @Test
    void testTourPausesView() {
 
-      Utils.getTour(bot);
-
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
 
-      bot.table().select("15:40"); //$NON-NLS-1$
+      bot.table().select("1:51"); //$NON-NLS-1$
    }
 }
