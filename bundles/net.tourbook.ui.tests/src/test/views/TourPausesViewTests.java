@@ -101,10 +101,13 @@ public class TourPausesViewTests extends UITest {
    @Test
    void testTourPausesView() {
 
-      Utils.getTour(bot);
+      // arrange
+      Utils.getTourWithPauses(bot);
 
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
 
-      bot.table().select("15:40"); //$NON-NLS-1$
+      bot.table().select("1:51"); //$NON-NLS-1$
+
+      Utils.deleteTourWithPauses(bot);
    }
 }
