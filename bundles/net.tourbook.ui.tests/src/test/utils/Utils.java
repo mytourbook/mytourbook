@@ -270,7 +270,7 @@ public class Utils {
 
    public static void importTour(final SWTWorkbenchBot bot, final String fileName) {
 
-      Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
+      showImportView(bot);
 
       //Switch between UIs
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
