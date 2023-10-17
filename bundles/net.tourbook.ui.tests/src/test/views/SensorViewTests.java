@@ -15,6 +15,8 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,8 @@ public class SensorViewTests extends UITest {
    @Test
    void selectSensors() {
 
+      Utils.importTourWithSensors(bot);
+
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
       final SWTBotView sensorChartView = Utils.showView(bot, "Sensor Chart"); //$NON-NLS-1$
 
@@ -34,16 +38,17 @@ public class SensorViewTests extends UITest {
       final SWTBotView sensorView = Utils.showView(bot, "Sensor"); //$NON-NLS-1$
 
       final SWTBotTable sensorViewTable = sensorView.bot().table();
-      //todo fb, the tour needs to be reimported first arg
-//      assertEquals(4, sensorViewTable.rowCount());
-//      sensorViewTable.select(0);
-//      //This sensor should trigger the graph drawing in the sensor chart view
-//      sensorViewTable.select(1);
-//      sensorViewTable.select(2);
-//      sensorViewTable.select(3);
+      assertEquals(4, sensorViewTable.rowCount());
+      sensorViewTable.select(0);
+      //This sensor should trigger the graph drawing in the sensor chart view
+      sensorViewTable.select(1);
+      sensorViewTable.select(2);
+      sensorViewTable.select(3);
 
       sensorChartView.close();
       sensorView.close();
+
+      //delete tourWithSensors();
    }
 
 }

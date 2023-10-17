@@ -31,8 +31,7 @@ public class RawDataViewTests extends UITest {
       Utils.getTour(bot);
 
       //Open the view
-      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
-      final SWTBotView tourImportView = Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
+      final SWTBotView tourImportView = Utils.showImportView(bot);
 
       //Switch between UIs
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();

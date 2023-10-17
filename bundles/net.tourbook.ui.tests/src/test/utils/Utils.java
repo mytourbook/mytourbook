@@ -245,6 +245,33 @@ public class Utils {
       return tour;
    }
 
+   public static void importTourWithSensors(final SWTWorkbenchBot bot) {
+
+      Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
+
+      //Switch between UIs
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+
+      bot.toolbarButton(1).click();
+
+      bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files");
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_CreateBackup).deselect();
+
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
+      bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_SaveTour).select();
+
+      Utils.clickOkButton(bot);
+
+      // Launch the import
+      bot.table().doubleClick(0, 0);
+
+      final var totot = 2;
+
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
+
+   }
+
    public static boolean isUrlReachable(final String url) {
 
       final HttpRequest request = HttpRequest.newBuilder()
@@ -292,6 +319,13 @@ public class Utils {
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static SWTBotView showImportView(final SWTWorkbenchBot bot) {
+
+    //Open the view
+      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
    }
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
