@@ -86,6 +86,7 @@ Setup the graddle wrapper in the build folder:
    
      https://github.com/mapsforge/vtm/blob/master/docs/desktop.md   
 
+
 ###########################
  Update Eclipse NL repo
 ###########################
@@ -94,10 +95,18 @@ see "build\build.eclipse.4.23.nl.repo\How to update this p2 repo.txt"
 
 
 
+################################################################
+Create Dojo files, when web-UI in net.tourbook.web is modified
+################################################################
+
+   - Set "IS_DEBUG = false" in net.tourbook.web.WEB 
+   - 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
+   - 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
+
+
+
 ###########################
-
 Build with POM (since 16.4)
-
 ###########################
 
 
@@ -160,14 +169,6 @@ Remove debug code
    
      Disable   "<win32>config-win-DEBUG.ini</win32>"
      Enable   "<win32>config-win.ini</win32>"
-
-
-Create Dojo files, when web-UI in net.tourbook.web is modified
---------------------------------------------------------------
-
-   - Set "IS_DEBUG = false" in net.tourbook.web.WEB 
-   - 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
-   - 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
 
 Copy/Merge app files to build folder

@@ -39,7 +39,7 @@ Improvements
   
 * Tour Editor
   - Append or replace the weather description
-    https://github.com/mytourbook/mytourbook/discussions/1069  
+    https://github.com/mytourbook/mytourbook/discussions/1069
 
 * Tour Blog
   - Detect http links in the tour description to make them clickable
@@ -56,6 +56,12 @@ Improvements
 * Tour Data
   - Scroll field content with mouse wheel, page up/down or arrow up/down keys
     https://github.com/mytourbook/mytourbook/issues/1189
+    
+* Autocomplete fields
+  - In tour editor, quick edit dialog, tour marker dialog and TCX export dialog
+  - Increased default height for the popup proposals dialog
+  - Keep selected height when reopened
+    https://github.com/mytourbook/mytourbook/issues/1199
 
 * Color Selector
   - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.

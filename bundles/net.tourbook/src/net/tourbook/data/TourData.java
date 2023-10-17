@@ -9913,7 +9913,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                   // inside a pause
 
-                  final int nextSerieIndex = serieIndex < numTimeSlices
+                  final int nextSerieIndex = serieIndex < numTimeSlices - 1
                         ? serieIndex + 1
                         : serieIndex;
 
