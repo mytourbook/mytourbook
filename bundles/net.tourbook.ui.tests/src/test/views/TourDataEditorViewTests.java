@@ -115,6 +115,7 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testTimeSlicesTab() {
 
+      Utils.getTour(bot);
       final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
