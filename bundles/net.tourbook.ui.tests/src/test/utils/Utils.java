@@ -277,6 +277,8 @@ public class Utils {
 
       bot.toolbarButton(1).click();
 
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Configuration).activate();
+
       bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files"); //$NON-NLS-1$
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_CreateBackup).deselect();
       bot.textWithLabel(Messages.Dialog_ImportConfig_Label_DeviceFiles).setText(fileName);
