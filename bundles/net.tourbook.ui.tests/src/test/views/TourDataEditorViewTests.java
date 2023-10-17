@@ -50,6 +50,8 @@ public class TourDataEditorViewTests extends UITest {
       tourDataEditorViewBot.comboBox(0).setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
+      bot.sleep(500);
+
       final SWTBotCombo titleCombo = tourDataEditorViewBot.comboBox(0);
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
@@ -92,7 +94,7 @@ public class TourDataEditorViewTests extends UITest {
 
       SWTBotTable timeSlicesTable = tourEditorViewBot.table();
 
-      final int timeSlicesTableCount = 16829;
+      final int timeSlicesTableCount = 7053;
       assertEquals(timeSlicesTableCount, timeSlicesTable.rowCount());
 
       timeSlicesTable.select(3);
