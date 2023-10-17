@@ -33,10 +33,10 @@ public class PoiViewTests extends UITest {
 
       //Open the POI view
       bot.toolbarButtonWithTooltip("Search for places and show them on the map (Ctrl+L)").click(); //$NON-NLS-1$
-      final SWTBotView viewByTitle = bot.viewByTitle("Search Places "); //$NON-NLS-1$
-      viewByTitle.show();
+      final SWTBotView searchByPlacesView = bot.viewByTitle("Search Places "); //$NON-NLS-1$
+      searchByPlacesView.show();
 
-      final SWTBot poiViewBot = viewByTitle.bot();
+      final SWTBot poiViewBot = searchByPlacesView.bot();
 
       poiViewBot.comboBox(0).setText("refuge"); //$NON-NLS-1$
       poiViewBot.button(Messages.Poi_View_Button_Search).click();
@@ -48,6 +48,6 @@ public class PoiViewTests extends UITest {
       //Make sure that there are POIs found
       assertTrue(tablePois.rowCount() > 0);
 
-      viewByTitle.close();
+      searchByPlacesView.close();
    }
 }
