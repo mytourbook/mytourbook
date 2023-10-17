@@ -50,8 +50,6 @@ public class TourDataEditorViewTests extends UITest {
       tourDataEditorViewBot.comboBox(0).setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      bot.sleep(500);
-
       final SWTBotCombo titleCombo = tourDataEditorViewBot.comboBox(0);
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
