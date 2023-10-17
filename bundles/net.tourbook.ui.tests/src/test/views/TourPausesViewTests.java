@@ -22,7 +22,6 @@ import net.tourbook.Messages;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -64,14 +63,12 @@ public class TourPausesViewTests extends UITest {
       Utils.deleteTourWithPauses(bot);
    }
 
-   @Disabled
    @Test
    void Given_PauseTypeAutomatic_When_ChangeToManual_Expect_PauseTypeManual() {
 
       // arrange
-      //todo fb need to reimport also to get the pauses !
-      // protocol => Reimport only the tour pauses and (maybe not: delete them at the end)
-      //Utils.getTourWithSeveralPauses(bot);
+      Utils.getTourWithPauses(bot);
+
       Utils.showView(bot, Utils.VIEW_NAME_TOURPAUSES);
       SWTBotTable pausesViewTable = bot.table();
       pausesViewTable.select(0);
@@ -97,6 +94,8 @@ public class TourPausesViewTests extends UITest {
             .click();
       pausesViewTable = bot.table();
       assertEquals(Messages.Tour_Pauses_Column_TypeValue_Automatic, pausesViewTable.cell(0, 1));
+
+      Utils.deleteTourWithPauses(bot);
    }
 
    @Test
