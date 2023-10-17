@@ -19,12 +19,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class SensorViewTests extends UITest {
+   @AfterAll
+   static void cleanUp() {
+
+      Utils.deleteTourWithSensors(bot);
+   }
+
+   @BeforeAll
+   static void initialize() {
+
+      Utils.importTourWithSensors(bot);
+   }
 
    @Test
    void selectSensors() {
@@ -34,8 +47,6 @@ public class SensorViewTests extends UITest {
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Se&nsor"); //$NON-NLS-1$
       final SWTBotView sensorView = Utils.showView(bot, "Sensor"); //$NON-NLS-1$
-
-      Utils.importTourWithSensors(bot);
 
       sensorChartView.show();
       sensorView.show();
@@ -50,8 +61,5 @@ public class SensorViewTests extends UITest {
 
       sensorChartView.close();
       sensorView.close();
-
-      Utils.deleteTourWithSensors(bot);
    }
-
 }
