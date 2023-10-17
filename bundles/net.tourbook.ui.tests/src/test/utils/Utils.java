@@ -59,6 +59,7 @@ public class Utils {
    public static final String VIEW_NAME_PHOTOSTOURSPHOTOS      = PluginProperties.getText("View_Name_PhotoTourPhotos");           //$NON-NLS-1$
    public static final String VIEW_NAME_REFERENCETOURS         = PluginProperties.getText("View_Name_ReferenceTours");            //$NON-NLS-1$
    public static final String VIEW_NAME_SEARCHALL              = PluginProperties.getText("View_Name_SearchAll");                 //$NON-NLS-1$
+   public static final String VIEW_NAME_SEARCHPLACES           = PluginProperties.getText("View_Name_SearchPOI");                 //$NON-NLS-1$
    public static final String VIEW_NAME_STATISTICS             = PluginProperties.getText("view_name_Statistics");                //$NON-NLS-1$
    public static final String VIEW_NAME_STATISTICVALUES        = PluginProperties.getText("View_Name_StatisticValues");           //$NON-NLS-1$
    public static final String VIEW_NAME_TAGGEDTOURS            = PluginProperties.getText("view_name_tagView");                   //$NON-NLS-1$

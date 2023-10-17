@@ -25,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PoiViewTests extends UITest {
 
@@ -33,7 +34,7 @@ public class PoiViewTests extends UITest {
 
       //Open the POI view
       bot.toolbarButtonWithTooltip("Search for places and show them on the map (Ctrl+L)").click(); //$NON-NLS-1$
-      final SWTBotView searchPlacesView = bot.viewByTitle("Search Places "); //$NON-NLS-1$
+      final SWTBotView searchPlacesView = bot.viewByTitle(Utils.VIEW_NAME_SEARCHPLACES);
       searchPlacesView.show();
 
       final SWTBot poiViewBot = searchPlacesView.bot();
