@@ -20,8 +20,6 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 
 public abstract class UITest {
 
@@ -37,18 +35,8 @@ public abstract class UITest {
    protected int                    tourBookView_RecordedTime_Column_Index  = 17;
    protected int                    tourBookView_PausedTime_Column_Index    = 18;
 
-   @AfterAll
-   static void cleanUp() {
-      tourBookView.close();
-   }
-
-   @BeforeAll
-   static void Initialize() {
-
-      // read texts from plugin.properties
-      PluginProperties.getInstance().populate(TourbookPlugin.getBundleContext().getBundle());
-
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_TOURBOOK);
-      tourBookView = Utils.showTourBookView(bot);
+   {
+      PluginProperties.getInstance().populate(TourbookPlugin
+            .getBundleContext().getBundle());
    }
 }
