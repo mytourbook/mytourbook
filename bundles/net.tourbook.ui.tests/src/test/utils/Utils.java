@@ -149,7 +149,7 @@ public class Utils {
 
       Utils.showTourBookView(bot);
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2016   2").expand() //$NON-NLS-1$
-            .getNode("Feb   2").expand().select().getNode("4").select(); //$NON-NLS-1$ //$NON-NLS-2$
+            .getNode("Sep   1").expand().select().getNode("19").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       //Delete the tour
