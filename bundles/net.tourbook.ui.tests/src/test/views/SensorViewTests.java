@@ -50,9 +50,6 @@ public class SensorViewTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Se&nsor"); //$NON-NLS-1$
       final SWTBotView sensorView = Utils.showView(bot, "Sensor"); //$NON-NLS-1$
 
-      sensorChartView.show();
-      sensorView.show();
-
       final SWTBotTable sensorViewTable = sensorView.bot().table();
       assertEquals(4, sensorViewTable.rowCount());
       sensorViewTable.select(0);
