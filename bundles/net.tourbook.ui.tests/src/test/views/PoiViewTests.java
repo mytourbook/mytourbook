@@ -47,5 +47,7 @@ public class PoiViewTests extends UITest {
 
       //Make sure that there are POIs found
       assertTrue(tablePois.rowCount() > 0);
+
+      viewByTitle.close();
    }
 }
