@@ -70,7 +70,7 @@ public class TourSegmenterViewTests extends UITest {
       assertEquals("1:06", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byPower);
-      assertEquals(">0", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("0:01", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byPulse);
       assertEquals(">0", tableSegments.cell(0, 0)); //$NON-NLS-1$
