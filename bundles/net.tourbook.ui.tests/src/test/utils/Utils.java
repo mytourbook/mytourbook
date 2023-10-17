@@ -265,7 +265,7 @@ public class Utils {
       // Launch the import
       bot.table().doubleClick(0, 0);
 
-      final var totot = 2;
+      bot.toolbarButtonWithTooltip(Messages.import_data_action_clear_view_tooltip).click();
 
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_ImportUI_Tooltip).click();
