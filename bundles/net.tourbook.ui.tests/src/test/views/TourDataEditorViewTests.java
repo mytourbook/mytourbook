@@ -73,10 +73,7 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testRemoveTimeSlice() {
 
-      Utils.showTourBookView(bot);
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
 
       final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
 
@@ -99,6 +96,9 @@ public class TourDataEditorViewTests extends UITest {
 
       //Ensuring that the time slice was deleted
       assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
+
+      tour = Utils.selectDuplicatedTour(bot);
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
