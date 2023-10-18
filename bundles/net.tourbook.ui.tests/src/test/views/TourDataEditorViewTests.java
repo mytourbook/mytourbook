@@ -84,7 +84,7 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testRemoveTimeSlice() {
 
-      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+      Utils.duplicateAndGetTour(bot);
 
       final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
 
