@@ -112,10 +112,11 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 51;
+   private static final int TOURBOOK_DB_VERSION = 52;
 
-//   private static final int TOURBOOK_DB_VERSION = 51; // 23.8 ??????
+//   private static final int TOURBOOK_DB_VERSION = 52; // 23.12 ??????
 
+//   private static final int TOURBOOK_DB_VERSION = 51; // 23.8
 //   private static final int TOURBOOK_DB_VERSION = 50; // 23.5
 //   private static final int TOURBOOK_DB_VERSION = 49; // 23.3
 //   private static final int TOURBOOK_DB_VERSION = 48; // 22.6
@@ -1565,9 +1566,10 @@ public class TourDatabase {
    }
 
    /**
-    * Disable runtime statistics by putting this stagement after the result set was read
+    * Disable runtime statistics by putting this statement after the result set was read
     *
     * @param conn
+    *
     * @throws SQLException
     */
    public static void disableRuntimeStatistic(final Connection conn) throws SQLException {
@@ -1604,9 +1606,10 @@ public class TourDatabase {
    }
 
    /**
-    * Get runtime statistics by putting this stagement before the query is executed
+    * Get runtime statistics by putting this statement before the query is executed
     *
     * @param conn
+    *
     * @throws SQLException
     */
    public static void enableRuntimeStatistics(final Connection conn) throws SQLException {
@@ -2014,7 +2017,7 @@ public class TourDatabase {
       });
 
       /*
-       * run in UI thread otherwise the busyindicator fails
+       * run in UI thread otherwise the busy indicator fails
        */
       final Display display = Display.getDefault();
 
@@ -2623,7 +2626,7 @@ public class TourDatabase {
                return true;
             }
 
-//            System.out.println("Table Indicies\n");
+//            System.out.println("Table Indices\n");
 //            System.out.println(
 //
 //                  String.format(
@@ -6009,7 +6012,7 @@ public class TourDatabase {
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        * <p>
        * Run data update AFTER the design version number is updated because the data update uses
-       * connections and entitymanager which is checking the version number.
+       * connections and entity manager which is checking the version number.
        * <p>
        * Also the data structure must be updated otherwise the entity manager fails because the
        * data structure in the database MUST be the same as in the program code.
@@ -6041,6 +6044,7 @@ public class TourDatabase {
          updateDb_050_To_051_DataUpdate(conn, splashManager);
 
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052());
 
       } catch (final SQLException e) {
 
