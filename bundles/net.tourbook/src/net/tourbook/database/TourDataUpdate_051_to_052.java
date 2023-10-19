@@ -40,7 +40,7 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
    @Override
    public boolean updateTourData(final TourData tourData) {
 
-      String airQualityDatabaseValue = IWeather.airQualityIsNotDefined;
+      String airQualityDatabaseValue;
 
       final String translatedAirQuality = tourData.getWeather_AirQuality();
       if (StringUtils.isNullOrEmpty(translatedAirQuality)) {
