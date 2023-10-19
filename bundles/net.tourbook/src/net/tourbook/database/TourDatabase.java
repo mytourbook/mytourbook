@@ -494,6 +494,7 @@ public class TourDatabase {
        * @param columnName
        * @param defaultValue
        *           Default value.
+       *
        * @throws SQLException
        */
       private static void AddColumn_Boolean(final Statement stmt,
@@ -547,6 +548,7 @@ public class TourDatabase {
        * @param columnName
        * @param defaultValue
        *           Default value.
+       *
        * @throws SQLException
        */
       private static void AddColumn_Int(final Statement stmt,
@@ -570,6 +572,7 @@ public class TourDatabase {
        * @param columnName
        * @param defaultValue
        *           Default value.
+       *
        * @throws SQLException
        */
       private static void AddColumn_SmallInt(final Statement stmt,
@@ -594,6 +597,7 @@ public class TourDatabase {
        * @param table
        * @param columnName
        * @param columnWidth
+       *
        * @throws SQLException
        */
       private static void AddColumn_VarCar(final Statement stmt,
@@ -630,6 +634,7 @@ public class TourDatabase {
        * @param columnName
        * @param defaultValue
        *           Default value.
+       *
        * @throws SQLException
        */
       private static void Cleanup_DropColumn(final Statement stmt,
@@ -697,6 +702,7 @@ public class TourDatabase {
        * @param fieldName
        * @param isGenerateID
        *           When <code>true</code> an identity ID is created.
+       *
        * @return
        */
       private static String CreateField_EntityId(final String fieldName, final boolean isGenerateID) {
@@ -721,6 +727,7 @@ public class TourDatabase {
        * @param stmt
        * @param tableName
        * @param indexAndColumnName
+       *
        * @throws SQLException
        */
       private static void CreateIndex(final Statement stmt, final String tableName, final String indexAndColumnName) throws SQLException {
@@ -747,6 +754,7 @@ public class TourDatabase {
        * @param stmt
        * @param tableName
        * @param columnName
+       *
        * @throws SQLException
        */
       private static void CreateIndex_Combined(final Statement stmt,
@@ -776,6 +784,7 @@ public class TourDatabase {
        * @param table
        * @param oldColumnName
        * @param newColumnName
+       *
        * @throws SQLException
        */
       private static void RenameCol(final Statement stmt,
@@ -1183,6 +1192,7 @@ public class TourDatabase {
     * @param tourIds
     *           Tour ID's which should be computed, when <code>null</code>, ALL tours will be
     *           computed.
+    *
     * @return
     */
    public static boolean computeAnyValues_ForAllTours(final IComputeTourValues computeValuesRunner,
@@ -1332,6 +1342,7 @@ public class TourDatabase {
     * @param tourIds
     *           Tour ID's which should be computed, when <code>null</code>, ALL tours will be
     *           computed.
+    *
     * @return
     */
    public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner,
@@ -1648,6 +1659,7 @@ public class TourDatabase {
 
    /**
     * @param tourTypeList
+    *
     * @return Returns a list with all {@link TourType}'s which are currently used (with filter) to
     *         display tours.<br>
     */
@@ -1921,6 +1933,7 @@ public class TourDatabase {
     * entries.
     *
     * @author Stefan F.
+    *
     * @return places as string array.
     */
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourPlaceEnds() {
@@ -1945,6 +1958,7 @@ public class TourDatabase {
     * entries.
     *
     * @author Stefan F.
+    *
     * @return titles as string array.
     */
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourPlaceStarts() {
@@ -1968,6 +1982,7 @@ public class TourDatabase {
     * Getting all tour titles from the database sorted by alphabet and without any double entries.
     *
     * @author Stefan F.
+    *
     * @return titles as string array.
     */
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourTitles() {
@@ -2002,9 +2017,11 @@ public class TourDatabase {
     * Getting one row from the database sorted by alphabet and without any double entries.
     *
     * @author Stefan F.
+    *
     * @param sqlQuery
     *           must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY
     *           tourTitle"
+    *
     * @return places as string array.
     */
    private static ConcurrentSkipListSet<String> getDistinctValues(final String db, final String fieldname) {
@@ -2142,6 +2159,7 @@ public class TourDatabase {
 
    /**
     * @param tagId
+    *
     * @return Returns the tag category notes
     *         <code>null</code>
     */
@@ -2169,6 +2187,7 @@ public class TourDatabase {
 
    /**
     * @param categoryId
+    *
     * @return Returns a {@link TagCollection} with all tags and categories for the category Id
     */
    public static TagCollection getTagEntries(final long categoryId) {
@@ -2213,6 +2232,7 @@ public class TourDatabase {
 
    /**
     * @param tagIds
+    *
     * @return Returns the tag names separated with a comma or an empty string when tagIds are.
     *         <code>null</code>
     */
@@ -2245,6 +2265,7 @@ public class TourDatabase {
 
    /**
     * @param tourTags
+    *
     * @return Returns the tag names separated with a comma or an empty string when not available.
     */
    public static String getTagNames(final Set<TourTag> tourTags) {
@@ -2337,6 +2358,7 @@ public class TourDatabase {
    /**
     * @param tagId
     * @param tagPropertyId
+    *
     * @return Returns the tag's specified property
     */
    public static String getTagPropertyValue(final Long tagId, final String tagPropertyId) {
@@ -2402,6 +2424,7 @@ public class TourDatabase {
     * Get a tour from the database
     *
     * @param tourId
+    *
     * @return Returns the tour data or <code>null</code> if the tour is not in the database
     */
    public static TourData getTourFromDb(final Long tourId) {
@@ -2419,6 +2442,7 @@ public class TourDatabase {
     * Get {@link TourType} from all available tour type by it's id.
     *
     * @param tourTypeId
+    *
     * @return Returns a {@link TourType} from the id or <code>null</code> when tour type is not
     *         available for the id.
     */
@@ -2441,6 +2465,7 @@ public class TourDatabase {
 
    /**
     * @param tourTypeId
+    *
     * @return Returns the name for the {@link TourType} or "- No Tour Type -" when the tour type id
     *         was not found
     */
@@ -2509,6 +2534,7 @@ public class TourDatabase {
     * @param conn
     * @param tableName
     * @param constraintName
+    *
     * @return
     */
    private static boolean isConstraintAvailable(final Connection conn, final String tableName, final String constraintName) {
@@ -2553,6 +2579,7 @@ public class TourDatabase {
     * @param field
     * @param maxLength
     * @param uiFieldName
+    *
     * @return Returns {@link FIELD_VALIDATION} status
     */
    public static FIELD_VALIDATION isFieldValidForSave(final String field,
@@ -2569,6 +2596,7 @@ public class TourDatabase {
     * @param maxLength
     * @param uiFieldName
     * @param isForceTruncation
+    *
     * @return Returns {@link FIELD_VALIDATION} status
     */
    public static FIELD_VALIDATION isFieldValidForSave(final String field,
@@ -2857,6 +2885,7 @@ public class TourDatabase {
     * @param entity
     * @param id
     * @param entityClass
+    *
     * @return Returns the saved entity.
     */
    public static <T> T saveEntity(final T entity, final long id, final Class<?> entityClass) {
@@ -2917,6 +2946,7 @@ public class TourDatabase {
     * @param entity
     * @param id
     * @param entityClass
+    *
     * @return Returns the saved entity
     */
    @SuppressWarnings("unused")
@@ -2978,6 +3008,7 @@ public class TourDatabase {
     * @param isUpdateModifiedDate
     *           When <code>true</code> the modified date is updated. For updating computed field it
     *           does not make sense to set the modified date.
+    *
     * @return persisted {@link TourData} or <code>null</code> when saving fails
     */
    public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
@@ -3061,6 +3092,7 @@ public class TourDatabase {
     * called <b>AFTER</b> all tours are saved
     *
     * @param tourData
+    *
     * @return
     */
    public static TourData saveTour_Concurrent(final TourData tourData, final boolean isUpdateModifiedDate) {
@@ -3260,6 +3292,7 @@ public class TourDatabase {
     * Validates a tour before it is saved
     *
     * @param tourData
+    *
     * @return Returns <code>true</code> when validation is OK, otherwise <code>false</code>
     */
    private static boolean saveTour_PreSaveActions(final TourData tourData) {
@@ -3404,7 +3437,9 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @return Returns <code>true</code> when the week is computed
+    *
     * @throws SQLException
     */
    public static boolean updateTourWeek(final Connection conn,
@@ -3508,6 +3543,7 @@ public class TourDatabase {
     * since db version 5
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createIndex_TourData_005(final Statement stmt) throws SQLException {
@@ -3538,7 +3574,9 @@ public class TourDatabase {
     * <p>
     *
     * @param stmt
+    *
     * @throws SQLException
+    *
     * @since db version 22
     */
    private void createIndex_TourData_022(final Statement stmt) throws SQLException {
@@ -3563,7 +3601,9 @@ public class TourDatabase {
     * <p>
     *
     * @param stmt
+    *
     * @throws SQLException
+    *
     * @since Db version 29
     */
    private void createIndex_TourData_029(final Statement stmt) throws SQLException {
@@ -3582,7 +3622,9 @@ public class TourDatabase {
     * <p>
     *
     * @param stmt
+    *
     * @throws SQLException
+    *
     * @since Db version 33
     */
    private void createIndex_TourData_033(final Statement stmt) throws SQLException {
@@ -3607,7 +3649,9 @@ public class TourDatabase {
     * <p>
     *
     * @param stmt
+    *
     * @throws SQLException
+    *
     * @since Db version 37
     */
    private void createIndex_TourData_037(final Statement stmt) throws SQLException {
@@ -3634,6 +3678,7 @@ public class TourDatabase {
     * Create table {@link #TABLE_DB_VERSION_DATA}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_DbVersion_Data(final Statement stmt, final int initialVersionNumber) throws SQLException {
@@ -3670,6 +3715,7 @@ public class TourDatabase {
     * Create table {@link #TABLE_DB_VERSION_DESIGN}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_DbVersion_Design(final Statement stmt) throws SQLException {
@@ -3699,6 +3745,7 @@ public class TourDatabase {
     * Create table {@link #TABLE_DEVICE_SENSOR}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_DeviceSensor(final Statement stmt) throws SQLException {
@@ -3730,6 +3777,7 @@ public class TourDatabase {
     * Create table {@link #TABLE_DEVICE_SENSOR_VALUE}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_DeviceSensorValues(final Statement stmt) throws SQLException {
@@ -3767,6 +3815,7 @@ public class TourDatabase {
     * create table {@link #TABLE_TOUR_BIKE}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourBike(final Statement stmt) throws SQLException {
@@ -3791,6 +3840,7 @@ public class TourDatabase {
     * create table {@link #TABLE_TOUR_COMPARED}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourCompared(final Statement stmt) throws SQLException {
@@ -3845,6 +3895,7 @@ public class TourDatabase {
     * create table {@link #TABLE_TOUR_DATA}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourData(final Statement stmt) throws SQLException {
@@ -4233,6 +4284,7 @@ public class TourDatabase {
     * create table {@link #}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourGeoParts(final Statement stmt) throws SQLException {
@@ -4257,6 +4309,7 @@ public class TourDatabase {
     * Create table {@link #TABLE_TOUR_MARKER} for {@link TourMarker}.
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourMarker(final Statement stmt) throws SQLException {
@@ -4333,6 +4386,7 @@ public class TourDatabase {
     * create table {@link #TABLE_TOUR_PERSON}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourPerson(final Statement stmt) throws SQLException {
@@ -4378,6 +4432,7 @@ public class TourDatabase {
     * Table is available since db version 16
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourPersonHRZone(final Statement stmt) throws SQLException {
@@ -4413,6 +4468,7 @@ public class TourDatabase {
     * Create table {@link #TABLE_TOUR_PHOTO}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourPhoto(final Statement stmt) throws SQLException {
@@ -4457,6 +4513,7 @@ public class TourDatabase {
     * create table {@link #TABLE_TOUR_REFERENCE}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourReference(final Statement stmt) throws SQLException {
@@ -4493,7 +4550,9 @@ public class TourDatabase {
     * Create table {@link #TABLE_TOUR_TAG} which contains {@link TourTag} entities.
     *
     * @param stmt
+    *
     * @throws SQLException
+    *
     * @since DB version 5
     */
    private void createTable_TourTag(final Statement stmt) throws SQLException {
@@ -4555,7 +4614,9 @@ public class TourDatabase {
     * entities.
     *
     * @param stmt
+    *
     * @throws SQLException
+    *
     * @since DB version 5
     */
    private void createTable_TourTag_Category(final Statement stmt) throws SQLException {
@@ -4648,6 +4709,7 @@ public class TourDatabase {
     * create table {@link #TABLE_TOUR_TYPE}
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourType(final Statement stmt) throws SQLException {
@@ -4708,6 +4770,7 @@ public class TourDatabase {
     * since db version 10
     *
     * @param stmt
+    *
     * @throws SQLException
     */
    private void createTable_TourWayPoint(final Statement stmt) throws SQLException {
@@ -4813,6 +4876,7 @@ public class TourDatabase {
     *         <p>
     *         <b> The pooled connection is not used because the database could be shutdown when it
     *         needs to be upgraded. </b>
+    *
     * @throws SQLException
     */
    private Connection getConnection_Simple() throws SQLException {
@@ -5132,6 +5196,7 @@ public class TourDatabase {
     * Check if the server is available
     *
     * @param splashManager
+    *
     * @throws Throwable
     * @throws MyTourbookException
     */
@@ -5405,6 +5470,7 @@ public class TourDatabase {
    /**
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
+    *
     * @return <code>true</code> when design version is updated to the last version, returns
     *         <code>false</code> when an error occurred
     */
@@ -5487,6 +5553,7 @@ public class TourDatabase {
     *
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
+    *
     * @return <code>true</code> when data version is updated to the last version, returns
     *         <code>false</code> when an error occurred
     */
@@ -5548,6 +5615,7 @@ public class TourDatabase {
     *
     * @param dbVersionBeforeUpdate
     * @param splashManager
+    *
     * @return
     */
    private void sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(final int dbVersionBeforeUpdate, final SplashManager splashManager) {
@@ -5639,7 +5707,9 @@ public class TourDatabase {
     * BOOLEAN datatype or Lucene fulltext index is used
     *
     * @param splashManager
+    *
     * @return
+    *
     * @throws SQLException
     */
    private void sqlStartup_UpgradeDerbyDatabase(final SplashManager splashManager) throws SQLException {
@@ -6126,6 +6196,7 @@ public class TourDatabase {
     *           {@link ITourDataUpdate} interface to update a tour
     * @param tourId
     *           Tour ID of the tour to be updated
+    *
     * @return
     */
    private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
@@ -6617,6 +6688,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_010_To_011_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -6786,6 +6858,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_012_To_013_DataUpdate(final Connection conn) throws SQLException {
@@ -7115,6 +7188,7 @@ public class TourDatabase {
     * Increase {@link TourData#serieData} blob size.
     *
     * @param conn
+    *
     * @throws SQLException
     */
    private void updateDb_019_To_020_10_DataSerieBlobSize(final Connection conn) throws SQLException {
@@ -7168,6 +7242,7 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_019_To_020_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7348,6 +7423,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_021_To_022_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7557,6 +7633,7 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_022_To_023_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7722,6 +7799,7 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    public void updateDb_024_To_025_DataUpdate(final Connection conn, final Object progress) throws SQLException {
@@ -7923,6 +8001,7 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_027_To_028_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8066,6 +8145,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_028_To_029_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8250,6 +8330,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_031_To_032_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8368,6 +8449,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_033_To_034_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8562,6 +8644,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_036_To_037_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8741,6 +8824,7 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_039_To_040_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8863,7 +8947,9 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @return
+    *
     * @throws SQLException
     */
    private int updateDb_040_To_041(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -8967,7 +9053,9 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @return Data update version when the data update is successfully run
+    *
     * @throws MyTourbookException
     * @throws SQLException
     * @throws Exception
@@ -9128,7 +9216,9 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @return
+    *
     * @throws SQLException
     */
    private int updateDb_043_To_044(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -9238,7 +9328,9 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @return
+    *
     * @throws SQLException
     */
    private int updateDb_044_To_045(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -9275,7 +9367,9 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @return
+    *
     * @throws SQLException
     */
    private int updateDb_045_To_046(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -9308,7 +9402,9 @@ public class TourDatabase {
     *
     * @param conn
     * @param splashManager
+    *
     * @return
+    *
     * @throws SQLException
     */
    private int updateDb_046_To_047(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -9601,6 +9697,7 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_049_To_050_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -9763,6 +9860,7 @@ public class TourDatabase {
    /**
     * @param conn
     * @param splashManager
+    *
     * @throws SQLException
     */
    private void updateDb_050_To_051_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
