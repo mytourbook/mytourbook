@@ -108,7 +108,7 @@ public class TourDataEditorViewTests extends UITest {
       //Ensuring that the time slice was deleted
       assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
 
-      SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
+      final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
    }
 
