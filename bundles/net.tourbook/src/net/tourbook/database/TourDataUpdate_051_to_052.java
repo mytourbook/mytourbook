@@ -28,14 +28,14 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
    }
 
    /**
-    * For each of the language containing translated strings for the air quality
+    * For each tour containing translated strings for the air quality
     * (as of 23.10), this function updates the database by saving a unique air
-    * quality identifier instead of the translated string.
+    * quality identifier instead of the existing translated string.
     *
     * See issue: https://github.com/mytourbook/mytourbook/issues/1193
     *
-    * Note that because the German translation was changed in 23.8, the function
-    * has 2 german translations for each air quality ids.
+    * Note that because the German translations were changed in 23.8, the function
+    * can have 2 german translations for each air quality ids.
     */
    @Override
    public boolean updateTourData(final TourData tourData) {
