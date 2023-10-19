@@ -40,13 +40,12 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
    @Override
    public boolean updateTourData(final TourData tourData) {
 
-      String airQualityDatabaseValue;
-
       final String translatedAirQuality = tourData.getWeather_AirQuality();
       if (StringUtils.isNullOrEmpty(translatedAirQuality)) {
          return false;
       }
 
+      String airQualityDatabaseValue;
       switch (translatedAirQuality) {
 
       case "Gut":
