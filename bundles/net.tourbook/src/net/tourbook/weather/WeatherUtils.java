@@ -262,12 +262,12 @@ public class WeatherUtils {
       }
 
       // Air Quality
-      final String airQuality = tourData.getWeather_AirQuality();
-      if (StringUtils.hasContent(airQuality)) {
+      final int airQualityTextIndex = tourData.getWeather_AirQuality_TextIndex();
+      if (airQualityTextIndex > 0) {
 
          weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality +
                UI.SPACE +
-               airQuality);
+               IWeather.airQualityTexts[airQualityTextIndex]);
       }
 
       // Humidity
