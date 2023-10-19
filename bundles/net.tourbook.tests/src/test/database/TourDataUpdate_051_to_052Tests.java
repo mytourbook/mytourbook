@@ -30,7 +30,7 @@ import utils.Initializer;
 public class TourDataUpdate_051_to_052Tests {
 
    @Test
-   void testUpdateTourData() {
+   void testUpdateTourData_AirQuality() {
 
       final TourDataUpdate_051_to_052 tourDataUpdate_051_to_052 = new TourDataUpdate_051_to_052();
 
