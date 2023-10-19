@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 
@@ -41,7 +42,12 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
 
       String airQualityDatabaseValue = IWeather.airQualityIsNotDefined;
 
-      switch (tourData.getWeather_AirQuality()) {
+      final String translatedAirQuality = tourData.getWeather_AirQuality();
+      if (StringUtils.isNullOrEmpty(translatedAirQuality)) {
+         return false;
+      }
+
+      switch (translatedAirQuality) {
 
       case "Gut":
       case "Bon":
@@ -51,8 +57,8 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
          airQualityDatabaseValue = IWeather.AIRQUALITY_ID_GOOD;
          break;
 
-      case "Sch\\u00F6n": //23.5
-      case "Mittelm\\u00E4ssig": // 23.8
+      case "Schön": //23.5
+      case "Mittelmässig": // 23.8
       case "Acceptable":
       case "Discreta":
       case "Redelijk":
@@ -70,7 +76,7 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
          break;
 
       case "Schlecht": //23.5
-      case "\\u00C4usserst Ungesund": // 23.8
+      case "Äusserst Ungesund": // 23.8
       case "Mauvais":
       case "Scarsa":
       case "Slecht":
@@ -79,8 +85,8 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
          break;
 
       case "Sehr schlecht": //23.5
-      case "Gef\\u00E4hrlich": // 23.8
-      case "Tr\\u00E8s mauvais":
+      case "Gefährlich": // 23.8
+      case "Très mauvais":
       case "Molto scarsa":
       case "Zeer slecht":
       case "Very poor":
@@ -88,7 +94,7 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
          break;
 
       default:
-         break;
+         return false;
       }
 
       tourData.setWeather_AirQuality(airQualityDatabaseValue);
