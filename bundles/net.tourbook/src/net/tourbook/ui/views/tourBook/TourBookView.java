@@ -1946,7 +1946,12 @@ public class TourBookView extends ViewPart implements
 
          if (UI.isCtrlKey(keyEvent) && UI.isShiftKey(keyEvent)
 
-               && keyEvent.keyCode == SWT.DEL) {
+               && (keyEvent.keyCode == SWT.DEL
+
+                     // Mac has no DEL key, support also BACKSPACE
+                     || keyEvent.keyCode == SWT.BS)
+
+         ) {
 
             // call action which is deleting selected tours
             _actionDeleteTour.run();
