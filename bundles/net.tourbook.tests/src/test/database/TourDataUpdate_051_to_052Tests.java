@@ -72,10 +72,10 @@ public class TourDataUpdate_051_to_052Tests {
       assertTrue(isUpdated);
       assertEquals(IWeather.AIRQUALITY_ID_VERYPOOR, tourData.getWeather_AirQuality());
 
-      tourData.setWeather_AirQuality(UI.EMPTY_STRING);
+      tourData.setWeather_AirQuality(UI.ISO_8859_1);
       isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
 
       assertFalse(isUpdated);
-      assertEquals(UI.EMPTY_STRING, tourData.getWeather_AirQuality());
+      assertEquals(UI.ISO_8859_1, tourData.getWeather_AirQuality());
    }
 }
