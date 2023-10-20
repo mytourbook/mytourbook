@@ -2340,7 +2340,7 @@ public class TourInfoUI {
       _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
       _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100.0));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100f));
       _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(vertSpeed_TimeGain / sumTime * 100f));
       _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
 
