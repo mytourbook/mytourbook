@@ -146,7 +146,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       _numberOfAvailableTours = new int[1];
       final int[] numberOfDownloadedTours = new int[1];
 
-      final Job runnable = new Job(Messages.Dialog_DownloadWorkoutsFromSuunto_Task) {
+      final Job job = new Job(Messages.Dialog_DownloadWorkoutsFromSuunto_Task) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
@@ -206,6 +206,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.worked(1);
 
+            monitor.done();
+
             return Status.OK_STATUS;
          }
       };
@@ -216,9 +218,10 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          TourLogManager.showLogView();
          TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
-         runnable.schedule();
+         job.setPriority(Job.INTERACTIVE);
+         job.schedule();
 
-         runnable.addJobChangeListener(new JobChangeAdapter() {
+         job.addJobChangeListener(new JobChangeAdapter() {
             @Override
             public void done(final IJobChangeEvent event) {
 
