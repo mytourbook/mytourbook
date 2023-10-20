@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDataUpdate_051_to_052;
@@ -35,12 +36,11 @@ public class TourDataUpdate_051_to_052Tests {
       final TourDataUpdate_051_to_052 tourDataUpdate_051_to_052 = new TourDataUpdate_051_to_052();
 
       final TourData tourData = Initializer.createManualTour();
-      tourData.setWeather_AirQuality("Schön");
+      tourData.setWeather_AirQuality("Schön"); //$NON-NLS-1$
       boolean isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
 
       assertTrue(isUpdated);
       assertEquals(IWeather.AIRQUALITY_ID_FAIR, tourData.getWeather_AirQuality());
-
 
       tourData.setWeather_AirQuality(null);
       isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
@@ -48,28 +48,34 @@ public class TourDataUpdate_051_to_052Tests {
       assertFalse(isUpdated);
       assertEquals(null, tourData.getWeather_AirQuality());
 
-      tourData.setWeather_AirQuality("Bon");
+      tourData.setWeather_AirQuality("Bon"); //$NON-NLS-1$
       isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
 
       assertTrue(isUpdated);
       assertEquals(IWeather.AIRQUALITY_ID_GOOD, tourData.getWeather_AirQuality());
 
-      tourData.setWeather_AirQuality("Moderat");
+      tourData.setWeather_AirQuality("Moderat"); //$NON-NLS-1$
       isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
 
       assertTrue(isUpdated);
       assertEquals(IWeather.AIRQUALITY_ID_MODERATE, tourData.getWeather_AirQuality());
 
-      tourData.setWeather_AirQuality("Äusserst Ungesund");
+      tourData.setWeather_AirQuality("Äusserst Ungesund"); //$NON-NLS-1$
       isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
 
       assertTrue(isUpdated);
       assertEquals(IWeather.AIRQUALITY_ID_POOR, tourData.getWeather_AirQuality());
 
-      tourData.setWeather_AirQuality("Très mauvais");
+      tourData.setWeather_AirQuality("Très mauvais"); //$NON-NLS-1$
       isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
 
       assertTrue(isUpdated);
       assertEquals(IWeather.AIRQUALITY_ID_VERYPOOR, tourData.getWeather_AirQuality());
+
+      tourData.setWeather_AirQuality(UI.EMPTY_STRING);
+      isUpdated = tourDataUpdate_051_to_052.updateTourData(tourData);
+
+      assertFalse(isUpdated);
+      assertEquals(UI.EMPTY_STRING, tourData.getWeather_AirQuality());
    }
 }
