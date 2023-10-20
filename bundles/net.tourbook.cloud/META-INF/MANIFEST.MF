@@ -6,6 +6,7 @@ Bundle-Version: 23.10.0.qualifier
 Bundle-Activator: net.tourbook.cloud.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
+ org.eclipse.jface.notifications,
  net.tourbook.common,
  net.tourbook.ext.jars,
  net.tourbook.ext.velocity,

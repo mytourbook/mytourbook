@@ -59,7 +59,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.notifications.NotificationPopup;
+import org.eclipse.jface.notifications.NotificationPopup.Builder;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -227,43 +228,22 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                   PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
                      TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-                     MessageDialog.openInformation(
-                           PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-                           Messages.Dialog_UploadToursToStrava_Title,
-                           NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
-                                 0,
-                                 0));
+                     final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
+                           numberOfDownloadedTours[0],
+                           _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
+
+                     final Builder totot = NotificationPopup.forDisplay(Display.getCurrent());
+                     final NotificationPopup notication = totot
+                           .text(infoText)
+                           .title(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, false)
+                           .fadeIn(true)
+                           .delay(2000)
+                           .build();
+                     notication.open();
                   });
                }
             }
-
          });
-
-//         final String titleText = Messages.Dialog_DownloadWorkoutsFromSuunto_Title;
-//         final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
-//               numberOfDownloadedTours[0],
-//               _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
-//         final PopupDialog dialog = new PopupDialog(null,
-//               PopupDialog.INFOPOPUP_SHELLSTYLE,
-//               true,
-//               true,
-//               true,
-//               true,
-//               true,
-//               titleText,
-//               infoText) {
-//
-//            @Override
-//            protected Control createDialogArea(final Composite parent) {
-//               final Composite composite = (Composite) super.createDialogArea(parent);
-//               final Label text = new Label(composite, SWT.SINGLE);
-//               text.setText("There is a update for your plugin, please install them before proceed!");
-//               return composite;
-//            }
-//
-//         };
-//
-//         dialog.open();
 
       } catch (final Exception e) {
          StatusUtil.log(e);
