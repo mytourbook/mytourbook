@@ -668,6 +668,9 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
+         final String oldAirQuality = oldTourData.getWeather_AirQuality_TextIndex() == 0 ? UI.EMPTY_STRING : IWeather.airQualityTexts[oldTourData
+               .getWeather_AirQuality_TextIndex()];
+
          previousData.add(
                oldTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + UI.COMMA_SPACE +
                      UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
@@ -678,7 +681,11 @@ public class RawDataManager {
                      + UI.COMMA_SPACE +
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     IWeather.airQualityTexts[oldTourData.getWeather_AirQuality_TextIndex()]);
+                     oldAirQuality);
+
+         final String newAirQuality = newTourData.getWeather_AirQuality_TextIndex() == 0 ? UI.EMPTY_STRING : IWeather.airQualityTexts[newTourData
+               .getWeather_AirQuality_TextIndex()];
+
          newData.add(
                newTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE +
                      UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
@@ -689,7 +696,7 @@ public class RawDataManager {
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_WindChill()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     IWeather.airQualityTexts[newTourData.getWeather_AirQuality_TextIndex()]);
+                     newAirQuality);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
