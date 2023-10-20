@@ -35,7 +35,6 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
@@ -409,6 +408,7 @@ public class TourInfoUI {
     * @param tourData
     * @param tourToolTipProvider
     * @param tourProvider
+    *
     * @return Returns the content area control
     */
    public Composite createContentArea(final Composite parent,
@@ -2211,10 +2211,10 @@ public class TourInfoUI {
       }
 
       // Air Quality
-      final String airQuality = _tourData.getWeather_AirQuality();
-      if (StringUtils.hasContent(airQuality) && !airQuality.equals(IWeather.airQualityIsNotDefined)) {
+      final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
+      if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(airQuality);
+         _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
       }
 
       // Average temperature
