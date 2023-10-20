@@ -1809,6 +1809,9 @@ public class TourBookView extends ViewPart implements
       // prevent sorting columns with Alt key which sorting is disabled
       uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.MOD3), null);
 
+      // delete a tour with the delete/backspace key
+      final NatTable_KeyAction_DeleteTours natTable_KeyAction_DeleteTours = new NatTable_KeyAction_DeleteTours();
+
       uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(
 
             // <Ctrl><Shift>
@@ -1816,7 +1819,17 @@ public class TourBookView extends ViewPart implements
 
             SWT.DEL),
 
-            new NatTable_KeyAction_DeleteTours());
+            natTable_KeyAction_DeleteTours);
+
+      uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(
+
+            // <Ctrl><Shift>
+            SWT.MOD1 | SWT.MOD2,
+
+            // Mac has no DEL key, support also BACKSPACE
+            SWT.BS),
+
+            natTable_KeyAction_DeleteTours);
 
       /*
        * Setup NatTable configuration
@@ -1946,7 +1959,12 @@ public class TourBookView extends ViewPart implements
 
          if (UI.isCtrlKey(keyEvent) && UI.isShiftKey(keyEvent)
 
-               && keyEvent.keyCode == SWT.DEL) {
+               && (keyEvent.keyCode == SWT.DEL
+
+                     // Mac has no DEL key, support also BACKSPACE
+                     || keyEvent.keyCode == SWT.BS)
+
+         ) {
 
             // call action which is deleting selected tours
             _actionDeleteTour.run();
