@@ -2322,7 +2322,7 @@ public class TourInfoUI {
       final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
       final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
 
-      final int   sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss;
+      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss;
       final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
       final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
@@ -2340,7 +2340,7 @@ public class TourInfoUI {
       _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
       _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100.0));
       _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(vertSpeed_TimeGain / sumTime * 100f));
       _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
 
