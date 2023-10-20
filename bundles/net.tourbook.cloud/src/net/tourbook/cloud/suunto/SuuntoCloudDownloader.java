@@ -60,7 +60,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.notifications.NotificationPopup;
-import org.eclipse.jface.notifications.NotificationPopup.Builder;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -147,14 +146,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       _numberOfAvailableTours = new int[1];
       final int[] numberOfDownloadedTours = new int[1];
 
-      final Job runnable = new Job(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
-            12,
-            "TOTO")) {
+      final Job runnable = new Job(Messages.Dialog_DownloadWorkoutsFromSuunto_Task) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
 
-            monitor.beginTask(Messages.Dialog_DownloadWorkoutsFromSuunto_Task, 2);
+            monitor.beginTask(UI.EMPTY_STRING, 3);
 
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
@@ -173,6 +170,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                         UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND,
                         UI.EMPTY_STRING,
                         UI.EMPTY_STRING }));
+            monitor.worked(1);
 
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
@@ -232,11 +230,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                            numberOfDownloadedTours[0],
                            _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
 
-                     final Builder totot = NotificationPopup.forDisplay(Display.getCurrent());
-                     final NotificationPopup notication = totot
+                     final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
                            .text(infoText)
                            .title(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, false)
-                           .fadeIn(true)
                            .delay(2000)
                            .build();
                      notication.open();
