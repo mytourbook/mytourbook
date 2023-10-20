@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
@@ -56,12 +54,16 @@ import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
@@ -144,10 +146,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       _numberOfAvailableTours = new int[1];
       final int[] numberOfDownloadedTours = new int[1];
 
-      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      final Job runnable = new Job(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
+            12,
+            "TOTO")) {
 
          @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+         public IStatus run(final IProgressMonitor monitor) {
 
             monitor.beginTask(Messages.Dialog_DownloadWorkoutsFromSuunto_Task, 2);
 
@@ -155,12 +159,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
                TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
-               return;
+               return Status.CANCEL_STATUS;
             }
 
             if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
                TourLogManager.log_ERROR(Messages.Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder);
-               return;
+               return Status.CANCEL_STATUS;
             }
 
             monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
@@ -173,7 +177,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             final Workouts workouts = retrieveWorkoutsList();
             if (workouts.payload.isEmpty()) {
                TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound);
-               return;
+               return Status.CANCEL_STATUS;
             }
 
             final List<Long> tourStartTimes = retrieveAllTourStartTimes();
@@ -181,12 +185,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             //Identifying the workouts that have not yet been imported in the tour database
             final List<Payload> newWorkouts = workouts.payload.stream()
                   .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L))
-                  .collect(Collectors.toList());
+                  .toList();
 
             final int numNewWorkouts = newWorkouts.size();
             if (numNewWorkouts == 0) {
                TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist);
-               return;
+               return Status.CANCEL_STATUS;
             }
 
             _numberOfAvailableTours[0] = numNewWorkouts;
@@ -202,6 +206,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             numberOfDownloadedTours[0] = downloadFiles(newWorkouts, monitor);
 
             monitor.worked(1);
+
+            return Status.OK_STATUS;
          }
       };
 
@@ -211,18 +217,55 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          TourLogManager.showLogView();
          TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+         runnable.schedule();
 
-         TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+         runnable.addJobChangeListener(new JobChangeAdapter() {
+            @Override
+            public void done(final IJobChangeEvent event) {
 
-         MessageDialog.openInformation(
-               Display.getDefault().getActiveShell(),
-               Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
-               NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
-                     numberOfDownloadedTours[0],
-                     _numberOfAvailableTours[0] - numberOfDownloadedTours[0]));
+               if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+                  PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+                     TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-      } catch (final InvocationTargetException | InterruptedException e) {
+                     MessageDialog.openInformation(
+                           PlatformUI.getWorkbench().getDisplay().getActiveShell(),
+                           Messages.Dialog_UploadToursToStrava_Title,
+                           NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
+                                 0,
+                                 0));
+                  });
+               }
+            }
+
+         });
+
+//         final String titleText = Messages.Dialog_DownloadWorkoutsFromSuunto_Title;
+//         final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
+//               numberOfDownloadedTours[0],
+//               _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
+//         final PopupDialog dialog = new PopupDialog(null,
+//               PopupDialog.INFOPOPUP_SHELLSTYLE,
+//               true,
+//               true,
+//               true,
+//               true,
+//               true,
+//               titleText,
+//               infoText) {
+//
+//            @Override
+//            protected Control createDialogArea(final Composite parent) {
+//               final Composite composite = (Composite) super.createDialogArea(parent);
+//               final Label text = new Label(composite, SWT.SINGLE);
+//               text.setText("There is a update for your plugin, please install them before proceed!");
+//               return composite;
+//            }
+//
+//         };
+//
+//         dialog.open();
+
+      } catch (final Exception e) {
          StatusUtil.log(e);
          Thread.currentThread().interrupt();
       }
@@ -403,15 +446,15 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       final CompletableFuture<WorkoutDownload> workoutDownload =
             OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
-            .thenApply(response -> writeFileToFolder(workoutPayload, response))
-            .exceptionally(e -> {
-               final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutPayload.workoutKey);
-               erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_007_Error,
-                     erroneousDownload.getWorkoutKey(),
-                     e.getMessage()));
-               erroneousDownload.setSuccessfullyDownloaded(false);
-               return erroneousDownload;
-            });
+                  .thenApply(response -> writeFileToFolder(workoutPayload, response))
+                  .exceptionally(e -> {
+                     final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutPayload.workoutKey);
+                     erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_007_Error,
+                           erroneousDownload.getWorkoutKey(),
+                           e.getMessage()));
+                     erroneousDownload.setSuccessfullyDownloaded(false);
+                     return erroneousDownload;
+                  });
 
       return workoutDownload;
    }
