@@ -1,4 +1,4 @@
-23.10.0                                                 ?. October 2023
+23.10.0                                                 22. October 2023
 
 
 Improvements
@@ -64,7 +64,8 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1199
 
 * Color Selector
-  - Save and restore custom colors (16 for Windows) that every time when the color selector is opened, that the previous custom colors are available again.
+  - Save and restore custom colors (16 for Windows) that every time when 
+    the color selector is opened, that the previous custom colors are available again.
     https://github.com/mytourbook/mytourbook/issues/1169
     
 * macOS ARM
@@ -76,13 +77,16 @@ Changes
 =======
 
 * Reference Tours
-  - Reference tours are now filtered by the selected person and tour type in the app toolbar
+  - Reference tours are now filtered by the selected person and tour type 
+    in the app toolbar
 
 * Statistics
-  - The year in the week start date are now displayed with 4 digits instead of 2 when the statistic values are copied into the clipboard
+  - The year in the week start date are now displayed with 4 digits 
+    instead of 2 when the statistic values are copied into the clipboard
 
 * Tour Segmenter
-  - The tour segmenter color for total values is used for the foreground color and not for the background color
+  - The tour segmenter color for total values is used for the foreground 
+    color and not for the background color
 
 
 Bugfix
@@ -93,19 +97,22 @@ Bugfix
     https://github.com/mytourbook/mytourbook/issues/1171
 
 * Calendar View (Frederic)
-  - Fix for a regression that caused the "Link with other views" button to be not persisted. The regression appeared in v18.9.0
+  - Fix for a regression that caused the "Link with other views" button 
+    to be not persisted. The regression appeared in v18.9.0
 
 * Tour Blog View & Tour Analyzer View (Frederic)
   - Refreshing each view when the measurement system is changed
 
 * Tour Analyzer View (Frederic)
-  - Some values are not properly computed when the measurement system is changed (averages: elevation, gradient)
+  - Some values are not properly computed when the measurement system is 
+    changed (averages: elevation, gradient)
 
 * Tour Editor (Frederic)
-  - Fix for linux async event (when using the tour editor, the tour chart and the segmenter view and switching from imperial to metric or vice-versa)
+  - Fix for linux async event (when using the tour editor, the tour chart 
+    and the segmenter view and switching from imperial to metric or vice-versa)
 
 
-Translation    
+Translation
 ===========
 
 - Dutch (Maarten)
@@ -113,12 +120,13 @@ Translation
 - German
 - Italian (Doriano)
 
- 
-System   
+
+System
 ======
 
 * MyTourbook Milestone 23.10  https://github.com/mytourbook/mytourbook/milestone/12?closed=1
-* Eclipse 2023-06 (4.28)
+* Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
 * NatTable 2.10               https://www.eclipse.org/nattable/download.php
-* FIT SDK 21.120.2			  https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.120.2            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
