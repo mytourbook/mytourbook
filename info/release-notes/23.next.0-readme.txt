@@ -67,7 +67,9 @@ Changes
 Bugfix
 ======
 
-* 
+* Air Quality
+  - The air quality texts were saved using the translated texts instead of a unique id.
+  https://github.com/mytourbook/mytourbook/issues/1193
 
 
 Translation    
