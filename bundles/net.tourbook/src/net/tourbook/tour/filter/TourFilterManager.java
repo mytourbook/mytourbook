@@ -768,6 +768,7 @@ public class TourFilterManager {
 
    /**
     * @param filterField
+    *
     * @return Returns the configuration for a filter field.
     */
    static TourFilterFieldConfig getFieldConfig(final TourFilterFieldId filterField) {
@@ -833,6 +834,7 @@ public class TourFilterManager {
    /**
     * @param requestedFieldId
     * @param startIndex
+    *
     * @return Returns the index of the requested field id.
     */
    static int getFilterFieldIndex(final TourFilterFieldId requestedFieldId) {
@@ -1038,7 +1040,7 @@ public class TourFilterManager {
 
                getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             } else {
-               final String text1 = VALUES_AIRQUALITY[selectedIndex];
+               final String text1 = IWeather.airQualityIds[selectedIndex];
                getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
             }
             break;
@@ -1142,6 +1144,7 @@ public class TourFilterManager {
       case LESS_THAN:
          getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
+
       case LESS_THAN_OR_EQUAL:
          //To be less than or equal, we include the next day (i.e.: + 86400_000)
          getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + TimeTools.DAY_MILLISECONDS);
@@ -1151,6 +1154,7 @@ public class TourFilterManager {
          //To be greater than, we go to the next day (i.e.: + 86400_000)
          getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1 + TimeTools.DAY_MILLISECONDS, OP_AND);
          break;
+
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
@@ -1159,6 +1163,7 @@ public class TourFilterManager {
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + TimeTools.DAY_MILLISECONDS);
          break;
+
       case NOT_EQUALS:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value1 + TimeTools.DAY_MILLISECONDS, false);
          break;
@@ -1166,6 +1171,7 @@ public class TourFilterManager {
       case BETWEEN:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, true);
          break;
+
       case NOT_BETWEEN:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
          break;
@@ -1229,6 +1235,7 @@ public class TourFilterManager {
       case LESS_THAN:
          getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
+
       case LESS_THAN_OR_EQUAL:
          getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
@@ -1236,6 +1243,7 @@ public class TourFilterManager {
       case GREATER_THAN:
          getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
+
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
@@ -1243,6 +1251,7 @@ public class TourFilterManager {
       case EQUALS:
          getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
          break;
+
       case NOT_EQUALS:
          getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
          break;
@@ -1250,6 +1259,7 @@ public class TourFilterManager {
       case BETWEEN:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, true);
          break;
+
       case NOT_BETWEEN:
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
          break;
@@ -1395,6 +1405,7 @@ public class TourFilterManager {
       case IS_EMPTY:
          getSQL_Empty(sqlWhere, sqlField, true);
          break;
+
       case IS_NOT_EMPTY:
          getSQL_Empty(sqlWhere, sqlField, false);
          break;
@@ -2022,6 +2033,7 @@ public class TourFilterManager {
          case NUMBER_FLOAT:
             writeXml_Number_Float(xmlProperty, doubleValue1, 1);
             break;
+
          case ENUMERATION:
             writeXml_Enumeration(xmlProperty, selectedIndex);
             break;

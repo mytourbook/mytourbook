@@ -35,7 +35,6 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
@@ -409,6 +408,7 @@ public class TourInfoUI {
     * @param tourData
     * @param tourToolTipProvider
     * @param tourProvider
+    *
     * @return Returns the content area control
     */
    public Composite createContentArea(final Composite parent,
@@ -2211,10 +2211,10 @@ public class TourInfoUI {
       }
 
       // Air Quality
-      final String airQuality = _tourData.getWeather_AirQuality();
-      if (StringUtils.hasContent(airQuality) && !airQuality.equals(IWeather.airQualityIsNotDefined)) {
+      final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
+      if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(airQuality);
+         _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
       }
 
       // Average temperature
@@ -2322,7 +2322,7 @@ public class TourInfoUI {
       final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
       final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
 
-      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss;
+      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
       final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
       final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
@@ -2340,9 +2340,9 @@ public class TourInfoUI {
       _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
       _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(vertSpeed_TimeGain / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative((double)vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative((double)vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative((double)vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
       _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));
