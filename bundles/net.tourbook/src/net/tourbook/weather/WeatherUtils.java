@@ -64,6 +64,7 @@ public class WeatherUtils {
     * @param airQualityIndex
     * @param tourDateTime
     * @param isDisplayEmptyValues
+    *
     * @return
     */
    public static String buildFullWeatherDataString(final float temperatureValue,
@@ -165,6 +166,7 @@ public class WeatherUtils {
     * @param isDisplayMaximumMinimumTemperature
     * @param isDisplayPressure
     * @param isWeatherDataSeparatorNewLine
+    *
     * @return
     */
    public static String buildWeatherDataString(final TourData tourData,
@@ -260,12 +262,12 @@ public class WeatherUtils {
       }
 
       // Air Quality
-      final String airQuality = tourData.getWeather_AirQuality();
-      if (StringUtils.hasContent(airQuality)) {
+      final int airQualityTextIndex = tourData.getWeather_AirQuality_TextIndex();
+      if (airQualityTextIndex > 0) {
 
          weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality +
                UI.SPACE +
-               airQuality);
+               IWeather.airQualityTexts[airQualityTextIndex]);
       }
 
       // Humidity
@@ -331,6 +333,7 @@ public class WeatherUtils {
     *           An array of wind speeds in km/h
     * @param windDirections
     *           An array of wind directions in degrees
+    *
     * @return
     */
    public static int[] computeAverageWindSpeedAndDirection(final double[] windSpeeds,
@@ -426,7 +429,7 @@ public class WeatherUtils {
    public static int getWeather_AirQuality_TextIndex(final String weather_AirQuality) {
 
       final int Weather_AirQuality_TextIndex =
-            Arrays.asList(IWeather.airQualityTexts).indexOf(weather_AirQuality);
+            Arrays.asList(IWeather.airQualityIds).indexOf(weather_AirQuality);
 
       return Weather_AirQuality_TextIndex < 0 ? 0 : Weather_AirQuality_TextIndex;
    }
@@ -438,6 +441,7 @@ public class WeatherUtils {
     * https://stackoverflow.com/a/68537229/7066681
     *
     * @param weatherIndex
+    *
     * @return
     */
    public static String getWeatherIcon(final int weatherIndex) {
@@ -450,26 +454,32 @@ public class WeatherUtils {
          //https://emojipedia.org/sun/
          weatherIcon = "\u2600"; //$NON-NLS-1$
          break;
+
       case IWeather.WEATHER_ID_PART_CLOUDS:
          //https://emojipedia.org/sun-behind-cloud/
          weatherIcon = "\u26C5"; //$NON-NLS-1$
          break;
+
       case IWeather.WEATHER_ID_OVERCAST:
          weatherIcon = "\u2601"; //$NON-NLS-1$
          break;
+
       case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
       case IWeather.WEATHER_ID_DRIZZLE:
          //https://emojipedia.org/sun-behind-rain-cloud/
          weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
          break;
+
       case IWeather.WEATHER_ID_RAIN:
          //https://emojipedia.org/cloud-with-rain/
          weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
          break;
+
       case IWeather.WEATHER_ID_LIGHTNING:
          //https://emojipedia.org/cloud-with-lightning/
          weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
          break;
+
       case IWeather.WEATHER_ID_SNOW:
 
          //https://emojipedia.org/snowflake/
@@ -480,10 +490,12 @@ public class WeatherUtils {
          //icon.
          //https://emojipedia.org/cloud-with-snow/
          break;
+
       case IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT:
          //https://emojipedia.org/warning/
          weatherIcon = "\u26A0"; //$NON-NLS-1$
          break;
+
       case UI.IMAGE_EMPTY_16:
       default:
          return UI.EMPTY_STRING;
@@ -526,6 +538,7 @@ public class WeatherUtils {
     *           in seconds
     * @param tourEndTime
     *           in seconds
+    *
     * @return
     */
    public static boolean isTourWeatherDataComplete(final long weatherDataStartTime,

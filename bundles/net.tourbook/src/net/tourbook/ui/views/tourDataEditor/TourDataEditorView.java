@@ -4816,12 +4816,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tableComboWeather_AirQuality.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _tableComboWeather_AirQuality.setShowTableHeader(false);
          _tableComboWeather_AirQuality.defineColumns(1);
-         _tableComboWeather_AirQuality.addModifyListener(_modifyListener);
 
          // We update the model in the selection listener as the selected
          // index value comes back with -1 in the modify listener
-         _tableComboWeather_AirQuality.addSelectionListener(
-               widgetSelectedAdapter(selectionEvent -> onSelect_AirQuality()));
+         _tableComboWeather_AirQuality.addSelectionListener(_selectionListener);
 
          _tk.adapt(_tableComboWeather_AirQuality, true, false);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQuality);
@@ -7744,17 +7742,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _containerTags_Scrolled.setMinSize(contentSize);
    }
 
-   private void onSelect_AirQuality() {
-
-      final int airQuality_SelectionIndex = _tableComboWeather_AirQuality.getSelectionIndex();
-      String airQualityValue = IWeather.airQualityTexts[airQuality_SelectionIndex];
-      if (airQualityValue.equals(IWeather.airQualityIsNotDefined)) {
-         // replace invalid value
-         airQualityValue = UI.EMPTY_STRING;
-      }
-      _tourData.setWeather_AirQuality(airQualityValue);
-   }
-
    private void onSelect_Slice(final SelectionChangedEvent selectionChangedEvent) {
 
       final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
@@ -9015,6 +9002,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tourData.setWeather_Temperature_Max(UI.convertTemperatureToMetric(temperature_Max));
             _tourData.setWeather_Temperature_WindChill(UI.convertTemperatureToMetric(temperature_WindChill));
          }
+
+         final int airQualityIndex = _tableComboWeather_AirQuality.getSelectionIndex();
+         final String airQualityId = IWeather.airQualityIds[airQualityIndex];
+         _tourData.setWeather_AirQuality(airQualityId);
 
          /*
           * Time

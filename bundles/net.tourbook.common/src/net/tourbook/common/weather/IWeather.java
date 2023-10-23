@@ -30,6 +30,12 @@ public interface IWeather {
    public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";            //$NON-NLS-1$
    public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scattered"; //$NON-NLS-1$
 
+   public static final String   AIRQUALITY_ID_GOOD              = "airquality-good";           //$NON-NLS-1$
+   public static final String   AIRQUALITY_ID_FAIR              = "airquality-fair";           //$NON-NLS-1$
+   public static final String   AIRQUALITY_ID_MODERATE          = "airquality-moderate";       //$NON-NLS-1$
+   public static final String   AIRQUALITY_ID_POOR              = "airquality-poor";           //$NON-NLS-1$
+   public static final String   AIRQUALITY_ID_VERYPOOR          = "airquality-verypoor";       //$NON-NLS-1$
+
    public static final String   windDirectionIsNotDefined       = UI.EMPTY_STRING;
 
    public static final String[] windDirectionText               = new String[] {
@@ -198,7 +204,7 @@ public interface IWeather {
    public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_0_IsNotDefined;
 
    /**
-    * Text for the weather's air quality
+    * Texts for the weather's air quality. Those texts are displayed in the UI.
     */
    public static final String[] airQualityTexts        = new String[] {
 
@@ -209,6 +215,21 @@ public interface IWeather {
          Messages.Weather_AirQuality_3_Moderate,
          Messages.Weather_AirQuality_4_Poor,
          Messages.Weather_AirQuality_5_VeryPoor
+
+   };
+
+   /**
+    * Ids for the weather's air quality. Those Ids are saved in the db.
+    */
+   public static final String[] airQualityIds          = new String[] {
+
+         UI.EMPTY_STRING,
+
+         AIRQUALITY_ID_GOOD,
+         AIRQUALITY_ID_FAIR,
+         AIRQUALITY_ID_MODERATE,
+         AIRQUALITY_ID_POOR,
+         AIRQUALITY_ID_VERYPOOR
 
    };
 

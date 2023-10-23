@@ -123,7 +123,7 @@ public class StravaUploaderTests {
       tour.setWeather_Wind_Direction(267);
       tour.setWeather_Precipitation(3);
       tour.setWeather_Snowfall(1.3f);
-      tour.setWeather_AirQuality(IWeather.airQualityTexts[5]);
+      tour.setWeather_AirQuality(IWeather.AIRQUALITY_ID_VERYPOOR);
 
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
