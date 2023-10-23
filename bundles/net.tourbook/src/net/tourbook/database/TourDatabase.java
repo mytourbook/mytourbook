@@ -6053,6 +6053,11 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_050_To_051(conn, splashManager);
          }
 
+         // 51 -> 52    > 23.10
+         if (currentDbVersion == 51) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_051_To_052(conn, splashManager);
+         }
+
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
 
@@ -9980,6 +9985,18 @@ public class TourDatabase {
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   private int updateDb_051_To_052(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      /*
+       * This db update is necessary even when it is doing nothing, otherwise the db-update process
+       * fails
+       */
+
+      final int newDbVersion = 52;
+
+      return newDbVersion;
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {
