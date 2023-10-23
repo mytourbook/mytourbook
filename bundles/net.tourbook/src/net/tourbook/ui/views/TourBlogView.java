@@ -18,6 +18,10 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.browser.LocationListener.changingAdapter;
 import static org.eclipse.swt.browser.ProgressListener.completedAdapter;
 
+import com.linkedin.urls.Url;
+import com.linkedin.urls.detection.UrlDetector;
+import com.linkedin.urls.detection.UrlDetectorOptions;
+
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -489,7 +493,15 @@ public class TourBlogView extends ViewPart {
                 */
                if (isDescription) {
 
-                  tourDescription = HTTP_PATTERN.matcher(tourDescription).replaceAll(HTTP_REPLACEMENT);
+                  final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.Default);
+                  final List<Url> found = parser.detect();
+
+                  for (final Url url : found) {
+                     final var original = url.getOriginalUrl();
+                     final var fullurl = url.getFullUrl();
+                     tourDescription = tourDescription.replace(original, "<a href=\"" + fullurl + "\">" + fullurl + "</a>");
+                  }
+
 
                   if (UI.IS_SCRAMBLE_DATA) {
                      tourDescription = UI.scrambleText(tourDescription);
