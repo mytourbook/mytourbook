@@ -99,8 +99,10 @@ public abstract class AutocompleteCombo extends AutocompleteWidget {
 
       final Point popupSize = adapter.getPopupSize();
 
-      // save popup height
-      state.put(stateKey, popupSize.y);
+      if (popupSize != null) {
 
+         // save popup height
+         state.put(stateKey, popupSize.y);
+      }
    }
 }
