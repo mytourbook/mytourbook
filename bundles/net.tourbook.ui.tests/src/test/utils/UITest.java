@@ -20,6 +20,7 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 public abstract class UITest {
 
@@ -38,5 +39,7 @@ public abstract class UITest {
    {
       PluginProperties.getInstance().populate(TourbookPlugin
             .getBundleContext().getBundle());
+
+      SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
    }
 }
