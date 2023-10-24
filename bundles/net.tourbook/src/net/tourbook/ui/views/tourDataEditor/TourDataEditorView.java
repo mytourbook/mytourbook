@@ -2618,10 +2618,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
                }
-
-               // update save icon
-               final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
-               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
             }
          }
 
@@ -2672,6 +2668,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                _isPartVisible = true;
 
                Display.getCurrent().asyncExec(() -> updateUI_FromModelRunnable());
+
+               /*
+                * Ensure that the save/retore icons display correctly, otherwise the bright icons
+                * (with dark theme) could be displayed until a refresh occurs
+                */
+               final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
+
+               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
+               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR, null);
             }
          }
       };
@@ -6317,7 +6322,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (_tourData == null) {
 
-         Display.getCurrent().asyncExec(() -> {
+         _pageBook.getDisplay().asyncExec(() -> {
 
             if (_pageBook.isDisposed()) {
                return;
@@ -6983,16 +6988,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       tbm.add(_actionToggleReadEditMode);
       tbm.add(_actionToggleRowSelectMode);
 
-      tbm.add(new Separator());
+      // save and restore actions are added from plugin.xml
+      tbm.add(new Separator("group_SaveAndRestoreActions"));
+
       tbm.add(_actionViewSettings);
 
       tbm.update(true);
-
-      /*
-       * fill toolbar view menu
-       */
-//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
    }
 
    /**

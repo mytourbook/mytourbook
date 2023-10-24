@@ -1027,30 +1027,7 @@
                icon           ="icons/tour-new.png"
                tooltip        ="%Command_App_CreateNewTour_Tooltip"/>
 
-            <!-- Save Tour -->
-            <command
-               commandId      ="command.net.tourbook.tour.SaveTour"
-               icon           ="icons/save-tour.png"
-               disabledIcon   ="icons/save-tour-disabled.png"
-               tooltip        ="%Command_Tour_SaveTour_Tooltip">
-
-               <visibleWhen   checkEnabled="false">
-                  <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
-               </visibleWhen>
-            </command>
-            
-            <!-- Restore Tour -->
-            <command
-               commandId      ="command.net.tourbook.tour.RestoreTour"
-               tooltip        ="%Command_Tour_RestoreTour_Tooltip">
-
-               <visibleWhen   checkEnabled="false">
-                  <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
-               </visibleWhen>
-            </command>
-
          </toolbar>
-         
             
       </menuContribution>
       
@@ -2479,6 +2456,12 @@
    </extension>
    -->
 
+
+   <!--
+   
+      TOUR EDITOR
+      
+   -->
    
    <extension point="org.eclipse.ui.handlers">
 
@@ -2516,15 +2499,44 @@
 
       <definition id="net.tourbook.definition.isTourEditorActive">
          <with variable="activePartId">
-            <or>
-               <equals value="net.tourbook.views.TourDataEditorView"/>
-               <equals value="net.tourbook.ui.views.tagging.TourTags_View"/>
-            </or>
+            <equals value="net.tourbook.views.TourDataEditorView"/>
          </with>
       </definition>
       
    </extension>
 
+   <extension point="org.eclipse.ui.menus">
+   
+      <!-- 
+            Show save/restore actions in the tour editor toolbar, 
+            the command framework is used otherwise the action texts needed to be replicated 
+      -->
+
+      <menuContribution locationURI="toolbar:net.tourbook.views.TourDataEditorView?after=group_SaveAndRestoreActions">
+   
+         <!-- Save Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.SaveTour"
+            mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
+            tooltip        ="%Command_Tour_SaveTour_Tooltip">
+         </command>
+
+         <!-- Restore Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.RestoreTour"
+            mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
+            tooltip        ="%Command_Tour_RestoreTour_Tooltip">
+         </command>
+   
+      </menuContribution>
+
+   </extension>
+
+   <!--
+   
+      OTHER
+   
+   -->
    <extension point="org.eclipse.core.expressions.propertyTesters">
    
       <propertyTester
