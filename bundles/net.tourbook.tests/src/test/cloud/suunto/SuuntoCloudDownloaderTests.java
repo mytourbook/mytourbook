@@ -31,7 +31,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
@@ -40,9 +39,6 @@ import net.tourbook.common.UI;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,21 +116,6 @@ public class SuuntoCloudDownloaderTests {
       suuntoCloudDownloader = new SuuntoCloudDownloader();
 
       authorize();
-
-      Display.getDefault().addFilter(SWT.Activate, event -> {
-         // Is this a Shell being activated?
-
-         if (event.widget instanceof final Shell shell) {
-
-            // Look at the shell title to see if it is the one we want
-
-            if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
-               // Close the shell after it has finished initializing
-
-               Display.getDefault().asyncExec(() -> shell.close());
-            }
-         }
-      });
    }
 
    private void setTokenRetrievalDateInThePast() {
