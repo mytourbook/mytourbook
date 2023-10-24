@@ -165,6 +165,12 @@ public class SuuntoCloudDownloaderTests {
 
       suuntoCloudDownloader.downloadTours();
 
+      try {
+         Thread.sleep(3000);
+      } catch (final InterruptedException e) {
+         Thread.currentThread().interrupt();
+      }
+
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$

@@ -246,7 +246,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       } catch (final Exception e) {
          StatusUtil.log(e);
-         Thread.currentThread().interrupt();
       }
 
    }
