@@ -357,6 +357,11 @@ public class Utils {
 
    public static SWTBotView showImportView(final SWTWorkbenchBot bot) {
 
+      // I don't know why but the tooltip value is different on Linux
+      final String tourImportTooltip = UI.IS_LINUX
+            ? "Tour Import (Shift+Ctrl+I)"
+            : "Tour Import (Ctrl+Shift+I)";
+      bot.toolbarButtonWithTooltip(tourImportTooltip).click();
       return Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
    }
 
