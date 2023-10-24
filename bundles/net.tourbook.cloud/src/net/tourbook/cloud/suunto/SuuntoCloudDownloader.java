@@ -109,7 +109,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       });
 
       final int[] numberOfDownloadedTours = new int[1];
-      workoutDownloads.stream().map(CompletableFuture::join).forEach(workoutDownload -> {
+      workoutDownloads.stream().map(download -> download.join()).forEach(workoutDownload -> {
          if (monitor.isCanceled()) {
             return;
          } else if (logDownloadResult(workoutDownload)) {
