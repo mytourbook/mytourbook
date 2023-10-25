@@ -162,9 +162,9 @@ public class HistoryResult {
 
    public List<Hour> getForecastdayHourList() {
 
-      if (getForecast() != null && getForecast().getForecastday() != null &&
-            getForecast().getForecastday().size() > 0) {
-         return getForecast().getForecastday().get(0).getHour();
+      if (getForecast() != null && getForecast().forecastday() != null &&
+            getForecast().forecastday().size() > 0) {
+         return getForecast().forecastday().get(0).hour();
       }
 
       return new ArrayList<>();
@@ -230,7 +230,7 @@ public class HistoryResult {
          return weatherDescription;
       }
 
-      return middleHour.getCondition().getText();
+      return middleHour.getCondition().text();
    }
 
    public String getWeatherType() {
@@ -239,6 +239,6 @@ public class HistoryResult {
          return UI.EMPTY_STRING;
       }
 
-      return WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(middleHourData.getCondition().getCode());
+      return WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(middleHourData.getCondition().code());
    }
 }

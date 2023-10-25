@@ -18,16 +18,4 @@ package net.tourbook.weather.weatherapi;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Condition {
-
-   private String text;
-   private int    code;
-
-   public int getCode() {
-      return code;
-   }
-
-   public String getText() {
-      return text;
-   }
-}
+public record Condition(String text, int code) {}

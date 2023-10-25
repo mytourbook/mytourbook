@@ -20,11 +20,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Forecast {
-
-   private List<Forecastday> forecastday;
-
-   public List<Forecastday> getForecastday() {
-      return forecastday;
-   }
-}
+public record Forecast(List<Forecastday> forecastday) {}

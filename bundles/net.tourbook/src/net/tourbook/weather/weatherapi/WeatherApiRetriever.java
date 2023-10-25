@@ -144,8 +144,8 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
                WeatherUtils.getWeatherIcon(
                      WeatherUtils.getWeatherIndex(
                            convertWeatherCodeToMTWeatherClouds(
-                                 hour.getCondition().getCode()))),
-               hour.getCondition().getText(),
+                                 hour.getCondition().code()))),
+               hour.getCondition().text(),
                (float) hour.getFeelslike_c(),
                (float) hour.getWind_kph(),
                hour.getWind_degree(),
