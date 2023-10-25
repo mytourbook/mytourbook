@@ -215,7 +215,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       try {
          final long start = System.currentTimeMillis();
 
-         TourLogManager.showLogView();
          TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
          job.setPriority(Job.INTERACTIVE);
