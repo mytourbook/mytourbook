@@ -331,7 +331,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       try {
          final long start = System.currentTimeMillis();
 
-         TourLogManager.showLogView();
          TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadRoutesToSuunto_001_Start, numberOfTours));
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
