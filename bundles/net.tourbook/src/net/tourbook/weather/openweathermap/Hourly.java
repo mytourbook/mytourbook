@@ -55,7 +55,7 @@ class Hourly {
          return 0f;
       }
 
-      return (float) rain.getOneHour();
+      return (float) rain.oneHour();
    }
 
    public float getSnow() {
@@ -64,7 +64,7 @@ class Hourly {
          return 0f;
       }
 
-      return (float) snow.getOneHour();
+      return (float) snow.oneHour();
    }
 
    public double getTemp() {

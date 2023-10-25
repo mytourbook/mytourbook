@@ -138,7 +138,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   hourlyDateTime * 1000L,
                   tour.getTimeZoneId());
 
-            final net.tourbook.weather.openweathermap.List currentAirPollutionResult = airPollutionResult.getList().stream()
+            final net.tourbook.weather.openweathermap.List currentAirPollutionResult = airPollutionResult.list().stream()
                   .filter(list -> list.dt() == hourlyDateTime)
                   .findAny()
                   .orElse(null);
@@ -173,7 +173,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          }
       } else if (airPollutionResult.getAirQualityIndexAverage() != 0) {
 
-         for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.getList()) {
+         for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.list()) {
 
             final int airQualityIndex = currentAirPollutionResult.main().aqi();
 
@@ -426,14 +426,14 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       tour.appendOrReplaceWeather(           currentWeather.getWeatherDescription());
       tour.setWeather_Clouds(                currentWeather.getWeatherClouds());
-      tour.setWeather_Temperature_Average(   currentWeather.getTemp());
-      tour.setWeather_Humidity((short)       currentWeather.getHumidity());
+      tour.setWeather_Temperature_Average(   currentWeather.temp());
+      tour.setWeather_Humidity((short)       currentWeather.humidity());
       tour.setWeather_Precipitation(         currentWeather.getPrecipitation());
-      tour.setWeather_Pressure((short)       currentWeather.getPressure());
+      tour.setWeather_Pressure((short)       currentWeather.pressure());
       tour.setWeather_Snowfall(              currentWeather.getSnowfall());
-      tour.setWeather_Temperature_WindChill( currentWeather.getFeels_like());
+      tour.setWeather_Temperature_WindChill( currentWeather.feels_like());
       tour.setWeather_Wind_Speed(            currentWeather.getWind_speed());
-      tour.setWeather_Wind_Direction(        currentWeather.getWind_deg());
+      tour.setWeather_Wind_Direction(        currentWeather.wind_deg());
 
 // SET_FORMATTING_ON
    }
