@@ -225,7 +225,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             public void done(final IJobChangeEvent event) {
 
                if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+
                   PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
                      TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
                      final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
@@ -233,8 +235,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                            _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
 
                      final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
-                           .text(infoText)
                            .title(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, false)
+                           .text(infoText)
                            .delay(2000)
                            .build();
                      notication.open();
@@ -246,7 +248,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       } catch (final Exception e) {
          StatusUtil.log(e);
       }
-
    }
 
    private String getAccessToken() {
