@@ -139,12 +139,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   tour.getTimeZoneId());
 
             final net.tourbook.weather.openweathermap.List currentAirPollutionResult = airPollutionResult.getList().stream()
-                  .filter(list -> list.getDt() == hourlyDateTime)
+                  .filter(list -> list.dt() == hourlyDateTime)
                   .findAny()
                   .orElse(null);
 
             final int airQualityIndex = currentAirPollutionResult == null
-                  ? 0 : currentAirPollutionResult.getMain().getAqi();
+                  ? 0 : currentAirPollutionResult.main().getAqi();
 
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
@@ -175,10 +175,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.getList()) {
 
-            final int airQualityIndex = currentAirPollutionResult.getMain().getAqi();
+            final int airQualityIndex = currentAirPollutionResult.main().getAqi();
 
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(
-                  currentAirPollutionResult.getDt() * 1000L,
+                  currentAirPollutionResult.dt() * 1000L,
                   tour.getTimeZoneId());
 
             final boolean isDisplayEmptyValues = !isCompressed;
