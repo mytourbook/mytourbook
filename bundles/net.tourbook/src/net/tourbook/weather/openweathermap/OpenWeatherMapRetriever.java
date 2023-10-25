@@ -152,8 +152,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   WeatherUtils.getWeatherIcon(
                         WeatherUtils.getWeatherIndex(
                               convertWeatherIconToMTWeatherClouds(
-                                    hourly.getWeather().get(0).getIcon()))),
-                  hourly.getWeather().get(0).getDescription(),
+                                    hourly.getWeather().get(0).icon()))),
+                  hourly.getWeather().get(0).description(),
                   (float) hourly.getFeels_like(),
                   (float) hourly.getWind_speedKmph(),
                   hourly.getWind_deg(),
