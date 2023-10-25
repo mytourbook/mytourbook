@@ -187,12 +187,12 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                WeatherUtils.getWeatherIcon(
                      WeatherUtils.getWeatherIndex(
                            convertWeatherCodeToMTWeatherClouds(
-                                 hourly.getWeatherCode()))),
+                                 hourly.weatherCode()))),
                hourly.getWeatherDescription(),
                hourly.getFeelsLikeC(),
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),
-               hourly.getHumidity(),
+               hourly.humidity(),
                hourly.getPressure(),
                hourly.getPrecipMM(),
                0,

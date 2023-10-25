@@ -123,7 +123,7 @@ public class Data {
    public short getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            filteredHourly.stream().mapToDouble(Hourly::getHumidity).average();
+            filteredHourly.stream().mapToDouble(hourly -> hourly.humidity()).average();
 
       if (averageHumidity.isPresent()) {
          return (short) (averageHumidity.getAsDouble());
@@ -230,7 +230,7 @@ public class Data {
          return UI.EMPTY_STRING;
       }
 
-      return WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds(middleHourly.getWeatherCode());
+      return WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds(middleHourly.weatherCode());
    }
 
 }
