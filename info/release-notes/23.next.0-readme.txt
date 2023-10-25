@@ -46,7 +46,9 @@ New
 Improvements
 ============
 
-* 
+* Quick Tour Editor
+  - Resize height of the weather description field
+    https://github.com/mytourbook/mytourbook/issues/1219
 
 
 Changes
