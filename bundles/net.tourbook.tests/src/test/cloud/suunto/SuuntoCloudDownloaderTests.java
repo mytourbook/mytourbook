@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
@@ -211,6 +212,6 @@ public class SuuntoCloudDownloaderTests {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "Action aborted due to invalid tokens"))); //$NON-NLS-1$
+            Messages.Log_CloudAction_InvalidTokens)));
    }
 }
