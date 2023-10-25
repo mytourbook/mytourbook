@@ -18,11 +18,4 @@ package net.tourbook.weather.worldweatheronline;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class ValueResult {
-
-   private String value;
-
-   public String getValue() {
-      return value;
-   }
-}
+public record ValueResult(String value) {}

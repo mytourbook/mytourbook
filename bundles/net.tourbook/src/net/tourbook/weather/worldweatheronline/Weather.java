@@ -20,12 +20,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Weather {
-
-   private List<Hourly> hourly;
-
-   public List<Hourly> getHourly() {
-      return hourly;
-   }
-
-}
+public record Weather(List<Hourly> hourly) {}
