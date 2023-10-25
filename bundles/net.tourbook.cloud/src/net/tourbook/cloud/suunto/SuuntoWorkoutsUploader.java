@@ -233,7 +233,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       try {
          request = HttpRequest.newBuilder()
                .uri(URI.create(workoutUpload.url()))
-               .header("x-ms-blob-type", workoutUpload.headers().getXMsBlobType()) //$NON-NLS-1$
+               .header("x-ms-blob-type", workoutUpload.headers().xmsBlobType()) //$NON-NLS-1$
                .header(OAuth2Constants.CONTENT_TYPE, "application/octet-stream") //$NON-NLS-1$
                .timeout(Duration.ofMinutes(5))
                .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get(tourAbsoluteFilePath)))
