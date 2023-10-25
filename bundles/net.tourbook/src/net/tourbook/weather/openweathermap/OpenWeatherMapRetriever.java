@@ -144,7 +144,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   .orElse(null);
 
             final int airQualityIndex = currentAirPollutionResult == null
-                  ? 0 : currentAirPollutionResult.main().getAqi();
+                  ? 0 : currentAirPollutionResult.main().aqi();
 
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
@@ -175,7 +175,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.getList()) {
 
-            final int airQualityIndex = currentAirPollutionResult.main().getAqi();
+            final int airQualityIndex = currentAirPollutionResult.main().aqi();
 
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(
                   currentAirPollutionResult.dt() * 1000L,

@@ -29,7 +29,7 @@ class AirPollutionResult {
    public int getAirQualityIndexAverage() {
 
       final ToDoubleFunction<net.tourbook.weather.openweathermap.List> listFunction =
-            listElement -> listElement.main().getAqi();
+            listElement -> listElement.main().aqi();
 
       final OptionalDouble averageAirQualityIndex =
             getList().stream().mapToDouble(listFunction).average();
