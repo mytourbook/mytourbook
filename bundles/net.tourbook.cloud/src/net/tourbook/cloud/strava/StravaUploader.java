@@ -548,7 +548,7 @@ public class StravaUploader extends TourbookCloudUploader {
       }
 
       final int[] numberOfUploadedTours = new int[1];
-      activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
+      activityUploads.stream().map(completableFuture -> completableFuture.join()).forEach(activityUpload -> {
          if (monitor.isCanceled()) {
             return;
          } else if (logUploadResult(activityUpload)) {
