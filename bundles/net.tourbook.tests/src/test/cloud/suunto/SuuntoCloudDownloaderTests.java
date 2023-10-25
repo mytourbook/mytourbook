@@ -82,6 +82,8 @@ public class SuuntoCloudDownloaderTests {
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
 
+      TourLogManager.showLogView();
+
       //We set the Suunto account information, otherwise the download can't
       //happen
       _prefStore.setValue(
@@ -128,7 +130,6 @@ public class SuuntoCloudDownloaderTests {
    void setUp() {
 
       httpClientMock.reset();
-      TourLogManager.showLogView();
    }
 
    @AfterEach
