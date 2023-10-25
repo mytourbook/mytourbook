@@ -71,7 +71,7 @@ public class Data {
       //If the returned data is for more than 1 day, we combine the multiple hourly
       //lists into 1
       final List<Hourly> combinedHourly = new ArrayList<>();
-      weather.forEach(currentWeather -> combinedHourly.addAll(currentWeather.getHourly()));
+      weather.forEach(currentWeather -> combinedHourly.addAll(currentWeather.hourly()));
 
       filteredHourly = new ArrayList<>();
       for (final Hourly currentHourly : combinedHourly) {

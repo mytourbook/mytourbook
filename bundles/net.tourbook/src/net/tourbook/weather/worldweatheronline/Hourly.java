@@ -134,7 +134,7 @@ class Hourly {
    }
 
    public String getWeatherDescription() {
-      return getWeatherDesc().get(0).getValue();
+      return getWeatherDesc().get(0).value();
    }
 
    public int getWinddirDegree() {

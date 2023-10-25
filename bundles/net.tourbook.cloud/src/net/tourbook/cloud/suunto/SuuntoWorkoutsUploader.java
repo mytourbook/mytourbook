@@ -232,8 +232,8 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       HttpRequest request = null;
       try {
          request = HttpRequest.newBuilder()
-               .uri(URI.create(workoutUpload.getUrl()))
-               .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType()) //$NON-NLS-1$
+               .uri(URI.create(workoutUpload.url()))
+               .header("x-ms-blob-type", workoutUpload.headers().getXMsBlobType()) //$NON-NLS-1$
                .header(OAuth2Constants.CONTENT_TYPE, "application/octet-stream") //$NON-NLS-1$
                .timeout(Duration.ofMinutes(5))
                .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get(tourAbsoluteFilePath)))
@@ -267,10 +267,10 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
       // Check upload status
       while (workoutUpload != null &&
-            (StringUtils.isNullOrEmpty(workoutUpload.getStatus()) ||
-                  workoutUpload.getStatus().equalsIgnoreCase("new"))) { //$NON-NLS-1$
+            (StringUtils.isNullOrEmpty(workoutUpload.status()) ||
+                  workoutUpload.status().equalsIgnoreCase("new"))) { //$NON-NLS-1$
 
-         workoutUpload = checkUploadStatus(tourData, workoutUpload.getId());
+         workoutUpload = checkUploadStatus(tourData, workoutUpload.id());
       }
 
       return workoutUpload;
@@ -356,10 +356,10 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          final WorkoutUpload workoutUpload = uploadTour(compressedTourAbsoluteFilePath, tourData);
 
          if (workoutUpload == null ||
-               workoutUpload.getStatus().equalsIgnoreCase("error")) { //$NON-NLS-1$
+               workoutUpload.status().equalsIgnoreCase("error")) { //$NON-NLS-1$
 
-            final String message = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getMessage();
-            final String workoutId = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getId();
+            final String message = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.message();
+            final String workoutId = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.id();
 
             TourLogManager.log_ERROR(NLS.bind(
                   Messages.Log_UploadWorkoutsToSuunto_004_UploadError,
@@ -370,7 +370,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             TourLogManager.log_OK(NLS.bind(
                   Messages.Log_UploadWorkoutsToSuunto_003_UploadStatus,
                   TourManager.getTourDateTimeShort(tourData),
-                  workoutUpload.getId()));
+                  workoutUpload.id()));
 
             ++numberOfUploadedTours;
          }

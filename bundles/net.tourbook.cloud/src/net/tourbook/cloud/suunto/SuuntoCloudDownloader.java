@@ -174,7 +174,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
-            if (workouts.payload.isEmpty()) {
+            if (workouts.payload().isEmpty()) {
                TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound);
                return Status.CANCEL_STATUS;
             }
@@ -182,7 +182,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             final List<Long> tourStartTimes = retrieveAllTourStartTimes();
 
             //Identifying the workouts that have not yet been imported in the tour database
-            final List<Payload> newWorkouts = workouts.payload.stream()
+            final List<Payload> newWorkouts = workouts.payload().stream()
                   .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L))
                   .toList();
 

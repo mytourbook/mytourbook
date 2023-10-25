@@ -81,9 +81,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    private RouteUpload convertResponseToUpload(final HttpResponse<String> routeUploadResponse, final String tourDate) {
 
-      RouteUploads routeUploads = new RouteUploads();
-      routeUploads.items = new ArrayList<>();
-      routeUploads.items.add(new RouteUpload());
+      final List<RouteUpload> items = new ArrayList<>();
+      items.add(new RouteUpload());
+      RouteUploads routeUploads = new RouteUploads(items);
 
       final String routeUploadContent = routeUploadResponse.body();
       if (routeUploadResponse.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(routeUploadContent)) {
@@ -96,12 +96,12 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
             StatusUtil.log(e);
          }
       } else {
-         routeUploads.items.get(0).setError(routeUploadContent);
+         routeUploads.items().get(0).setError(routeUploadContent);
       }
 
-      routeUploads.items.get(0).setTourDate(tourDate);
+      routeUploads.items().get(0).setTourDate(tourDate);
 
-      return routeUploads.items.get(0);
+      return routeUploads.items().get(0);
    }
 
    /**
