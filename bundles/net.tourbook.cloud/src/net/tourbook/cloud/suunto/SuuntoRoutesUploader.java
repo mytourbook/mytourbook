@@ -109,6 +109,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
     * https://apimgmtstfbqznm5nc6zmvgx.blob.core.windows.net/content/MediaLibrary/docs/Suunto%20Watches-%20SuuntoApp%20-Movescount-FIT-Activities.pdf
     *
     * @param tourData
+    *
     * @return
     */
    private String convertTourToGpx(final TourData tourData) {
@@ -261,7 +262,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       }
 
       final int[] numberOfUploadedTours = new int[1];
-      activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
+      activityUploads.stream().map(completable -> completable.join()).forEach(activityUpload -> {
          if (monitor.isCanceled()) {
             return;
          } else if (logUploadResult(activityUpload)) {
