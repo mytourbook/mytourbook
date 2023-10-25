@@ -156,12 +156,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
-               TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
+               Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
                return Status.CANCEL_STATUS;
             }
 
             if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
-               TourLogManager.log_ERROR(Messages.Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder);
+               Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(Messages.Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder));
                return Status.CANCEL_STATUS;
             }
 
@@ -175,7 +175,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
             if (workouts.payload().isEmpty()) {
-               TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound);
+               Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound));
                return Status.CANCEL_STATUS;
             }
 
@@ -188,7 +188,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             final int numNewWorkouts = newWorkouts.size();
             if (numNewWorkouts == 0) {
-               TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist);
+               Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist));
                return Status.CANCEL_STATUS;
             }
 
@@ -329,12 +329,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
          isTourDownloaded = true;
 
-         TourLogManager.log_OK(
+         Display.getDefault().asyncExec(() -> TourLogManager.log_OK(
                NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_005_DownloadStatus,
                      workoutDownload.getWorkoutKey(),
-                     workoutDownload.getAbsoluteFilePath()));
+                     workoutDownload.getAbsoluteFilePath())));
       } else {
-         TourLogManager.log_ERROR(workoutDownload.getError());
+         Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(workoutDownload.getError()));
       }
 
       return isTourDownloaded;
