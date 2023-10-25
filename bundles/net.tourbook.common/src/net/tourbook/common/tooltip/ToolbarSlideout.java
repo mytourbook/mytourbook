@@ -94,12 +94,19 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
       final int itemWidth = _toolTipItemBounds.width;
       final int itemHeight = _toolTipItemBounds.height;
 
-      // center horizontally
-
       int devX = _toolTipItemBounds.x;
 
       if (isCenterHorizontal()) {
+
+         // center horizontally
+
          devX += itemWidth / 2 - tipWidth / 2;
+
+      } else if (isAlignLeft()) {
+
+         // align left
+
+         devX += itemWidth - tipWidth;
       }
 
       int devY = _toolTipItemBounds.y + itemHeight + 0;
@@ -117,10 +124,21 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
    }
 
    /**
+    * @return When it returns <code>true</code> then the slideout is aligned to the left of the
+    *         action button, {@link ToolbarSlideout#isCenterHorizontal()} must return
+    *         <code>false</code> because it has historically a higher priority.
+    */
+   protected boolean isAlignLeft() {
+
+      return false;
+   }
+
+   /**
     * @return Returns <code>true</code> to center the slideout horizontally, otherwise it is
     *         displayed to the right of the action button.
     */
    protected boolean isCenterHorizontal() {
+
       return false;
    }
 

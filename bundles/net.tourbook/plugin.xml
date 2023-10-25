@@ -2509,7 +2509,7 @@
    
       <!-- 
             Show save/restore actions in the tour editor toolbar, 
-            the command framework is used otherwise the action texts needed to be replicated 
+            the command framework is used otherwise the action texts needed to be duplicated 
       -->
 
       <menuContribution locationURI="toolbar:net.tourbook.views.TourDataEditorView?after=group_SaveAndRestoreActions">
