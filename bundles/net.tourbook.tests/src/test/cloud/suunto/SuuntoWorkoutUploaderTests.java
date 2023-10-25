@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -94,6 +95,12 @@ public class SuuntoWorkoutUploaderTests {
             }
          }
       });
+   }
+
+   @BeforeEach
+   void setUp() {
+
+      TourLogManager.showLogView();
    }
 
    @AfterEach
