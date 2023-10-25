@@ -133,6 +133,7 @@ public class SuuntoCloudDownloaderTests {
    void setUp() {
 
       httpClientMock.reset();
+      TourLogManager.clear();
    }
 
    @AfterEach
@@ -143,7 +144,6 @@ public class SuuntoCloudDownloaderTests {
 
    //We set the access token issue date time in the past to trigger the retrieval
    //of a new token.
-
    @Disabled
    @Test
    void testTourDownload() {
@@ -171,18 +171,28 @@ public class SuuntoCloudDownloaderTests {
 
       suuntoCloudDownloader.downloadTours();
 
-      try {
-         Thread.sleep(3000);
-      } catch (final InterruptedException e) {
-         Thread.currentThread().interrupt();
-      }
+      List<?> logs = TourLogManager.getLogs();
+//      boolean logContainsSuuntoEntries = false;
+//      while (!logContainsSuuntoEntries) {
+//
+//         logContainsSuuntoEntries = logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+//               Messages.Log_CloudAction_End));
+//
+//         try {
+//            Thread.sleep(1000);
+//         } catch (final InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//         }
+//
+//         logs = TourLogManager.getLogs();
+//      }
 
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
             .called();
 
-      final List<?> logs = TourLogManager.getLogs();
+      logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
@@ -194,7 +204,6 @@ public class SuuntoCloudDownloaderTests {
    }
 
    @Disabled
-
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
 
@@ -206,12 +215,6 @@ public class SuuntoCloudDownloaderTests {
             .withStatus(201);
 
       suuntoCloudDownloader.downloadTours();
-
-      try {
-         Thread.sleep(3000);
-      } catch (final InterruptedException e) {
-         Thread.currentThread().interrupt();
-      }
 
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
 
