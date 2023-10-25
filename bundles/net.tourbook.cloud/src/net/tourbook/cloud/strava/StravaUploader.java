@@ -66,6 +66,7 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
+   //todo fb replace with a job
    private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";            //$NON-NLS-1$
 
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();

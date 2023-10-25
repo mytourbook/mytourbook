@@ -59,6 +59,8 @@ import org.json.JSONObject;
 
 public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
+   //todo fb replace with a job
+
    private static final String LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
    private static final String LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
