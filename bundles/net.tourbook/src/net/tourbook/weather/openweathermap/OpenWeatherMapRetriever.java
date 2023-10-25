@@ -132,7 +132,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          for (final Hourly hourly : hourlyList) {
 
-            final int hourlyDateTime = hourly.getDt();
+            final int hourlyDateTime = hourly.dt();
 
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(
                   hourlyDateTime * 1000L,
@@ -148,17 +148,17 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
-                  (float) hourly.getTemp(),
+                  (float) hourly.temp(),
                   WeatherUtils.getWeatherIcon(
                         WeatherUtils.getWeatherIndex(
                               convertWeatherIconToMTWeatherClouds(
-                                    hourly.getWeather().get(0).icon()))),
-                  hourly.getWeather().get(0).description(),
-                  (float) hourly.getFeels_like(),
+                                    hourly.weather().get(0).icon()))),
+                  hourly.weather().get(0).description(),
+                  (float) hourly.feels_like(),
                   (float) hourly.getWind_speedKmph(),
-                  hourly.getWind_deg(),
-                  hourly.getHumidity(),
-                  hourly.getPressure(),
+                  hourly.wind_deg(),
+                  hourly.humidity(),
+                  hourly.pressure(),
                   hourly.getRain(),
                   hourly.getSnow(),
                   airQualityIndex,
@@ -358,9 +358,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
          final List<Hourly> hourly = timeMachineResult.getHourly();
 
-         final int lastWeatherDataHour = hourly.get(hourly.size() - 1).getDt();
+         final int lastWeatherDataHour = hourly.get(hourly.size() - 1).dt();
          if (WeatherUtils.isTourWeatherDataComplete(
-               hourly.get(0).getDt(),
+               hourly.get(0).dt(),
                lastWeatherDataHour,
                tourStartTime,
                tourEndTime)) {

@@ -64,7 +64,7 @@ class TimeMachineResult {
 
       final int[] windDirections = hourly
             .stream()
-            .mapToInt(Hourly::getWind_deg)
+            .mapToInt(hourly -> hourly.wind_deg())
             .toArray();
 
       final int[] averageWindSpeedAndDirection =
@@ -90,8 +90,8 @@ class TimeMachineResult {
          // OR
          // - more than 30 mins after the tour end time
 
-         if (currentHourly.getDt() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
-               currentHourly.getDt() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
+         if (currentHourly.dt() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               currentHourly.dt() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
@@ -114,7 +114,7 @@ class TimeMachineResult {
       long timeDifference = Long.MAX_VALUE;
       for (final Hourly currentHourly : hourly) {
 
-         final long currentTimeDifference = Math.abs(currentHourly.getDt() - tourMiddleTime);
+         final long currentTimeDifference = Math.abs(currentHourly.dt() - tourMiddleTime);
          if (currentTimeDifference < timeDifference) {
             middleHourly = currentHourly;
             timeDifference = currentTimeDifference;
@@ -126,7 +126,7 @@ class TimeMachineResult {
    public float getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            hourly.stream().mapToDouble(Hourly::getHumidity).average();
+            hourly.stream().mapToDouble(hourly -> hourly.humidity()).average();
 
       if (averageHumidity.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageHumidity.getAsDouble());
@@ -138,7 +138,7 @@ class TimeMachineResult {
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
-            hourly.stream().mapToDouble(Hourly::getPressure).average();
+            hourly.stream().mapToDouble(hourly -> hourly.pressure()).average();
 
       if (averagePressure.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
@@ -150,7 +150,7 @@ class TimeMachineResult {
    public float getAverageWindChill() {
 
       final OptionalDouble averageWindChill =
-            hourly.stream().mapToDouble(Hourly::getFeels_like).average();
+            hourly.stream().mapToDouble(hourly -> hourly.feels_like()).average();
 
       if (averageWindChill.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
@@ -179,7 +179,7 @@ class TimeMachineResult {
 
    private Weather getMiddleHourlyWeather() {
 
-      final List<Weather> middleHourlyWeather = middleHourly.getWeather();
+      final List<Weather> middleHourlyWeather = middleHourly.weather();
       if (middleHourlyWeather == null || middleHourlyWeather.isEmpty()) {
          return null;
       }
@@ -190,7 +190,7 @@ class TimeMachineResult {
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
-            hourly.stream().mapToDouble(Hourly::getTemp).average();
+            hourly.stream().mapToDouble(hourly -> hourly.temp()).average();
 
       if (averageTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
@@ -202,7 +202,7 @@ class TimeMachineResult {
    public float getTemperatureMax() {
 
       final OptionalDouble maxTemperature =
-            hourly.stream().mapToDouble(Hourly::getTemp).max();
+            hourly.stream().mapToDouble(hourly -> hourly.temp()).max();
 
       if (maxTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
@@ -214,7 +214,7 @@ class TimeMachineResult {
    public float getTemperatureMin() {
 
       final OptionalDouble minTemperature =
-            hourly.stream().mapToDouble(Hourly::getTemp).min();
+            hourly.stream().mapToDouble(hourly -> hourly.temp()).min();
 
       if (minTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());

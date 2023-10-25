@@ -20,34 +20,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Hourly {
-
-   private int           dt;
-   private double        temp;
-   private double        feels_like;
-   private int           pressure;
-   private int           humidity;
-   private List<Weather> weather;
-   private double        wind_speed;
-   private int           wind_deg;
-   private Volume        rain;
-   private Volume        snow;
-
-   public int getDt() {
-      return dt;
-   }
-
-   public double getFeels_like() {
-      return feels_like;
-   }
-
-   public int getHumidity() {
-      return humidity;
-   }
-
-   public int getPressure() {
-      return pressure;
-   }
+public record Hourly(int dt,
+                     double temp,
+                     double feels_like,
+                     int pressure,
+                     int humidity,
+                     List<Weather> weather,
+                     double wind_speed,
+                     int wind_deg,
+                     Volume rain,
+                     Volume snow) {
 
    public float getRain() {
 
@@ -65,22 +47,6 @@ class Hourly {
       }
 
       return (float) snow.oneHour();
-   }
-
-   public double getTemp() {
-      return temp;
-   }
-
-   public List<Weather> getWeather() {
-      return weather;
-   }
-
-   public int getWind_deg() {
-      return wind_deg;
-   }
-
-   public double getWind_speed() {
-      return wind_speed;
    }
 
    public double getWind_speedKmph() {
