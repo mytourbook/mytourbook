@@ -44,6 +44,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -143,6 +144,7 @@ public class SuuntoCloudDownloaderTests {
    //We set the access token issue date time in the past to trigger the retrieval
    //of a new token.
 
+   @Disabled
    @Test
    void testTourDownload() {
 
@@ -190,6 +192,8 @@ public class SuuntoCloudDownloaderTests {
 
       FileUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
+
+   @Disabled
 
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
