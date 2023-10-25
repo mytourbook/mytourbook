@@ -198,7 +198,14 @@ public class SuuntoCloudDownloaderTests {
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(UI.EMPTY_STRING)
             .withStatus(201);
+
       suuntoCloudDownloader.downloadTours();
+
+      try {
+         Thread.sleep(3000);
+      } catch (final InterruptedException e) {
+         Thread.currentThread().interrupt();
+      }
 
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
 
