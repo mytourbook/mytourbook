@@ -57,7 +57,7 @@ public class SuuntoCloudDownloaderTests {
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
-   private static final String           _validTokenResponse         = Comparison.readFileContent(SUUNTO_FILE_PATH
+   private static final String           VALID_TOKEN_RESPONSE        = Comparison.readFileContent(SUUNTO_FILE_PATH
          + "Token-Response.json");                                                                                                    //$NON-NLS-1$
 
    private static void authorize() throws IOException {
@@ -113,7 +113,7 @@ public class SuuntoCloudDownloaderTests {
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(_validTokenResponse)
+            .doReturn(VALID_TOKEN_RESPONSE)
             .withStatus(201);
 
       suuntoCloudDownloader = new SuuntoCloudDownloader();
@@ -156,7 +156,7 @@ public class SuuntoCloudDownloaderTests {
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(_validTokenResponse)
+            .doReturn(VALID_TOKEN_RESPONSE)
             .withStatus(201);
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
