@@ -128,6 +128,7 @@ public class SuuntoCloudDownloaderTests {
    void setUp() {
 
       httpClientMock.reset();
+      TourLogManager.showLogView();
    }
 
    @AfterEach
