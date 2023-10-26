@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,18 +17,38 @@ package net.tourbook.tour;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
 
-   private static final CopyOnWriteArrayList<TourLog> _allTourLogs = new CopyOnWriteArrayList<>();
+   static final String                                ID                            = "net.tourbook.tour.TourLogManager"; //$NON-NLS-1$
+
+   static final String                                STATE_AUTO_OPEN_TOUR_LOG_VIEW = "STATE_AUTO_OPEN_TOUR_LOG_VIEW";    //$NON-NLS-1$
+
+   private static final IDialogSettings               _state                        = TourbookPlugin.getState(ID);
+
+   private static final CopyOnWriteArrayList<TourLog> _allTourLogs                  = new CopyOnWriteArrayList<>();
 
    private static TourLogView                         _logView;
+
+   public enum AutoOpenEvent{
+
+      DELETE_TOUR, //
+   }
+
+   public enum AutoOpenTourLogView {
+
+      NEVER, //
+      ANY_EVENTS, //
+      SELECTED_EVENTS
+   }
 
    private static void addLog(final TourLog tourLog) {
 
@@ -70,6 +90,11 @@ public class TourLogManager {
    public static CopyOnWriteArrayList<TourLog> getLogs() {
 
       return _allTourLogs;
+   }
+
+   public static IDialogSettings getState() {
+
+      return _state;
    }
 
    private static boolean isTourLogOpen() {
