@@ -44,7 +44,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   public static final String DIRECTORY                        = "Directory";                                                     //$NON-NLS-1$
+   public static final String DIRECTORY                        = Messages.App_Action_Menu_Directory;
    public static final String SAVE_MODIFIED_TOUR               = "Save modified tour (Ctrl+S)";                                   //$NON-NLS-1$
    public static final String TOOLS                            = "Tools ";                                                        //$NON-NLS-1$
 

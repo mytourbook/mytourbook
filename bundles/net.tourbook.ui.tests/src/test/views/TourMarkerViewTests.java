@@ -68,7 +68,7 @@ public class TourMarkerViewTests extends UITest {
 
       tableMarkers.select(0);
       tableMarkers.contextMenu(Messages.App_Action_DeleteTourMarker).click();
-      bot.button("Yes").click(); //$NON-NLS-1$
+      Utils.clickYesButton(bot);
 
       //Make sure that the tour contains 2 markers
       assertEquals(2, tableMarkers.rowCount());
