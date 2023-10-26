@@ -103,6 +103,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourViewer {
 
+   //todo fb when starting MT, the DEL key doesn't trigger anything
    public static final String          ID                                = "net.tourbook.ui.views.TourMarkerAllView";   //$NON-NLS-1$
    //
    private static final String         COLUMN_ALTITUDE                   = "Altitude";                                  //$NON-NLS-1$
