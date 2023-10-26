@@ -84,7 +84,7 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testRemoveTimeSlice() {
 
-      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+      Utils.duplicateAndGetTour(bot);
 
       final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
 
@@ -108,7 +108,7 @@ public class TourDataEditorViewTests extends UITest {
       //Ensuring that the time slice was deleted
       assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
 
-      tour = Utils.selectDuplicatedTour(bot);
+      final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
    }
 

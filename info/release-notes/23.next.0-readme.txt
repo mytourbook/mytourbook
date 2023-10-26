@@ -47,8 +47,9 @@ New
 Improvements
 ============
 
-* Tour Concatenation (Frederic):
-  - Added the ability to retrieve the weather when concatenating a tour
+* Quick Tour Editor
+  - Resize height of the weather description field
+    https://github.com/mytourbook/mytourbook/issues/1219
 
 
 Changes

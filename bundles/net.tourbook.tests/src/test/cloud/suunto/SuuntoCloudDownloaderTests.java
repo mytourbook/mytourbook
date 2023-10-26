@@ -37,14 +37,15 @@ import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
 import net.tourbook.cloud.suunto.SuuntoTokensRetrievalHandler;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -59,7 +60,7 @@ public class SuuntoCloudDownloaderTests {
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
-   private static final String           VALID_TOKEN_RESPONSE        = Comparison.readFileContent(SUUNTO_FILE_PATH
+   private static final String           _validTokenResponse         = Comparison.readFileContent(SUUNTO_FILE_PATH
          + "Token-Response.json");                                                                                                    //$NON-NLS-1$
 
    private static void authorize() throws IOException {
@@ -84,8 +85,6 @@ public class SuuntoCloudDownloaderTests {
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
-
-      TourLogManager.showLogView();
 
       //We set the Suunto account information, otherwise the download can't
       //happen
@@ -115,12 +114,27 @@ public class SuuntoCloudDownloaderTests {
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(VALID_TOKEN_RESPONSE)
+            .doReturn(_validTokenResponse)
             .withStatus(201);
 
       suuntoCloudDownloader = new SuuntoCloudDownloader();
 
       authorize();
+
+      Display.getDefault().addFilter(SWT.Activate, event -> {
+         // Is this a Shell being activated?
+
+         if (event.widget instanceof final Shell shell) {
+
+            // Look at the shell title to see if it is the one we want
+
+            if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
+               // Close the shell after it has finished initializing
+
+               Display.getDefault().asyncExec(() -> shell.close());
+            }
+         }
+      });
    }
 
    private void setTokenRetrievalDateInThePast() {
@@ -133,7 +147,6 @@ public class SuuntoCloudDownloaderTests {
    void setUp() {
 
       httpClientMock.reset();
-      TourLogManager.clear();
    }
 
    @AfterEach
@@ -144,7 +157,7 @@ public class SuuntoCloudDownloaderTests {
 
    //We set the access token issue date time in the past to trigger the retrieval
    //of a new token.
-   @Disabled
+
    @Test
    void testTourDownload() {
 
@@ -159,7 +172,7 @@ public class SuuntoCloudDownloaderTests {
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(VALID_TOKEN_RESPONSE)
+            .doReturn(_validTokenResponse)
             .withStatus(201);
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
@@ -171,28 +184,12 @@ public class SuuntoCloudDownloaderTests {
 
       suuntoCloudDownloader.downloadTours();
 
-      List<?> logs = TourLogManager.getLogs();
-//      boolean logContainsSuuntoEntries = false;
-//      while (!logContainsSuuntoEntries) {
-//
-//         logContainsSuuntoEntries = logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-//               Messages.Log_CloudAction_End));
-//
-//         try {
-//            Thread.sleep(1000);
-//         } catch (final InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//         }
-//
-//         logs = TourLogManager.getLogs();
-//      }
-
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
             .called();
 
-      logs = TourLogManager.getLogs();
+      final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
@@ -200,10 +197,9 @@ public class SuuntoCloudDownloaderTests {
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             downloadedFilename)));
 
-      FileUtils.deleteIfExists(Paths.get(downloadedFilename));
+      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
 
-   @Disabled
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
 
@@ -213,13 +209,12 @@ public class SuuntoCloudDownloaderTests {
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(UI.EMPTY_STRING)
             .withStatus(201);
-
       suuntoCloudDownloader.downloadTours();
 
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            Messages.Log_CloudAction_InvalidTokens)));
+            "Action aborted due to invalid tokens"))); //$NON-NLS-1$
    }
 }
