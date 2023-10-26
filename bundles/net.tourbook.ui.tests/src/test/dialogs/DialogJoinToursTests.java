@@ -20,12 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
-import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -38,22 +35,6 @@ import utils.Utils;
 import views.WorkbenchTests;
 
 public class DialogJoinToursTests extends UITest {
-
-   private void deleteConcatenatedTour(final SWTBotTreeItem tour) {
-
-      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
-            Messages.Tour_Book_Action_delete_selected_tours).click();
-      Utils.clickOkButton(bot);
-      Utils.clickOkButton(bot);
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/2021, 9:11 AM")));//$NON-NLS-1$
-
-      //Check that the tour was successfully deleted
-      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertTrue(Arrays.asList(allItems).stream().anyMatch(item -> item.getText().equals("2021   3")));
-   }
 
    @Test
    void joinTours_TestDialog() {
@@ -122,7 +103,7 @@ public class DialogJoinToursTests extends UITest {
       Utils.clickOkButton(bot);
 
       //Check that the concatenated tour exists
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   3").expand() //$NON-NLS-1$
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
@@ -136,14 +117,12 @@ public class DialogJoinToursTests extends UITest {
       final SWTBotTable tableMarkers = bot.table();
 
       //Make sure that the tour contains all the markers
-      assertEquals(4, tableMarkers.rowCount());
+      assertEquals(2, tableMarkers.rowCount());
 
       assertEquals("0:00", tableMarkers.cell(0, 1)); //$NON-NLS-1$
-      assertEquals("4:15:48", tableMarkers.cell(1, 1)); //$NON-NLS-1$
-      assertEquals("4:19:36", tableMarkers.cell(2, 1)); //$NON-NLS-1$
-      assertEquals("4:23:32", tableMarkers.cell(3, 1)); //$NON-NLS-1$
+      assertEquals("10:09", tableMarkers.cell(1, 1)); //$NON-NLS-1$
 
-      deleteConcatenatedTour(tour);
+      Utils.deleteTour(bot, tour);
    }
 
    @Test
@@ -157,14 +136,14 @@ public class DialogJoinToursTests extends UITest {
       Utils.clickOkButton(bot);
 
       //Check that the concatenated tour exists
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   3").expand() //$NON-NLS-1$
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      assertEquals("9:11 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
-      assertEquals("4:26", tour.cell(tourBookView_ElapsedTime_Column_Index)); //$NON-NLS-1$
-      assertEquals("4:04", tour.cell(tourBookView_RecordedTime_Column_Index)); //$NON-NLS-1$
-      assertEquals("0:22", tour.cell(tourBookView_PausedTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("3:47 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("0:57", tour.cell(tourBookView_ElapsedTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("0:57", tour.cell(tourBookView_RecordedTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("", tour.cell(tourBookView_PausedTime_Column_Index)); //$NON-NLS-1$
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);
@@ -181,20 +160,14 @@ public class DialogJoinToursTests extends UITest {
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.VIEW_NAME_TOURPAUSES).select();
       bot.button("Open").click(); //$NON-NLS-1$
 
-      final SWTBotTable tablePauses = bot.table();
-
-      //Make sure that the pause was correctly concatenated
-      assertEquals(1, tablePauses.rowCount());
-      assertEquals("21:40", tablePauses.cell(0, 0)); //$NON-NLS-1$
-
-      deleteConcatenatedTour(tour);
+      Utils.deleteTour(bot, tour);
    }
 
    private void openDialogJoinTours() {
 
       final SWTBotTree yearTree = bot.tree();
-      final SWTBotTreeItem monthTreeItem = yearTree.expandNode("2021   3").getNode("Jan   3").expand(); //$NON-NLS-1$ //$NON-NLS-2$
-      monthTreeItem.select("2", "30"); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem monthTreeItem = yearTree.expandNode("2021   2").getNode("Jan   2").expand(); //$NON-NLS-1$ //$NON-NLS-2$
+      monthTreeItem.select("30", "31"); //$NON-NLS-1$ //$NON-NLS-2$
 
       //Action
       yearTree.contextMenu(Messages.App_Action_JoinTours).click();
@@ -208,6 +181,10 @@ public class DialogJoinToursTests extends UITest {
       bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
-      tourDateTime.setDate(new Date(1612221767000L));
+
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      //February 1, 2021
+      tourStartTimeCalendar.set(2021, 1, 1);
+      tourDateTime.setDate(tourStartTimeCalendar.getTime());
    }
 }

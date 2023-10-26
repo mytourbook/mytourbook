@@ -45,7 +45,7 @@ public class TaggedToursViewTests extends UITest {
 
       final SWTBotView taggedToursView = Utils.showView(bot, Utils.VIEW_NAME_TAGGEDTOURS);
 
-      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   9").select(); //$NON-NLS-1$
+      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   2").select(); //$NON-NLS-1$
       assertNotNull(item);
       final SWTBotTreeItem node = item.getNode("5/31/2015").select(); //$NON-NLS-1$
       assertNotNull(node);

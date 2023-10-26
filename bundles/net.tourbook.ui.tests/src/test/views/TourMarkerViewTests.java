@@ -36,8 +36,8 @@ public class TourMarkerViewTests extends UITest {
 
       Utils.showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
-            .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   2").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       final SWTBotView tourEditorView = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
