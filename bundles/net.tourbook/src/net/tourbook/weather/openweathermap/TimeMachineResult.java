@@ -59,12 +59,12 @@ class TimeMachineResult {
 
       final double[] windSpeeds = hourly
             .stream()
-            .mapToDouble(Hourly::getWind_speedKmph)
+            .mapToDouble(h -> h.getWind_speedKmph())
             .toArray();
 
       final int[] windDirections = hourly
             .stream()
-            .mapToInt(hourly -> hourly.wind_deg())
+            .mapToInt(h -> h.wind_deg())
             .toArray();
 
       final int[] averageWindSpeedAndDirection =
@@ -126,7 +126,7 @@ class TimeMachineResult {
    public float getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            hourly.stream().mapToDouble(hourly -> hourly.humidity()).average();
+            hourly.stream().mapToDouble(h -> h.humidity()).average();
 
       if (averageHumidity.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageHumidity.getAsDouble());
@@ -138,7 +138,7 @@ class TimeMachineResult {
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
-            hourly.stream().mapToDouble(hourly -> hourly.pressure()).average();
+            hourly.stream().mapToDouble(h -> h.pressure()).average();
 
       if (averagePressure.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
@@ -150,7 +150,7 @@ class TimeMachineResult {
    public float getAverageWindChill() {
 
       final OptionalDouble averageWindChill =
-            hourly.stream().mapToDouble(hourly -> hourly.feels_like()).average();
+            hourly.stream().mapToDouble(h -> h.feels_like()).average();
 
       if (averageWindChill.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
@@ -190,7 +190,7 @@ class TimeMachineResult {
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
-            hourly.stream().mapToDouble(hourly -> hourly.temp()).average();
+            hourly.stream().mapToDouble(h -> h.temp()).average();
 
       if (averageTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
@@ -202,7 +202,7 @@ class TimeMachineResult {
    public float getTemperatureMax() {
 
       final OptionalDouble maxTemperature =
-            hourly.stream().mapToDouble(hourly -> hourly.temp()).max();
+            hourly.stream().mapToDouble(h -> h.temp()).max();
 
       if (maxTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
@@ -214,7 +214,7 @@ class TimeMachineResult {
    public float getTemperatureMin() {
 
       final OptionalDouble minTemperature =
-            hourly.stream().mapToDouble(hourly -> hourly.temp()).min();
+            hourly.stream().mapToDouble(h -> h.temp()).min();
 
       if (minTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
@@ -225,12 +225,12 @@ class TimeMachineResult {
 
    public float getTotalPrecipitation() {
 
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(h -> h.getRain()).sum());
    }
 
    public float getTotalSnowfall() {
 
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(h -> h.getSnow()).sum());
    }
 
    public String getWeatherClouds() {
