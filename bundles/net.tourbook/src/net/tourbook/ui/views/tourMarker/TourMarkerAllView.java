@@ -100,6 +100,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourViewer {
 
+   private static final char           NL                                = UI.NEW_LINE;
    public static final String          ID                                = "net.tourbook.ui.views.TourMarkerAllView";   //$NON-NLS-1$
    //
    private static final String         COLUMN_ALTITUDE                   = "Altitude";                                  //$NON-NLS-1$
@@ -1364,25 +1365,23 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final String tblTourMarker = TourDatabase.TABLE_TOUR_MARKER;
-         final String tourKey = TourDatabase.KEY_TOUR;
+         final String sql = UI.EMPTY_STRING
 
-         final String sql = "SELECT " // //$NON-NLS-1$
-               + "MarkerID, " //                  // 1 //$NON-NLS-1$
-               + (tourKey + ", ") //               // 2 //$NON-NLS-1$
-               + "Label, " //                     // 3 //$NON-NLS-1$
-               + "description, " //               // 4 //$NON-NLS-1$
-               + "urlText, " //                  // 5 //$NON-NLS-1$
-               + "urlAddress, " //                  // 6 //$NON-NLS-1$
-               + "latitude, " //                  // 7 //$NON-NLS-1$
-               + "longitude, " //                  // 8 //$NON-NLS-1$
-               + "altitude, " //                  // 9 //$NON-NLS-1$
-               + "tourTime " //                  // 10 //$NON-NLS-1$
-               //
-               + UI.NEW_LINE
-               //
-               + (" FROM " + tblTourMarker + UI.NEW_LINE) //$NON-NLS-1$
-         //
+               + "SELECT" + NL //                           //$NON-NLS-1$
+
+               + "MarkerID," + NL //                     1  //$NON-NLS-1$
+               + TourDatabase.KEY_TOUR + "," + NL //     2  //$NON-NLS-1$
+               + "Label," + NL //                        3  //$NON-NLS-1$
+               + "description," + NL //                  4  //$NON-NLS-1$
+               + "urlText," + NL //                      5  //$NON-NLS-1$
+               + "urlAddress," + NL //                   6  //$NON-NLS-1$
+               + "latitude," + NL //                     7  //$NON-NLS-1$
+               + "longitude," + NL //                    8  //$NON-NLS-1$
+               + "altitude," + NL //                     9  //$NON-NLS-1$
+               + "tourTime " + NL //                     10 //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.TABLE_TOUR_MARKER + NL //$NON-NLS-1$
+
          ;
 
          statement = conn.prepareStatement(sql);
@@ -1428,14 +1427,18 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 //               }
             }
 
-            markerItem.markerId = result.getLong(1);
-            markerItem.tourId = result.getLong(2);
-            markerItem.label = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
-            markerItem.description = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
-            markerItem.urlLabel = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
-            markerItem.urlAddress = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
-            markerItem.altitude = result.getFloat(9);
-            markerItem.time = result.getLong(10);
+// SET_FORMATTING_OFF
+
+            markerItem.markerId     = result.getLong(1);
+            markerItem.tourId       = result.getLong(2);
+            markerItem.label        = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
+            markerItem.description  = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
+            markerItem.urlLabel     = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
+            markerItem.urlAddress   = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
+            markerItem.altitude     = result.getFloat(9);
+            markerItem.time         = result.getLong(10);
+
+// SET_FORMATTING_ON
          }
 
       } catch (final SQLException e) {

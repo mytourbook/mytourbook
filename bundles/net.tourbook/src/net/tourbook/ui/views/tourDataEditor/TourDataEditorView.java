@@ -4938,12 +4938,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void createUI_SectionSeparator(final Composite parent) {
-
-      final Composite sep = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
-   }
-
    private Composite createUI_Tab_10_Tour(final Composite parent) {
 
       // scrolled container
@@ -4954,8 +4948,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       {
          _tourContainer = new Composite(_tab1Container, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(_tourContainer);
-         _tk.adapt(_tourContainer);
          GridLayoutFactory.swtDefaults().applyTo(_tourContainer);
+         _tk.adapt(_tourContainer);
 //       _tourContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
 
          // set content for scrolled composite
@@ -4964,17 +4958,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tk.setBorderStyle(SWT.BORDER);
          {
             createUI_Section_110_Tour(_tourContainer);
-            createUI_SectionSeparator(_tourContainer);
-
             createUI_Section_120_DateTime(_tourContainer);
-            createUI_SectionSeparator(_tourContainer);
-
             createUI_Section_130_Personal(_tourContainer);
-            createUI_SectionSeparator(_tourContainer);
-
             createUI_Section_140_Weather(_tourContainer);
-            createUI_SectionSeparator(_tourContainer);
-
             createUI_Section_150_Characteristics(_tourContainer);
          }
       }
