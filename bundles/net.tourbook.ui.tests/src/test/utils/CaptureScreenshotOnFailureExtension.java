@@ -23,7 +23,6 @@ public class CaptureScreenshotOnFailureExtension implements TestWatcher {
 
    private String constructFilename(final ExtensionContext context) {
       return "./target/" //$NON-NLS-1$
-            + context.getClass().getCanonicalName() + "." //$NON-NLS-1$
             + context.getTestClass().get().getName() + "." //$NON-NLS-1$
             + context.getTestMethod().get().getName() + ".png"; //$NON-NLS-1$
    }
