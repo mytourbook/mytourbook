@@ -50,7 +50,7 @@ public class AllTourMarkersViewTests extends UITest {
 
       //todo fb fix when the duplicate of markers is fixed
 //      final int rowIndex = tableMarkersTable.searchText("2/1/09");
-      final int rowIndex = tableMarkersTable.searchText("5/18/13");
+      final int rowIndex = tableMarkersTable.searchText("2/1/09");
       assertTrue(rowIndex != -1);
       tableMarkersTable.select(rowIndex);
       tableMarkersTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();
