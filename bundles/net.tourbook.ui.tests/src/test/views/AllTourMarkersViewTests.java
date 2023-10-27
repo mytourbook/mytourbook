@@ -50,7 +50,7 @@ public class AllTourMarkersViewTests extends UITest {
 
       // Assert that there are 2 more markers
       initialTableRowCount = initialTableRowCount + 2;
-      assertEquals(initialTableRowCount + 2, tableMarkersTable.rowCount());
+      assertEquals(initialTableRowCount, tableMarkersTable.rowCount());
 
       final int rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
       assertTrue(rowIndex != -1);
