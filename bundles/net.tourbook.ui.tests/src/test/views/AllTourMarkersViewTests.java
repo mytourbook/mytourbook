@@ -51,7 +51,7 @@ public class AllTourMarkersViewTests extends UITest {
       // Assert that there are 2 more markers
       assertEquals(initialTableRowCount + 2, tableMarkersTable.rowCount());
 
-      final int rowIndex = tableMarkersTable.searchText("2/1/09"); //$NON-NLS-1$
+      final int rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
       assertTrue(rowIndex != -1);
       tableMarkersTable.select(rowIndex);
       tableMarkersTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();
