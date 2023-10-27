@@ -40,7 +40,7 @@ public class AllTourMarkersViewTests extends UITest {
       final SWTBotTable tableMarkersTable = allTourMarkersView.bot().table();
 
       // assert initial state
-      final int initialTableRowCount = tableMarkersTable.rowCount();
+      int initialTableRowCount = tableMarkersTable.rowCount();
       // Make sure that the table contains several markers
       assertTrue(initialTableRowCount > 0);
 
@@ -49,6 +49,7 @@ public class AllTourMarkersViewTests extends UITest {
       allTourMarkersView.show();
 
       // Assert that there are 2 more markers
+      initialTableRowCount = initialTableRowCount + 2;
       assertEquals(initialTableRowCount + 2, tableMarkersTable.rowCount());
 
       final int rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
