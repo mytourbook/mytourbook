@@ -37,10 +37,6 @@ public class AllTourMarkersViewTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_ALLTOURMARKERS);
       final SWTBotView allTourMarkersView = Utils.showView(bot, Utils.VIEW_NAME_ALLTOURMARKERS);
 
-      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
-
-      allTourMarkersView.show();
-
       final SWTBotTable tableMarkersTable = allTourMarkersView.bot().table();
 
       // assert initial state
@@ -48,9 +44,14 @@ public class AllTourMarkersViewTests extends UITest {
       // Make sure that the table contains several markers
       assertTrue(initialTableRowCount > 0);
 
-      //todo fb fix when the duplicate of markers is fixed
-//      final int rowIndex = tableMarkersTable.searchText("2/1/09");
-      final int rowIndex = tableMarkersTable.searchText("2/1/09");
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+
+      allTourMarkersView.show();
+
+      // Assert that there are 2 more markers
+      assertEquals(initialTableRowCount + 2, tableMarkersTable.rowCount());
+
+      final int rowIndex = tableMarkersTable.searchText("2/1/09"); //$NON-NLS-1$
       assertTrue(rowIndex != -1);
       tableMarkersTable.select(rowIndex);
       tableMarkersTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();

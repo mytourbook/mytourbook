@@ -40,6 +40,6 @@ public abstract class UITest {
       PluginProperties.getInstance().populate(TourbookPlugin
             .getBundleContext().getBundle());
 
-      SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+      SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US"; //$NON-NLS-1$
    }
 }
