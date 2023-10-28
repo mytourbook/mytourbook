@@ -108,6 +108,7 @@ import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
@@ -7827,7 +7828,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // tour is not modified which is caused when an error occurs -> show error log
 
-            TourLogManager.showLogView();
+            TourLogManager.showLogView(AutoOpenEvent.DOWNLOAD_SOMETHING);
 
          } else {
 

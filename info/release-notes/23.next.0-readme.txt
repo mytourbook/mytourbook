@@ -51,6 +51,11 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1219
 
 
+* Tour Log View
+  - Customize when this view is opened automatically, exceptions will always show this view
+    https://github.com/mytourbook/mytourbook/issues/1222 
+    https://github.com/mytourbook/mytourbook/discussions/1210
+
 Changes
 =======
 

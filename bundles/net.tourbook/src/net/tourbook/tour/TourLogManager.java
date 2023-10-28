@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.tourbook.application.TourbookPlugin;
@@ -28,25 +31,37 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
 
-   static final String                                ID                            = "net.tourbook.tour.TourLogManager"; //$NON-NLS-1$
+   static final String                                ID                     = "net.tourbook.tour.TourLogManager"; //$NON-NLS-1$
 
-   static final String                                STATE_AUTO_OPEN_TOUR_LOG_VIEW = "STATE_AUTO_OPEN_TOUR_LOG_VIEW";    //$NON-NLS-1$
+   private static final String                        STATE_AUTO_OPEN_WHEN   = "STATE_AUTO_OPEN_WHEN";             //$NON-NLS-1$
+   private static final String                        STATE_AUTO_OPEN_EVENTS = "STATE_AUTO_OPEN_EVENTS";           //$NON-NLS-1$
 
-   private static final IDialogSettings               _state                        = TourbookPlugin.getState(ID);
+   private static final IDialogSettings               _state                 = TourbookPlugin.getState(ID);
 
-   private static final CopyOnWriteArrayList<TourLog> _allTourLogs                  = new CopyOnWriteArrayList<>();
+   private static final CopyOnWriteArrayList<TourLog> _allTourLogs           = new CopyOnWriteArrayList<>();
 
    private static TourLogView                         _logView;
 
-   public enum AutoOpenEvent{
+   private static AutoOpenWhen                        _autoOpenWhen;
+   private static Set<AutoOpenEvent>                  _autoOpenEvents;
 
-      DELETE_TOUR, //
+   public enum AutoOpenEvent {
+
+      EXCEPTION, //
+
+      DELETE_SOMETHING, //
+      DOWNLOAD_SOMETHING, //
+      SAVE_SOMETHING, //
+
+      TOUR_ADJUSTMENTS, //
+      TOUR_IMPORT, //
+      TOUR_UPLOAD, //
    }
 
-   public enum AutoOpenTourLogView {
+   public enum AutoOpenWhen {
 
       NEVER, //
-      ANY_EVENTS, //
+      ALL_EVENTS, //
       SELECTED_EVENTS
    }
 
@@ -87,14 +102,27 @@ public class TourLogManager {
       TourLog.clear();
    }
 
+   static Set<AutoOpenEvent> getAutoOpenEvents() {
+
+      if (_autoOpenEvents == null) {
+         restoreState();
+      }
+
+      return _autoOpenEvents;
+   }
+
+   static AutoOpenWhen getAutoOpenWhen() {
+
+      if (_autoOpenWhen == null) {
+         restoreState();
+      }
+
+      return _autoOpenWhen;
+   }
+
    public static CopyOnWriteArrayList<TourLog> getLogs() {
 
       return _allTourLogs;
-   }
-
-   public static IDialogSettings getState() {
-
-      return _state;
    }
 
    private static boolean isTourLogOpen() {
@@ -138,7 +166,7 @@ public class TourLogManager {
 
       addLog(tourLog);
 
-      Display.getDefault().syncExec(TourLogManager::showLogView);
+      Display.getDefault().syncExec(() -> TourLogManager.showLogView(AutoOpenEvent.EXCEPTION));
 
       // ensure it is logged when crashing
       StatusUtil.log(e);
@@ -194,18 +222,64 @@ public class TourLogManager {
       addLog(tourLog);
    }
 
+   private static void restoreState() {
+
+      _autoOpenWhen = (AutoOpenWhen) Util.getStateEnum(_state,
+            STATE_AUTO_OPEN_WHEN,
+            AutoOpenWhen.NEVER);
+
+      final ArrayList<AutoOpenEvent> openEventDefaultValues = new ArrayList<>();
+      for (final AutoOpenEvent autoOpenEvent : AutoOpenEvent.values()) {
+         openEventDefaultValues.add(autoOpenEvent);
+      }
+
+      final ArrayList<AutoOpenEvent> autoOpenEvents = Util.getStateEnumList(_state, STATE_AUTO_OPEN_EVENTS, openEventDefaultValues);
+
+      _autoOpenEvents = new HashSet<>();
+      _autoOpenEvents.addAll(autoOpenEvents);
+   }
+
+   static void saveState_AutoOpenValues(final AutoOpenWhen autoOpenWhen,
+                                        final ArrayList<AutoOpenEvent> allOpenEvents) {
+
+      _autoOpenWhen = autoOpenWhen;
+
+      _autoOpenEvents.clear();
+      _autoOpenEvents.addAll(allOpenEvents);
+
+      Util.setStateEnum(_state, STATE_AUTO_OPEN_WHEN, autoOpenWhen);
+      Util.setStateEnum(_state, STATE_AUTO_OPEN_EVENTS, allOpenEvents);
+   }
+
    public static void setLogView(final TourLogView tourLogView) {
 
       _logView = tourLogView;
    }
 
-   public static void showLogView() {
+   public static void showLogView(final AutoOpenEvent autoOpenEvent) {
 
-      _logView = (TourLogView) Util.showView(TourLogView.ID,
+      final AutoOpenWhen autoOpenWhen = getAutoOpenWhen();
 
-            // !!! log view MUST NOT be activated, otherwise events (e.g. deletion) are NOT fired from the source view !!!
+      if (autoOpenWhen.equals(AutoOpenWhen.NEVER)) {
+         return;
+      }
 
-            false);
+      final Set<AutoOpenEvent> allAutoOpenEvents = getAutoOpenEvents();
+
+      if (false
+
+            || autoOpenWhen.equals(AutoOpenWhen.ALL_EVENTS)
+            || autoOpenWhen.equals(AutoOpenWhen.SELECTED_EVENTS) && allAutoOpenEvents.contains(autoOpenEvent)
+
+            // ensure that exceptions are always displayed
+            || autoOpenEvent == AutoOpenEvent.EXCEPTION) {
+
+         _logView = (TourLogView) Util.showView(TourLogView.ID,
+
+               // !!! log view MUST NOT be activated, otherwise events (e.g. deletion) are NOT fired from the source view !!!
+
+               false);
+      }
    }
 
    /**

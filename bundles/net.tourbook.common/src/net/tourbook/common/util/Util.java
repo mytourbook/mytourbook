@@ -1151,7 +1151,12 @@ public class Util {
       }
 
       final String[] allStateValues = state.getArray(key);
-      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.isEmpty()) {
+
+      if (allStateValues == null
+            || allStateValues.length == 0
+            || allDefaultValues == null
+            || allDefaultValues.isEmpty()) {
+
          return allDefaultValues;
       }
 

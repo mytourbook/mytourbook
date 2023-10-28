@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2022 Frédéric Bard
+ * Copyright (C) 2019, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
@@ -77,7 +78,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
 
       final long start = System.currentTimeMillis();
 
-      TourLogManager.showLogView();
+      TourLogManager.showLogView(AutoOpenEvent.TOUR_ADJUSTMENTS);
       TourLogManager.log_TITLE(NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
 
       boolean isTaskDone = false;
@@ -98,6 +99,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
             Display.getDefault().asyncExec(() -> {
 
                TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
                // prevent re-importing in the import view
                RawDataManager.setIsReimportingActive(true);
                {

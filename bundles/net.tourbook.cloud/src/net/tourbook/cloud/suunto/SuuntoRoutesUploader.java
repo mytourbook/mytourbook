@@ -47,6 +47,7 @@ import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -330,7 +331,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       try {
          final long start = System.currentTimeMillis();
 
-         TourLogManager.showLogView();
+         TourLogManager.showLogView(AutoOpenEvent.TOUR_UPLOAD);
          TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadRoutesToSuunto_001_Start, numberOfTours));
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);

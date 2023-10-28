@@ -1446,7 +1446,6 @@ public class Messages extends NLS {
    public static String        PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
    public static String        PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
-   public static String        PrefPage_Import_Checkbox_AutoOpenTourLogView;
    public static String        PrefPage_Import_Checkbox_CreateTourIdWithTime;
    public static String        PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
    public static String        PrefPage_Import_Checkbox_IgnoreInvalidFiles;
@@ -2507,10 +2506,17 @@ public class Messages extends NLS {
    public static String        Slideout_TourInfoOptions_Label_TooltipDelaySimple_Tooltip;
    public static String        Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 
-   public static String        Slideout_TourLogOptions_Checkbox_Event_DeleteTour;
+   public static String        Slideout_TourLogOptions_Checkbox_Event_DeleteSomething;
+   public static String        Slideout_TourLogOptions_Checkbox_Event_DownloadSomething;
+   public static String        Slideout_TourLogOptions_Checkbox_Event_ImportTour;
+   public static String        Slideout_TourLogOptions_Checkbox_Event_SaveSomething;
+   public static String        Slideout_TourLogOptions_Checkbox_Event_TourAdjustments;
+   public static String        Slideout_TourLogOptions_Checkbox_Event_TourUpload;
    public static String        Slideout_TourLogOptions_Label_AutoOpenLogView;
+
+   public static String Slideout_TourLogOptions_Label_AutoOpenLogView_MoreInfo;
    public static String        Slideout_TourLogOptions_Label_Title;
-   public static String        Slideout_TourLogOptions_Radio_OpenLog_AnyEvents;
+   public static String        Slideout_TourLogOptions_Radio_OpenLog_AllEvents;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_Never;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_SelectedEvents;
 
