@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final IDialogSettings _state              = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings _state                = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private static final String[]        ALL_ELEVATION_OPTIONS = {
 
@@ -79,10 +79,11 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    private Button    _chkDelete_KeepDistance;
    private Button    _chkDelete_KeepTime;
    private Button    _chkRecomputeElevation;
-   
+   private Button    _chkUseMouseWheel;
+
    private Combo     _comboElevationOptions;
    private Combo     _comboTagContent;
-   
+
    private Label     _lblNumTagContentColumns;
    private Label     _lblTagImageSize;
    private Label     _lblTagContentWidth;
@@ -260,6 +261,37 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       }
       {
          /*
+          * Scroll field content with mouse wheel
+          */
+         _chkUseMouseWheel = new Button(parent, SWT.CHECK);
+         _chkUseMouseWheel.setText(Messages.Slideout_TourEditor_Checkbox_UseMouseWheel);
+         _chkUseMouseWheel.setToolTipText(Messages.Slideout_TourEditor_Checkbox_UseMouseWheel_Tooltip);
+         _chkUseMouseWheel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_UseMouseWheel()));
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkUseMouseWheel);
+      }
+      {
+         /*
+          * Recompute elevation up/down when saved
+          */
+         _chkRecomputeElevation = new Button(parent, SWT.CHECK);
+         _chkRecomputeElevation.setText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown);
+         _chkRecomputeElevation.setToolTipText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip);
+         _chkRecomputeElevation.addSelectionListener(_defaultSelectionListener);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkRecomputeElevation);
+
+         // combo
+         _comboElevationOptions = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+         _comboElevationOptions.setVisibleItemCount(20);
+         _comboElevationOptions.addSelectionListener(_defaultSelectionListener);
+         _comboElevationOptions.addFocusListener(_keepOpenListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .grab(true, false)
+               .indent(16, 0)
+               .applyTo(_comboElevationOptions);
+      }
+      {
+         /*
           * DEL key actions
           */
          final Composite container = new Composite(parent, SWT.NONE);
@@ -285,27 +317,6 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             _chkDelete_KeepDistance.setToolTipText(Messages.Slideout_TourEditor_Checkbox_KeepDistance_Tooltip);
             _chkDelete_KeepDistance.addSelectionListener(_defaultSelectionListener);
          }
-      }
-      {
-         /*
-          * Recompute elevation up/down when saved
-          */
-         _chkRecomputeElevation = new Button(parent, SWT.CHECK);
-         _chkRecomputeElevation.setText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown);
-         _chkRecomputeElevation.setToolTipText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip);
-         _chkRecomputeElevation.addSelectionListener(_defaultSelectionListener);
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkRecomputeElevation);
-
-         // combo
-         _comboElevationOptions = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-         _comboElevationOptions.setVisibleItemCount(20);
-         _comboElevationOptions.addSelectionListener(_defaultSelectionListener);
-         _comboElevationOptions.addFocusListener(_keepOpenListener);
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .grab(true, false)
-               .indent(16, 0)
-               .applyTo(_comboElevationOptions);
       }
    }
 
@@ -545,6 +556,15 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _shellContainer.getDisplay().asyncExec(() -> TagManager.updateTagContent());
    }
 
+   private void onSelect_UseMouseWheel() {
+
+      final boolean isUseMouseWheel = _chkUseMouseWheel.getSelection();
+
+      _state.put(TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL, isUseMouseWheel);
+
+      _tourEditorView.updateUI_ScollFieldContentWithMouseWheel(isUseMouseWheel);
+   }
+
    @Override
    public void resetToDefaults() {
 
@@ -561,6 +581,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
       final boolean isElevationFromDevice       = TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT;
       final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
+      final boolean isUseMouseWheel             = TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL_DEFAULT;
 
       final int tagContentWidth                 = TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT;
       final int tagImageSize                    = TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT;
@@ -570,10 +591,12 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       /*
        * Update model
        */
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,            isDeleteKeepDistance);
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                isDeleteKeepTime);
-      _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,           isElevationFromDevice);
-      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,     isRecomputeElevation);
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,                  isDeleteKeepDistance);
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                      isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,                 isElevationFromDevice);
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,           isRecomputeElevation);
+      _state.put(TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL, isUseMouseWheel);
+
       _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,        descriptionNumberOfLines);
       _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                     latLonDigits);
 
@@ -589,6 +612,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _chkDelete_KeepDistance             .setSelection(isDeleteKeepDistance);
       _chkDelete_KeepTime                 .setSelection(isDeleteKeepTime);
       _chkRecomputeElevation              .setSelection(isRecomputeElevation);
+      _chkUseMouseWheel                   .setSelection(isUseMouseWheel);
       _comboElevationOptions              .select(getElevationFromDeviceIndex(isElevationFromDevice));
       _spinnerLatLonDigits                .setSelection(latLonDigits);
       _spinnerTourDescriptionNumLines     .setSelection(descriptionNumberOfLines);
@@ -629,6 +653,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _chkRecomputeElevation.setSelection(Util.getStateBoolean(_state,
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT));
+
+      _chkUseMouseWheel.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL,
+            TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL_DEFAULT));
 
       _spinnerLatLonDigits.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_LAT_LON_DIGITS,
@@ -679,7 +707,5 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,        getIsElevationFromDevice());
 
 // SET_FORMATTING_ON
-
    }
-
 }

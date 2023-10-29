@@ -2412,6 +2412,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Checkbox_KeepTime_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip;
+   public static String        Slideout_TourEditor_Checkbox_UseMouseWheel;
+   public static String        Slideout_TourEditor_Checkbox_UseMouseWheel_Tooltip;
    public static String        Slideout_TourEditor_Combo_ElevationFromDevice;
    public static String        Slideout_TourEditor_Combo_ElevationFromSRTM;
    public static String        Slideout_TourEditor_Group_Tags;
@@ -2514,7 +2516,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourLogOptions_Checkbox_Event_TourUpload;
    public static String        Slideout_TourLogOptions_Label_AutoOpenLogView;
 
-   public static String Slideout_TourLogOptions_Label_AutoOpenLogView_MoreInfo;
+   public static String        Slideout_TourLogOptions_Label_AutoOpenLogView_MoreInfo;
    public static String        Slideout_TourLogOptions_Label_Title;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_AllEvents;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_Never;

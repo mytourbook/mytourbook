@@ -190,9 +190,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -227,94 +229,96 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
+   public static final String            ID                                                     = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
    //
-   private static final char             NL                                               = UI.NEW_LINE;
+   private static final char             NL                                                     = UI.NEW_LINE;
    //
-   private static final int              COLUMN_SPACING                                   = 20;
+   private static final int              COLUMN_SPACING                                         = 20;
    //
-   private static final String           WIDGET_KEY                                       = "widgetKey";                                      //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOUR_DISTANCE                         = "tourDistance";                                   //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP                           = "altitudeUp";                                     //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN                         = "altitudeDown";                                   //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON                                = "tourPerson";                                     //$NON-NLS-1$
+   private static final String           WIDGET_KEY                                             = "widgetKey";                                      //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOUR_DISTANCE                               = "tourDistance";                                   //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_UP                                 = "altitudeUp";                                     //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_DOWN                               = "altitudeDown";                                   //$NON-NLS-1$
+   private static final String           WIDGET_KEY_PERSON                                      = "tourPerson";                                     //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                    = "anotherSelection";                               //$NON-NLS-1$
+   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                          = "anotherSelection";                               //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int              BUSY_INDICATOR_ITEMS                             = 5000;
+   private static final int              BUSY_INDICATOR_ITEMS                                   = 5000;
    //
-   private static final String           STATE_SELECTED_TAB                               = "tourDataEditor.selectedTab";                     //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE                              = "tourDataEditor.rowEditMode";                     //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE                               = "tourDataEditor.isEditMode";                      //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH                            = "tourDataEditor.csvExportPath";                   //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB                                     = "tourDataEditor.selectedTab";                     //$NON-NLS-1$
+   private static final String           STATE_ROW_EDIT_MODE                                    = "tourDataEditor.rowEditMode";                     //$NON-NLS-1$
+   private static final String           STATE_IS_EDIT_MODE                                     = "tourDataEditor.isEditMode";                      //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                                  = "tourDataEditor.csvExportPath";                   //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS                    = "STATE_SECTION_CHARACTERISTICS";                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME                          = "STATE_SECTION_DATE_TIME";                        //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL                           = "STATE_SECTION_PERSONAL";                         //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE                              = "STATE_SECTION_TITLE";                            //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER                            = "STATE_SECTION_WEATHER";                          //$NON-NLS-1$
+   private static final String           STATE_SECTION_CHARACTERISTICS                          = "STATE_SECTION_CHARACTERISTICS";                  //$NON-NLS-1$
+   private static final String           STATE_SECTION_DATE_TIME                                = "STATE_SECTION_DATE_TIME";                        //$NON-NLS-1$
+   private static final String           STATE_SECTION_PERSONAL                                 = "STATE_SECTION_PERSONAL";                         //$NON-NLS-1$
+   private static final String           STATE_SECTION_TITLE                                    = "STATE_SECTION_TITLE";                            //$NON-NLS-1$
+   private static final String           STATE_SECTION_WEATHER                                  = "STATE_SECTION_WEATHER";                          //$NON-NLS-1$
    //
-   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
-   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
-   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
-   static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
-   static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
-   static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
-   static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
-   static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
-   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$
-   static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
-   static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                           //$NON-NLS-1$
-   static final int                      STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
-   public static final String            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";       //$NON-NLS-1$
-   public static final int               STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
+   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                      = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
+   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT              = 3;
+   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                          = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
+   static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT                  = false;
+   static final String                   STATE_IS_DELETE_KEEP_TIME                              = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
+   static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                      = false;
+   static final String                   STATE_IS_ELEVATION_FROM_DEVICE                         = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
+   static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT                 = true;
+   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN                   = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$
+   static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT           = true;
+   static final String                   STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL         = "STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL"; //$NON-NLS-1$
+   static final boolean                  STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL_DEFAULT = true;
+   static final String                   STATE_LAT_LON_DIGITS                                   = "STATE_LAT_LON_DIGITS";                           //$NON-NLS-1$
+   static final int                      STATE_LAT_LON_DIGITS_DEFAULT                           = 5;
+   public static final String            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES               = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";       //$NON-NLS-1$
+   public static final int               STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT       = 6;
    //
-   public static final String            STATE_TAG_CONTENT_LAYOUT                         = "STATE_TAG_CONTENT_LAYOUT";                       //$NON-NLS-1$
-   public static final TagContentLayout  STATE_TAG_CONTENT_LAYOUT_DEFAULT                 = TagContentLayout.IMAGE_AND_DATA;
-   public static final String            STATE_TAG_IMAGE_SIZE                             = "STATE_TAG_IMAGE_SIZE";                           //$NON-NLS-1$
-   public static final int               STATE_TAG_IMAGE_SIZE_DEFAULT                     = 100;
-   public static final int               STATE_TAG_IMAGE_SIZE_MIN                         = 10;
-   public static final int               STATE_TAG_IMAGE_SIZE_MAX                         = 500;
-   public static final String            STATE_TAG_TEXT_WIDTH                             = "STATE_TAG_TEXT_WIDTH";                           //$NON-NLS-1$
-   public static final int               STATE_TAG_TEXT_WIDTH_DEFAULT                     = 200;
-   public static final int               STATE_TAG_TEXT_WIDTH_MIN                         = 20;
-   public static final int               STATE_TAG_TEXT_WIDTH_MAX                         = 1000;
-   public static final String            STATE_TAG_NUM_CONTENT_COLUMNS                    = "STATE_TAG_NUM_CONTENT_COLUMNS";                  //$NON-NLS-1$
-   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT            = 2;
-   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MIN                = 1;
-   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MAX                = 100;
+   public static final String            STATE_TAG_CONTENT_LAYOUT                               = "STATE_TAG_CONTENT_LAYOUT";                       //$NON-NLS-1$
+   public static final TagContentLayout  STATE_TAG_CONTENT_LAYOUT_DEFAULT                       = TagContentLayout.IMAGE_AND_DATA;
+   public static final String            STATE_TAG_IMAGE_SIZE                                   = "STATE_TAG_IMAGE_SIZE";                           //$NON-NLS-1$
+   public static final int               STATE_TAG_IMAGE_SIZE_DEFAULT                           = 100;
+   public static final int               STATE_TAG_IMAGE_SIZE_MIN                               = 10;
+   public static final int               STATE_TAG_IMAGE_SIZE_MAX                               = 500;
+   public static final String            STATE_TAG_TEXT_WIDTH                                   = "STATE_TAG_TEXT_WIDTH";                           //$NON-NLS-1$
+   public static final int               STATE_TAG_TEXT_WIDTH_DEFAULT                           = 200;
+   public static final int               STATE_TAG_TEXT_WIDTH_MIN                               = 20;
+   public static final int               STATE_TAG_TEXT_WIDTH_MAX                               = 1000;
+   public static final String            STATE_TAG_NUM_CONTENT_COLUMNS                          = "STATE_TAG_NUM_CONTENT_COLUMNS";                  //$NON-NLS-1$
+   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT                  = 2;
+   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MIN                      = 1;
+   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MAX                      = 100;
    //
-   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE            = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE";          //$NON-NLS-1$
-   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START"; //$NON-NLS-1$
-   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END     = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";   //$NON-NLS-1$
+   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE                  = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE";          //$NON-NLS-1$
+   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START         = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START"; //$NON-NLS-1$
+   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END           = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";   //$NON-NLS-1$
    //
-   private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                              //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                             //$NON-NLS-1$
-   private static final String           COLUMN_DATA_SEQUENCE                             = "DATA_SEQUENCE";                                  //$NON-NLS-1$
-   private static final String           COLUMN_POWER                                     = "POWER";                                          //$NON-NLS-1$
-   private static final String           COLUMN_PACE                                      = "MOTION_PACE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                                     = "BODY_PULSE";                                     //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                               = "WEATHER_TEMPERATURE";                            //$NON-NLS-1$
+   private static final String           COLUMN_ALTITUDE                                        = "ALTITUDE_ALTITUDE";                              //$NON-NLS-1$
+   private static final String           COLUMN_CADENCE                                         = "POWERTRAIN_CADENCE";                             //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                                   = "DATA_SEQUENCE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_POWER                                           = "POWER";                                          //$NON-NLS-1$
+   private static final String           COLUMN_PACE                                            = "MOTION_PACE";                                    //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                                           = "BODY_PULSE";                                     //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                                     = "WEATHER_TEMPERATURE";                            //$NON-NLS-1$
    //
-   private static final IPreferenceStore _prefStore                                       = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common                                = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                                           = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateSwimSlice                                  = TourbookPlugin.getState(ID + ".swimSlice");       //$NON-NLS-1$
-   private static final IDialogSettings  _stateTimeSlice                                  = TourbookPlugin.getState(ID + ".slice");           //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                                             = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                                      = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                                                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _stateSwimSlice                                        = TourbookPlugin.getState(ID + ".swimSlice");       //$NON-NLS-1$
+   private static final IDialogSettings  _stateTimeSlice                                        = TourbookPlugin.getState(ID + ".slice");           //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
-   private static final boolean          IS_OSX                                           = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                                    = UI.IS_DARK_THEME;
+   private static final boolean          IS_LINUX                                               = UI.IS_LINUX;
+   private static final boolean          IS_OSX                                                 = UI.IS_OSX;
+   private static final boolean          IS_DARK_THEME                                          = UI.IS_DARK_THEME;
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
     */
-   private static final int              _hintTextColumnWidth                             = IS_OSX ? 200 : 150;
+   private static final int              _hintTextColumnWidth                                   = IS_OSX ? 200 : 150;
    //
-   DecimalFormat                         _temperatureFormat                               = new DecimalFormat("###.0");                       //$NON-NLS-1$
+   DecimalFormat                         _temperatureFormat                                     = new DecimalFormat("###.0");                       //$NON-NLS-1$
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -400,19 +404,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private boolean                            _isRowEditMode          = true;
    private boolean                            _isEditMode;
-   private boolean                            _isTourDirty            = false;
+   private boolean                            _isTourDirty;
    private boolean                            _isTourWithSwimData;
    //
    /**
-    * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
+    * When <code>true</code> then the mouse wheel scrolls the content of the hovered fields, e.g.
+    * spinner, combobox, ...
+    */
+   private boolean                            _isScrollFieldContentWithMouseWheel;
+   //
+   /**
+    * Is <code>true</code> when the tour is currently being saved to prevent a modify event or the
     * onSelectionChanged event
     */
-   private boolean                            _isSavingInProgress     = false;
+   private boolean                            _isSavingInProgress;
 
    /**
     * When <code>true</code> then data are loaded into fields
     */
-   private boolean                            _isSetField             = false;
+   private boolean                            _isSetField;
 
    /**
     * contains the tour id from the last selection event
@@ -421,6 +431,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ModifyListener                     _modifyListener;
    private ModifyListener                     _modifyListener_Temperature;
    private MouseWheelListener                 _mouseWheelListener;
+   private Listener                           _mouseWheelListener_Managed;
    private MouseWheelListener                 _mouseWheelListener_Temperature;
    private SelectionListener                  _selectionListener;
    private SelectionListener                  _selectionListener_Temperature;
@@ -1463,7 +1474,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * minute
              */
             _spinMinutes = new Spinner(_pageEditMode, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
 //                .hint(spinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinMinutes);
@@ -3121,7 +3132,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _modifyListener_Temperature = modifyEvent -> {
 
-         if (UI.isLinuxAsyncEvent(modifyEvent.widget) || _isSetField || _isSavingInProgress) {
+         if (UI.isLinuxAsyncEvent(modifyEvent.widget)
+               || _isSetField
+               || _isSavingInProgress
+               || _isScrollFieldContentWithMouseWheel == false) {
+
             return;
          }
 
@@ -3131,7 +3146,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _mouseWheelListener = mouseEvent -> {
 
-         if (_isSetField || _isSavingInProgress) {
+         if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
             return;
          }
 
@@ -3145,37 +3160,39 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _mouseWheelListener_Temperature = mouseEvent -> {
 
-         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-
-         if (_isSetField || _isSavingInProgress) {
+         if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
             return;
          }
+
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
          _isTemperatureManuallyModified = true;
          setTourDirty();
       };
 
-      _selectionListener = widgetSelectedAdapter(
-            selectionEvent -> {
+      _selectionListener = widgetSelectedAdapter(selectionEvent -> {
 
-               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
-                  return;
-               }
+         if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+            return;
+         }
 
-               updateModel_FromUI();
-               setTourDirty();
-            });
+         updateModel_FromUI();
+         setTourDirty();
+      });
 
-      _selectionListener_Temperature = widgetSelectedAdapter(
-            selectionEvent -> {
+      _selectionListener_Temperature = widgetSelectedAdapter(selectionEvent -> {
 
-               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
-                  return;
-               }
+         if (UI.isLinuxAsyncEvent(selectionEvent.widget)
+               || _isSetField
+               || _isSavingInProgress
+               || _isScrollFieldContentWithMouseWheel == false) {
 
-               _isTemperatureManuallyModified = true;
-               setTourDirty();
-            });
+            return;
+         }
+
+         _isTemperatureManuallyModified = true;
+         setTourDirty();
+      });
 
       /*
        * listener for elapsed/moving/paused time
@@ -3535,13 +3552,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _comboTitle = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboTitle.setText(UI.EMPTY_STRING);
 
-            _tk.adapt(_comboTitle, true, false);
-
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .applyTo(_comboTitle);
-
+            _comboTitle.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboTitle.addModifyListener(modifyEvent -> {
 
                if (_isSetField || _isSavingInProgress) {
@@ -3550,9 +3561,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                _isTitleModified = true;
                setTourDirty();
-
-//                onModifyContent();
             });
+
+            _tk.adapt(_comboTitle, true, false);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .applyTo(_comboTitle);
 
             // fill combobox
             final ConcurrentSkipListSet<String> allTourTitles = TourDatabase.getCachedFields_AllTourTitles();
@@ -3610,13 +3626,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _comboLocation_Start = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboLocation_Start.setText(UI.EMPTY_STRING);
 
-            _tk.adapt(_comboLocation_Start, true, false);
-
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .applyTo(_comboLocation_Start);
-
+            _comboLocation_Start.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboLocation_Start.addModifyListener(modifyEvent -> {
                if (_isSetField || _isSavingInProgress) {
                   return;
@@ -3624,6 +3634,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                _isLocationStartModified = true;
                setTourDirty();
             });
+
+            _tk.adapt(_comboLocation_Start, true, false);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .applyTo(_comboLocation_Start);
 
             // fill combobox
             final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
@@ -3645,13 +3662,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _comboLocation_End = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboLocation_End.setText(UI.EMPTY_STRING);
 
-            _tk.adapt(_comboLocation_End, true, false);
-
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .applyTo(_comboLocation_End);
-
+            _comboLocation_End.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboLocation_End.addModifyListener(modifyEvent -> {
                if (_isSetField || _isSavingInProgress) {
                   return;
@@ -3659,6 +3670,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                _isLocationEndModified = true;
                setTourDirty();
             });
+
+            _tk.adapt(_comboLocation_End, true, false);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .applyTo(_comboLocation_End);
 
             // fill combobox
             final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceEnds();
@@ -3678,8 +3696,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _sectionDateTime = createSection(parent, _tk, Messages.tour_editor_section_date_time, false, true);
 
       final Composite container = (Composite) _sectionDateTime.getClient();
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(COLUMN_SPACING, 5)
             .applyTo(container);
@@ -3909,13 +3926,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void createUI_Section_129_DateTime_TimeZone(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(false, false)
             .span(2, 1)
             .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .applyTo(container);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
@@ -3934,6 +3949,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // combo
             _comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
             _comboTimeZone.setVisibleItemCount(50);
+
+            _comboTimeZone.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
                _isTimeZoneManuallyModified = true;
@@ -3966,8 +3983,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _decoTimeZone.setDescriptionText(Messages.Tour_Editor_Decorator_TimeZone_Tooltip);
 
             // indent the combo that the decorator is not truncated
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .indent(UI.DECORATOR_HORIZONTAL_INDENT, 0)
                   .applyTo(_comboTimeZone);
          }
@@ -4018,8 +4034,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _sectionPersonal = createSection(parent, _tk, Messages.tour_editor_section_personal, false, true);
       final Composite container = (Composite) _sectionPersonal.getClient();
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(COLUMN_SPACING, 5)
             .applyTo(container);
@@ -4073,8 +4088,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _spinPerson_RestPulse = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinPerson_RestPulse);
@@ -4268,8 +4282,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                // icon: clouds
                _lblCloudIcon = new Label(cloudContainer, SWT.NONE);
-               GridDataFactory
-                     .fillDefaults()//
+               GridDataFactory.fillDefaults()
                      .align(SWT.END, SWT.FILL)
                      .grab(true, false)
                      .applyTo(_lblCloudIcon);
@@ -4277,12 +4290,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // combo: clouds
             _comboWeather_Clouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_Clouds);
-            _tk.adapt(_comboWeather_Clouds, true, false);
             _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
             _comboWeather_Clouds.setVisibleItemCount(10);
+
+            _comboWeather_Clouds.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboWeather_Clouds.addModifyListener(_modifyListener);
             _comboWeather_Clouds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
+
+            _tk.adapt(_comboWeather_Clouds, true, false);
+
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_Clouds);
 
             // fill combobox
             for (final String cloudText : IWeather.cloudText) {
@@ -4309,7 +4326,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       {
          {
             /*
-             * wind speed
+             * Wind speed
              */
 
             // label
@@ -4319,38 +4336,44 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _spinWeather_Wind_SpeedValue = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Wind_SpeedValue);
             _spinWeather_Wind_SpeedValue.setMinimum(0);
             _spinWeather_Wind_SpeedValue.setMaximum(120);
             _spinWeather_Wind_SpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
 
+            _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
+
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
+                  return;
+               }
+
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+               onSelect_WindSpeedValue();
+               setTourDirty();
+            });
+
             _spinWeather_Wind_SpeedValue.addModifyListener(modifyEvent -> {
-               if (_isSetField || _isSavingInProgress) {
+
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
                   return;
                }
                onSelect_WindSpeedValue();
                setTourDirty();
             });
+
             _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               if (_isSetField || _isSavingInProgress) {
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
                   return;
                }
                onSelect_WindSpeedValue();
                setTourDirty();
             }));
-            _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               if (_isSetField || _isSavingInProgress) {
-                  return;
-               }
-               onSelect_WindSpeedValue();
-               setTourDirty();
-            });
+
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWeather_Wind_SpeedValue);
 
             // label: km/h, mi/h
             _lblSpeedUnit = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
@@ -4367,22 +4390,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // combo: wind direction text
             _comboWeather_Wind_DirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _tk.adapt(_comboWeather_Wind_DirectionText, true, false);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .applyTo(_comboWeather_Wind_DirectionText);
             _comboWeather_Wind_DirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
             _comboWeather_Wind_DirectionText.setVisibleItemCount(16);
+
+            _comboWeather_Wind_DirectionText.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboWeather_Wind_DirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
+
                onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             }));
+
+            _tk.adapt(_comboWeather_Wind_DirectionText, true, false);
+            
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .applyTo(_comboWeather_Wind_DirectionText);
 
             // fill combobox
             for (final String windDirText : IWeather.windDirectionText) {
@@ -4393,7 +4420,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             new Label(container, SWT.NONE);
          }
       }
-
    }
 
    private void createUI_Section_143_Weather_Wind_Col2(final Composite parent) {
@@ -4404,18 +4430,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       {
          {
             /*
-             * wind speed
+             * Wind speed
              */
 
             // combo: wind speed with text
             _comboWeather_WindSpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .span(2, 1)
-                  .applyTo(_comboWeather_WindSpeedText);
-            _tk.adapt(_comboWeather_WindSpeedText, true, false);
             _comboWeather_WindSpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _comboWeather_WindSpeedText.setVisibleItemCount(20);
+
+            _comboWeather_WindSpeedText.addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboWeather_WindSpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
                if (_isSetField || _isSavingInProgress) {
@@ -4425,6 +4448,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                setTourDirty();
             }));
 
+            _tk.adapt(_comboWeather_WindSpeedText, true, false);
+            
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .span(2, 1)
+                  .applyTo(_comboWeather_WindSpeedText);
+
             // fill combobox
             for (final String speedText : IWeather.windSpeedText) {
                _comboWeather_WindSpeedText.add(speedText);
@@ -4432,7 +4462,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
          {
             /*
-             * wind direction
+             * Wind direction
              */
 
             // spinner: wind direction value
@@ -4446,30 +4476,37 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinWeather_Wind_DirectionValue.setDigits(1);
             _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
 
-            _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
-               if (_isSetField || _isSavingInProgress) {
+            _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
+
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
                   return;
                }
+
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               
                onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             });
-            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               if (_isSetField || _isSavingInProgress) {
+            _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
+
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
                   return;
                }
+
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
+               setTourDirty();
+            });
+
+            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
+                  return;
+               }
+
                onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             }));
-
-            _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               if (_isSetField || _isSavingInProgress) {
-                  return;
-               }
-               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
-               setTourDirty();
-            });
 
             // label: direction unit = degree
             _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
@@ -4534,6 +4571,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // spinner
             _spinWeather_Temperature_Min = new Spinner(container, SWT.BORDER);
             _spinWeather_Temperature_Min.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
+
             _spinWeather_Temperature_Min.addModifyListener(_modifyListener_Temperature);
             _spinWeather_Temperature_Min.addSelectionListener(_selectionListener_Temperature);
             _spinWeather_Temperature_Min.addMouseWheelListener(_mouseWheelListener_Temperature);
@@ -4562,6 +4600,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // spinner
             _spinWeather_Temperature_Max = new Spinner(container, SWT.BORDER);
             _spinWeather_Temperature_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
+
             _spinWeather_Temperature_Max.addModifyListener(_modifyListener_Temperature);
             _spinWeather_Temperature_Max.addSelectionListener(_selectionListener_Temperature);
             _spinWeather_Temperature_Max.addMouseWheelListener(_mouseWheelListener_Temperature);
@@ -4590,6 +4629,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // spinner
             _spinWeather_Temperature_WindChill = new Spinner(container, SWT.BORDER);
             _spinWeather_Temperature_WindChill.setToolTipText(Messages.Tour_Editor_Label_Temperature_WindChill_Tooltip);
+
             _spinWeather_Temperature_WindChill.addModifyListener(_modifyListener_Temperature);
             _spinWeather_Temperature_WindChill.addSelectionListener(_selectionListener_Temperature);
             _spinWeather_Temperature_WindChill.addMouseWheelListener(_mouseWheelListener_Temperature);
@@ -4926,9 +4966,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(label);
 
             _comboCadence = new ComboViewerCadence(container);
+
+            _comboCadence.getCombo().addListener(SWT.MouseWheel, _mouseWheelListener_Managed);
             _comboCadence.addSelectionChangedListener(selectionChangedEvent -> {
 
-               if (_isSetField || _isSavingInProgress) {
+               if (_isSetField || _isSavingInProgress || _isScrollFieldContentWithMouseWheel == false) {
                   return;
                }
 
@@ -7455,13 +7497,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _pc = new PixelConverter(parent);
 
-      _hintDefaultSpinnerWidth = IS_LINUX //
+      _hintDefaultSpinnerWidth = IS_LINUX
             ? SWT.DEFAULT
             : _pc.convertWidthInCharsToPixels(IS_OSX ? 14 : 7);
 
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+
+      _mouseWheelListener_Managed = new Listener() {
+
+         @Override
+         public void handleEvent(final Event event) {
+
+            if (_isScrollFieldContentWithMouseWheel == false) {
+
+               // disable mouse wheel
+
+               event.doit = false;
+            }
+         }
+      };
 
       parent.addDisposeListener(e -> onDispose());
    }
@@ -8314,9 +8370,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   Messages.TourEditor_Action_SetStartDistanceTo0,
                   UI.UNIT_LABEL_DISTANCE));
 
-//    _advMenuAddTag.setAutoOpen(
-//    _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN),
-//    _prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _isScrollFieldContentWithMouseWheel = Util.getStateBoolean(_state,
+            STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL,
+            STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL_DEFAULT);
 
 // SET_FORMATTING_OFF
 
@@ -9432,6 +9488,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _refTourRange = null;
       }
+   }
+
+   void updateUI_ScollFieldContentWithMouseWheel(final boolean isUseMouseWheel) {
+
+      _isScrollFieldContentWithMouseWheel = isUseMouseWheel;
    }
 
    private void updateUI_Tab_1_Tour() {
