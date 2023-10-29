@@ -96,7 +96,10 @@ public class TourLogManager {
 
    public static void clear() {
 
-      _logView.clear();
+      if (_logView != null) {
+         _logView.clear();
+      }
+
       _allTourLogs.clear();
 
       TourLog.clear();
