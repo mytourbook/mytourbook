@@ -2412,10 +2412,12 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Checkbox_KeepTime_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip;
-   public static String        Slideout_TourEditor_Checkbox_UseMouseWheel;
-   public static String        Slideout_TourEditor_Checkbox_UseMouseWheel_Tooltip;
+   public static String        Slideout_TourEditor_Checkbox_ScrollFieldContent;
+   public static String        Slideout_TourEditor_Checkbox_ScrollFieldContent_Tooltip;
    public static String        Slideout_TourEditor_Combo_ElevationFromDevice;
    public static String        Slideout_TourEditor_Combo_ElevationFromSRTM;
+   public static String        Slideout_TourEditor_Combo_ScrollFieldContent_WhenFocused;
+   public static String        Slideout_TourEditor_Combo_ScrollFieldContent_WhenHovered;
    public static String        Slideout_TourEditor_Group_Tags;
    public static String        Slideout_TourEditor_Label_DeleteTimeSlices;
    public static String        Slideout_TourEditor_Label_LatLonDigits;

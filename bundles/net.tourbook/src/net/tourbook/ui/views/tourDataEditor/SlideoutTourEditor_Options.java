@@ -29,6 +29,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.tag.TagContentLayout;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagManager.TagContentLayoutItem;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView.ScrollFieldContent;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -53,47 +54,66 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final IDialogSettings _state                = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings   _state                   = TourbookPlugin.getState(TourDataEditorView.ID);
 
-   private static final String[]        ALL_ELEVATION_OPTIONS = {
+   private static final String[]          ALL_ELEVATION_OPTIONS    = {
 
          Messages.Slideout_TourEditor_Combo_ElevationFromDevice,
          Messages.Slideout_TourEditor_Combo_ElevationFromSRTM,
    };
 
-   private TourDataEditorView           _tourEditorView;
+   private static final ScrollFieldItem[] ALL_SCROLL_FIELD_OPTIONS = {
 
-   private ActionResetToDefaults        _actionRestoreDefaults;
+         new ScrollFieldItem(Messages.Slideout_TourEditor_Combo_ScrollFieldContent_WhenHovered, ScrollFieldContent.WHEN_FIELD_IS_HOVERED),
+         new ScrollFieldItem(Messages.Slideout_TourEditor_Combo_ScrollFieldContent_WhenFocused, ScrollFieldContent.WHEN_FIELD_HAS_FOCUS),
+   };
 
-   private SelectionListener            _defaultSelectionListener;
-   private FocusListener                _keepOpenListener;
+   private TourDataEditorView             _tourEditorView;
 
-   private PixelConverter               _pc;
-   private int                          _hintValueFieldWidth;
+   private ActionResetToDefaults          _actionRestoreDefaults;
+   private SelectionListener              _defaultSelectionListener;
+   private FocusListener                  _keepOpenListener;
+
+   private PixelConverter                 _pc;
+
+   private int                            _hintValueFieldWidth;
 
    /*
     * UI controls
     */
    private Composite _shellContainer;
-
+   //
    private Button    _chkDelete_KeepDistance;
    private Button    _chkDelete_KeepTime;
    private Button    _chkRecomputeElevation;
-   private Button    _chkUseMouseWheel;
-
+   private Button    _chkScrollFieldContent;
+   //
    private Combo     _comboElevationOptions;
+   private Combo     _comboScrollFieldContent;
    private Combo     _comboTagContent;
-
+   //
    private Label     _lblNumTagContentColumns;
    private Label     _lblTagImageSize;
    private Label     _lblTagContentWidth;
-
+   //
    private Spinner   _spinnerLatLonDigits;
    private Spinner   _spinnerTag_NumContentColumns;
    private Spinner   _spinnerTag_ImageSize;
    private Spinner   _spinnerTag_TextWidth;
    private Spinner   _spinnerTourDescriptionNumLines;
    private Spinner   _spinnerWeatherDescriptionNumLines;
+
+   private static class ScrollFieldItem {
+
+      public String             label;
+      public ScrollFieldContent scrollFieldContent;
+
+      public ScrollFieldItem(final String label, final TourDataEditorView.ScrollFieldContent scrollFieldContent) {
+
+         this.label = label;
+         this.scrollFieldContent = scrollFieldContent;
+      }
+   }
 
    public SlideoutTourEditor_Options(final Control ownerControl,
                                      final ToolBar toolBar,
@@ -263,11 +283,23 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
          /*
           * Scroll field content with mouse wheel
           */
-         _chkUseMouseWheel = new Button(parent, SWT.CHECK);
-         _chkUseMouseWheel.setText(Messages.Slideout_TourEditor_Checkbox_UseMouseWheel);
-         _chkUseMouseWheel.setToolTipText(Messages.Slideout_TourEditor_Checkbox_UseMouseWheel_Tooltip);
-         _chkUseMouseWheel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_UseMouseWheel()));
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkUseMouseWheel);
+         _chkScrollFieldContent = new Button(parent, SWT.CHECK);
+         _chkScrollFieldContent.setText(Messages.Slideout_TourEditor_Checkbox_ScrollFieldContent);
+         _chkScrollFieldContent.setToolTipText(Messages.Slideout_TourEditor_Checkbox_ScrollFieldContent_Tooltip);
+         _chkScrollFieldContent.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ScrollFieldContent()));
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .span(2, 1)
+               .applyTo(_chkScrollFieldContent);
+
+         _comboScrollFieldContent = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+         _comboScrollFieldContent.setVisibleItemCount(20);
+         _comboScrollFieldContent.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ScrollFieldContent()));
+         _comboScrollFieldContent.addFocusListener(_keepOpenListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(16, 0)
+               .applyTo(_comboScrollFieldContent);
       }
       {
          /*
@@ -425,12 +457,14 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
       final boolean isRecomputeElevation  = _chkRecomputeElevation.getSelection();
+      final boolean isScrollFieldContent  = _chkScrollFieldContent.getSelection();
 
       _lblNumTagContentColumns      .setEnabled(isTagContentWithImage);
       _lblTagContentWidth           .setEnabled(isTagContentWithImage);
       _lblTagImageSize              .setEnabled(isTagContentWithImage);
 
-      _comboElevationOptions         .setEnabled(isRecomputeElevation);
+      _comboElevationOptions        .setEnabled(isRecomputeElevation);
+      _comboScrollFieldContent      .setEnabled(isScrollFieldContent);
 
       _spinnerTag_NumContentColumns .setEnabled(isTagContentWithImage);
       _spinnerTag_TextWidth         .setEnabled(isTagContentWithImage);
@@ -448,6 +482,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       for (final TagContentLayoutItem layoutItem : TagManager.ALL_TAG_CONTENT_LAYOUT) {
          _comboTagContent.add(layoutItem.label);
       }
+
+      for (final ScrollFieldItem scrollFieldItem : ALL_SCROLL_FIELD_OPTIONS) {
+         _comboScrollFieldContent.add(scrollFieldItem.label);
+      }
    }
 
    private int getElevationFromDeviceIndex(final boolean isElevationFromDevice) {
@@ -461,6 +499,29 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       final int selectionIndex = Math.max(0, _comboElevationOptions.getSelectionIndex());
 
       return selectionIndex == 0;
+   }
+
+   private int getScrollFieldContentIndex(final ScrollFieldContent scrollField) {
+
+      for (int layoutIndex = 0; layoutIndex < ALL_SCROLL_FIELD_OPTIONS.length; layoutIndex++) {
+
+         final ScrollFieldItem layoutItem = ALL_SCROLL_FIELD_OPTIONS[layoutIndex];
+
+         if (scrollField == layoutItem.scrollFieldContent) {
+
+            return layoutIndex;
+         }
+      }
+
+      return 0;
+   }
+
+   private ScrollFieldContent getSelectedScrollFieldContent() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboScrollFieldContent.getSelectionIndex());
+
+      return ALL_SCROLL_FIELD_OPTIONS[selectionIndex].scrollFieldContent;
    }
 
    private TagContentLayout getSelectedTagContentLayout() {
@@ -542,6 +603,19 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _tourEditorView.updateUI_DescriptionNumLines(tourDescriptionNumberOfLines, weatherDescriptionNumberOfLines);
    }
 
+   private void onSelect_ScrollFieldContent() {
+
+      final boolean isScrollFieldContent = _chkScrollFieldContent.getSelection();
+      final ScrollFieldContent scrollFieldContent = getSelectedScrollFieldContent();
+
+      _state.put(TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT, isScrollFieldContent);
+      Util.setStateEnum(_state, TourDataEditorView.STATE_SCROLL_FIELD_CONTENT, scrollFieldContent);
+
+      _tourEditorView.setState_ScollFieldContent(isScrollFieldContent, scrollFieldContent);
+
+      enableControls();
+   }
+
    private void onSelect_TagContent() {
 
       _state.put(TourDataEditorView.STATE_TAG_TEXT_WIDTH, _spinnerTag_TextWidth.getSelection());
@@ -556,15 +630,6 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _shellContainer.getDisplay().asyncExec(() -> TagManager.updateTagContent());
    }
 
-   private void onSelect_UseMouseWheel() {
-
-      final boolean isUseMouseWheel = _chkUseMouseWheel.getSelection();
-
-      _state.put(TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL, isUseMouseWheel);
-
-      _tourEditorView.updateUI_ScollFieldContentWithMouseWheel(isUseMouseWheel);
-   }
-
    @Override
    public void resetToDefaults() {
 
@@ -573,20 +638,22 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       /*
        * Get default values
        */
-      final int descriptionNumberOfLines        = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
-      final int latLonDigits                    = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
-      final int weatherDescriptionNumberOfLines = TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT;
+      final int descriptionNumberOfLines           = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
+      final int latLonDigits                       = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
+      final int weatherDescriptionNumberOfLines    = TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT;
 
-      final boolean isDeleteKeepDistance        = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
-      final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
-      final boolean isElevationFromDevice       = TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT;
-      final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
-      final boolean isUseMouseWheel             = TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL_DEFAULT;
+      final boolean isDeleteKeepDistance           = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
+      final boolean isDeleteKeepTime               = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
+      final boolean isElevationFromDevice          = TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT;
+      final boolean isRecomputeElevation           = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
+      
+      final boolean isScrollFieldContent           = TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_DEFAULT;
+      final ScrollFieldContent scrollFieldContent  = TourDataEditorView.STATE_SCROLL_FIELD_CONTENT_DEFAULT;
 
-      final int tagContentWidth                 = TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT;
-      final int tagImageSize                    = TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT;
-      final int tagNumContentColumns            = TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT;
-      final TagContentLayout tagContentLayout   = TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT;
+      final int tagContentWidth                    = TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT;
+      final int tagImageSize                       = TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT;
+      final int tagNumContentColumns               = TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT;
+      final TagContentLayout tagContentLayout      = TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT;
 
       /*
        * Update model
@@ -595,10 +662,12 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                      isDeleteKeepTime);
       _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,                 isElevationFromDevice);
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,           isRecomputeElevation);
-      _state.put(TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL, isUseMouseWheel);
 
-      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,        descriptionNumberOfLines);
-      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                     latLonDigits);
+      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,              descriptionNumberOfLines);
+      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                           latLonDigits);
+
+      _state.put(TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT,                  isScrollFieldContent);
+      Util.setStateEnum(_state, TourDataEditorView.STATE_SCROLL_FIELD_CONTENT,      scrollFieldContent);
 
       // tags
       _state.put(TourDataEditorView.STATE_TAG_TEXT_WIDTH,                     tagContentWidth);
@@ -612,11 +681,13 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _chkDelete_KeepDistance             .setSelection(isDeleteKeepDistance);
       _chkDelete_KeepTime                 .setSelection(isDeleteKeepTime);
       _chkRecomputeElevation              .setSelection(isRecomputeElevation);
-      _chkUseMouseWheel                   .setSelection(isUseMouseWheel);
       _comboElevationOptions              .select(getElevationFromDeviceIndex(isElevationFromDevice));
       _spinnerLatLonDigits                .setSelection(latLonDigits);
       _spinnerTourDescriptionNumLines     .setSelection(descriptionNumberOfLines);
       _spinnerWeatherDescriptionNumLines  .setSelection(weatherDescriptionNumberOfLines);
+
+      _chkScrollFieldContent              .setSelection(isScrollFieldContent);
+      _comboScrollFieldContent            .select(getScrollFieldContentIndex(scrollFieldContent));
 
       // tags
       _comboTagContent                    .select(getTagContentLayoutIndex(tagContentLayout));
@@ -654,9 +725,14 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT));
 
-      _chkUseMouseWheel.setSelection(Util.getStateBoolean(_state,
-            TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL,
-            TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_WITH_MOUSE_WHEEL_DEFAULT));
+      _chkScrollFieldContent.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT,
+            TourDataEditorView.STATE_IS_SCROLL_FIELD_CONTENT_DEFAULT));
+
+      _comboScrollFieldContent.select(getScrollFieldContentIndex(
+            (ScrollFieldContent) Util.getStateEnum(_state,
+                  TourDataEditorView.STATE_SCROLL_FIELD_CONTENT,
+                  TourDataEditorView.STATE_SCROLL_FIELD_CONTENT_DEFAULT)));
 
       _spinnerLatLonDigits.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_LAT_LON_DIGITS,
