@@ -52,7 +52,6 @@ import net.tourbook.commands.AppCommands;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.StrokeStyle;
@@ -6976,58 +6975,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       for (int index = 0; index < IWeather.airQualityTexts.length; index++) {
 
-         final TableItem tableItem = new TableItem(_tableComboWeather_AirQuality.getTable(), SWT.READ_ONLY);
-
-         // set the column text
-         tableItem.setText(IWeather.airQualityTexts[index]);
-
          Color backgroundColor = null;
          Color foregroundColor = null;
 
-         final boolean isDarkTheme = UI.IS_DARK_THEME;
+         final int colorIndex = index * 2;
 
-         switch (index) {
+         if (UI.IS_DARK_THEME) {
 
-         case 1: // Good - green
+            foregroundColor = IWeather.airQualityColors_DarkTheme[colorIndex];
+            backgroundColor = IWeather.airQualityColors_DarkTheme[colorIndex + 1];
 
-            backgroundColor = new Color(0, 175, 0);
-            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
+         } else {
 
-            break;
-
-         case 2: // Fair - yellow
-
-            backgroundColor = isDarkTheme ? new Color(170, 170, 0) : new Color(255, 255, 0);
-            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(0, 0, 0);
-
-            break;
-
-         case 3: // Moderate - orange
-
-            backgroundColor = new Color(255, 128, 0);
-            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
-            break;
-
-         case 4: // Poor - red
-
-            backgroundColor = new Color(230, 0, 0);
-            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
-            break;
-
-         case 5: // Very poor - pink
-
-            backgroundColor = new Color(227, 0, 227);
-            foregroundColor = isDarkTheme ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
-            break;
-
-         default:
-
-            backgroundColor = ThemeUtil.getDefaultBackgroundColor_Combo();
-            foregroundColor = ThemeUtil.getDefaultForegroundColor_Combo();
-
-            break;
+            foregroundColor = IWeather.airQualityColors_BrightTheme[colorIndex];
+            backgroundColor = IWeather.airQualityColors_BrightTheme[colorIndex + 1];
          }
 
+         final TableItem tableItem = new TableItem(_tableComboWeather_AirQuality.getTable(), SWT.READ_ONLY);
+
+         tableItem.setText(IWeather.airQualityTexts[index]); // set the column text
          tableItem.setBackground(backgroundColor);
          tableItem.setForeground(foregroundColor);
       }

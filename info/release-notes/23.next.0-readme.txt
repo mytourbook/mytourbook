@@ -54,6 +54,10 @@ Improvements
   - Make the use of the scroll wheel optional
     https://github.com/mytourbook/mytourbook/issues/1200
 
+* Tour Info
+  - Show air quality value with its assigned color
+    https://github.com/mytourbook/mytourbook/issues/1223
+
 * Tour Log View
   - Customize when this view is opened automatically, exceptions will always show this view
     https://github.com/mytourbook/mytourbook/issues/1222 

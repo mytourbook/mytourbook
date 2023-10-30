@@ -265,9 +265,9 @@ public class WeatherUtils {
       final int airQualityTextIndex = tourData.getWeather_AirQuality_TextIndex();
       if (airQualityTextIndex > 0) {
 
-         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality +
-               UI.SPACE +
-               IWeather.airQualityTexts[airQualityTextIndex]);
+         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality
+               + UI.SPACE
+               + IWeather.airQualityTexts[airQualityTextIndex]);
       }
 
       // Humidity
@@ -428,10 +428,11 @@ public class WeatherUtils {
 
    public static int getWeather_AirQuality_TextIndex(final String weather_AirQuality) {
 
-      final int Weather_AirQuality_TextIndex =
-            Arrays.asList(IWeather.airQualityIds).indexOf(weather_AirQuality);
+      final int Weather_AirQuality_TextIndex = Arrays.asList(IWeather.airQualityIds).indexOf(weather_AirQuality);
 
-      return Weather_AirQuality_TextIndex < 0 ? 0 : Weather_AirQuality_TextIndex;
+      return Weather_AirQuality_TextIndex < 0
+            ? 0
+            : Weather_AirQuality_TextIndex;
    }
 
    /**

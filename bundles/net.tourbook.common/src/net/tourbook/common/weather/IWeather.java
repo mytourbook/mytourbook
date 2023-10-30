@@ -17,6 +17,9 @@ package net.tourbook.common.weather;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
+
+import org.eclipse.swt.graphics.Color;
 
 public interface IWeather {
 
@@ -185,7 +188,7 @@ public interface IWeather {
    /**
     * Text for the weather
     */
-   public static final String[] cloudText              = new String[] {
+   public static final String[] cloudText                    = new String[] {
 
          cloudIsNotDefined,
 
@@ -198,17 +201,18 @@ public interface IWeather {
          Messages.Weather_Clouds_Lightning,
          Messages.Weather_Clouds_Snow,
          Messages.Weather_Clouds_SevereWeatherAlert
-
    };
 
-   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_0_IsNotDefined;
-
    /**
-    * Texts for the weather's air quality. Those texts are displayed in the UI.
+    *
+    * Texts for the weather's air quality, must be in sync with
+    * {@link #airQualityColors_BrightTheme} and {@link #airQualityColors_DarkTheme}
+    *
+    * Those texts are displayed in the UI.
     */
-   public static final String[] airQualityTexts        = new String[] {
+   public static final String[] airQualityTexts              = new String[] {
 
-         airQualityIsNotDefined,
+         Messages.Weather_AirQuality_0_IsNotDefined,
 
          Messages.Weather_AirQuality_1_Good,
          Messages.Weather_AirQuality_2_Fair,
@@ -221,7 +225,7 @@ public interface IWeather {
    /**
     * Ids for the weather's air quality. Those Ids are saved in the db.
     */
-   public static final String[] airQualityIds          = new String[] {
+   public static final String[] airQualityIds                = new String[] {
 
          UI.EMPTY_STRING,
 
@@ -234,9 +238,63 @@ public interface IWeather {
    };
 
    /**
+    * Foreground and background colors for the air quality, must be in sync with
+    * {@link #airQualityTexts}
+    */
+   public static final Color[]  airQualityColors_BrightTheme = new Color[] {
+
+         // not defined
+         ThemeUtil.getDefaultForegroundColor_Combo(),
+         ThemeUtil.getDefaultBackgroundColor_Combo(),
+
+         // 1 Good - green
+         UI.SYS_COLOR_WHITE, new Color(0, 175, 0),
+
+         // 2 Fair - yellow
+         UI.SYS_COLOR_BLACK, new Color(255, 255, 0),
+
+         // 3 Moderate - orange
+         UI.SYS_COLOR_WHITE, new Color(255, 128, 0),
+
+         // 4 Poor - red
+         UI.SYS_COLOR_WHITE, new Color(230, 0, 0),
+
+         // 5 Very poor - pink
+         UI.SYS_COLOR_WHITE, new Color(227, 0, 227),
+   };
+
+   /**
+    * Foreground and background colors for the air quality, must be in sync with
+    * {@link #airQualityTexts}
+    */
+   public static final Color[]  airQualityColors_DarkTheme   = new Color[] {
+
+         // not defined
+//         ThemeUtil.getDefaultForegroundColor_Combo(),
+//         ThemeUtil.getDefaultBackgroundColor_Combo(),
+         null,
+         null,
+
+         // 1 Good - green
+         UI.SYS_COLOR_WHITE, new Color(0, 175, 0),
+
+         // 2 Fair - yellow
+         UI.SYS_COLOR_BLACK, new Color(227, 227, 0),
+
+         // 3 Moderate - orange
+         UI.SYS_COLOR_WHITE, new Color(255, 128, 0),
+
+         // 4 Poor - red
+         UI.SYS_COLOR_WHITE, new Color(230, 0, 0),
+
+         // 5 Very poor - pink
+         UI.SYS_COLOR_WHITE, new Color(227, 0, 227),
+   };
+
+   /**
     * Icons for the weather
     */
-   public static final String[] cloudIcon              = new String[] {
+   public static final String[] cloudIcon                    = new String[] {
 
          UI.IMAGE_EMPTY_16,
 

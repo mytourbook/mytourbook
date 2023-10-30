@@ -208,12 +208,13 @@ public class TourFilterManager {
 
    private static final String[]                  VALUES_AIRQUALITY               = {
 
-         IWeather.airQualityIsNotDefined,
+         OtherMessages.WEATHER_AIRQUAlITY_0_IS_NOT_DEFINED,
+
          OtherMessages.WEATHER_AIRQUAlITY_1_GOOD,
-         OtherMessages.WEATHER_AIRQUAlITY_1_FAIR,
-         OtherMessages.WEATHER_AIRQUAlITY_1_MODERATE,
-         OtherMessages.WEATHER_AIRQUAlITY_1_POOR,
-         OtherMessages.WEATHER_AIRQUAlITY_1_VERYPOOR
+         OtherMessages.WEATHER_AIRQUAlITY_2_FAIR,
+         OtherMessages.WEATHER_AIRQUAlITY_3_MODERATE,
+         OtherMessages.WEATHER_AIRQUAlITY_4_POOR,
+         OtherMessages.WEATHER_AIRQUAlITY_5_VERYPOOR
    };
 
    private static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {
