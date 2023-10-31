@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.tourbook.Messages;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -39,7 +41,7 @@ public class AllTourMarkersViewTests extends UITest {
 
       final SWTBotTable tableMarkersTable = allTourMarkersView.bot().table();
 
-      // assert initial state
+      // Assert initial state
       int initialTableRowCount = tableMarkersTable.rowCount();
       // Make sure that the table contains several markers
       assertTrue(initialTableRowCount > 0);
@@ -52,14 +54,19 @@ public class AllTourMarkersViewTests extends UITest {
       initialTableRowCount = initialTableRowCount + 2;
       assertEquals(initialTableRowCount, tableMarkersTable.rowCount());
 
+      // Act: Delete the 2 markers
       final int rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
       assertTrue(rowIndex != -1);
       tableMarkersTable.select(rowIndex);
       tableMarkersTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();
       Utils.clickYesButton(bot);
 
-      // Make sure that the table contains 1 less marker
-      assertEquals(initialTableRowCount - 1, tableMarkersTable.rowCount());
+      tableMarkersTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
+      bot.sleep(1000);
+      Utils.clickYesButton(bot);
+
+      // Make sure that the table contains 2 less marker
+      assertEquals(initialTableRowCount - 2, tableMarkersTable.rowCount());
 
       tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
