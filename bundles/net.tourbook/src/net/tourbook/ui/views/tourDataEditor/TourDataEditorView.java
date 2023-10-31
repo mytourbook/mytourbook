@@ -3658,7 +3658,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Start location
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_start_location);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Location_Start);
             _firstColumnControls.add(label);
 
             _comboLocation_Start = new Combo(container, SWT.BORDER | SWT.FLAT);
@@ -3695,7 +3695,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * End location
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_end_location);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Location_End);
             _firstColumnControls.add(label);
 
             _comboLocation_End = new Combo(container, SWT.BORDER | SWT.FLAT);

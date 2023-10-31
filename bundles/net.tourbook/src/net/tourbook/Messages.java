@@ -2947,13 +2947,16 @@ public class Messages extends NLS {
    public static String        tour_editor_label_distance;
    public static String        Tour_Editor_Label_DistanceSensor;
    public static String        tour_editor_label_elapsed_time;
-   public static String        tour_editor_label_end_location;
    public static String        Tour_Editor_Label_FTP;
    public static String        Tour_Editor_Label_FTP_Tooltip;
    public static String        Tour_Editor_Label_Hours_Tooltip;
    public static String        Tour_Editor_Label_Humidity;
    public static String        Tour_Editor_Label_Humidity_Tooltip;
    public static String        tour_editor_label_import_file_path;
+   public static String        Tour_Editor_Label_Location_End;
+   public static String        Tour_Editor_Label_Location_End_Tooltip;
+   public static String        Tour_Editor_Label_Location_Start;
+   public static String        Tour_Editor_Label_Location_Start_Tooltip;
    public static String        tour_editor_label_merge_from_tour_id;
    public static String        tour_editor_label_merge_from_tour_id_tooltip;
    public static String        tour_editor_label_merge_into_tour_id;
@@ -2976,7 +2979,6 @@ public class Messages extends NLS {
    public static String        Tour_Editor_Label_Seconds_Tooltip;
    public static String        Tour_Editor_Label_Sensor_No;
    public static String        Tour_Editor_Label_Sensor_Yes;
-   public static String        tour_editor_label_start_location;
    public static String        tour_editor_label_start_time;
    public static String        Tour_Editor_Label_StrideSensor;
    public static String        Tour_Editor_Label_Temperature;

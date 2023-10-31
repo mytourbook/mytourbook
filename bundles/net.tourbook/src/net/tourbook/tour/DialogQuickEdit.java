@@ -17,6 +17,15 @@ package net.tourbook.tour;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -25,11 +34,13 @@ import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
+import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -43,15 +54,18 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -62,8 +76,12 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
-   private static IDialogSettings       _state                         = TourbookPlugin.getState(DialogQuickEdit.class.getName());
+   private static final IDialogSettings _state                         = TourbookPlugin.getState(DialogQuickEdit.class.getName());
    private static final IDialogSettings _state_TourDataEditorView      = TourbookPlugin.getState(TourDataEditorView.ID);
+
+   private static final String          _userAgent                     = "MyTourbook/" + ApplicationVersion.getVersionSimple();                 //$NON-NLS-1$
+
+   private static final HttpClient      _httpClient                    = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
 
    private final TourData               _tourData;
    private PixelConverter               _pc;
@@ -107,6 +125,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private Combo                  _comboWeather_Clouds;
    private Combo                  _comboWeather_Wind_DirectionText;
    private Combo                  _comboWeather_Wind_SpeedText;
+
+   private Link                   _linkStartLocation;
+   private Link                   _linkEndLocation;
 
    private Spinner                _spinBodyWeight;
    private Spinner                _spinFTP;
@@ -323,8 +344,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
          /*
           * Start location
           */
-         final Label label = _tk.createLabel(sectionContainer, Messages.tour_editor_label_start_location);
-         _firstColumnControls.add(label);
+         _linkStartLocation = new Link(sectionContainer, SWT.NONE);
+         _linkStartLocation.setText(Messages.Tour_Editor_Label_Location_Start);
+         _linkStartLocation.setToolTipText(Messages.Tour_Editor_Label_Location_Start_Tooltip);
+         _linkStartLocation.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Location_Start()));
+
+         _tk.adapt(_linkStartLocation, true, true);
+         _firstColumnControls.add(_linkStartLocation);
 
          _comboLocation_Start = new Combo(sectionContainer, SWT.BORDER | SWT.FLAT);
          _comboLocation_Start.setText(UI.EMPTY_STRING);
@@ -350,9 +376,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
          /*
           * End location
           */
-//            &End Location
-         final Label label = _tk.createLabel(sectionContainer, Messages.tour_editor_label_end_location);
-         _firstColumnControls.add(label);
+         _linkEndLocation = new Link(sectionContainer, SWT.NONE);
+         _linkEndLocation.setText(Messages.Tour_Editor_Label_Location_End);
+         _linkEndLocation.setToolTipText(Messages.Tour_Editor_Label_Location_End_Tooltip);
+         _linkEndLocation.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Location_End()));
+
+         _tk.adapt(_linkEndLocation, true, true);
+         _firstColumnControls.add(_linkEndLocation);
 
          _comboLocation_End = new Combo(sectionContainer, SWT.BORDER | SWT.FLAT);
          _comboLocation_End.setText(UI.EMPTY_STRING);
@@ -907,6 +937,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void enableControls() {
 
+      final boolean isGeoLocation = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 0;
+
+      _linkEndLocation.setEnabled(isGeoLocation);
+      _linkStartLocation.setEnabled(isGeoLocation);
+
       _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
@@ -941,6 +976,104 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _mouseWheelListener = mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
    }
 
+   private OSMLocation location_DeserializeLocationData(final String osmLocationString) {
+
+      OSMLocation osmLocation = null;
+
+      try {
+
+         osmLocation = new ObjectMapper().readValue(osmLocationString, OSMLocation.class);
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError(
+               "OpenWeatherMapRetriever.deserializeAirPollutionData : Error while " + //$NON-NLS-1$
+                     "deserializing the historical air quality JSON object :" //$NON-NLS-1$
+                     + osmLocationString + UI.NEW_LINE + e.getMessage());
+      }
+
+      return osmLocation;
+   }
+
+   private String location_Retrieve(final double latitude, final double longitudeSerie) {
+
+//      BusyIndicator.showWhile(_parent.getDisplay(), () -> {
+//
+//      });
+
+      // Source: https://nominatim.org/release-docs/develop/api/Reverse/
+      //
+      // The main format of the reverse API is
+      //
+      // https://nominatim.openstreetmap.org/reverse?lat=<value>&lon=<value>&<params>
+
+      // zoom  address detail
+      //
+      // 3     country
+      // 5     state
+      // 8     county
+      // 10    city
+      // 12    town / borough
+      // 13    village / suburb
+      // 14    neighbourhood
+      // 15    any settlement
+      // 16    major streets
+      // 17    major and minor streets
+      // 18    building
+
+      final String requestUrl = UI.EMPTY_STRING
+
+            + "https://nominatim.openstreetmap.org/reverse?format=json"
+
+            + "&lat=" + latitude
+            + "&lon=" + longitudeSerie
+            + "&zoom=18" // Building
+            + "&addressdetails=1";
+
+      String responseData = UI.EMPTY_STRING;
+
+      try {
+
+         final HttpRequest request = HttpRequest
+               .newBuilder(URI.create(requestUrl))
+               .GET()
+               .build();
+
+//         final String userAgent = mp.getUserAgent();
+//
+//         if (StringUtils.hasContent(userAgent)) {
+//            connection.setRequestProperty(HTTP_HEADER_USER_AGENT, userAgent);
+//         }
+
+         final HttpResponse<String> response = _httpClient.send(request, BodyHandlers.ofString());
+
+         responseData = response.body();
+
+         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
+
+            logError(response.body());
+
+            return UI.EMPTY_STRING;
+         }
+
+      } catch (final Exception ex) {
+
+         logError(ex.getMessage());
+         Thread.currentThread().interrupt();
+
+         return UI.EMPTY_STRING;
+      }
+
+      return responseData;
+   }
+
+   private void logError(final String exceptionMessage) {
+
+      TourLogManager.log_ERROR(NLS.bind(
+            "Error while retrieving location data: \"{1}\"",
+            exceptionMessage));
+   }
+
    @Override
    protected void okPressed() {
 
@@ -973,6 +1106,73 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _firstColumnControls.clear();
       _secondColumnControls.clear();
       _firstColumnContainerControls.clear();
+   }
+
+   private void onSelect_Location_End() {
+
+      // TODO Auto-generated method stub
+
+      final int lastIndex = _tourData.latitudeSerie.length - 1;
+
+      final String data = location_Retrieve(
+            _tourData.latitudeSerie[lastIndex],
+            _tourData.longitudeSerie[lastIndex]);
+
+      System.out.println(data);
+// TODO remove SYSTEM.OUT.PRINTLN
+   }
+
+   private void onSelect_Location_Start() {
+      // TODO Auto-generated method stub
+
+      final String data = location_Retrieve(
+            _tourData.latitudeSerie[0],
+            _tourData.longitudeSerie[0]);
+
+//      final String data = """
+//
+//            {
+//               "place_id": 78981669,
+//               "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+//               "osm_type": "way",
+//               "osm_id": 44952014,
+//               "lat": "47.116116899999994",
+//               "lon": "7.989645450000001",
+//               "class": "leisure",
+//               "type": "pitch",
+//               "place_rank": 30,
+//               "importance": 0.00000999999999995449,
+//               "addresstype": "leisure",
+//               "name": "",
+//               "display_name": "5a, Schlossfeldstrasse, St. Niklausenberg, Guon, Willisau, Luzern, 6130, Schweiz/Suisse/Svizzera/Svizra",
+//               "address": {
+//                  "house_number": "5a",
+//                  "road": "Schlossfeldstrasse",
+//                  "neighbourhood": "St. Niklausenberg",
+//                  "farm": "Guon",
+//                  "village": "Willisau",
+//                  "state": "Luzern",
+//                  "ISO3166-2-lvl4": "CH-LU",
+//                  "postcode": "6130",
+//                  "country": "Schweiz/Suisse/Svizzera/Svizra",
+//                  "country_code": "ch"
+//               },
+//               "boundingbox": [
+//                  "47.1159171",
+//                  "47.1163167",
+//                  "7.9895150",
+//                  "7.9897759"
+//               ]
+//            }
+//                        """;
+
+      System.out.println(data);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      final OSMLocation osmLocation = location_DeserializeLocationData(data);
+
+      int a = 0;
+      a++;
    }
 
    private void onSelect_WindSpeed_Text() {
