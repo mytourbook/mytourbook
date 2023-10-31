@@ -33,7 +33,7 @@ import utils.Utils;
 public class AllTourMarkersViewTests extends UITest {
 
    @Test
-   void testDeleteTourMarker() {
+   void testDeleteTourMarkers() {
 
       // Open the All Tour Markers View
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_ALLTOURMARKERS);
