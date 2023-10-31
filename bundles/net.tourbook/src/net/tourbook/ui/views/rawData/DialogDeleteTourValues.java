@@ -35,6 +35,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -563,7 +564,7 @@ class DialogDeleteTourValues extends TitleAreaDialog {
 
          saveState();
 
-         TourLogManager.showLogView();
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
          final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 

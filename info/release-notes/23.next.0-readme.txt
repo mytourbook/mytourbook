@@ -51,9 +51,26 @@ Improvements
   - Resize height of the weather description field
     https://github.com/mytourbook/mytourbook/issues/1219
 
+* Tour Editor
+  - Make the use of the scroll wheel optional
+    https://github.com/mytourbook/mytourbook/issues/1200
+
+* Tour Info
+  - Show air quality value with its assigned color
+    https://github.com/mytourbook/mytourbook/issues/1223
+
+* Tour Log View
+  - Customize when this view is opened automatically, exceptions will always show this view
+    https://github.com/mytourbook/mytourbook/issues/1222 
+    https://github.com/mytourbook/mytourbook/discussions/1210
+
 
 Changes
 =======
+
+* Import
+  - "Open tour log view when starting a tour import" in the import preferences dialog is removed, now it can be set in the tour log view
+    https://github.com/mytourbook/mytourbook/issues/1222 
 
 * Tour Editor
   - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar

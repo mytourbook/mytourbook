@@ -72,6 +72,7 @@ import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
@@ -124,23 +125,22 @@ public class RawDataManager {
       }
    }
 
-   private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
-   private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                            //$NON-NLS-1$
+   private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";       //$NON-NLS-1$
+   private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                      //$NON-NLS-1$
 
-   private static final String           FILE_EXTENSION_FIT               = ".fit";                                                //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";                                             //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";                                           //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT               = ".fit";                                          //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";                                       //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";                                     //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
 
-   private static final String           INVALIDFILES_TO_IGNORE           = "invalidfiles_to_ignore.txt";                          //$NON-NLS-1$
+   private static final String           INVALIDFILES_TO_IGNORE           = "invalidfiles_to_ignore.txt";                    //$NON-NLS-1$
 
    public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
 
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean                _importState_IsAutoOpenImportLog = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    private static boolean                _importState_IsIgnoreInvalidFile = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean                _importState_IsSetBodyWeight     = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
    private static CadenceMultiplier      _importState_DefaultCadenceMultiplier;
@@ -845,10 +845,6 @@ public class RawDataManager {
       return TourbookPlugin.getDefault().getStateLocation().toFile().getAbsolutePath();
    }
 
-   public static boolean isAutoOpenImportLog() {
-      return _importState_IsAutoOpenImportLog;
-   }
-
    /**
     * @return Returns <code>true</code> when currently deleting values from tour(s)
     */
@@ -1214,9 +1210,7 @@ public class RawDataManager {
          allOSFiles.add(osFile);
       }
 
-      if (_importState_IsAutoOpenImportLog) {
-         TourLogManager.showLogView();
-      }
+      TourLogManager.showLogView(AutoOpenEvent.TOUR_IMPORT);
 
       final ImportState_Process importState_Process = new ImportState_Process();
 
@@ -1897,7 +1891,7 @@ public class RawDataManager {
 
       final TourData saveTourData = TourManager.saveModifiedTour(tourData, false);
 
-      TourLogManager.showLogView();
+      TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
       TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(saveTourData));
 
       for (final TourValueType tourValueType : tourValueTypes) {
@@ -3278,7 +3272,7 @@ public class RawDataManager {
                                     final TourData oldTourData,
                                     final Map<Long, TourData> allImportedToursFromOneFile) {
 
-      TourLogManager.showLogView();
+      TourLogManager.showLogView(AutoOpenEvent.TOUR_IMPORT);
 
       final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
       String message = null;
@@ -3746,10 +3740,6 @@ public class RawDataManager {
 
    public void setState_IsIgnoreInvalidFile(final boolean isIgnoreInvalidFile) {
       _importState_IsIgnoreInvalidFile = isIgnoreInvalidFile;
-   }
-
-   public void setState_IsOpenImportLogView(final boolean isOpenImportLog) {
-      _importState_IsAutoOpenImportLog = isOpenImportLog;
    }
 
    public void setState_IsSetBodyWeight(final boolean isSetBodyWeight) {

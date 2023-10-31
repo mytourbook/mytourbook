@@ -34,6 +34,7 @@ import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -101,7 +102,7 @@ public class StravaUploaderTests {
    @BeforeEach
    void setUp() {
 
-      TourLogManager.showLogView();
+      TourLogManager.showLogView(AutoOpenEvent.TOUR_UPLOAD);
    }
 
    @AfterEach

@@ -32,6 +32,7 @@ import net.tourbook.cloud.suunto.SuuntoWorkoutsUploader;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -56,7 +57,7 @@ public class SuuntoWorkoutUploaderTests {
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
-      TourLogManager.showLogView();
+      TourLogManager.showLogView(AutoOpenEvent.TOUR_UPLOAD);
 
       //We set the Suunto account information, otherwise the upload can't
       //happen

@@ -31,6 +31,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
@@ -62,6 +64,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
@@ -105,6 +108,7 @@ public class TourLogView extends ViewPart {
    private Action                         _action_CopyIntoClipboard;
    private Action                         _action_Clear;
    private Action_ToggleSimpleOrColor     _action_ToggleSimpleOrColor;
+   private Action_TourLogOptions          _action_TourLogOptions;
 
    private boolean                        _isBrowserContentSet;
    private boolean                        _isBrowserCompleted;
@@ -184,6 +188,15 @@ public class TourLogView extends ViewPart {
       @Override
       public void run() {
          onAction_ToggleSimpleOrColorUI();
+      }
+   }
+
+   private class Action_TourLogOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTourLogOptions(_pageBook, toolbar);
       }
    }
 
@@ -416,6 +429,7 @@ public class TourLogView extends ViewPart {
       _action_Clear = new Action_ClearView();
       _action_CopyIntoClipboard = new Action_CopyLogValuesIntoClipboard();
       _action_ToggleSimpleOrColor = new Action_ToggleSimpleOrColor();
+      _action_TourLogOptions = new Action_TourLogOptions();
    }
 
    private String createHTML() {
@@ -735,6 +749,7 @@ public class TourLogView extends ViewPart {
       tbm.add(_action_CopyIntoClipboard);
       tbm.add(_action_ToggleSimpleOrColor);
       tbm.add(_action_Clear);
+      tbm.add(_action_TourLogOptions);
    }
 
    private String getStateImage_NoBrowser(final TourLogState state) {

@@ -1196,7 +1196,7 @@ public class TourInfoUI {
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
 
-      _lblAirQuality = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblAirQuality = createUI_LabelValue(parent, SWT.CENTER);
    }
 
    private void createUI_48_Battery(final Composite parent) {
@@ -2210,14 +2210,39 @@ public class TourInfoUI {
                UI.getCardinalDirectionText(weatherWindDirectionDegree)));
       }
 
-      // Air Quality
+      /*
+       * Air Quality
+       */
       final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
       if (airQualityTextIndex > 0) {
 
          _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
+
+         final int colorIndex = airQualityTextIndex * 2;
+
+         // run asyc otherwise in the dark mode the colors are not displayed
+         _parent.getDisplay().asyncExec(() -> {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+            if (UI.IS_DARK_THEME) {
+
+               _lblAirQuality.setForeground(IWeather.airQualityColors_DarkTheme[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.airQualityColors_DarkTheme[colorIndex + 1]);
+
+            } else {
+
+               _lblAirQuality.setForeground(IWeather.airQualityColors_BrightTheme[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.airQualityColors_BrightTheme[colorIndex + 1]);
+            }
+         });
       }
 
-      // Average temperature
+      /*
+       * Average temperature
+       */
       final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
       final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
 
@@ -2227,6 +2252,7 @@ public class TourInfoUI {
       final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
             ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
             : FormatManager.formatTemperature(convertedTemperature_NoDevice);
+
       final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
             ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
             : FormatManager.formatTemperature(convertedTemperature_FromDevice);
