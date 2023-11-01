@@ -156,10 +156,10 @@ Messages //
                this._showDialog();
             },
 
-            // show dialog when action button is hovered
-            onMouseOver : function() {
-               this._showDialog();
-            },
+//            // show dialog when action button is hovered
+//            onMouseOver : function() {
+//               this._showDialog();
+//            },
 
             _showDialog : function() {
 

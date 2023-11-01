@@ -69,8 +69,12 @@ Changes
 
 * Import
   - "Open tour log view when starting a tour import" in the import preferences dialog is removed, now it can be set in the tour log view
-    https://github.com/mytourbook/mytourbook/issues/1222 
+    https://github.com/mytourbook/mytourbook/issues/1222
 
+* Tour Search
+  - The options dialog can be opened only by clicking on its action button but not anymore when its hovered
+    https://github.com/mytourbook/mytourbook/issues/1224
+  
 * Tour Editor
   - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar
     https://github.com/mytourbook/mytourbook/issues/1201

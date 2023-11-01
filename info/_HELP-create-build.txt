@@ -100,7 +100,7 @@ Create Dojo files, when web-UI in net.tourbook.web is modified
 ################################################################
 
    - Set "IS_DEBUG = false" in net.tourbook.web.WEB 
-   - 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
+   - 1. run script /build.net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
    - 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
 
