@@ -850,7 +850,6 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param allGraphDrawingData
-    *
     * @return Returns <code>true</code> when a chart can be overlapped.
     *         <p>
     *         The overlap feature is currently supported for graphs which all have the chart type
@@ -1038,7 +1037,6 @@ public class ChartComponentGraph extends Canvas {
     * Create a cursor resource from an image file
     *
     * @param imageName
-    *
     * @return
     */
    private Cursor createCursorFromImage(final String imageName) {
@@ -7019,7 +7017,6 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param rgb
-    *
     * @return Returns the color from the color cache, the color must not be disposed this is done
     *         when the cache is disposed
     */
@@ -7378,7 +7375,6 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param devXGraph
-    *
     * @return Returns <code>true</code> when the synch marker was hit
     */
    private boolean isSynchMarkerHit(final int devXGraph) {
@@ -7431,7 +7427,6 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param graphX
     * @param devY
-    *
     * @return
     */
    private ChartYSlider isYSliderHit(final int graphX, final int devY) {
@@ -7493,7 +7488,7 @@ public class ChartComponentGraph extends Canvas {
          final float pointX = points[pathIndex];
          final float pointY = points[pathIndex + 1];
 
-         System.out.println(String.format("%5d  %7.0f  %7.0f", pathIndex / 2, pointX, pointY)); //$NON-NLS-1$
+         System.out.println(String.format("%5d  %7.0f  %7.0f", pathIndex / 2, pointX, pointY));
       }
    }
 
@@ -7625,7 +7620,6 @@ public class ChartComponentGraph extends Canvas {
     * @param xxDevSliderLinePos
     *           x coordinate for the slider line within the graph, this can be outside of the
     *           visible graph
-    *
     * @return Returns <code>true</code> when the slider position has changed
     */
    private boolean moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
@@ -8209,7 +8203,6 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param mouseEvent
-    *
     * @return Returns <code>true</code> when the mouse event was handled.
     */
    boolean onMouseExitAxis(final MouseEvent mouseEvent) {
@@ -8490,7 +8483,6 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param mouseEvent
-    *
     * @return Returns <code>true</code> when the mouse event was been handled.
     */
    boolean onMouseMoveAxis(final MouseEvent mouseEvent) {
@@ -9845,7 +9837,6 @@ public class ChartComponentGraph extends Canvas {
     * Set the value index in the X-slider for the hovered position.
     *
     * @param xSlider
-    *
     * @return Returns <code>true</code> when the slider position has changed
     */
    boolean setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
