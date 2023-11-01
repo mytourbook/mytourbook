@@ -334,7 +334,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public class MarkerItemFilter extends ViewerFilter {
+   private class MarkerItemFilter extends ViewerFilter {
 
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
@@ -408,7 +408,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       }
    }
 
-   public class TableContextMenuProvider implements IContextMenuProvider {
+   private class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
