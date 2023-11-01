@@ -487,7 +487,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     *
     * @param result
     * @param tourItem
+    *
     * @return
+    *
     * @throws SQLException
     */
    public static TVITourBookTour getTourDataFields(final ResultSet result,
@@ -783,9 +785,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTourComputedTime_Break        = colTourDeviceTime_Elapsed - colTourComputedTime_Moving;
 
       colSlowVsFastCadence             = TourManager.generateCadenceZones_TimePercentages(
-                                                cadenceZone_SlowTime, 
+                                                cadenceZone_SlowTime,
                                                 cadenceZone_FastTime);
-      
+
 // SET_FORMATTING_ON
    }
 
@@ -933,7 +935,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             final String fieldName = field.getName();
 
-            if ("colClouds".equals(fieldName)) {
+            if ("colClouds".equals(fieldName)) { //$NON-NLS-1$
 
                // skip cloud field otherwise the cloud icon is not displayed
                continue;

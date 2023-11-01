@@ -7056,7 +7056,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       tbm.add(_actionToggleRowSelectMode);
 
       // save and restore actions are added from plugin.xml
-      tbm.add(new Separator("group_SaveAndRestoreActions"));
+      tbm.add(new Separator("group_SaveAndRestoreActions")); //$NON-NLS-1$
 
       tbm.add(_actionViewSettings);
 
