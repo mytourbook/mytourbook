@@ -363,8 +363,8 @@ public class Utils {
       // The tooltip value is different on Linux because it's encrypted in M1, M2 and M3
       // https://github.com/mytourbook/mytourbook/blob/197f21c34e03728832a415f9368eca43260750bb/bundles/net.tourbook/plugin.properties#L109-L131
       final String tourImportTooltip = UI.IS_LINUX
-            ? "Tour Import (Shift+Ctrl+I)"
-            : "Tour Import (Ctrl+Shift+I)";
+            ? "Tour Import (Shift+Ctrl+I)" //$NON-NLS-1$
+            : "Tour Import (Ctrl+Shift+I)"; //$NON-NLS-1$
       bot.toolbarButtonWithTooltip(tourImportTooltip).click();
       return Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
    }
