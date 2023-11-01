@@ -2897,6 +2897,8 @@ public class Messages extends NLS {
 
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
+   public static String        Tour_Editor_Action_DownloadEndLocation;
+   public static String        Tour_Editor_Action_DownloadStartLocation;
    public static String        Tour_Editor_Button_DiscardModifications;
    public static String        Tour_Editor_Button_SaveTour;
    public static String        tour_editor_csvTimeSliceExport;
@@ -2954,9 +2956,7 @@ public class Messages extends NLS {
    public static String        Tour_Editor_Label_Humidity_Tooltip;
    public static String        tour_editor_label_import_file_path;
    public static String        Tour_Editor_Label_Location_End;
-   public static String        Tour_Editor_Label_Location_End_Tooltip;
    public static String        Tour_Editor_Label_Location_Start;
-   public static String        Tour_Editor_Label_Location_Start_Tooltip;
    public static String        tour_editor_label_merge_from_tour_id;
    public static String        tour_editor_label_merge_from_tour_id_tooltip;
    public static String        tour_editor_label_merge_into_tour_id;

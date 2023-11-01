@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class OSMLocation {
+class OSMAddress {
 
    /**
     * <pre>
@@ -68,26 +68,17 @@ class OSMLocation {
     * </pre>
     */
 
-   public long       place_id;
-   public long       osm_id;
-   public String     licence;
+   public String country;
+   public String country_code;
+   public String neighbourhood;
+   public String farm;
+   public String state;
 
-   public String     osm_type;
-   public String     type;
-   public String     addresstype;
+   public String road;
+   public String house_number;
+   public String postcode;
+   public String village;
 
-   @JsonAlias({ "class" })
-   public String     locationClass;
-
-   public double     lat;
-   public double     lon;
-   public String     name;
-   public String     display_name;
-
-   public int        place_rank;
-   public double     importance;
-
-   public OSMAddress address;
-
-   public double[]   boundingbox;
+   @JsonAlias({ "ISO3166-2-lvl4" })
+   public String ISO3166_2_lvl4;
 }
