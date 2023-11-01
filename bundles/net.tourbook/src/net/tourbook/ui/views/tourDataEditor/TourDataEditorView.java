@@ -1333,7 +1333,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                table.setRedraw(false);
                {
                   /*
-                   * update the viewer, show busy indicator when it's a large tour or the previous
+                   * update the viewer, show busy indicator when its a large tour or the previous
                    * tour was large because it takes time to remove the old items
                    */
                   if (((_tourData != null) && (_tourData.timeSerie != null)
