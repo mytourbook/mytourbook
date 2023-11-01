@@ -89,7 +89,7 @@ public class StravaUploaderTests {
             if (Messages.Dialog_UploadToursToStrava_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
-               Display.getDefault().asyncExec(shell::close);
+               Display.getDefault().asyncExec(() -> shell.close());
             }
          }
       });
@@ -123,7 +123,7 @@ public class StravaUploaderTests {
       tour.setWeather_Wind_Direction(267);
       tour.setWeather_Precipitation(3);
       tour.setWeather_Snowfall(1.3f);
-      tour.setWeather_AirQuality(IWeather.airQualityTexts[5]);
+      tour.setWeather_AirQuality(IWeather.AIRQUALITY_ID_VERYPOOR);
 
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
@@ -140,7 +140,7 @@ public class StravaUploaderTests {
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "message      = 1/3/2022, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
    }
 
@@ -169,7 +169,7 @@ public class StravaUploaderTests {
             .called();
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "message      = 7/4/2020, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
    }
 }

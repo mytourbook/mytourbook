@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -150,6 +151,7 @@ public class ColorSelectorExtended extends EventManager {
     *
     * @param listener
     *           a property change listener
+    *
     * @since 3.0
     */
    public void addListener(final IPropertyChangeListener listener) {
@@ -168,6 +170,7 @@ public class ColorSelectorExtended extends EventManager {
     * @param parent
     *           -
     *           the window used to calculate
+    *
     * @return <code>Point</code>
     */
    private Point computeImageSize(final Control parent) {
@@ -232,6 +235,7 @@ public class ColorSelectorExtended extends EventManager {
     *
     * @param opacity
     *           Opacity values
+    *
     * @return
     */
    public RGBA getRGBA(final int opacity) {
@@ -263,7 +267,16 @@ public class ColorSelectorExtended extends EventManager {
       final ColorDialog colorDialog = new ColorDialog(_btnColorSelector.getShell());
 
       colorDialog.setRGB(_colorValue);
-      colorDialog.setRGBs(_allCustomRGBs);
+
+      if (UI.IS_LINUX == false) {
+
+         /*
+          * Linux shows only the custom colors and not any more also the standard colors -> disabled
+          * Fix for https://github.com/mytourbook/mytourbook/issues/1208
+          */
+
+         colorDialog.setRGBs(_allCustomRGBs);
+      }
 
       final RGB newColor = colorDialog.open();
 
@@ -301,6 +314,7 @@ public class ColorSelectorExtended extends EventManager {
     *
     * @param listener
     *           a property change listener
+    *
     * @since 3.0
     */
    public void removeListener(final IPropertyChangeListener listener) {

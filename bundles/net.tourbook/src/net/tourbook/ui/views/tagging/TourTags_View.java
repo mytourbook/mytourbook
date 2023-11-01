@@ -27,8 +27,6 @@ import java.util.Set;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.commands.AppCommands;
-import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
@@ -109,12 +107,10 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveAndRestorePart {
+public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer {
 
    public static final String                  ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
 
@@ -225,8 +221,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       public void run() {
 
          doRestore();
-
-         updateCommandHandler();
       }
    }
 
@@ -246,8 +240,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       public void run() {
 
          doSave();
-
-         updateCommandHandler();
       }
    }
 
@@ -553,12 +545,14 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == TourTags_View.this) {
-
-               // update save icon
-               final ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
-               commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
-            }
+//            if (partRef.getPart(false) == TourTags_View.this) {
+//
+//               // update save icon
+//               final ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+//
+//               commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
+//               commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR, null);
+//            }
          }
 
          @Override
@@ -1080,18 +1074,14 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       super.dispose();
    }
 
-   @Override
-   public void doRestore() {
+   private void doRestore() {
 
       updateUI_Tags();
 
       enableControls();
-
-//      firePropertyChange(PROP_DIRTY);
    }
 
-   @Override
-   public void doSave() {
+   private void doSave() {
 
       // check if the tour editor contains a modified tour
       if (TourManager.isTourEditorModified()) {
@@ -1181,6 +1171,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -1206,6 +1197,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
     * @param parentItems
     * @param tagItems
     * @param tagId
+    *
     * @return Returns <code>true</code> when the tag id is found
     */
    private boolean getTagItems(final ArrayList<TreeViewerItem> parentItems,
@@ -1356,8 +1348,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 //      _tagViewer.refresh();
 
       enableControls();
-
-      updateCommandHandler();
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -1848,18 +1838,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
-
-   /**
-    * Enable/disable save/restore actions in the app toolbar
-    */
-   private void updateCommandHandler() {
-
-// this is not used any more because the save/restore icons are always enabled
-
-//      final IEvaluationService evalService = PlatformUI.getWorkbench().getService(IEvaluationService.class);
-//
-//      evalService.requestEvaluation(AppCommands.COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY);
-   }
 
    /**
     * Update view header which shows the number of selected tour(s) and tags.

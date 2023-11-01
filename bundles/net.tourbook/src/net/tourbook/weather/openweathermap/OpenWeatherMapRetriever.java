@@ -63,6 +63,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
     * Codes : https://openweathermap.org/weather-conditions#Icon-list
     *
     * @param weatherIcon
+    *
     * @return
     */
    public static String convertWeatherIconToMTWeatherClouds(final String weatherIcon) {
@@ -279,6 +280,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
     * Determines if the tour start time is within the current hour
     *
     * @param tourStartTime
+    *
     * @return
     */
    private boolean isTourStartTimeCurrent(final long tourStartTime, final String tourTimeZoneId) {
@@ -415,7 +417,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final int airQualityIndexAverage = airPollutionResult.getAirQualityIndexAverage();
 
-      tour.setWeather_AirQuality(IWeather.airQualityTexts[airQualityIndexAverage]);
+      tour.setWeather_AirQuality(IWeather.airQualityIds[airQualityIndexAverage]);
    }
 
    private void setTourWeatherWithCurrentWeather(final Current currentWeather) {

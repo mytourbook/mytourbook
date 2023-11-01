@@ -35,7 +35,6 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
@@ -409,6 +408,7 @@ public class TourInfoUI {
     * @param tourData
     * @param tourToolTipProvider
     * @param tourProvider
+    *
     * @return Returns the content area control
     */
    public Composite createContentArea(final Composite parent,
@@ -1196,7 +1196,7 @@ public class TourInfoUI {
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
 
-      _lblAirQuality = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblAirQuality = createUI_LabelValue(parent, SWT.CENTER);
    }
 
    private void createUI_48_Battery(final Composite parent) {
@@ -2210,14 +2210,39 @@ public class TourInfoUI {
                UI.getCardinalDirectionText(weatherWindDirectionDegree)));
       }
 
-      // Air Quality
-      final String airQuality = _tourData.getWeather_AirQuality();
-      if (StringUtils.hasContent(airQuality) && !airQuality.equals(IWeather.airQualityIsNotDefined)) {
+      /*
+       * Air Quality
+       */
+      final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
+      if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(airQuality);
+         _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
+
+         final int colorIndex = airQualityTextIndex * 2;
+
+         // run asyc otherwise in the dark mode the colors are not displayed
+         _parent.getDisplay().asyncExec(() -> {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+            if (UI.IS_DARK_THEME) {
+
+               _lblAirQuality.setForeground(IWeather.airQualityColors_DarkTheme[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.airQualityColors_DarkTheme[colorIndex + 1]);
+
+            } else {
+
+               _lblAirQuality.setForeground(IWeather.airQualityColors_BrightTheme[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.airQualityColors_BrightTheme[colorIndex + 1]);
+            }
+         });
       }
 
-      // Average temperature
+      /*
+       * Average temperature
+       */
       final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
       final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
 
@@ -2227,6 +2252,7 @@ public class TourInfoUI {
       final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
             ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
             : FormatManager.formatTemperature(convertedTemperature_NoDevice);
+
       final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
             ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
             : FormatManager.formatTemperature(convertedTemperature_FromDevice);
@@ -2322,7 +2348,7 @@ public class TourInfoUI {
       final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
       final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
 
-      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss;
+      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
       final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
       final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
@@ -2340,9 +2366,9 @@ public class TourInfoUI {
       _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
       _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(vertSpeed_TimeGain / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative((double)vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative((double)vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative((double)vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
       _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));

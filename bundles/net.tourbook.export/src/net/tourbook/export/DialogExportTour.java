@@ -80,30 +80,32 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-   private static final String EXPORT_ID_GPX                     = "net.tourbook.export.gpx";           //$NON-NLS-1$
-   private static final String EXPORT_ID_TCX                     = "net.tourbook.export.tcx";           //$NON-NLS-1$
+   private static final String EXPORT_ID_GPX                                = "net.tourbook.export.gpx";                      //$NON-NLS-1$
+   private static final String EXPORT_ID_TCX                                = "net.tourbook.export.tcx";                      //$NON-NLS-1$
 
-   private static final String STATE_GPX_IS_ABSOLUTE_DISTANCE    = "STATE_GPX_IS_ABSOLUTE_DISTANCE";    //$NON-NLS-1$
-   private static final String STATE_GPX_IS_EXPORT_DESCRITION    = "STATE_GPX_IS_EXPORT_DESCRITION";    //$NON-NLS-1$
-   private static final String STATE_GPX_IS_EXPORT_MARKERS       = "STATE_GPX_IS_EXPORT_MARKERS";       //$NON-NLS-1$
-   private static final String STATE_GPX_IS_EXPORT_TOUR_DATA     = "STATE_GPX_IS_EXPORT_TOUR_DATA";     //$NON-NLS-1$
-   private static final String STATE_GPX_IS_EXPORT_SURFING_WAVES = "STATE_GPX_IS_EXPORT_SURFING_WAVES"; //$NON-NLS-1$
-   private static final String STATE_GPX_IS_WITH_BAROMETER       = "STATE_GPX_IS_WITH_BAROMETER";       //$NON-NLS-1$
+   private static final String STATE_GPX_IS_ABSOLUTE_DISTANCE               = "STATE_GPX_IS_ABSOLUTE_DISTANCE";               //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_DESCRITION               = "STATE_GPX_IS_EXPORT_DESCRITION";               //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_MARKERS                  = "STATE_GPX_IS_EXPORT_MARKERS";                  //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_TOUR_DATA                = "STATE_GPX_IS_EXPORT_TOUR_DATA";                //$NON-NLS-1$
+   private static final String STATE_GPX_IS_EXPORT_SURFING_WAVES            = "STATE_GPX_IS_EXPORT_SURFING_WAVES";            //$NON-NLS-1$
+   private static final String STATE_GPX_IS_WITH_BAROMETER                  = "STATE_GPX_IS_WITH_BAROMETER";                  //$NON-NLS-1$
 
-   private static final String STATE_TCX_ACTIVITY_TYPES          = "STATE_TCX_ACTIVITY_TYPES";          //$NON-NLS-1$
-   private static final String STATE_TCX_ACTIVITY_TYPE           = "STATE_TCX_ACTIVITY_TYPE";           //$NON-NLS-1$
-   private static final String STATE_TCX_IS_COURSES              = "STATE_TCX_IS_COURSES";              //$NON-NLS-1$
-   private static final String STATE_TCX_IS_EXPORT_DESCRITION    = "STATE_TCX_IS_EXPORT_DESCRITION";    //$NON-NLS-1$
-   private static final String STATE_TCX_IS_NAME_FROM_TOUR       = "STATE_TCX_IS_NAME_FROM_TOUR";       //$NON-NLS-1$
-   private static final String STATE_TCX_COURSE_NAME             = "STATE_TCX_COURSE_NAME";             //$NON-NLS-1$
+   private static final String STATE_TCX_ACTIVITY_TYPES                     = "STATE_TCX_ACTIVITY_TYPES";                     //$NON-NLS-1$
+   private static final String STATE_TCX_ACTIVITY_TYPE                      = "STATE_TCX_ACTIVITY_TYPE";                      //$NON-NLS-1$
+   private static final String STATE_TCX_IS_COURSES                         = "STATE_TCX_IS_COURSES";                         //$NON-NLS-1$
+   private static final String STATE_TCX_IS_EXPORT_DESCRITION               = "STATE_TCX_IS_EXPORT_DESCRITION";               //$NON-NLS-1$
+   private static final String STATE_TCX_IS_NAME_FROM_TOUR                  = "STATE_TCX_IS_NAME_FROM_TOUR";                  //$NON-NLS-1$
+   private static final String STATE_TCX_COURSE_NAME                        = "STATE_TCX_COURSE_NAME";                        //$NON-NLS-1$
 
-   private static final String STATE_CAMOUFLAGE_SPEED            = "camouflageSpeedValue";              //$NON-NLS-1$
-   private static final String STATE_IS_CAMOUFLAGE_SPEED         = "isCamouflageSpeed";                 //$NON-NLS-1$
-   private static final String STATE_IS_EXPORT_TOUR_RANGE        = "isExportTourRange";                 //$NON-NLS-1$
-   private static final String STATE_IS_OVERWRITE_FILES          = "isOverwriteFiles";                  //$NON-NLS-1$
-   private static final String STATE_IS_MERGE_ALL_TOURS          = "isMergeAllTours";                   //$NON-NLS-1$
-   private static final String STATE_EXPORT_PATH_NAME            = "exportPathName";                    //$NON-NLS-1$
-   private static final String STATE_EXPORT_FILE_NAME            = "exportFileName";                    //$NON-NLS-1$
+   private static final String STATE_CAMOUFLAGE_SPEED                       = "camouflageSpeedValue";                         //$NON-NLS-1$
+   private static final String STATE_IS_CAMOUFLAGE_SPEED                    = "isCamouflageSpeed";                            //$NON-NLS-1$
+   private static final String STATE_IS_EXPORT_TOUR_RANGE                   = "isExportTourRange";                            //$NON-NLS-1$
+   private static final String STATE_IS_OVERWRITE_FILES                     = "isOverwriteFiles";                             //$NON-NLS-1$
+   private static final String STATE_IS_MERGE_ALL_TOURS                     = "isMergeAllTours";                              //$NON-NLS-1$
+   private static final String STATE_EXPORT_PATH_NAME                       = "exportPathName";                               //$NON-NLS-1$
+   private static final String STATE_EXPORT_FILE_NAME                       = "exportFileName";                               //$NON-NLS-1$
+
+   private static final String STATE_AUTOCOMPLETE_POPUP_HEIGHT_TCX_ACTIVITY = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TCX_ACTIVITY"; //$NON-NLS-1$
 
    //$NON-NLS-1$
 
@@ -198,43 +200,45 @@ public class DialogExportTour extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button    _btnSelectFile;
+   private Button                 _btnSelectFile;
 
-   private Button    _chkCamouflageSpeed;
-   private Button    _chkExportTourRange;
-   private Button    _chkMergeAllTours;
-   private Button    _chkOverwriteFiles;
+   private Button                 _chkCamouflageSpeed;
+   private Button                 _chkExportTourRange;
+   private Button                 _chkMergeAllTours;
+   private Button                 _chkOverwriteFiles;
 
-   private Button    _chkGPX_Description;
-   private Button    _rdoGPX_DistanceAbsolute;
-   private Button    _rdoGPX_DistanceRelative;
-   private Button    _chkGPX_Markers;
-   private Button    _chkGPX_NoneGPXFields;
-   private Button    _chkGPX_SurfingWaves;
-   private Button    _chkGPX_WithBarometer;
+   private Button                 _chkGPX_Description;
+   private Button                 _rdoGPX_DistanceAbsolute;
+   private Button                 _rdoGPX_DistanceRelative;
+   private Button                 _chkGPX_Markers;
+   private Button                 _chkGPX_NoneGPXFields;
+   private Button                 _chkGPX_SurfingWaves;
+   private Button                 _chkGPX_WithBarometer;
 
-   private Button    _chkTCX_Description;
-   private Button    _rdoTCX_Activities;
-   private Button    _rdoTCX_Courses;
-   private Button    _rdoTCX_NameFromField;
-   private Button    _rdoTCX_NameFromTour;
+   private Button                 _chkTCX_Description;
+   private Button                 _rdoTCX_Activities;
+   private Button                 _rdoTCX_Courses;
+   private Button                 _rdoTCX_NameFromField;
+   private Button                 _rdoTCX_NameFromTour;
 
-   private Combo     _comboFile;
-   private Combo     _comboPath;
-   private Combo     _comboTcxActivityTypes;
-   private Combo     _comboTcxCourseName;
+   private Combo                  _comboFile;
+   private Combo                  _comboPath;
+   private Combo                  _comboTcxActivityTypes;
+   private Combo                  _comboTcxCourseName;
 
-   private Composite _dlgContainer;
-   private Composite _inputContainer;
+   private Composite              _dlgContainer;
+   private Composite              _inputContainer;
 
-   private Label     _lblCamouflageSpeedUnit;
-   private Label     _lblTcxActivityType;
-   private Label     _lblTcxCourseName;
-   private Label     _lblTcxNameFrom;
+   private Label                  _lblCamouflageSpeedUnit;
+   private Label                  _lblTcxActivityType;
+   private Label                  _lblTcxCourseName;
+   private Label                  _lblTcxNameFrom;
 
-   private Spinner   _spinnerCamouflageSpeed;
+   private Spinner                _spinnerCamouflageSpeed;
 
-   private Text      _txtFilePath;
+   private Text                   _txtFilePath;
+
+   private AutocompleteComboInput _autocompleteTcxActivity;
 
    /**
     * @param parentShell
@@ -1236,6 +1240,7 @@ public class DialogExportTour extends TitleAreaDialog {
     * @param monitor
     * @param exportFileName
     * @param tourSize
+    *
     * @throws IOException
     */
    private void mergeAllTours(final IProgressMonitor monitor, final String exportFileName, final int tourSize) throws IOException {
@@ -1388,7 +1393,8 @@ public class DialogExportTour extends TitleAreaDialog {
             _comboTcxActivityTypes.select(_comboTcxActivityTypes.indexOf(lastSelected_ActivityType));
          }
 
-         new AutocompleteComboInput(_comboTcxActivityTypes);
+         _autocompleteTcxActivity = new AutocompleteComboInput(_comboTcxActivityTypes);
+         _autocompleteTcxActivity.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TCX_ACTIVITY);
 
          updateUI_CourseName();
       }
@@ -1443,6 +1449,8 @@ public class DialogExportTour extends TitleAreaDialog {
          }
          _state.put(STATE_TCX_ACTIVITY_TYPES,            _comboTcxActivityTypes.getItems());
          _state.put(STATE_TCX_ACTIVITY_TYPE,             getActivityType());
+
+         _autocompleteTcxActivity.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TCX_ACTIVITY);
       }
 
       // camouflage speed

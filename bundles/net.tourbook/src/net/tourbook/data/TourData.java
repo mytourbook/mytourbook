@@ -100,6 +100,7 @@ import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
@@ -2903,7 +2904,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          if (elevationSerie == null) {
 
-            TourLogManager.showLogView();
+            TourLogManager.showLogView(AutoOpenEvent.TOUR_ADJUSTMENTS);
 
             TourLogManager.log_INFO(String.format(
                   Messages.Tour_Data_LogInfo_SRTM_DataAreNotAvailable,
@@ -9913,7 +9914,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                   // inside a pause
 
-                  final int nextSerieIndex = serieIndex < numTimeSlices
+                  final int nextSerieIndex = serieIndex < numTimeSlices - 1
                         ? serieIndex + 1
                         : serieIndex;
 

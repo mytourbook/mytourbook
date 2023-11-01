@@ -54,6 +54,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -208,7 +209,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       try {
          final long start = System.currentTimeMillis();
 
-         TourLogManager.showLogView();
+         TourLogManager.showLogView(AutoOpenEvent.DOWNLOAD_SOMETHING);
          TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);

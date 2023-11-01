@@ -96,14 +96,16 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener, ITourMarkerModifyListener {
 
-   private static final String      DIALOG_SETTINGS_POSITION = "marker_position";                       //$NON-NLS-1$
-   private static final String      STATE_INNER_SASH_HEIGHT  = "STATE_INNER_SASH_HEIGHT";               //$NON-NLS-1$
-   private static final String      STATE_OUTER_SASH_WIDTH   = "STATE_OUTER_SASH_WIDTH";                //$NON-NLS-1$
+   private static final String      DIALOG_SETTINGS_POSITION                    = "marker_position";                             //$NON-NLS-1$
 
-   private static final int         OFFSET_PAGE_INCREMENT    = 20;
-   private static final int         OFFSET_MAX               = 200;
+   private static final String      STATE_AUTOCOMPLETE_POPUP_HEIGHT_MARKER_NAME = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_MARKER_NAME"; //$NON-NLS-1$
+   private static final String      STATE_INNER_SASH_HEIGHT                     = "STATE_INNER_SASH_HEIGHT";                     //$NON-NLS-1$
+   private static final String      STATE_OUTER_SASH_WIDTH                      = "STATE_OUTER_SASH_WIDTH";                      //$NON-NLS-1$
 
-   private final IDialogSettings    _state                   = TourbookPlugin.getState("DialogMarker"); //$NON-NLS-1$
+   private static final int         OFFSET_PAGE_INCREMENT                       = 20;
+   private static final int         OFFSET_MAX                                  = 200;
+
+   private final IDialogSettings    _state                                      = TourbookPlugin.getState("DialogMarker");       //$NON-NLS-1$
 
    private TourChart                _tourChart;
    private TourData                 _tourData;
@@ -116,7 +118,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    /**
     * backup for the selected tour marker
     */
-   private TourMarker               _backupMarker            = new TourMarker();
+   private TourMarker               _backupMarker                               = new TourMarker();
 
    private Set<TourMarker>          _originalTourMarkers;
    private HashSet<TourMarker>      _dialogTourMarkers;
@@ -133,9 +135,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private boolean                  _isOkPressed;
    private boolean                  _isInCreateUI;
    private boolean                  _isUpdateUI;
-   private boolean                  _isSetXSlider            = true;
+   private boolean                  _isSetXSlider                               = true;
 
-   private NumberFormat             _nf3                     = NumberFormat.getNumberInstance();
+   private NumberFormat             _nf3                                        = NumberFormat.getNumberInstance();
 
    private int                      _contentWidthHint;
 
@@ -143,7 +145,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width.
     */
-   private final ArrayList<Control> _firstColumnControls     = new ArrayList<>();
+   private final ArrayList<Control> _firstColumnControls                        = new ArrayList<>();
 
    /*
     * none UI
@@ -153,44 +155,46 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    /*
     * UI controls
     */
-   private Sash                _sashInner;
-   private SashLeftFixedForm   _sashOuterForm;
-   private SashBottomFixedForm _sashInnerForm;
-   private Composite           _sashOuterFixedPart;
-   private Composite           _sashInnerFixedPart;
+   private Sash                   _sashInner;
+   private SashLeftFixedForm      _sashOuterForm;
+   private SashBottomFixedForm    _sashInnerForm;
+   private Composite              _sashOuterFixedPart;
+   private Composite              _sashInnerFixedPart;
 
-   private TableViewer         _markerViewer;
+   private TableViewer            _markerViewer;
 
-   private Button              _btnDelete;
-   private Button              _btnHideAll;
-   private Button              _btnPasteText;
-   private Button              _btnPasteUrl;
-   private Button              _btnShowAll;
-   private Button              _btnUndo;
-   private Button              _chkVisibility;
+   private Button                 _btnDelete;
+   private Button                 _btnHideAll;
+   private Button                 _btnPasteText;
+   private Button                 _btnPasteUrl;
+   private Button                 _btnShowAll;
+   private Button                 _btnUndo;
+   private Button                 _chkVisibility;
 
-   private Combo               _comboLabelPosition;
-   private Combo               _comboMarkerName;
+   private Combo                  _comboLabelPosition;
+   private Combo                  _comboMarkerName;
 
-   private Group               _groupText;
-   private Group               _groupUrl;
+   private Group                  _groupText;
+   private Group                  _groupUrl;
 
-   private Image               _imagePaste;
+   private Image                  _imagePaste;
 
-   private Label               _lblDescription;
-   private Label               _lblLabel;
-   private Label               _lblLabelOffsetX;
-   private Label               _lblLabelOffsetY;
-   private Label               _lblLabelPosition;
-   private Label               _lblLinkText;
-   private Label               _lblLinkUrl;
+   private Label                  _lblDescription;
+   private Label                  _lblLabel;
+   private Label                  _lblLabelOffsetX;
+   private Label                  _lblLabelOffsetY;
+   private Label                  _lblLabelPosition;
+   private Label                  _lblLinkText;
+   private Label                  _lblLinkUrl;
 
-   private Spinner             _spinLabelOffsetX;
-   private Spinner             _spinLabelOffsetY;
+   private Spinner                _spinLabelOffsetX;
+   private Spinner                _spinLabelOffsetY;
 
-   private Text                _txtDescription;
-   private Text                _txtUrlAddress;
-   private Text                _txtUrlText;
+   private Text                   _txtDescription;
+   private Text                   _txtUrlAddress;
+   private Text                   _txtUrlText;
+
+   private AutocompleteComboInput _autocompleteMarkerName;
 
    {
       _nf3.setMinimumFractionDigits(3);
@@ -502,6 +506,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
          _comboMarkerName.setFocus();
       });
+
+      restoreState_WithUI();
 
       return dlgContainer;
    }
@@ -1347,7 +1353,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _comboMarkerName.add(title);
       }
 
-      new AutocompleteComboInput(_comboMarkerName);
+      _autocompleteMarkerName = new AutocompleteComboInput(_comboMarkerName);
    }
 
    /**
@@ -1480,6 +1486,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_DEFAULT);
    }
 
+   private void restoreState_WithUI() {
+
+      _autocompleteMarkerName.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MARKER_NAME);
+   }
+
    private void saveState() {
 
       final int sashInnerFixedHeight = _sashInnerFixedPart.getSize().y;
@@ -1488,6 +1499,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _state.put(DIALOG_SETTINGS_POSITION, _comboLabelPosition.getSelectionIndex());
       _state.put(STATE_OUTER_SASH_WIDTH, _sashOuterFixedPart.getSize().x);
       _state.put(STATE_INNER_SASH_HEIGHT, sashInnerFixedHeight - sashInnerHeight);
+
+      _autocompleteMarkerName.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MARKER_NAME);
    }
 
    @Override

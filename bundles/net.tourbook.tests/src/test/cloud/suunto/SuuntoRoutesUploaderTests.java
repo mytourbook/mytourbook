@@ -89,7 +89,7 @@ public class SuuntoRoutesUploaderTests {
             if (Messages.Dialog_UploadRoutesToSuunto_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
-               Display.getDefault().asyncExec(shell::close);
+               Display.getDefault().asyncExec(() -> shell.close());
             }
          }
       });
@@ -116,7 +116,7 @@ public class SuuntoRoutesUploaderTests {
       httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/route/import").toString()).called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "7/4/2020, 5:00 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
    }
 }

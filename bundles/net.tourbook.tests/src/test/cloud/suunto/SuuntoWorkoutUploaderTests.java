@@ -90,7 +90,7 @@ public class SuuntoWorkoutUploaderTests {
             if (Messages.Dialog_UploadWorkoutsToSuunto_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
-               Display.getDefault().asyncExec(shell::close);
+               Display.getDefault().asyncExec(() -> shell.close());
             }
          }
       });
@@ -131,7 +131,7 @@ public class SuuntoWorkoutUploaderTests {
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload/642c5admtced4c09af1c49e6").toString()).called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "7/4/2020, 5:00 AM -> Uploaded Workout Id: \"642c5admtced4c09af1c49e6\""))); //$NON-NLS-1$
    }
 }

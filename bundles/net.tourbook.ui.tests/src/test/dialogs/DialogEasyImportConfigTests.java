@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,13 +27,14 @@ public class DialogEasyImportConfigTests extends UITest {
    @Test
    void configureEasyImport() {
 
-      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
+      Utils.showImportView(bot);
 
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_SetupEasyImport_Tooltip).click();
 
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
 
+      bot.button(Messages.App_Action_New).click();
+      bot.textWithLabel(Messages.Dialog_ImportConfig_Label_ConfigName).setText("New Import For Tests");
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_TourType).select();
       bot.comboBox(0).setSelection(Messages.Import_Data_TourTypeConfig_BySpeed);
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_LastMarker).select();
@@ -43,14 +44,16 @@ public class DialogEasyImportConfigTests extends UITest {
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData).select();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_SaveTour).select();
 
+      // Delete the easy import launcher
+      bot.button(Messages.App_Action_Remove_Immediate).click();
+
       Utils.clickOkButton(bot);
    }
 
    @Test
    void openEasyImportConfig() {
 
-      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
+      Utils.showImportView(bot);
 
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_SetupEasyImport_Tooltip).click();
 

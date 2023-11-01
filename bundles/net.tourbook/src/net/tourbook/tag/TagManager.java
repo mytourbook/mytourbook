@@ -43,6 +43,7 @@ import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterProfile;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -326,7 +327,7 @@ public class TagManager {
          conn.commit();
 
          // log result
-         TourLogManager.showLogView();
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
          for (int tagIndex = 0; tagIndex < allTags.size(); tagIndex++) {
 
@@ -441,7 +442,7 @@ public class TagManager {
          conn.commit();
 
          // log result
-         TourLogManager.showLogView();
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
          TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTagCategory,
                returnValue_CategoryCategory[0],
                returnValue_TagCategory[0],
