@@ -105,7 +105,6 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourViewer {
 
-   //todo fb, when deleting tours (that contain markers), from the tour book view, the view is not updated
    private static final char           NL                                = UI.NEW_LINE;
    public static final String          ID                                = "net.tourbook.ui.views.TourMarkerAllView";   //$NON-NLS-1$
    //
