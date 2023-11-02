@@ -34,7 +34,7 @@ public class DialogEasyImportConfigTests extends UITest {
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
 
       bot.button(Messages.App_Action_New).click();
-      bot.textWithLabel(Messages.Dialog_ImportConfig_Label_ConfigName).setText("New Import For Tests");
+      bot.textWithLabel(Messages.Dialog_ImportConfig_Label_ConfigName).setText("New Import For Tests"); //$NON-NLS-1$
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_TourType).select();
       bot.comboBox(0).setSelection(Messages.Import_Data_TourTypeConfig_BySpeed);
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_LastMarker).select();

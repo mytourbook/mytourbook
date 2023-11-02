@@ -44,7 +44,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   public static final String DIRECTORY                        = "Directory";                                                     //$NON-NLS-1$
+   public static final String DIRECTORY                        = Messages.App_Action_Menu_Directory;
    public static final String SAVE_MODIFIED_TOUR               = "Save modified tour (Ctrl+S)";                                   //$NON-NLS-1$
    public static final String TOOLS                            = "Tools ";                                                        //$NON-NLS-1$
 
@@ -79,7 +79,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURSEGMENTER          = PluginProperties.getText("view_name_Segmenter");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TRAINING               = PluginProperties.getText("View_Name_Training");                  //$NON-NLS-1$
    public static final String VIEW_NAME_WAYPOINTS              = PluginProperties.getText("View_Name_Waypoint");                  //$NON-NLS-1$
-   public static final String workingDirectory                 = System.getProperty("user.dir");                                  //$NON-NLS-1$
+   public static final String WORKING_DIRECTORY                = System.getProperty("user.dir");                                  //$NON-NLS-1$
 
    public static void changeMeasurementSystem(final SWTWorkbenchBot bot, final String measurementSystem) {
 
@@ -279,7 +279,7 @@ public class Utils {
 
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Configuration).activate();
 
-      bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files"); //$NON-NLS-1$
+      bot.comboBox(2).setText(Utils.WORKING_DIRECTORY + "\\src\\test\\files"); //$NON-NLS-1$
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_CreateBackup).deselect();
       bot.textWithLabel(Messages.Dialog_ImportConfig_Label_DeviceFiles).setText(fileName);
 
@@ -363,8 +363,8 @@ public class Utils {
       // The tooltip value is different on Linux because it's encrypted in M1, M2 and M3
       // https://github.com/mytourbook/mytourbook/blob/197f21c34e03728832a415f9368eca43260750bb/bundles/net.tourbook/plugin.properties#L109-L131
       final String tourImportTooltip = UI.IS_LINUX
-            ? "Tour Import (Shift+Ctrl+I)"
-            : "Tour Import (Ctrl+Shift+I)";
+            ? "Tour Import (Shift+Ctrl+I)" //$NON-NLS-1$
+            : "Tour Import (Ctrl+Shift+I)"; //$NON-NLS-1$
       bot.toolbarButtonWithTooltip(tourImportTooltip).click();
       return Utils.showView(bot, Utils.VIEW_NAME_TOURIMPORT);
    }

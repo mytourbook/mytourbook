@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,10 +42,10 @@ public class DialogPrintTourTests extends UITest {
       bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
       final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
-      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.comboBox(3).setText(Utils.WORKING_DIRECTORY);
       bot.button(Messages.Dialog_Print_Btn_Print).click();
 
-      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
+      final Path pdfFilePath = Paths.get(Utils.WORKING_DIRECTORY, fileName);
       assertTrue(Files.exists(pdfFilePath));
 
       FileUtils.deleteIfExists(pdfFilePath);
