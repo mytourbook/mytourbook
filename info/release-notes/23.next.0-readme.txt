@@ -40,7 +40,8 @@ Experimental
 New
 ===
 
-* 
+* All Tour Markers View (Frederic):
+  - Added the ability to delete markers
 
 
 Improvements

@@ -48,47 +48,47 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
       String airQualityDatabaseValue;
       switch (translatedAirQuality) {
 
-      case "Gut":
-      case "Bon":
-      case "Buona":
-      case "Goed":
-      case "Good":
+      case "Gut": //$NON-NLS-1$
+      case "Bon": //$NON-NLS-1$
+      case "Buona": //$NON-NLS-1$
+      case "Goed": //$NON-NLS-1$
+      case "Good": //$NON-NLS-1$
          airQualityDatabaseValue = IWeather.AIRQUALITY_ID_GOOD;
          break;
 
-      case "Schön": //23.5
-      case "Mittelmässig": // 23.8
-      case "Acceptable":
-      case "Discreta":
-      case "Redelijk":
-      case "Fair":
+      case "Schön": //23.5 //$NON-NLS-1$
+      case "Mittelmässig": // 23.8 //$NON-NLS-1$
+      case "Acceptable": //$NON-NLS-1$
+      case "Discreta": //$NON-NLS-1$
+      case "Redelijk": //$NON-NLS-1$
+      case "Fair": //$NON-NLS-1$
          airQualityDatabaseValue = IWeather.AIRQUALITY_ID_FAIR;
          break;
 
-      case "Moderat": //23.5
-      case "Ungesund": // 23.8
-      case "Moyen":
-      case "Sufficiente":
-      case "Gemiddeld":
-      case "Moderate":
+      case "Moderat": //23.5 //$NON-NLS-1$
+      case "Ungesund": // 23.8 //$NON-NLS-1$
+      case "Moyen": //$NON-NLS-1$
+      case "Sufficiente": //$NON-NLS-1$
+      case "Gemiddeld": //$NON-NLS-1$
+      case "Moderate": //$NON-NLS-1$
          airQualityDatabaseValue = IWeather.AIRQUALITY_ID_MODERATE;
          break;
 
-      case "Schlecht": //23.5
-      case "Äusserst Ungesund": // 23.8
-      case "Mauvais":
-      case "Scarsa":
-      case "Slecht":
-      case "Poor":
+      case "Schlecht": //23.5 //$NON-NLS-1$
+      case "Äusserst Ungesund": // 23.8 //$NON-NLS-1$
+      case "Mauvais": //$NON-NLS-1$
+      case "Scarsa": //$NON-NLS-1$
+      case "Slecht": //$NON-NLS-1$
+      case "Poor": //$NON-NLS-1$
          airQualityDatabaseValue = IWeather.AIRQUALITY_ID_POOR;
          break;
 
-      case "Sehr schlecht": //23.5
-      case "Gefährlich": // 23.8
-      case "Très mauvais":
-      case "Molto scarsa":
-      case "Zeer slecht":
-      case "Very poor":
+      case "Sehr schlecht": //23.5 //$NON-NLS-1$
+      case "Gefährlich": // 23.8 //$NON-NLS-1$
+      case "Très mauvais": //$NON-NLS-1$
+      case "Molto scarsa": //$NON-NLS-1$
+      case "Zeer slecht": //$NON-NLS-1$
+      case "Very poor": //$NON-NLS-1$
          airQualityDatabaseValue = IWeather.AIRQUALITY_ID_VERYPOOR;
          break;
 
