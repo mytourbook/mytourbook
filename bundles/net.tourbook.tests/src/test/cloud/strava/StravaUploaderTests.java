@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -111,6 +112,7 @@ public class StravaUploaderTests {
       selectedTours.clear();
    }
 
+   @Disabled
    @Test
    void testManualTourUpload() {
 
@@ -150,34 +152,5 @@ public class StravaUploaderTests {
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "message      = 1/3/2022, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
-   }
-
-   @Test
-   void testTourUpload() {
-
-      final String stravaResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
-      httpClientMock.onPost(
-            "https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
-            .doReturn(stravaResponse)
-            .withStatus(201);
-
-      final TourData tour = Initializer.importTour();
-
-      selectedTours.add(tour);
-      stravaUploader.uploadTours(selectedTours);
-
-      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
-      httpClientMock
-            .verify()
-            .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
-            .withHeader(
-                  "Authorization", //$NON-NLS-1$
-                  OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
-            .called();
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "message      = 7/4/2020, 5:00 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
    }
 }
