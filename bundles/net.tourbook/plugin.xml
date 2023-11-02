@@ -454,6 +454,15 @@
          class="net.tourbook.preferences.PrefPageWeather"
       />
 
+      <!--
+         Nutrition
+      -->
+      <page
+         name="%Pref_Page_Nutrition"
+         id="net.tourbook.preferences.PrefPageNutrition"
+         class="net.tourbook.preferences.PrefPageNutrition"
+      />
+
    </extension>
 
 
