@@ -54,20 +54,19 @@ public class ApplicationVersion {
 
       _isDev = qualifier.contains("qualifier"); //$NON-NLS-1$
 
-      _qualifierText = _isDev ? //
-      //
-      // this text is used to identify development versions
-            DEVELOPMENT_VERSION_TEXT
-            //
+      _qualifierText = _isDev
+
+            // this text is used to identify development versions
+            ? DEVELOPMENT_VERSION_TEXT
+
             : qualifier;
 
       _qualifierText += _subVersion;
 
       _versionSimple = UI.EMPTY_STRING
-            + version.getMajor()
-            + UI.SYMBOL_DOT
-            + version.getMinor()
-            + UI.SYMBOL_DOT
+
+            + version.getMajor() + UI.SYMBOL_DOT
+            + version.getMinor() + UI.SYMBOL_DOT
             + version.getMicro();
 
       _versionFull = _versionSimple + UI.SYMBOL_DOT + _qualifierText;

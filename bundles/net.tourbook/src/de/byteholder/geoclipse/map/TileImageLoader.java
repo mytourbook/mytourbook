@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.web.WEB;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -42,9 +43,7 @@ import org.eclipse.swt.graphics.PaletteData;
  */
 public class TileImageLoader implements Runnable {
 
-   private static final String HTTP_HEADER_USER_AGENT = "User-Agent"; //$NON-NLS-1$
-
-   private static int          _stackTraceCounter;
+   private static int _stackTraceCounter;
 
    /**
     * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
@@ -168,7 +167,7 @@ public class TileImageLoader implements Runnable {
                         final String userAgent = mp.getUserAgent();
 
                         if (StringUtils.hasContent(userAgent)) {
-                           connection.setRequestProperty(HTTP_HEADER_USER_AGENT, userAgent);
+                           connection.setRequestProperty(WEB.HTTP_HEADER_USER_AGENT, userAgent);
                         }
 
                         inputStream = connection.getInputStream();
