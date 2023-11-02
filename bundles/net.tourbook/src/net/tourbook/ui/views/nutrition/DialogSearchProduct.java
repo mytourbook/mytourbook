@@ -19,7 +19,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +27,12 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.views.rawData.TourMerger;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -57,7 +53,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -66,13 +61,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
-
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
    private static final int              MAX_ADJUST_SECONDS     = 120;
@@ -85,7 +78,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
    private TableViewer                   _productsViewer;
-   private List<String>                  _products;
+   private List<Product>                 _products;
 
    private TourData                      _sourceTour;
    private TourData                      _targetTour;
@@ -133,23 +126,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private Label  _lblAdjustMinuteUnit;
    private Label  _lblAdjustSecondsUnit;
 
-   private Button _btnResetAdjustment;
-   private Button _btnResetValues;
 
-   /*
-    * save actions
-    */
-   private Button _chkAdjustAltiFromStart;
-   private Label  _lblAdjustAltiValueTimeUnit;
-   private Label  _lblAdjustAltiValueDistanceUnit;
-   private Label  _lblAdjustAltiValueTime;
-   private Label  _lblAdjustAltiValueDistance;
-
-   private Button _chkSetTourType;
-   private Link   _linkTourType;
-   private CLabel _lblTourType;
-
-   private Button _chkKeepHVAdjustments;
 
    /*
     * display actions
@@ -158,39 +135,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private Button  _chkPreviewChart;
 
-   private boolean _isChartUpdated;
 
-   /*
-    * backup data
-    */
-   private int[]                         _backupSourceTimeSerie;
-   private float[]                       _backupSourceDistanceSerie;
-   private float[]                       _backupSourceAltitudeSerie;
 
-   private TourType                      _backupSourceTourType;
-
-   private float[]                       _backupTargetAltitudeSerie;
-   private float[]                       _backupTargetCadenceSerie;
-   private float[]                       _backupTargetPulseSerie;
-   private float[]                       _backupTargetTemperatureSerie;
-   private float[]                       _backupTargetSpeedSerie;
-   private int[]                         _backupTargetTimeSerie;
-   private long                          _backupTargetDeviceTime_Elapsed;
-
-   private int                           _backupTargetTimeOffset;
-   private int                           _backupTargetAltitudeOffset;
-
-   private ActionOpenPrefDialog          _actionOpenTourTypePrefs;
-
-   private final NumberFormat            _nf          = NumberFormat.getNumberInstance();
 
    private final Image                   _iconPlaceholder;
    private final HashMap<Integer, Image> _graphImages = new HashMap<>();
 
-   private int                           _tourTimeOffsetBackup;
 
-   private boolean                       _isAdjustAltiFromSourceBackup;
-   private boolean                       _isAdjustAltiFromStartBackup;
 
    private IPropertyChangeListener       _prefChangeListener;
 
@@ -332,81 +283,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       return super.close();
    }
 
-   private float[] computeAdjustedAltitude(final TourMerger tourMerger) {
 
-      final float[] targetDistanceSerie = _targetTour.distanceSerie;
-
-      final boolean isSourceAltitude = _sourceTour.altitudeSerie != null;
-      final boolean isTargetAltitude = _targetTour.altitudeSerie != null;
-      final boolean isTargetDistance = targetDistanceSerie != null;
-
-      final float[] altitudeDifferences = new float[2];
-
-      if (!isSourceAltitude || !isTargetAltitude || !isTargetDistance) {
-         return altitudeDifferences;
-      }
-
-      final int[] targetTimeSerie = tourMerger.getNewTargetTimeSerie();
-      final int serieLength = targetTimeSerie.length;
-      final float[] newSourceAltitudeDifferencesSerie = tourMerger.getNewSourceAltitudeDifferencesSerie();
-      final float[] newSourceAltitudeSerie = tourMerger.getNewSourceAltitudeSerie();
-      if (_chkAdjustAltiFromStart.getSelection()) {
-
-         /*
-          * adjust start altitude until left slider
-          */
-
-         final float[] adjustedTargetAltitudeSerie = new float[serieLength];
-
-         float startAltitudeDifferences = newSourceAltitudeDifferencesSerie[0];
-         final int endIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
-         final float distanceDiff = targetDistanceSerie[endIndex];
-
-         final float[] altitudeSerie = _targetTour.altitudeSerie;
-
-         for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-            if (serieIndex < endIndex) {
-
-               // add adjusted altitude
-
-               final float targetDistance = targetDistanceSerie[serieIndex];
-               final float distanceScale = 1 - targetDistance / distanceDiff;
-
-               final float adjustedAltiDiff = startAltitudeDifferences * distanceScale;
-               final float newAltitude = altitudeSerie[serieIndex] + adjustedAltiDiff;
-
-               adjustedTargetAltitudeSerie[serieIndex] = newAltitude;
-               newSourceAltitudeDifferencesSerie[serieIndex] = newSourceAltitudeSerie[serieIndex] - newAltitude;
-
-            } else {
-
-               // add altitude which are not adjusted
-
-               adjustedTargetAltitudeSerie[serieIndex] = altitudeSerie[serieIndex];
-            }
-         }
-
-         _sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
-
-         startAltitudeDifferences /= UI.UNIT_VALUE_ELEVATION;
-
-         final int targetEndTime = targetTimeSerie[endIndex];
-         final float targetEndDistance = targetDistanceSerie[endIndex];
-
-         // meter/min
-         altitudeDifferences[0] = targetEndTime == 0 ? //
-               0f
-               : startAltitudeDifferences / targetEndTime * 60;
-
-         // meter/meter
-         altitudeDifferences[1] = targetEndDistance == 0 ? //
-               0f
-               : ((startAltitudeDifferences * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
-
-      }
-      return altitudeDifferences;
-   }
 
    @Override
    protected void configureShell(final Shell shell) {
@@ -445,9 +322,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void createActions() {
 
-      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-            Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+
    }
 
    @Override
@@ -468,6 +343,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _dlgContainer = (Composite) super.createDialogArea(parent);
 
       createUI(_dlgContainer);
+
+      // this part is a selection provider
+      _postSelectionProvider = new PostSelectionProvider("ID");
 
       return _dlgContainer;
    }
@@ -837,12 +715,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
 
    @Override
-   public void propertyChange(final PropertyChangeEvent evt) {
+   public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 
-      final List<String> searchResult = (List<String>) evt.getNewValue();
+      @SuppressWarnings("unchecked")
+      final List<Product> searchResults = (List<Product>) propertyChangeEvent.getNewValue();
 
-      if (searchResult != null) {
-         _products = searchResult;
+      if (searchResults != null) {
+         _products = searchResults;
       }
 
       Display.getDefault().asyncExec(() -> {
@@ -913,8 +792,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _scaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
       _scaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
-
-      net.tourbook.ui.UI.updateUI_TourType(_sourceTour, _lblTourType, true);
 
       onModifyProperties();
    }

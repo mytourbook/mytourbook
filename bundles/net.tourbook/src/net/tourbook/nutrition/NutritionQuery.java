@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2023 Frédéric Bard
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.nutrition;
 
 import java.beans.PropertyChangeListener;
@@ -12,7 +27,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 public class NutritionQuery implements Runnable {
 
-   private List<String>        _searchResult = new ArrayList<>();
+   private List<Product>         _searchResult = new ArrayList<>();
 
    private Exception           _exception;
 
@@ -48,7 +63,7 @@ public class NutritionQuery implements Runnable {
       return _exception;
    }
 
-   public List<String> getSearchResult() {
+   public List<Product> getSearchResult() {
       return _searchResult;
    }
 
@@ -63,12 +78,15 @@ public class NutritionQuery implements Runnable {
       try {
 
          _searchResult.clear();
-//
-//			final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
-//
-//			SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
+
          final var toto = NutritionUtils.searchProduct(_query);
-         toto.stream().forEach(product -> _searchResult.add(product.getProductName()));
+
+         toto.stream().forEach(product -> {
+            final var titi = new Product();
+            titi.setName(product.getProductName());
+            _searchResult.add(titi);
+         });
+
       } catch (final Exception e) {
          _exception = e;
       }

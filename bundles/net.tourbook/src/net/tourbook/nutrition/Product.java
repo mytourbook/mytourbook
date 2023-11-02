@@ -1,51 +1,36 @@
+/*******************************************************************************
+ * Copyright (C) 2023 Frédéric Bard
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.nutrition;
-
-import de.byteholder.gpx.Waypoint;
-
-import java.util.List;
 
 import org.eclipse.jface.viewers.ISelection;
 
-/**
- * A Point of interest is essentially a {@link Waypoint} that has additional information like a
- * type, category and information, what's near it. It can also contain a value, which zoom level is
- * recommended to show it in the map.
- *
- * @author Michael Kanis
- */
 public class Product implements ISelection {
 
 //	public enum Type {Area, Way, Node};
 
 //	private Type type;
 
-   private String category;
+   private String name;
 
-   private String info;
 
-//	private int							recommendedZoom	= -1;
 
-   private List<? extends Waypoint> nearestPlaces;
-
-   private String                   _boundingBox;
-
-   /**
-    * @return Returns bounding box of this POI or <code>null</code>, when not available.
-    *         <p>
-    *         e.g.
-    *         boundingbox="48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
-    */
-   public String getBoundingBox() {
-      return _boundingBox;
+   public String getName() {
+      return name;
    }
 
-   public String getCategory() {
-      return category;
-   }
-
-   public String getInfo() {
-      return info;
-   }
 
 //	/**
 //	 * @return Return the recommended zoom level or -1 when the zoom level should not be changed
@@ -54,9 +39,7 @@ public class Product implements ISelection {
 //		return recommendedZoom;
 //	}
 
-   public List<? extends Waypoint> getNearestPlaces() {
-      return nearestPlaces;
-   }
+
 
    @Override
    public boolean isEmpty() {
@@ -80,35 +63,23 @@ public class Product implements ISelection {
 //		}
 //	}
 
-   public void setBoundingBox(final String boundingBox) {
-      _boundingBox = boundingBox;
+
+
+   public void setName(final String name) {
+      this.name = name;
    }
 
-   public void setCategory(final String category) {
-      this.category = category;
-   }
 
-   public void setInfo(final String info) {
-      this.info = info;
-   }
 
-//	public void setRecommendedZoom(final int recommendedZoom) {
-//		this.recommendedZoom = recommendedZoom;
-//	}
-
-   public void setNearestPlaces(final List<? extends Waypoint> nearestPlaces) {
-      this.nearestPlaces = nearestPlaces;
-   }
 
    @Override
    public String toString() {
 
-      final StringBuilder buf = new StringBuilder();
+      final StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append(getName());
 
-      if ((nearestPlaces != null) && (nearestPlaces.size() > 0)) {
-         buf.append(" near ").append(nearestPlaces.get(0).toString()); //$NON-NLS-1$
-      }
 
-      return buf.toString();
+
+      return stringBuilder.toString();
    }
 }
