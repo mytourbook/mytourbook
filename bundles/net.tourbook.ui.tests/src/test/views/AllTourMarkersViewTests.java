@@ -46,7 +46,7 @@ public class AllTourMarkersViewTests extends UITest {
       // Make sure that the table contains several markers
       assertTrue(initialTableRowCount > 0);
 
-      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+      Utils.duplicateAndGetTour(bot);
 
       allTourMarkersView.show();
 
@@ -71,7 +71,7 @@ public class AllTourMarkersViewTests extends UITest {
       // Make sure that the table contains 2 less marker
       assertEquals(initialTableRowCount - 2, tableMarkersTable.rowCount());
 
-      tour = Utils.selectDuplicatedTour(bot);
+      final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
    }
 

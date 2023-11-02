@@ -76,7 +76,7 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
             + "      WHERE " + TourDatabase.TABLE_TOUR_COMPARED + ".reftourid=" + TourDatabase.TABLE_TOUR_REFERENCE + ".refid" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             + ")" + NL //                                                                    //$NON-NLS-1$
 
-            + "   FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " TourReference" + NL //     //$NON-NLS-1$
+            + "   FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " TourReference" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
 
             // get data for a tour
             + "   LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //   //$NON-NLS-1$ //$NON-NLS-2$

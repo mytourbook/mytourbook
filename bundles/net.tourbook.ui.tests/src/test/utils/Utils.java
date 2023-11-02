@@ -79,7 +79,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURSEGMENTER          = PluginProperties.getText("view_name_Segmenter");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TRAINING               = PluginProperties.getText("View_Name_Training");                  //$NON-NLS-1$
    public static final String VIEW_NAME_WAYPOINTS              = PluginProperties.getText("View_Name_Waypoint");                  //$NON-NLS-1$
-   public static final String workingDirectory                 = System.getProperty("user.dir");                                  //$NON-NLS-1$
+   public static final String WORKING_DIRECTORY                = System.getProperty("user.dir");                                  //$NON-NLS-1$
 
    public static void changeMeasurementSystem(final SWTWorkbenchBot bot, final String measurementSystem) {
 
@@ -279,7 +279,7 @@ public class Utils {
 
       bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Configuration).activate();
 
-      bot.comboBox(2).setText(Utils.workingDirectory + "\\src\\test\\files"); //$NON-NLS-1$
+      bot.comboBox(2).setText(Utils.WORKING_DIRECTORY + "\\src\\test\\files"); //$NON-NLS-1$
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_CreateBackup).deselect();
       bot.textWithLabel(Messages.Dialog_ImportConfig_Label_DeviceFiles).setText(fileName);
 
