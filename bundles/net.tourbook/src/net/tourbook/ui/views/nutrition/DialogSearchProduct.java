@@ -17,8 +17,6 @@ package net.tourbook.ui.views.nutrition;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import de.byteholder.gpx.PointOfInterest;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
@@ -32,10 +30,10 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.nutrition.NutritionQuery;
+import net.tourbook.nutrition.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.rawData.TourMerger;
@@ -86,8 +84,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
-   private TableViewer                   _poiViewer;
-   private List<String>                  _pois;
+   private TableViewer                   _productsViewer;
+   private List<String>                  _products;
 
    private TourData                      _sourceTour;
    private TourData                      _targetTour;
@@ -217,10 +215,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       @Override
       public Object[] getElements(final Object parent) {
-         if (_pois == null) {
+         if (_products == null) {
             return new String[] {};
          } else {
-            return _pois.toArray();
+            return _products.toArray();
          }
       }
 
@@ -316,8 +314,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-            _poiViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-            _poiViewer.refresh();
+            _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _productsViewer.refresh();
          }
       };
 
@@ -553,16 +551,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       columnName.setText("Name"); //$NON-NLS-1$
       columnName.setWidth(300);
 
-      _poiViewer = new TableViewer(poiTable);
+      _productsViewer = new TableViewer(poiTable);
 
-      _poiViewer.setContentProvider(new ViewContentProvider());
-      _poiViewer.setLabelProvider(new ViewLabelProvider());
+      _productsViewer.setContentProvider(new ViewContentProvider());
+      _productsViewer.setLabelProvider(new ViewLabelProvider());
 
-      _poiViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
+      _productsViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
 
          final ISelection selection = selectionChangedEvent.getSelection();
          final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-         final PointOfInterest selectedPoi = (PointOfInterest) firstElement;
+         final Product selectedPoi = (Product) firstElement;
 
          _postSelectionProvider.setSelection(selectedPoi);
       });
@@ -726,45 +724,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    }
 
-   private void createUISectionResetButtons(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(false, false).align(SWT.END, SWT.FILL).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-
-      /*
-       * button: reset all adjustment options
-       */
-      _btnResetAdjustment = new Button(container, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).applyTo(_btnResetAdjustment);
-      _btnResetAdjustment.setText(Messages.tour_merger_btn_reset_adjustment);
-      _btnResetAdjustment.setToolTipText(Messages.tour_merger_btn_reset_adjustment_tooltip);
-      _btnResetAdjustment.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectResetAdjustments()));
-
-      /*
-       * button: show original values
-       */
-      _btnResetValues = new Button(container, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).applyTo(_btnResetValues);
-      _btnResetValues.setText(Messages.tour_merger_btn_reset_values);
-      _btnResetValues.setToolTipText(Messages.tour_merger_btn_reset_values_tooltip);
-      _btnResetValues.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectResetValues()));
-   }
 
    private void enableActions() {
 
    }
 
-   private void enableGraphActions() {
 
-      final boolean isAltitude = _sourceTour.altitudeSerie != null && _targetTour.altitudeSerie != null;
-      final boolean isSourceDistance = _sourceTour.distanceSerie != null;
-      final boolean isSourcePulse = _sourceTour.pulseSerie != null;
-      final boolean isSourceTime = _sourceTour.timeSerie != null;
-      final boolean isSourceTemperature = _sourceTour.temperatureSerie != null;
-      final boolean isSourceCadence = _sourceTour.getCadenceSerie() != null;
-
-   }
 
    private void enableMergeButton(final boolean isEnabled) {
 
@@ -866,40 +832,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _nutritionQuery.asyncFind(searchText);
    }
 
-   private void onSelectResetAdjustments() {
 
-      _scaleAdjustSeconds.setSelection(MAX_ADJUST_SECONDS);
-      _scaleAdjustMinutes.setSelection(MAX_ADJUST_MINUTES);
-      _scaleAltitude1.setSelection(MAX_ADJUST_ALTITUDE_1);
-      _scaleAltitude10.setSelection(MAX_ADJUST_ALTITUDE_10);
 
-      onModifyProperties();
-   }
 
-   private void onSelectResetValues() {
-
-      /*
-       * Get original data from the backed up data
-       */
-      _sourceTour.timeSerie = Util.createIntegerCopy(_backupSourceTimeSerie);
-      _sourceTour.distanceSerie = Util.createFloatCopy(_backupSourceDistanceSerie);
-      _sourceTour.altitudeSerie = Util.createFloatCopy(_backupSourceAltitudeSerie);
-
-      _targetTour.altitudeSerie = Util.createFloatCopy(_backupTargetAltitudeSerie);
-      _targetTour.setCadenceSerie(Util.createFloatCopy(_backupTargetCadenceSerie));
-      _targetTour.pulseSerie = Util.createFloatCopy(_backupTargetPulseSerie);
-      _targetTour.temperatureSerie = Util.createFloatCopy(_backupTargetTemperatureSerie);
-      _targetTour.setSpeedSerie(Util.createFloatCopy(_backupTargetSpeedSerie));
-      _targetTour.timeSerie = Util.createIntegerCopy(_backupTargetTimeSerie);
-      _targetTour.setTourDeviceTime_Elapsed(_backupTargetDeviceTime_Elapsed);
-
-      _targetTour.setMergedTourTimeOffset(_backupTargetTimeOffset);
-      _targetTour.setMergedAltitudeOffset(_backupTargetAltitudeOffset);
-
-      updateUIFromTourData();
-
-      enableActions();
-   }
 
    @Override
    public void propertyChange(final PropertyChangeEvent evt) {
@@ -907,7 +842,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final List<String> searchResult = (List<String>) evt.getNewValue();
 
       if (searchResult != null) {
-         _pois = searchResult;
+         _products = searchResult;
       }
 
       Display.getDefault().asyncExec(() -> {
@@ -918,16 +853,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          }
 
          // refresh viewer
-         _poiViewer.setInput(new Object());
+         _productsViewer.setInput(new Object());
 
          // select first entry, if there is one
-         final Table poiTable = _poiViewer.getTable();
+         final Table poiTable = _productsViewer.getTable();
          if (poiTable.getItemCount() > 0) {
 
             final Object firstData = poiTable.getItem(0).getData();
-            if (firstData instanceof PointOfInterest) {
+            if (firstData instanceof Product) {
 
-               _poiViewer.setSelection(new StructuredSelection(firstData));
+               _productsViewer.setSelection(new StructuredSelection(firstData));
                setViewerFocus();
             }
          }
@@ -951,7 +886,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
     */
    private void setViewerFocus() {
 
-      final Table table = _poiViewer.getTable();
+      final Table table = _productsViewer.getTable();
 
       table.setSelection(table.getSelectionIndex());
       table.setFocus();
