@@ -30,6 +30,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.views.nutrition.DialogSearchProduct;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -38,7 +39,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -47,7 +47,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
@@ -90,7 +89,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private Button      _btnSearch;
 
    private Combo       _cboSearchQuery;
-   private ComboViewer _queryViewer;
 
    public class SearchContentProvider implements IStructuredContentProvider {
 
@@ -280,32 +278,14 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
          {
             /*
-             * combo: search
-             */
-            _cboSearchQuery = new Combo(queryContainer, SWT.NONE);
-            _cboSearchQuery.setVisibleItemCount(30);
-            _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               // start searching when ENTER is pressed
-               onSearchPoi();
-            }));
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .applyTo(_cboSearchQuery);
-         }
-         {
-            /*
              * button: search
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText("Messages.Poi_View_Button_Search");
-            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
+            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell())
+                  .open()));
          }
       }
-
-      _queryViewer = new ComboViewer(_cboSearchQuery);
-      _queryViewer.setContentProvider(new SearchContentProvider());
-      _queryViewer.setComparator(new ViewerComparator());
 
       // add autocomplete feature to the combo viewer
       // this feature is disable because it's not working very well
@@ -382,15 +362,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       final String searchText = _cboSearchQuery.getText();
 
-      // remove same search text
-      if (_searchHistory.contains(searchText) == false) {
-
-         // update model
-         // _searchHistory.add(searchText);
-
-         // update viewer
-         _queryViewer.add(searchText);
-      }
 
       // start product search
 
@@ -441,9 +412,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       if (stateSearchedQueries != null) {
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
-
-      // update content in the comboviewer
-      _queryViewer.setInput(new Object());
    }
 
    @PersistState
@@ -458,8 +426,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       // set default button
       _btnSearch.getShell().setDefaultButton(_btnSearch);
 
-      // set focus
-      _cboSearchQuery.setFocus();
+
    }
 
    /**
