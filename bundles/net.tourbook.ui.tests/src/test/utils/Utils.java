@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 
@@ -31,6 +32,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -211,6 +213,11 @@ public class Utils {
       return tour;
    }
 
+   public static String getAbsoluteFilePath(final String filePath) {
+
+      return Paths.get(filePath).toAbsolutePath().toString();
+   }
+
    /**
     * Because the SWTBot function {@link SWTBot#buttonWithTooltip} doesn't appear
     * to work in every case, this function will find a toolbar button for a given
@@ -253,7 +260,6 @@ public class Utils {
 
       return tour;
    }
-
    /**
     * Select a tour for which we have SRTM3 data
     */
@@ -344,6 +350,13 @@ public class Utils {
    public static void openVendorPage(final SWTBotTreeItem treeItem, final String vendorName) {
 
       treeItem.getNode(vendorName).select();
+   }
+
+   public static String readFileContent(final String controlDocumentFileName) {
+
+      final String controlDocumentFilePath = getAbsoluteFilePath(controlDocumentFileName);
+
+      return FileUtils.readFileContentString(controlDocumentFilePath);
    }
 
    public static SWTBotTreeItem selectDuplicatedTour(final SWTWorkbenchBot bot) {

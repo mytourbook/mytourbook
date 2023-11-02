@@ -50,3 +50,4 @@ Import-Package: com.fasterxml.jackson.core.type,
  org.eclipse.swt.widgets,
  org.json
 Automatic-Module-Name: net.tourbook.tests
+Export-Package: com.pgssoft.httpclient
