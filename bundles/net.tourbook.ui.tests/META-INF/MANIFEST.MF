@@ -4,6 +4,7 @@ Bundle-Name: GUI tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
 Bundle-Version: 23.10.0.qualifier
 Import-Package: com.pgssoft.httpclient,
+ com.pgssoft.httpclient.HttpClientMock,
  org.eclipse.nebula.widgets.nattable
 Require-Bundle: net.tourbook,
  net.tourbook.common,
