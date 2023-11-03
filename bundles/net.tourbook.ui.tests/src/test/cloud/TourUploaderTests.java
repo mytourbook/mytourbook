@@ -26,7 +26,6 @@ import net.tourbook.Messages;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
-import net.tourbook.cloud.strava.StravaUploader;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -46,7 +45,6 @@ public class TourUploaderTests extends UITest {
    private static final String           CLOUD_FILES_PATH = Utils.WORKING_DIRECTORY + "\\src\\test\\cloud\\files\\"; //$NON-NLS-1$
 
    static HttpClientMock                 httpClientMock;
-   static StravaUploader                 stravaUploader;
 
    static Object                         initialHttpClient;
 
@@ -74,8 +72,6 @@ public class TourUploaderTests extends UITest {
 
       initialHttpClient = field.get(null);
       field.set(null, httpClientMock);
-
-      stravaUploader = new StravaUploader();
    }
 
    @BeforeEach
