@@ -147,7 +147,7 @@ public class SuuntoCloudDownloaderTests {
    @BeforeEach
    void setUp() {
 
-      httpClientMock.reset();
+      //httpClientMock.reset();
    }
 
    @AfterEach
@@ -159,7 +159,6 @@ public class SuuntoCloudDownloaderTests {
    //We set the access token issue date time in the past to trigger the retrieval
    //of a new token.
    @Disabled
-
    @Test
    void testTourDownload() {
 
