@@ -29,7 +29,6 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.strava.StravaUploader;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
@@ -83,8 +82,6 @@ public class TourUploaderTests extends UITest {
       field.set(null, httpClientMock);
 
       stravaUploader = new StravaUploader();
-
-      FormatManager.updateDisplayFormats();
    }
 
    @BeforeEach
