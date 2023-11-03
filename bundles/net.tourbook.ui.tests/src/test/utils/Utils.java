@@ -73,6 +73,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURDATA               = PluginProperties.getText("View_Name_TourData");                  //$NON-NLS-1$
    public static final String VIEW_NAME_TOUREDITOR             = PluginProperties.getText("command_view_tourEditor");             //$NON-NLS-1$
    public static final String VIEW_NAME_TOURIMPORT             = PluginProperties.getText("view_name_Data_Import");               //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURLOG                = PluginProperties.getText("View_Name_TourLog");                   //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP25              = PluginProperties.getText("View_Name_TourMap25");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP3               = PluginProperties.getText("View_Name_TourMap3");                  //$NON-NLS-1$
    public static final String VIEW_NAME_ALLTOURMARKERS         = PluginProperties.getText("View_Name_AllTourMarkers");            //$NON-NLS-1$
@@ -385,6 +386,11 @@ public class Utils {
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
       return showView(bot, VIEW_NAME_TOURBOOK);
+   }
+
+   public static SWTBotView showTourLogView(final SWTWorkbenchBot bot) {
+
+      return showView(bot, VIEW_NAME_TOURLOG);
    }
 
    public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {

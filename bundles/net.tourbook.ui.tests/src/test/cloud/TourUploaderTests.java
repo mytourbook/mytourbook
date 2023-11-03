@@ -15,7 +15,7 @@
  *******************************************************************************/
 package cloud;
 
-
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
@@ -34,9 +34,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -73,8 +76,18 @@ public class TourUploaderTests extends UITest {
       FormatManager.updateDisplayFormats();
    }
 
+   @BeforeEach
+   void setUp() {
+      final SWTBotView tourLogView = Utils.showTourLogView(bot);
+      tourLogView.toolbarButton(Messages.Tour_Log_Action_Clear_Tooltip);
+   }
+
    @AfterEach
    void tearDown() {
+      final SWTBotView tourLogView = Utils.showTourLogView(bot);
+      final SWTBotToolbarButton linkWithOtherViewsButton = Utils.getToolbarButton(tourLogView, Messages.Tour_Log_Action_Clear_Tooltip);
+      assertNotNull(linkWithOtherViewsButton);
+      linkWithOtherViewsButton.click();
       selectedTours.clear();
    }
 
