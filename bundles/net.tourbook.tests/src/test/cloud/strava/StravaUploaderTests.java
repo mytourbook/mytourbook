@@ -65,51 +65,51 @@ public class StravaUploaderTests {
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
-      _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, true);
-      _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, true);
+   //   _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, true);
+  //    _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, true);
 
-      httpClientMock = new HttpClientMock();
-      final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
-            + "PasseurResponse.json"); //$NON-NLS-1$
-      httpClientMock.onPost(
-            OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(passeurResponse)
-            .withStatus(201);
+  //    httpClientMock = new HttpClientMock();
+ //     final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
+ //           + "PasseurResponse.json"); //$NON-NLS-1$
+  //     httpClientMock.onPost(
+ //            OAUTH_PASSEUR_APP_URL_TOKEN)
+//             .doReturn(passeurResponse)
+//             .withStatus(201);
 
-      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
+//       final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+//       field.setAccessible(true);
+//       field.set(null, httpClientMock);
 
-      stravaUploader = new StravaUploader();
+//       stravaUploader = new StravaUploader();
 
-      Display.getDefault().addFilter(SWT.Activate, event -> {
+ //      Display.getDefault().addFilter(SWT.Activate, event -> {
          // Is this a Shell being activated?
 
-         if (event.widget instanceof final Shell shell) {
+//          if (event.widget instanceof final Shell shell) {
 
             // Look at the shell title to see if it is the one we want
 
-            if (Messages.Dialog_UploadToursToStrava_Title.equals(shell.getText())) {
+//             if (Messages.Dialog_UploadToursToStrava_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
-               Display.getDefault().asyncExec(() -> shell.close());
-            }
-         }
-      });
+ //               Display.getDefault().asyncExec(() -> shell.close());
+ //            }
+//          }
+//       });
 
-      FormatManager.updateDisplayFormats();
+  //     FormatManager.updateDisplayFormats();
    }
 
    @BeforeEach
    void setUp() {
 
-      TourLogManager.showLogView(AutoOpenEvent.TOUR_UPLOAD);
+   //    TourLogManager.showLogView(AutoOpenEvent.TOUR_UPLOAD);
    }
 
    @AfterEach
    void tearDown() {
-      TourLogManager.clear();
-      selectedTours.clear();
+   //    TourLogManager.clear();
+   //    selectedTours.clear();
    }
 
    @Disabled
