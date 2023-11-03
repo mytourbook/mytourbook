@@ -37,6 +37,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +55,15 @@ public class TourUploaderTests extends UITest {
    static HttpClientMock                 httpClientMock;
    static StravaUploader                 stravaUploader;
 
+   static Object                         initialHttpClient;
    private List<TourData>                selectedTours               = new ArrayList<>();
+
+   @AfterAll
+   static void cleanUp() throws NoSuchFieldException, IllegalAccessException {
+      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, initialHttpClient);
+   }
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
@@ -70,6 +79,7 @@ public class TourUploaderTests extends UITest {
       final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
+      initialHttpClient = field.get(null);
 
       stravaUploader = new StravaUploader();
 
