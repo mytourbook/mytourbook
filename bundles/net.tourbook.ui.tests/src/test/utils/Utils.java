@@ -256,6 +256,7 @@ public class Utils {
 
       return tour;
    }
+
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
 
       importTour(bot, "ParkCity.fitlogEx"); //$NON-NLS-1$
@@ -395,6 +396,7 @@ public class Utils {
 
       return showView(bot, VIEW_NAME_TOURBOOK);
    }
+
    public static SWTBotView showTourLogView(final SWTWorkbenchBot bot) {
 
       return showView(bot, VIEW_NAME_TOURLOG);
