@@ -93,6 +93,14 @@ public class Utils {
       Utils.clickApplyAndCloseButton(bot);
    }
 
+   public static void clearTourLogView(final SWTWorkbenchBot bot) {
+
+      final SWTBotView tourLogView = showTourLogView(bot);
+      final SWTBotToolbarButton clearTourLogButton = Utils.getToolbarButton(tourLogView, Messages.Tour_Log_Action_Clear_Tooltip);
+      assertNotNull(clearTourLogButton);
+      clearTourLogButton.click();
+   }
+
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
 
       clickButton("Apply and Close", bot); //$NON-NLS-1$
@@ -248,7 +256,6 @@ public class Utils {
 
       return tour;
    }
-
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
 
       importTour(bot, "ParkCity.fitlogEx"); //$NON-NLS-1$
@@ -261,6 +268,7 @@ public class Utils {
 
       return tour;
    }
+
    /**
     * Select a tour for which we have SRTM3 data
     */
@@ -387,7 +395,6 @@ public class Utils {
 
       return showView(bot, VIEW_NAME_TOURBOOK);
    }
-
    public static SWTBotView showTourLogView(final SWTWorkbenchBot bot) {
 
       return showView(bot, VIEW_NAME_TOURLOG);

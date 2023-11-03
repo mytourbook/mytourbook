@@ -15,13 +15,11 @@
  *******************************************************************************/
 package cloud;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -29,12 +27,9 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.strava.StravaUploader;
-import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -55,7 +50,6 @@ public class TourUploaderTests extends UITest {
    static StravaUploader                 stravaUploader;
 
    static Object                         initialHttpClient;
-   private List<TourData>                selectedTours               = new ArrayList<>();
 
    @AfterAll
    static void cleanUp() throws NoSuchFieldException, IllegalAccessException {
@@ -86,17 +80,12 @@ public class TourUploaderTests extends UITest {
 
    @BeforeEach
    void setUp() {
-      final SWTBotView tourLogView = Utils.showTourLogView(bot);
-      tourLogView.toolbarButton(Messages.Tour_Log_Action_Clear_Tooltip);
+      Utils.clearTourLogView(bot);
    }
 
    @AfterEach
    void tearDown() {
-      final SWTBotView tourLogView = Utils.showTourLogView(bot);
-      final SWTBotToolbarButton linkWithOtherViewsButton = Utils.getToolbarButton(tourLogView, Messages.Tour_Log_Action_Clear_Tooltip);
-      assertNotNull(linkWithOtherViewsButton);
-      linkWithOtherViewsButton.click();
-      selectedTours.clear();
+      Utils.clearTourLogView(bot);
    }
 
    @Test
