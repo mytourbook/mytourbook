@@ -42,9 +42,8 @@ import utils.Utils;
 
 public class TourUploaderTests extends UITest {
 
-   private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/strava/token").toString(); //$NON-NLS-1$
-   private static final IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
-   private static final String           CLOUD_FILES_PATH            = Utils.WORKING_DIRECTORY + "\\src\\test\\cloud\\files\\";       //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore       = Activator.getDefault().getPreferenceStore();
+   private static final String           CLOUD_FILES_PATH = Utils.WORKING_DIRECTORY + "\\src\\test\\cloud\\files\\"; //$NON-NLS-1$
 
    static HttpClientMock                 httpClientMock;
    static StravaUploader                 stravaUploader;
@@ -53,6 +52,7 @@ public class TourUploaderTests extends UITest {
 
    @AfterAll
    static void cleanUp() throws NoSuchFieldException, IllegalAccessException {
+
       final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, initialHttpClient);
