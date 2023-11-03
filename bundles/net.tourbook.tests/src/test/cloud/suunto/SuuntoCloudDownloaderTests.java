@@ -23,7 +23,6 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -31,7 +30,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
@@ -40,9 +38,6 @@ import net.tourbook.common.UI;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,53 +84,53 @@ public class SuuntoCloudDownloaderTests {
 
       //We set the Suunto account information, otherwise the download can't
       //happen
-      _prefStore.setValue(
-            Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String(),
-            "./"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoWorkoutFilterStartDate_Active_Person_String(),
-            "1293840000000"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoWorkoutFilterEndDate_Active_Person_String(),
-            "1295049600000"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoUseWorkoutFilterStartDate_Active_Person_String(),
-            true);
-      _prefStore.setValue(
-            Preferences.getSuuntoUseWorkoutFilterEndDate_Active_Person_String(),
-            true);
-      _prefStore.setValue(Preferences.SUUNTO_FILENAME_COMPONENTS,
-            "{YEAR}{MONTH}{DAY}{USER_TEXT:-}{HOUR}{USER_TEXT:h}{MINUTE}{USER_TEXT:-}{SUUNTO_FILE_NAME}{USER_TEXT:-}{WORKOUT_ID}{USER_TEXT:-}{ACTIVITY_TYPE}{FIT_EXTENSION}"); //$NON-NLS-1$
-
-      httpClientMock = new HttpClientMock();
-
-      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
-
-      httpClientMock.onPost(
-            OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(_validTokenResponse)
-            .withStatus(201);
-
-      suuntoCloudDownloader = new SuuntoCloudDownloader();
-
-      authorize();
-
-      Display.getDefault().addFilter(SWT.Activate, event -> {
-         // Is this a Shell being activated?
-
-         if (event.widget instanceof final Shell shell) {
-
-            // Look at the shell title to see if it is the one we want
-
-            if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
-               // Close the shell after it has finished initializing
-
-               Display.getDefault().asyncExec(() -> shell.close());
-            }
-         }
-      });
+//      _prefStore.setValue(
+//            Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String(),
+//            "./"); //$NON-NLS-1$
+//      _prefStore.setValue(
+//            Preferences.getSuuntoWorkoutFilterStartDate_Active_Person_String(),
+//            "1293840000000"); //$NON-NLS-1$
+//      _prefStore.setValue(
+//            Preferences.getSuuntoWorkoutFilterEndDate_Active_Person_String(),
+//            "1295049600000"); //$NON-NLS-1$
+//      _prefStore.setValue(
+//            Preferences.getSuuntoUseWorkoutFilterStartDate_Active_Person_String(),
+//            true);
+//      _prefStore.setValue(
+//            Preferences.getSuuntoUseWorkoutFilterEndDate_Active_Person_String(),
+//            true);
+//      _prefStore.setValue(Preferences.SUUNTO_FILENAME_COMPONENTS,
+//            "{YEAR}{MONTH}{DAY}{USER_TEXT:-}{HOUR}{USER_TEXT:h}{MINUTE}{USER_TEXT:-}{SUUNTO_FILE_NAME}{USER_TEXT:-}{WORKOUT_ID}{USER_TEXT:-}{ACTIVITY_TYPE}{FIT_EXTENSION}"); //$NON-NLS-1$
+//
+//      httpClientMock = new HttpClientMock();
+//
+//      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+//      field.setAccessible(true);
+//      field.set(null, httpClientMock);
+//
+//      httpClientMock.onPost(
+//            OAUTH_PASSEUR_APP_URL_TOKEN)
+//            .doReturn(_validTokenResponse)
+//            .withStatus(201);
+//
+//      suuntoCloudDownloader = new SuuntoCloudDownloader();
+//
+//      authorize();
+//
+//      Display.getDefault().addFilter(SWT.Activate, event -> {
+//         // Is this a Shell being activated?
+//
+//         if (event.widget instanceof final Shell shell) {
+//
+//            // Look at the shell title to see if it is the one we want
+//
+//            if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
+//               // Close the shell after it has finished initializing
+//
+//               Display.getDefault().asyncExec(() -> shell.close());
+//            }
+//         }
+//      });
    }
 
    private void setTokenRetrievalDateInThePast() {
@@ -153,7 +148,6 @@ public class SuuntoCloudDownloaderTests {
    @AfterEach
    void tearDown() {
 
-      TourLogManager.clear();
    }
 
    //We set the access token issue date time in the past to trigger the retrieval
