@@ -78,8 +78,9 @@ public class TourUploaderTests extends UITest {
 
       final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
-      field.set(null, httpClientMock);
+
       initialHttpClient = field.get(null);
+      field.set(null, httpClientMock);
 
       stravaUploader = new StravaUploader();
 
