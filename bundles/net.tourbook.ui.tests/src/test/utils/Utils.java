@@ -98,7 +98,9 @@ public class Utils {
       final SWTBotView tourLogView = showTourLogView(bot);
       final SWTBotToolbarButton clearTourLogButton = Utils.getToolbarButton(tourLogView, Messages.Tour_Log_Action_Clear_Tooltip);
       assertNotNull(clearTourLogButton);
-      clearTourLogButton.click();
+      if (clearTourLogButton.isEnabled()) {
+         clearTourLogButton.click();
+      }
    }
 
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
