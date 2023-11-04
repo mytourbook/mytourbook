@@ -46,7 +46,7 @@ import utils.Utils;
 public class SuuntoCloudDownloaderTests extends UITest {
 
    private static final IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
-static HttpClientMock initialHttpClient;
+static Object          initialHttpClient;
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
@@ -89,7 +89,7 @@ static HttpClientMock initialHttpClient;
 
      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
-      initialHttpClient =  field.get(null);
+     initialHttpClient = field.get(null);
       field.set(null, httpClientMock);
    }
 
