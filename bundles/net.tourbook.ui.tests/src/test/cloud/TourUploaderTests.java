@@ -85,7 +85,7 @@ public class TourUploaderTests extends UITest {
       Utils.clearTourLogView(bot);
    }
 
-   @Disabled
+
    @Test
    void testTourUpload_Strava() {
 
