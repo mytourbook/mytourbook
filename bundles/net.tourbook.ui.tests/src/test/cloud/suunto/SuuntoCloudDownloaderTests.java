@@ -35,6 +35,7 @@ import net.tourbook.tour.TourLogManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,10 +46,17 @@ import utils.Utils;
 public class SuuntoCloudDownloaderTests extends UITest {
 
    private static final IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
-
+static HttpClientMock initialHttpClient;
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
+   @AfterAll
+   static void cleanUp() throws NoSuchFieldException, IllegalAccessException {
+
+      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, initialHttpClient);
+   }
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
 
@@ -77,11 +85,12 @@ public class SuuntoCloudDownloaderTests extends UITest {
       _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String("0"), "access_token");
       _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String("0"), "refresh_token");
 
-   //   httpClientMock = new HttpClientMock();
+      httpClientMock = new HttpClientMock();
 
-   //   final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-   //   field.setAccessible(true);
-   //   field.set(null, httpClientMock);
+     final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      initialHttpClient =  field.get(null);
+      field.set(null, httpClientMock);
    }
 
    private void setTokenRetrievalDateInThePast() {
@@ -92,17 +101,17 @@ public class SuuntoCloudDownloaderTests extends UITest {
 
    @BeforeEach
    void setUp() {
-   //   Utils.clearTourLogView(bot);
+     Utils.clearTourLogView(bot);
    }
 
    @AfterEach
    void tearDown() {
-    //  Utils.clearTourLogView(bot);
+      Utils.clearTourLogView(bot);
    }
 
    //We set the access token issue date time in the past to trigger the retrieval
    //of a new token.
-   @Disabled
+   
    @Test
    void testTourDownload() {
 
