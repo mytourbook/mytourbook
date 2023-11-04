@@ -77,11 +77,11 @@ public class SuuntoCloudDownloaderTests extends UITest {
       _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String("0"), "access_token");
       _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String("0"), "refresh_token");
 
-      httpClientMock = new HttpClientMock();
+   //   httpClientMock = new HttpClientMock();
 
-      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
+   //   final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+   //   field.setAccessible(true);
+   //   field.set(null, httpClientMock);
    }
 
    private void setTokenRetrievalDateInThePast() {
@@ -92,12 +92,12 @@ public class SuuntoCloudDownloaderTests extends UITest {
 
    @BeforeEach
    void setUp() {
-      Utils.clearTourLogView(bot);
+   //   Utils.clearTourLogView(bot);
    }
 
    @AfterEach
    void tearDown() {
-      Utils.clearTourLogView(bot);
+    //  Utils.clearTourLogView(bot);
    }
 
    //We set the access token issue date time in the past to trigger the retrieval
