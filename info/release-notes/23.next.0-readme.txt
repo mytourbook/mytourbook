@@ -106,7 +106,7 @@ System
 
 * MyTourbook Milestone 23.10  https://github.com/mytourbook/mytourbook/milestone/12?closed=1
 * Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
-* NatTable 2.10               https://www.eclipse.org/nattable/download.php
+* NatTable 2.20               https://www.eclipse.org/nattable/download.php
 * FIT SDK 21.120.2            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
