@@ -29,6 +29,7 @@ import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.extension.download.CloudDownloaderManager;
 import net.tourbook.tour.TourLogManager;
 
@@ -157,6 +158,6 @@ public class SuuntoCloudDownloaderTests extends UITest {
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             downloadedFilename)));
 
-      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(downloadedFilename));
+      FileUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
 }
