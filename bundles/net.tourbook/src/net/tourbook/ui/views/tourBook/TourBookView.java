@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
-
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -87,6 +84,7 @@ import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
+import net.tourbook.ui.action.ActionSetStartEndLocation;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
@@ -197,6 +195,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
@@ -393,6 +392,7 @@ public class TourBookView extends ViewPart implements
    private ActionSelectAllTours               _actionSelectAllTours;
    private ActionSetTourTypeMenu              _actionSetTourType;
    private ActionSetPerson                    _actionSetOtherPerson;
+   private ActionSetStartEndLocation          _actionSetStartEndLocation;
    private ActionToggleViewLayout             _actionToggleViewLayout;
    private ActionTourBookOptions              _actionTourBookOptions;
    private ActionTourCollectionFilter         _actionTourCollectionFilter;
@@ -1553,9 +1553,10 @@ public class TourBookView extends ViewPart implements
       _actionOpenTour                  = new ActionOpenTour(this);
       _actionPrintTour                 = new ActionPrint(this);
       _actionRefreshView               = new ActionRefreshView(this);
-      _actionSetOtherPerson            = new ActionSetPerson(this);
-      _actionSetTourType               = new ActionSetTourTypeMenu(this);
       _actionSelectAllTours            = new ActionSelectAllTours(this);
+      _actionSetOtherPerson            = new ActionSetPerson(this);
+      _actionSetStartEndLocation       = new ActionSetStartEndLocation(this);
+      _actionSetTourType               = new ActionSetTourTypeMenu(this);
       _actionToggleViewLayout          = new ActionToggleViewLayout(this);
       _actionTourBookOptions           = new ActionTourBookOptions();
       _actionTourCollectionFilter      = new ActionTourCollectionFilter();
@@ -1953,7 +1954,7 @@ public class TourBookView extends ViewPart implements
          }
       });
 
-      tree.addKeyListener(keyPressedAdapter(keyEvent -> {
+      tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
          _isSelectedWithKeyboard = true;
 
@@ -1992,7 +1993,7 @@ public class TourBookView extends ViewPart implements
       _colDef_WeatherClouds_Tree = _columnFactory.getColDef_WeatherClouds_Tree();
 
       boolean isColumnVisible = false;
-      final ControlListener controlResizedAdapter = controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
+      final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
 
       // update column index which is needed for repainting
       final ColumnProfile activeProfile = _columnManager_Tree.getActiveProfile();
@@ -2350,6 +2351,7 @@ public class TourBookView extends ViewPart implements
       menuMgr.add(_actionEditTour);
       menuMgr.add(_actionOpenMarkerDialog);
       menuMgr.add(_actionOpenAdjustAltitudeDialog);
+      menuMgr.add(_actionSetStartEndLocation);
       menuMgr.add(_actionOpenTour);
       menuMgr.add(_actionDuplicateTour);
       menuMgr.add(_actionMergeTour);

@@ -2971,7 +2971,7 @@ public class TourManager {
     * @param modifiedTours
     *           modified tours
     * @param canFireNotification
-    *           when <code>true</code>, a notification is fired when the data are saved
+    *           When <code>true</code>, a notification is fired when the data are saved
     *
     * @return a list with all persisted {@link TourData}
     */

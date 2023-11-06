@@ -126,7 +126,7 @@ class OSMLocation {
 
             + NL
 
-            + " address        = " + address + NL //               //$NON-NLS-1$
+            + " address        = " + address + NL //              //$NON-NLS-1$
 
 //          + "]" + NL //                                         //$NON-NLS-1$
       ;

@@ -1061,22 +1061,22 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void onSelect_Location_01_Start() {
 
-      final String locationName = TourLocationManager.getLocationName(
+      final TourLocationData locationData = TourLocationManager.getLocationName(
             _tourData.latitudeSerie[0],
             _tourData.longitudeSerie[0]);
 
-      _comboLocation_Start.setText(locationName);
+      _comboLocation_Start.setText(TourLocationManager.createLocationDisplayName(locationData.osmLocation));
    }
 
    private void onSelect_Location_02_End() {
 
       final int lastIndex = _tourData.latitudeSerie.length - 1;
 
-      final String locationName = TourLocationManager.getLocationName(
+      final TourLocationData locationData = TourLocationManager.getLocationName(
             _tourData.latitudeSerie[lastIndex],
             _tourData.longitudeSerie[lastIndex]);
 
-      _comboLocation_End.setText(locationName);
+      _comboLocation_End.setText(TourLocationManager.createLocationDisplayName(locationData.osmLocation));
    }
 
    private void onSelect_WindSpeed_Text() {

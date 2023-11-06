@@ -2774,6 +2774,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_SetMinMaxTemperature_Apply;
    public static String        Tour_Action_SetMinMaxTemperature_Message;
    public static String        Tour_Action_SetMinMaxTemperature_Title;
+   public static String        Tour_Action_SetStartEndLocation;
+   public static String        Tour_Action_SetStartEndLocation_Tooltip;
    public static String        Tour_Action_SetTimeZone;
    public static String        Tour_Action_SetWeatherConditions;
    public static String        Tour_Action_ShowBreaktimeValues;

@@ -323,6 +323,7 @@ public class Images {
    public static final String TagsChecked_Disabled                       = "tags-checked-disabled.png";                           //$NON-NLS-1$
    public static final String Tour_Duplicate                             = "tour-duplicate.png";                                  //$NON-NLS-1$
    public static final String Tour_Duplicate_Disabled                    = "tour-duplicate-disabled.png";                         //$NON-NLS-1$
+   public static final String Tour_StartEnd                              = "tour-start-end.png";                                  //$NON-NLS-1$
    public static final String TourAnalyzer                               = "tour-analyzer.png";                                   //$NON-NLS-1$
    public static final String TourBlog                                   = "tour-blog.png";                                       //$NON-NLS-1$
    public static final String TourBook_Month                             = "tourbook-month.png";                                  //$NON-NLS-1$

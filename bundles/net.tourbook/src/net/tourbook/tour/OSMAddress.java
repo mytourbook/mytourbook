@@ -117,15 +117,16 @@ class OSMAddress {
    public String             village;
    public String             municipality;
 
+   public String             amenity;
+
    @JsonAlias({ "ISO3166-2-lvl4" })
    public String             ISO3166_2_lvl4;
 
-   @Override
-   public String toString() {
+   public String logAddress() {
 
       return UI.EMPTY_STRING
 
-            + "OSMAddress" + NL //                                //$NON-NLS-1$
+            + "OSMAddress" + NL //                                   //$NON-NLS-1$
 
             + NL
 
@@ -135,21 +136,21 @@ class OSMAddress {
 
             + NL
 
-            + "  county          = " + county + NL //               //$NON-NLS-1$
+            + "  county          = " + county + NL //                //$NON-NLS-1$
             + "  village         = " + village + NL //               //$NON-NLS-1$
-            + "  hamlet          = " + hamlet + NL //               //$NON-NLS-1$
-            + "  municipality    = " + municipality + NL //               //$NON-NLS-1$
+            + "  hamlet          = " + hamlet + NL //                //$NON-NLS-1$
+            + "  municipality    = " + municipality + NL //          //$NON-NLS-1$
             + "  neighbourhood   = " + neighbourhood + NL //         //$NON-NLS-1$
             + "  farm            = " + farm + NL //                  //$NON-NLS-1$
 
             + NL
 
             + "  postcode        = " + postcode + NL //              //$NON-NLS-1$
-            + "  town            = " + town + NL //               //$NON-NLS-1$
+            + "  town            = " + town + NL //                  //$NON-NLS-1$
             + "  road            = " + road + NL //                  //$NON-NLS-1$
             + "  house_number    = " + house_number + NL //          //$NON-NLS-1$
 
-//          + " ISO3166_2_lvl4 = " + ISO3166_2_lvl4 + NL //        //$NON-NLS-1$
+//          + " ISO3166_2_lvl4 = " + ISO3166_2_lvl4 + NL //          //$NON-NLS-1$
 
       ;
    }
