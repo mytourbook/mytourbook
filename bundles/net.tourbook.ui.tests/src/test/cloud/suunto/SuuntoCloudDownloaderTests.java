@@ -15,10 +15,14 @@
  *******************************************************************************/
 package cloud.suunto;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
+import java.util.List;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
@@ -26,6 +30,7 @@ import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
 import net.tourbook.common.UI;
 import net.tourbook.extension.download.CloudDownloaderManager;
+import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.AfterAll;
@@ -39,7 +44,9 @@ import utils.Utils;
 
 public class SuuntoCloudDownloaderTests extends UITest {
 
-   private static final IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
+   private static final String           CLOUD_FILES_PATH = Utils.WORKING_DIRECTORY + "\\src\\test\\cloud\\files\\"; //$NON-NLS-1$
+
+   private static final IPreferenceStore _prefStore       = Activator.getDefault().getPreferenceStore();
    static Object                         initialHttpClient;
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
@@ -110,24 +117,20 @@ public class SuuntoCloudDownloaderTests extends UITest {
    @Test
    void testTourDownload() {
 
-      setTokenRetrievalDateInThePast();
+      //setTokenRetrievalDateInThePast();
 
-      final var toto = CloudDownloaderManager.getCloudDownloaderList();
-      //todo fb make sure that we find and get the actual suunto cloud downloader. Check the ID maybe ?
-      suuntoCloudDownloader = (SuuntoCloudDownloader) toto.get(0);
-      suuntoCloudDownloader.downloadTours();
+      // Arrange
+      suuntoCloudDownloader = (SuuntoCloudDownloader) CloudDownloaderManager.getCloudDownloaderList().stream()
+            .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO"))
+            .findAny()
+            .orElse(null);
 
-      final String workoutsResponse = "";//Comparison.readFileContent(SUUNTO_FILE_PATH
-      //      + "Workouts-Response.json"); //$NON-NLS-1$
+      final String workoutsResponse = Utils.readFileContent(CLOUD_FILES_PATH
+            + "Workouts-Response.json"); //$NON-NLS-1$
       httpClientMock.onGet(
             OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()) //$NON-NLS-1$
             .doReturn(workoutsResponse)
             .withStatus(200);
-//
-//      httpClientMock.onPost(
-//            OAUTH_PASSEUR_APP_URL_TOKEN)
-//            .doReturn(_validTokenResponse)
-//            .withStatus(201);
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
@@ -136,20 +139,24 @@ public class SuuntoCloudDownloaderTests extends UITest {
             .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             .withStatus(200);
 
+      // Act
       suuntoCloudDownloader.downloadTours();
+
       bot.sleep(5000);
-      //     httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
-      //     httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
-//            .called();
 
-      //     final List<?> logs = TourLogManager.getLogs();
-//      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-      //           "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
+      // Assert
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
+            .called();
 
-//      final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
-//      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-//            downloadedFilename)));
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+            "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
-//      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(downloadedFilename));
+      final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+            downloadedFilename)));
+
+      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
 }
