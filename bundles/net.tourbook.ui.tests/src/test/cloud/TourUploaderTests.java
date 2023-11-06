@@ -35,7 +35,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import utils.UITest;
 import utils.Utils;
@@ -84,7 +83,6 @@ public class TourUploaderTests extends UITest {
    void tearDown() {
       Utils.clearTourLogView(bot);
    }
-
 
    @Test
    void testTourUpload_Strava() {

@@ -15,14 +15,10 @@
  *******************************************************************************/
 package cloud.suunto;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Paths;
-import java.util.List;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
@@ -30,14 +26,12 @@ import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
 import net.tourbook.common.UI;
 import net.tourbook.extension.download.CloudDownloaderManager;
-import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -46,7 +40,7 @@ import utils.Utils;
 public class SuuntoCloudDownloaderTests extends UITest {
 
    private static final IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
-static Object          initialHttpClient;
+   static Object                         initialHttpClient;
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
@@ -57,6 +51,7 @@ static Object          initialHttpClient;
       field.setAccessible(true);
       field.set(null, initialHttpClient);
    }
+
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
 
@@ -87,9 +82,9 @@ static Object          initialHttpClient;
 
       httpClientMock = new HttpClientMock();
 
-     final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
-     initialHttpClient = field.get(null);
+      initialHttpClient = field.get(null);
       field.set(null, httpClientMock);
    }
 
@@ -101,7 +96,7 @@ static Object          initialHttpClient;
 
    @BeforeEach
    void setUp() {
-     Utils.clearTourLogView(bot);
+      Utils.clearTourLogView(bot);
    }
 
    @AfterEach
@@ -111,7 +106,7 @@ static Object          initialHttpClient;
 
    //We set the access token issue date time in the past to trigger the retrieval
    //of a new token.
-   
+
    @Test
    void testTourDownload() {
 
@@ -142,14 +137,14 @@ static Object          initialHttpClient;
             .withStatus(200);
 
       suuntoCloudDownloader.downloadTours();
-  bot.sleep(5000);
- //     httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
- //     httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
+      bot.sleep(5000);
+      //     httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
+      //     httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
 //            .called();
 
- //     final List<?> logs = TourLogManager.getLogs();
+      //     final List<?> logs = TourLogManager.getLogs();
 //      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
- //           "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
+      //           "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
 //      final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
 //      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
