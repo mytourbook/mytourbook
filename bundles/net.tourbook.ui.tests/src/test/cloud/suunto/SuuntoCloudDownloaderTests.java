@@ -45,9 +45,12 @@ import utils.Utils;
 
 public class SuuntoCloudDownloaderTests extends UITest {
 
-   private static final String           CLOUD_FILES_PATH = Utils.WORKING_DIRECTORY + "\\src\\test\\cloud\\files\\"; //$NON-NLS-1$
+   private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString();   //$NON-NLS-1$
+   private static final String           CLOUD_FILES_PATH            = Utils.WORKING_DIRECTORY + "\\src\\test\\cloud\\suunto\\files\\"; //$NON-NLS-1$
+   private static final String           VALID_TOKEN_RESPONSE        = Utils.readFileContent(CLOUD_FILES_PATH
+         + "Token-Response.json");                                                                                                      //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore       = Activator.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
    static Object                         initialHttpClient;
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
@@ -85,8 +88,8 @@ public class SuuntoCloudDownloaderTests extends UITest {
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
             "2740498817000"); //$NON-NLS-1$
-      _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String("0"), "access_token");
-      _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String("0"), "refresh_token");
+      _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String("0"), "access_token"); //$NON-NLS-1$ //$NON-NLS-2$
+      _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String("0"), "refresh_token"); //$NON-NLS-1$ //$NON-NLS-2$
 
       httpClientMock = new HttpClientMock();
 
@@ -112,19 +115,23 @@ public class SuuntoCloudDownloaderTests extends UITest {
       Utils.clearTourLogView(bot);
    }
 
-   //We set the access token issue date time in the past to trigger the retrieval
-   //of a new token.
-
    @Test
    void testTourDownload() {
 
-      //setTokenRetrievalDateInThePast();
+      //We set the access token issue date time in the past to trigger the retrieval
+      //of a new token.
+      setTokenRetrievalDateInThePast();
 
       // Arrange
       suuntoCloudDownloader = (SuuntoCloudDownloader) CloudDownloaderManager.getCloudDownloaderList().stream()
-            .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO"))
+            .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO")) //$NON-NLS-1$
             .findAny()
             .orElse(null);
+
+      httpClientMock.onPost(
+            OAUTH_PASSEUR_APP_URL_TOKEN)
+            .doReturn(VALID_TOKEN_RESPONSE)
+            .withStatus(201);
 
       final String workoutsResponse = Utils.readFileContent(CLOUD_FILES_PATH
             + "Workouts-Response.json"); //$NON-NLS-1$
