@@ -87,6 +87,7 @@ public class TourUploaderTests extends UITest {
    @Test
    void testTourUpload_Strava() {
 
+      // Arrange
       final String stravaResponse = Utils.readFileContent(CLOUD_FILES_PATH
             + "LongsPeak-StravaResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
@@ -97,11 +98,14 @@ public class TourUploaderTests extends UITest {
       // Select a tour
       Utils.showTourBookView(bot);
       final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      // Act
       tour.contextMenu(Messages.App_Action_Upload_Tour)
             .menu("&Strava").click();
 
       bot.sleep(5000);
 
+      // Assert
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "message      = 1/31/2021, 7:15 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
