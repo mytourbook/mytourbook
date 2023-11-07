@@ -447,6 +447,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final String description = buildFormattedDescription(tourData);
       body.put("description", description); //$NON-NLS-1$
+      final var toto = body.toString();
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(STRAVA_BASE_URL + "/activities")) //$NON-NLS-1$

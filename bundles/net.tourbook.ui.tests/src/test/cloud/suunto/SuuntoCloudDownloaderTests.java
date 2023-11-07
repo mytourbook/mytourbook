@@ -86,6 +86,11 @@ public class SuuntoCloudDownloaderTests extends UITest {
             "{YEAR}{MONTH}{DAY}{USER_TEXT:-}{HOUR}{USER_TEXT:h}{MINUTE}{USER_TEXT:-}{SUUNTO_FILE_NAME}{USER_TEXT:-}{WORKOUT_ID}{USER_TEXT:-}{ACTIVITY_TYPE}{FIT_EXTENSION}"); //$NON-NLS-1$
       _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String("0"), "access_token"); //$NON-NLS-1$ //$NON-NLS-2$
       _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String("0"), "refresh_token"); //$NON-NLS-1$ //$NON-NLS-2$
+      //We set the access token issue date time in the past to trigger the retrieval
+      //of a new token.
+      _prefStore.setValue(
+            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
+            "973701086000"); //$NON-NLS-1$
 
       httpClientMock = new HttpClientMock();
 
@@ -98,13 +103,6 @@ public class SuuntoCloudDownloaderTests extends UITest {
             .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO")) //$NON-NLS-1$
             .findAny()
             .orElse(null);
-   }
-
-   private void setTokenRetrievalDateInThePast() {
-
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "973701086000"); //$NON-NLS-1$
    }
 
    @BeforeEach
@@ -121,11 +119,6 @@ public class SuuntoCloudDownloaderTests extends UITest {
    void testTourDownload() {
 
       // Arrange
-
-      //We set the access token issue date time in the past to trigger the retrieval
-      //of a new token.
-      setTokenRetrievalDateInThePast();
-
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(VALID_TOKEN_RESPONSE)
@@ -169,10 +162,7 @@ public class SuuntoCloudDownloaderTests extends UITest {
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
 
-      //We set the access token issue date time in the past to trigger the retrieval
-      //of a new token.
-      setTokenRetrievalDateInThePast();
-
+      // Arrange
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(UI.EMPTY_STRING)

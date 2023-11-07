@@ -40,6 +40,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -136,6 +137,29 @@ public class Utils {
    public static void clickYesButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.YES_LABEL, bot);
+   }
+
+   public static SWTBotTreeItem createManualTour(final SWTWorkbenchBot bot) {
+
+      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
+
+      final SWTBot tourDataEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
+
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      tourStartTimeCalendar.set(2005, 0, 1, 5, 0, 0);
+      // Set a different date than today's date
+      tourDataEditorViewBot.dateTime(0).setDate(tourStartTimeCalendar.getTime());
+
+      // Set a specific time
+      tourDataEditorViewBot.dateTime(1).setDate(tourStartTimeCalendar.getTime());
+
+      final SWTBotCombo tourTimeZone = tourDataEditorViewBot.comboBox(3);
+      assertNotNull(tourTimeZone);
+      tourTimeZone.setSelection("+01:00    +02:00    Europe/Paris   -   DST - 1 h - N"); //$NON-NLS-1$
+
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+
+      return selectManualTour(bot);
    }
 
    public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour) {
@@ -377,6 +401,17 @@ public class Utils {
 
       // Get a tour that can be duplicated
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2009   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
+   public static SWTBotTreeItem selectManualTour(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2005   1").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
