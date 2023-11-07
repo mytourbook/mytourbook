@@ -97,6 +97,11 @@ public class SuuntoCloudDownloaderTests extends UITest {
       field.setAccessible(true);
       initialHttpClient = field.get(null);
       field.set(null, httpClientMock);
+
+      suuntoCloudDownloader = (SuuntoCloudDownloader) CloudDownloaderManager.getCloudDownloaderList().stream()
+            .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO")) //$NON-NLS-1$
+            .findAny()
+            .orElse(null);
    }
 
    private void setTokenRetrievalDateInThePast() {
@@ -123,11 +128,6 @@ public class SuuntoCloudDownloaderTests extends UITest {
       setTokenRetrievalDateInThePast();
 
       // Arrange
-      suuntoCloudDownloader = (SuuntoCloudDownloader) CloudDownloaderManager.getCloudDownloaderList().stream()
-            .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO")) //$NON-NLS-1$
-            .findAny()
-            .orElse(null);
-
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(VALID_TOKEN_RESPONSE)
@@ -166,5 +166,25 @@ public class SuuntoCloudDownloaderTests extends UITest {
             downloadedFilename)));
 
       FileUtils.deleteIfExists(Paths.get(downloadedFilename));
+   }
+
+   @Test
+   void tourDownload_TokenRetrieval_NullResponse() {
+
+      setTokenRetrievalDateInThePast();
+
+      httpClientMock.onPost(
+            OAUTH_PASSEUR_APP_URL_TOKEN)
+            .doReturn(UI.EMPTY_STRING)
+            .withStatus(201);
+      suuntoCloudDownloader.downloadTours();
+
+      bot.sleep(5000);
+
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+            "Action aborted due to invalid tokens"))); //$NON-NLS-1$
    }
 }
