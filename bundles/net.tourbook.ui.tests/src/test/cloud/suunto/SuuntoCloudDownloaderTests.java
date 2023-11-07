@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.List;
@@ -64,7 +63,7 @@ public class SuuntoCloudDownloaderTests extends UITest {
    }
 
    @BeforeAll
-   static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
+   static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
       //We set the Suunto account information, otherwise the download can't
       //happen
@@ -102,6 +101,7 @@ public class SuuntoCloudDownloaderTests extends UITest {
    }
 
    private void setTokenRetrievalDateInThePast() {
+
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
             "973701086000"); //$NON-NLS-1$
@@ -168,16 +168,21 @@ public class SuuntoCloudDownloaderTests extends UITest {
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
 
+      //We set the access token issue date time in the past to trigger the retrieval
+      //of a new token.
       setTokenRetrievalDateInThePast();
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(UI.EMPTY_STRING)
             .withStatus(201);
+
+      // Act
       suuntoCloudDownloader.downloadTours();
 
       bot.sleep(5000);
 
+      // Assert
       httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
 
       final List<?> logs = TourLogManager.getLogs();
