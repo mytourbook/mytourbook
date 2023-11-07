@@ -80,7 +80,7 @@ public class SuuntoTests {
    }
 
    @Test
-   void testTokenRetrieval() {
+   void testTokenRetrieval() throws IOException {
 
       final String tokenResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Token-Response.json"); //$NON-NLS-1$
@@ -89,17 +89,12 @@ public class SuuntoTests {
             .doReturn(tokenResponse)
             .withStatus(201);
 
-      try {
-         authorize();
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
+      authorize();
 
       assertEquals("8888888888888888888888888888888888888888", _prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(UI.EMPTY_STRING))); //$NON-NLS-1$
       assertEquals("8888888888888888888888888888888888888888", //$NON-NLS-1$
             _prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(UI.EMPTY_STRING)));
       assertEquals("12609", _prefStore.getString(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(UI.EMPTY_STRING))); //$NON-NLS-1$
-
    }
 
 }

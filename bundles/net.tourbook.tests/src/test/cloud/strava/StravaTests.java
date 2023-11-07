@@ -15,43 +15,72 @@
  *******************************************************************************/
 package cloud.strava;
 
-import com.pgssoft.httpclient.HttpClientMock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.pgssoft.httpclient.HttpClientMock;
+import com.sun.net.httpserver.HttpServer;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
-import net.tourbook.cloud.strava.StravaUploader;
-import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.cloud.strava.StravaTokensRetrievalHandler;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
 import utils.FilesUtils;
 
 public class StravaTests {
 
-   private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/strava/token").toString(); //$NON-NLS-1$
-   private static final IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
+   private static final String     OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/strava/token").toString(); //$NON-NLS-1$
+   private static IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
 
-   private static final String           STRAVA_FILE_PATH            = FilesUtils.rootPath + "cloud/strava/files/";                   //$NON-NLS-1$
+   private static final String     STRAVA_FILE_PATH            = FilesUtils.rootPath + "cloud/strava/files/";                   //$NON-NLS-1$
+   static HttpClientMock           httpClientMock;
 
-   static HttpClientMock                 httpClientMock;
-   static StravaUploader                 stravaUploader;
+   private static void authorize() throws IOException {
+
+      // create the HttpServer
+      final HttpServer httpServer = HttpServer.create(new InetSocketAddress(4918), 0);
+      final StravaTokensRetrievalHandler tokensRetrievalHandler =
+            new StravaTokensRetrievalHandler();
+      httpServer.createContext("/", tokensRetrievalHandler); //$NON-NLS-1$
+
+      // start the server
+      httpServer.start();
+
+      // authorize and retrieve the tokens
+      final URL url = new URL("http://localhost:4918/?code=12345"); //$NON-NLS-1$
+      final URLConnection conn = url.openConnection();
+      new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+      // stop the server
+      httpServer.stop(0);
+   }
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
-      _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, true);
-      _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, true);
-
       httpClientMock = new HttpClientMock();
+
+      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
+   }
+
+   @Test
+   void testTokenRetrieval() throws IOException {
+
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
             + "PasseurResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
@@ -59,28 +88,13 @@ public class StravaTests {
             .doReturn(passeurResponse)
             .withStatus(201);
 
-      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
+      authorize();
 
-      stravaUploader = new StravaUploader();
-
-      Display.getDefault().addFilter(SWT.Activate, event -> {
-         // Is this a Shell being activated?
-
-         if (event.widget instanceof final Shell shell) {
-
-            // Look at the shell title to see if it is the one we want
-
-            if (Messages.Dialog_UploadToursToStrava_Title.equals(shell.getText())) {
-               // Close the shell after it has finished initializing
-
-               Display.getDefault().asyncExec(() -> shell.close());
-            }
-         }
-      });
-
-      FormatManager.updateDisplayFormats();
+      assertEquals("4444444444444444444", _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN)); //$NON-NLS-1$
+      assertEquals("1699400247000", //$NON-NLS-1$
+            _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT));
+      assertEquals("John Doe", _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)); //$NON-NLS-1$
+      assertEquals("1234", _prefStore.getString(Preferences.STRAVA_ATHLETEID)); //$NON-NLS-1$
+      assertEquals("4444444444444444444", _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN)); //$NON-NLS-1$
    }
-
 }

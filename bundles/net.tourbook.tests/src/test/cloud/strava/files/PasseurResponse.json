@@ -1,0 +1,29 @@
+{
+	"token_type": "Bearer",
+	"expires_at": "1699400247000",
+	"expires_in": 21600,
+	"refresh_token": "4444444444444444444",
+	"access_token": "4444444444444444444",
+	"athlete": {
+		"id": 1234,
+		"username": null,
+		"resource_state": 2,
+		"firstname": "John",
+		"lastname": "Doe",
+		"bio": "Text",
+		"city": "",
+		"state": "",
+		"country": "",
+		"sex": "",
+		"premium": false,
+		"summit": false,
+		"created_at": "",
+		"updated_at": "",
+		"badge_type_id": 0,
+		"weight": 0,
+		"profile_medium": "",
+		"profile": "",
+		"friend": null,
+		"follower": null
+	}
+}
