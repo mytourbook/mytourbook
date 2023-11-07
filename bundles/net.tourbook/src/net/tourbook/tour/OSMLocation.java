@@ -23,7 +23,7 @@ import java.util.Arrays;
 import net.tourbook.common.UI;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class OSMLocation {
+public class OSMLocation {
 
    private static final char NL = UI.NEW_LINE;
 

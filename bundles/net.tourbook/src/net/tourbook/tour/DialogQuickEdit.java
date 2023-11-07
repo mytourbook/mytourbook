@@ -62,36 +62,40 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
-   private static final IDialogSettings _state                         = TourbookPlugin.getState(DialogQuickEdit.class.getName());
-   private static final IDialogSettings _state_TourDataEditorView      = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings           _state                         = TourbookPlugin.getState(DialogQuickEdit.class.getName());
+   private static final IDialogSettings           _state_TourDataEditorView      = TourbookPlugin.getState(TourDataEditorView.ID);
 
-   private final TourData               _tourData;
-   private PixelConverter               _pc;
+   private final TourData                         _tourData;
+   private PixelConverter                         _pc;
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
-   private final ArrayList<Control>     _firstColumnControls           = new ArrayList<>();
-   private final ArrayList<Control>     _firstColumnContainerControls  = new ArrayList<>();
-   private final ArrayList<Control>     _secondColumnControls          = new ArrayList<>();
+   private final ArrayList<Control>               _firstColumnControls           = new ArrayList<>();
+   private final ArrayList<Control>               _firstColumnContainerControls  = new ArrayList<>();
+   private final ArrayList<Control>               _secondColumnControls          = new ArrayList<>();
 
-   private int                          _hintDefaultSpinnerWidth;
-   private int                          _numLines_WeatherDescription;
+   private int                                    _hintDefaultSpinnerWidth;
+   private int                                    _numLines_WeatherDescription;
 
-   private boolean                      _isUpdateUI                    = false;
-   private boolean                      _isTemperatureManuallyModified = false;
-   private boolean                      _isWindSpeedManuallyModified   = false;
-   private int[]                        _unitValueWindSpeed;
-   private float                        _unitValueDistance;
+   private boolean                                _isUpdateUI                    = false;
+   private boolean                                _isTemperatureManuallyModified = false;
+   private boolean                                _isWindSpeedManuallyModified   = false;
+   private int[]                                  _unitValueWindSpeed;
+   private float                                  _unitValueDistance;
 
-   private ActionDownload_EndLocation   _actionDownload_EndLocation;
-   private ActionDownload               _actionDownload_StartLocation;
-   private ActionQuickEditorOptions     _actionSlideoutWeatherOptions;
+   private ActionDownload_EndLocation             _actionDownload_EndLocation;
+   private ActionDownload                         _actionDownload_StartLocation;
+   private ActionQuickEditor_EndLocationOptions   _actionSlideout_EndLocationOptions;
+   private ActionQuickEditor_StartLocationOptions _actionSlideout_StartLocationOptions;
+   private ActionQuickEditor_WeatherOptions       _actionSlideout_WeatherOptions;
 
-   private MouseWheelListener           _mouseWheelListener;
+   private MouseWheelListener                     _mouseWheelListener;
 
-   private ToolBarManager               _toolbarManager_WeatherOptions;
+   private ToolBarManager                         _toolbarManager_EndLocationOptions;
+   private ToolBarManager                         _toolbarManager_StartLocationOptions;
+   private ToolBarManager                         _toolbarManager_WeatherOptions;
 
    /*
     * UI controls
@@ -150,12 +154,30 @@ public class DialogQuickEdit extends TitleAreaDialog {
       }
    }
 
-   private class ActionQuickEditorOptions extends ActionToolbarSlideout {
+   private class ActionQuickEditor_EndLocationOptions extends ActionToolbarSlideout {
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutQuickEditor_Options(_parent, toolbar, DialogQuickEdit.this);
+         return new SlideoutTourEditor_LocationOptions(_parent, toolbar, DialogQuickEdit.this, false);
+      }
+   }
+
+   private class ActionQuickEditor_StartLocationOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTourEditor_LocationOptions(_parent, toolbar, DialogQuickEdit.this, true);
+      }
+   }
+
+   private class ActionQuickEditor_WeatherOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutQuickEditor_WeatherOptions(_parent, toolbar, DialogQuickEdit.this);
       }
    }
 
@@ -201,7 +223,10 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       _actionDownload_EndLocation = new ActionDownload_EndLocation(Messages.Tour_Editor_Action_DownloadEndLocation);
       _actionDownload_StartLocation = new ActionDownload_StartLocation(Messages.Tour_Editor_Action_DownloadStartLocation);
-      _actionSlideoutWeatherOptions = new ActionQuickEditorOptions();
+
+      _actionSlideout_EndLocationOptions = new ActionQuickEditor_EndLocationOptions();
+      _actionSlideout_StartLocationOptions = new ActionQuickEditor_StartLocationOptions();
+      _actionSlideout_WeatherOptions = new ActionQuickEditor_WeatherOptions();
    }
 
    @Override
@@ -283,6 +308,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
       UI.setEqualizeColumWidths(_firstColumnContainerControls);
 
       // !!! MUST BE DONE VERY LATE, OTHERWISE COLUMN 1 DISAPPEARS !!!
+      _toolbarManager_StartLocationOptions.update(true);
+//      _toolbarManager_EndLocationOptions.update(true);
       _toolbarManager_WeatherOptions.update(true);
    }
 
@@ -351,14 +378,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
          /*
           * Start location
           */
-         final Composite container = new Composite(sectionContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         final Composite labelContainer = new Composite(sectionContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().applyTo(labelContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(labelContainer);
          {
             {
                // label
 
-               final Label label = new Label(container, SWT.NONE);
+               final Label label = new Label(labelContainer, SWT.NONE);
                label.setText(Messages.Tour_Editor_Label_Location_Start);
 
                _tk.adapt(label, true, true);
@@ -366,37 +393,57 @@ public class DialogQuickEdit extends TitleAreaDialog {
             {
                // download action
 
-               final ToolBar toolBar = _actionDownload_StartLocation.createUI(container);
+               final ToolBar toolBar = _actionDownload_StartLocation.createUI(labelContainer);
                GridDataFactory.fillDefaults()
                      .grab(true, false)
                      .align(SWT.END, SWT.BEGINNING)
                      .applyTo(toolBar);
             }
 
-            _firstColumnControls.add(container);
+            _firstColumnControls.add(labelContainer);
          }
+         final Composite contentContainer = new Composite(sectionContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(contentContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(contentContainer);
          {
-            // autocomplete combo
+            {
+               // autocomplete combo
 
-            _comboLocation_Start = new Combo(sectionContainer, SWT.BORDER | SWT.FLAT);
-            _comboLocation_Start.setText(UI.EMPTY_STRING);
+               _comboLocation_Start = new Combo(contentContainer, SWT.BORDER | SWT.FLAT);
+               _comboLocation_Start.setText(UI.EMPTY_STRING);
 
-            _tk.adapt(_comboLocation_Start, true, false);
+               _tk.adapt(_comboLocation_Start, true, false);
 
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(defaultTextWidth, SWT.DEFAULT)
-                  .applyTo(_comboLocation_Start);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .hint(defaultTextWidth, SWT.DEFAULT)
+                     .applyTo(_comboLocation_Start);
 
-            // fill combobox
-            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
-            for (final String string : arr) {
-               if (string != null) {
-                  _comboLocation_Start.add(string);
+               // fill combobox
+               final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
+               for (final String string : arr) {
+                  if (string != null) {
+                     _comboLocation_Start.add(string);
+                  }
                }
-            }
 
-            _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
+               _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
+            }
+            {
+               /*
+                * Options slideout
+                */
+               final ToolBar toolbar = new ToolBar(contentContainer, SWT.FLAT);
+               GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+                     .align(SWT.END, SWT.BEGINNING)
+                     .applyTo(toolbar);
+
+               _toolbarManager_StartLocationOptions = new ToolBarManager(toolbar);
+               _toolbarManager_StartLocationOptions.add(_actionSlideout_StartLocationOptions);
+
+               _tk.adapt(toolbar, true, false);
+            }
          }
       }
       {
@@ -725,7 +772,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
                _toolbarManager_WeatherOptions = new ToolBarManager(toolbar);
 
-               _toolbarManager_WeatherOptions.add(_actionSlideoutWeatherOptions);
+               _toolbarManager_WeatherOptions.add(_actionSlideout_WeatherOptions);
 
                _tk.adapt(toolbar, true, false);
             }
@@ -1066,6 +1113,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _tourData.longitudeSerie[0]);
 
       _comboLocation_Start.setText(TourLocationManager.createLocationDisplayName(locationData.osmLocation));
+
+      _tourData.osmLocation_Start = locationData.osmLocation;
    }
 
    private void onSelect_Location_02_End() {
@@ -1077,6 +1126,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _tourData.longitudeSerie[lastIndex]);
 
       _comboLocation_End.setText(TourLocationManager.createLocationDisplayName(locationData.osmLocation));
+
+      _tourData.osmLocation_End = locationData.osmLocation;
    }
 
    private void onSelect_WindSpeed_Text() {

@@ -21,14 +21,14 @@ public class TourLocationData {
 
    OSMLocation osmLocation;
 
-   long        retrievalTime;
+   long        downloadTime;
    long        waitingTime;
 
    public TourLocationData(final String downloadedData, final long retrievalTime, final long waitingTime) {
 
       this.downloadedData = downloadedData;
 
-      this.retrievalTime = retrievalTime;
+      this.downloadTime = retrievalTime;
       this.waitingTime = waitingTime;
    }
 }

@@ -99,6 +99,7 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.OSMLocation;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
@@ -2029,6 +2030,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /** Elevation in meters for the downhill area */
    @Transient
    public float         verticalSpeed_Down_Elevation;
+
+   /**
+    * Downloaded start location
+    */
+   @Transient
+   public OSMLocation   osmLocation_Start;
+
+   /**
+    * Downloaded end location
+    */
+   @Transient
+   public OSMLocation   osmLocation_End;
 
 
 // SET_FORMATTING_ON

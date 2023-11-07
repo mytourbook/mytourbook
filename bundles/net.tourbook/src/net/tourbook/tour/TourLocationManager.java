@@ -25,7 +25,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,7 +60,9 @@ public class TourLocationManager {
 
    private static final String SYS_PROP__LOG_ADDRESS_RETRIEVAL = "logAddressRetrieval";                                      //$NON-NLS-1$
    private static boolean      _isLogging_AddressRetrieval     = System.getProperty(SYS_PROP__LOG_ADDRESS_RETRIEVAL) != null;
+
    static {
+
       if (_isLogging_AddressRetrieval) {
          Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_ADDRESS_RETRIEVAL, "OSM address retrieval is logged"); //$NON-NLS-1$
       }
@@ -76,6 +80,9 @@ public class TourLocationManager {
    private static final ConcurrentHashMap<String, Image> _imageCache              = new ConcurrentHashMap<>();
    private static final ConcurrentLinkedQueue<String>    _imageCacheFifo          = new ConcurrentLinkedQueue<>();
    private static final ReentrantLock                    CACHE_LOCK               = new ReentrantLock();
+
+   private static final StringBuilder                    _displayNameBuffer       = new StringBuilder();
+   private static final Set<String>                      _usedDisplayNames        = new HashSet<>();
 
    /**
     * Zoom address detail
@@ -96,11 +103,26 @@ public class TourLocationManager {
 
    private static long                                   _lastRetrievalTimeMS;
 
-//   // create loading task
-//   final Future<?> future = getExecutor().submit(new TileImageLoader());
-//
-//   // keep loading task
-//   tile.setFuture(future);
+   /**
+    * Append text to the display name
+    *
+    * @param text
+    */
+   private static void appendText(final String text) {
+
+      // prevent to show duplicated fields, this can happen when the "name" field contains also e.g. the road name
+      if (_usedDisplayNames.contains(text)) {
+         return;
+      }
+
+      if (_displayNameBuffer.length() > 0) {
+         _displayNameBuffer.append(UI.SYMBOL_COMMA + UI.SPACE);
+      }
+
+      _displayNameBuffer.append(text);
+
+      _usedDisplayNames.add(text);
+   }
 
    /**
     * Creates the location name from different name parts.
@@ -109,11 +131,92 @@ public class TourLocationManager {
     */
    public static String createLocationDisplayName(final OSMLocation osmLocation) {
 
-      if (osmLocation == null) {
+      if (osmLocation == null || osmLocation.address == null) {
          return UI.EMPTY_STRING;
       }
 
-      return osmLocation.display_name;
+      final OSMAddress address = osmLocation.address;
+
+      /**
+       * Places are sorted by number of inhabitants, only some or nothing are available
+       *
+       * place = city,
+       * place = town,
+       * place = village,
+       * place = hamlet
+       * place = isolated_dwelling
+       *
+       * https://wiki.openstreetmap.org/wiki/Key:place
+       */
+
+// SET_FORMATTING_OFF
+
+      final String adrCity                = address.city;
+      final String adrTown                = address.town;
+      final String adrVillage             = address.village;
+      final String adrHamlet              = address.hamlet;
+      final String adrIsolated_dwelling   = address.isolated_dwelling;
+
+      String city = null;
+
+      if (adrCity != null) {                    city = adrCity;               }
+      else if (adrTown != null) {               city = adrTown;               }
+      else if (adrVillage != null) {            city = adrVillage;            }
+      else if (adrHamlet != null) {             city = adrHamlet;             }
+      else if (adrIsolated_dwelling != null) {  city = adrIsolated_dwelling;  }
+
+// SET_FORMATTING_ON
+
+      // reset buffer
+      _displayNameBuffer.setLength(0);
+      _usedDisplayNames.clear();
+
+      // OSM name
+      final String osmName = osmLocation.name;
+
+      if (osmName != null && osmName.length() > 0) {
+         appendText(osmName);
+      }
+
+      // city
+      final String formattedCity = getFormatted_City(address, city);
+      if (formattedCity != null) {
+         appendText(formattedCity);
+      }
+
+      // POIs
+      final String adrAmenity = address.amenity;
+      final String adrTourism = address.tourism;
+
+      if (adrAmenity != null) {
+         appendText(adrAmenity);
+      }
+
+      if (adrTourism != null) {
+         appendText(adrTourism);
+      }
+
+      // street
+      final String formattedStreet = getFormatted_Street(address);
+      if (formattedStreet != null) {
+         appendText(formattedStreet);
+      }
+
+      // state, country
+      final String adrState = address.state;
+      final String adrCountry = address.country;
+
+      if (adrState != null) {
+         appendText(adrState);
+      }
+
+      if (adrCountry != null) {
+         appendText(adrCountry);
+      }
+
+      return _displayNameBuffer.toString();
+
+//    return osmLocation.display_name;
    }
 
    /**
@@ -144,6 +247,79 @@ public class TourLocationManager {
       return UI.EMPTY_STRING;
    }
 
+   private static String getFormatted_City(final OSMAddress address, final String city) {
+
+      if (city == null) {
+         return null;
+      }
+
+      final String adrPostCode = address.postcode;
+
+      final String countryCode = address.country_code;
+
+      String formattedStreet = null;
+
+      if ("us".equals(countryCode)) {
+
+         // city + zip code
+
+         formattedStreet = city;
+
+         if (adrPostCode != null) {
+            formattedStreet += UI.SPACE + adrPostCode;
+         }
+
+      } else {
+
+         // zip code + city
+
+         if (adrPostCode != null) {
+            formattedStreet = adrPostCode;
+         }
+
+         formattedStreet += UI.SPACE + city;
+      }
+
+      return formattedStreet;
+   }
+
+   private static String getFormatted_Street(final OSMAddress address) {
+
+      if (address.road == null) {
+         return null;
+      }
+
+      final String adrRoad = address.road;
+      final String adrHouse_number = address.house_number;
+
+      final String countryCode = address.country_code;
+
+      String formattedStreet = UI.EMPTY_STRING;
+
+      if ("us".equals(countryCode)) {
+
+         if (adrHouse_number != null) {
+            formattedStreet += adrHouse_number + UI.SPACE;
+         }
+
+         formattedStreet += adrRoad;
+
+      } else {
+
+         formattedStreet += adrRoad;
+
+         if (adrHouse_number != null) {
+            formattedStreet += UI.SPACE + adrHouse_number;
+         }
+      }
+
+      if (formattedStreet.length() == 0) {
+         return null;
+      }
+
+      return formattedStreet;
+   }
+
    /**
     * @param latitude
     * @param longitude
@@ -158,18 +334,16 @@ public class TourLocationManager {
 
       if (_isLogging_AddressRetrieval && osmLocation != null) {
 
-         System.out.println();
+         System.out.println("Default name      " + osmLocation.display_name);
 
-         System.out.println("Download time:   %d ms - Waiting time: %d ms"
-               .formatted(
-                     tourLocationData.retrievalTime,
-                     tourLocationData.waitingTime));
+         if (osmLocation.name != null && osmLocation.name.length() > 0) {
+            System.out.println("name              " + osmLocation.name);
+         }
 
-         System.out.println("Downloaded data: " + tourLocationData.downloadedData);
-         System.out.println("Default name:    " + osmLocation.display_name);
+         System.out.println(" Waiting time     %d ms".formatted(tourLocationData.waitingTime));
+         System.out.println(" Download time    %d ms".formatted(tourLocationData.downloadTime));
 
          if (osmLocation.address != null) {
-
             System.out.println(osmLocation.address.logAddress());
          }
       }
@@ -267,6 +441,8 @@ public class TourLocationManager {
           * https://operations.osmfoundation.org/policies/nominatim/
           */
 
+         waitingTime = 1000 - waitingTime;
+
          try {
 
             Thread.sleep(waitingTime);
@@ -283,8 +459,11 @@ public class TourLocationManager {
          waitingTime = 0;
       }
 
-      _lastRetrievalTimeMS = now;
-      final long retrievalTimeStart = System.currentTimeMillis();
+      final long retrievalStartTime = System.currentTimeMillis();
+      _lastRetrievalTimeMS = retrievalStartTime;
+
+//      System.out.println(UI.timeStamp() + " DOWNLOAD start - waiting time: " + waitingTime);
+// TODO remove SYSTEM.OUT.PRINTLN
 
       final String requestUrl = UI.EMPTY_STRING
 
@@ -332,9 +511,11 @@ public class TourLocationManager {
          return null;
       }
 
-      final long retrievalTime = System.currentTimeMillis() - retrievalTimeStart;
+      final long retrievalEndTime = System.currentTimeMillis();
 
-      return new TourLocationData(downloadedData, retrievalTime, waitingTime);
+      final long retrievalDuration = retrievalEndTime - retrievalStartTime;
+
+      return new TourLocationData(downloadedData, retrievalDuration, waitingTime);
    }
 
    private static OSMLocation getName_20_DeserializeData(final String osmLocationString) {
