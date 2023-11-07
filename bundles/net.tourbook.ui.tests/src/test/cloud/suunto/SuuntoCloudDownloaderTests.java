@@ -85,9 +85,6 @@ public class SuuntoCloudDownloaderTests extends UITest {
             true);
       _prefStore.setValue(Preferences.SUUNTO_FILENAME_COMPONENTS,
             "{YEAR}{MONTH}{DAY}{USER_TEXT:-}{HOUR}{USER_TEXT:h}{MINUTE}{USER_TEXT:-}{SUUNTO_FILE_NAME}{USER_TEXT:-}{WORKOUT_ID}{USER_TEXT:-}{ACTIVITY_TYPE}{FIT_EXTENSION}"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "2740498817000"); //$NON-NLS-1$
       _prefStore.setValue(Preferences.getPerson_SuuntoAccessToken_String("0"), "access_token"); //$NON-NLS-1$ //$NON-NLS-2$
       _prefStore.setValue(Preferences.getPerson_SuuntoRefreshToken_String("0"), "refresh_token"); //$NON-NLS-1$ //$NON-NLS-2$
 
