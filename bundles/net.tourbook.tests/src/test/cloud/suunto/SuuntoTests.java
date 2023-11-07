@@ -15,6 +15,8 @@
  *******************************************************************************/
 package cloud.suunto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.pgssoft.httpclient.HttpClientMock;
 import com.sun.net.httpserver.HttpServer;
 
@@ -26,10 +28,13 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 
+import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoTokensRetrievalHandler;
 import net.tourbook.common.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -38,13 +43,11 @@ import utils.FilesUtils;
 
 public class SuuntoTests {
 
-   private static final String OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString(); //$NON-NLS-1$
-   private static final String SUUNTO_FILE_PATH            = FilesUtils.rootPath + "cloud/suunto/files/";                   //$NON-NLS-1$
+   private static final String     OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString(); //$NON-NLS-1$
+   private static final String     SUUNTO_FILE_PATH            = FilesUtils.rootPath + "cloud/suunto/files/";                   //$NON-NLS-1$
+   private static IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
 
-   static HttpClientMock       httpClientMock;
-
-   private static final String VALID_TOKEN_RESPONSE        = Comparison.readFileContent(SUUNTO_FILE_PATH
-         + "Token-Response.json");                                                                                          //$NON-NLS-1$
+   static HttpClientMock           httpClientMock;
 
    private static void authorize() throws IOException {
 
@@ -67,7 +70,7 @@ public class SuuntoTests {
    }
 
    @BeforeAll
-   static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
+   static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
       httpClientMock = new HttpClientMock();
 
@@ -79,9 +82,11 @@ public class SuuntoTests {
    @Test
    void testTokenRetrieval() {
 
+      final String tokenResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
+            + "Token-Response.json"); //$NON-NLS-1$
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(VALID_TOKEN_RESPONSE)
+            .doReturn(tokenResponse)
             .withStatus(201);
 
       try {
@@ -89,6 +94,12 @@ public class SuuntoTests {
       } catch (final IOException e) {
          e.printStackTrace();
       }
+
+      assertEquals("8888888888888888888888888888888888888888", _prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(UI.EMPTY_STRING))); //$NON-NLS-1$
+      assertEquals("8888888888888888888888888888888888888888", //$NON-NLS-1$
+            _prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(UI.EMPTY_STRING)));
+      assertEquals("12609", _prefStore.getString(Preferences.getPerson_SuuntoAccessTokenExpiresIn_String(UI.EMPTY_STRING))); //$NON-NLS-1$
+
    }
 
 }
