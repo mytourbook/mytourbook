@@ -120,11 +120,12 @@ public class SuuntoCloudDownloaderTests extends UITest {
    @Test
    void testTourDownload() {
 
+      // Arrange
+
       //We set the access token issue date time in the past to trigger the retrieval
       //of a new token.
       setTokenRetrievalDateInThePast();
 
-      // Arrange
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(VALID_TOKEN_RESPONSE)
