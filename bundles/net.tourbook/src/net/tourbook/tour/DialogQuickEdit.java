@@ -163,7 +163,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutLocationOptions(_parent, toolbar, DialogQuickEdit.this, false);
+         return new SlideoutLocationOptions(_parent, toolbar, DialogQuickEdit.this, false, _tourData);
       }
 
       @Override
@@ -177,7 +177,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutLocationOptions(_parent, toolbar, DialogQuickEdit.this, true);
+         return new SlideoutLocationOptions(_parent, toolbar, DialogQuickEdit.this, true, _tourData);
       }
 
       @Override

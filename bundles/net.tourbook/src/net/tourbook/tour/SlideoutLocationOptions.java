@@ -15,19 +15,26 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourData;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
+import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DualList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -37,24 +44,29 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
 
    private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
-   private DialogQuickEdit              _dialogQuickEdit;
-
+   private TourData                     _tourData;
    private boolean                      _isStartLocation;
+
+   private DialogQuickEdit              _dialogQuickEdit;
 
    /*
     * UI controls
     */
    private Composite _shellContainer;
 
+   private MT_DualList _addressItemList;
+
    public SlideoutLocationOptions(final Control ownerControl,
                                   final ToolBar toolBar,
                                   final DialogQuickEdit dialogQuickEdit,
-                                  final boolean isStartLocation) {
+                                  final boolean isStartLocation,
+                                  final TourData tourData) {
 
       super(ownerControl, toolBar);
 
       _dialogQuickEdit = dialogQuickEdit;
       _isStartLocation = isStartLocation;
+      _tourData = tourData;
    }
 
    @Override
@@ -70,6 +82,8 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
 
       restoreState();
 
+      fillUI();
+
       return ui;
    }
 
@@ -80,15 +94,68 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
       {
          final Composite container = new Composite(_shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
-            final Label label = new Label(container, SWT.NONE);
-            label.setText("asd fa sdf");
+
+            _addressItemList = new MT_DualList(container, SWT.NONE);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(600, 600)
+                  .applyTo(_addressItemList);
+
          }
       }
 
       return _shellContainer;
+   }
+
+   private void fillUI() {
+      // TODO Auto-generated method stub
+
+      final List<MT_DLItem> allItems = new ArrayList<>();
+
+      final TourLocationData locationData = _isStartLocation
+            ? _tourData.osmLocation_Start
+            : _tourData.osmLocation_End;
+
+      final OSMLocation osmLocation = locationData.osmLocation;
+
+      try {
+
+         final OSMAddress address = osmLocation.address;
+
+         final Field[] allAddressFields = address.getClass().getFields();
+
+         for (final Field field : allAddressFields) {
+
+            // skip names which are not needed
+            if ("ISO3166_2_lvl4".equals(field.getName())) { //$NON-NLS-1$
+               continue;
+            }
+
+            final Object fieldValue = field.get(address);
+
+            if (fieldValue instanceof final String stringValue) {
+
+               // log only fields with value
+               if (stringValue.length() > 0) {
+
+                  final MT_DLItem dlItem = new MT_DLItem("%s                          (%s)".formatted(
+                        fieldValue,
+                        field.getName()));
+
+                  allItems.add(dlItem);
+               }
+            }
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+         StatusUtil.log(e);
+      }
+
+      _addressItemList.setItems(allItems.toArray(new MT_DLItem[allItems.size()]));
    }
 
    @Override
