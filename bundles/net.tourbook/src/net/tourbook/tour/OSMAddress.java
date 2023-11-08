@@ -110,7 +110,7 @@ class OSMAddress {
 
          for (final Field field : allFields) {
 
-            // skip names
+            // skip names which are not needed
             if ("ISO3166_2_lvl4".equals(field.getName())) { //$NON-NLS-1$
                continue;
             }

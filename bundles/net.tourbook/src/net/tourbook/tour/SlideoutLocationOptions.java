@@ -27,12 +27,13 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Slideout for the tour data editor options.
  */
-public class SlideoutTourEditor_LocationOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
@@ -45,10 +46,10 @@ public class SlideoutTourEditor_LocationOptions extends ToolbarSlideout implemen
     */
    private Composite _shellContainer;
 
-   public SlideoutTourEditor_LocationOptions(final Control ownerControl,
-                                             final ToolBar toolBar,
-                                             final DialogQuickEdit dialogQuickEdit,
-                                             final boolean isStartLocation) {
+   public SlideoutLocationOptions(final Control ownerControl,
+                                  final ToolBar toolBar,
+                                  final DialogQuickEdit dialogQuickEdit,
+                                  final boolean isStartLocation) {
 
       super(ownerControl, toolBar);
 
@@ -81,16 +82,13 @@ public class SlideoutTourEditor_LocationOptions extends ToolbarSlideout implemen
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-         {}
+         {
+            final Label label = new Label(container, SWT.NONE);
+            label.setText("asd fa sdf");
+         }
       }
 
       return _shellContainer;
-   }
-
-   @Override
-   protected boolean isAlignLeft() {
-
-      return true;
    }
 
    @Override

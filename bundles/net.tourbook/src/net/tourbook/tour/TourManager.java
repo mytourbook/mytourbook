@@ -2995,7 +2995,12 @@ public class TourManager {
 
          // no progress when only 1 tour is saved
 
-         saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, modifiedTours.get(0));
+         saveModifiedTours_OneTour(
+               
+               savedTours,
+               tourDataEditorSavedTour,
+               doFireChangeEvent,
+               modifiedTours.get(0));
 
       } else {
 
@@ -3017,7 +3022,12 @@ public class TourManager {
                            ++saveCounter,
                            tourSize));
 
-                     saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData);
+                     saveModifiedTours_OneTour(
+                           
+                           savedTours,
+                           tourDataEditorSavedTour,
+                           doFireChangeEvent,
+                           tourData);
 
                      monitor.worked(1);
                   }

@@ -99,7 +99,7 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
-import net.tourbook.tour.OSMLocation;
+import net.tourbook.tour.TourLocationData;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
@@ -2032,16 +2032,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public float         verticalSpeed_Down_Elevation;
 
    /**
-    * Downloaded start location
+    * Downloaded start location data
     */
    @Transient
-   public OSMLocation   osmLocation_Start;
+   public TourLocationData   osmLocation_Start;
 
    /**
-    * Downloaded end location
+    * Downloaded end location data
     */
    @Transient
-   public OSMLocation   osmLocation_End;
+   public TourLocationData   osmLocation_End;
 
 
 // SET_FORMATTING_ON

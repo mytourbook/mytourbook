@@ -321,12 +321,35 @@ public class TourLocationManager {
    }
 
    /**
+    * Retrieve location data
+    *
     * @param latitude
     * @param longitude
     *
     * @return
     */
-   public static TourLocationData getLocationName(final double latitude, final double longitude) {
+   public static TourLocationData getLocationData(final double latitude,
+                                                  final double longitude) {
+
+      return getLocationData(latitude, longitude, null);
+   }
+
+   /**
+    * Retrieve location data when not yet available
+    *
+    * @param latitude
+    * @param longitude
+    * @param existingLocationData
+    *
+    * @return
+    */
+   public static TourLocationData getLocationData(final double latitude,
+                                                  final double longitude,
+                                                  final TourLocationData existingLocationData) {
+
+      if (existingLocationData != null) {
+         return existingLocationData;
+      }
 
       final TourLocationData tourLocationData = getName_10_RetrieveData(latitude, longitude, _zoomLevel);
 
@@ -349,70 +372,6 @@ public class TourLocationManager {
       }
 
       return tourLocationData;
-   }
-
-   public static void getLocationNames(final List<TourData> requestedTours, final List<TourData> modifiedTours) {
-
-      try {
-
-         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-            @Override
-            public void run(final IProgressMonitor monitor)
-                  throws InvocationTargetException, InterruptedException {
-
-               final int numTours = requestedTours.size();
-               int numWorked = 0;
-
-               monitor.beginTask("Retrieving tour locations", numTours);
-
-               for (final TourData tourData : requestedTours) {
-
-                  if (monitor.isCanceled()) {
-                     break;
-                  }
-
-                  final double[] latitudeSerie = tourData.latitudeSerie;
-                  final double[] longitudeSerie = tourData.longitudeSerie;
-
-                  if (latitudeSerie == null || latitudeSerie.length == 0) {
-
-                     // needed data are not available
-
-                     monitor.subTask(SUB_TASK_MESSAGE_SKIPPED.formatted(++numWorked, numTours));
-
-                     continue;
-                  }
-
-                  final int lastIndex = latitudeSerie.length - 1;
-
-                  final int numRequests = numTours * 2;
-
-                  final TourLocationData locationStart = getLocationName(latitudeSerie[0], longitudeSerie[0]);
-                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationStart.waitingTime));
-
-                  final TourLocationData locationEnd = getLocationName(latitudeSerie[lastIndex], longitudeSerie[lastIndex]);
-                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationEnd.waitingTime));
-
-                  final String oldTourStartPlace = tourData.getTourStartPlace();
-                  final String oldTourEndPlace = tourData.getTourEndPlace();
-
-                  final String osmStartLocation = createLocationDisplayName(locationStart.osmLocation);
-                  final String osmEndLocation = createLocationDisplayName(locationEnd.osmLocation);
-
-                  tourData.setTourStartPlace(getCombinedLocationName(oldTourStartPlace, osmStartLocation));
-                  tourData.setTourEndPlace(getCombinedLocationName(oldTourEndPlace, osmEndLocation));
-
-                  modifiedTours.add(tourData);
-               }
-            }
-         };
-
-         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
-
-      } catch (final InvocationTargetException | InterruptedException e) {
-         StatusUtil.showStatus(e);
-         Thread.currentThread().interrupt();
-      }
    }
 
    /**
@@ -543,5 +502,83 @@ public class TourLocationManager {
       TourLogManager.log_ERROR(NLS.bind(
             "Error while retrieving location data: \"{1}\"", //$NON-NLS-1$
             exceptionMessage));
+   }
+
+   public static void setLocationNames(final List<TourData> requestedTours,
+                                       final List<TourData> modifiedTours) {
+
+      try {
+
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor)
+                  throws InvocationTargetException, InterruptedException {
+
+               final int numTours = requestedTours.size();
+               int numWorked = 0;
+
+               monitor.beginTask("Retrieving tour locations", numTours);
+
+               for (final TourData tourData : requestedTours) {
+
+                  if (monitor.isCanceled()) {
+                     break;
+                  }
+
+                  final double[] latitudeSerie = tourData.latitudeSerie;
+                  final double[] longitudeSerie = tourData.longitudeSerie;
+
+                  if (latitudeSerie == null || latitudeSerie.length == 0) {
+
+                     // needed data are not available
+
+                     monitor.subTask(SUB_TASK_MESSAGE_SKIPPED.formatted(++numWorked, numTours));
+
+                     continue;
+                  }
+
+                  final int lastIndex = latitudeSerie.length - 1;
+
+                  final int numRequests = numTours * 2;
+
+                  final TourLocationData locationStart = getLocationData(
+                        latitudeSerie[0],
+                        longitudeSerie[0],
+                        tourData.osmLocation_Start);
+
+                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationStart.waitingTime));
+
+                  final TourLocationData locationEnd = getLocationData(
+                        latitudeSerie[lastIndex],
+                        longitudeSerie[lastIndex],
+                        tourData.osmLocation_End);
+
+                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationEnd.waitingTime));
+
+                  final String oldTourStartPlace = tourData.getTourStartPlace();
+                  final String oldTourEndPlace = tourData.getTourEndPlace();
+
+                  final String osmStartLocation = createLocationDisplayName(locationStart.osmLocation);
+                  final String osmEndLocation = createLocationDisplayName(locationEnd.osmLocation);
+
+                  tourData.setTourStartPlace(getCombinedLocationName(oldTourStartPlace, osmStartLocation));
+                  tourData.setTourEndPlace(getCombinedLocationName(oldTourEndPlace, osmEndLocation));
+
+                  // keep location values
+                  tourData.osmLocation_Start = locationStart;
+                  tourData.osmLocation_End = locationEnd;
+
+                  modifiedTours.add(tourData);
+               }
+            }
+         };
+
+         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+
+      } catch (final InvocationTargetException | InterruptedException e) {
+
+         StatusUtil.showStatus(e);
+         Thread.currentThread().interrupt();
+      }
    }
 }

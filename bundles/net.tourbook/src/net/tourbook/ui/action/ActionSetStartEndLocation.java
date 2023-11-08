@@ -52,7 +52,7 @@ public class ActionSetStartEndLocation extends Action {
       final List<TourData> selectedTours = _tourProvider.getSelectedTours();
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
-      TourLocationManager.getLocationNames(selectedTours, modifiedTours);
+      TourLocationManager.setLocationNames(selectedTours, modifiedTours);
 
       if (modifiedTours.size() > 0) {
 

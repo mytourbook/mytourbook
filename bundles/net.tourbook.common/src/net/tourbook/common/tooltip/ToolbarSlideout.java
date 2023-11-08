@@ -124,9 +124,11 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
    }
 
    /**
-    * @return When it returns <code>true</code> then the slideout is aligned to the left of the
-    *         action button, {@link ToolbarSlideout#isCenterHorizontal()} must return
-    *         <code>false</code> because it has historically a higher priority.
+    * @return When <code>true</code> is returned, then the slideout is aligned to the left of the
+    *         action button.
+    *         <p>
+    *         {@link ToolbarSlideout#isCenterHorizontal()} must return <code>false</code> because
+    *         it has historically a higher priority.
     */
    protected boolean isAlignLeft() {
 

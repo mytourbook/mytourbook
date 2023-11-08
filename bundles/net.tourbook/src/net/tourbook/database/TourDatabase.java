@@ -3081,7 +3081,7 @@ public class TourDatabase {
 
          em.close();
 
-         saveTour_PostSaveActions(persistedEntity);
+         saveTour_PostSaveActions(persistedEntity, tourData);
       }
 
       return persistedEntity;
@@ -3092,10 +3092,12 @@ public class TourDatabase {
     * called <b>AFTER</b> all tours are saved
     *
     * @param tourData
+    * @param isUpdateModifiedDate
     *
     * @return
     */
-   public static TourData saveTour_Concurrent(final TourData tourData, final boolean isUpdateModifiedDate) {
+   public static TourData saveTour_Concurrent(final TourData tourData,
+                                              final boolean isUpdateModifiedDate) {
 
       if (saveTour_PreSaveActions(tourData) == false) {
          return null;
@@ -3155,7 +3157,7 @@ public class TourDatabase {
          }
 
          // do post save actions for only ONE tour
-         saveTour_PostSaveActions_Concurrent_1_ForOneTour(persistedEntity);
+         saveTour_PostSaveActions_Concurrent_1_ForOneTour(persistedEntity, tourData);
 
          // !!! This method MUST be called AFTER all tours are saved !!!
          // !!! This method MUST be called AFTER all tours are saved !!!
@@ -3246,13 +3248,27 @@ public class TourDatabase {
 //      );
    }
 
-   private static void saveTour_PostSaveActions(final TourData persistedEntity) {
+   /**
+    * Keep transient values
+    *
+    * @param persistedEntity
+    * @param oldTourData
+    */
+   private static void saveTour_KeepTransientValues(final TourData persistedEntity,
+                                                    final TourData oldTourData) {
+
+      persistedEntity.osmLocation_Start = oldTourData.osmLocation_Start;
+      persistedEntity.osmLocation_End = oldTourData.osmLocation_End;
+   }
+
+   private static void saveTour_PostSaveActions(final TourData persistedEntity, final TourData oldTourData) {
 
       TourManager.getInstance().updateTourInCache(persistedEntity);
 
       updateCachedFields(persistedEntity);
 
       saveTour_GeoParts(persistedEntity);
+      saveTour_KeepTransientValues(persistedEntity, oldTourData);
 
       /*
        * Update ft index
@@ -3267,14 +3283,17 @@ public class TourDatabase {
     * Perform concurrent actions after a tour is saved
     *
     * @param persistedEntity
+    * @param oldTourData
     */
-   private static void saveTour_PostSaveActions_Concurrent_1_ForOneTour(final TourData persistedEntity) {
+   private static void saveTour_PostSaveActions_Concurrent_1_ForOneTour(final TourData persistedEntity,
+                                                                        final TourData oldTourData) {
 
       TourManager.getInstance().updateTourInCache(persistedEntity);
 
       updateCachedFields(persistedEntity);
 
       saveTour_GeoParts(persistedEntity);
+      saveTour_KeepTransientValues(persistedEntity, oldTourData);
    }
 
    /**
