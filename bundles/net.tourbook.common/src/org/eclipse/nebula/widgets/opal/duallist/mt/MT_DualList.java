@@ -47,24 +47,25 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class MT_DualList extends Composite {
 
-   private static final String              DOUBLE_DOWN_IMAGE  = "double_down.png";
-   private static final String              DOUBLE_UP_IMAGE    = "double_up.png";
-   private static final String              DOUBLE_LEFT_IMAGE  = "double_left.png";
-   private static final String              DOUBLE_RIGHT_IMAGE = "double_right.png";
-   private static final String              ARROW_DOWN_IMAGE   = "arrow_down.png";
-   private static final String              ARROW_LEFT_IMAGE   = "arrow_left.png";
-   private static final String              ARROW_UP_IMAGE     = "arrow_up.png";
-   private static final String              ARROW_RIGHT_IMAGE  = "arrow_right.png";
+   private static final String              DOUBLE_DOWN_IMAGE  = "double_down.png";  //$NON-NLS-1$
+   private static final String              DOUBLE_UP_IMAGE    = "double_up.png";    //$NON-NLS-1$
+   private static final String              DOUBLE_LEFT_IMAGE  = "double_left.png";  //$NON-NLS-1$
+   private static final String              DOUBLE_RIGHT_IMAGE = "double_right.png"; //$NON-NLS-1$
+   private static final String              ARROW_DOWN_IMAGE   = "arrow_down.png";   //$NON-NLS-1$
+   private static final String              ARROW_LEFT_IMAGE   = "arrow_left.png";   //$NON-NLS-1$
+   private static final String              ARROW_UP_IMAGE     = "arrow_up.png";     //$NON-NLS-1$
+   private static final String              ARROW_RIGHT_IMAGE  = "arrow_right.png";  //$NON-NLS-1$
 
-   private final List<MT_DLItem>            items;
-   private final List<MT_DLItem>            selection;
-
-   private Table                            itemsTable;
-   private Table                            selectionTable;
+   private final List<MT_DLItem>            _allItems;
+   private final List<MT_DLItem>            _allSelectedItems;
 
    private List<MT_SelectionChangeListener> selectionChangeListeners;
    private MT_DLConfiguration               configuration;
-   private Button                           buttonSelectAll,
+
+   /*
+    * UI controls
+    */
+   private Button buttonSelectAll,
          buttonMoveFirst,
          buttonSelect,
          buttonMoveUp,
@@ -72,6 +73,9 @@ public class MT_DualList extends Composite {
          buttonMoveDown,
          buttonDeselectAll,
          buttonMoveLast;
+
+   private Table  _tableAllItems;
+   private Table  _tableAllSelectedItems;
 
    /**
     * Constructs a new instance of this class given its parent and a style value
@@ -103,14 +107,18 @@ public class MT_DualList extends Composite {
     *
     */
    public MT_DualList(final Composite parent, final int style) {
+
       super(parent, style);
-      items = new ArrayList<>();
-      selection = new ArrayList<>();
+
+      _allItems = new ArrayList<>();
+      _allSelectedItems = new ArrayList<>();
 
       setLayout(new GridLayout(4, false));
+
       createItemsTable();
       createButtonSelectAll();
       createSelectionTable();
+
       createButtonMoveFirst();
       createButtonSelect();
       createButtonMoveUp();
@@ -145,7 +153,7 @@ public class MT_DualList extends Composite {
       if (item == null) {
          SWT.error(SWT.ERROR_NULL_ARGUMENT);
       }
-      items.add(item);
+      _allItems.add(item);
       redrawTables();
    }
 
@@ -182,10 +190,10 @@ public class MT_DualList extends Composite {
       if (item == null) {
          SWT.error(SWT.ERROR_NULL_ARGUMENT);
       }
-      if (index < 0 || index >= items.size()) {
+      if (index < 0 || index >= _allItems.size()) {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
       }
-      items.add(index, item);
+      _allItems.add(index, item);
       redrawTables();
    }
 
@@ -257,6 +265,7 @@ public class MT_DualList extends Composite {
    }
 
    private void applyNewConfiguration() {
+
       try {
          setRedraw(true);
          if (configuration == null) {
@@ -280,6 +289,7 @@ public class MT_DualList extends Composite {
     *           table to be emptied
     */
    private void clean(final Table table) {
+
       if (table == null) {
          return;
       }
@@ -303,11 +313,15 @@ public class MT_DualList extends Composite {
     * @return a new button
     */
    private Button createButton(final String fileName, final boolean verticalExpand, final int alignment) {
+
       final Button button = new Button(this, SWT.PUSH);
-      final Image image = SWTGraphicUtil.createImageFromFile("images/" + fileName);
+
+      final Image image = SWTGraphicUtil.createImageFromFile("images/" + fileName); //$NON-NLS-1$
       button.setImage(image);
       button.setLayoutData(new GridData(GridData.CENTER, alignment, false, verticalExpand));
+
       SWTGraphicUtil.addDisposer(button, image);
+
       return button;
    }
 
@@ -368,15 +382,15 @@ public class MT_DualList extends Composite {
    }
 
    private void createItemsTable() {
-      itemsTable = createTable();
-      itemsTable.addListener(SWT.MouseDoubleClick, event -> {
+      _tableAllItems = createTable();
+      _tableAllItems.addListener(SWT.MouseDoubleClick, event -> {
          selectItem();
       });
    }
 
    private void createSelectionTable() {
-      selectionTable = createTable();
-      selectionTable.addListener(SWT.MouseDoubleClick, event -> {
+      _tableAllSelectedItems = createTable();
+      _tableAllSelectedItems.addListener(SWT.MouseDoubleClick, event -> {
          deselectItem();
       });
    }
@@ -385,15 +399,20 @@ public class MT_DualList extends Composite {
     * @return a table that will contain data
     */
    private Table createTable() {
+
       final Table table = new Table(this, SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
       table.setLinesVisible(false);
       table.setHeaderVisible(false);
+      table.setData(-1);
+
       final GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true, 1, 4);
       gd.widthHint = 200;
       table.setLayoutData(gd);
-      new TableColumn(table, SWT.CENTER);
-      new TableColumn(table, SWT.LEFT);
-      table.setData(-1);
+
+      new TableColumn(table, SWT.CENTER); // image
+      new TableColumn(table, SWT.LEFT); // text
+      new TableColumn(table, SWT.LEFT); // text2
+
       return table;
    }
 
@@ -435,10 +454,10 @@ public class MT_DualList extends Composite {
     */
    private void deselect(final int index, final boolean shouldFireEvents) {
       checkWidget();
-      if (index < 0 || index >= items.size()) {
+      if (index < 0 || index >= _allItems.size()) {
          return;
       }
-      final MT_DLItem item = selection.remove(index);
+      final MT_DLItem item = _allSelectedItems.remove(index);
       if (shouldFireEvents) {
          fireSelectionEvent(item);
       }
@@ -488,14 +507,14 @@ public class MT_DualList extends Composite {
       final List<MT_DLItem> toBeRemoved = new ArrayList<>();
 
       for (int index = start; index <= end; index++) {
-         if (index < 0 || index >= items.size()) {
+         if (index < 0 || index >= _allItems.size()) {
             continue;
          }
-         toBeRemoved.add(selection.get(index));
+         toBeRemoved.add(_allSelectedItems.get(index));
       }
 
       for (final MT_DLItem item : toBeRemoved) {
-         selection.remove(item);
+         _allSelectedItems.remove(item);
          if (shouldFireEvents) {
             fireSelectionEvent(item);
          }
@@ -562,14 +581,14 @@ public class MT_DualList extends Composite {
       final List<MT_DLItem> toBeRemoved = new ArrayList<>();
 
       for (final int index : indices) {
-         if (index < 0 || index >= items.size()) {
+         if (index < 0 || index >= _allItems.size()) {
             continue;
          }
-         toBeRemoved.add(selection.get(index));
+         toBeRemoved.add(_allSelectedItems.get(index));
       }
 
       for (final MT_DLItem item : toBeRemoved) {
-         selection.remove(item);
+         _allSelectedItems.remove(item);
          if (shouldFireEvents) {
             fireSelectionEvent(item);
          }
@@ -610,10 +629,10 @@ public class MT_DualList extends Composite {
     */
    public void deselectAll(final boolean shouldFireEvents) {
       checkWidget();
-      items.addAll(selection);
+      _allItems.addAll(_allSelectedItems);
 
       final List<MT_DLItem> deselectedItems = new ArrayList<>();
-      for (final MT_DLItem item : selection) {
+      for (final MT_DLItem item : _allSelectedItems) {
          item.setLastAction(LAST_ACTION.DESELECTION);
          deselectedItems.add(item);
          if (shouldFireEvents) {
@@ -622,7 +641,7 @@ public class MT_DualList extends Composite {
       }
       fireSelectionChangeEvent(deselectedItems);
 
-      selection.clear();
+      _allSelectedItems.clear();
       redrawTables();
    }
 
@@ -718,16 +737,16 @@ public class MT_DualList extends Composite {
     * Deselect a given item
     */
    protected void deselectItem() {
-      if (selectionTable.getSelectionCount() == 0) {
+      if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
       final List<MT_DLItem> deselectedItems = new ArrayList<>();
-      for (final TableItem tableItem : selectionTable.getSelection()) {
+      for (final TableItem tableItem : _tableAllSelectedItems.getSelection()) {
          final MT_DLItem item = (MT_DLItem) tableItem.getData();
          item.setLastAction(LAST_ACTION.DESELECTION);
          deselectedItems.add(item);
-         items.add(item);
-         selection.remove(item);
+         _allItems.add(item);
+         _allSelectedItems.remove(item);
          fireSelectionEvent(item);
       }
       fireSelectionChangeEvent(deselectedItems);
@@ -743,9 +762,13 @@ public class MT_DualList extends Composite {
     *           list of data
     */
    private void fillData(final Table table, final boolean isSelected) {
-      final List<MT_DLItem> listOfData = isSelected ? selection : items;
+
+      final List<MT_DLItem> listOfData = isSelected ? _allSelectedItems : _allItems;
+
       int counter = 0;
+
       for (final MT_DLItem item : listOfData) {
+
          final TableItem tableItem = new TableItem(table, SWT.NONE);
          tableItem.setData(item);
 
@@ -764,7 +787,10 @@ public class MT_DualList extends Composite {
          if (item.getFont() != null) {
             tableItem.setFont(item.getFont());
          }
+
          tableItem.setText(1, item.getText());
+         tableItem.setText(2, item.getText2());
+
          if (configuration != null && item.getBackground() == null && counter % 2 == 0) {
             if (isSelected) {
                tableItem.setBackground(configuration.getSelectionOddLinesColor());
@@ -854,10 +880,10 @@ public class MT_DualList extends Composite {
 
    public MT_DLItem getItem(final int index) {
       checkWidget();
-      if (index < 0 || index >= items.size()) {
+      if (index < 0 || index >= _allItems.size()) {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
       }
-      return items.get(index);
+      return _allItems.get(index);
    }
 
    /**
@@ -875,7 +901,7 @@ public class MT_DualList extends Composite {
     */
    public int getItemCount() {
       checkWidget();
-      return items.size();
+      return _allItems.size();
    }
 
    /**
@@ -898,7 +924,7 @@ public class MT_DualList extends Composite {
     */
    public MT_DLItem[] getItems() {
       checkWidget();
-      return items.toArray(new MT_DLItem[items.size()]);
+      return _allItems.toArray(new MT_DLItem[_allItems.size()]);
    }
 
    /**
@@ -921,7 +947,7 @@ public class MT_DualList extends Composite {
     */
    public List<MT_DLItem> getItemsAsList() {
       checkWidget();
-      return new ArrayList<>(items);
+      return new ArrayList<>(_allItems);
    }
 
    /**
@@ -944,7 +970,7 @@ public class MT_DualList extends Composite {
     */
    public MT_DLItem[] getSelection() {
       checkWidget();
-      return selection.toArray(new MT_DLItem[selection.size()]);
+      return _allSelectedItems.toArray(new MT_DLItem[_allSelectedItems.size()]);
    }
 
    /**
@@ -967,7 +993,7 @@ public class MT_DualList extends Composite {
     */
    public List<MT_DLItem> getSelectionAsList() {
       checkWidget();
-      return new ArrayList<>(selection);
+      return new ArrayList<>(_allSelectedItems);
    }
 
    /**
@@ -985,20 +1011,21 @@ public class MT_DualList extends Composite {
     */
    public int getSelectionCount() {
       checkWidget();
-      return selection.size();
+      return _allSelectedItems.size();
    }
 
    /**
     * @return <code>true</code> if any item contains an image
     */
-   private boolean itemsContainImage() {
-      for (final MT_DLItem item : items) {
+   private boolean isItemsContainImage() {
+
+      for (final MT_DLItem item : _allItems) {
          if (item.getImage() != null) {
             return true;
          }
       }
 
-      for (final MT_DLItem item : selection) {
+      for (final MT_DLItem item : _allSelectedItems) {
          if (item.getImage() != null) {
             return true;
          }
@@ -1008,6 +1035,7 @@ public class MT_DualList extends Composite {
    }
 
    private void modifyButtonImages() {
+
       if (configuration.getDoubleDownImage() != null) {
          buttonMoveLast.setImage(configuration.getDoubleDownImage());
       }
@@ -1035,6 +1063,7 @@ public class MT_DualList extends Composite {
    }
 
    private void modifyButtonVisibility() {
+
       buttonMoveLast.setVisible(configuration.isDoubleDownVisible());
       buttonMoveFirst.setVisible(configuration.isDoubleUpVisible());
       buttonDeselectAll.setVisible(configuration.isDoubleLeftVisible());
@@ -1044,120 +1073,122 @@ public class MT_DualList extends Composite {
    }
 
    private void modifyPanelsColors() {
+
       if (configuration.getItemsBackgroundColor() != null) {
-         itemsTable.setBackground(configuration.getItemsBackgroundColor());
+         _tableAllItems.setBackground(configuration.getItemsBackgroundColor());
       }
       if (configuration.getItemsForegroundColor() != null) {
-         itemsTable.setForeground(configuration.getItemsForegroundColor());
+         _tableAllItems.setForeground(configuration.getItemsForegroundColor());
       }
       if (configuration.getSelectionBackgroundColor() != null) {
-         selectionTable.setBackground(configuration.getSelectionBackgroundColor());
+         _tableAllSelectedItems.setBackground(configuration.getSelectionBackgroundColor());
       }
       if (configuration.getSelectionForegroundColor() != null) {
-         selectionTable.setForeground(configuration.getSelectionForegroundColor());
+         _tableAllSelectedItems.setForeground(configuration.getSelectionForegroundColor());
       }
    }
 
    private void modifyTextAlignment() {
-      recreateTableColumns(itemsTable, configuration.getItemsTextAlignment());
-      recreateTableColumns(selectionTable, configuration.getSelectionTextAlignment());
+
+      recreateTableColumns(_tableAllItems, configuration.getItemsTextAlignment());
+      recreateTableColumns(_tableAllSelectedItems, configuration.getSelectionTextAlignment());
    }
 
    /**
     * Move the selected item down
     */
    protected void moveDownItem() {
-      if (selectionTable.getSelectionCount() == 0) {
+      if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
 
-      for (final int index : selectionTable.getSelectionIndices()) {
-         if (index == selectionTable.getItemCount() - 1) {
-            selectionTable.forceFocus();
+      for (final int index : _tableAllSelectedItems.getSelectionIndices()) {
+         if (index == _tableAllSelectedItems.getItemCount() - 1) {
+            _tableAllSelectedItems.forceFocus();
             return;
          }
       }
 
-      final int[] newSelection = new int[selectionTable.getSelectionCount()];
+      final int[] newSelection = new int[_tableAllSelectedItems.getSelectionCount()];
       int newSelectionIndex = 0;
-      for (final TableItem tableItem : selectionTable.getSelection()) {
-         final int position = selection.indexOf(tableItem.getData());
+      for (final TableItem tableItem : _tableAllSelectedItems.getSelection()) {
+         final int position = _allSelectedItems.indexOf(tableItem.getData());
          swap(position, position + 1);
          newSelection[newSelectionIndex++] = position + 1;
       }
 
       redrawTables();
-      selectionTable.select(newSelection);
-      selectionTable.forceFocus();
+      _tableAllSelectedItems.select(newSelection);
+      _tableAllSelectedItems.forceFocus();
    }
 
    /**
     * Move the selected item to the first position
     */
    protected void moveSelectionToFirstPosition() {
-      if (selectionTable.getSelectionCount() == 0) {
+      if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
 
       int index = 0;
-      for (final TableItem tableItem : selectionTable.getSelection()) {
+      for (final TableItem tableItem : _tableAllSelectedItems.getSelection()) {
          final MT_DLItem item = (MT_DLItem) tableItem.getData();
-         selection.remove(item);
-         selection.add(index++, item);
+         _allSelectedItems.remove(item);
+         _allSelectedItems.add(index++, item);
       }
 
       redrawTables();
-      selectionTable.select(0, index - 1);
-      selectionTable.forceFocus();
+      _tableAllSelectedItems.select(0, index - 1);
+      _tableAllSelectedItems.forceFocus();
    }
 
    /**
     * Move the selected item to the last position
     */
    protected void moveSelectionToLastPosition() {
-      if (selectionTable.getSelectionCount() == 0) {
+      if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
 
-      final int numberOfSelectedElements = selectionTable.getSelectionCount();
-      for (final TableItem tableItem : selectionTable.getSelection()) {
+      final int numberOfSelectedElements = _tableAllSelectedItems.getSelectionCount();
+      for (final TableItem tableItem : _tableAllSelectedItems.getSelection()) {
          final MT_DLItem item = (MT_DLItem) tableItem.getData();
-         selection.remove(item);
-         selection.add(item);
+         _allSelectedItems.remove(item);
+         _allSelectedItems.add(item);
       }
 
       redrawTables();
-      final int numberOfElements = selectionTable.getItemCount();
-      selectionTable.select(numberOfElements - numberOfSelectedElements, numberOfElements - 1);
-      selectionTable.forceFocus();
+      final int numberOfElements = _tableAllSelectedItems.getItemCount();
+      _tableAllSelectedItems.select(numberOfElements - numberOfSelectedElements, numberOfElements - 1);
+      _tableAllSelectedItems.forceFocus();
    }
 
    /**
     * Move the selected item up
     */
    protected void moveUpItem() {
-      if (selectionTable.getSelectionCount() == 0) {
+      if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
 
-      for (final int index : selectionTable.getSelectionIndices()) {
+      for (final int index : _tableAllSelectedItems.getSelectionIndices()) {
          if (index == 0) {
-            selectionTable.forceFocus();
+            _tableAllSelectedItems.forceFocus();
             return;
          }
       }
 
-      final int[] newSelection = new int[selectionTable.getSelectionCount()];
+      final int[] newSelection = new int[_tableAllSelectedItems.getSelectionCount()];
       int newSelectionIndex = 0;
-      for (final TableItem tableItem : selectionTable.getSelection()) {
-         final int position = selection.indexOf(tableItem.getData());
+      for (final TableItem tableItem : _tableAllSelectedItems.getSelection()) {
+         final int position = _allSelectedItems.indexOf(tableItem.getData());
          swap(position, position - 1);
          newSelection[newSelectionIndex++] = position - 1;
       }
 
       redrawTables();
-      selectionTable.select(newSelection);
-      selectionTable.forceFocus();
+      _tableAllSelectedItems.select(newSelection);
+      _tableAllSelectedItems.forceFocus();
    }
 
    private void recreateTableColumns(final Table table, final int textAlignment) {
@@ -1178,7 +1209,9 @@ public class MT_DualList extends Composite {
     *           Otherwise, fill the table with the unselected items.
     */
    private void redrawTable(final Table table, final boolean isSelected) {
+
       clean(table);
+
       fillData(table, isSelected);
    }
 
@@ -1186,11 +1219,15 @@ public class MT_DualList extends Composite {
     * Redraws all tables that compose this widget
     */
    private void redrawTables() {
+
       setRedraw(false);
-      redrawTable(itemsTable, false);
-      redrawTable(selectionTable, true);
+
+      redrawTable(_tableAllItems, false);
+      redrawTable(_tableAllSelectedItems, true);
+
       final Rectangle bounds = getBounds();
       this.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+
       setRedraw(true);
    }
 
@@ -1215,10 +1252,10 @@ public class MT_DualList extends Composite {
     */
    public void remove(final int index) {
       checkWidget();
-      if (index < 0 || index >= items.size()) {
+      if (index < 0 || index >= _allItems.size()) {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
       }
-      items.remove(index);
+      _allItems.remove(index);
       redrawTables();
    }
 
@@ -1251,10 +1288,10 @@ public class MT_DualList extends Composite {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
       }
       for (int index = start; index < end; index++) {
-         if (index < 0 || index >= items.size()) {
+         if (index < 0 || index >= _allItems.size()) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
          }
-         items.remove(index);
+         _allItems.remove(index);
       }
       redrawTables();
    }
@@ -1282,10 +1319,10 @@ public class MT_DualList extends Composite {
    public void remove(final int[] indices) {
       checkWidget();
       for (final int index : indices) {
-         if (index < 0 || index >= items.size()) {
+         if (index < 0 || index >= _allItems.size()) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
          }
-         items.remove(index);
+         _allItems.remove(index);
       }
       redrawTables();
    }
@@ -1316,10 +1353,10 @@ public class MT_DualList extends Composite {
       if (item == null) {
          SWT.error(SWT.ERROR_NULL_ARGUMENT);
       }
-      if (!items.contains(item)) {
+      if (!_allItems.contains(item)) {
          SWT.error(SWT.ERROR_INVALID_ARGUMENT);
       }
-      items.remove(item);
+      _allItems.remove(item);
       redrawTables();
    }
 
@@ -1337,7 +1374,7 @@ public class MT_DualList extends Composite {
     */
    public void removeAll() {
       checkWidget();
-      items.clear();
+      _allItems.clear();
       redrawTables();
    }
 
@@ -1402,20 +1439,20 @@ public class MT_DualList extends Composite {
    }
 
    private void resetButton(final Button button, final String fileName) {
-      final Image image = SWTGraphicUtil.createImageFromFile("images/" + fileName);
+      final Image image = SWTGraphicUtil.createImageFromFile("images/" + fileName); //$NON-NLS-1$
       button.setImage(image);
       SWTGraphicUtil.addDisposer(button, image);
       button.setVisible(true);
    }
 
    private void resetConfigurationToDefault() {
-      itemsTable.setBackground(null);
-      itemsTable.setForeground(null);
-      selectionTable.setBackground(null);
-      selectionTable.setForeground(null);
+      _tableAllItems.setBackground(null);
+      _tableAllItems.setForeground(null);
+      _tableAllSelectedItems.setBackground(null);
+      _tableAllSelectedItems.setForeground(null);
 
-      recreateTableColumns(itemsTable, SWT.LEFT);
-      recreateTableColumns(selectionTable, SWT.LEFT);
+      recreateTableColumns(_tableAllItems, SWT.LEFT);
+      recreateTableColumns(_tableAllSelectedItems, SWT.LEFT);
 
       resetButton(buttonMoveLast, DOUBLE_DOWN_IMAGE);
       resetButton(buttonMoveFirst, DOUBLE_UP_IMAGE);
@@ -1449,14 +1486,14 @@ public class MT_DualList extends Composite {
 
    private void select(final int index, final boolean shouldFireEvents) {
       checkWidget();
-      if (index < 0 || index >= items.size()) {
+      if (index < 0 || index >= _allItems.size()) {
          return;
       }
       final List<MT_DLItem> selectedItems = new ArrayList<>();
-      final MT_DLItem item = items.remove(index);
+      final MT_DLItem item = _allItems.remove(index);
       item.setLastAction(LAST_ACTION.SELECTION);
       selectedItems.add(item);
-      selection.add(item);
+      _allSelectedItems.add(item);
 
       if (shouldFireEvents) {
          fireSelectionEvent(item);
@@ -1503,13 +1540,13 @@ public class MT_DualList extends Composite {
       }
       final List<MT_DLItem> selectedItems = new ArrayList<>();
       for (int index = start; index <= end; index++) {
-         if (index < 0 || index >= items.size()) {
+         if (index < 0 || index >= _allItems.size()) {
             continue;
          }
-         final MT_DLItem item = items.get(index);
+         final MT_DLItem item = _allItems.get(index);
          item.setLastAction(LAST_ACTION.SELECTION);
          selectedItems.add(item);
-         selection.add(item);
+         _allSelectedItems.add(item);
          if (shouldFireEvents) {
             fireSelectionEvent(item);
          }
@@ -1556,19 +1593,19 @@ public class MT_DualList extends Composite {
 
       final List<MT_DLItem> selectedItems = new ArrayList<>();
       for (final int index : indices) {
-         if (index < 0 || index >= items.size()) {
+         if (index < 0 || index >= _allItems.size()) {
             continue;
          }
-         final MT_DLItem item = items.get(index);
+         final MT_DLItem item = _allItems.get(index);
          item.setLastAction(LAST_ACTION.SELECTION);
          selectedItems.add(item);
 
-         selection.add(item);
+         _allSelectedItems.add(item);
          if (shouldFireEvents) {
             fireSelectionEvent(item);
          }
       }
-      items.removeAll(selectedItems);
+      _allItems.removeAll(selectedItems);
       if (shouldFireEvents) {
          fireSelectionChangeEvent(selectedItems);
       }
@@ -1594,22 +1631,22 @@ public class MT_DualList extends Composite {
 
    private void selectAll(final boolean shouldFireEvents) {
       checkWidget();
-      selection.addAll(items);
+      _allSelectedItems.addAll(_allItems);
       if (shouldFireEvents) {
-         for (final MT_DLItem item : items) {
+         for (final MT_DLItem item : _allItems) {
             fireSelectionEvent(item);
          }
       }
 
       if (shouldFireEvents) {
          final List<MT_DLItem> selectedItems = new ArrayList<>();
-         for (final MT_DLItem item : items) {
+         for (final MT_DLItem item : _allItems) {
             item.setLastAction(LAST_ACTION.SELECTION);
             selectedItems.add(item);
          }
          fireSelectionChangeEvent(selectedItems);
       }
-      items.clear();
+      _allItems.clear();
       redrawTables();
    }
 
@@ -1712,16 +1749,16 @@ public class MT_DualList extends Composite {
     * Select a given item
     */
    protected void selectItem() {
-      if (itemsTable.getSelectionCount() == 0) {
+      if (_tableAllItems.getSelectionCount() == 0) {
          return;
       }
       final List<MT_DLItem> selectedItems = new ArrayList<>();
-      for (final TableItem tableItem : itemsTable.getSelection()) {
+      for (final TableItem tableItem : _tableAllItems.getSelection()) {
          final MT_DLItem item = (MT_DLItem) tableItem.getData();
          item.setLastAction(LAST_ACTION.SELECTION);
          selectedItems.add(item);
-         selection.add(item);
-         items.remove(item);
+         _allSelectedItems.add(item);
+         _allItems.remove(item);
          fireSelectionEvent(item);
       }
       fireSelectionChangeEvent(selectedItems);
@@ -1734,35 +1771,45 @@ public class MT_DualList extends Composite {
     */
    @Override
    public void setBounds(final int x, final int y, final int width, final int height) {
+
       super.setBounds(x, y, width, height);
+
       layout(true);
-      final boolean itemsContainImage = itemsContainImage();
-      final Point itemsTableDefaultSize = itemsTable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-      final Point selectionTableDefaultSize = selectionTable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
-      int itemsTableSize = itemsTable.getSize().x;
-      if (itemsTableDefaultSize.y > itemsTable.getSize().y) {
-         itemsTableSize -= itemsTable.getVerticalBar().getSize().x + 1;
+      final boolean isContainsImage = isItemsContainImage();
+
+      final Point itemsTableDefaultSize = _tableAllItems.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+      final Point selectionTableDefaultSize = _tableAllSelectedItems.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      int itemsTableSize = _tableAllItems.getSize().x;
+
+      if (itemsTableDefaultSize.y > _tableAllItems.getSize().y) {
+         itemsTableSize -= _tableAllItems.getVerticalBar().getSize().x + 1;
       }
 
-      int selectionTableSize = selectionTable.getSize().x;
-      if (selectionTableDefaultSize.y > selectionTable.getSize().y) {
-         selectionTableSize -= selectionTable.getVerticalBar().getSize().x;
+      int selectionTableSize = _tableAllSelectedItems.getSize().x;
+
+      if (selectionTableDefaultSize.y > _tableAllSelectedItems.getSize().y) {
+         selectionTableSize -= _tableAllSelectedItems.getVerticalBar().getSize().x;
       }
 
-      if (itemsContainImage) {
-         itemsTable.getColumn(0).pack();
-         itemsTable.getColumn(1).setWidth(itemsTableSize - itemsTable.getColumn(0).getWidth());
+      if (isContainsImage) {
 
-         selectionTable.getColumn(0).pack();
-         selectionTable.getColumn(1).setWidth(selectionTableSize - selectionTable.getColumn(0).getWidth());
+         _tableAllItems.getColumn(0).pack();
+         _tableAllItems.getColumn(1).setWidth(itemsTableSize - _tableAllItems.getColumn(0).getWidth());
+
+         _tableAllSelectedItems.getColumn(0).pack();
+         _tableAllSelectedItems.getColumn(1).setWidth(selectionTableSize - _tableAllSelectedItems.getColumn(0).getWidth());
 
       } else {
-         itemsTable.getColumn(0).setWidth(0);
-         itemsTable.getColumn(1).setWidth(itemsTableSize);
 
-         selectionTable.getColumn(0).setWidth(0);
-         selectionTable.getColumn(1).setWidth(selectionTableSize);
+         _tableAllItems.getColumn(0).setWidth(0);
+         _tableAllItems.getColumn(1).setWidth(itemsTableSize / 2);
+         _tableAllItems.getColumn(2).setWidth(itemsTableSize / 2);
+
+         _tableAllSelectedItems.getColumn(0).setWidth(0);
+         _tableAllSelectedItems.getColumn(1).setWidth(selectionTableSize / 2);
+         _tableAllSelectedItems.getColumn(2).setWidth(selectionTableSize / 2);
       }
 
    }
@@ -1815,10 +1862,10 @@ public class MT_DualList extends Composite {
       if (item == null) {
          SWT.error(SWT.ERROR_NULL_ARGUMENT);
       }
-      if (index < 0 || index >= items.size()) {
+      if (index < 0 || index >= _allItems.size()) {
          SWT.error(SWT.ERROR_INVALID_RANGE);
       }
-      items.set(index, item);
+      _allItems.set(index, item);
       redrawTables();
    }
 
@@ -1843,28 +1890,34 @@ public class MT_DualList extends Composite {
     *               </ul>
     */
    public void setItems(final List<MT_DLItem> items) {
+
       checkWidget();
+
       if (items == null) {
          SWT.error(SWT.ERROR_NULL_ARGUMENT);
       }
 
       final List<MT_DLItem> unselectedItems = new ArrayList<>();
       final List<MT_DLItem> selectedItems = new ArrayList<>();
+
       for (final MT_DLItem item : items) {
+
          if (item == null) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
          }
+
          if (item.getLastAction() == LAST_ACTION.SELECTION) {
             selectedItems.add(item);
          } else {
             unselectedItems.add(item);
          }
       }
-      this.items.clear();
-      this.items.addAll(unselectedItems);
 
-      this.selection.clear();
-      this.selection.addAll(selectedItems);
+      _allItems.clear();
+      _allItems.addAll(unselectedItems);
+
+      _allSelectedItems.clear();
+      _allSelectedItems.addAll(selectedItems);
 
       redrawTables();
    }
@@ -1890,20 +1943,25 @@ public class MT_DualList extends Composite {
     *               </ul>
     */
    public void setItems(final MT_DLItem[] items) {
+
       checkWidget();
+
       if (items == null) {
          SWT.error(SWT.ERROR_NULL_ARGUMENT);
       }
 
       final List<MT_DLItem> temp = new ArrayList<>();
+
       for (final MT_DLItem item : items) {
          if (item == null) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
          }
          temp.add(item);
       }
-      this.items.clear();
-      this.items.addAll(temp);
+
+      _allItems.clear();
+      _allItems.addAll(temp);
+
       redrawTables();
    }
 
@@ -1916,9 +1974,9 @@ public class MT_DualList extends Composite {
     *           position of the second item to swap
     */
    private void swap(final int first, final int second) {
-      final MT_DLItem temp = selection.get(first);
-      selection.set(first, selection.get(second));
-      selection.set(second, temp);
+      final MT_DLItem temp = _allSelectedItems.get(first);
+      _allSelectedItems.set(first, _allSelectedItems.get(second));
+      _allSelectedItems.set(second, temp);
    }
 
 }

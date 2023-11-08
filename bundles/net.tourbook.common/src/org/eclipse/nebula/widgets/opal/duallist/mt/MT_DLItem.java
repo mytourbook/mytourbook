@@ -22,10 +22,15 @@ import org.eclipse.swt.graphics.Image;
  */
 public class MT_DLItem extends OpalItem {
 
-   private LAST_ACTION lastAction;
+   private LAST_ACTION _lastAction;
+
+   private String      _text2;
 
    public enum LAST_ACTION {
-      NONE, SELECTION, DESELECTION
+
+      NONE, //
+      SELECTION, //
+      DESELECTION
    }
 
    /**
@@ -35,6 +40,7 @@ public class MT_DLItem extends OpalItem {
     *           the text displayed in the DualList widget for this item
     */
    public MT_DLItem(final String text) {
+
       this(text, null);
    }
 
@@ -65,11 +71,14 @@ public class MT_DLItem extends OpalItem {
     *           for this item
     */
    public MT_DLItem(final String text, final Image image, final Color foregroundColor, final Color backgroundColor) {
+
       setText(text);
       setImage(image);
+
       setForeground(foregroundColor);
       setBackground(backgroundColor);
-      lastAction = LAST_ACTION.NONE;
+
+      _lastAction = LAST_ACTION.NONE;
    }
 
    /**
@@ -100,11 +109,14 @@ public class MT_DLItem extends OpalItem {
     *           for this item
     */
    public MT_DLItem(final String text, final Image image, final Font font, final Color foregroundColor) {
+
       setText(text);
       setImage(image);
+
       setFont(font);
       setForeground(foregroundColor);
-      lastAction = LAST_ACTION.NONE;
+
+      _lastAction = LAST_ACTION.NONE;
    }
 
    /**
@@ -119,7 +131,11 @@ public class MT_DLItem extends OpalItem {
     * @return the last action (NONE, SELECTION, DESELECTION)
     */
    public LAST_ACTION getLastAction() {
-      return lastAction;
+      return _lastAction;
+   }
+
+   public String getText2() {
+      return _text2;
    }
 
    /**
@@ -137,7 +153,9 @@ public class MT_DLItem extends OpalItem {
     * @return
     */
    public MT_DLItem setLastAction(final LAST_ACTION lastAction) {
-      this.lastAction = lastAction;
+
+      _lastAction = lastAction;
+
       return this;
    }
 
@@ -149,7 +167,14 @@ public class MT_DLItem extends OpalItem {
     * @return
     */
    public MT_DLItem setSelected(final boolean selection) {
-      this.lastAction = selection ? LAST_ACTION.SELECTION : LAST_ACTION.DESELECTION;
+
+      _lastAction = selection ? LAST_ACTION.SELECTION : LAST_ACTION.DESELECTION;
+
       return this;
+   }
+
+   public void setText2(final String text2) {
+
+      _text2 = text2;
    }
 }

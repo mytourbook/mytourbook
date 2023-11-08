@@ -102,7 +102,7 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .hint(600, 600)
+                  .hint(800, 400)
                   .applyTo(_addressItemList);
 
          }
@@ -142,9 +142,9 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
                // log only fields with value
                if (stringValue.length() > 0) {
 
-                  final MT_DLItem dlItem = new MT_DLItem("%s                          (%s)".formatted(
-                        fieldValue,
-                        field.getName()));
+                  final MT_DLItem dlItem = new MT_DLItem(stringValue);
+
+                  dlItem.setText2(field.getName());
 
                   allItems.add(dlItem);
                }
@@ -155,7 +155,7 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
          StatusUtil.log(e);
       }
 
-      _addressItemList.setItems(allItems.toArray(new MT_DLItem[allItems.size()]));
+      _addressItemList.setItems(allItems);
    }
 
    @Override
