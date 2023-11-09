@@ -15,6 +15,9 @@ package org.eclipse.nebula.widgets.opal.duallist.mt;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
+
 import org.eclipse.nebula.widgets.opal.commons.SWTGraphicUtil;
 import org.eclipse.nebula.widgets.opal.commons.SelectionListenerUtil;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem.LAST_ACTION;
@@ -29,6 +32,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -47,14 +51,18 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class MT_DualList extends Composite {
 
-   private static final String              DOUBLE_DOWN_IMAGE  = "double_down.png";  //$NON-NLS-1$
-   private static final String              DOUBLE_UP_IMAGE    = "double_up.png";    //$NON-NLS-1$
-   private static final String              DOUBLE_LEFT_IMAGE  = "double_left.png";  //$NON-NLS-1$
-   private static final String              DOUBLE_RIGHT_IMAGE = "double_right.png"; //$NON-NLS-1$
-   private static final String              ARROW_DOWN_IMAGE   = "arrow_down.png";   //$NON-NLS-1$
-   private static final String              ARROW_LEFT_IMAGE   = "arrow_left.png";   //$NON-NLS-1$
-   private static final String              ARROW_UP_IMAGE     = "arrow_up.png";     //$NON-NLS-1$
-   private static final String              ARROW_RIGHT_IMAGE  = "arrow_right.png";  //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+   private Image _imageMoveLeft     = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Left)     .createImage();
+   private Image _imageMoveLeft_2x  = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Left_2x)  .createImage();
+   private Image _imageMoveRight    = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Right)    .createImage();
+   private Image _imageMoveRight_2x = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Right_2x) .createImage();
+   private Image _imageMoveUp       = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Up)       .createImage();
+   private Image _imageMoveUp_2x    = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Up_2x)    .createImage();
+   private Image _imageMoveDown     = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Down)     .createImage();
+   private Image _imageMoveDown_2x  = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Down_2x)  .createImage();
+
+// SET_FORMATTING_ON
 
    private final List<MT_DLItem>            _allItems;
    private final List<MT_DLItem>            _allSelectedItems;
@@ -113,11 +121,14 @@ public class MT_DualList extends Composite {
       _allItems = new ArrayList<>();
       _allSelectedItems = new ArrayList<>();
 
-      setLayout(new GridLayout(4, false));
+      final GridLayout layout = new GridLayout(4, false);
+      layout.marginWidth = 0;
+      layout.marginHeight = 0;
+      setLayout(layout);
 
-      createItemsTable();
+      createTable_AllItems();
       createButtonSelectAll();
-      createSelectionTable();
+      createTable_SelectedItems();
 
       createButtonMoveFirst();
       createButtonSelect();
@@ -126,6 +137,23 @@ public class MT_DualList extends Composite {
       createButtonMoveDown();
       createButtonDeselectAll();
       createButtonMoveLast();
+
+      this.setTabList(new Control[] {
+
+            _tableAllItems,
+
+            buttonSelectAll,
+            buttonSelect,
+            buttonDeselect,
+            buttonDeselectAll,
+
+            _tableAllSelectedItems,
+
+            buttonMoveFirst,
+            buttonMoveUp,
+            buttonMoveDown,
+            buttonMoveLast
+      });
    }
 
    /**
@@ -302,7 +330,7 @@ public class MT_DualList extends Composite {
    /**
     * Create a button
     *
-    * @param fileName
+    * @param image
     *           file name of the icon
     * @param verticalExpand
     *           if <code>true</code>, the button will take all the
@@ -312,11 +340,10 @@ public class MT_DualList extends Composite {
     *
     * @return a new button
     */
-   private Button createButton(final String fileName, final boolean verticalExpand, final int alignment) {
+   private Button createButton(final Image image, final boolean verticalExpand, final int alignment) {
 
       final Button button = new Button(this, SWT.PUSH);
 
-      final Image image = SWTGraphicUtil.createImageFromFile("images/" + fileName); //$NON-NLS-1$
       button.setImage(image);
       button.setLayoutData(new GridData(GridData.CENTER, alignment, false, verticalExpand));
 
@@ -326,72 +353,58 @@ public class MT_DualList extends Composite {
    }
 
    private void createButtonDeselect() {
-      buttonDeselect = createButton(ARROW_LEFT_IMAGE, false, GridData.CENTER);
+      buttonDeselect = createButton(_imageMoveLeft, false, GridData.CENTER);
       buttonDeselect.addListener(SWT.Selection, e -> {
          deselectItem();
       });
    }
 
    private void createButtonDeselectAll() {
-      buttonDeselectAll = createButton(DOUBLE_LEFT_IMAGE, false, GridData.BEGINNING);
+      buttonDeselectAll = createButton(_imageMoveLeft_2x, false, GridData.BEGINNING);
       buttonDeselectAll.addListener(SWT.Selection, e -> {
          deselectAll();
       });
    }
 
    private void createButtonMoveDown() {
-      buttonMoveDown = createButton(ARROW_DOWN_IMAGE, false, GridData.CENTER);
+      buttonMoveDown = createButton(_imageMoveDown, false, GridData.CENTER);
       buttonMoveDown.addListener(SWT.Selection, e -> {
          moveDownItem();
       });
    }
 
    private void createButtonMoveFirst() {
-      buttonMoveFirst = createButton(DOUBLE_UP_IMAGE, true, GridData.END);
+      buttonMoveFirst = createButton(_imageMoveUp_2x, true, GridData.END);
       buttonMoveFirst.addListener(SWT.Selection, e -> {
          moveSelectionToFirstPosition();
       });
    }
 
    private void createButtonMoveLast() {
-      buttonMoveLast = createButton(DOUBLE_DOWN_IMAGE, true, GridData.BEGINNING);
+      buttonMoveLast = createButton(_imageMoveDown_2x, true, GridData.BEGINNING);
       buttonMoveLast.addListener(SWT.Selection, e -> {
          moveSelectionToLastPosition();
       });
    }
 
    private void createButtonMoveUp() {
-      buttonMoveUp = createButton(ARROW_UP_IMAGE, false, GridData.CENTER);
+      buttonMoveUp = createButton(_imageMoveUp, false, GridData.CENTER);
       buttonMoveUp.addListener(SWT.Selection, e -> {
          moveUpItem();
       });
    }
 
    private void createButtonSelect() {
-      buttonSelect = createButton(ARROW_RIGHT_IMAGE, false, GridData.CENTER);
+      buttonSelect = createButton(_imageMoveRight, false, GridData.CENTER);
       buttonSelect.addListener(SWT.Selection, e -> {
          selectItem();
       });
    }
 
    private void createButtonSelectAll() {
-      buttonSelectAll = createButton(DOUBLE_RIGHT_IMAGE, true, GridData.END);
+      buttonSelectAll = createButton(_imageMoveRight_2x, true, GridData.END);
       buttonSelectAll.addListener(SWT.Selection, e -> {
          selectAll();
-      });
-   }
-
-   private void createItemsTable() {
-      _tableAllItems = createTable();
-      _tableAllItems.addListener(SWT.MouseDoubleClick, event -> {
-         selectItem();
-      });
-   }
-
-   private void createSelectionTable() {
-      _tableAllSelectedItems = createTable();
-      _tableAllSelectedItems.addListener(SWT.MouseDoubleClick, event -> {
-         deselectItem();
       });
    }
 
@@ -402,7 +415,7 @@ public class MT_DualList extends Composite {
 
       final Table table = new Table(this, SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
       table.setLinesVisible(false);
-      table.setHeaderVisible(false);
+      table.setHeaderVisible(true);
       table.setData(-1);
 
       final GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true, 1, 4);
@@ -414,6 +427,20 @@ public class MT_DualList extends Composite {
       new TableColumn(table, SWT.LEFT); // text2
 
       return table;
+   }
+
+   private void createTable_AllItems() {
+      _tableAllItems = createTable();
+      _tableAllItems.addListener(SWT.MouseDoubleClick, event -> {
+         selectItem();
+      });
+   }
+
+   private void createTable_SelectedItems() {
+      _tableAllSelectedItems = createTable();
+      _tableAllSelectedItems.addListener(SWT.MouseDoubleClick, event -> {
+         deselectItem();
+      });
    }
 
    /**
@@ -1438,14 +1465,16 @@ public class MT_DualList extends Composite {
       SelectionListenerUtil.removeSelectionListener(this, listener);
    }
 
-   private void resetButton(final Button button, final String fileName) {
-      final Image image = SWTGraphicUtil.createImageFromFile("images/" + fileName); //$NON-NLS-1$
+   private void resetButton(final Button button, final Image image) {
+
       button.setImage(image);
-      SWTGraphicUtil.addDisposer(button, image);
       button.setVisible(true);
+
+      SWTGraphicUtil.addDisposer(button, image);
    }
 
    private void resetConfigurationToDefault() {
+
       _tableAllItems.setBackground(null);
       _tableAllItems.setForeground(null);
       _tableAllSelectedItems.setBackground(null);
@@ -1454,14 +1483,18 @@ public class MT_DualList extends Composite {
       recreateTableColumns(_tableAllItems, SWT.LEFT);
       recreateTableColumns(_tableAllSelectedItems, SWT.LEFT);
 
-      resetButton(buttonMoveLast, DOUBLE_DOWN_IMAGE);
-      resetButton(buttonMoveFirst, DOUBLE_UP_IMAGE);
-      resetButton(buttonDeselectAll, DOUBLE_LEFT_IMAGE);
-      resetButton(buttonSelectAll, DOUBLE_RIGHT_IMAGE);
-      resetButton(buttonMoveDown, ARROW_DOWN_IMAGE);
-      resetButton(buttonMoveUp, ARROW_UP_IMAGE);
-      resetButton(buttonDeselect, ARROW_LEFT_IMAGE);
-      resetButton(buttonSelect, ARROW_RIGHT_IMAGE);
+// SET_FORMATTING_OFF
+
+      resetButton(buttonMoveDown,      _imageMoveDown);
+      resetButton(buttonMoveUp,        _imageMoveUp);
+      resetButton(buttonDeselect,      _imageMoveLeft);
+      resetButton(buttonSelect,        _imageMoveRight);
+      resetButton(buttonMoveLast,      _imageMoveDown_2x);
+      resetButton(buttonMoveFirst,     _imageMoveUp_2x);
+      resetButton(buttonDeselectAll,   _imageMoveLeft_2x);
+      resetButton(buttonSelectAll,     _imageMoveRight_2x);
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -1804,12 +1837,12 @@ public class MT_DualList extends Composite {
       } else {
 
          _tableAllItems.getColumn(0).setWidth(0);
-         _tableAllItems.getColumn(1).setWidth(itemsTableSize / 2);
-         _tableAllItems.getColumn(2).setWidth(itemsTableSize / 2);
+         _tableAllItems.getColumn(1).setWidth((int) (itemsTableSize * 0.8));
+         _tableAllItems.getColumn(2).setWidth((int) (itemsTableSize * 0.2));
 
          _tableAllSelectedItems.getColumn(0).setWidth(0);
-         _tableAllSelectedItems.getColumn(1).setWidth(selectionTableSize / 2);
-         _tableAllSelectedItems.getColumn(2).setWidth(selectionTableSize / 2);
+         _tableAllSelectedItems.getColumn(1).setWidth((int) (selectionTableSize * 0.8));
+         _tableAllSelectedItems.getColumn(2).setWidth((int) (selectionTableSize * 0.2));
       }
 
    }

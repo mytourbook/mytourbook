@@ -28,6 +28,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionDownload;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -47,6 +49,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -58,14 +61,24 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
-   private static final IDialogSettings         _state                         = TourbookPlugin.getState(DialogQuickEdit.class.getName());
-   private static final IDialogSettings         _state_TourDataEditorView      = TourbookPlugin.getState(TourDataEditorView.ID);
+// SET_FORMATTING_OFF
+
+   private static final IDialogSettings         _state                        = TourbookPlugin.getState("net.tourbook.tour.DialogQuickEdit");                 //$NON-NLS-1$
+
+   // start/end needs separate states otherwise the slideout states (window position/location) cannot be differentiated
+   private static final IDialogSettings         _state_StartLocation          = TourbookPlugin.getState("net.tourbook.tour.DialogQuickEdit.StartLocation");   //$NON-NLS-1$
+   private static final IDialogSettings         _state_EndLocation            = TourbookPlugin.getState("net.tourbook.tour.DialogQuickEdit.EndLocation");     //$NON-NLS-1$
+
+   private static final IDialogSettings         _state_TourDataEditorView     = TourbookPlugin.getState(TourDataEditorView.ID);
+
+// SET_FORMATTING_ON
 
    private final TourData                       _tourData;
    private PixelConverter                       _pc;
@@ -158,12 +171,26 @@ public class DialogQuickEdit extends TitleAreaDialog {
       }
    }
 
-   private class ActionSlideout_LocationOptions_End extends ActionToolbarSlideout {
+   private class ActionSlideout_LocationOptions_End extends ActionToolbarSlideoutAdv {
+
+      private SlideoutLocationOptions __slideoutLocaationOptions;
+
+      public ActionSlideout_LocationOptions_End() {
+
+         super();
+      }
 
       @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         return new SlideoutLocationOptions(_parent, toolbar, DialogQuickEdit.this, false, _tourData);
+         __slideoutLocaationOptions = new SlideoutLocationOptions(
+               toolItem,
+               _state_EndLocation,
+               DialogQuickEdit.this,
+               false,
+               _tourData);
+
+         return __slideoutLocaationOptions;
       }
 
       @Override
@@ -172,12 +199,26 @@ public class DialogQuickEdit extends TitleAreaDialog {
       }
    }
 
-   private class ActionSlideout_LocationOptions_Start extends ActionToolbarSlideout {
+   private class ActionSlideout_LocationOptions_Start extends ActionToolbarSlideoutAdv {
+
+      private SlideoutLocationOptions __slideoutLocationOptions;
+
+      public ActionSlideout_LocationOptions_Start() {
+
+         super();
+      }
 
       @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         return new SlideoutLocationOptions(_parent, toolbar, DialogQuickEdit.this, true, _tourData);
+         __slideoutLocationOptions = new SlideoutLocationOptions(
+               toolItem,
+               _state_StartLocation,
+               DialogQuickEdit.this,
+               true,
+               _tourData);
+
+         return __slideoutLocationOptions;
       }
 
       @Override

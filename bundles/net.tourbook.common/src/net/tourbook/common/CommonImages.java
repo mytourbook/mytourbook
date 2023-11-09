@@ -35,6 +35,14 @@ public class CommonImages {
    public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
    public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
    public static final String App_KeepOpen                 = "app-keep-open.png";                         //$NON-NLS-1$
+   public static final String App_Move_Left                = "app-move-left.png";                         //$NON-NLS-1$
+   public static final String App_Move_Left_2x             = "app-move-left-2x.png";                      //$NON-NLS-1$
+   public static final String App_Move_Right               = "app-move-right.png";                        //$NON-NLS-1$
+   public static final String App_Move_Right_2x            = "app-move-right-2x.png";                     //$NON-NLS-1$
+   public static final String App_Move_Up                  = "app-move-up.png";                           //$NON-NLS-1$
+   public static final String App_Move_Up_2x               = "app-move-up-2x.png";                        //$NON-NLS-1$
+   public static final String App_Move_Down                = "app-move-down.png";                         //$NON-NLS-1$
+   public static final String App_Move_Down_2x             = "app-move-down-2x.png";                      //$NON-NLS-1$
    public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
    public static final String App_Options_Disabled         = "options-disabled.png";                      //$NON-NLS-1$
    public static final String App_Pin                      = "app-pin.png";                               //$NON-NLS-1$

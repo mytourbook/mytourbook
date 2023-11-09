@@ -19,96 +19,121 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.IActionResetToDefault;
-import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.Messages;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DualList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Slideout for the tour data editor options.
+ * Slideout for the easy import device state
  */
-public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutLocationOptions extends AdvancedSlideout {
 
-   private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
+   private ToolItem        _toolItem;
 
-   private TourData                     _tourData;
-   private boolean                      _isStartLocation;
+   private PixelConverter  _pc;
 
-   private DialogQuickEdit              _dialogQuickEdit;
+   private TourData        _tourData;
+   private boolean         _isStartLocation;
+
+   private DialogQuickEdit _dialogQuickEdit;
 
    /*
     * UI controls
     */
-   private Composite _shellContainer;
 
-   private MT_DualList _addressItemList;
+   private MT_DualList _placeItemList;
 
-   public SlideoutLocationOptions(final Control ownerControl,
-                                  final ToolBar toolBar,
+   private Text        _txtCombinedLocation;
+
+   public SlideoutLocationOptions(final ToolItem toolItem,
+                                  final IDialogSettings state,
                                   final DialogQuickEdit dialogQuickEdit,
                                   final boolean isStartLocation,
                                   final TourData tourData) {
 
-      super(ownerControl, toolBar);
+      super(toolItem.getParent(), state, new int[] { 800, 800 });
+
+      _toolItem = toolItem;
 
       _dialogQuickEdit = dialogQuickEdit;
       _isStartLocation = isStartLocation;
       _tourData = tourData;
+
+      // prevent that the opened slideout is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
+
+      final String title = isStartLocation
+            ? Messages.Slideout_LocationOptions_Label_StartLocation_Title
+            : Messages.Slideout_LocationOptions_Label_EndLocation_Title;
+
+      setTitleText(title);
    }
 
    @Override
-   public void colorDialogOpened(final boolean isDialogOpened) {
+   protected void createSlideoutContent(final Composite parent) {
 
-      setIsAnotherDialogOpened(isDialogOpened);
-   }
+      initUI(parent);
 
-   @Override
-   protected Composite createToolTipContentArea(final Composite parent) {
-
-      final Composite ui = createUI(parent);
+      createUI(parent);
 
       restoreState();
 
       fillUI();
-
-      return ui;
    }
 
-   private Composite createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-      _shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_RED);
       {
-         final Composite container = new Composite(_shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
+            // Joined location parts
 
-            _addressItemList = new MT_DualList(container, SWT.NONE);
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_LocationOptions_Label_JoinedLocationParts);
 
+            _txtCombinedLocation = new Text(container, SWT.READ_ONLY);
             GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
-                  .hint(800, 400)
-                  .applyTo(_addressItemList);
+                  .applyTo(_txtCombinedLocation);
+         }
+         {
+            // dual list with address parts
 
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_LocationOptions_Label_LocationParts);
+
+            _placeItemList = new MT_DualList(container, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .applyTo(_placeItemList);
+//            _placeItemList.setBackground(UI.SYS_COLOR_CYAN);
          }
       }
+   }
 
-      return _shellContainer;
+   private void enableActions() {
+
    }
 
    private void fillUI() {
@@ -155,16 +180,47 @@ public class SlideoutLocationOptions extends ToolbarSlideout implements IColorSe
          StatusUtil.log(e);
       }
 
-      _addressItemList.setItems(allItems);
+      _placeItemList.setItems(allItems);
    }
 
    @Override
-   public void resetToDefaults() {
+   protected Rectangle getParentBounds() {
+
+      final Rectangle itemBounds = _toolItem.getBounds();
+      final Point itemDisplayPosition = _toolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
+
+      return itemBounds;
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+   }
+
+   @Override
+   protected void onDispose() {
+
+      super.onDispose();
+   }
+
+   @Override
+   protected void onFocus() {
 
    }
 
    private void restoreState() {
 
+      enableActions();
+   }
+
+   @Override
+   protected void saveState() {
+
+      // save slideout position/size
+      super.saveState();
    }
 
 }
