@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.nebula.widgets.opal.duallist.mt;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.nebula.widgets.opal.commons.OpalItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -22,9 +24,11 @@ import org.eclipse.swt.graphics.Image;
  */
 public class MT_DLItem extends OpalItem {
 
-   private LAST_ACTION _lastAction;
+   private static final char NL = UI.NEW_LINE;
 
-   private String      _text2;
+   private LAST_ACTION       _lastAction;
+
+   private String            _text2;
 
    public enum LAST_ACTION {
 
@@ -124,7 +128,7 @@ public class MT_DLItem extends OpalItem {
     */
    @Override
    public int getHeight() {
-      throw new UnsupportedOperationException("DLItem does not support this method");
+      throw new UnsupportedOperationException("MT_DLItem does not support this method"); //$NON-NLS-1$
    }
 
    /**
@@ -143,7 +147,7 @@ public class MT_DLItem extends OpalItem {
     */
    @Override
    public void setHeight(final int height) {
-      throw new UnsupportedOperationException("DLItem does not support this method");
+      throw new UnsupportedOperationException("MT_DLItem does not support this method"); //$NON-NLS-1$
    }
 
    /**
@@ -176,5 +180,18 @@ public class MT_DLItem extends OpalItem {
    public void setText2(final String text2) {
 
       _text2 = text2;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "MT_DLItem" + NL //                     //$NON-NLS-1$
+
+            + " text  = " + getText() + NL //          //$NON-NLS-1$
+            + " text2 = " + _text2 + NL //             //$NON-NLS-1$
+
+            + NL;
    }
 }

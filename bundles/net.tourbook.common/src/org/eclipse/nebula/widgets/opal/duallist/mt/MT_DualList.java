@@ -369,7 +369,7 @@ public class MT_DualList extends Composite {
    private void createButtonMoveDown() {
       buttonMoveDown = createButton(_imageMoveDown, false, GridData.CENTER);
       buttonMoveDown.addListener(SWT.Selection, e -> {
-         moveDownItem();
+         moveSelectionDown();
       });
    }
 
@@ -390,7 +390,7 @@ public class MT_DualList extends Composite {
    private void createButtonMoveUp() {
       buttonMoveUp = createButton(_imageMoveUp, false, GridData.CENTER);
       buttonMoveUp.addListener(SWT.Selection, e -> {
-         moveUpItem();
+         moveSelectionUp();
       });
    }
 
@@ -1124,7 +1124,7 @@ public class MT_DualList extends Composite {
    /**
     * Move the selected item down
     */
-   protected void moveDownItem() {
+   protected void moveSelectionDown() {
       if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
@@ -1147,6 +1147,8 @@ public class MT_DualList extends Composite {
       redrawTables();
       _tableAllSelectedItems.select(newSelection);
       _tableAllSelectedItems.forceFocus();
+
+      fireSelectionChangeEvent(getSelectionAsList());
    }
 
    /**
@@ -1167,6 +1169,8 @@ public class MT_DualList extends Composite {
       redrawTables();
       _tableAllSelectedItems.select(0, index - 1);
       _tableAllSelectedItems.forceFocus();
+
+      fireSelectionChangeEvent(getSelectionAsList());
    }
 
    /**
@@ -1188,12 +1192,14 @@ public class MT_DualList extends Composite {
       final int numberOfElements = _tableAllSelectedItems.getItemCount();
       _tableAllSelectedItems.select(numberOfElements - numberOfSelectedElements, numberOfElements - 1);
       _tableAllSelectedItems.forceFocus();
+
+      fireSelectionChangeEvent(getSelectionAsList());
    }
 
    /**
     * Move the selected item up
     */
-   protected void moveUpItem() {
+   protected void moveSelectionUp() {
       if (_tableAllSelectedItems.getSelectionCount() == 0) {
          return;
       }
@@ -1216,6 +1222,8 @@ public class MT_DualList extends Composite {
       redrawTables();
       _tableAllSelectedItems.select(newSelection);
       _tableAllSelectedItems.forceFocus();
+
+      fireSelectionChangeEvent(getSelectionAsList());
    }
 
    private void recreateTableColumns(final Table table, final int textAlignment) {
@@ -1836,13 +1844,16 @@ public class MT_DualList extends Composite {
 
       } else {
 
+         final double textWidth = 0.7;
+         final double partWidth = 1 - textWidth;
+
          _tableAllItems.getColumn(0).setWidth(0);
-         _tableAllItems.getColumn(1).setWidth((int) (itemsTableSize * 0.8));
-         _tableAllItems.getColumn(2).setWidth((int) (itemsTableSize * 0.2));
+         _tableAllItems.getColumn(1).setWidth((int) (itemsTableSize * textWidth));
+         _tableAllItems.getColumn(2).setWidth((int) (itemsTableSize * partWidth));
 
          _tableAllSelectedItems.getColumn(0).setWidth(0);
-         _tableAllSelectedItems.getColumn(1).setWidth((int) (selectionTableSize * 0.8));
-         _tableAllSelectedItems.getColumn(2).setWidth((int) (selectionTableSize * 0.2));
+         _tableAllSelectedItems.getColumn(1).setWidth((int) (selectionTableSize * textWidth));
+         _tableAllSelectedItems.getColumn(2).setWidth((int) (selectionTableSize * partWidth));
       }
 
    }

@@ -13,16 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.tour.location;
 
 public class TourLocationData {
 
-   String      downloadedData;
+   String             downloadedData;
 
-   OSMLocation osmLocation;
+   public OSMLocation osmLocation;
 
-   long        downloadTime;
-   long        waitingTime;
+   long               downloadTime;
+   long               waitingTime;
 
    public TourLocationData(final String downloadedData, final long retrievalTime, final long waitingTime) {
 

@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.tour.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +38,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -489,7 +491,7 @@ public class TourLocationManager {
 
          StatusUtil.logError(
 
-               DialogQuickEdit.class.getSimpleName() + ".deserializeLocationData : " //$NON-NLS-1$
+               TourLocationManager.class.getSimpleName() + ".deserializeLocationData : " //$NON-NLS-1$
                      + "Error while deserializing the location JSON object : " //$NON-NLS-1$
                      + osmLocationString + UI.NEW_LINE + e.getMessage());
       }

@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.tour.location;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -22,7 +22,9 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.DialogQuickEdit;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -56,9 +58,10 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
     * UI controls
     */
 
-   private MT_DualList _placeItemList;
+   private MT_DualList _listLocationParts;
 
-   private Text        _txtCombinedLocation;
+   private Text        _txtDefaultName;
+   private Text        _txtSelectedLocationNames;
 
    public SlideoutLocationOptions(final ToolItem toolItem,
                                   final IDialogSettings state,
@@ -77,79 +80,16 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
 
-      final String title = isStartLocation
+      final String title = _isStartLocation
             ? Messages.Slideout_LocationOptions_Label_StartLocation_Title
             : Messages.Slideout_LocationOptions_Label_EndLocation_Title;
 
       setTitleText(title);
    }
 
-   @Override
-   protected void createSlideoutContent(final Composite parent) {
-
-      initUI(parent);
-
-      createUI(parent);
-
-      restoreState();
-
-      fillUI();
-   }
-
-   private void createUI(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_RED);
-      {
-         {
-            // Joined location parts
-
-            final Label label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(label);
-            label.setText(Messages.Slideout_LocationOptions_Label_JoinedLocationParts);
-
-            _txtCombinedLocation = new Text(container, SWT.READ_ONLY);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .grab(true, false)
-                  .applyTo(_txtCombinedLocation);
-         }
-         {
-            // dual list with address parts
-
-            final Label label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(label);
-            label.setText(Messages.Slideout_LocationOptions_Label_LocationParts);
-
-            _placeItemList = new MT_DualList(container, SWT.NONE);
-            GridDataFactory.fillDefaults()
-                  .grab(true, true)
-                  .applyTo(_placeItemList);
-//            _placeItemList.setBackground(UI.SYS_COLOR_CYAN);
-         }
-      }
-   }
-
-   private void enableActions() {
-
-   }
-
-   private void fillUI() {
-      // TODO Auto-generated method stub
-
-      final List<MT_DLItem> allItems = new ArrayList<>();
-
-      final TourLocationData locationData = _isStartLocation
-            ? _tourData.osmLocation_Start
-            : _tourData.osmLocation_End;
-
-      final OSMLocation osmLocation = locationData.osmLocation;
+   private void addAllAddressParts(final OSMAddress address, final List<MT_DLItem> allItems) {
 
       try {
-
-         final OSMAddress address = osmLocation.address;
 
          final Field[] allAddressFields = address.getClass().getFields();
 
@@ -179,8 +119,80 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       } catch (IllegalArgumentException | IllegalAccessException e) {
          StatusUtil.log(e);
       }
+   }
 
-      _placeItemList.setItems(allItems);
+   @Override
+   protected void createSlideoutContent(final Composite parent) {
+
+      initUI(parent);
+
+      createUI(parent);
+
+      restoreState();
+
+      updateUI_Initial();
+   }
+
+   private void createUI(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_RED);
+      {
+         {
+            // default location name
+
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_LocationOptions_Label_DefaultLocationName);
+
+            _txtDefaultName = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .grab(true, false)
+                  .applyTo(_txtDefaultName);
+         }
+         {
+            // selected location parts
+
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_LocationOptions_Label_SelectedLocationParts);
+
+            _txtSelectedLocationNames = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .grab(true, false)
+                  .applyTo(_txtSelectedLocationNames);
+         }
+         {
+            // dual list with location parts
+
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Slideout_LocationOptions_Label_LocationParts);
+
+            _listLocationParts = new MT_DualList(container, SWT.NONE);
+            _listLocationParts.addSelectionChangeListener(selectionChangeListener -> onChangeLocationPart());
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .applyTo(_listLocationParts);
+         }
+      }
+   }
+
+   private void enableActions() {
+
+   }
+
+   private OSMLocation getOsmLocation() {
+
+      final TourLocationData locationData = _isStartLocation
+            ? _tourData.osmLocation_Start
+            : _tourData.osmLocation_End;
+
+      return locationData.osmLocation;
    }
 
    @Override
@@ -198,6 +210,15 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+   }
+
+   private void onChangeLocationPart() {
+
+      final List<MT_DLItem> allSelectedParts = _listLocationParts.getSelectionAsList();
+
+      final String locationDisplayName = TourLocationManager.createLocationDisplayName(getOsmLocation());
+
+      _txtSelectedLocationNames.setText(locationDisplayName);
    }
 
    @Override
@@ -221,6 +242,33 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
       // save slideout position/size
       super.saveState();
+   }
+
+   private void updateUI_Initial() {
+
+      final OSMLocation osmLocation = getOsmLocation();
+
+      // show "display_name" as default name
+      _txtDefaultName.setText(osmLocation.display_name);
+
+      /*
+       * Fill address part widget
+       */
+      final List<MT_DLItem> allItems = new ArrayList<>();
+
+      // add "name"
+      final String locationName = osmLocation.name;
+      if (StringUtils.hasContent(locationName)) {
+
+         final MT_DLItem locationNameItem = new MT_DLItem(locationName);
+         locationNameItem.setText2("name");
+
+         allItems.add(locationNameItem);
+      }
+
+      addAllAddressParts(osmLocation.address, allItems);
+
+      _listLocationParts.setItems(allItems);
    }
 
 }

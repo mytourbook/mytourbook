@@ -22,8 +22,8 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourLocationManager;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;

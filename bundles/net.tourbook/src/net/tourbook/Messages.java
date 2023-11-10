@@ -2090,9 +2090,10 @@ public class Messages extends NLS {
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
+   public static String        Slideout_LocationOptions_Label_DefaultLocationName;
    public static String        Slideout_LocationOptions_Label_EndLocation_Title;
-   public static String        Slideout_LocationOptions_Label_JoinedLocationParts;
    public static String        Slideout_LocationOptions_Label_LocationParts;
+   public static String        Slideout_LocationOptions_Label_SelectedLocationParts;
    public static String        Slideout_LocationOptions_Label_StartLocation_Title;
 
    public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance;
