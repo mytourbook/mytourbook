@@ -41,18 +41,22 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Slideout for the easy import device state
+ * Slideout for the start/end location
  */
 public class SlideoutLocationOptions extends AdvancedSlideout {
 
-   private ToolItem        _toolItem;
+   private static final String OSM_FIELD_NAME = "name";         //$NON-NLS-1$
 
-   private PixelConverter  _pc;
+   private static final String LOCATION_KEY   = "LOCATION_KEY"; //$NON-NLS-1$
 
-   private TourData        _tourData;
-   private boolean         _isStartLocation;
+   private ToolItem            _toolItem;
 
-   private DialogQuickEdit _dialogQuickEdit;
+   private PixelConverter      _pc;
+
+   private TourData            _tourData;
+   private boolean             _isStartLocation;
+
+   private DialogQuickEdit     _dialogQuickEdit;
 
    /*
     * UI controls
@@ -95,8 +99,10 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
          for (final Field field : allAddressFields) {
 
-            // skip names which are not needed
-            if ("ISO3166_2_lvl4".equals(field.getName())) { //$NON-NLS-1$
+            final String fieldName = field.getName();
+
+            // skip field names which are not needed
+            if ("ISO3166_2_lvl4".equals(fieldName)) { //$NON-NLS-1$
                continue;
             }
 
@@ -107,9 +113,11 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
                // log only fields with value
                if (stringValue.length() > 0) {
 
-                  final MT_DLItem dlItem = new MT_DLItem(stringValue);
-
-                  dlItem.setText2(field.getName());
+                  final MT_DLItem dlItem = new MT_DLItem(
+                        stringValue,
+                        fieldName,
+                        LOCATION_KEY,
+                        LocationPart.valueOf(fieldName));
 
                   allItems.add(dlItem);
                }
@@ -117,7 +125,24 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
          }
 
       } catch (IllegalArgumentException | IllegalAccessException e) {
-         StatusUtil.log(e);
+         StatusUtil.showStatus(e);
+      }
+   }
+
+   private void addCustomPart(final LocationPart locationPart,
+                              final String partValue,
+                              final List<MT_DLItem> allParts) {
+
+      if (partValue != null) {
+
+         final String partName = "* " + locationPart.name();
+
+         allParts.add(new MT_DLItem(
+
+               partValue,
+               partName,
+               LOCATION_KEY,
+               locationPart));
       }
    }
 
@@ -186,13 +211,16 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
    }
 
+   private String getFormattedPartName(final LocationPart locationPart) {
+
+      return "* " + locationPart.name();
+   }
+
    private OSMLocation getOsmLocation() {
 
-      final TourLocationData locationData = _isStartLocation
-            ? _tourData.osmLocation_Start
-            : _tourData.osmLocation_End;
-
-      return locationData.osmLocation;
+      return _isStartLocation
+            ? _tourData.osmLocation_Start.osmLocation
+            : _tourData.osmLocation_End.osmLocation;
    }
 
    @Override
@@ -214,9 +242,10 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
    private void onChangeLocationPart() {
 
-      final List<MT_DLItem> allSelectedParts = _listLocationParts.getSelectionAsList();
+      // get selected part IDs
+      final List<MT_DLItem> allSelectedItems = _listLocationParts.getSelectionAsList();
 
-      final String locationDisplayName = TourLocationManager.createLocationDisplayName(getOsmLocation());
+      final String locationDisplayName = TourLocationManager.createLocationDisplayName(allSelectedItems);
 
       _txtSelectedLocationNames.setText(locationDisplayName);
    }
@@ -247,6 +276,7 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
    private void updateUI_Initial() {
 
       final OSMLocation osmLocation = getOsmLocation();
+      final OSMAddress address = osmLocation.address;
 
       // show "display_name" as default name
       _txtDefaultName.setText(osmLocation.display_name);
@@ -254,21 +284,52 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       /*
        * Fill address part widget
        */
-      final List<MT_DLItem> allItems = new ArrayList<>();
+      final List<MT_DLItem> allParts = new ArrayList<>();
 
-      // add "name"
+// SET_FORMATTING_OFF
+
+      // add customized parts
+      final String smallestCity           = TourLocationManager.getCustom_City_Smallest(address);
+      final String smallestCityWithZip    = TourLocationManager.getCustom_CityWithZip_Smallest(address);
+      final String largestCity            = TourLocationManager.getCustom_City_Largest(address);
+      final String largestCityWithZip     = TourLocationManager.getCustom_CityWithZip_Largest(address);
+      final String streetWithHouseNumber  = TourLocationManager.getCustom_Street(address);
+
+// SET_FORMATTING_ON
+
+      boolean isShowSmallestCity = false;
+      if (largestCity != null && largestCity.equals(smallestCity) == false) {
+         isShowSmallestCity = true;
+      }
+
+      addCustomPart(LocationPart.CUSTOM_CITY_LARGEST, largestCity, allParts);
+      if (isShowSmallestCity) {
+         addCustomPart(LocationPart.CUSTOM_CITY_SMALLEST, smallestCity, allParts);
+      }
+
+      addCustomPart(LocationPart.CUSTOM_CITY_WITH_ZIP_LARGEST, largestCityWithZip, allParts);
+      if (isShowSmallestCity) {
+         addCustomPart(LocationPart.CUSTOM_CITY_WITH_ZIP_SMALLEST, smallestCityWithZip, allParts);
+      }
+
+      addCustomPart(LocationPart.CUSTOM_STREET_WITH_HOUSE_NUMBER, streetWithHouseNumber, allParts);
+
+      // add "name" when available
       final String locationName = osmLocation.name;
       if (StringUtils.hasContent(locationName)) {
 
-         final MT_DLItem locationNameItem = new MT_DLItem(locationName);
-         locationNameItem.setText2("name");
+         allParts.add(new MT_DLItem(
 
-         allItems.add(locationNameItem);
+               locationName,
+               getFormattedPartName(LocationPart.OSM_NAME),
+               LOCATION_KEY,
+               LocationPart.OSM_NAME));
       }
 
-      addAllAddressParts(osmLocation.address, allItems);
+      // add address parts
+      addAllAddressParts(address, allParts);
 
-      _listLocationParts.setItems(allItems);
+      _listLocationParts.setItems(allParts);
    }
 
 }

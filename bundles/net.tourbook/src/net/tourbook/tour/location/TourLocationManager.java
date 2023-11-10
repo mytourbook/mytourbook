@@ -45,6 +45,7 @@ import net.tourbook.web.WEB;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 
@@ -110,7 +111,7 @@ public class TourLocationManager {
     *
     * @param text
     */
-   private static void appendText(final String text) {
+   private static void appendPart(final String text) {
 
       // prevent to show duplicated fields, this can happen when the "name" field contains also e.g. the road name
       if (_usedDisplayNames.contains(text)) {
@@ -124,6 +125,19 @@ public class TourLocationManager {
       _displayNameBuffer.append(text);
 
       _usedDisplayNames.add(text);
+   }
+
+   public static String createLocationDisplayName(final List<MT_DLItem> allSelectedItems) {
+
+      // reset buffers
+      _displayNameBuffer.setLength(0);
+      _usedDisplayNames.clear();
+
+      for (final MT_DLItem dlItem : allSelectedItems) {
+         appendPart(dlItem.getText());
+      }
+
+      return _displayNameBuffer.toString();
    }
 
    /**
@@ -151,7 +165,61 @@ public class TourLocationManager {
        * https://wiki.openstreetmap.org/wiki/Key:place
        */
 
-// SET_FORMATTING_OFF
+      // reset buffers
+      _displayNameBuffer.setLength(0);
+      _usedDisplayNames.clear();
+
+      // OSM name
+      final String osmName = osmLocation.name;
+
+      if (osmName != null && osmName.length() > 0) {
+         appendPart(osmName);
+      }
+
+      // city
+      final String formattedCity = getCustom_City_Largest(address);
+      if (formattedCity != null) {
+         appendPart(formattedCity);
+      }
+
+      // POIs
+      final String adrAmenity = address.amenity;
+      final String adrTourism = address.tourism;
+
+      if (adrAmenity != null) {
+         appendPart(adrAmenity);
+      }
+
+      if (adrTourism != null) {
+         appendPart(adrTourism);
+      }
+
+      // street
+      final String formattedStreet = getCustom_Street(address);
+      if (formattedStreet != null) {
+         appendPart(formattedStreet);
+      }
+
+      // state, country
+      final String adrState = address.state;
+      final String adrCountry = address.country;
+
+      if (adrState != null) {
+         appendPart(adrState);
+      }
+
+      if (adrCountry != null) {
+         appendPart(adrCountry);
+      }
+
+      return _displayNameBuffer.toString();
+
+//    return osmLocation.display_name;
+   }
+
+   static String getCustom_City_Largest(final OSMAddress address) {
+
+      // SET_FORMATTING_OFF
 
       final String adrCity                = address.city;
       final String adrTown                = address.town;
@@ -169,56 +237,117 @@ public class TourLocationManager {
 
 // SET_FORMATTING_ON
 
-      // reset buffer
-      _displayNameBuffer.setLength(0);
-      _usedDisplayNames.clear();
+      return city;
+   }
 
-      // OSM name
-      final String osmName = osmLocation.name;
+   static String getCustom_City_Smallest(final OSMAddress address) {
 
-      if (osmName != null && osmName.length() > 0) {
-         appendText(osmName);
+      // SET_FORMATTING_OFF
+
+      final String adrCity                = address.city;
+      final String adrTown                = address.town;
+      final String adrVillage             = address.village;
+      final String adrHamlet              = address.hamlet;
+      final String adrIsolated_dwelling   = address.isolated_dwelling;
+
+      String city = null;
+
+      if (adrIsolated_dwelling != null) { city = adrIsolated_dwelling;  }
+      else if (adrHamlet != null) {       city = adrHamlet;             }
+      else if (adrVillage != null) {      city = adrVillage;            }
+      else if (adrTown != null) {         city = adrTown;               }
+      else if (adrCity != null) {         city = adrCity;               }
+
+// SET_FORMATTING_ON
+
+      return city;
+   }
+
+   static String getCustom_CityWithZip_Largest(final OSMAddress address) {
+
+      final String city = getCustom_City_Largest(address);
+      final String adrPostCode = address.postcode;
+
+      if (city == null || adrPostCode == null) {
+         return null;
       }
 
-      // city
-      final String formattedCity = getFormatted_City(address, city);
-      if (formattedCity != null) {
-         appendText(formattedCity);
+      final String adrCountryCode = address.country_code;
+
+      if ("us".equals(adrCountryCode)) {
+
+         // city + zip code
+
+         return city + UI.SPACE + adrPostCode;
+
+      } else {
+
+         // zip code + city
+
+         return adrPostCode + UI.SPACE + city;
+      }
+   }
+
+   static String getCustom_CityWithZip_Smallest(final OSMAddress address) {
+
+      final String city = getCustom_City_Smallest(address);
+      final String adrPostCode = address.postcode;
+
+      if (city == null || adrPostCode == null) {
+         return null;
       }
 
-      // POIs
-      final String adrAmenity = address.amenity;
-      final String adrTourism = address.tourism;
+      final String adrCountryCode = address.country_code;
 
-      if (adrAmenity != null) {
-         appendText(adrAmenity);
+      if ("us".equals(adrCountryCode)) {
+
+         // city + zip code
+
+         return city + UI.SPACE + adrPostCode;
+
+      } else {
+
+         // zip code + city
+
+         return adrPostCode + UI.SPACE + city;
+      }
+   }
+
+   static String getCustom_Street(final OSMAddress address) {
+
+      final String adrRoad = address.road;
+      final String adrHouseNumber = address.house_number;
+
+      if (address.road == null || adrHouseNumber == null) {
+         return null;
       }
 
-      if (adrTourism != null) {
-         appendText(adrTourism);
+      final String countryCode = address.country_code;
+
+      String formattedStreet = UI.EMPTY_STRING;
+
+      if ("us".equals(countryCode)) {
+
+         if (adrHouseNumber != null) {
+            formattedStreet += adrHouseNumber + UI.SPACE;
+         }
+
+         formattedStreet += adrRoad;
+
+      } else {
+
+         formattedStreet += adrRoad;
+
+         if (adrHouseNumber != null) {
+            formattedStreet += UI.SPACE + adrHouseNumber;
+         }
       }
 
-      // street
-      final String formattedStreet = getFormatted_Street(address);
-      if (formattedStreet != null) {
-         appendText(formattedStreet);
+      if (formattedStreet.length() == 0) {
+         return null;
       }
 
-      // state, country
-      final String adrState = address.state;
-      final String adrCountry = address.country;
-
-      if (adrState != null) {
-         appendText(adrState);
-      }
-
-      if (adrCountry != null) {
-         appendText(adrCountry);
-      }
-
-      return _displayNameBuffer.toString();
-
-//    return osmLocation.display_name;
+      return formattedStreet;
    }
 
    /**
@@ -229,7 +358,7 @@ public class TourLocationManager {
     *
     * @return
     */
-   public static String getCombinedLocationName(final String oldLocation, final String newLocation) {
+   private static String getJoinedLocationNames(final String oldLocation, final String newLocation) {
 
       final boolean isOldLocation = oldLocation.length() > 0;
       final boolean isNewLocation = newLocation.length() > 0;
@@ -247,79 +376,6 @@ public class TourLocationManager {
       }
 
       return UI.EMPTY_STRING;
-   }
-
-   private static String getFormatted_City(final OSMAddress address, final String city) {
-
-      if (city == null) {
-         return null;
-      }
-
-      final String adrPostCode = address.postcode;
-
-      final String countryCode = address.country_code;
-
-      String formattedStreet = null;
-
-      if ("us".equals(countryCode)) {
-
-         // city + zip code
-
-         formattedStreet = city;
-
-         if (adrPostCode != null) {
-            formattedStreet += UI.SPACE + adrPostCode;
-         }
-
-      } else {
-
-         // zip code + city
-
-         if (adrPostCode != null) {
-            formattedStreet = adrPostCode;
-         }
-
-         formattedStreet += UI.SPACE + city;
-      }
-
-      return formattedStreet;
-   }
-
-   private static String getFormatted_Street(final OSMAddress address) {
-
-      if (address.road == null) {
-         return null;
-      }
-
-      final String adrRoad = address.road;
-      final String adrHouse_number = address.house_number;
-
-      final String countryCode = address.country_code;
-
-      String formattedStreet = UI.EMPTY_STRING;
-
-      if ("us".equals(countryCode)) {
-
-         if (adrHouse_number != null) {
-            formattedStreet += adrHouse_number + UI.SPACE;
-         }
-
-         formattedStreet += adrRoad;
-
-      } else {
-
-         formattedStreet += adrRoad;
-
-         if (adrHouse_number != null) {
-            formattedStreet += UI.SPACE + adrHouse_number;
-         }
-      }
-
-      if (formattedStreet.length() == 0) {
-         return null;
-      }
-
-      return formattedStreet;
    }
 
    /**
@@ -563,8 +619,8 @@ public class TourLocationManager {
                   final String osmStartLocation = createLocationDisplayName(locationStart.osmLocation);
                   final String osmEndLocation = createLocationDisplayName(locationEnd.osmLocation);
 
-                  tourData.setTourStartPlace(getCombinedLocationName(oldTourStartPlace, osmStartLocation));
-                  tourData.setTourEndPlace(getCombinedLocationName(oldTourEndPlace, osmEndLocation));
+                  tourData.setTourStartPlace(getJoinedLocationNames(oldTourStartPlace, osmStartLocation));
+                  tourData.setTourEndPlace(getJoinedLocationNames(oldTourEndPlace, osmEndLocation));
 
                   // keep location values
                   tourData.osmLocation_Start = locationStart;

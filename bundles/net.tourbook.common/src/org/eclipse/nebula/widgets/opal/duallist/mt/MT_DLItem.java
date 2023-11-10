@@ -123,6 +123,14 @@ public class MT_DLItem extends OpalItem {
       _lastAction = LAST_ACTION.NONE;
    }
 
+   public MT_DLItem(final String text, final String text2, final String dataKey, final Object data) {
+
+      setText(text);
+      _text2 = text2;
+
+      setData(dataKey, data);
+   }
+
    /**
     * @see org.eclipse.nebula.widgets.opal.commons.OpalItem#getHeight()
     */

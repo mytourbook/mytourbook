@@ -73,14 +73,16 @@ public class MT_DualList extends Composite {
    /*
     * UI controls
     */
-   private Button buttonSelectAll,
-         buttonMoveFirst,
-         buttonSelect,
+   private Button buttonMoveFirst,
+
+         buttonMoveLast,
          buttonMoveUp,
-         buttonDeselect,
          buttonMoveDown,
-         buttonDeselectAll,
-         buttonMoveLast;
+
+         buttonSelect,
+         buttonSelectAll,
+         buttonDeselect,
+         buttonDeselectAll;
 
    private Table  _tableAllItems;
    private Table  _tableAllSelectedItems;
@@ -1227,11 +1229,14 @@ public class MT_DualList extends Composite {
    }
 
    private void recreateTableColumns(final Table table, final int textAlignment) {
+
       for (final TableColumn tc : table.getColumns()) {
          tc.dispose();
       }
-      new TableColumn(table, SWT.CENTER);
-      new TableColumn(table, textAlignment);
+
+      new TableColumn(table, SWT.CENTER); // image
+      new TableColumn(table, textAlignment); // text
+      new TableColumn(table, textAlignment); // text2
    }
 
    /**
@@ -1844,7 +1849,7 @@ public class MT_DualList extends Composite {
 
       } else {
 
-         final double textWidth = 0.7;
+         final double textWidth = 0.5;
          final double partWidth = 1 - textWidth;
 
          _tableAllItems.getColumn(0).setWidth(0);
