@@ -63,7 +63,6 @@ sonarqube {
     property 'sonar.issue.ignore.multicriteria',                'e1'
     property 'sonar.issue.ignore.multicriteria.e1.ruleKey',     'java:S1104'
     property 'sonar.issue.ignore.multicriteria.e1.resourceKey', 'bundles/**/Messages.java'
-    property 'sonar.issue.ignore.multicriteria',                'e2'
     property 'sonar.issue.ignore.multicriteria.e2.ruleKey',     'java:S1444'
     property 'sonar.issue.ignore.multicriteria.e2.resourceKey', 'bundles/**/Messages.java'
   }
