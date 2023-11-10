@@ -2090,12 +2090,6 @@ public class Messages extends NLS {
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
-   public static String        Slideout_LocationOptions_Label_DefaultLocationName;
-   public static String        Slideout_LocationOptions_Label_EndLocation_Title;
-   public static String        Slideout_LocationOptions_Label_LocationParts;
-   public static String        Slideout_LocationOptions_Label_SelectedLocationParts;
-   public static String        Slideout_LocationOptions_Label_StartLocation_Title;
-
    public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance;
    public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance_Tooltip;
    public static String        Slideout_Map25Layer_Checkbox_Layer_3DBuilding;
@@ -2516,6 +2510,12 @@ public class Messages extends NLS {
    public static String        Slideout_TourInfoOptions_Label_TooltipDelay;
    public static String        Slideout_TourInfoOptions_Label_TooltipDelaySimple_Tooltip;
    public static String        Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
+
+   public static String        Slideout_TourLocation_Label_DefaultLocationName;
+   public static String        Slideout_TourLocation_Label_EndLocation_Title;
+   public static String        Slideout_TourLocation_Label_LocationParts;
+   public static String        Slideout_TourLocation_Label_SelectedLocationParts;
+   public static String        Slideout_TourLocation_Label_StartLocation_Title;
 
    public static String        Slideout_TourLogOptions_Checkbox_Event_DeleteSomething;
    public static String        Slideout_TourLogOptions_Checkbox_Event_DownloadSomething;
@@ -3095,6 +3095,8 @@ public class Messages extends NLS {
    public static String        Tour_Info_Flag_Database;
    public static String        Tour_Info_Label_AllFields;
    public static String        Tour_Info_Label_AllFields_Tooltip;
+
+   public static String        Tour_Location_Default_ProfileName;
 
    public static String        Tour_Log_Action_Clear_Tooltip;
    public static String        Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;

@@ -25,12 +25,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
@@ -47,7 +45,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.graphics.Image;
 
 /**
  * Source: https://nominatim.org/release-docs/develop/api/Reverse/
@@ -71,21 +68,27 @@ public class TourLocationManager {
       }
    }
 
-   private static final String                           SUB_TASK_MESSAGE         = "%d / %d - waited %d ms";
-   private static final String                           SUB_TASK_MESSAGE_SKIPPED = "%d / %d";                                             //$NON-NLS-1$
+   private static final String     SUB_TASK_MESSAGE         = "%d / %d - waited %d ms";
+   private static final String     SUB_TASK_MESSAGE_SKIPPED = "%d / %d";                                             //$NON-NLS-1$
 
-   private static final String                           _userAgent               = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+   private static final String     _userAgent               = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
 
-   private static final HttpClient                       _httpClient              = HttpClient.newBuilder()
+   private static final HttpClient _httpClient              = HttpClient.newBuilder()
          .connectTimeout(Duration.ofSeconds(10))
          .build();
 
-   private static final ConcurrentHashMap<String, Image> _imageCache              = new ConcurrentHashMap<>();
-   private static final ConcurrentLinkedQueue<String>    _imageCacheFifo          = new ConcurrentLinkedQueue<>();
-   private static final ReentrantLock                    CACHE_LOCK               = new ReentrantLock();
+//   private static final ConcurrentHashMap<String, Image> _imageCache              = new ConcurrentHashMap<>();
+//   private static final ConcurrentLinkedQueue<String>    _imageCacheFifo          = new ConcurrentLinkedQueue<>();
+//   private static final ReentrantLock                    CACHE_LOCK               = new ReentrantLock();
 
-   private static final StringBuilder                    _displayNameBuffer       = new StringBuilder();
-   private static final Set<String>                      _usedDisplayNames        = new HashSet<>();
+   private static final StringBuilder             _displayNameBuffer   = new StringBuilder();
+   private static final Set<String>               _usedDisplayNames    = new HashSet<>();
+
+   /**
+    * Contains all available profiles
+    */
+   private static final List<TourLocationProfile> _allLocationProfiles = new ArrayList<>();
+   private static TourLocationProfile             _selectedProfile;
 
    /**
     * Zoom address detail
@@ -102,9 +105,9 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   private static final int                              _zoomLevel               = 18;
+   private static final int                       _zoomLevel           = 18;
 
-   private static long                                   _lastRetrievalTimeMS;
+   private static long                            _lastRetrievalTimeMS;
 
    /**
     * Append text to the display name
@@ -555,6 +558,18 @@ public class TourLocationManager {
       return osmLocation;
    }
 
+   static List<TourLocationProfile> getProfiles() {
+
+      return _allLocationProfiles;
+   }
+
+   /**
+    * @return Returns the selected profile or <code>null</code> when a profile is not selected.
+    */
+   static TourLocationProfile getSelectedProfile() {
+      return _selectedProfile;
+   }
+
    private static void logError(final String exceptionMessage) {
 
       TourLogManager.log_ERROR(NLS.bind(
@@ -639,4 +654,10 @@ public class TourLocationManager {
          Thread.currentThread().interrupt();
       }
    }
+
+   static void setSelectedProfile(final TourLocationProfile selectedProfile) {
+
+      _selectedProfile = selectedProfile;
+   }
+
 }
