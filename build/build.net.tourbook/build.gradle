@@ -60,6 +60,12 @@ sonarqube {
     property 'sonar.cpd.exclusions',                 'bundles/net.tourbook.web/WebContent-rel/tourbook/search/**/*.*,bundles/net.tourbook.web/WebContent-dev/tourbook/search/nls/**/*.js'
     property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml, ../../mytourbook-BUILD-autocreated/core/net.tourbook.ui.tests/target/site/jacoco-aggregate/jacoco.xml'
     property 'sonar.java.source',                    '17'
+    property 'sonar.issue.ignore.multicriteria',                'e1'
+    property 'sonar.issue.ignore.multicriteria.e1.ruleKey',     'java:S1104'
+    property 'sonar.issue.ignore.multicriteria.e1.resourceKey', 'bundles/**/Messages.java'
+    property 'sonar.issue.ignore.multicriteria',                'e2'
+    property 'sonar.issue.ignore.multicriteria.e2.ruleKey',     'java:S1444'
+    property 'sonar.issue.ignore.multicriteria.e2.resourceKey', 'bundles/**/Messages.java'
   }
 }
 
