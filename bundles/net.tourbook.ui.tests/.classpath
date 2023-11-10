@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry exported="true" kind="lib" path="HttpClientMock-1.0.0.jar"/> <!-- https://mvnrepository.com/artifact/com.pgs-soft/HttpClientMock -->
+	<classpathentry exported="true" kind="lib" path="hamcrest-all-1.3.jar"/> <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

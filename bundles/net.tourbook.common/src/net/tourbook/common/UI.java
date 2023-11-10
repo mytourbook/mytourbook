@@ -57,6 +57,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.notifications.NotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -2329,6 +2330,22 @@ public class UI {
          contextMenu.setLocation(pt.x, pt.y);
          contextMenu.setVisible(true);
       }
+   }
+
+   /**
+    * Open a notification popup for the number of seconds configured by the user
+    *
+    * @param title
+    * @param text
+    */
+   public static void openNotificationPopup(final String title, final String text) {
+
+      final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
+            .title(title, false)
+            .text(text)
+            .delay(2000)
+            .build();
+      notication.open();
    }
 
    public static void paintImageCentered(final Event event, final Image image, final int availableWidth) {

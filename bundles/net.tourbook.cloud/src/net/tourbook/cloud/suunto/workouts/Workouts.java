@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,15 +17,8 @@ package net.tourbook.cloud.suunto.workouts;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Workouts {
-   public String        error;
-   public List<Payload> payload;
-
-   public Workouts() {
-      payload = new ArrayList<>();
-   }
-}
+public record Workouts(String error,
+                       List<Payload> payload) {}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,8 +57,8 @@ public class StravaTokensRetrievalHandler extends TokensRetrievalHandler {
 
       final Athlete athlete = stravaTokens.getAthlete();
       if (athlete != null) {
-         _prefStore.setValue(Preferences.STRAVA_ATHLETEFULLNAME, athlete.getFirstName() + UI.SPACE1 + athlete.getLastName());
-         _prefStore.setValue(Preferences.STRAVA_ATHLETEID, athlete.getId());
+         _prefStore.setValue(Preferences.STRAVA_ATHLETEFULLNAME, athlete.firstName() + UI.SPACE1 + athlete.lastName());
+         _prefStore.setValue(Preferences.STRAVA_ATHLETEID, athlete.id());
       }
 
       //Setting it last so that we trigger the preference change when everything is ready
