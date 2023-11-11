@@ -47,14 +47,23 @@ import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Source: https://nominatim.org/release-docs/develop/api/Reverse/
+ * Source: <a href=
+ * "https://nominatim.org/release-docs/develop/api/Reverse/">https://nominatim.org/release-docs/develop/api/Reverse/</a>
+ * <p>
  *
  * The main format of the reverse API is
- * https://nominatim.openstreetmap.org/reverse?lat=<value>&lon=<value>&<params>
+ * <a href=
+ * "https://nominatim.openstreetmap.org/reverse?lat=<value>&lon=<value>&<params>">https://nominatim.openstreetmap.org/reverse?lat=<value>&lon=<value>&<params></a>
+ * <p>
  *
- * Limits and download policy: https://operations.osmfoundation.org/policies/nominatim/
+ * Limits and download policy:
+ * <a href=
+ * "https://operations.osmfoundation.org/policies/nominatim/">https://operations.osmfoundation.org/policies/nominatim/</a>
+ * <p>
  *
- * Requested feature: https://github.com/mytourbook/mytourbook/issues/878
+ * Requested feature: <a href=
+ * "https://github.com/mytourbook/mytourbook/issues/878">https://github.com/mytourbook/mytourbook/issues/878</a>
+ * <p>
  */
 public class TourLocationManager {
 
@@ -73,7 +82,9 @@ public class TourLocationManager {
 
    private static final String     _userAgent               = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
 
-   private static final HttpClient _httpClient              = HttpClient.newBuilder()
+   private static final HttpClient _httpClient              = HttpClient
+
+         .newBuilder()
          .connectTimeout(Duration.ofSeconds(10))
          .build();
 

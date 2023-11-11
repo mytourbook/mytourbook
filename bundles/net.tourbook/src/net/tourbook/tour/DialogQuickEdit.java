@@ -37,6 +37,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.location.ITourLocationConsumer;
 import net.tourbook.tour.location.SlideoutLocationOptions;
 import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
@@ -68,7 +69,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-public class DialogQuickEdit extends TitleAreaDialog {
+public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationConsumer {
 
 // SET_FORMATTING_OFF
 
@@ -175,7 +176,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private class ActionSlideout_LocationOptions_End extends ActionToolbarSlideoutAdv {
 
-      private SlideoutLocationOptions __slideoutLocaationOptions;
+      private SlideoutLocationOptions __slideoutLocationOptions;
 
       public ActionSlideout_LocationOptions_End() {
 
@@ -185,19 +186,28 @@ public class DialogQuickEdit extends TitleAreaDialog {
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         __slideoutLocaationOptions = new SlideoutLocationOptions(
+         __slideoutLocationOptions = new SlideoutLocationOptions(
                toolItem,
                _state_EndLocation,
                DialogQuickEdit.this,
                false,
                _tourData);
 
-         return __slideoutLocaationOptions;
+         return __slideoutLocationOptions;
+      }
+
+      SlideoutLocationOptions getSlideout() {
+
+         return __slideoutLocationOptions;
       }
 
       @Override
       protected void onBeforeOpenSlideout() {
+
          closeOpenedDialogs(this);
+
+         // close the other location slideout that only one is open at the time
+         _actionSlideout_StartLocationOptions.getSlideout().close();
       }
    }
 
@@ -220,12 +230,20 @@ public class DialogQuickEdit extends TitleAreaDialog {
                true,
                _tourData);
 
+         return getSlideout();
+      }
+
+      SlideoutLocationOptions getSlideout() {
          return __slideoutLocationOptions;
       }
 
       @Override
       protected void onBeforeOpenSlideout() {
+
          closeOpenedDialogs(this);
+
+         // close the other location slideout that only one is open at the time
+         _actionSlideout_EndLocationOptions.getSlideout().close();
       }
    }
 
@@ -1279,6 +1297,18 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _numLines_WeatherDescription = Util.getStateInt(_state_TourDataEditorView,
             TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
             TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
+   }
+
+   @Override
+   public void setTourEndLocation(final String endLocation) {
+
+      _comboLocation_End.setText(endLocation);
+   }
+
+   @Override
+   public void setTourStartLocation(final String startLocation) {
+
+      _comboLocation_Start.setText(startLocation);
    }
 
    /**

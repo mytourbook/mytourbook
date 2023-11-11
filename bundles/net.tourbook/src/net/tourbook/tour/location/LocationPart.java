@@ -17,6 +17,7 @@ package net.tourbook.tour.location;
 
 public enum LocationPart {
 
+   OSM_DEFAULT_NAME, //
    OSM_NAME, //
 
    CUSTOM_CITY_LARGEST, //

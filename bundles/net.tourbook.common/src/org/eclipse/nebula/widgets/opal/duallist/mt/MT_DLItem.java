@@ -195,10 +195,11 @@ public class MT_DLItem extends OpalItem {
 
       return UI.EMPTY_STRING
 
-            + "MT_DLItem" + NL //                     //$NON-NLS-1$
+            + "MT_DLItem" + NL //                           //$NON-NLS-1$
 
-            + " text  = " + getText() + NL //          //$NON-NLS-1$
-            + " text2 = " + _text2 + NL //             //$NON-NLS-1$
+            + " text        = " + getText() + NL //         //$NON-NLS-1$
+            + " text2       = " + _text2 + NL //            //$NON-NLS-1$
+            + " _lastAction = " + _lastAction + NL //       //$NON-NLS-1$
 
             + NL;
    }

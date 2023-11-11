@@ -73,16 +73,14 @@ public class MT_DualList extends Composite {
    /*
     * UI controls
     */
-   private Button buttonMoveFirst,
-
-         buttonMoveLast,
-         buttonMoveUp,
-         buttonMoveDown,
-
-         buttonSelect,
-         buttonSelectAll,
-         buttonDeselect,
-         buttonDeselectAll;
+   private Button  _btnMoveFirst;
+   private Button  _btnMoveLast;
+   private Button  _btnMoveUp;
+   private Button  _btnMoveDown;
+   private Button  _btnSelect;
+   private Button  _btnSelectAll;
+   private Button  _btnDeselect;
+   private Button  _btnDeselectAll;
 
    private Table  _tableAllItems;
    private Table  _tableAllSelectedItems;
@@ -144,17 +142,17 @@ public class MT_DualList extends Composite {
 
             _tableAllItems,
 
-            buttonSelectAll,
-            buttonSelect,
-            buttonDeselect,
-            buttonDeselectAll,
+            _btnSelectAll,
+            _btnSelect,
+            _btnDeselect,
+            _btnDeselectAll,
 
             _tableAllSelectedItems,
 
-            buttonMoveFirst,
-            buttonMoveUp,
-            buttonMoveDown,
-            buttonMoveLast
+            _btnMoveFirst,
+            _btnMoveUp,
+            _btnMoveDown,
+            _btnMoveLast
       });
    }
 
@@ -355,57 +353,57 @@ public class MT_DualList extends Composite {
    }
 
    private void createButtonDeselect() {
-      buttonDeselect = createButton(_imageMoveLeft, false, GridData.CENTER);
-      buttonDeselect.addListener(SWT.Selection, e -> {
+      _btnDeselect = createButton(_imageMoveLeft, false, GridData.CENTER);
+      _btnDeselect.addListener(SWT.Selection, e -> {
          deselectItem();
       });
    }
 
    private void createButtonDeselectAll() {
-      buttonDeselectAll = createButton(_imageMoveLeft_2x, false, GridData.BEGINNING);
-      buttonDeselectAll.addListener(SWT.Selection, e -> {
+      _btnDeselectAll = createButton(_imageMoveLeft_2x, false, GridData.BEGINNING);
+      _btnDeselectAll.addListener(SWT.Selection, e -> {
          deselectAll();
       });
    }
 
    private void createButtonMoveDown() {
-      buttonMoveDown = createButton(_imageMoveDown, false, GridData.CENTER);
-      buttonMoveDown.addListener(SWT.Selection, e -> {
+      _btnMoveDown = createButton(_imageMoveDown, false, GridData.CENTER);
+      _btnMoveDown.addListener(SWT.Selection, e -> {
          moveSelectionDown();
       });
    }
 
    private void createButtonMoveFirst() {
-      buttonMoveFirst = createButton(_imageMoveUp_2x, true, GridData.END);
-      buttonMoveFirst.addListener(SWT.Selection, e -> {
+      _btnMoveFirst = createButton(_imageMoveUp_2x, true, GridData.END);
+      _btnMoveFirst.addListener(SWT.Selection, e -> {
          moveSelectionToFirstPosition();
       });
    }
 
    private void createButtonMoveLast() {
-      buttonMoveLast = createButton(_imageMoveDown_2x, true, GridData.BEGINNING);
-      buttonMoveLast.addListener(SWT.Selection, e -> {
+      _btnMoveLast = createButton(_imageMoveDown_2x, true, GridData.BEGINNING);
+      _btnMoveLast.addListener(SWT.Selection, e -> {
          moveSelectionToLastPosition();
       });
    }
 
    private void createButtonMoveUp() {
-      buttonMoveUp = createButton(_imageMoveUp, false, GridData.CENTER);
-      buttonMoveUp.addListener(SWT.Selection, e -> {
+      _btnMoveUp = createButton(_imageMoveUp, false, GridData.CENTER);
+      _btnMoveUp.addListener(SWT.Selection, e -> {
          moveSelectionUp();
       });
    }
 
    private void createButtonSelect() {
-      buttonSelect = createButton(_imageMoveRight, false, GridData.CENTER);
-      buttonSelect.addListener(SWT.Selection, e -> {
+      _btnSelect = createButton(_imageMoveRight, false, GridData.CENTER);
+      _btnSelect.addListener(SWT.Selection, e -> {
          selectItem();
       });
    }
 
    private void createButtonSelectAll() {
-      buttonSelectAll = createButton(_imageMoveRight_2x, true, GridData.END);
-      buttonSelectAll.addListener(SWT.Selection, e -> {
+      _btnSelectAll = createButton(_imageMoveRight_2x, true, GridData.END);
+      _btnSelectAll.addListener(SWT.Selection, e -> {
          selectAll();
       });
    }
@@ -1066,39 +1064,39 @@ public class MT_DualList extends Composite {
    private void modifyButtonImages() {
 
       if (configuration.getDoubleDownImage() != null) {
-         buttonMoveLast.setImage(configuration.getDoubleDownImage());
+         _btnMoveLast.setImage(configuration.getDoubleDownImage());
       }
       if (configuration.getDoubleUpImage() != null) {
-         buttonMoveFirst.setImage(configuration.getDoubleUpImage());
+         _btnMoveFirst.setImage(configuration.getDoubleUpImage());
       }
       if (configuration.getDoubleLeftImage() != null) {
-         buttonDeselectAll.setImage(configuration.getDoubleLeftImage());
+         _btnDeselectAll.setImage(configuration.getDoubleLeftImage());
       }
       if (configuration.getDoubleRightImage() != null) {
-         buttonSelectAll.setImage(configuration.getDoubleRightImage());
+         _btnSelectAll.setImage(configuration.getDoubleRightImage());
       }
       if (configuration.getDownImage() != null) {
-         buttonMoveDown.setImage(configuration.getDownImage());
+         _btnMoveDown.setImage(configuration.getDownImage());
       }
       if (configuration.getUpImage() != null) {
-         buttonMoveUp.setImage(configuration.getUpImage());
+         _btnMoveUp.setImage(configuration.getUpImage());
       }
       if (configuration.getLeftImage() != null) {
-         buttonDeselect.setImage(configuration.getLeftImage());
+         _btnDeselect.setImage(configuration.getLeftImage());
       }
       if (configuration.getRightImage() != null) {
-         buttonSelect.setImage(configuration.getRightImage());
+         _btnSelect.setImage(configuration.getRightImage());
       }
    }
 
    private void modifyButtonVisibility() {
 
-      buttonMoveLast.setVisible(configuration.isDoubleDownVisible());
-      buttonMoveFirst.setVisible(configuration.isDoubleUpVisible());
-      buttonDeselectAll.setVisible(configuration.isDoubleLeftVisible());
-      buttonSelectAll.setVisible(configuration.isDoubleRightVisible());
-      buttonMoveDown.setVisible(configuration.isDownVisible());
-      buttonMoveUp.setVisible(configuration.isUpVisible());
+      _btnMoveLast.setVisible(configuration.isDoubleDownVisible());
+      _btnMoveFirst.setVisible(configuration.isDoubleUpVisible());
+      _btnDeselectAll.setVisible(configuration.isDoubleLeftVisible());
+      _btnSelectAll.setVisible(configuration.isDoubleRightVisible());
+      _btnMoveDown.setVisible(configuration.isDownVisible());
+      _btnMoveUp.setVisible(configuration.isUpVisible());
    }
 
    private void modifyPanelsColors() {
@@ -1498,14 +1496,14 @@ public class MT_DualList extends Composite {
 
 // SET_FORMATTING_OFF
 
-      resetButton(buttonMoveDown,      _imageMoveDown);
-      resetButton(buttonMoveUp,        _imageMoveUp);
-      resetButton(buttonDeselect,      _imageMoveLeft);
-      resetButton(buttonSelect,        _imageMoveRight);
-      resetButton(buttonMoveLast,      _imageMoveDown_2x);
-      resetButton(buttonMoveFirst,     _imageMoveUp_2x);
-      resetButton(buttonDeselectAll,   _imageMoveLeft_2x);
-      resetButton(buttonSelectAll,     _imageMoveRight_2x);
+      resetButton(_btnMoveDown,      _imageMoveDown);
+      resetButton(_btnMoveUp,        _imageMoveUp);
+      resetButton(_btnDeselect,      _imageMoveLeft);
+      resetButton(_btnSelect,        _imageMoveRight);
+      resetButton(_btnMoveLast,      _imageMoveDown_2x);
+      resetButton(_btnMoveFirst,     _imageMoveUp_2x);
+      resetButton(_btnDeselectAll,   _imageMoveLeft_2x);
+      resetButton(_btnSelectAll,     _imageMoveRight_2x);
 
 // SET_FORMATTING_ON
    }
@@ -1881,6 +1879,23 @@ public class MT_DualList extends Composite {
       checkWidget();
       this.configuration = configuration;
       applyNewConfiguration();
+   }
+
+   @Override
+   public void setEnabled(final boolean isEnabled) {
+
+      _tableAllItems.setEnabled(isEnabled);
+      _tableAllSelectedItems.setEnabled(isEnabled);
+
+      _btnMoveFirst.setEnabled(isEnabled);
+      _btnMoveLast.setEnabled(isEnabled);
+      _btnMoveUp.setEnabled(isEnabled);
+      _btnMoveDown.setEnabled(isEnabled);
+
+      _btnSelect.setEnabled(isEnabled);
+      _btnSelectAll.setEnabled(isEnabled);
+      _btnDeselect.setEnabled(isEnabled);
+      _btnDeselectAll.setEnabled(isEnabled);
    }
 
    /**

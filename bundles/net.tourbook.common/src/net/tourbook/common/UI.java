@@ -2602,6 +2602,26 @@ public class UI {
    }
 
    /**
+    * Set the layout data of the button to a GridData with appropriate heights and widths.
+    *
+    * @param button
+    */
+   public static void setButtonLayoutWidth(final Button button) {
+
+      // keep existing layout data
+      final GridData data = (GridData) button.getLayoutData();
+
+      final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+
+      final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      final int defaultWidth = minSize.x;
+
+      data.widthHint = Math.max(widthHint, defaultWidth);
+
+      button.setLayoutData(data);
+   }
+
+   /**
     * Initialize cell editing.
     *
     * @param viewer

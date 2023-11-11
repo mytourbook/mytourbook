@@ -15,14 +15,16 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 public class TourLocationProfile implements Cloneable {
 
-   private static final char NL         = UI.NEW_LINE                              //
-   ;
+   private static final char NL         = UI.NEW_LINE;
 
    private static int        _idCounter = 0;
 
@@ -33,7 +35,7 @@ public class TourLocationProfile implements Cloneable {
     */
    String                    name       = Messages.Tour_Location_Default_ProfileName;
 
-//   ArrayList<TourFilterProperty> filterProperties = new ArrayList<>();
+   List<LocationPart>        allParts   = new ArrayList<>();
 
    public TourLocationProfile() {
 
@@ -54,11 +56,10 @@ public class TourLocationProfile implements Cloneable {
          // create a unique name
          clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
-//         clonedObject.filterProperties = new ArrayList<>();
-//
-//         for (final TourFilterProperty tourFilterProperty : filterProperties) {
-//            clonedObject.filterProperties.add(tourFilterProperty.clone());
-//         }
+         clonedObject.allParts = new ArrayList<>();
+         for (final LocationPart part : allParts) {
+            clonedObject.allParts.add(part);
+         }
 
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);
@@ -110,8 +111,9 @@ public class TourLocationProfile implements Cloneable {
 
             + "TourFilterProfile" + NL //                //$NON-NLS-1$
 
-            + " profileId = " + profileId + NL //        //$NON-NLS-1$
             + " name      = " + name + NL //             //$NON-NLS-1$
+            + " profileId = " + profileId + NL //        //$NON-NLS-1$
+            + " allParts  =" + allParts + NL //          //$NON-NLS-1$
 
             + NL;
    }
