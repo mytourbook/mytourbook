@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.application.ApplicationVersion;
@@ -44,6 +45,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.Messages;
 import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IPath;
@@ -151,6 +153,92 @@ public class TourLocationManager {
    private static final int                       _zoomLevel           = 18;
 
    private static long                            _lastRetrievalTimeMS;
+
+// SET_FORMATTING_OFF
+
+   static Map<LocationPartID, String>             allLocationPartLabel = Map.ofEntries(
+
+
+//         OSM_DEFAULT_NAME, //
+//         OSM_NAME, //
+//
+//         CUSTOM_CITY_LARGEST, //
+//         CUSTOM_CITY_SMALLEST, //
+//         CUSTOM_CITY_WITH_ZIP_LARGEST, //
+//         CUSTOM_CITY_WITH_ZIP_SMALLEST, //
+//
+//         CUSTOM_STREET_WITH_HOUSE_NUMBER, //
+
+
+         Map.entry(LocationPartID.continent,          Messages.Location_Part_Continent),
+         Map.entry(LocationPartID.country,            Messages.Location_Part_Country),
+         Map.entry(LocationPartID.country_code,       Messages.Location_Part_CountryCode),
+
+         Map.entry(LocationPartID.region,             Messages.Location_Part_Region),
+         Map.entry(LocationPartID.state,              Messages.Location_Part_State),
+         Map.entry(LocationPartID.state_district,     Messages.Location_Part_StateDistrict),
+         Map.entry(LocationPartID.county,             Messages.Location_Part_County),
+
+         Map.entry(LocationPartID.municipality,       Messages.Location_Part_Municipality),
+         Map.entry(LocationPartID.city,               Messages.Location_Part_City),
+         Map.entry(LocationPartID.town,               Messages.Location_Part_Town),
+         Map.entry(LocationPartID.village,            Messages.Location_Part_Village),
+
+         Map.entry(LocationPartID.city_district,      Messages.Location_Part_CityDistrict),
+         Map.entry(LocationPartID.district,           Messages.Location_Part_District),
+         Map.entry(LocationPartID.borough,            Messages.Location_Part_Borough),
+         Map.entry(LocationPartID.suburb,             Messages.Location_Part_Suburb),
+         Map.entry(LocationPartID.subdivision,        Messages.Location_Part_Subdivision),
+
+         Map.entry(LocationPartID.hamlet,             Messages.Location_Part_Hamlet),
+         Map.entry(LocationPartID.croft,              Messages.Location_Part_Craft),
+         Map.entry(LocationPartID.isolated_dwelling,  Messages.Location_Part_IsolatedDwelling),
+
+         Map.entry(LocationPartID.neighbourhood,      Messages.Location_Part_Neighbourhood),
+         Map.entry(LocationPartID.allotments,         Messages.Location_Part_Allotments),
+         Map.entry(LocationPartID.quarter,            Messages.Location_Part_Quarter),
+
+         Map.entry(LocationPartID.city_block,         Messages.Location_Part_CityBlock),
+         Map.entry(LocationPartID.residential,        Messages.Location_Part_Residential),
+         Map.entry(LocationPartID.farm,               Messages.Location_Part_Farm),
+         Map.entry(LocationPartID.farmyard,           Messages.Location_Part_Farmyard),
+         Map.entry(LocationPartID.industrial,         Messages.Location_Part_Industrial),
+         Map.entry(LocationPartID.commercial,         Messages.Location_Part_Commercial),
+         Map.entry(LocationPartID.retail,             Messages.Location_Part_Retail),
+
+         Map.entry(LocationPartID.road,               Messages.Location_Part_Road),
+
+         Map.entry(LocationPartID.house_name,         Messages.Location_Part_HouseName),
+         Map.entry(LocationPartID.house_number,       Messages.Location_Part_HouseNumber),
+
+         Map.entry(LocationPartID.aerialway,          Messages.Location_Part_Aerialway),
+         Map.entry(LocationPartID.aeroway,            Messages.Location_Part_Aeroway),
+         Map.entry(LocationPartID.amenity,            Messages.Location_Part_Amenity),
+         Map.entry(LocationPartID.boundary,           Messages.Location_Part_Boundary),
+         Map.entry(LocationPartID.bridge,             Messages.Location_Part_Bridge),
+         Map.entry(LocationPartID.club,               Messages.Location_Part_Club),
+         Map.entry(LocationPartID.craft,              Messages.Location_Part_Craft),
+         Map.entry(LocationPartID.emergency,          Messages.Location_Part_Emergency),
+         Map.entry(LocationPartID.historic,           Messages.Location_Part_Historic),
+         Map.entry(LocationPartID.landuse,            Messages.Location_Part_Landuse),
+         Map.entry(LocationPartID.leisure,            Messages.Location_Part_Leisure),
+         Map.entry(LocationPartID.man_made,           Messages.Location_Part_ManMade),
+         Map.entry(LocationPartID.military,           Messages.Location_Part_Military),
+         Map.entry(LocationPartID.mountain_pass,      Messages.Location_Part_MountainPass),
+         Map.entry(LocationPartID.natural,            Messages.Location_Part_Natural),
+         Map.entry(LocationPartID.office,             Messages.Location_Part_Office),
+         Map.entry(LocationPartID.place,              Messages.Location_Part_Place),
+         Map.entry(LocationPartID.railway,            Messages.Location_Part_Railway),
+         Map.entry(LocationPartID.shop,               Messages.Location_Part_Shop),
+         Map.entry(LocationPartID.tourism,            Messages.Location_Part_Tourism),
+         Map.entry(LocationPartID.tunnel,             Messages.Location_Part_Tunnel),
+         Map.entry(LocationPartID.waterway,           Messages.Location_Part_Waterway),
+
+         Map.entry(LocationPartID.postcode,           Messages.Location_Part_Postcode)
+
+      );
+
+// SET_FORMATTING_ON
 
    /**
     * Append text to the display name in {@link #_displayNameBuffer}
@@ -268,7 +356,6 @@ public class TourLocationManager {
             /*
              * Append all other fieds
              */
-
             try {
 
                final String fieldName = locationPart.name();

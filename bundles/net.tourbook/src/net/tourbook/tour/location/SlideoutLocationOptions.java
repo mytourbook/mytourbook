@@ -178,6 +178,7 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
          final Field[] allAddressFields = address.getClass().getFields();
 
+         // loop: all fields in the retrieved address
          for (final Field field : allAddressFields) {
 
             final String fieldName = field.getName();
@@ -191,14 +192,18 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
             if (fieldValue instanceof final String stringValue) {
 
-               // log only fields with value
+               // use only fields with a value
                if (stringValue.length() > 0) {
+
+                  final LocationPartID locationPart = LocationPartID.valueOf(fieldName);
+
+                  final String label = TourLocationManager.allLocationPartLabel.get(locationPart);
 
                   final MT_DLItem dlItem = new MT_DLItem(
                         stringValue,
-                        fieldName,
+                        label,
                         TourLocationManager.KEY_LOCATION_PART_ID,
-                        LocationPartID.valueOf(fieldName));
+                        locationPart);
 
                   allItems.add(dlItem);
                }
@@ -229,12 +234,16 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
    private String createPartName_Combined(final LocationPartID locationPart) {
 
-      return UI.SYMBOL_STAR + UI.SPACE + locationPart.name();
+      final String label = TourLocationManager.allLocationPartLabel.get(locationPart);
+
+      return UI.SYMBOL_STAR + UI.SPACE + label;
    }
 
-   private String createPartName_NotAvailable(final LocationPartID remainingPart) {
+   private String createPartName_NotAvailable(final LocationPartID locationPart) {
 
-      return UI.SYMBOL_STAR + UI.SYMBOL_STAR + UI.SPACE + remainingPart;
+      final String label = TourLocationManager.allLocationPartLabel.get(locationPart);
+
+      return UI.SYMBOL_STAR + UI.SYMBOL_STAR + UI.SPACE + label;
    }
 
    @Override
