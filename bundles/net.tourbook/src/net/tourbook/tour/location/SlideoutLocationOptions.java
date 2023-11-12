@@ -94,22 +94,22 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
    /*
     * UI controls
     */
-   private Composite   _parent;
-   private MT_DualList _listLocationParts;
+   private Composite             _parent;
+   private MT_DualList           _listLocationParts;
 
-   private Button      _btnApply;
-   private Button      _btnCopyProfile;
-   private Button      _btnDeleteProfile;
+   private Button                _btnApply;
+   private Button                _btnCopyProfile;
+   private Button                _btnDeleteProfile;
 
-   private Label       _lblDefaultName;
-   private Label       _lblLocationParts;
-   private Label       _lblProfileName;
-   private Label       _lblProfiles;
-   private Label       _lblSelectedLocationParts;
+   private Label                 _lblDefaultName;
+   private Label                 _lblLocationParts;
+   private Label                 _lblProfileName;
+   private Label                 _lblProfiles;
+   private Label                 _lblSelectedLocationParts;
 
-   private Text        _txtDefaultName;
-   private Text        _txtProfileName;
-   private Text        _txtSelectedLocationParts;
+   private Text                  _txtDefaultName;
+   private Text                  _txtProfileName;
+   private Text                  _txtSelectedLocationParts;
 
    private ITourLocationConsumer _tourLocationConsumer;
 
@@ -529,6 +529,8 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
          _tourLocationConsumer.setTourEndLocation(_txtSelectedLocationParts.getText());
       }
+
+      TourLocationManager.saveState();
 
       close();
    }

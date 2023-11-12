@@ -17,6 +17,9 @@ package net.tourbook.tour.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -33,6 +36,7 @@ import java.util.Set;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -40,11 +44,17 @@ import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 /**
  * Source: <a href=
@@ -77,12 +87,29 @@ public class TourLocationManager {
       }
    }
 
-   private static final String     SUB_TASK_MESSAGE         = "%d / %d - waited %d ms";
-   private static final String     SUB_TASK_MESSAGE_SKIPPED = "%d / %d";                                             //$NON-NLS-1$
+   private static final Bundle     _bundle                    = TourbookPlugin.getDefault().getBundle();
+   private static final IPath      _stateLocation             = Platform.getStateLocation(_bundle);
 
-   private static final String     _userAgent               = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+   private static final String     TOUR_LOCATION_FILE_NAME    = "tour-location.xml";                                   //$NON-NLS-1$
+   private static final int        TOUR_LOCATION_VERSION      = 1;
 
-   private static final HttpClient _httpClient              = HttpClient
+   private static final String     TAG_ROOT                   = "TourLocationProfiles";                                //$NON-NLS-1$
+   private static final String     TAG_PROFILE                = "Profile";                                             //$NON-NLS-1$
+   private static final String     TAG_PARTS                  = "Parts";                                               //$NON-NLS-1$
+   private static final String     TAG_PART                   = "Part";                                                //$NON-NLS-1$
+
+   private static final String     ATTR_ACTIVE_PROFILE_ID     = "activeProfileId";                                     //$NON-NLS-1$
+   private static final String     ATTR_NAME                  = "name";                                                //$NON-NLS-1$
+   private static final String     ATTR_PROFILE_ID            = "profileID";                                           //$NON-NLS-1$
+   private static final String     ATTR_PROFILE_NAME          = "profileName";                                         //$NON-NLS-1$
+   private static final String     ATTR_TOUR_LOCATION_VERSION = "tourLocationVersion";                                 //$NON-NLS-1$
+
+   private static final String     SUB_TASK_MESSAGE           = "%d / %d - waited %d ms";
+   private static final String     SUB_TASK_MESSAGE_SKIPPED   = "%d / %d";                                             //$NON-NLS-1$
+
+   private static final String     _userAgent                 = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+
+   private static final HttpClient _httpClient                = HttpClient
 
          .newBuilder()
          .connectTimeout(Duration.ofSeconds(10))
@@ -581,11 +608,31 @@ public class TourLocationManager {
       return _selectedProfile;
    }
 
+   private static File getXmlFile() {
+
+      final File layerFile = _stateLocation.append(TOUR_LOCATION_FILE_NAME).toFile();
+
+      return layerFile;
+   }
+
    private static void logError(final String exceptionMessage) {
 
       TourLogManager.log_ERROR(NLS.bind(
             "Error while retrieving location data: \"{1}\"", //$NON-NLS-1$
             exceptionMessage));
+   }
+
+   public static void restoreState() {
+
+      xmlRead_Profiles();
+   }
+
+   public static void saveState() {
+
+      final XMLMemento xmlRoot = xmlWrite_Profiles();
+      final File xmlFile = getXmlFile();
+
+      Util.writeXml(xmlRoot, xmlFile);
    }
 
    public static void setLocationNames(final List<TourData> requestedTours,
@@ -669,6 +716,158 @@ public class TourLocationManager {
    static void setSelectedProfile(final TourLocationProfile selectedProfile) {
 
       _selectedProfile = selectedProfile;
+   }
+
+   /**
+    * Read tour location xml file.
+    *
+    * @return
+    */
+   private static void xmlRead_Profiles() {
+
+      final File xmlFile = getXmlFile();
+
+      if (xmlFile.exists() == false) {
+         return;
+      }
+
+      Integer activeProfileId = null;
+
+      try (InputStreamReader reader = new InputStreamReader(new FileInputStream(xmlFile), UI.UTF_8)) {
+
+         // <TourLocationProfiles>
+         final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+
+         activeProfileId = Util.getXmlInteger(xmlRoot, ATTR_ACTIVE_PROFILE_ID, null);
+
+         // loop: all location profiles
+         for (final IMemento mementoChild : xmlRoot.getChildren()) {
+
+            final XMLMemento xmlProfile = (XMLMemento) mementoChild;
+
+            if (TAG_PROFILE.equals(xmlProfile.getType())) {
+
+               // <Profile>
+
+               final TourLocationProfile profile = new TourLocationProfile();
+
+               // id
+               final int profileId = Util.getXmlInteger(xmlProfile, ATTR_PROFILE_ID, -1);
+               if (profileId != -1) {
+                  profile.profileId = profileId;
+               }
+
+               profile.name = Util.getXmlString(xmlProfile, ATTR_PROFILE_NAME, UI.EMPTY_STRING);
+
+               final IMemento xmlParts = xmlProfile.getChild(TAG_PARTS);
+
+               if (xmlParts != null) {
+
+                  // <Parts>
+
+                  for (final IMemento xmlPart : xmlParts.getChildren()) {
+
+                     final LocationPart part = (LocationPart) Util.getXmlEnum(xmlPart, ATTR_NAME, LocationPart.NONE);
+
+                     if (part.equals(LocationPart.NONE) == false) {
+
+                        profile.allParts.add(part);
+                     }
+                  }
+               }
+
+               _allLocationProfiles.add(profile);
+            }
+         }
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      }
+
+      /*
+       * Select profile
+       */
+      if (activeProfileId != null) {
+
+         // select last active profile
+
+         for (final TourLocationProfile locationProfile : _allLocationProfiles) {
+            if (locationProfile.profileId == activeProfileId) {
+
+               _selectedProfile = locationProfile;
+               break;
+            }
+         }
+      }
+
+      if (_selectedProfile == null && _allLocationProfiles.size() > 0) {
+
+         // select first profile
+
+         _selectedProfile = _allLocationProfiles.get(0);
+      }
+   }
+
+   private static XMLMemento xmlWrite_Profiles() {
+
+      XMLMemento xmlRoot = null;
+
+      try {
+
+         // <TourLocationProfiles>
+         xmlRoot = xmlWrite_Profiles_10_Root();
+
+         if (_selectedProfile != null) {
+            xmlRoot.putInteger(ATTR_ACTIVE_PROFILE_ID, _selectedProfile.profileId);
+         }
+
+         // loop: all location profiles
+         for (final TourLocationProfile locationProfile : _allLocationProfiles) {
+
+            // <Profile>
+            final IMemento xmlLocation = xmlRoot.createChild(TAG_PROFILE);
+
+            xmlLocation.putInteger(ATTR_PROFILE_ID, locationProfile.profileId);
+            xmlLocation.putString(ATTR_PROFILE_NAME, locationProfile.name);
+
+            // <Parts>
+            final IMemento xmlParts = xmlLocation.createChild(TAG_PARTS);
+
+            // loop: all location parts
+            for (final LocationPart locationPart : locationProfile.allParts) {
+
+               // <Part>
+               final IMemento xmlPart = xmlParts.createChild(TAG_PART);
+
+               Util.setXmlEnum(xmlPart, ATTR_NAME, locationPart);
+            }
+         }
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      }
+
+      return xmlRoot;
+   }
+
+   private static XMLMemento xmlWrite_Profiles_10_Root() {
+
+      final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
+
+      // date/time
+      xmlRoot.putString(Util.ATTR_ROOT_DATETIME, TimeTools.now().toString());
+
+      // plugin version
+      final Version version = _bundle.getVersion();
+      xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MAJOR, version.getMajor());
+      xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MINOR, version.getMinor());
+      xmlRoot.putInteger(Util.ATTR_ROOT_VERSION_MICRO, version.getMicro());
+      xmlRoot.putString(Util.ATTR_ROOT_VERSION_QUALIFIER, version.getQualifier());
+
+      // layer structure version
+      xmlRoot.putInteger(ATTR_TOUR_LOCATION_VERSION, TOUR_LOCATION_VERSION);
+
+      return xmlRoot;
    }
 
 }
