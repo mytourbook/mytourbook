@@ -15,11 +15,11 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -70,8 +70,6 @@ import org.eclipse.swt.widgets.ToolItem;
  * Slideout for the start/end location
  */
 public class SlideoutLocationOptions extends AdvancedSlideout {
-
-   private static final String             LOCATION_KEY      = "LOCATION_KEY";                                                      //$NON-NLS-1$
 
    private static final Font               _boldFont         = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
@@ -199,8 +197,8 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
                   final MT_DLItem dlItem = new MT_DLItem(
                         stringValue,
                         fieldName,
-                        LOCATION_KEY,
-                        LocationPart.valueOf(fieldName));
+                        TourLocationManager.KEY_LOCATION_PART_ID,
+                        LocationPartID.valueOf(fieldName));
 
                   allItems.add(dlItem);
                }
@@ -212,21 +210,31 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       }
    }
 
-   private void addCustomPart(final LocationPart locationPart,
+   private void addCustomPart(final LocationPartID locationPart,
                               final String partValue,
                               final List<MT_DLItem> allParts) {
 
       if (StringUtils.hasContent(partValue)) {
 
-         final String partName = UI.SYMBOL_STAR + UI.SPACE + locationPart.name();
+         final String partName = createPartName_Combined(locationPart);
 
          allParts.add(new MT_DLItem(
 
                partValue,
                partName,
-               LOCATION_KEY,
+               TourLocationManager.KEY_LOCATION_PART_ID,
                locationPart));
       }
+   }
+
+   private String createPartName_Combined(final LocationPartID locationPart) {
+
+      return UI.SYMBOL_STAR + UI.SPACE + locationPart.name();
+   }
+
+   private String createPartName_NotAvailable(final LocationPartID remainingPart) {
+
+      return UI.SYMBOL_STAR + UI.SYMBOL_STAR + UI.SPACE + remainingPart;
    }
 
    @Override
@@ -498,19 +506,28 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
+         {
+            // Label: Profile name
+
+            final Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.Slideout_TourFilter_Label_Remarks);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .applyTo(label);
+         }
          {
             /*
              * Button: Apply & Close
              */
             _btnApply = new Button(container, SWT.PUSH);
             _btnApply.setText(OtherMessages.APP_ACTION_APPLY_AND_CLOSE);
-            _btnApply.addSelectionListener(widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
+            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .align(SWT.END, SWT.FILL)
+                  .align(SWT.END, SWT.END)
                   .applyTo(_btnApply);
 
             // set button default width
@@ -774,20 +791,28 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
       // set selected/not selected parts
 
+      final List<LocationPartID> allProfileParts = _selectedProfile.allParts;
+
+      final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
+      allRemainingProfileParts.addAll(allProfileParts);
+
       nextPart:
 
       // loop: all available parts
       for (final MT_DLItem dualListItem : _allDualListItems) {
 
-         final LocationPart dualListPart = (LocationPart) dualListItem.getData(LOCATION_KEY);
+         final LocationPartID dualListPart = (LocationPartID) dualListItem.getData(TourLocationManager.KEY_LOCATION_PART_ID);
 
          // loop: all profile parts
-         for (final LocationPart profilePart : _selectedProfile.allParts) {
+         for (final LocationPartID profilePart : allProfileParts) {
 
             if (dualListPart.equals(profilePart)) {
 
                // part is selected
                dualListItem.setLastAction(MT_DLItem.LAST_ACTION.SELECTION);
+
+               // update remaining parts
+               allRemainingProfileParts.remove(profilePart);
 
                // continue with the next part
                continue nextPart;
@@ -796,6 +821,24 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
          // part is not selected
          dualListItem.setLastAction(MT_DLItem.LAST_ACTION.DESELECTION);
+      }
+
+      // add profile parts which are not available in the downloaded parts
+      for (final LocationPartID remainingPart : allRemainingProfileParts) {
+
+         final MT_DLItem dlItem = new MT_DLItem(
+               UI.EMPTY_STRING,
+               createPartName_NotAvailable(remainingPart),
+               TourLocationManager.KEY_LOCATION_PART_ID,
+               remainingPart);
+
+         // set n/a flag
+         dlItem.setData(TourLocationManager.KEY_IS_NOT_AVAILABLE, Boolean.TRUE);
+
+         // show it in the selection list
+         dlItem.setLastAction(MT_DLItem.LAST_ACTION.SELECTION);
+
+         _allDualListItems.add(dlItem);
       }
 
       _listLocationParts.setItems(_allDualListItems);
@@ -856,32 +899,31 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 // SET_FORMATTING_OFF
 
       // add customized parts
-      final String smallestCity           = TourLocationManager.getCustom_City_Smallest(address);
-      final String smallestCityWithZip    = TourLocationManager.getCustom_CityWithZip_Smallest(address);
-      final String largestCity            = TourLocationManager.getCustom_City_Largest(address);
-      final String largestCityWithZip     = TourLocationManager.getCustom_CityWithZip_Largest(address);
-      final String streetWithHouseNumber  = TourLocationManager.getCustom_Street(address);
+      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(address);
+      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(address);
+      final String largestCity            = TourLocationManager.getCombined_City_Largest(address);
+      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(address);
+      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber(address);
 
       boolean isShowSmallestCity = false;
       if (largestCity != null && largestCity.equals(smallestCity) == false) {
          isShowSmallestCity = true;
       }
 
+      addCustomPart(LocationPartID    .OSM_DEFAULT_NAME,                  osmLocation.display_name, _allDualListItems);
+      addCustomPart(LocationPartID    .OSM_NAME,                          osmLocation.name, _allDualListItems);
 
-      addCustomPart(LocationPart.OSM_DEFAULT_NAME,                   osmLocation.display_name, _allDualListItems);
-      addCustomPart(LocationPart.OSM_NAME,                           osmLocation.name, _allDualListItems);
-
-      addCustomPart(LocationPart.CUSTOM_CITY_LARGEST,                largestCity, _allDualListItems);
+      addCustomPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity, _allDualListItems);
       if (isShowSmallestCity) {
-         addCustomPart(LocationPart.CUSTOM_CITY_SMALLEST,            smallestCity, _allDualListItems);
+         addCustomPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity, _allDualListItems);
       }
 
-      addCustomPart(LocationPart.CUSTOM_CITY_WITH_ZIP_LARGEST,       largestCityWithZip, _allDualListItems);
+      addCustomPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip, _allDualListItems);
       if (isShowSmallestCity) {
-         addCustomPart(LocationPart.CUSTOM_CITY_WITH_ZIP_SMALLEST,   smallestCityWithZip, _allDualListItems);
+         addCustomPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip, _allDualListItems);
       }
 
-      addCustomPart(LocationPart.CUSTOM_STREET_WITH_HOUSE_NUMBER,    streetWithHouseNumber, _allDualListItems);
+      addCustomPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber, _allDualListItems);
 
 
 // SET_FORMATTING_ON
@@ -904,10 +946,14 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       // get selected parts
       final List<MT_DLItem> allSelectedItems = _listLocationParts.getSelectionAsList();
 
+      final List<LocationPartID> allProfileParts = _selectedProfile.allParts;
+
+      final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
+      allRemainingProfileParts.addAll(allProfileParts);
+
       /*
        * Update model
        */
-      final List<LocationPart> allProfileParts = _selectedProfile.allParts;
       allProfileParts.clear();
 
       for (final MT_DLItem partItem : allSelectedItems) {
@@ -916,9 +962,11 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
          if (partItem.getLastAction().equals(MT_DLItem.LAST_ACTION.SELECTION)) {
 
-            final LocationPart locationPart = (LocationPart) partItem.getData(LOCATION_KEY);
+            final LocationPartID locationPart = (LocationPartID) partItem.getData(TourLocationManager.KEY_LOCATION_PART_ID);
 
             allProfileParts.add(locationPart);
+
+            allRemainingProfileParts.remove(locationPart);
          }
       }
 

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
-public enum LocationPart {
+public enum LocationPartID {
 
    NONE, //
 

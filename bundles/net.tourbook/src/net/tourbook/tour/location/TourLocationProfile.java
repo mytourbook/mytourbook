@@ -35,7 +35,7 @@ public class TourLocationProfile implements Cloneable {
     */
    String                    name       = Messages.Tour_Location_Default_ProfileName;
 
-   List<LocationPart>        allParts   = new ArrayList<>();
+   List<LocationPartID>        allParts   = new ArrayList<>();
 
    public TourLocationProfile() {
 
@@ -57,7 +57,7 @@ public class TourLocationProfile implements Cloneable {
          clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
          clonedObject.allParts = new ArrayList<>();
-         for (final LocationPart part : allParts) {
+         for (final LocationPartID part : allParts) {
             clonedObject.allParts.add(part);
          }
 

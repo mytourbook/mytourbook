@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -38,6 +39,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
@@ -104,6 +106,9 @@ public class TourLocationManager {
    private static final String     ATTR_PROFILE_NAME          = "profileName";                                         //$NON-NLS-1$
    private static final String     ATTR_TOUR_LOCATION_VERSION = "tourLocationVersion";                                 //$NON-NLS-1$
 
+   static final String             KEY_LOCATION_PART_ID       = "KEY_LOCATION_PART_ID";                                //$NON-NLS-1$
+   static final String             KEY_IS_NOT_AVAILABLE       = "KEY_IS_NOT_AVAILABLE";                                //$NON-NLS-1$
+
    private static final String     SUB_TASK_MESSAGE           = "%d / %d - waited %d ms";
    private static final String     SUB_TASK_MESSAGE_SKIPPED   = "%d / %d";                                             //$NON-NLS-1$
 
@@ -148,11 +153,15 @@ public class TourLocationManager {
    private static long                            _lastRetrievalTimeMS;
 
    /**
-    * Append text to the display name
+    * Append text to the display name in {@link #_displayNameBuffer}
     *
     * @param text
     */
    private static void appendPart(final String text) {
+
+      if (StringUtils.isNullOrEmpty(text)) {
+         return;
+      }
 
       // prevent to show duplicated fields, this can happen when the "name" field contains also e.g. the road name
       if (_usedDisplayNames.contains(text)) {
@@ -174,8 +183,21 @@ public class TourLocationManager {
       _displayNameBuffer.setLength(0);
       _usedDisplayNames.clear();
 
-      for (final MT_DLItem dlItem : allSelectedItems) {
-         appendPart(dlItem.getText());
+      for (final MT_DLItem partItem : allSelectedItems) {
+
+         final Boolean isNotAvailable = (Boolean) partItem.getData(KEY_IS_NOT_AVAILABLE);
+
+         if (isNotAvailable != null && isNotAvailable) {
+
+            /*
+             * Skip parts which are not available in the downloaded address data, this happens
+             * when a profile was created with this part
+             */
+
+            continue;
+         }
+
+         appendPart(partItem.getText());
       }
 
       return _displayNameBuffer.toString();
@@ -188,79 +210,110 @@ public class TourLocationManager {
     */
    public static String createLocationDisplayName(final OSMLocation osmLocation) {
 
-      if (osmLocation == null || osmLocation.address == null) {
+      if (osmLocation == null) {
+
          return UI.EMPTY_STRING;
       }
 
-      final OSMAddress address = osmLocation.address;
+      if (_selectedProfile != null) {
 
-      /**
-       * Places are sorted by number of inhabitants, only some or nothing are available
-       *
-       * place = city,
-       * place = town,
-       * place = village,
-       * place = hamlet
-       * place = isolated_dwelling
-       *
-       * https://wiki.openstreetmap.org/wiki/Key:place
-       */
+         // create name from a profile
+
+         return createLocationDisplayName(osmLocation, _selectedProfile);
+
+      } else {
+
+         // use osm default name
+
+         return osmLocation.display_name;
+      }
+   }
+
+   private static String createLocationDisplayName(final OSMLocation osmLocation,
+                                                   final TourLocationProfile profile) {
+
+      // TODO Auto-generated method stub
 
       // reset buffers
       _displayNameBuffer.setLength(0);
       _usedDisplayNames.clear();
 
-      // OSM name
-      final String osmName = osmLocation.name;
+      final OSMAddress address = osmLocation.address;
 
-      if (osmName != null && osmName.length() > 0) {
-         appendPart(osmName);
-      }
+      for (final LocationPartID locationPart : profile.allParts) {
 
-      // city
-      final String formattedCity = getCustom_City_Largest(address);
-      if (formattedCity != null) {
-         appendPart(formattedCity);
-      }
+         switch (locationPart) {
 
-      // POIs
-      final String adrAmenity = address.amenity;
-      final String adrTourism = address.tourism;
+// SET_FORMATTING_OFF
 
-      if (adrAmenity != null) {
-         appendPart(adrAmenity);
-      }
+         // ignore
+         case NONE:                             break;
+         case ISO3166_2_lvl4:                   break;
 
-      if (adrTourism != null) {
-         appendPart(adrTourism);
-      }
+         case OSM_DEFAULT_NAME:                 appendPart(osmLocation.display_name);                 break;
+         case OSM_NAME:                         appendPart(osmLocation.name);                         break;
 
-      // street
-      final String formattedStreet = getCustom_Street(address);
-      if (formattedStreet != null) {
-         appendPart(formattedStreet);
-      }
+         case CUSTOM_CITY_LARGEST:              appendPart(getCombined_City_Largest(address));          break;
+         case CUSTOM_CITY_SMALLEST:             appendPart(getCombined_City_Smallest(address));         break;
 
-      // state, country
-      final String adrState = address.state;
-      final String adrCountry = address.country;
+         case CUSTOM_CITY_WITH_ZIP_LARGEST:     appendPart(getCombined_CityWithZip_Largest(address));   break;
+         case CUSTOM_CITY_WITH_ZIP_SMALLEST:    appendPart(getCombined_CityWithZip_Smallest(address));  break;
 
-      if (adrState != null) {
-         appendPart(adrState);
-      }
+         case CUSTOM_STREET_WITH_HOUSE_NUMBER:  appendPart(getCombined_StreetWithHouseNumber(address));  break;
 
-      if (adrCountry != null) {
-         appendPart(adrCountry);
+// SET_FORMATTING_ON
+
+         default:
+
+            /*
+             * Append all other fieds
+             */
+
+            try {
+
+               final String fieldName = locationPart.name();
+               final Field addressField = address.getClass().getField(fieldName);
+
+               final Object fieldValue = addressField.get(address);
+
+               if (fieldValue instanceof final String textValue) {
+
+                  appendPart(textValue);
+               }
+
+            } catch (NoSuchFieldException
+                  | SecurityException
+                  | IllegalArgumentException
+                  | IllegalAccessException e) {
+
+               StatusUtil.log(e);
+            }
+
+            break;
+         }
       }
 
       return _displayNameBuffer.toString();
-
-//    return osmLocation.display_name;
    }
 
-   static String getCustom_City_Largest(final OSMAddress address) {
+   /**
+    * Places are sorted by number of inhabitants, only some or nothing are available
+    *
+    * place = city,
+    * place = town,
+    * place = village,
+    * place = hamlet
+    * place = isolated_dwelling
+    *
+    * https://wiki.openstreetmap.org/wiki/Key:place
+    *
+    * @param address
+    *
+    * @return
+    */
+   static String getCombined_City_Largest(final OSMAddress address) {
 
-      // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
       final String adrCity                = address.city;
       final String adrTown                = address.town;
@@ -281,9 +334,9 @@ public class TourLocationManager {
       return city;
    }
 
-   static String getCustom_City_Smallest(final OSMAddress address) {
+   static String getCombined_City_Smallest(final OSMAddress address) {
 
-      // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
       final String adrCity                = address.city;
       final String adrTown                = address.town;
@@ -304,9 +357,9 @@ public class TourLocationManager {
       return city;
    }
 
-   static String getCustom_CityWithZip_Largest(final OSMAddress address) {
+   static String getCombined_CityWithZip_Largest(final OSMAddress address) {
 
-      final String city = getCustom_City_Largest(address);
+      final String city = getCombined_City_Largest(address);
       final String adrPostCode = address.postcode;
 
       if (city == null || adrPostCode == null) {
@@ -329,9 +382,9 @@ public class TourLocationManager {
       }
    }
 
-   static String getCustom_CityWithZip_Smallest(final OSMAddress address) {
+   static String getCombined_CityWithZip_Smallest(final OSMAddress address) {
 
-      final String city = getCustom_City_Smallest(address);
+      final String city = getCombined_City_Smallest(address);
       final String adrPostCode = address.postcode;
 
       if (city == null || adrPostCode == null) {
@@ -354,7 +407,7 @@ public class TourLocationManager {
       }
    }
 
-   static String getCustom_Street(final OSMAddress address) {
+   static String getCombined_StreetWithHouseNumber(final OSMAddress address) {
 
       final String adrRoad = address.road;
       final String adrHouseNumber = address.house_number;
@@ -767,9 +820,9 @@ public class TourLocationManager {
 
                   for (final IMemento xmlPart : xmlParts.getChildren()) {
 
-                     final LocationPart part = (LocationPart) Util.getXmlEnum(xmlPart, ATTR_NAME, LocationPart.NONE);
+                     final LocationPartID part = (LocationPartID) Util.getXmlEnum(xmlPart, ATTR_NAME, LocationPartID.NONE);
 
-                     if (part.equals(LocationPart.NONE) == false) {
+                     if (part.equals(LocationPartID.NONE) == false) {
 
                         profile.allParts.add(part);
                      }
@@ -834,7 +887,7 @@ public class TourLocationManager {
             final IMemento xmlParts = xmlLocation.createChild(TAG_PARTS);
 
             // loop: all location parts
-            for (final LocationPart locationPart : locationProfile.allParts) {
+            for (final LocationPartID locationPart : locationProfile.allParts) {
 
                // <Part>
                final IMemento xmlPart = xmlParts.createChild(TAG_PART);
