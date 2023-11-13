@@ -1821,7 +1821,7 @@ public class UI {
       ).toString();
    }
 
-   public static String FormatDoubleMinMaxElevationMeter(final double value) {
+   public static String formatDoubleMinMaxElevationMeter(final double value) {
 
       if (value == -Double.MAX_VALUE) {
          return SYMBOL_INFINITY_MIN;
