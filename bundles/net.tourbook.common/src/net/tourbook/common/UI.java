@@ -2340,10 +2340,12 @@ public class UI {
     */
    public static void openNotificationPopup(final String title, final String text) {
 
+      final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
+
       final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
             .title(title, false)
             .text(text)
-            .delay(2000)
+            .delay(delay)
             .build();
       notication.open();
    }
@@ -3199,8 +3201,9 @@ public class UI {
 
          statusLineMgr.setMessage(statusMessage);
 
+         final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
          // cleanup message
-         Display.getDefault().timerExec(3000, () -> statusLineMgr.setMessage(null));
+         Display.getDefault().timerExec(delay, () -> statusLineMgr.setMessage(null));
       }
    }
 
