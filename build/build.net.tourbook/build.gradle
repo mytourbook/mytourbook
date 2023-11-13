@@ -50,7 +50,7 @@ sonarqube {
     property 'sonar.projectKey',                     'wolfgang-ch_mytourbook'
     property 'sonar.organization',                   'wolfgang-ch'
     property 'sonar.host.url',                       'https://sonarcloud.io'
-    property 'sonar.projectVersion',                 _mtVersion
+    property 'sonar.projectVersion',                            _mtVersion
     property 'sonar.projectName',                               'MyTourbook'
     property 'sonar.sources',                                   'bundles'
     property 'sonar.java.binaries',                             '.'
