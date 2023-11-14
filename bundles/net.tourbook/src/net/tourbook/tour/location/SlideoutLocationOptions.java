@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -37,7 +38,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -55,7 +55,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -70,8 +69,6 @@ import org.eclipse.swt.widgets.ToolItem;
  * Slideout for the start/end location
  */
 public class SlideoutLocationOptions extends AdvancedSlideout {
-
-   private static final Font               _boldFont         = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private ToolItem                        _toolItem;
 
@@ -99,13 +96,11 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
    private Button                _btnCopyProfile;
    private Button                _btnDeleteProfile;
 
-   private Label                 _lblDefaultName;
    private Label                 _lblLocationParts;
    private Label                 _lblProfileName;
    private Label                 _lblProfiles;
    private Label                 _lblSelectedLocationParts;
 
-   private Text                  _txtDefaultName;
    private Text                  _txtProfileName;
    private Text                  _txtSelectedLocationParts;
 
@@ -215,13 +210,13 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       }
    }
 
-   private void addCustomPart(final LocationPartID locationPart,
-                              final String partValue,
-                              final List<MT_DLItem> allParts) {
+   private void addCombinedPart(final LocationPartID locationPart,
+                                final String partValue,
+                                final List<MT_DLItem> allParts) {
 
       if (StringUtils.hasContent(partValue)) {
 
-         final String partName = createPartName_Combined(locationPart);
+         final String partName = TourLocationManager.createPartName_Combined(locationPart);
 
          allParts.add(new MT_DLItem(
 
@@ -230,20 +225,6 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
                TourLocationManager.KEY_LOCATION_PART_ID,
                locationPart));
       }
-   }
-
-   private String createPartName_Combined(final LocationPartID locationPart) {
-
-      final String label = TourLocationManager.allLocationPartLabel.get(locationPart);
-
-      return UI.SYMBOL_STAR + UI.SPACE + label;
-   }
-
-   private String createPartName_NotAvailable(final LocationPartID locationPart) {
-
-      final String label = TourLocationManager.allLocationPartLabel.get(locationPart);
-
-      return UI.SYMBOL_STAR + UI.SYMBOL_STAR + UI.SPACE + label;
    }
 
    @Override
@@ -361,7 +342,36 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
                final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
 
-               cell.setText(profile.allParts.toString());
+               final String joinedParts = profile.allParts.stream()
+
+                     .map(locationPart -> {
+
+                        String label;
+
+                        switch (locationPart) {
+                        case OSM_DEFAULT_NAME:
+                        case OSM_NAME:
+                        case CUSTOM_CITY_LARGEST:
+                        case CUSTOM_CITY_SMALLEST:
+                        case CUSTOM_CITY_WITH_ZIP_LARGEST:
+                        case CUSTOM_CITY_WITH_ZIP_SMALLEST:
+                        case CUSTOM_STREET_WITH_HOUSE_NUMBER:
+
+                           label = TourLocationManager.createPartName_Combined(locationPart);
+                           break;
+
+                        default:
+
+                           label = TourLocationManager.allLocationPartLabel.get(locationPart);
+                           break;
+                        }
+
+                        return label;
+                     })
+
+                     .collect(Collectors.joining(UI.SYMBOL_COMMA + UI.SPACE));
+
+               cell.setText(joinedParts);
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
@@ -438,70 +448,74 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
    private void createUI_30_ProfileName(final Composite parent) {
 
+   }
+
+   private void createUI_50_LocationParts(final Composite parent) {
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3)
-            .applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_GREEN);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
-            // Label: Profile name
+            // label: Profile name
 
             _lblProfileName = new Label(container, SWT.NONE);
             _lblProfileName.setText(Messages.Slideout_TourFilter_Label_ProfileName);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblProfileName);
          }
          {
-            // Text: Profile name
+            // text: Profile name
 
             _txtProfileName = new Text(container, SWT.BORDER);
             _txtProfileName.addModifyListener(_defaultModifyListener);
             GridDataFactory.fillDefaults()
-                  .indent(20, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(50), SWT.DEFAULT)
-
+                  .grab(true, false)
                   .applyTo(_txtProfileName);
          }
-      }
-   }
-
-   private void createUI_50_LocationParts(final Composite parent) {
-
-      {
-         // default location name
-
-         _lblDefaultName = new Label(parent, SWT.NONE);
-         _lblDefaultName.setText(Messages.Slideout_TourLocation_Label_DefaultLocationName);
-         _lblDefaultName.setFont(_boldFont);
-         GridDataFactory.fillDefaults().applyTo(_lblDefaultName);
-
-         _txtDefaultName = new Text(parent, SWT.READ_ONLY | SWT.WRAP);
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .grab(true, false)
-               .applyTo(_txtDefaultName);
+         UI.createSpacer_Horizontal(container, 1);
       }
       {
-         // selected location parts
+         // label: selected location parts
 
-         _lblSelectedLocationParts = new Label(parent, SWT.NONE);
+         _lblSelectedLocationParts = new Label(container, SWT.NONE);
          _lblSelectedLocationParts.setText(Messages.Slideout_TourLocation_Label_SelectedLocationParts);
-         _lblSelectedLocationParts.setFont(_boldFont);
          GridDataFactory.fillDefaults().applyTo(_lblSelectedLocationParts);
 
-         _txtSelectedLocationParts = new Text(parent, SWT.READ_ONLY | SWT.WRAP);
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .grab(true, false)
-               .applyTo(_txtSelectedLocationParts);
+         UI.createSpacer_Horizontal(container, 2);
+      }
+      {
+         {
+            // text: selected location parts
 
+            _txtSelectedLocationParts = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .grab(true, false)
+                  .span(2, 1)
+                  .applyTo(_txtSelectedLocationParts);
+         }
+         {
+            // button: Apply & Close
+
+            _btnApply = new Button(container, SWT.PUSH);
+            _btnApply.setText(OtherMessages.APP_ACTION_APPLY_AND_CLOSE);
+            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .applyTo(_btnApply);
+
+            // set button default width
+            UI.setButtonLayoutWidth(_btnApply);
+         }
       }
       {
          // dual list with location parts
 
          _lblLocationParts = new Label(parent, SWT.NONE);
          _lblLocationParts.setText(Messages.Slideout_TourLocation_Label_LocationParts);
-         GridDataFactory.fillDefaults().applyTo(_lblLocationParts);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.END)
+               .applyTo(_lblLocationParts);
 
          _listLocationParts = new MT_DualList(parent, SWT.NONE);
          _listLocationParts.addSelectionChangeListener(selectionChangeListener -> updateModelAndUI_FromSelectedParts());
@@ -513,35 +527,15 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
    private void createUI_90_ProfileActions(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-         {
-            // Label: Profile name
+         // Label: Profile name
 
-            final Label label = new Label(container, SWT.WRAP);
-            label.setText(Messages.Slideout_TourFilter_Label_Remarks);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .align(SWT.FILL, SWT.BEGINNING)
-                  .applyTo(label);
-         }
-         {
-            /*
-             * Button: Apply & Close
-             */
-            _btnApply = new Button(container, SWT.PUSH);
-            _btnApply.setText(OtherMessages.APP_ACTION_APPLY_AND_CLOSE);
-            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
-            GridDataFactory.fillDefaults()
-                  .align(SWT.END, SWT.END)
-                  .applyTo(_btnApply);
-
-            // set button default width
-            UI.setButtonLayoutWidth(_btnApply);
-         }
+         final Label label = new Label(parent, SWT.WRAP);
+         label.setText(Messages.Slideout_TourFilter_Label_Remarks);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.FILL, SWT.BEGINNING)
+               .applyTo(label);
       }
    }
 
@@ -570,12 +564,10 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       _btnCopyProfile.setEnabled(isProfileSelected);
       _btnDeleteProfile.setEnabled(isProfileSelected);
 
-      _lblDefaultName.setEnabled(isProfileSelected);
       _lblLocationParts.setEnabled(isProfileSelected);
       _lblProfileName.setEnabled(isProfileSelected);
       _lblSelectedLocationParts.setEnabled(isProfileSelected);
 
-      _txtDefaultName.setEnabled(isProfileSelected);
       _txtProfileName.setEnabled(isProfileSelected);
 
       _lblProfiles.setEnabled(numProfiles > 0);
@@ -837,7 +829,7 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
          final MT_DLItem dlItem = new MT_DLItem(
                UI.EMPTY_STRING,
-               createPartName_NotAvailable(remainingPart),
+               TourLocationManager.createPartName_NotAvailable(remainingPart),
                TourLocationManager.KEY_LOCATION_PART_ID,
                remainingPart);
 
@@ -898,9 +890,6 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       final OSMLocation osmLocation = getOsmLocation();
       final OSMAddress address = osmLocation.address;
 
-      // show "display_name" as default name
-      _txtDefaultName.setText(osmLocation.display_name);
-
       /*
        * Fill address part widget
        */
@@ -919,20 +908,20 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
          isShowSmallestCity = true;
       }
 
-      addCustomPart(LocationPartID    .OSM_DEFAULT_NAME,                  osmLocation.display_name, _allDualListItems);
-      addCustomPart(LocationPartID    .OSM_NAME,                          osmLocation.name, _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                  osmLocation.display_name, _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_NAME,                          osmLocation.name, _allDualListItems);
 
-      addCustomPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity, _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity, _allDualListItems);
       if (isShowSmallestCity) {
-         addCustomPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity, _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity, _allDualListItems);
       }
 
-      addCustomPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip, _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip, _allDualListItems);
       if (isShowSmallestCity) {
-         addCustomPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip, _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip, _allDualListItems);
       }
 
-      addCustomPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber, _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber, _allDualListItems);
 
 
 // SET_FORMATTING_ON

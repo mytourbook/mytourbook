@@ -24,6 +24,9 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
+/**
+ * Common code for a submenu of an {@link Action}
+ */
 public abstract class SubMenu extends Action implements IMenuCreator {
 
    private Menu _menu;
@@ -59,14 +62,16 @@ public abstract class SubMenu extends Action implements IMenuCreator {
    public Menu getMenu(final Menu parent) {
 
       dispose();
+
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
       _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
          // dispose old menu items
-         Arrays.stream(((Menu) menuEvent.widget).getItems())
-               .forEach(menuItem -> menuItem.dispose());
+         final Menu menu = (Menu) menuEvent.widget;
+
+         Arrays.stream(menu.getItems()).forEach(menuItem -> menuItem.dispose());
 
          fillMenu(_menu);
 

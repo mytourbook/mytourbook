@@ -2513,7 +2513,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 
    public static String        Slideout_TourLocation_Column_LocationParts;
-   public static String        Slideout_TourLocation_Label_DefaultLocationName;
    public static String        Slideout_TourLocation_Label_EndLocation_Title;
    public static String        Slideout_TourLocation_Label_LocationParts;
    public static String        Slideout_TourLocation_Label_SelectedLocationParts;
@@ -2732,6 +2731,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_ComputeCadenceZonesTimes;
    public static String        Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String        Tour_Action_ComputeCadenceZonesTimes_Title;
+   public static String        Tour_Action_DownloadEndLocation;
+   public static String        Tour_Action_DownloadEndLocation_Tooltip;
+   public static String        Tour_Action_DownloadStartLocation;
+   public static String        Tour_Action_DownloadStartLocation_Tooltip;
    public static String        Tour_Action_DuplicateTour;
    public static String        Tour_Action_EditChartPreferences;
    public static String        Tour_Action_EditSmoothingPreferences;
@@ -2909,8 +2912,6 @@ public class Messages extends NLS {
 
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
-   public static String        Tour_Editor_Action_DownloadEndLocation;
-   public static String        Tour_Editor_Action_DownloadStartLocation;
    public static String        Tour_Editor_Button_DiscardModifications;
    public static String        Tour_Editor_Button_SaveTour;
    public static String        tour_editor_csvTimeSliceExport;

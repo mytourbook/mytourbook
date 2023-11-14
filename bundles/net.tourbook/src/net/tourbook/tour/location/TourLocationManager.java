@@ -111,7 +111,7 @@ public class TourLocationManager {
    static final String             KEY_LOCATION_PART_ID       = "KEY_LOCATION_PART_ID";                                //$NON-NLS-1$
    static final String             KEY_IS_NOT_AVAILABLE       = "KEY_IS_NOT_AVAILABLE";                                //$NON-NLS-1$
 
-   private static final String     SUB_TASK_MESSAGE           = "%d / %d - waited %d ms";
+   private static final String     SUB_TASK_MESSAGE           = "%d / %d - waited %d ms";                              //$NON-NLS-1$
    private static final String     SUB_TASK_MESSAGE_SKIPPED   = "%d / %d";                                             //$NON-NLS-1$
 
    private static final String     _userAgent                 = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
@@ -158,84 +158,81 @@ public class TourLocationManager {
 
    static Map<LocationPartID, String>             allLocationPartLabel = Map.ofEntries(
 
+         Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Location_Part_OsmDefaultName),
+         Map.entry(LocationPartID.OSM_NAME,                          Messages.Location_Part_OsmName),
 
-//         OSM_DEFAULT_NAME, //
-//         OSM_NAME, //
-//
-//         CUSTOM_CITY_LARGEST, //
-//         CUSTOM_CITY_SMALLEST, //
-//         CUSTOM_CITY_WITH_ZIP_LARGEST, //
-//         CUSTOM_CITY_WITH_ZIP_SMALLEST, //
-//
-//         CUSTOM_STREET_WITH_HOUSE_NUMBER, //
+         Map.entry(LocationPartID.CUSTOM_CITY_LARGEST,               Messages.Location_Part_City_Largest),
+         Map.entry(LocationPartID.CUSTOM_CITY_SMALLEST,              Messages.Location_Part_City_Smallest),
+         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_LARGEST,      Messages.Location_Part_CityWithZip_Largest),
+         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_SMALLEST,     Messages.Location_Part_CityWithZip_Smalles),
 
+         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Location_Part_StreeWithHouseNumber),
 
-         Map.entry(LocationPartID.continent,          Messages.Location_Part_Continent),
-         Map.entry(LocationPartID.country,            Messages.Location_Part_Country),
-         Map.entry(LocationPartID.country_code,       Messages.Location_Part_CountryCode),
+         Map.entry(LocationPartID.continent,                         Messages.Location_Part_Continent),
+         Map.entry(LocationPartID.country,                           Messages.Location_Part_Country),
+         Map.entry(LocationPartID.country_code,                      Messages.Location_Part_CountryCode),
 
-         Map.entry(LocationPartID.region,             Messages.Location_Part_Region),
-         Map.entry(LocationPartID.state,              Messages.Location_Part_State),
-         Map.entry(LocationPartID.state_district,     Messages.Location_Part_StateDistrict),
-         Map.entry(LocationPartID.county,             Messages.Location_Part_County),
+         Map.entry(LocationPartID.region,                            Messages.Location_Part_Region),
+         Map.entry(LocationPartID.state,                             Messages.Location_Part_State),
+         Map.entry(LocationPartID.state_district,                    Messages.Location_Part_StateDistrict),
+         Map.entry(LocationPartID.county,                            Messages.Location_Part_County),
 
-         Map.entry(LocationPartID.municipality,       Messages.Location_Part_Municipality),
-         Map.entry(LocationPartID.city,               Messages.Location_Part_City),
-         Map.entry(LocationPartID.town,               Messages.Location_Part_Town),
-         Map.entry(LocationPartID.village,            Messages.Location_Part_Village),
+         Map.entry(LocationPartID.municipality,                      Messages.Location_Part_Municipality),
+         Map.entry(LocationPartID.city,                              Messages.Location_Part_City),
+         Map.entry(LocationPartID.town,                              Messages.Location_Part_Town),
+         Map.entry(LocationPartID.village,                           Messages.Location_Part_Village),
 
-         Map.entry(LocationPartID.city_district,      Messages.Location_Part_CityDistrict),
-         Map.entry(LocationPartID.district,           Messages.Location_Part_District),
-         Map.entry(LocationPartID.borough,            Messages.Location_Part_Borough),
-         Map.entry(LocationPartID.suburb,             Messages.Location_Part_Suburb),
-         Map.entry(LocationPartID.subdivision,        Messages.Location_Part_Subdivision),
+         Map.entry(LocationPartID.city_district,                     Messages.Location_Part_CityDistrict),
+         Map.entry(LocationPartID.district,                          Messages.Location_Part_District),
+         Map.entry(LocationPartID.borough,                           Messages.Location_Part_Borough),
+         Map.entry(LocationPartID.suburb,                            Messages.Location_Part_Suburb),
+         Map.entry(LocationPartID.subdivision,                       Messages.Location_Part_Subdivision),
 
-         Map.entry(LocationPartID.hamlet,             Messages.Location_Part_Hamlet),
-         Map.entry(LocationPartID.croft,              Messages.Location_Part_Craft),
-         Map.entry(LocationPartID.isolated_dwelling,  Messages.Location_Part_IsolatedDwelling),
+         Map.entry(LocationPartID.hamlet,                            Messages.Location_Part_Hamlet),
+         Map.entry(LocationPartID.croft,                             Messages.Location_Part_Craft),
+         Map.entry(LocationPartID.isolated_dwelling,                 Messages.Location_Part_IsolatedDwelling),
 
-         Map.entry(LocationPartID.neighbourhood,      Messages.Location_Part_Neighbourhood),
-         Map.entry(LocationPartID.allotments,         Messages.Location_Part_Allotments),
-         Map.entry(LocationPartID.quarter,            Messages.Location_Part_Quarter),
+         Map.entry(LocationPartID.neighbourhood,                     Messages.Location_Part_Neighbourhood),
+         Map.entry(LocationPartID.allotments,                        Messages.Location_Part_Allotments),
+         Map.entry(LocationPartID.quarter,                           Messages.Location_Part_Quarter),
 
-         Map.entry(LocationPartID.city_block,         Messages.Location_Part_CityBlock),
-         Map.entry(LocationPartID.residential,        Messages.Location_Part_Residential),
-         Map.entry(LocationPartID.farm,               Messages.Location_Part_Farm),
-         Map.entry(LocationPartID.farmyard,           Messages.Location_Part_Farmyard),
-         Map.entry(LocationPartID.industrial,         Messages.Location_Part_Industrial),
-         Map.entry(LocationPartID.commercial,         Messages.Location_Part_Commercial),
-         Map.entry(LocationPartID.retail,             Messages.Location_Part_Retail),
+         Map.entry(LocationPartID.city_block,                        Messages.Location_Part_CityBlock),
+         Map.entry(LocationPartID.residential,                       Messages.Location_Part_Residential),
+         Map.entry(LocationPartID.farm,                              Messages.Location_Part_Farm),
+         Map.entry(LocationPartID.farmyard,                          Messages.Location_Part_Farmyard),
+         Map.entry(LocationPartID.industrial,                        Messages.Location_Part_Industrial),
+         Map.entry(LocationPartID.commercial,                        Messages.Location_Part_Commercial),
+         Map.entry(LocationPartID.retail,                            Messages.Location_Part_Retail),
 
-         Map.entry(LocationPartID.road,               Messages.Location_Part_Road),
+         Map.entry(LocationPartID.road,                              Messages.Location_Part_Road),
 
-         Map.entry(LocationPartID.house_name,         Messages.Location_Part_HouseName),
-         Map.entry(LocationPartID.house_number,       Messages.Location_Part_HouseNumber),
+         Map.entry(LocationPartID.house_name,                        Messages.Location_Part_HouseName),
+         Map.entry(LocationPartID.house_number,                      Messages.Location_Part_HouseNumber),
 
-         Map.entry(LocationPartID.aerialway,          Messages.Location_Part_Aerialway),
-         Map.entry(LocationPartID.aeroway,            Messages.Location_Part_Aeroway),
-         Map.entry(LocationPartID.amenity,            Messages.Location_Part_Amenity),
-         Map.entry(LocationPartID.boundary,           Messages.Location_Part_Boundary),
-         Map.entry(LocationPartID.bridge,             Messages.Location_Part_Bridge),
-         Map.entry(LocationPartID.club,               Messages.Location_Part_Club),
-         Map.entry(LocationPartID.craft,              Messages.Location_Part_Craft),
-         Map.entry(LocationPartID.emergency,          Messages.Location_Part_Emergency),
-         Map.entry(LocationPartID.historic,           Messages.Location_Part_Historic),
-         Map.entry(LocationPartID.landuse,            Messages.Location_Part_Landuse),
-         Map.entry(LocationPartID.leisure,            Messages.Location_Part_Leisure),
-         Map.entry(LocationPartID.man_made,           Messages.Location_Part_ManMade),
-         Map.entry(LocationPartID.military,           Messages.Location_Part_Military),
-         Map.entry(LocationPartID.mountain_pass,      Messages.Location_Part_MountainPass),
-         Map.entry(LocationPartID.natural,            Messages.Location_Part_Natural),
-         Map.entry(LocationPartID.office,             Messages.Location_Part_Office),
-         Map.entry(LocationPartID.place,              Messages.Location_Part_Place),
-         Map.entry(LocationPartID.railway,            Messages.Location_Part_Railway),
-         Map.entry(LocationPartID.shop,               Messages.Location_Part_Shop),
-         Map.entry(LocationPartID.tourism,            Messages.Location_Part_Tourism),
-         Map.entry(LocationPartID.tunnel,             Messages.Location_Part_Tunnel),
-         Map.entry(LocationPartID.waterway,           Messages.Location_Part_Waterway),
+         Map.entry(LocationPartID.aerialway,                         Messages.Location_Part_Aerialway),
+         Map.entry(LocationPartID.aeroway,                           Messages.Location_Part_Aeroway),
+         Map.entry(LocationPartID.amenity,                           Messages.Location_Part_Amenity),
+         Map.entry(LocationPartID.boundary,                          Messages.Location_Part_Boundary),
+         Map.entry(LocationPartID.bridge,                            Messages.Location_Part_Bridge),
+         Map.entry(LocationPartID.club,                              Messages.Location_Part_Club),
+         Map.entry(LocationPartID.craft,                             Messages.Location_Part_Craft),
+         Map.entry(LocationPartID.emergency,                         Messages.Location_Part_Emergency),
+         Map.entry(LocationPartID.historic,                          Messages.Location_Part_Historic),
+         Map.entry(LocationPartID.landuse,                           Messages.Location_Part_Landuse),
+         Map.entry(LocationPartID.leisure,                           Messages.Location_Part_Leisure),
+         Map.entry(LocationPartID.man_made,                          Messages.Location_Part_ManMade),
+         Map.entry(LocationPartID.military,                          Messages.Location_Part_Military),
+         Map.entry(LocationPartID.mountain_pass,                     Messages.Location_Part_MountainPass),
+         Map.entry(LocationPartID.natural,                           Messages.Location_Part_Natural),
+         Map.entry(LocationPartID.office,                            Messages.Location_Part_Office),
+         Map.entry(LocationPartID.place,                             Messages.Location_Part_Place),
+         Map.entry(LocationPartID.railway,                           Messages.Location_Part_Railway),
+         Map.entry(LocationPartID.shop,                              Messages.Location_Part_Shop),
+         Map.entry(LocationPartID.tourism,                           Messages.Location_Part_Tourism),
+         Map.entry(LocationPartID.tunnel,                            Messages.Location_Part_Tunnel),
+         Map.entry(LocationPartID.waterway,                          Messages.Location_Part_Waterway),
 
-         Map.entry(LocationPartID.postcode,           Messages.Location_Part_Postcode)
-
+         Map.entry(LocationPartID.postcode,                          Messages.Location_Part_Postcode)
       );
 
 // SET_FORMATTING_ON
@@ -381,6 +378,20 @@ public class TourLocationManager {
       }
 
       return _displayNameBuffer.toString();
+   }
+
+   static String createPartName_Combined(final LocationPartID locationPart) {
+
+      final String label = allLocationPartLabel.get(locationPart);
+
+      return UI.SYMBOL_STAR + UI.SPACE + label;
+   }
+
+   static String createPartName_NotAvailable(final LocationPartID locationPart) {
+
+      final String label = allLocationPartLabel.get(locationPart);
+
+      return UI.SYMBOL_STAR + UI.SYMBOL_STAR + UI.SPACE + label;
    }
 
    /**
@@ -592,6 +603,10 @@ public class TourLocationManager {
 
       final TourLocationData tourLocationData = getName_10_RetrieveData(latitude, longitude, _zoomLevel);
 
+      if (tourLocationData == null) {
+         return null;
+      }
+
       final OSMLocation osmLocation = tourLocationData.osmLocation = getName_20_DeserializeData(tourLocationData.downloadedData);
 
       if (_isLogging_AddressRetrieval && osmLocation != null) {
@@ -703,7 +718,7 @@ public class TourLocationManager {
 
       } catch (final Exception ex) {
 
-         logError(ex.getMessage());
+         logException(ex);
          Thread.currentThread().interrupt();
 
          return null;
@@ -753,6 +768,11 @@ public class TourLocationManager {
       final File layerFile = _stateLocation.append(TOUR_LOCATION_FILE_NAME).toFile();
 
       return layerFile;
+   }
+
+   private static void logException(final Exception ex) {
+
+      TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving location data", ex);
    }
 
    private static void logError(final String exceptionMessage) {

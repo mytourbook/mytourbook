@@ -537,8 +537,12 @@ public class Messages extends NLS {
    public static String        Location_Part_Boundary;
    public static String        Location_Part_Bridge;
    public static String        Location_Part_City;
+   public static String        Location_Part_City_Largest;
+   public static String        Location_Part_City_Smallest;
    public static String        Location_Part_CityBlock;
    public static String        Location_Part_CityDistrict;
+   public static String        Location_Part_CityWithZip_Largest;
+   public static String        Location_Part_CityWithZip_Smalles;
    public static String        Location_Part_Commercial;
    public static String        Location_Part_Continent;
    public static String        Location_Part_Country;
@@ -566,6 +570,8 @@ public class Messages extends NLS {
    public static String        Location_Part_Natural;
    public static String        Location_Part_Neighbourhood;
    public static String        Location_Part_Office;
+   public static String        Location_Part_OsmDefaultName;
+   public static String        Location_Part_OsmName;
    public static String        Location_Part_Place;
    public static String        Location_Part_Postcode;
    public static String        Location_Part_Quarter;
@@ -577,6 +583,7 @@ public class Messages extends NLS {
    public static String        Location_Part_Shop;
    public static String        Location_Part_State;
    public static String        Location_Part_StateDistrict;
+   public static String        Location_Part_StreeWithHouseNumber;
    public static String        Location_Part_Suburb;
    public static String        Location_Part_Subdivision;
    public static String        Location_Part_Tourism;

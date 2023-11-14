@@ -17,14 +17,15 @@ package net.tourbook.common.action;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
+import net.tourbook.common.ui.SubMenu;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 
-public abstract class ActionDownload extends Action {
+public abstract class ActionDownload extends SubMenu {
 
    /**
     * Common action to download something
@@ -33,7 +34,7 @@ public abstract class ActionDownload extends Action {
     */
    public ActionDownload(final String downloadTooltip) {
 
-      super();
+      super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
       setToolTipText(downloadTooltip);
 
