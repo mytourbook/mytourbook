@@ -111,7 +111,6 @@ public class Messages extends NLS {
    public static String Log_DownloadWorkoutsFromSuunto_001_Start;
    public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
    public static String Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
-   public static String Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder;
    public static String Log_DownloadWorkoutsFromSuunto_005_DownloadStatus;
    public static String Log_DownloadWorkoutsFromSuunto_006_FileAlreadyExists;
    public static String Log_DownloadWorkoutsFromSuunto_007_Error;
