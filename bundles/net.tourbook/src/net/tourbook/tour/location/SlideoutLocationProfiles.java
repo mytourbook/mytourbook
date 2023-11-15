@@ -59,6 +59,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -68,7 +69,7 @@ import org.eclipse.swt.widgets.ToolItem;
 /**
  * Slideout for the start/end location
  */
-public class SlideoutLocationOptions extends AdvancedSlideout {
+public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private ToolItem                        _toolItem;
 
@@ -86,25 +87,27 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
    private List<MT_DLItem>                 _allDualListItems = new ArrayList<>();
 
+   private ITourLocationConsumer           _tourLocationConsumer;
+
    /*
     * UI controls
     */
-   private Composite             _parent;
-   private MT_DualList           _listLocationParts;
+   private Composite   _parent;
+   private MT_DualList _listLocationParts;
 
-   private Button                _btnApply;
-   private Button                _btnCopyProfile;
-   private Button                _btnDeleteProfile;
+   private Button      _btnApply;
+   private Button      _btnCopyProfile;
+   private Button      _btnDeleteProfile;
 
-   private Label                 _lblLocationParts;
-   private Label                 _lblProfileName;
-   private Label                 _lblProfiles;
-   private Label                 _lblSelectedLocationParts;
+   private Label       _lblLocationParts;
+   private Label       _lblProfileName;
+   private Label       _lblProfiles;
+   private Label       _lblSelectedLocationParts;
 
-   private Text                  _txtProfileName;
-   private Text                  _txtSelectedLocationParts;
+   private Text        _txtProfileName;
+   private Text        _txtSelectedLocationParts;
 
-   private ITourLocationConsumer _tourLocationConsumer;
+   private Control     _ownerControl;
 
    private class LocationProfileComparator extends ViewerComparator {
 
@@ -143,14 +146,17 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public SlideoutLocationOptions(final ToolItem toolItem,
-                                  final IDialogSettings state,
-                                  final ITourLocationConsumer tourLocationConsumer,
-                                  final boolean isStartLocation,
-                                  final TourData tourData) {
+   public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
+                                   final TourData tourData,
+                                   final Control ownerControl,
+                                   final ToolItem toolItem,
+                                   final IDialogSettings state,
+                                   final boolean isStartLocation) {
 
-      super(toolItem.getParent(), state, new int[] { 800, 800 });
+      // TODO Auto-generated constructor stub
+      super(ownerControl, state, new int[] { 800, 800 });
 
+      _ownerControl = ownerControl;
       _toolItem = toolItem;
 
       _tourLocationConsumer = tourLocationConsumer;
@@ -337,6 +343,7 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
          tc = tvc.getColumn();
          tc.setText(Messages.Slideout_TourLocation_Column_LocationParts);
          tvc.setLabelProvider(new CellLabelProvider() {
+
             @Override
             public void update(final ViewerCell cell) {
 
@@ -373,6 +380,7 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
 
                cell.setText(joinedParts);
             }
+
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
       }
@@ -587,7 +595,7 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
    protected Rectangle getParentBounds() {
 
       final Rectangle itemBounds = _toolItem.getBounds();
-      final Point itemDisplayPosition = _toolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+      final Point itemDisplayPosition = _ownerControl.toDisplay(itemBounds.x, itemBounds.y);
 
       itemBounds.x = itemDisplayPosition.x;
       itemBounds.y = itemDisplayPosition.y;
@@ -885,6 +893,11 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       table.setSelection(table.getSelectionIndices());
    }
 
+   public void setIsStartLocation(final boolean isStartLocation) {
+
+      _isStartLocation = isStartLocation;
+   }
+
    private void setupUI() {
 
       final OSMLocation osmLocation = getOsmLocation();
@@ -909,20 +922,19 @@ public class SlideoutLocationOptions extends AdvancedSlideout {
       }
 
       addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                  osmLocation.display_name, _allDualListItems);
-      addCombinedPart(LocationPartID    .OSM_NAME,                          osmLocation.name, _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_NAME,                          osmLocation.name,         _allDualListItems);
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity, _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity,              _allDualListItems);
       if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity, _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity,             _allDualListItems);
       }
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip, _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip,       _allDualListItems);
       if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip, _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip,      _allDualListItems);
       }
 
-      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber, _allDualListItems);
-
+      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber,    _allDualListItems);
 
 // SET_FORMATTING_ON
 

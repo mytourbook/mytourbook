@@ -17,7 +17,11 @@ package net.tourbook.tour.location;
 
 public interface ITourLocationConsumer {
 
+   public void setTourEndLocation();
+
    public void setTourEndLocation(String endLocation);
+
+   public void setTourStartLocation();
 
    public void setTourStartLocation(String startLocation);
 }

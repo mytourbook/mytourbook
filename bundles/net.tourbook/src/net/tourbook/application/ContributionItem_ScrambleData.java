@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
@@ -24,6 +22,7 @@ import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -64,14 +63,7 @@ public class ContributionItem_ScrambleData extends ContributionItem {
 
          _actionToolItem.setToolTipText(Messages.Action_App_ScrambleData_Tooltip);
          _actionToolItem.setImage(_actionImage);
-         _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-            final boolean isSelected = _actionToolItem.getSelection();
-
-            UI.setIsScrambleData(isSelected);
-         }
-
-         ));
+         _actionToolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect()));
 
          // set initial selection which can be set with the command line
          _actionToolItem.setSelection(UI.IS_SCRAMBLE_DATA);
@@ -84,5 +76,12 @@ public class ContributionItem_ScrambleData extends ContributionItem {
 
       _actionToolItem.dispose();
       _actionToolItem = null;
+   }
+
+   private void onSelect() {
+
+      final boolean isSelected = _actionToolItem.getSelection();
+
+      UI.setIsScrambleData(isSelected);
    }
 }

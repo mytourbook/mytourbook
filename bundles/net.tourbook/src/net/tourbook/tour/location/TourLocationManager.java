@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -716,10 +717,19 @@ public class TourLocationManager {
             return null;
          }
 
+      } catch (final HttpConnectTimeoutException ex) {
+
+         StatusUtil.showStatus(ex);
+
+         logException(ex);
+
+         return null;
+
       } catch (final Exception ex) {
 
          logException(ex);
-         Thread.currentThread().interrupt();
+
+//       Thread.currentThread().interrupt();
 
          return null;
       }
@@ -770,16 +780,16 @@ public class TourLocationManager {
       return layerFile;
    }
 
-   private static void logException(final Exception ex) {
-
-      TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving location data", ex);
-   }
-
    private static void logError(final String exceptionMessage) {
 
       TourLogManager.log_ERROR(NLS.bind(
             "Error while retrieving location data: \"{1}\"", //$NON-NLS-1$
             exceptionMessage));
+   }
+
+   private static void logException(final Exception ex) {
+
+      TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving location data", ex);
    }
 
    public static void restoreState() {

@@ -2731,14 +2731,11 @@ public class Messages extends NLS {
    public static String        Tour_Action_ComputeCadenceZonesTimes;
    public static String        Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String        Tour_Action_ComputeCadenceZonesTimes_Title;
-   public static String        Tour_Action_DownloadEndLocation;
-   public static String        Tour_Action_DownloadEndLocation_Tooltip;
-   public static String        Tour_Action_DownloadStartLocation;
-   public static String        Tour_Action_DownloadStartLocation_Tooltip;
    public static String        Tour_Action_DuplicateTour;
    public static String        Tour_Action_EditChartPreferences;
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
+
    public static String        Tour_Action_GeoCompare;
    public static String        Tour_Action_GeoCompare_Tooltip;
    public static String        Tour_Action_Graph_PaceInterval_Tooltip;
@@ -2759,6 +2756,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_graph_speed_tooltip;
    public static String        Tour_Action_graph_temperature_tooltip;
    public static String        Tour_Action_graph_tour_compare_tooltip;
+   public static String        Tour_Action_LocationCustomize_End_Tooltip;
+   public static String        Tour_Action_LocationCustomize_Start_Tooltip;
+   public static String        Tour_Action_LocationDownload_End_Tooltip;
+   public static String        Tour_Action_LocationDownload_Start_Tooltip;
    public static String        Tour_Action_MapMarkerOptions_Tooltip;
    public static String        Tour_Action_MarkerOptions_Tooltip;
    public static String        Tour_Action_Marker_Delete;
@@ -2796,6 +2797,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_ShowTourPauses;
    public static String        Tour_Action_ShowTourPauses_Tooltip;
    public static String        Tour_Action_ShowValuePointValue;
+
    public static String        tour_action_show_srtm_data;
    public static String        Tour_Action_show_start_time_on_x_axis;
    public static String        Tour_Action_Swim_Strokes_Tooltip;
