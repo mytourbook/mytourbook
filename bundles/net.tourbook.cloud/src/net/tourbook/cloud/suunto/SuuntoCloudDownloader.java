@@ -59,7 +59,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.notifications.NotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -160,11 +159,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                return Status.CANCEL_STATUS;
             }
 
-            if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
-               Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(Messages.Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder));
-               return Status.CANCEL_STATUS;
-            }
-
             monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
                         UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND,
@@ -174,7 +168,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
-            if (workouts.payload().isEmpty()) {
+            if (workouts == null || workouts.payload().isEmpty()) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound));
                return Status.CANCEL_STATUS;
             }
@@ -212,42 +206,32 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          }
       };
 
-      try {
-         final long start = System.currentTimeMillis();
+      final long start = System.currentTimeMillis();
 
-         TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
+      TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
-         job.setPriority(Job.INTERACTIVE);
-         job.schedule();
+      job.setPriority(Job.INTERACTIVE);
+      job.schedule();
 
-         job.addJobChangeListener(new JobChangeAdapter() {
-            @Override
-            public void done(final IJobChangeEvent event) {
+      job.addJobChangeListener(new JobChangeAdapter() {
+         @Override
+         public void done(final IJobChangeEvent event) {
 
-               if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+            if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
 
-                  PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
-                     TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+                  TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-                     final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
-                           numberOfDownloadedTours[0],
-                           _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
+                  final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
+                        numberOfDownloadedTours[0],
+                        _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
 
-                     final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
-                           .title(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, false)
-                           .text(infoText)
-                           .delay(2000)
-                           .build();
-                     notication.open();
-                  });
-               }
+                  UI.openNotificationPopup(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, infoText);
+               });
             }
-         });
-
-      } catch (final Exception e) {
-         StatusUtil.log(e);
-      }
+         }
+      });
    }
 
    private String getAccessToken() {
@@ -416,7 +400,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          Thread.currentThread().interrupt();
       }
 
-      return new Workouts();
+      return null;
    }
 
    private CompletableFuture<WorkoutDownload> sendAsyncRequest(final Payload workoutPayload,

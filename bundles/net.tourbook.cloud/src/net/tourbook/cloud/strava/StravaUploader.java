@@ -60,7 +60,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.notifications.NotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -526,12 +525,7 @@ public class StravaUploader extends TourbookCloudUploader {
                         numberOfUploadedTours[0],
                         numberOfTours - numberOfUploadedTours[0]);
 
-                  final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
-                        .title(Messages.Dialog_UploadToursToStrava_Title, false)
-                        .text(infoText)
-                        .delay(2000)
-                        .build();
-                  notication.open();
+                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title, infoText);
                });
             }
          }

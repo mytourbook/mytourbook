@@ -18,7 +18,10 @@ package utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.pgssoft.httpclient.HttpClientMock;
+
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -253,6 +256,20 @@ public class Utils {
       return Paths.get(filePath).toAbsolutePath().toString();
    }
 
+   public static Object getInitialHttpClient() {
+
+      Field field = null;
+      try {
+         field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+         field.setAccessible(true);
+         return field.get(null);
+      } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+         StatusUtil.log(e);
+      }
+
+      return field;
+   }
+
    /**
     * Because the SWTBot function {@link SWTBot#buttonWithTooltip} doesn't appear
     * to work in every case, this function will find a toolbar button for a given
@@ -348,6 +365,15 @@ public class Utils {
       importTour(bot, "2022-02-04-152754-UBERDROID8A2F-9-0.fit"); //$NON-NLS-1$
    }
 
+   public static HttpClientMock initializeHttpClientMock() {
+
+      final HttpClientMock httpClientMock = new HttpClientMock();
+
+      setHttpClient(httpClientMock);
+
+      return httpClientMock;
+   }
+
    public static boolean isUrlReachable(final String url) {
 
       final HttpRequest request = HttpRequest.newBuilder()
@@ -416,6 +442,18 @@ public class Utils {
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static void setHttpClient(final Object httpClient) {
+
+      Field field;
+      try {
+         field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+         field.setAccessible(true);
+         field.set(null, httpClient);
+      } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+         StatusUtil.log(e);
+      }
    }
 
    public static SWTBotView showImportView(final SWTWorkbenchBot bot) {

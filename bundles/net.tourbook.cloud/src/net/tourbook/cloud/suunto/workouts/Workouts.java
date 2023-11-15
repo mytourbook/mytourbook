@@ -17,15 +17,8 @@ package net.tourbook.cloud.suunto.workouts;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import net.tourbook.common.UI;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Workouts(String error,
-                       List<Payload> payload) {
-   public Workouts() {
-      this(UI.EMPTY_STRING, new ArrayList<>());
-   }
-}
+                       List<Payload> payload) {}

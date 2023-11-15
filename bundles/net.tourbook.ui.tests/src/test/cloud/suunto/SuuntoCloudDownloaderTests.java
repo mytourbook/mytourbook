@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -55,18 +54,16 @@ public class SuuntoCloudDownloaderTests extends UITest {
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
    @AfterAll
-   static void cleanUp() throws NoSuchFieldException, IllegalAccessException {
+   static void cleanUp() {
 
-      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, initialHttpClient);
+      Utils.setHttpClient(initialHttpClient);
    }
 
    @BeforeAll
-   static void initAll() throws NoSuchFieldException, IllegalAccessException {
+   static void initAll() {
 
       //We set the Suunto account information, otherwise the download can't
-      //happen
+      //happen as the context menu will be grayed out.
       _prefStore.setValue(
             Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String(),
             "./"); //$NON-NLS-1$
@@ -92,12 +89,8 @@ public class SuuntoCloudDownloaderTests extends UITest {
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
             "973701086000"); //$NON-NLS-1$
 
-      httpClientMock = new HttpClientMock();
-
-      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      initialHttpClient = field.get(null);
-      field.set(null, httpClientMock);
+      initialHttpClient = Utils.getInitialHttpClient();
+      httpClientMock = Utils.initializeHttpClientMock();
 
       suuntoCloudDownloader = (SuuntoCloudDownloader) CloudDownloaderManager.getCloudDownloaderList().stream()
             .filter(tourCloudDownloader -> tourCloudDownloader.getId().equals("SUUNTO")) //$NON-NLS-1$
@@ -148,13 +141,24 @@ public class SuuntoCloudDownloaderTests extends UITest {
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
             .called();
 
-      final List<?> logs = TourLogManager.getLogs();
+      List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
 
       final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             downloadedFilename)));
+
+      // Act
+      // Attempting to download again
+      suuntoCloudDownloader.downloadTours();
+
+      bot.sleep(5000);
+
+      // Assert
+      logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+            "601227a563c46e612c20b579 -> The following file already exists at the location:"))); //$NON-NLS-1$
 
       FileUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
