@@ -39,6 +39,7 @@ import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -66,41 +67,43 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationConsumer {
 
-   private static final IDialogSettings          _state                         = TourbookPlugin.getState("net.tourbook.tour.DialogQuickEdit"); //$NON-NLS-1$
-   private static final IDialogSettings          _state_TourDataEditorView      = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final String           STATE_ID                  = "net.tourbook.tour.DialogQuickEdit";           //$NON-NLS-1$
 
-   private final TourData                        _tourData;
-   private PixelConverter                        _pc;
+   private static final IDialogSettings  _state                    = TourbookPlugin.getState(STATE_ID);
+   private static final IDialogSettings  _state_TourDataEditorView = TourbookPlugin.getState(TourDataEditorView.ID);
+
+   private final TourData                _tourData;
+   private PixelConverter                _pc;
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
-   private final ArrayList<Control>              _firstColumnControls           = new ArrayList<>();
-   private final ArrayList<Control>              _secondColumnControls          = new ArrayList<>();
+   private final ArrayList<Control>      _firstColumnControls      = new ArrayList<>();
+   private final ArrayList<Control>      _secondColumnControls     = new ArrayList<>();
 
-   private int                                   _hintDefaultSpinnerWidth;
-   private int                                   _numLines_WeatherDescription;
+   private int                           _hintDefaultSpinnerWidth;
+   private int                           _numLines_WeatherDescription;
 
-   private boolean                               _isUpdateUI                    = false;
-   private boolean                               _isTemperatureManuallyModified = false;
-   private boolean                               _isWindSpeedManuallyModified   = false;
-   private int[]                                 _unitValueWindSpeed;
-   private float                                 _unitValueDistance;
+   private boolean                       _isUpdateUI;
+   private boolean                       _isTemperatureManuallyModified;
+   private boolean                       _isWindSpeedManuallyModified;
+   private int[]                         _unitValueWindSpeed;
+   private float                         _unitValueDistance;
 
-   private ContribItem_DownloadTourLocation _contribItem_Download_StartLocation;
-   private ContribItem_DownloadTourLocation _contribItem_Download_EndLocation;
-   private ActionSlideout_WeatherOptions         _actionSlideout_WeatherOptions;
+   private ActionDownloadTourLocation    _actionDownload_StartLocation;
+   private ActionDownloadTourLocation    _actionDownload_EndLocation;
+   private ActionSlideout_WeatherOptions _actionSlideout_WeatherOptions;
 
-   private MouseWheelListener                    _mouseWheelListener;
+   private MouseWheelListener            _mouseWheelListener;
 
-   private ToolBarManager                        _toolbarManager_EndLocation;
-   private ToolBarManager                        _toolbarManager_StartLocation;
-   private ToolBarManager                        _toolbarManager_WeatherOptions;
+   private ToolBarManager                _toolbarManager_EndLocation;
+   private ToolBarManager                _toolbarManager_StartLocation;
+   private ToolBarManager                _toolbarManager_WeatherOptions;
 
-   private OpenDialogManager                     _openDlgMgr                    = new OpenDialogManager();
+   private OpenDialogManager             _openDlgMgr               = new OpenDialogManager();
 
-   private GridDataFactory                       _gridData_GrabHorizontal_CenterVertical;
+   private GridDataFactory               _gridData_GrabHorizontal_CenterVertical;
 
    /*
     * UI controls
@@ -174,6 +177,24 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    }
 
    @Override
+   public void closeOtherSlideouts(final ContributionItem requestForOpeningContribItem) {
+
+      if (requestForOpeningContribItem.equals(_actionDownload_EndLocation)) {
+
+         // close start location slideout
+
+         _actionDownload_StartLocation.closeSlideout();
+
+      } else {
+
+         // close end location slideout
+
+         _actionDownload_EndLocation.closeSlideout();
+      }
+
+   }
+
+   @Override
    protected void configureShell(final Shell shell) {
 
       super.configureShell(shell);
@@ -199,8 +220,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
    private void createActions() {
 
-      _contribItem_Download_StartLocation = new ContribItem_DownloadTourLocation(this, _tourData, true);
-      _contribItem_Download_EndLocation = new ContribItem_DownloadTourLocation(this, _tourData, false);
+      _actionDownload_StartLocation = new ActionDownloadTourLocation(this, _tourData, true, STATE_ID);
+      _actionDownload_EndLocation = new ActionDownloadTourLocation(this, _tourData, false, STATE_ID);
 
       _actionSlideout_WeatherOptions = new ActionSlideout_WeatherOptions();
    }
@@ -379,7 +400,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 
                _toolbarManager_StartLocation = new ToolBarManager(toolbar);
-               _toolbarManager_StartLocation.add(_contribItem_Download_StartLocation);
+               _toolbarManager_StartLocation.add(_actionDownload_StartLocation);
                _toolbarManager_StartLocation.update(true);
             }
 
@@ -434,7 +455,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 
                _toolbarManager_EndLocation = new ToolBarManager(toolbar);
-               _toolbarManager_EndLocation.add(_contribItem_Download_EndLocation);
+               _toolbarManager_EndLocation.add(_actionDownload_EndLocation);
                _toolbarManager_EndLocation.update(true);
             }
 
@@ -981,6 +1002,14 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             .applyTo(sep);
    }
 
+   @Override
+   public void defaultProfileIsUpdated() {
+
+      // update action tooltip which displays the current profile
+      _actionDownload_StartLocation.updateUI_ToolItem();
+      _actionDownload_EndLocation.updateUI_ToolItem();
+   }
+
    private void displayCloudIcon() {
 
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -995,8 +1024,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
       final boolean hasGeoLocationData = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 0;
 
-      _contribItem_Download_StartLocation.setEnabled(hasGeoLocationData);
-      _contribItem_Download_EndLocation.setEnabled(hasGeoLocationData);
+      _actionDownload_StartLocation.setEnabled(hasGeoLocationData);
+      _actionDownload_EndLocation.setEnabled(hasGeoLocationData);
 
       _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
@@ -1117,9 +1146,21 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    }
 
    @Override
-   public void setTourEndLocation() {
+   public void setTourEndLocation(final String endLocation) {
 
-      TourLocationData endLocationData = _tourData.osmLocation_End;
+      _comboLocation_End.setText(endLocation);
+   }
+
+   @Override
+   public void setTourStartLocation(final String startLocation) {
+
+      _comboLocation_Start.setText(startLocation);
+   }
+
+   @Override
+   public void setupTourEndLocation() {
+
+      TourLocationData endLocationData = _tourData.tourLocationData_End;
 
       if (endLocationData == null) {
 
@@ -1133,10 +1174,10 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             return;
          }
 
-         endLocationData = _tourData.osmLocation_End = retrievedLocationData;
+         endLocationData = _tourData.tourLocationData_End = retrievedLocationData;
 
          // show different action image
-         _contribItem_Download_EndLocation.setHasLocationData(true);
+         _actionDownload_EndLocation.setHasLocationData(true);
          _toolbarManager_EndLocation.update(true);
       }
 
@@ -1146,15 +1187,9 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    }
 
    @Override
-   public void setTourEndLocation(final String endLocation) {
+   public void setupTourStartLocation() {
 
-      _comboLocation_End.setText(endLocation);
-   }
-
-   @Override
-   public void setTourStartLocation() {
-
-      TourLocationData startLocationData = _tourData.osmLocation_Start;
+      TourLocationData startLocationData = _tourData.tourLocationData_Start;
 
       if (startLocationData == null) {
 
@@ -1166,22 +1201,16 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             return;
          }
 
-         startLocationData = _tourData.osmLocation_Start = retrievedLocationData;
+         startLocationData = _tourData.tourLocationData_Start = retrievedLocationData;
 
          // show different action image
-         _contribItem_Download_StartLocation.setHasLocationData(true);
+         _actionDownload_StartLocation.setHasLocationData(true);
          _toolbarManager_StartLocation.update(true);
       }
 
       _comboLocation_Start.setText(TourLocationManager.createLocationDisplayName(startLocationData.osmLocation));
 
       enableControls();
-   }
-
-   @Override
-   public void setTourStartLocation(final String startLocation) {
-
-      _comboLocation_Start.setText(startLocation);
    }
 
    /**

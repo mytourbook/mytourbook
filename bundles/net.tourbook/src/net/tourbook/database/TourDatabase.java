@@ -3257,8 +3257,8 @@ public class TourDatabase {
    private static void saveTour_KeepTransientValues(final TourData persistedEntity,
                                                     final TourData oldTourData) {
 
-      persistedEntity.osmLocation_Start = oldTourData.osmLocation_Start;
-      persistedEntity.osmLocation_End = oldTourData.osmLocation_End;
+      persistedEntity.tourLocationData_Start = oldTourData.tourLocationData_Start;
+      persistedEntity.tourLocationData_End = oldTourData.tourLocationData_End;
    }
 
    private static void saveTour_PostSaveActions(final TourData persistedEntity, final TourData oldTourData) {

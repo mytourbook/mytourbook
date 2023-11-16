@@ -15,13 +15,43 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+import org.eclipse.jface.action.ContributionItem;
+
 public interface ITourLocationConsumer {
 
-   public void setTourEndLocation();
+   /**
+    * Close other slideouts, ensure that only one slideout is open
+    *
+    * @param contribItem_DownloadTourLocation
+    */
+   public void closeOtherSlideouts(ContributionItem requestForOpeningContribItem);
 
-   public void setTourEndLocation(String endLocation);
+   /**
+    * Is called when a new profile is set with {@link TourLocationManager#setDefaultProfile()}
+    */
+   public void defaultProfileIsUpdated();
 
-   public void setTourStartLocation();
+   /**
+    * Set the tour end location value
+    *
+    * @param endLocation
+    */
+   public void setTourEndLocation(String endLocationLabel);
 
-   public void setTourStartLocation(String startLocation);
+   /**
+    * Set the tour start location value
+    *
+    * @param startLocation
+    */
+   public void setTourStartLocation(String startLocationLabel);
+
+   /**
+    * Retrieve tour end location and sets the location value
+    */
+   public void setupTourEndLocation();
+
+   /**
+    * Retrieve tour start location and sets the location value
+    */
+   public void setupTourStartLocation();
 }

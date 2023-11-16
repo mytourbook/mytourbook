@@ -22,7 +22,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
-public class TourLocationProfile implements Cloneable {
+public class TourLocationProfile implements Cloneable, Comparable<Object> {
 
    private static final char NL         = UI.NEW_LINE;
 
@@ -35,7 +35,7 @@ public class TourLocationProfile implements Cloneable {
     */
    String                    name       = Messages.Tour_Location_Default_ProfileName;
 
-   List<LocationPartID>        allParts   = new ArrayList<>();
+   List<LocationPartID>      allParts   = new ArrayList<>();
 
    public TourLocationProfile() {
 
@@ -56,6 +56,7 @@ public class TourLocationProfile implements Cloneable {
          // create a unique name
          clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
+         // clone all parts
          clonedObject.allParts = new ArrayList<>();
          for (final LocationPartID part : allParts) {
             clonedObject.allParts.add(part);
@@ -66,6 +67,16 @@ public class TourLocationProfile implements Cloneable {
       }
 
       return clonedObject;
+   }
+
+   @Override
+   public int compareTo(final Object obj) {
+
+      if (obj instanceof final TourLocationProfile otherProfile) {
+         return name.compareTo(otherProfile.name);
+      }
+
+      return 0;
    }
 
    @Override
@@ -90,6 +101,11 @@ public class TourLocationProfile implements Cloneable {
       }
 
       return true;
+   }
+
+   public String getName() {
+
+      return name;
    }
 
    @Override

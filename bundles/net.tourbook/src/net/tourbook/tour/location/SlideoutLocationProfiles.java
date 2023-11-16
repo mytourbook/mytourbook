@@ -38,8 +38,11 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
@@ -97,6 +100,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private Button      _btnApply;
    private Button      _btnCopyProfile;
+   private Button      _btnDefaultProfile;
    private Button      _btnDeleteProfile;
 
    private Label       _lblLocationParts;
@@ -121,7 +125,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          final TourLocationProfile profile1 = (TourLocationProfile) e1;
          final TourLocationProfile profile2 = (TourLocationProfile) e2;
 
-         return profile1.name.compareTo(profile2.name);
+         return profile1.getName().compareTo(profile2.getName());
       }
 
       @Override
@@ -146,6 +150,72 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
+   private final class ProfileEditingSupport extends EditingSupport {
+
+      private final CheckboxCellEditor _cellEditor;
+
+      private ProfileEditingSupport(final TableViewer tableViewer) {
+
+         super(tableViewer);
+
+         _cellEditor = new CheckboxCellEditor(tableViewer.getTable());
+      }
+
+      @Override
+      protected boolean canEdit(final Object element) {
+
+         if (element instanceof final TourLocationProfile locationProfile) {
+
+            /*
+             * Only another profile can be edited
+             */
+            final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+            final boolean isSameProfile = locationProfile.equals(defaultProfile);
+            final boolean canEdit = isSameProfile == false;
+
+            return canEdit;
+         }
+
+         return false;
+      }
+
+      @Override
+      protected CellEditor getCellEditor(final Object element) {
+
+         return _cellEditor;
+      }
+
+      @Override
+      protected Object getValue(final Object element) {
+
+         if (element instanceof final TourLocationProfile locationProfile) {
+
+            final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+            final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
+
+            return isDefaultProfile ? Boolean.TRUE : Boolean.FALSE;
+         }
+
+         return Boolean.FALSE;
+      }
+
+      @Override
+      protected void setValue(final Object element, final Object value) {
+
+         if (element instanceof final TourLocationProfile locationProfile) {
+
+            TourLocationManager.setDefaultProfile(locationProfile);
+
+            // update default state for all profiles
+            _profileViewer.update(_allProfiles.toArray(), null);
+
+            _tourLocationConsumer.defaultProfileIsUpdated();
+         }
+      }
+   }
+
    public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
                                    final TourData tourData,
                                    final Control ownerControl,
@@ -153,7 +223,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                                    final IDialogSettings state,
                                    final boolean isStartLocation) {
 
-      // TODO Auto-generated constructor stub
       super(ownerControl, state, new int[] { 800, 800 });
 
       _ownerControl = ownerControl;
@@ -233,6 +302,101 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       }
    }
 
+   private void createColumn_10_ProfileName(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
+
+            cell.setText(profile.getName());
+         }
+      });
+
+      tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
+   }
+
+   private void createColumn_20_LocationParts(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Slideout_TourLocation_Column_LocationParts);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
+
+            final String joinedParts = profile.allParts.stream()
+
+                  .map(locationPart -> {
+
+                     String label;
+
+                     switch (locationPart) {
+                     case OSM_DEFAULT_NAME:
+                     case OSM_NAME:
+                     case CUSTOM_CITY_LARGEST:
+                     case CUSTOM_CITY_SMALLEST:
+                     case CUSTOM_CITY_WITH_ZIP_LARGEST:
+                     case CUSTOM_CITY_WITH_ZIP_SMALLEST:
+                     case CUSTOM_STREET_WITH_HOUSE_NUMBER:
+
+                        label = TourLocationManager.createPartName_Combined(locationPart);
+                        break;
+
+                     default:
+
+                        label = TourLocationManager.allLocationPartLabel.get(locationPart);
+                        break;
+                     }
+
+                     return label;
+                  })
+
+                  .collect(Collectors.joining(UI.SYMBOL_COMMA + UI.SPACE));
+
+            cell.setText(joinedParts);
+         }
+
+      });
+
+      tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
+   }
+
+   private void createColumn_30_IsDefaultProfile(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
+      final TableColumn tc = tvc.getColumn();
+
+      tc.setText(Messages.Slideout_TourLocation_Column_Default);
+      tc.setToolTipText(Messages.Slideout_TourLocation_Column_Default_Tooltip);
+
+      tvc.setEditingSupport(new ProfileEditingSupport(_profileViewer));
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocationProfile locationProfile = (TourLocationProfile) cell.getElement();
+            final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+            cell.setText(locationProfile.equals(defaultProfile)
+                  ? Messages.App_Label_BooleanYes
+                  : UI.EMPTY_STRING);
+         }
+      });
+
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
+   }
+
    @Override
    protected void createSlideoutContent(final Composite parent) {
 
@@ -258,9 +422,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          createUI_20_Profiles(container);
-         createUI_30_ProfileName(container);
          createUI_50_LocationParts(container);
-         createUI_90_ProfileActions(container);
+         createUI_90_Remarks(container);
       }
    }
 
@@ -268,7 +431,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-            .hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(10))
+            .hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(12))
             .applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
@@ -307,8 +470,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       table.setLayout(new TableLayout());
 
-      // !!! this prevents that the horizontal scrollbar is displayed, but is not always working :-(
-//      table.setHeaderVisible(false);
       table.setHeaderVisible(true);
 
       _profileViewer = new TableViewer(table);
@@ -316,74 +477,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       /*
        * Create columns
        */
-      TableViewerColumn tvc;
-      TableColumn tc;
-
-      {
-         // Column: Profile name
-
-         tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
-
-               cell.setText(profile.name);
-            }
-         });
-         tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
-      }
-      {
-         // Column: Location Parts
-
-         tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Slideout_TourLocation_Column_LocationParts);
-         tvc.setLabelProvider(new CellLabelProvider() {
-
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
-
-               final String joinedParts = profile.allParts.stream()
-
-                     .map(locationPart -> {
-
-                        String label;
-
-                        switch (locationPart) {
-                        case OSM_DEFAULT_NAME:
-                        case OSM_NAME:
-                        case CUSTOM_CITY_LARGEST:
-                        case CUSTOM_CITY_SMALLEST:
-                        case CUSTOM_CITY_WITH_ZIP_LARGEST:
-                        case CUSTOM_CITY_WITH_ZIP_SMALLEST:
-                        case CUSTOM_STREET_WITH_HOUSE_NUMBER:
-
-                           label = TourLocationManager.createPartName_Combined(locationPart);
-                           break;
-
-                        default:
-
-                           label = TourLocationManager.allLocationPartLabel.get(locationPart);
-                           break;
-                        }
-
-                        return label;
-                     })
-
-                     .collect(Collectors.joining(UI.SYMBOL_COMMA + UI.SPACE));
-
-               cell.setText(joinedParts);
-            }
-
-         });
-         tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
-      }
+      createColumn_10_ProfileName(tableLayout);
+      createColumn_20_LocationParts(tableLayout);
+      createColumn_30_IsDefaultProfile(tableLayout);
 
       /*
        * Create table viewer
@@ -410,10 +506,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private void createUI_24_ProfileActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-//            .grab(true, false)
-            .applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
@@ -441,6 +536,18 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          }
          {
             /*
+             * Button: Default
+             */
+            _btnDefaultProfile = new Button(container, SWT.PUSH);
+            _btnDefaultProfile.setText(Messages.Slideout_TourLocation_Action_DefaultProfile);
+            _btnDefaultProfile.setToolTipText(Messages.Slideout_TourLocation_Action_DefaultProfile_Tooltip);
+            _btnDefaultProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Default()));
+
+            // set button default width
+            UI.setButtonLayoutData(_btnDefaultProfile);
+         }
+         {
+            /*
              * Button: Delete
              */
             _btnDeleteProfile = new Button(container, SWT.PUSH);
@@ -448,14 +555,15 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             _btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
             _btnDeleteProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Delete()));
 
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.END)
+                  .applyTo(_btnDeleteProfile);
+
             // set button default width
-            UI.setButtonLayoutData(_btnDeleteProfile);
+            UI.setButtonLayoutWidth(_btnDeleteProfile);
          }
       }
-   }
-
-   private void createUI_30_ProfileName(final Composite parent) {
-
    }
 
    private void createUI_50_LocationParts(final Composite parent) {
@@ -533,10 +641,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       }
    }
 
-   private void createUI_90_ProfileActions(final Composite parent) {
+   private void createUI_90_Remarks(final Composite parent) {
 
       {
-         // Label: Profile name
+         // Label: Remarks
 
          final Label label = new Label(parent, SWT.WRAP);
          label.setText(Messages.Slideout_TourFilter_Label_Remarks);
@@ -570,6 +678,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       _btnApply.setEnabled(isProfileSelected);
       _btnCopyProfile.setEnabled(isProfileSelected);
+      _btnDefaultProfile.setEnabled(isProfileSelected);
       _btnDeleteProfile.setEnabled(isProfileSelected);
 
       _lblLocationParts.setEnabled(isProfileSelected);
@@ -582,13 +691,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _profileViewer.getTable().setEnabled(numProfiles > 0);
 
       _listLocationParts.setEnabled(isProfileSelected);
-   }
-
-   private OSMLocation getOsmLocation() {
-
-      return _isStartLocation
-            ? _tourData.osmLocation_Start.osmLocation
-            : _tourData.osmLocation_End.osmLocation;
    }
 
    @Override
@@ -664,6 +766,21 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _txtProfileName.setFocus();
    }
 
+   private void onProfile_Default() {
+
+      if (_selectedProfile == null) {
+         // ignore
+         return;
+      }
+
+      TourLocationManager.setDefaultProfile(_selectedProfile);
+
+      // update default state for all profiles
+      _profileViewer.update(_allProfiles.toArray(), null);
+
+      _tourLocationConsumer.defaultProfileIsUpdated();
+   }
+
    private void onProfile_Delete() {
 
       if (_selectedProfile == null) {
@@ -684,7 +801,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
                null, // no title image
 
-               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name),
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.getName()),
                MessageDialog.CONFIRM,
 
                0, // default index
@@ -709,13 +826,15 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       // update model
       _allProfiles.remove(_selectedProfile);
-      TourLocationManager.setSelectedProfile(null);
+      TourLocationManager.setDefaultProfile(null);
+
+      _tourLocationConsumer.defaultProfileIsUpdated();
 
       // update UI
       _profileViewer.remove(_selectedProfile);
 
       /*
-       * Select another filter at the same position
+       * Select another profile at the same position
        */
       final int numFilters = _allProfiles.size();
       final int nextFilterIndex = Math.min(numFilters - 1, lastIndex);
@@ -772,11 +891,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _selectedProfile = selectedProfile;
 
       /*
-       * Update model
-       */
-      TourLocationManager.setSelectedProfile(_selectedProfile);
-
-      /*
        * Update UI
        */
 
@@ -787,9 +901,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       } else {
 
-         _txtProfileName.setText(_selectedProfile.name);
+         _txtProfileName.setText(_selectedProfile.getName());
 
-         if (_selectedProfile.name.equals(Messages.Tour_Filter_Default_ProfileName)) {
+         if (_selectedProfile.getName().equals(Messages.Tour_Filter_Default_ProfileName)) {
 
             // a default profile is selected, make is easy to rename it
 
@@ -860,19 +974,19 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private void restoreState() {
 
       /*
-       * Get previous selected profile
+       * Get previous default profile
        */
-      TourLocationProfile selectedProfile = TourLocationManager.getSelectedProfile();
+      TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
 
-      if (selectedProfile == null) {
+      if (defaultProfile == null) {
 
          // select first profile
 
-         selectedProfile = (TourLocationProfile) _profileViewer.getElementAt(0);
+         defaultProfile = (TourLocationProfile) _profileViewer.getElementAt(0);
       }
 
-      if (selectedProfile != null) {
-         selectProfile(selectedProfile);
+      if (defaultProfile != null) {
+         selectProfile(defaultProfile);
       }
 
       enableControls();
@@ -893,14 +1007,12 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       table.setSelection(table.getSelectionIndices());
    }
 
-   public void setIsStartLocation(final boolean isStartLocation) {
-
-      _isStartLocation = isStartLocation;
-   }
-
    private void setupUI() {
 
-      final OSMLocation osmLocation = getOsmLocation();
+      final OSMLocation osmLocation = _isStartLocation
+            ? _tourData.tourLocationData_Start.osmLocation
+            : _tourData.tourLocationData_End.osmLocation;
+
       final OSMAddress address = osmLocation.address;
 
       /*

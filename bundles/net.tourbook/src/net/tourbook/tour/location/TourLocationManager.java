@@ -134,7 +134,7 @@ public class TourLocationManager {
     * Contains all available profiles
     */
    private static final List<TourLocationProfile> _allLocationProfiles = new ArrayList<>();
-   private static TourLocationProfile             _selectedProfile;
+   private static TourLocationProfile             _defaultProfile;
 
    /**
     * Zoom address detail
@@ -301,11 +301,11 @@ public class TourLocationManager {
          return UI.EMPTY_STRING;
       }
 
-      if (_selectedProfile != null) {
+      if (_defaultProfile != null) {
 
          // create name from a profile
 
-         return createLocationDisplayName(osmLocation, _selectedProfile);
+         return createLocationDisplayName(osmLocation, _defaultProfile);
 
       } else {
 
@@ -315,10 +315,15 @@ public class TourLocationManager {
       }
    }
 
-   private static String createLocationDisplayName(final OSMLocation osmLocation,
-                                                   final TourLocationProfile profile) {
-
-      // TODO Auto-generated method stub
+   /**
+    * @param osmLocation
+    *           OSM location data
+    * @param profile
+    *
+    * @return
+    */
+   public static String createLocationDisplayName(final OSMLocation osmLocation,
+                                                  final TourLocationProfile profile) {
 
       // reset buffers
       _displayNameBuffer.setLength(0);
@@ -544,6 +549,14 @@ public class TourLocationManager {
    }
 
    /**
+    * @return Returns the default profile or <code>null</code> when a profile is not set.
+    */
+   public static TourLocationProfile getDefaultProfile() {
+
+      return _defaultProfile;
+   }
+
+   /**
     * Combine old and new location name
     *
     * @param oldLocation
@@ -676,9 +689,6 @@ public class TourLocationManager {
       final long retrievalStartTime = System.currentTimeMillis();
       _lastRetrievalTimeMS = retrievalStartTime;
 
-//      System.out.println(UI.timeStamp() + " DOWNLOAD start - waiting time: " + waitingTime);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       final String requestUrl = UI.EMPTY_STRING
 
             + "https://nominatim.openstreetmap.org/reverse?format=json" //$NON-NLS-1$
@@ -761,16 +771,9 @@ public class TourLocationManager {
       return osmLocation;
    }
 
-   static List<TourLocationProfile> getProfiles() {
+   public static List<TourLocationProfile> getProfiles() {
 
       return _allLocationProfiles;
-   }
-
-   /**
-    * @return Returns the selected profile or <code>null</code> when a profile is not selected.
-    */
-   static TourLocationProfile getSelectedProfile() {
-      return _selectedProfile;
    }
 
    private static File getXmlFile() {
@@ -803,6 +806,11 @@ public class TourLocationManager {
       final File xmlFile = getXmlFile();
 
       Util.writeXml(xmlRoot, xmlFile);
+   }
+
+   static void setDefaultProfile(final TourLocationProfile defaultProfile) {
+
+      _defaultProfile = defaultProfile;
    }
 
    public static void setLocationNames(final List<TourData> requestedTours,
@@ -845,14 +853,14 @@ public class TourLocationManager {
                   final TourLocationData locationStart = getLocationData(
                         latitudeSerie[0],
                         longitudeSerie[0],
-                        tourData.osmLocation_Start);
+                        tourData.tourLocationData_Start);
 
                   monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationStart.waitingTime));
 
                   final TourLocationData locationEnd = getLocationData(
                         latitudeSerie[lastIndex],
                         longitudeSerie[lastIndex],
-                        tourData.osmLocation_End);
+                        tourData.tourLocationData_End);
 
                   monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationEnd.waitingTime));
 
@@ -866,8 +874,8 @@ public class TourLocationManager {
                   tourData.setTourEndPlace(getJoinedLocationNames(oldTourEndPlace, osmEndLocation));
 
                   // keep location values
-                  tourData.osmLocation_Start = locationStart;
-                  tourData.osmLocation_End = locationEnd;
+                  tourData.tourLocationData_Start = locationStart;
+                  tourData.tourLocationData_End = locationEnd;
 
                   modifiedTours.add(tourData);
                }
@@ -881,11 +889,6 @@ public class TourLocationManager {
          StatusUtil.showStatus(e);
          Thread.currentThread().interrupt();
       }
-   }
-
-   static void setSelectedProfile(final TourLocationProfile selectedProfile) {
-
-      _selectedProfile = selectedProfile;
    }
 
    /**
@@ -964,17 +967,17 @@ public class TourLocationManager {
          for (final TourLocationProfile locationProfile : _allLocationProfiles) {
             if (locationProfile.profileId == activeProfileId) {
 
-               _selectedProfile = locationProfile;
+               _defaultProfile = locationProfile;
                break;
             }
          }
       }
 
-      if (_selectedProfile == null && _allLocationProfiles.size() > 0) {
+      if (_defaultProfile == null && _allLocationProfiles.size() > 0) {
 
          // select first profile
 
-         _selectedProfile = _allLocationProfiles.get(0);
+         _defaultProfile = _allLocationProfiles.get(0);
       }
    }
 
@@ -987,8 +990,8 @@ public class TourLocationManager {
          // <TourLocationProfiles>
          xmlRoot = xmlWrite_Profiles_10_Root();
 
-         if (_selectedProfile != null) {
-            xmlRoot.putInteger(ATTR_ACTIVE_PROFILE_ID, _selectedProfile.profileId);
+         if (_defaultProfile != null) {
+            xmlRoot.putInteger(ATTR_ACTIVE_PROFILE_ID, _defaultProfile.profileId);
          }
 
          // loop: all location profiles
@@ -998,7 +1001,7 @@ public class TourLocationManager {
             final IMemento xmlLocation = xmlRoot.createChild(TAG_PROFILE);
 
             xmlLocation.putInteger(ATTR_PROFILE_ID, locationProfile.profileId);
-            xmlLocation.putString(ATTR_PROFILE_NAME, locationProfile.name);
+            xmlLocation.putString(ATTR_PROFILE_NAME, locationProfile.getName());
 
             // <Parts>
             final IMemento xmlParts = xmlLocation.createChild(TAG_PARTS);

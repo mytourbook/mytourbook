@@ -2512,6 +2512,10 @@ public class Messages extends NLS {
    public static String        Slideout_TourInfoOptions_Label_TooltipDelaySimple_Tooltip;
    public static String        Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 
+   public static String        Slideout_TourLocation_Action_DefaultProfile;
+   public static String        Slideout_TourLocation_Action_DefaultProfile_Tooltip;
+   public static String        Slideout_TourLocation_Column_Default;
+   public static String        Slideout_TourLocation_Column_Default_Tooltip;
    public static String        Slideout_TourLocation_Column_LocationParts;
    public static String        Slideout_TourLocation_Label_EndLocation_Title;
    public static String        Slideout_TourLocation_Label_LocationParts;
@@ -2756,10 +2760,13 @@ public class Messages extends NLS {
    public static String        Tour_Action_graph_speed_tooltip;
    public static String        Tour_Action_graph_temperature_tooltip;
    public static String        Tour_Action_graph_tour_compare_tooltip;
+   public static String        Tour_Action_Location_OpenProfileEditor;
    public static String        Tour_Action_LocationCustomize_End_Tooltip;
    public static String        Tour_Action_LocationCustomize_Start_Tooltip;
    public static String        Tour_Action_LocationDownload_End_Tooltip;
    public static String        Tour_Action_LocationDownload_Start_Tooltip;
+   public static String        Tour_Action_LocationDownload_WithProfile_End_Tooltip;
+   public static String        Tour_Action_LocationDownload_WithProfile_Start_Tooltip;
    public static String        Tour_Action_MapMarkerOptions_Tooltip;
    public static String        Tour_Action_MarkerOptions_Tooltip;
    public static String        Tour_Action_Marker_Delete;

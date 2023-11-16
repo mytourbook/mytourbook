@@ -2035,13 +2035,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Downloaded start location data
     */
    @Transient
-   public TourLocationData   osmLocation_Start;
+   public TourLocationData    tourLocationData_Start;
 
    /**
     * Downloaded end location data
     */
    @Transient
-   public TourLocationData   osmLocation_End;
+   public TourLocationData    tourLocationData_End;
 
 
 // SET_FORMATTING_ON
