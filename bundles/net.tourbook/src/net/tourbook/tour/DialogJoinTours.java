@@ -324,7 +324,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       createMenus();
 
       // must be run async because the dark theme is overwriting colors after calling createDialogArea()
-      parent.getDisplay().asyncExec(this::updateUI_LockUnlockButton);
+      parent.getDisplay().asyncExec(() -> updateUI_LockUnlockButton());
 
       return dlgContainer;
    }
@@ -994,7 +994,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       int joinedSerieIndex = 0;
       int joinedTourStartIndex = 0;
       int joinedTourStartDistance = 0;
-      int joinedRecordedTime = 0;
+      long joinedRecordedTime = 0;
       int joinedPausedTime = 0;
       final ArrayList<Long> joinedPausedTime_Start = new ArrayList<>();
       final ArrayList<Long> joinedPausedTime_End = new ArrayList<>();
@@ -1569,11 +1569,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       if (_chkDeleteSourceTours.isEnabled() &&
             _chkDeleteSourceTours.getSelection() &&
-            _tourProvider instanceof TourBookView) {
+            _tourProvider instanceof final TourBookView tourBookView) {
 
          super.close();
 
-         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
+         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour(tourBookView);
          actionDeleteTours.run();
       }
 
