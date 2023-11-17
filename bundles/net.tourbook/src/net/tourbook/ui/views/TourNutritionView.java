@@ -86,7 +86,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private Combo                         _cboSearchQuery;
 
-   private Section                       _sectionNutrition;
+   private Section                       _sectionSummary;
+   private Section                       _sectionProductsList;
    private FormToolkit                   _tk;
 
    public class SearchContentProvider implements IStructuredContentProvider {
@@ -285,14 +286,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void createUI_Section_10_Summary(final Composite parent) {
 
-      //put a link with "Not finding the product you used ? You can create it here"
-      //https://world.openfoodfacts.org/cgi/product.pl
-
-      _sectionNutrition = createSection(parent, _tk, "Summary/Report card" /*
-                                                                            * Messages.
-                                                                            * tour_editor_section_characteristics
-                                                                            */, false, true);
-      final Composite container = (Composite) _sectionNutrition.getClient();
+      _sectionSummary = createSection(parent, _tk, "Summary/Report card" /*
+                                                                          * Messages.
+                                                                          * tour_editor_section_characteristics
+                                                                          */, false, true);
+      final Composite container = (Composite) _sectionSummary.getClient();
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
@@ -305,11 +303,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       //put a link with "Not finding the product you used ? You can create it here"
       //https://world.openfoodfacts.org/cgi/product.pl
 
-      _sectionNutrition = createSection(parent, _tk, "Products List" /*
-                                                                      * Messages.
-                                                                      * tour_editor_section_characteristics
-                                                                      */, false, true);
-      final Composite container = (Composite) _sectionNutrition.getClient();
+      _sectionProductsList = createSection(parent, _tk, "Products List" /*
+                                                                         * Messages.
+                                                                         * tour_editor_section_characteristics
+                                                                         */, false, true);
+      final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
