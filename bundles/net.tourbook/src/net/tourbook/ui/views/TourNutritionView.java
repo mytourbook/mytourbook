@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.views.nutrition.DialogSearchProduct;
@@ -39,9 +38,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -55,7 +52,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.ViewPart;
@@ -64,33 +60,31 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
 
-   private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";           //$NON-NLS-1$
+   private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
 
-   private static final String           IMG_KEY_ANCHOR         = "anchor";                              //$NON-NLS-1$
-   private static final String           IMG_KEY_CAR            = "car";                                 //$NON-NLS-1$
-   private static final String           IMG_KEY_CART           = "cart";                                //$NON-NLS-1$
-   private static final String           IMG_KEY_FLAG           = "flag";                                //$NON-NLS-1$
-   private static final String           IMG_KEY_HOUSE          = "house";                               //$NON-NLS-1$
-   private static final String           IMG_KEY_SOCCER         = "soccer";                              //$NON-NLS-1$
-   private static final String           IMG_KEY_STAR           = "star";                                //$NON-NLS-1$
+   private static final String           IMG_KEY_ANCHOR                  = "anchor";                                  //$NON-NLS-1$
+   private static final String           IMG_KEY_CAR                     = "car";                                     //$NON-NLS-1$
+   private static final String           IMG_KEY_CART                    = "cart";                                    //$NON-NLS-1$
+   private static final String           IMG_KEY_FLAG                    = "flag";                                    //$NON-NLS-1$
+   private static final String           IMG_KEY_HOUSE                   = "house";                                   //$NON-NLS-1$
+   private static final String           IMG_KEY_SOCCER                  = "soccer";                                  //$NON-NLS-1$
+   private static final String           IMG_KEY_STAR                    = "star";                                    //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
    private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
 
    private TableViewer                   _poiViewer;
    private List<String>                  _pois;
-   private List<String>                  _searchHistory         = new ArrayList<>();
-
-   private PostSelectionProvider         _postSelectionProvider;
+   private List<String>                  _searchHistory                  = new ArrayList<>();
 
    private IPropertyChangeListener       _prefChangeListener;
    final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
    /*
     * UI controls
     */
-   private Button      _btnSearch;
+   private Button                        _btnSearch;
 
-   private Combo       _cboSearchQuery;
+   private Combo                         _cboSearchQuery;
 
    private Section                       _sectionNutrition;
    private FormToolkit                   _tk;
@@ -134,6 +128,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          switch (index) {
          case 0:
             return getImage(obj);
+
          default:
             return null;
          }
@@ -280,83 +275,31 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       _tk = new FormToolkit(display);
 
-
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
       {
-         // createUI_Section_10_Summary(container);
+         createUI_Section_10_Summary(container);
          createUI_Section_20_ProductsList(container);
       }
    }
-   private void createUI_10_Header(final Composite parent) {
 
-      final Composite queryContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(queryContainer);
-      GridLayoutFactory.fillDefaults()
-            .extendedMargins(5, 5, 2, 2)
-            .spacing(5, 0)
-            .numColumns(3)
-            .applyTo(queryContainer);
+   private void createUI_Section_10_Summary(final Composite parent) {
+
+      //put a link with "Not finding the product you used ? You can create it here"
+      //https://world.openfoodfacts.org/cgi/product.pl
+
+      _sectionNutrition = createSection(parent, _tk, "Summary/Report card" /*
+                                                                            * Messages.
+                                                                            * tour_editor_section_characteristics
+                                                                            */, false, true);
+      final Composite container = (Composite) _sectionNutrition.getClient();
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         {
-            /*
-             * label: POI
-             */
-            final Label label = new Label(queryContainer, SWT.NONE);
-            label.setText("Messages.Poi_View_Label_POI");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-         }
-         {
-            /*
-             * button: search
-             */
-            _btnSearch = new Button(queryContainer, SWT.PUSH);
-            _btnSearch.setText("Messages.Poi_View_Button_Search");
-            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell())
-                  .open()));
-         }
+
       }
-
-      // add autocomplete feature to the combo viewer
-      // this feature is disable because it's not working very well
-//    new AutoComplete(_queryViewer);
    }
 
-   private void createUI_20_Viewer(final Composite parent) {
-
-      /*
-       * table viewer: poi items
-       */
-      final Table poiTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(poiTable);
-      poiTable.setLinesVisible(true);
-      poiTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-      poiTable.setHeaderVisible(true);
-
-      // column: category
-      final TableColumn columnCategory = new TableColumn(poiTable, SWT.LEFT);
-      columnCategory.setText("Category"); //$NON-NLS-1$
-      columnCategory.setWidth(75);
-
-      // column: name
-      final TableColumn columnName = new TableColumn(poiTable, SWT.LEFT);
-      columnName.setText("Name"); //$NON-NLS-1$
-      columnName.setWidth(300);
-
-      _poiViewer = new TableViewer(poiTable);
-
-      _poiViewer.setContentProvider(new ViewContentProvider());
-      _poiViewer.setLabelProvider(new ViewLabelProvider());
-
-      _poiViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
-
-         final ISelection selection = selectionChangedEvent.getSelection();
-         final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-         final PointOfInterest selectedPoi = (PointOfInterest) firstElement;
-
-         _postSelectionProvider.setSelection(selectedPoi);
-      });
-   }
    private void createUI_Section_20_ProductsList(final Composite parent) {
 
       //put a link with "Not finding the product you used ? You can create it here"
@@ -387,29 +330,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell())
                   .open()));
          }
-         /*
-          * tags
-          */
-            // combo: tour title with history
-//            _comboFoodSearch = new CCombo(container, SWT.BORDER | SWT.FLAT);
-//            _comboFoodSearch.setText(UI.EMPTY_STRING);
-//
-//            _tk.adapt(_comboFoodSearch, true, false);
-//
-//            GridDataFactory.fillDefaults()
-//                  .grab(true, false)
-//                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-//                  .applyTo(_comboFoodSearch);
-//
-//            _comboFoodSearch.addModifyListener(modifyEvent -> {
-//
-//               if (_isSetField || _isSavingInProgress) {
-//                  return;
-//               }
-//
-//               System.out.println(modifyEvent.data.toString());
-//            });
-         }
+      }
    }
 
    @Override
@@ -436,20 +357,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Images.POI_Soccer));
          imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Images.POI_Star));
       }
-   }
-
-   private void onSearchPoi() {
-
-      // disable search controls
-      _cboSearchQuery.setEnabled(false);
-      _btnSearch.setEnabled(false);
-
-      final String searchText = _cboSearchQuery.getText();
-
-
-      // start product search
-
-      _nutritionQuery.asyncFind(searchText);
    }
 
    @Override
@@ -509,7 +416,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       // set default button
       _btnSearch.getShell().setDefaultButton(_btnSearch);
-
 
    }
 
