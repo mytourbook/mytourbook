@@ -32,6 +32,16 @@ public interface ITourLocationConsumer {
    public void defaultProfileIsUpdated();
 
    /**
+    * Retrieve tour end location and sets the location value
+    */
+   public void downloadAndSetTourEndLocation();
+
+   /**
+    * Retrieve tour start location and sets the location value
+    */
+   public void downloadAndSetTourStartLocation();
+
+   /**
     * Set the tour end location value
     *
     * @param endLocation
@@ -44,14 +54,4 @@ public interface ITourLocationConsumer {
     * @param startLocation
     */
    public void setTourStartLocation(String startLocationLabel);
-
-   /**
-    * Retrieve tour end location and sets the location value
-    */
-   public void setupTourEndLocation();
-
-   /**
-    * Retrieve tour start location and sets the location value
-    */
-   public void setupTourStartLocation();
 }

@@ -105,7 +105,7 @@ public class ActionTourLocation extends ContributionItem {
       @Override
       public void run() {
 
-         onSelectProfile(_locationProfile);
+         actionSetTourLocation(_locationProfile);
       }
    }
 
@@ -121,7 +121,7 @@ public class ActionTourLocation extends ContributionItem {
       @Override
       public void run() {
 
-         retrieveLocationAgain();
+         actionRetrieveLocationAgain();
       }
    }
 
@@ -135,7 +135,7 @@ public class ActionTourLocation extends ContributionItem {
       @Override
       public void run() {
 
-         openProfileSlideout();
+         actionOpenProfileSlideout();
       }
    }
 
@@ -164,6 +164,108 @@ public class ActionTourLocation extends ContributionItem {
             : TourbookPlugin.getState(stateId + ".EndLocation"); //$NON-NLS-1$
 
       createActions();
+   }
+
+   private void actionOpenProfileSlideout() {
+
+      if (_slideoutLocationProfiles == null) {
+
+         // !!! must be created lately otherwise the UI is not fully setup !!!
+
+         final Rectangle itemBounds = _toolItem.getBounds();
+         final Point itemDisplayPosition = _toolbar.toDisplay(itemBounds.x, itemBounds.y);
+
+         itemBounds.x = itemDisplayPosition.x;
+         itemBounds.y = itemDisplayPosition.y;
+
+         _slideoutLocationProfiles = new SlideoutLocationProfiles(
+
+               _tourLocationConsumer,
+               _tourData,
+               _toolbar,
+               itemBounds,
+               _state,
+               _isStartLocation);
+      }
+
+      /*
+       * Close other location slideout that only one slideout is open, otherwise they can
+       * conflict because they are using the same model
+       */
+      _tourLocationConsumer.closeOtherSlideouts(ActionTourLocation.this);
+
+      _slideoutLocationProfiles.open(false);
+   }
+
+   private void actionRetrieveLocationAgain() {
+
+      // delete old location values
+      if (_isStartLocation) {
+
+         _tourData.tourLocationData_Start = null;
+
+      } else {
+
+         _tourData.tourLocationData_End = null;
+      }
+
+      downloadAndSetLocationData();
+   }
+
+   /**
+    * Set location which was created with the provided profile
+    *
+    * @param locationProfile
+    */
+   private void actionSetTourLocation(final TourLocationProfile locationProfile) {
+
+      final String displayName = createProfileDisplayName(locationProfile);
+
+      if (_isStartLocation) {
+
+         _tourLocationConsumer.setTourStartLocation(displayName);
+
+      } else {
+
+         _tourLocationConsumer.setTourEndLocation(displayName);
+      }
+   }
+
+   /**
+    * @param selectionEvent
+    * @param toolbar
+    */
+   private void actionTourLocation(final SelectionEvent selectionEvent, final ToolBar toolbar) {
+
+      // there are 3 different actions
+
+      if (_hasLocationData) {
+
+         if (UI.isCtrlKey(selectionEvent)) {
+
+            // open profile editor
+
+            actionOpenProfileSlideout();
+
+         } else {
+
+            // show context menu
+
+            final Rectangle itemBounds = _toolItem.getBounds();
+
+            final Point relativePos = new Point(itemBounds.x, itemBounds.y + itemBounds.height);
+            final Point displayPos = toolbar.toDisplay(relativePos);
+
+            _contextMenu.setLocation(displayPos.x, displayPos.y);
+            _contextMenu.setVisible(true);
+         }
+
+      } else {
+
+         // location data are not yet available -> download location data
+
+         downloadAndSetLocationData();
+      }
    }
 
    public void closeSlideout() {
@@ -213,17 +315,17 @@ public class ActionTourLocation extends ContributionItem {
       return TourLocationManager.createLocationDisplayName(osmLocation, locationProfile);
    }
 
-   private void downloadLocationData() {
+   private void downloadAndSetLocationData() {
 
       BusyIndicator.showWhile(Display.getDefault(), () -> {
 
          if (_isStartLocation) {
 
-            _tourLocationConsumer.setupTourStartLocation();
+            _tourLocationConsumer.downloadAndSetTourStartLocation();
 
          } else {
 
-            _tourLocationConsumer.setupTourEndLocation();
+            _tourLocationConsumer.downloadAndSetTourEndLocation();
          }
       });
    }
@@ -253,7 +355,7 @@ public class ActionTourLocation extends ContributionItem {
       updateUI_ToolItem();
 
       _toolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-            selectionEvent -> onSelectTourLocationAction(selectionEvent, toolbar)));
+            selectionEvent -> actionTourLocation(selectionEvent, toolbar)));
 
       /*
        * Context menu
@@ -269,30 +371,43 @@ public class ActionTourLocation extends ContributionItem {
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+      fillContextMenu_AddProfileActions(menuMgr);
+
+      menuMgr.add(_actionSlideoutLocationProfiles);
+      menuMgr.add(_actionRetrieveLocationAgain);
+   }
+
+   /**
+    * Create an action for each profile
+    *
+    * @param menuMgr
+    */
+   private void fillContextMenu_AddProfileActions(final IMenuManager menuMgr) {
+
       final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
+      final int numProfiles = allProfiles.size();
+
+      if (numProfiles == 0) {
+         return;
+      }
+
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
 
       // sort profiles by name
       Collections.sort(allProfiles);
 
+      menuMgr.add(_actionProfileTitle);
+      menuMgr.add(new Separator());
+
       // create actions for each profile
-      if (allProfiles.size() > 0) {
+      for (final TourLocationProfile locationProfile : allProfiles) {
 
-         menuMgr.add(_actionProfileTitle);
-         menuMgr.add(new Separator());
+         final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
 
-         for (final TourLocationProfile locationProfile : allProfiles) {
-
-            final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
-
-            menuMgr.add(new ActionLocationProfile(locationProfile, isDefaultProfile));
-         }
-
-         menuMgr.add(new Separator());
+         menuMgr.add(new ActionLocationProfile(locationProfile, isDefaultProfile));
       }
 
-      menuMgr.add(_actionSlideoutLocationProfiles);
-      menuMgr.add(_actionRetrieveLocationAgain);
+      menuMgr.add(new Separator());
    }
 
    private void onDispose() {
@@ -308,107 +423,9 @@ public class ActionTourLocation extends ContributionItem {
       _contextMenu.dispose();
    }
 
-   /**
-    * Set location which was created with the provided profile
-    *
-    * @param locationProfile
-    */
-   private void onSelectProfile(final TourLocationProfile locationProfile) {
-
-      final String displayName = createProfileDisplayName(locationProfile);
-
-      if (_isStartLocation) {
-
-         _tourLocationConsumer.setTourStartLocation(displayName);
-
-      } else {
-
-         _tourLocationConsumer.setTourEndLocation(displayName);
-      }
-   }
-
-   /**
-    * @param selectionEvent
-    * @param toolbar
-    */
-   private void onSelectTourLocationAction(final SelectionEvent selectionEvent, final ToolBar toolbar) {
-
-      // there are 3 different actions
-
-      if (_hasLocationData) {
-
-         if (UI.isCtrlKey(selectionEvent)) {
-
-            // open profile editor
-
-            openProfileSlideout();
-
-         } else {
-
-            // show context menu
-
-            final Rectangle itemBounds = _toolItem.getBounds();
-
-            final Point relativePos = new Point(itemBounds.x, itemBounds.y + itemBounds.height);
-            final Point displayPos = toolbar.toDisplay(relativePos);
-
-            _contextMenu.setLocation(displayPos.x, displayPos.y);
-            _contextMenu.setVisible(true);
-         }
-
-      } else {
-
-         // download location data
-
-         downloadLocationData();
-      }
-   }
-
-   private void openProfileSlideout() {
-
-      if (_slideoutLocationProfiles == null) {
-
-         // !!! must be created lately otherwise the UI is not fully setup !!!
-
-         _slideoutLocationProfiles = new SlideoutLocationProfiles(
-
-               _tourLocationConsumer,
-               _tourData,
-               _toolbar,
-               _toolItem,
-               _state,
-               _isStartLocation);
-      }
-
-      /*
-       * Close other location slideout that only one slideout is open, otherwise they can
-       * conflict because they are using the same model
-       */
-      _tourLocationConsumer.closeOtherSlideouts(ActionTourLocation.this);
-
-      _slideoutLocationProfiles.open(false);
-   }
-
-   private void retrieveLocationAgain() {
-
-      // delete old location values
-      if (_isStartLocation) {
-
-         _tourData.tourLocationData_Start = null;
-
-      } else {
-
-         _tourData.tourLocationData_End = null;
-      }
-
-      downloadLocationData();
-   }
-
    public void setEnabled(final boolean isEnabled) {
 
       _toolItem.setEnabled(isEnabled);
-
-//      _actionDownloadLocation.setEnabled();
    }
 
    public void setHasLocationData(final boolean hasLocationData) {

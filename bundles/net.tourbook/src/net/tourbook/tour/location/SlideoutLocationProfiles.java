@@ -57,7 +57,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -66,14 +65,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Slideout for the start/end location
  */
 public class SlideoutLocationProfiles extends AdvancedSlideout {
-
-   private ToolItem                        _toolItem;
 
    private PixelConverter                  _pc;
 
@@ -91,13 +87,15 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private ITourLocationConsumer           _tourLocationConsumer;
 
+   private Rectangle                       _ownerBounds;
+
    /*
     * UI controls
     */
    private Composite   _parent;
    private MT_DualList _listLocationParts;
 
-   private Button      _btnApply;
+   private Button      _btnApplyAndClose;
    private Button      _btnCopyProfile;
    private Button      _btnDefaultProfile;
    private Button      _btnDeleteProfile;
@@ -109,8 +107,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private Text        _txtProfileName;
    private Text        _txtSelectedLocationParts;
-
-   private Control     _ownerControl;
 
    private class LocationProfileComparator extends ViewerComparator {
 
@@ -210,22 +206,32 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             // update default state for all profiles
             _profileViewer.update(_allProfiles.toArray(), null);
 
-            _tourLocationConsumer.defaultProfileIsUpdated();
+            if (_tourLocationConsumer != null) {
+               _tourLocationConsumer.defaultProfileIsUpdated();
+            }
          }
       }
    }
 
+   /**
+    * @param tourLocationConsumer
+    *           Can be <code>null</code>
+    * @param tourData
+    * @param ownerControl
+    * @param ownerBounds
+    * @param state
+    * @param isStartLocation
+    */
    public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
                                    final TourData tourData,
                                    final Control ownerControl,
-                                   final ToolItem toolItem,
+                                   final Rectangle ownerBounds,
                                    final IDialogSettings state,
                                    final boolean isStartLocation) {
 
       super(ownerControl, state, new int[] { 800, 800 });
 
-      _ownerControl = ownerControl;
-      _toolItem = toolItem;
+      _ownerBounds = ownerBounds;
 
       _tourLocationConsumer = tourLocationConsumer;
       _isStartLocation = isStartLocation;
@@ -582,15 +588,15 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          {
             // button: Apply & Close
 
-            _btnApply = new Button(container, SWT.PUSH);
-            _btnApply.setText(OtherMessages.APP_ACTION_APPLY_AND_CLOSE);
-            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
+            _btnApplyAndClose = new Button(container, SWT.PUSH);
+            _btnApplyAndClose.setText(OtherMessages.APP_ACTION_APPLY_AND_CLOSE);
+            _btnApplyAndClose.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
-                  .applyTo(_btnApply);
+                  .applyTo(_btnApplyAndClose);
 
             // set button default width
-            UI.setButtonLayoutWidth(_btnApply);
+            UI.setButtonLayoutWidth(_btnApplyAndClose);
          }
       }
       {
@@ -642,10 +648,11 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void enableControls() {
 
+      final boolean isLocationConsumer = _tourLocationConsumer != null;
       final boolean isProfileSelected = _selectedProfile != null;
       final int numProfiles = _allProfiles.size();
 
-      _btnApply.setEnabled(isProfileSelected);
+      _btnApplyAndClose.setEnabled(isProfileSelected && isLocationConsumer);
       _btnCopyProfile.setEnabled(isProfileSelected);
       _btnDefaultProfile.setEnabled(isProfileSelected);
       _btnDeleteProfile.setEnabled(isProfileSelected);
@@ -665,13 +672,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    @Override
    protected Rectangle getParentBounds() {
 
-      final Rectangle itemBounds = _toolItem.getBounds();
-      final Point itemDisplayPosition = _ownerControl.toDisplay(itemBounds.x, itemBounds.y);
-
-      itemBounds.x = itemDisplayPosition.x;
-      itemBounds.y = itemDisplayPosition.y;
-
-      return itemBounds;
+      return _ownerBounds;
    }
 
    private void initUI(final Composite parent) {
@@ -747,7 +748,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       // update default state for all profiles
       _profileViewer.update(_allProfiles.toArray(), null);
 
-      _tourLocationConsumer.defaultProfileIsUpdated();
+      if (_tourLocationConsumer != null) {
+         _tourLocationConsumer.defaultProfileIsUpdated();
+      }
    }
 
    private void onProfile_Delete() {
@@ -797,7 +800,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _allProfiles.remove(_selectedProfile);
       TourLocationManager.setDefaultProfile(null);
 
-      _tourLocationConsumer.defaultProfileIsUpdated();
+      if (_tourLocationConsumer != null) {
+         _tourLocationConsumer.defaultProfileIsUpdated();
+      }
 
       // update UI
       _profileViewer.remove(_selectedProfile);

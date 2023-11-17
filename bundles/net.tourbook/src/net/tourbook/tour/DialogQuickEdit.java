@@ -1158,7 +1158,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    }
 
    @Override
-   public void setupTourEndLocation() {
+   public void downloadAndSetTourEndLocation() {
 
       TourLocationData endLocationData = _tourData.tourLocationData_End;
 
@@ -1187,7 +1187,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    }
 
    @Override
-   public void setupTourStartLocation() {
+   public void downloadAndSetTourStartLocation() {
 
       TourLocationData startLocationData = _tourData.tourLocationData_Start;
 

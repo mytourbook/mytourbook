@@ -1555,7 +1555,7 @@ public class TourBookView extends ViewPart implements
       _actionRefreshView               = new ActionRefreshView(this);
       _actionSelectAllTours            = new ActionSelectAllTours(this);
       _actionSetOtherPerson            = new ActionSetPerson(this);
-      _actionSetStartEndLocation       = new ActionSetStartEndLocation(this);
+      _actionSetStartEndLocation       = new ActionSetStartEndLocation(this, _parent);
       _actionSetTourType               = new ActionSetTourTypeMenu(this);
       _actionToggleViewLayout          = new ActionToggleViewLayout(this);
       _actionTourBookOptions           = new ActionTourBookOptions();
@@ -2252,28 +2252,34 @@ public class TourBookView extends ViewPart implements
       _subMenu_AdjustTourValues.enableSubMenu_Pauses();
       _subMenu_AdjustTourValues.enableSubMenu_Cadence();
 
-      // re-import and tour values deletion can be run on all/selected/between dates tours
-      _actionReimport_Tours.setEnabled(true);
-      _actionDeleteTourMenu.setEnabled(true);
-      _actionDeleteTourValues.setEnabled(true);
+// SET_FORMATTING_OFF
 
-      _actionEditQuick.setEnabled(isOneTour);
-      _actionEditTour.setEnabled(isOneTour);
-      _actionExportTour.setEnabled(isTourSelected);
-      _actionExportViewCSV.setEnabled(numSelectedItems > 0);
-      _actionGotoToday.setEnabled(numAvailableItems > 0);
-      _actionJoinTours.setEnabled(numTourItems > 1);
-      _actionOpenTour.setEnabled(isOneTour);
-      _actionPrintTour.setEnabled(isTourSelected);
-      _actionSetOtherPerson.setEnabled(isTourSelected);
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      // re-import and tour values deletion can be run on all/selected/between dates tours
+      _actionReimport_Tours      .setEnabled(true);
+      _actionDeleteTourMenu      .setEnabled(true);
+      _actionDeleteTourValues    .setEnabled(true);
+
+      _actionEditQuick           .setEnabled(isOneTour);
+      _actionEditTour            .setEnabled(isOneTour);
+      _actionExportTour          .setEnabled(isTourSelected);
+      _actionExportViewCSV       .setEnabled(numSelectedItems > 0);
+      _actionGotoToday           .setEnabled(numAvailableItems > 0);
+      _actionJoinTours           .setEnabled(numTourItems > 1);
+      _actionOpenTour            .setEnabled(isOneTour);
+      _actionPrintTour           .setEnabled(isTourSelected);
+      _actionSetOtherPerson      .setEnabled(isTourSelected);
+      _actionSetStartEndLocation .setEnabled(isTourSelected);
+      _actionSetTourType         .setEnabled(isTourSelected && tourTypes.size() > 0);
+
+// SET_FORMATTING_ON
+
 
       _actionCollapseAll.setEnabled(isTreeLayout);
-      _actionCollapseOthers.setEnabled(isTreeLayout &&
-            (numSelectedItems == 1 && firstElementHasChildren));
+      _actionCollapseOthers.setEnabled(isTreeLayout && (numSelectedItems == 1 && firstElementHasChildren));
 
-      _actionExpandSelection.setEnabled(isTreeLayout &&
-            (firstTreeElement == null
+      _actionExpandSelection.setEnabled(isTreeLayout
+
+            && (firstTreeElement == null
                   ? false
                   : numSelectedItems == 1
                         ? firstElementHasChildren

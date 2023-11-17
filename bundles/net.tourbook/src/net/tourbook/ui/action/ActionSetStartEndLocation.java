@@ -26,18 +26,62 @@ import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.location.SlideoutLocationProfiles;
+import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.location.TourLocationProfile;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 
+/**
+ * Actions to set start/end location
+ *
+ * <pre>
+ *
+ * -- Set start/end location
+ *
+ *   -- >> Profile <<
+ *   ----------------------
+ *   -- Profile 1
+ *   -- Profile 2
+ *   -- Profile 3
+ *   ----------------------
+ *   -- Open Profile Editor
+ *
+ * </pre>
+ */
 public class ActionSetStartEndLocation extends SubMenu {
 
-   private ITourProvider _tourProvider;
+   private static final String          ID     = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private Action        _actionProfileTitle;
+   private static final IDialogSettings _state = TourbookPlugin.getState(ID);
+
+   private ITourProvider                _tourProvider;
+
+   private ActionEditProfiles           _actionEditProfiles;
+   private Action                       _actionProfileTitle;
+
+   private Control                      _ownerControl;
+
+   private class ActionEditProfiles extends Action {
+
+      public ActionEditProfiles() {
+
+         super(Messages.Tour_Location_Action_OpenProfileEditor, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+         actionOpenProfileSlideout();
+      }
+   }
 
    private class ActionLocationProfile extends Action {
 
@@ -53,7 +97,7 @@ public class ActionSetStartEndLocation extends SubMenu {
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
 
          setText(profileName);
-         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(profileName, joinedPartNames));
+         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(joinedPartNames));
 
          if (isDefaultProfile) {
             setChecked(true);
@@ -63,14 +107,16 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void run() {
 
-         onSelectProfile(_locationProfile);
+         actionSetTourLocation(_locationProfile);
       }
    }
 
    /**
     * @param tourProvider
+    * @param ownerControl
     */
-   public ActionSetStartEndLocation(final ITourProvider tourProvider) {
+   public ActionSetStartEndLocation(final ITourProvider tourProvider,
+                                    final Control ownerControl) {
 
       super(Messages.Tour_Action_SetStartEndLocation, AS_DROP_DOWN_MENU);
 
@@ -78,14 +124,75 @@ public class ActionSetStartEndLocation extends SubMenu {
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd));
 
       _tourProvider = tourProvider;
+      _ownerControl = ownerControl;
 
       createActions();
+   }
+
+   private void actionOpenProfileSlideout() {
+
+      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final TourData tourData = selectedTours.get(0);
+
+      // ensure that location data are available
+      final TourLocationData tourLocationData = tourData.tourLocationData_Start;
+      if (tourLocationData == null) {
+
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         if (latitudeSerie == null || latitudeSerie.length == 0) {
+            return;
+         }
+
+         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
+               latitudeSerie[0],
+               longitudeSerie[0]);
+
+         if (retrievedLocationData == null) {
+            return;
+         }
+
+         tourData.tourLocationData_Start = retrievedLocationData;
+      }
+
+      final Point cursorLocation = Display.getCurrent().getCursorLocation();
+      final Rectangle ownerBounds = new Rectangle(cursorLocation.x, cursorLocation.y, 0, 0);
+
+      // !!! must be created lately otherwise the UI is not fully setup !!!
+      final SlideoutLocationProfiles slideoutLocationProfiles = new SlideoutLocationProfiles(
+
+            null,
+            tourData,
+            _ownerControl,
+            ownerBounds,
+            _state,
+
+            true // use start location data
+      );
+
+      slideoutLocationProfiles.open(false);
+   }
+
+   private void actionSetTourLocation(final TourLocationProfile locationProfile) {
+
+      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> modifiedTours = new ArrayList<>();
+
+      TourLocationManager.setLocationNames(selectedTours, modifiedTours, locationProfile);
+
+      if (modifiedTours.size() > 0) {
+
+         TourManager.saveModifiedTours(modifiedTours);
+      }
    }
 
    private void createActions() {
 
       _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle) {};
       _actionProfileTitle.setEnabled(false);
+
+      _actionEditProfiles = new ActionEditProfiles();
    }
 
    @Override
@@ -101,33 +208,30 @@ public class ActionSetStartEndLocation extends SubMenu {
       final int numProfiles = allProfiles.size();
       if (numProfiles > 0) {
 
-         final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
-
-         // sort profiles by name
-         Collections.sort(allProfiles);
-
          addActionToMenu(_actionProfileTitle);
          addSeparatorToMenu();
 
-         for (final TourLocationProfile locationProfile : allProfiles) {
+         fillMenu_AddAllProfileActions(allProfiles);
 
-            final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
+         addSeparatorToMenu();
+      }
 
-            addActionToMenu(new ActionLocationProfile(locationProfile, isDefaultProfile));
-         }
+      addActionToMenu(_actionEditProfiles);
+   }
+
+   private void fillMenu_AddAllProfileActions(final List<TourLocationProfile> allProfiles) {
+
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+      // sort profiles by name
+      Collections.sort(allProfiles);
+
+      for (final TourLocationProfile locationProfile : allProfiles) {
+
+         final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
+
+         addActionToMenu(new ActionLocationProfile(locationProfile, isDefaultProfile));
       }
    }
 
-   private void onSelectProfile(final TourLocationProfile locationProfile) {
-
-      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
-      final ArrayList<TourData> modifiedTours = new ArrayList<>();
-
-      TourLocationManager.setLocationNames(selectedTours, modifiedTours, locationProfile);
-
-      if (modifiedTours.size() > 0) {
-
-         TourManager.saveModifiedTours(modifiedTours);
-      }
-   }
 }
