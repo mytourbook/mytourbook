@@ -56,6 +56,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
@@ -89,6 +91,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private Button      _btnSearch;
 
    private Combo       _cboSearchQuery;
+
+   private Section                       _sectionNutrition;
+   private FormToolkit                   _tk;
 
    public class SearchContentProvider implements IStructuredContentProvider {
 
@@ -248,16 +253,41 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       restoreState();
    }
 
+   private Section createSection(final Composite parent,
+                                 final FormToolkit tk,
+                                 final String title,
+                                 final boolean isGrabVertical,
+                                 final boolean isExpandable) {
+
+      final int style = isExpandable
+            ? Section.TWISTIE | Section.TITLE_BAR
+            : Section.TITLE_BAR;
+
+      final Section section = tk.createSection(parent, style);
+
+      section.setText(title);
+      GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
+
+      final Composite sectionContainer = tk.createComposite(section);
+      section.setClient(sectionContainer);
+
+      return section;
+   }
+
    private void createUI(final Composite parent) {
+
+      final Display display = parent.getDisplay();
+
+      _tk = new FormToolkit(display);
+
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
       {
-         createUI_10_Header(container);
-         createUI_20_Viewer(container);
+         // createUI_Section_10_Summary(container);
+         createUI_Section_20_ProductsList(container);
       }
    }
-
    private void createUI_10_Header(final Composite parent) {
 
       final Composite queryContainer = new Composite(parent, SWT.NONE);
@@ -326,6 +356,60 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          _postSelectionProvider.setSelection(selectedPoi);
       });
+   }
+   private void createUI_Section_20_ProductsList(final Composite parent) {
+
+      //put a link with "Not finding the product you used ? You can create it here"
+      //https://world.openfoodfacts.org/cgi/product.pl
+
+      _sectionNutrition = createSection(parent, _tk, "Products List" /*
+                                                                      * Messages.
+                                                                      * tour_editor_section_characteristics
+                                                                      */, false, true);
+      final Composite container = (Composite) _sectionNutrition.getClient();
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      {
+         {
+            /*
+             * label: POI
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText("Messages.Poi_View_Label_POI");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+         }
+         {
+            /*
+             * button: search
+             */
+            _btnSearch = new Button(container, SWT.PUSH);
+            _btnSearch.setText("Messages.Poi_View_Button_Search");
+            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell())
+                  .open()));
+         }
+         /*
+          * tags
+          */
+            // combo: tour title with history
+//            _comboFoodSearch = new CCombo(container, SWT.BORDER | SWT.FLAT);
+//            _comboFoodSearch.setText(UI.EMPTY_STRING);
+//
+//            _tk.adapt(_comboFoodSearch, true, false);
+//
+//            GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+//                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+//                  .applyTo(_comboFoodSearch);
+//
+//            _comboFoodSearch.addModifyListener(modifyEvent -> {
+//
+//               if (_isSetField || _isSavingInProgress) {
+//                  return;
+//               }
+//
+//               System.out.println(modifyEvent.data.toString());
+//            });
+         }
    }
 
    @Override
