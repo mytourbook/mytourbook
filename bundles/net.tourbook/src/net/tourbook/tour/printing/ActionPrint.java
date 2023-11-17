@@ -33,14 +33,12 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.swt.widgets.Menu;
 
 public class ActionPrint extends SubMenu {
 
    private static List<PrintTourExtension> _printExtensionPoints;
 
-   private Menu                            _menu;
    private List<ActionPrintTour>           _printTourActions;
 
    private ITourProvider                   _tourProvider;
@@ -100,12 +98,6 @@ public class ActionPrint extends SubMenu {
       createActions();
    }
 
-   private void addActionToMenu(final Action action) {
-
-      final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(_menu, -1);
-   }
-
    private void createActions() {
 
       if (_printTourActions != null) {
@@ -114,7 +106,7 @@ public class ActionPrint extends SubMenu {
 
       _printTourActions = new ArrayList<>();
 
-      // create action for each extension point
+      // create an action for each extension point
       for (final PrintTourExtension printTourExtension : _printExtensionPoints) {
          _printTourActions.add(new ActionPrintTour(printTourExtension));
       }
@@ -125,8 +117,6 @@ public class ActionPrint extends SubMenu {
 
    @Override
    public void fillMenu(final Menu menu) {
-
-      _menu = menu;
 
       _printTourActions.forEach(this::addActionToMenu);
    }
