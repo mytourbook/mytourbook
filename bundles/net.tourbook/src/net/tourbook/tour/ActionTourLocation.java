@@ -47,7 +47,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionDownloadTourLocation extends ContributionItem {
+/**
+ * Action to download and set tour locations
+ */
+public class ActionTourLocation extends ContributionItem {
 
    private static IDialogSettings         _state;
 
@@ -125,7 +128,7 @@ public class ActionDownloadTourLocation extends ContributionItem {
     * @param isStartLocation
     * @param stateId
     */
-   public ActionDownloadTourLocation(final ITourLocationConsumer tourLocationConsumer,
+   public ActionTourLocation(final ITourLocationConsumer tourLocationConsumer,
                                      final TourData tourData,
                                      final boolean isStartLocation,
                                      final String stateId) {
@@ -344,7 +347,7 @@ public class ActionDownloadTourLocation extends ContributionItem {
        * Close other location slideout that only one slideout is open, otherwise they can
        * conflict because they are using the same model
        */
-      _tourLocationConsumer.closeOtherSlideouts(ActionDownloadTourLocation.this);
+      _tourLocationConsumer.closeOtherSlideouts(ActionTourLocation.this);
 
       _slideoutLocationProfiles.open(false);
    }

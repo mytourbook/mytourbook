@@ -91,8 +91,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    private int[]                         _unitValueWindSpeed;
    private float                         _unitValueDistance;
 
-   private ActionDownloadTourLocation    _actionDownload_StartLocation;
-   private ActionDownloadTourLocation    _actionDownload_EndLocation;
+   private ActionTourLocation            _actionStartLocation;
+   private ActionTourLocation            _actionEndLocation;
    private ActionSlideout_WeatherOptions _actionSlideout_WeatherOptions;
 
    private MouseWheelListener            _mouseWheelListener;
@@ -179,17 +179,17 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    @Override
    public void closeOtherSlideouts(final ContributionItem requestForOpeningContribItem) {
 
-      if (requestForOpeningContribItem.equals(_actionDownload_EndLocation)) {
+      if (requestForOpeningContribItem.equals(_actionEndLocation)) {
 
          // close start location slideout
 
-         _actionDownload_StartLocation.closeSlideout();
+         _actionStartLocation.closeSlideout();
 
       } else {
 
          // close end location slideout
 
-         _actionDownload_EndLocation.closeSlideout();
+         _actionEndLocation.closeSlideout();
       }
 
    }
@@ -220,8 +220,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
    private void createActions() {
 
-      _actionDownload_StartLocation = new ActionDownloadTourLocation(this, _tourData, true, STATE_ID);
-      _actionDownload_EndLocation = new ActionDownloadTourLocation(this, _tourData, false, STATE_ID);
+      _actionStartLocation = new ActionTourLocation(this, _tourData, true, STATE_ID);
+      _actionEndLocation = new ActionTourLocation(this, _tourData, false, STATE_ID);
 
       _actionSlideout_WeatherOptions = new ActionSlideout_WeatherOptions();
    }
@@ -400,7 +400,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 
                _toolbarManager_StartLocation = new ToolBarManager(toolbar);
-               _toolbarManager_StartLocation.add(_actionDownload_StartLocation);
+               _toolbarManager_StartLocation.add(_actionStartLocation);
                _toolbarManager_StartLocation.update(true);
             }
 
@@ -455,7 +455,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 
                _toolbarManager_EndLocation = new ToolBarManager(toolbar);
-               _toolbarManager_EndLocation.add(_actionDownload_EndLocation);
+               _toolbarManager_EndLocation.add(_actionEndLocation);
                _toolbarManager_EndLocation.update(true);
             }
 
@@ -1006,8 +1006,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    public void defaultProfileIsUpdated() {
 
       // update action tooltip which displays the current profile
-      _actionDownload_StartLocation.updateUI_ToolItem();
-      _actionDownload_EndLocation.updateUI_ToolItem();
+      _actionStartLocation.updateUI_ToolItem();
+      _actionEndLocation.updateUI_ToolItem();
    }
 
    private void displayCloudIcon() {
@@ -1024,8 +1024,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
       final boolean hasGeoLocationData = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 0;
 
-      _actionDownload_StartLocation.setEnabled(hasGeoLocationData);
-      _actionDownload_EndLocation.setEnabled(hasGeoLocationData);
+      _actionStartLocation.setEnabled(hasGeoLocationData);
+      _actionEndLocation.setEnabled(hasGeoLocationData);
 
       _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
@@ -1177,7 +1177,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          endLocationData = _tourData.tourLocationData_End = retrievedLocationData;
 
          // show different action image
-         _actionDownload_EndLocation.setHasLocationData(true);
+         _actionEndLocation.setHasLocationData(true);
          _toolbarManager_EndLocation.update(true);
       }
 
@@ -1204,7 +1204,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          startLocationData = _tourData.tourLocationData_Start = retrievedLocationData;
 
          // show different action image
-         _actionDownload_StartLocation.setHasLocationData(true);
+         _actionStartLocation.setHasLocationData(true);
          _toolbarManager_StartLocation.update(true);
       }
 
