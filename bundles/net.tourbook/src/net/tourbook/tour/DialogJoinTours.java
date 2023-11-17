@@ -84,6 +84,11 @@ import org.eclipse.swt.widgets.Text;
 public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    //todo fb what to do with weather when concatening tours
+   // as of today, this is what is leftover after concatenating 2 tours
+   // ☀ clear sky, 6mph from SSE
+   // cf 11/04/2023
+
+   // remove everything ?
 
    private static final String   STATE_TOUR_TITLE                       = "Title";                                    //$NON-NLS-1$
    private static final String   STATE_TOUR_TYPE_ID                     = "TourTypeId";                               //$NON-NLS-1$
