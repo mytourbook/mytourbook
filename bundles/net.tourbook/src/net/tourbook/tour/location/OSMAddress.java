@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.lang.reflect.Field;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 /**
@@ -28,6 +29,8 @@ import net.tourbook.common.util.StatusUtil;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 class OSMAddress {
+
+   private static final char   NL        = UI.NEW_LINE;
 
    private static final String FIELD_LOG = "%-17s %s\n"; //$NON-NLS-1$
 
@@ -132,6 +135,16 @@ class OSMAddress {
       }
 
       return sb.toString();
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "OSMAddress" + NL // //$NON-NLS-1$
+
+            + logAddress();
    }
 
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -334,38 +333,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
             final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
 
-            final String joinedParts = profile.allParts.stream()
-
-                  .map(locationPart -> {
-
-                     String label;
-
-                     switch (locationPart) {
-                     case OSM_DEFAULT_NAME:
-                     case OSM_NAME:
-                     case CUSTOM_CITY_LARGEST:
-                     case CUSTOM_CITY_SMALLEST:
-                     case CUSTOM_CITY_WITH_ZIP_LARGEST:
-                     case CUSTOM_CITY_WITH_ZIP_SMALLEST:
-                     case CUSTOM_STREET_WITH_HOUSE_NUMBER:
-
-                        label = TourLocationManager.createPartName_Combined(locationPart);
-                        break;
-
-                     default:
-
-                        label = TourLocationManager.allLocationPartLabel.get(locationPart);
-                        break;
-                     }
-
-                     return label;
-                  })
-
-                  .collect(Collectors.joining(UI.SYMBOL_COMMA + UI.SPACE));
-
-            cell.setText(joinedParts);
+            cell.setText(TourLocationManager.createJoinedPartNames(profile, UI.SYMBOL_COMMA + UI.SPACE));
          }
-
       });
 
       tableLayout.setColumnData(tc, new ColumnWeightData(2, true));

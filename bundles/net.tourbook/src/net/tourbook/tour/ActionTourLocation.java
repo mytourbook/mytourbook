@@ -43,6 +43,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -57,7 +58,9 @@ public class ActionTourLocation extends ContributionItem {
    private boolean                        _isStartLocation;
    private boolean                        _hasLocationData;
 
+   private Action                         _actionProfileTitle;
    private ActionSlideoutLocationProfiles _actionSlideoutLocationProfiles;
+   private ActionRetrieveLocationAgain    _actionRetrieveLocationAgain;
    private SlideoutLocationProfiles       _slideoutLocationProfiles;
 
    private ITourLocationConsumer          _tourLocationConsumer;
@@ -67,10 +70,10 @@ public class ActionTourLocation extends ContributionItem {
    /*
     * UI controls
     */
-   private Image    _contribItemImage_Download;
-   private Image    _contribItemImage_Download_Disabled;
-   private Image    _contribItemImage_Options;
-   private Image    _contribItemImage_Options_Disabled;
+   private Image    _actionImage_Download;
+   private Image    _actionImage_Download_Disabled;
+   private Image    _actionImage_Options;
+   private Image    _actionImage_Options_Disabled;
 
    private Menu     _contextMenu;
 
@@ -89,9 +92,10 @@ public class ActionTourLocation extends ContributionItem {
 
          final String profileName = _locationProfile.getName();
          final String locationName = createProfileDisplayName(_locationProfile);
+         final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
 
          setText(locationName);
-         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(profileName));
+         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(profileName, joinedPartNames));
 
          if (isDefaultProfile) {
             setChecked(true);
@@ -102,6 +106,22 @@ public class ActionTourLocation extends ContributionItem {
       public void run() {
 
          onSelectProfile(_locationProfile);
+      }
+   }
+
+   private class ActionRetrieveLocationAgain extends Action {
+
+      public ActionRetrieveLocationAgain() {
+
+         super(Messages.Tour_Location_Action_RetrieveLocationAgain);
+
+         setToolTipText(Messages.Tour_Location_Action_RetrieveLocationAgain_Tooltip);
+      }
+
+      @Override
+      public void run() {
+
+         retrieveLocationAgain();
       }
    }
 
@@ -156,6 +176,10 @@ public class ActionTourLocation extends ContributionItem {
 
    private void createActions() {
 
+      _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle) {};
+      _actionProfileTitle.setEnabled(false);
+
+      _actionRetrieveLocationAgain = new ActionRetrieveLocationAgain();
       _actionSlideoutLocationProfiles = new ActionSlideoutLocationProfiles();
    }
 
@@ -172,10 +196,11 @@ public class ActionTourLocation extends ContributionItem {
       } else {
 
          final String profileName = defaultProfile.getName();
+         final String joinedPartNames = TourLocationManager.createJoinedPartNames(defaultProfile, UI.NEW_LINE1);
 
          return _isStartLocation
-               ? Messages.Tour_Location_Action_Download_WithProfile_Start_Tooltip.formatted(profileName)
-               : Messages.Tour_Location_Action_Download_WithProfile_End_Tooltip.formatted(profileName);
+               ? Messages.Tour_Location_Action_Download_WithProfile_Start_Tooltip.formatted(profileName, joinedPartNames)
+               : Messages.Tour_Location_Action_Download_WithProfile_End_Tooltip.formatted(profileName, joinedPartNames);
       }
    }
 
@@ -186,6 +211,21 @@ public class ActionTourLocation extends ContributionItem {
             : _tourData.tourLocationData_End.osmLocation;
 
       return TourLocationManager.createLocationDisplayName(osmLocation, locationProfile);
+   }
+
+   private void downloadLocationData() {
+
+      BusyIndicator.showWhile(Display.getDefault(), () -> {
+
+         if (_isStartLocation) {
+
+            _tourLocationConsumer.setupTourStartLocation();
+
+         } else {
+
+            _tourLocationConsumer.setupTourEndLocation();
+         }
+      });
    }
 
    @Override
@@ -200,11 +240,11 @@ public class ActionTourLocation extends ContributionItem {
 
 // SET_FORMATTING_OFF
 
-      _contribItemImage_Download          = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download).createImage();
-      _contribItemImage_Download_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download_Disabled).createImage();
+      _actionImage_Download          = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download).createImage();
+      _actionImage_Download_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download_Disabled).createImage();
 
-      _contribItemImage_Options           = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-      _contribItemImage_Options_Disabled  = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+      _actionImage_Options           = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+      _actionImage_Options_Disabled  = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
 
 // SET_FORMATTING_ON
 
@@ -212,7 +252,8 @@ public class ActionTourLocation extends ContributionItem {
 
       updateUI_ToolItem();
 
-      _toolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect(selectionEvent, toolbar)));
+      _toolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            selectionEvent -> onSelectTourLocationAction(selectionEvent, toolbar)));
 
       /*
        * Context menu
@@ -237,6 +278,9 @@ public class ActionTourLocation extends ContributionItem {
       // create actions for each profile
       if (allProfiles.size() > 0) {
 
+         menuMgr.add(_actionProfileTitle);
+         menuMgr.add(new Separator());
+
          for (final TourLocationProfile locationProfile : allProfiles) {
 
             final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
@@ -248,14 +292,15 @@ public class ActionTourLocation extends ContributionItem {
       }
 
       menuMgr.add(_actionSlideoutLocationProfiles);
+      menuMgr.add(_actionRetrieveLocationAgain);
    }
 
    private void onDispose() {
 
-      _contribItemImage_Download.dispose();
-      _contribItemImage_Download_Disabled.dispose();
-      _contribItemImage_Options.dispose();
-      _contribItemImage_Options_Disabled.dispose();
+      _actionImage_Download.dispose();
+      _actionImage_Download_Disabled.dispose();
+      _actionImage_Options.dispose();
+      _actionImage_Options_Disabled.dispose();
 
       _toolItem.dispose();
       _toolItem = null;
@@ -264,10 +309,29 @@ public class ActionTourLocation extends ContributionItem {
    }
 
    /**
+    * Set location which was created with the provided profile
+    *
+    * @param locationProfile
+    */
+   private void onSelectProfile(final TourLocationProfile locationProfile) {
+
+      final String displayName = createProfileDisplayName(locationProfile);
+
+      if (_isStartLocation) {
+
+         _tourLocationConsumer.setTourStartLocation(displayName);
+
+      } else {
+
+         _tourLocationConsumer.setTourEndLocation(displayName);
+      }
+   }
+
+   /**
     * @param selectionEvent
     * @param toolbar
     */
-   private void onSelect(final SelectionEvent selectionEvent, final ToolBar toolbar) {
+   private void onSelectTourLocationAction(final SelectionEvent selectionEvent, final ToolBar toolbar) {
 
       // there are 3 different actions
 
@@ -296,31 +360,7 @@ public class ActionTourLocation extends ContributionItem {
 
          // download location data
 
-         BusyIndicator.showWhile(toolbar.getDisplay(), () -> {
-
-            if (_isStartLocation) {
-
-               _tourLocationConsumer.setupTourStartLocation();
-
-            } else {
-
-               _tourLocationConsumer.setupTourEndLocation();
-            }
-         });
-      }
-   }
-
-   private void onSelectProfile(final TourLocationProfile locationProfile) {
-
-      final String displayName = createProfileDisplayName(locationProfile);
-
-      if (_isStartLocation) {
-
-         _tourLocationConsumer.setTourStartLocation(displayName);
-
-      } else {
-
-         _tourLocationConsumer.setTourEndLocation(displayName);
+         downloadLocationData();
       }
    }
 
@@ -349,6 +389,21 @@ public class ActionTourLocation extends ContributionItem {
       _slideoutLocationProfiles.open(false);
    }
 
+   private void retrieveLocationAgain() {
+
+      // delete old location values
+      if (_isStartLocation) {
+
+         _tourData.tourLocationData_Start = null;
+
+      } else {
+
+         _tourData.tourLocationData_End = null;
+      }
+
+      downloadLocationData();
+   }
+
    public void setEnabled(final boolean isEnabled) {
 
       _toolItem.setEnabled(isEnabled);
@@ -369,8 +424,8 @@ public class ActionTourLocation extends ContributionItem {
 
          // set location data
 
-         _toolItem.setImage(_contribItemImage_Options);
-         _toolItem.setDisabledImage(_contribItemImage_Options);
+         _toolItem.setImage(_actionImage_Options);
+         _toolItem.setDisabledImage(_actionImage_Options_Disabled);
 
          _toolItem.setToolTipText(_isStartLocation
                ? Messages.Tour_Location_Action_Customize_Start_Tooltip
@@ -380,8 +435,8 @@ public class ActionTourLocation extends ContributionItem {
 
          // download location data
 
-         _toolItem.setImage(_contribItemImage_Download);
-         _toolItem.setDisabledImage(_contribItemImage_Download_Disabled);
+         _toolItem.setImage(_actionImage_Download);
+         _toolItem.setDisabledImage(_actionImage_Download_Disabled);
 
          _toolItem.setToolTipText(createDownloadTooltip());
       }

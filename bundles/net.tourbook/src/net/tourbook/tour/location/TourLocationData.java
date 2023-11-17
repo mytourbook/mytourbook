@@ -15,14 +15,18 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+import de.byteholder.geoclipse.map.UI;
+
 public class TourLocationData {
 
-   String             downloadedData;
+   private static final String NL = UI.NEW_LINE;
 
-   public OSMLocation osmLocation;
+   String                      downloadedData;
 
-   long               downloadTime;
-   long               waitingTime;
+   public OSMLocation          osmLocation;
+
+   long                        downloadTime;
+   long                        waitingTime;
 
    public TourLocationData(final String downloadedData, final long retrievalTime, final long waitingTime) {
 
@@ -30,5 +34,21 @@ public class TourLocationData {
 
       this.downloadTime = retrievalTime;
       this.waitingTime = waitingTime;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "TourLocationData" + NL //                          //$NON-NLS-1$
+
+            + " downloadedData = " + downloadedData + NL //       //$NON-NLS-1$
+            + " downloadTime   = " + downloadTime + NL //         //$NON-NLS-1$
+            + " waitingTime    = " + waitingTime + NL //          //$NON-NLS-1$
+
+            + " osmLocation    = " + NL //                        //$NON-NLS-1$
+            + osmLocation + NL //
+      ;
    }
 }

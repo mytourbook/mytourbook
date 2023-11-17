@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
@@ -261,6 +262,40 @@ public class TourLocationManager {
       _displayNameBuffer.append(text);
 
       _usedDisplayNames.add(text);
+   }
+
+   public static String createJoinedPartNames(final TourLocationProfile profile, final String delimiter) {
+
+      final String joinedParts = profile.allParts.stream()
+
+            .map(locationPart -> {
+
+               String label;
+
+               switch (locationPart) {
+               case OSM_DEFAULT_NAME:
+               case OSM_NAME:
+               case CUSTOM_CITY_LARGEST:
+               case CUSTOM_CITY_SMALLEST:
+               case CUSTOM_CITY_WITH_ZIP_LARGEST:
+               case CUSTOM_CITY_WITH_ZIP_SMALLEST:
+               case CUSTOM_STREET_WITH_HOUSE_NUMBER:
+
+                  label = TourLocationManager.createPartName_Combined(locationPart);
+                  break;
+
+               default:
+
+                  label = TourLocationManager.allLocationPartLabel.get(locationPart);
+                  break;
+               }
+
+               return label;
+            })
+
+            .collect(Collectors.joining(delimiter));
+
+      return joinedParts;
    }
 
    public static String createLocationDisplayName(final List<MT_DLItem> allSelectedItems) {
@@ -557,34 +592,6 @@ public class TourLocationManager {
    }
 
    /**
-    * Combine old and new location name
-    *
-    * @param oldLocation
-    * @param newLocation
-    *
-    * @return
-    */
-   private static String getJoinedLocationNames(final String oldLocation, final String newLocation) {
-
-      final boolean isOldLocation = oldLocation.length() > 0;
-      final boolean isNewLocation = newLocation.length() > 0;
-
-      if (isOldLocation && isNewLocation) {
-         return oldLocation + UI.DASH_WITH_DOUBLE_SPACE + newLocation;
-      }
-
-      if (isNewLocation) {
-         return newLocation;
-      }
-
-      if (isOldLocation) {
-         return oldLocation;
-      }
-
-      return UI.EMPTY_STRING;
-   }
-
-   /**
     * Retrieve location data
     *
     * @param latitude
@@ -643,19 +650,19 @@ public class TourLocationManager {
    }
 
    /**
+    * Limits and download policy:
+    * <a href=
+    * "https://operations.osmfoundation.org/policies/nominatim/">https://operations.osmfoundation.org/policies/nominatim/</a>
+    * <p>
+    *
     * @param latitude
-    * @param longitudeSerie
+    * @param longitude
     * @param zoomLevel
     *
-    * @return Returns <code>null</code> or
-    *
-    *         <ol>
-    *         <li>Location</li>
-    *         <li>Request waiting time in ms</li>
-    *         </ol>
+    * @return Returns <code>null</code> or {@link TourLocationData}
     */
    private static TourLocationData getName_10_RetrieveData(final double latitude,
-                                                           final double longitudeSerie,
+                                                           final double longitude,
                                                            final int zoomLevel) {
 
       final long now = System.currentTimeMillis();
@@ -691,13 +698,14 @@ public class TourLocationManager {
 
       final String requestUrl = UI.EMPTY_STRING
 
-            + "https://nominatim.openstreetmap.org/reverse?format=json" //$NON-NLS-1$
+            + "https://nominatim.openstreetmap.org/reverse?" //$NON-NLS-1$
 
-            + "&lat=" + latitude //             //$NON-NLS-1$
-            + "&lon=" + longitudeSerie //       //$NON-NLS-1$
-            + "&zoom=" + zoomLevel //           //$NON-NLS-1$
+            + "format=json" //               //$NON-NLS-1$
+            + "&addressdetails=1" //         //$NON-NLS-1$
 
-            + "&addressdetails=1" //$NON-NLS-1$
+            + "&lat=" + latitude //          //$NON-NLS-1$
+            + "&lon=" + longitude //         //$NON-NLS-1$
+            + "&zoom=" + zoomLevel //        //$NON-NLS-1$
 
 //          + "&extratags=1" //$NON-NLS-1$
 //          + "&namedetails=1" //$NON-NLS-1$
@@ -814,7 +822,8 @@ public class TourLocationManager {
    }
 
    public static void setLocationNames(final List<TourData> requestedTours,
-                                       final List<TourData> modifiedTours) {
+                                       final List<TourData> modifiedTours,
+                                       final TourLocationProfile locationProfile) {
 
       try {
 
@@ -864,14 +873,11 @@ public class TourLocationManager {
 
                   monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, locationEnd.waitingTime));
 
-                  final String oldTourStartPlace = tourData.getTourStartPlace();
-                  final String oldTourEndPlace = tourData.getTourEndPlace();
+                  final String osmStartLocation = createLocationDisplayName(locationStart.osmLocation, locationProfile);
+                  final String osmEndLocation = createLocationDisplayName(locationEnd.osmLocation, locationProfile);
 
-                  final String osmStartLocation = createLocationDisplayName(locationStart.osmLocation);
-                  final String osmEndLocation = createLocationDisplayName(locationEnd.osmLocation);
-
-                  tourData.setTourStartPlace(getJoinedLocationNames(oldTourStartPlace, osmStartLocation));
-                  tourData.setTourEndPlace(getJoinedLocationNames(oldTourEndPlace, osmEndLocation));
+                  tourData.setTourStartPlace(osmStartLocation);
+                  tourData.setTourEndPlace(osmEndLocation);
 
                   // keep location values
                   tourData.tourLocationData_Start = locationStart;
