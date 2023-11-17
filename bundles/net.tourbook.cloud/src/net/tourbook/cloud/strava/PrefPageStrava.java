@@ -51,9 +51,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    public static final String      ID                      = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
-   public static final int         CALLBACK_PORT           = 4918;
+   private static final int        CALLBACK_PORT           = 4918;
 
-   public static final String      ClientId                = "55536";                                                                     //$NON-NLS-1$
+   private static final String     ClientId                = "55536";                                                                     //$NON-NLS-1$
 
    private static final String     _stravaApp_WebPage_Link = "https://www.strava.com";                                                    //$NON-NLS-1$
    private IPreferenceStore        _prefStore              = Activator.getDefault().getPreferenceStore();

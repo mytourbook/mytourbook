@@ -30,7 +30,7 @@ public class TourLogViewTests extends UITest {
    void test_ViewOptions() {
 
       //Opening the tour log view
-      final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
+      final SWTBotView tourLogView = Utils.showTourLogView(bot);
 
       SWTBotTreeItem tour = Utils.getTour(bot);
 

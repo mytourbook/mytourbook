@@ -1881,7 +1881,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /**
        * @param sortColumnId
        *
-       * @return Returns the column widget by it's column id, when column id is not found then the
+       * @return Returns the column widget by its column id, when column id is not found then the
        *         first column is returned.
        */
       private TableColumn getSortColumn(final String sortColumnId) {
@@ -2097,7 +2097,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                            + NL
                            + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL //$NON-NLS-1$
                            + NL
-                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed " //$NON-NLS-1$
+                           + "One issue could be that when a duplicated tour is selected then its data are not displayed " //$NON-NLS-1$
                            + "because the original tour was selected before. " //$NON-NLS-1$
                            + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL //$NON-NLS-1$
                            + NL
@@ -7113,7 +7113,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       tbm.add(_actionToggleRowSelectMode);
 
       // save and restore actions are added from plugin.xml
-      tbm.add(new Separator("group_SaveAndRestoreActions"));
+      tbm.add(new Separator("group_SaveAndRestoreActions")); //$NON-NLS-1$
 
       tbm.add(_actionViewSettings);
 

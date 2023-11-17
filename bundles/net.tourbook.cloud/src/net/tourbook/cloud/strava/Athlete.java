@@ -19,23 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Athlete {
-
-   private String id;
-   private String firstName;
-   private String lastName;
-
-   @JsonProperty("firstname")
-   public String getFirstName() {
-      return firstName;
-   }
-
-   public String getId() {
-      return id;
-   }
-
-   @JsonProperty("lastname")
-   public String getLastName() {
-      return lastName;
-   }
-}
+public record Athlete(String id,
+                      @JsonProperty("firstname") String firstName,
+                      @JsonProperty("lastname") String lastName) {}
