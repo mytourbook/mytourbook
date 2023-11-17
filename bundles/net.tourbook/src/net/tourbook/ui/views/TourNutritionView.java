@@ -60,7 +60,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
-   public static final String            ID                     = "de.byteholder.geoclipse.poi.poiView"; //$NON-NLS-1$
+   public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";           //$NON-NLS-1$
 
@@ -73,7 +73,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final String           IMG_KEY_STAR           = "star";                                //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state                 = TourbookPlugin.getState("PoiView");    //$NON-NLS-1$
+   private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
 
    private TableViewer                   _poiViewer;
    private List<String>                  _pois;
