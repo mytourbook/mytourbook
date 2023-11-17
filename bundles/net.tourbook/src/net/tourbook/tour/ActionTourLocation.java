@@ -87,14 +87,11 @@ public class ActionTourLocation extends ContributionItem {
 
          _locationProfile = locationProfile;
 
-         /*
-          * Create action label
-          */
          final String profileName = _locationProfile.getName();
          final String locationName = createProfileDisplayName(_locationProfile);
 
          setText(locationName);
-         setToolTipText("Profile: \"%s\"".formatted(profileName));
+         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(profileName));
 
          if (isDefaultProfile) {
             setChecked(true);
@@ -112,7 +109,7 @@ public class ActionTourLocation extends ContributionItem {
 
       public ActionSlideoutLocationProfiles() {
 
-         super(Messages.Tour_Action_Location_OpenProfileEditor);
+         super(Messages.Tour_Location_Action_OpenProfileEditor);
       }
 
       @Override
@@ -129,9 +126,9 @@ public class ActionTourLocation extends ContributionItem {
     * @param stateId
     */
    public ActionTourLocation(final ITourLocationConsumer tourLocationConsumer,
-                                     final TourData tourData,
-                                     final boolean isStartLocation,
-                                     final String stateId) {
+                             final TourData tourData,
+                             final boolean isStartLocation,
+                             final String stateId) {
 
       _tourLocationConsumer = tourLocationConsumer;
       _tourData = tourData;
@@ -169,16 +166,16 @@ public class ActionTourLocation extends ContributionItem {
       if (defaultProfile == null) {
 
          return _isStartLocation
-               ? Messages.Tour_Action_LocationDownload_Start_Tooltip
-               : Messages.Tour_Action_LocationDownload_End_Tooltip;
+               ? Messages.Tour_Location_Action_Download_Start_Tooltip
+               : Messages.Tour_Location_Action_Download_End_Tooltip;
 
       } else {
 
          final String profileName = defaultProfile.getName();
 
          return _isStartLocation
-               ? Messages.Tour_Action_LocationDownload_WithProfile_Start_Tooltip.formatted(profileName)
-               : Messages.Tour_Action_LocationDownload_WithProfile_End_Tooltip.formatted(profileName);
+               ? Messages.Tour_Location_Action_Download_WithProfile_Start_Tooltip.formatted(profileName)
+               : Messages.Tour_Location_Action_Download_WithProfile_End_Tooltip.formatted(profileName);
       }
    }
 
@@ -376,8 +373,8 @@ public class ActionTourLocation extends ContributionItem {
          _toolItem.setDisabledImage(_contribItemImage_Options);
 
          _toolItem.setToolTipText(_isStartLocation
-               ? Messages.Tour_Action_LocationCustomize_Start_Tooltip
-               : Messages.Tour_Action_LocationCustomize_End_Tooltip);
+               ? Messages.Tour_Location_Action_Customize_Start_Tooltip
+               : Messages.Tour_Location_Action_Customize_End_Tooltip);
 
       } else {
 

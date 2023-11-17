@@ -2760,13 +2760,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_graph_speed_tooltip;
    public static String        Tour_Action_graph_temperature_tooltip;
    public static String        Tour_Action_graph_tour_compare_tooltip;
-   public static String        Tour_Action_Location_OpenProfileEditor;
-   public static String        Tour_Action_LocationCustomize_End_Tooltip;
-   public static String        Tour_Action_LocationCustomize_Start_Tooltip;
-   public static String        Tour_Action_LocationDownload_End_Tooltip;
-   public static String        Tour_Action_LocationDownload_Start_Tooltip;
-   public static String        Tour_Action_LocationDownload_WithProfile_End_Tooltip;
-   public static String        Tour_Action_LocationDownload_WithProfile_Start_Tooltip;
+
    public static String        Tour_Action_MapMarkerOptions_Tooltip;
    public static String        Tour_Action_MarkerOptions_Tooltip;
    public static String        Tour_Action_Marker_Delete;
@@ -3108,7 +3102,15 @@ public class Messages extends NLS {
    public static String        Tour_Info_Label_AllFields;
    public static String        Tour_Info_Label_AllFields_Tooltip;
 
-   public static String        Tour_Location_Default_ProfileName;
+   public static String        Tour_Location_Action_Customize_End_Tooltip;
+   public static String        Tour_Location_Action_Customize_Start_Tooltip;
+   public static String        Tour_Location_Action_Download_End_Tooltip;
+   public static String        Tour_Location_Action_Download_Start_Tooltip;
+   public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;
+   public static String        Tour_Location_Action_Download_WithProfile_Start_Tooltip;
+   public static String        Tour_Location_Action_OpenProfileEditor;
+   public static String        Tour_Location_Action_Profile_Tooltip;
+   public static String        Tour_Location_DefaultProfileName;
 
    public static String        Tour_Log_Action_Clear_Tooltip;
    public static String        Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;

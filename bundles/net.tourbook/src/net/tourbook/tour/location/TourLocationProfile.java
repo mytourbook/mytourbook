@@ -33,7 +33,7 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
    /**
     * Profile name
     */
-   String                    name       = Messages.Tour_Location_Default_ProfileName;
+   String                    name       = Messages.Tour_Location_DefaultProfileName;
 
    List<LocationPartID>      allParts   = new ArrayList<>();
 
