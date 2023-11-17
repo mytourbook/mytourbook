@@ -15,102 +15,131 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import net.tourbook.ui.views.WeatherProvidersUI;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class PrefPageNutrition extends PreferencePage implements IWorkbenchPreferencePage {
 
    public static final String ID = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
 
-   private int                DEFAULT_DESCRIPTION_WIDTH;
-
-   private WeatherProvidersUI _weatherProvidersUI;
-   private ScrolledComposite  _smoothingScrolledContainer;
-   private Composite          _smoothingScrolledContent;
-
-   private FormToolkit        _formToolkit;
    private PixelConverter     _pixelConverter;
+   private int                _defaultInfoWidth;
+   private int                _defaultSpinnerWidth;
+   private MouseWheelListener _defaultMouseWheelListener;
+
+
+   /*
+    * UI controls
+    */
+   private Spinner _spinnerCaloriesPerHourTarget;
+   private Button             _chkIgnoreFirstHour;
 
    @Override
    protected Control createContents(final Composite parent) {
 
       initUI(parent);
 
-      final Composite container = createUI();
+      final Composite container = createUI(parent);
 
       return container;
    }
 
-   private Composite createUI() {
+   private Composite createUI(final Composite parent) {
 
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_smoothingScrolledContainer);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .spacing(5, 15)
+            .applyTo(container);
       {
-         _smoothingScrolledContent = _formToolkit.createComposite(_smoothingScrolledContainer);
-         _smoothingScrolledContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         GridDataFactory.fillDefaults()
-               .grab(true, true)
-               .hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-               .applyTo(_smoothingScrolledContent);
-         GridLayoutFactory.swtDefaults()
-               .extendedMargins(5, 5, 10, 5)
-               .numColumns(1)
-               .applyTo(_smoothingScrolledContent);
+         /*
+          * Ignore 1st hour
+          */
          {
-            _weatherProvidersUI.createUI(_smoothingScrolledContent);
+            _chkIgnoreFirstHour = new Button(container, SWT.CHECK);
+            _chkIgnoreFirstHour.setText("Ignore 1st hour in nutrition averages computation");
+            _chkIgnoreFirstHour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+               //todo fb
+            }));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_chkIgnoreFirstHour);
          }
-
-         // setup scrolled container
-         _smoothingScrolledContainer.setExpandVertical(true);
-         _smoothingScrolledContainer.setExpandHorizontal(true);
-         _smoothingScrolledContainer.addControlListener(
-               controlResizedAdapter(controlEvent -> _smoothingScrolledContainer.setMinSize(
-                     _smoothingScrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT))));
-
-         _smoothingScrolledContainer.setContent(_smoothingScrolledContent);
+         createUI_20_NutritionTargets(container);
       }
 
-      return _smoothingScrolledContainer;
+      return container;
    }
 
+   private void createUI_20_NutritionTargets(final Composite parent) {
+
+      final int verticalIndent = 20;
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText("Messages.Pref_TourNutrition_Group_Targets");
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      {
+         /*
+          * label: cache size
+          */
+         final Label label = UI.createLabel(group, "Calories (kcal/hr) Messages.Pref_TourNutrition_Label_CaloriesTarget");
+         GridDataFactory.fillDefaults()
+               .indent(0, verticalIndent)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(label);
+
+         // spinner: cache size
+         _spinnerCaloriesPerHourTarget = new Spinner(group, SWT.BORDER);
+
+         // cache size ==1 causes "java.lang.IllegalStateException: Queue full"
+         _spinnerCaloriesPerHourTarget.setMinimum(2);
+         _spinnerCaloriesPerHourTarget.setMaximum(100_000);
+         _spinnerCaloriesPerHourTarget.addMouseWheelListener(_defaultMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .indent(0, verticalIndent)
+               .hint(_defaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerCaloriesPerHourTarget);
+      }
+   }
    @Override
    public void init(final IWorkbench workbench) {}
 
    private void initUI(final Composite parent) {
 
-      _formToolkit = new FormToolkit(parent.getDisplay());
       _pixelConverter = new PixelConverter(parent);
-      _weatherProvidersUI = new WeatherProvidersUI();
-      _smoothingScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+      _defaultInfoWidth = _pixelConverter.convertWidthInCharsToPixels(50);
+      _defaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pixelConverter.convertWidthInCharsToPixels(UI.IS_OSX ? 14 : 7);
 
-      DEFAULT_DESCRIPTION_WIDTH = _pixelConverter.convertWidthInCharsToPixels(70);
+      _defaultMouseWheelListener = mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
    }
 
    @Override
    protected void performDefaults() {
-
-      _weatherProvidersUI.performDefaults();
 
       super.performDefaults();
    }
 
    @Override
    public boolean performOk() {
-
-      _weatherProvidersUI.saveState();
 
       return super.performOk();
    }
