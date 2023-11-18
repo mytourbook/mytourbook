@@ -713,7 +713,7 @@ class TourBook_ColumnFactory {
 
             final long value = ((TVITourBookItem) element).colNumberOfTimeSlices;
 
-            return colDef_NatTable.printDoubleValue(value);
+            return colDef_NatTable.printLongValue(value);
          }
       });
 

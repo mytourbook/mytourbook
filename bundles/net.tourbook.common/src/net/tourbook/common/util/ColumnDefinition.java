@@ -477,9 +477,8 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Print double value with a value formatter.
     *
-    * @param cell
     * @param value
-    * @param isDetail
+    *
     * @return
     */
    public String printDoubleValue(final double value) {
@@ -520,9 +519,9 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Print long value with a value formatter.
     *
-    * @param cell
     * @param value
-    * @param isDetail
+    *
+    * @return
     */
    public String printLongValue(final long value) {
 
