@@ -923,6 +923,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @JsonProperty
    private short                 battery_Percentage_End        = -1;
 
+
    // ############################################# UNUSED FIELDS - START #############################################
    /**
     * ssss distance msw
@@ -960,6 +961,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private int                      deviceWeight;
 
    // ############################################# UNUSED FIELDS - END #############################################
+
 
    /**
     * Number of time slices in {@link #timeSerie}
@@ -1050,6 +1052,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @ManyToOne
    private TourBike                    tourBike;
+
+   @ManyToOne
+   private TourLocation                tourLocationStart;
+
+   @ManyToOne
+   private TourLocation                tourLocationEnd;
 
    /**
     * <br>
@@ -10825,6 +10833,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourId;
    }
 
+   public TourLocation getTourLocationEnd() {
+      return tourLocationEnd;
+   }
+
+   public TourLocation getTourLocationStart() {
+      return tourLocationStart;
+   }
+
    /**
     * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
     *         are not available.
@@ -11455,13 +11471,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          convertDataSeries();
       }
 
-      onPostLoadGetDataSeries();
+      onPostLoad_GetDataSeries();
    }
 
    /**
     * Move/convert serie data into tour data
     */
-   private void onPostLoadGetDataSeries() {
+   private void onPostLoad_GetDataSeries() {
 
       timeSerie = serieData.timeSerie;
 
@@ -12438,7 +12454,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       this.serieData = serieData;
 
-      onPostLoadGetDataSeries();
+      onPostLoad_GetDataSeries();
    }
 
    private void setSpeed(final int serieIndex,
@@ -12652,6 +12668,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public void setTourImportFilePath(final String tourImportFilePath) {
       this.tourImportFilePath = tourImportFilePath;
+   }
+
+   public void setTourLocationEnd(final TourLocation tourLocationEnd) {
+      this.tourLocationEnd = tourLocationEnd;
+   }
+
+   public void setTourLocationStart(final TourLocation tourLocationStart) {
+      this.tourLocationStart = tourLocationStart;
    }
 
    public void setTourMarkers(final Set<TourMarker> tourMarkers) {

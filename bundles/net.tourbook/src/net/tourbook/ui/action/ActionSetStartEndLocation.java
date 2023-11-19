@@ -23,7 +23,11 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.ui.SubMenu;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.SlideoutLocationProfiles;
@@ -185,6 +189,48 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          TourManager.saveModifiedTours(modifiedTours);
       }
+
+//      System.out.println();
+//      System.out.println("       "
+//
+//            + "Date  "
+//
+////          + "TourData  "
+//            + "SerieData      "
+//
+//            + "Start        "
+//            + "End    "
+//
+//            + "%"
+//
+//      );
+//
+//      for (final TourData tourData : selectedTours) {
+//
+//         final TourDateTime tourDateTime = tourData.getTourDateTime();
+//
+//         final int sizeofSerieData = Util.sizeof(tourData.getSerieData());
+//         final int sizeofStart = Util.sizeof(tourData.tourLocationData_Start.osmLocation);
+//         final int sizeofEnd = Util.sizeof(tourData.tourLocationData_End.osmLocation);
+//
+//         final float percent = (float) (sizeofStart + sizeofEnd) / sizeofSerieData * 100f;
+//
+//         System.out.println(""
+//
+//               + " %8s".formatted(TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime))
+//
+////             + " %10s".formatted(FormatManager.formatNumber_0(Util.sizeof(tourData)))
+//               + " %10s".formatted(FormatManager.formatNumber_0(sizeofSerieData))
+//
+//               + " %10s".formatted(sizeofStart)
+//               + " %10s".formatted(sizeofEnd)
+//
+//               + " %4.1f".formatted(percent)
+//
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//      }
    }
 
    private void createActions() {

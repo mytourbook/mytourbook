@@ -17,12 +17,14 @@ package net.tourbook.common.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -651,6 +653,31 @@ public class Util {
       } catch (final SecurityException e) {
          StatusUtil.showStatus(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
       }
+   }
+
+   /**
+    * @param objectStream
+    *
+    * @return
+    */
+   public static Object deserializeObject(final byte[] objectStream) {
+
+      Object object = null;
+
+      try {
+
+         final ByteArrayInputStream byteInputStream = new ByteArrayInputStream(objectStream);
+         final ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
+         {
+            object = objectInputStream.readObject();
+         }
+         objectInputStream.close();
+
+      } catch (final IOException | ClassNotFoundException e) {
+         StatusUtil.log(e);
+      }
+
+      return object;
    }
 
    public static void dumpChildren(final Control parent, final int indent) {
@@ -2968,6 +2995,39 @@ public class Util {
    }
 
    /**
+    * Source: <a href=
+    * "https://stackoverflow.com/questions/3938122/how-to-get-amount-of-serialized-bytes-representing-a-java-object"
+    * >https://stackoverflow.com/questions/3938122/how-to-get-amount-of-serialized-bytes-representing-a-java-object</a>
+    * 
+    * @param object
+    * 
+    * @return
+    */
+   public static byte[] serializeObject(final Object object) {
+
+      byte[] byteArray = null;
+
+      try {
+
+         final ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+
+         final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);
+         {
+            objectOutputStream.writeObject(object);
+            objectOutputStream.flush();
+         }
+         objectOutputStream.close();
+
+         byteArray = byteOutputStream.toByteArray();
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+
+      return byteArray;
+   }
+
+   /**
     * Set the state for an integer array, integer values are converted into string value.
     *
     * @param state
@@ -3219,31 +3279,15 @@ public class Util {
    }
 
    /**
-    * Source: <a href=
-    * "https://stackoverflow.com/questions/3938122/how-to-get-amount-of-serialized-bytes-representing-a-java-object"
-    * >https://stackoverflow.com/questions/3938122/how-to-get-amount-of-serialized-bytes-representing-a-java-object</a>
-    *
     * @param object
-    *
     *
     * @return Returns the size of a serialized object
     *
     * @throws IOException
     */
-   public static int sizeof(final Object object) throws IOException {
+   public static int sizeof(final Object object) {
 
-      final ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-
-      final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);
-
-      objectOutputStream.writeObject(object);
-      objectOutputStream.flush();
-      objectOutputStream.close();
-
-      final byte[] byteArray = byteOutputStream.toByteArray();
-      final int length = byteArray.length;
-
-      return length;
+      return serializeObject(object).length;
    }
 
    /**

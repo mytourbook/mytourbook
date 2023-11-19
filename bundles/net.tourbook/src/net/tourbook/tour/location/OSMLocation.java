@@ -18,8 +18,6 @@ package net.tourbook.tour.location;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.Arrays;
-
 import net.tourbook.common.UI;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -33,7 +31,7 @@ public class OSMLocation {
     *   {
     *      "place_id"      : 78981669,
     *      "osm_id"        : 44952014,
-
+   
     *      "licence"       : "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
     *
     *      "place_rank"    : 30,
@@ -43,7 +41,7 @@ public class OSMLocation {
     *      "class"         : "leisure",
     *      "osm_type"      : "way",
     *      "type"          : "pitch",
-
+   
     *      "lat"           : "47.116116899999994",
     *      "lon"           : "7.989645450000001",
     *
@@ -74,8 +72,18 @@ public class OSMLocation {
     * </pre>
     */
 
+   public String             name;
+   public String             display_name;
+
+   public OSMAddress         address;
+
+   public double             lat;
+   public double             lon;
+   public double[]           boundingbox;
+
    public long               place_id;
    public long               osm_id;
+
    public String             licence;
 
    public String             osm_type;
@@ -85,17 +93,8 @@ public class OSMLocation {
    @JsonAlias({ "class" })
    public String             locationClass;
 
-   public double             lat;
-   public double             lon;
-   public String             name;
-   public String             display_name;
-
    public int                place_rank;
    public double             importance;
-
-   public double[]           boundingbox;
-
-   public OSMAddress         address;
 
    @Override
    public String toString() {
@@ -104,31 +103,28 @@ public class OSMLocation {
 
             + "OSMLocation" + NL //                               //$NON-NLS-1$
 
-//          + "[" + NL //                                         //$NON-NLS-1$
-
 //          + " place_id       = " + place_id + NL //              //$NON-NLS-1$
 //          + " osm_id         = " + osm_id + NL //                //$NON-NLS-1$
 //          + " licence        = " + licence + NL //               //$NON-NLS-1$
 //          + " osm_type       = " + osm_type + NL //              //$NON-NLS-1$
-            + " type           = " + type + NL //                  //$NON-NLS-1$
-            + " addresstype    = " + addresstype + NL //           //$NON-NLS-1$
-            + " locationClass  = " + locationClass + NL //         //$NON-NLS-1$
-            + " lat            = " + lat + NL //                   //$NON-NLS-1$
-            + " lon            = " + lon + NL //                   //$NON-NLS-1$
+//          + " type           = " + type + NL //                  //$NON-NLS-1$
+//          + " addresstype    = " + addresstype + NL //           //$NON-NLS-1$
+//          + " locationClass  = " + locationClass + NL //         //$NON-NLS-1$
+//          + " lat            = " + lat + NL //                   //$NON-NLS-1$
+//          + " lon            = " + lon + NL //                   //$NON-NLS-1$
             + " name           = " + name + NL //                  //$NON-NLS-1$
             + " display_name   = " + display_name + NL //          //$NON-NLS-1$
 //          + " place_rank     = " + place_rank + NL //            //$NON-NLS-1$
 //          + " importance     = " + importance + NL //            //$NON-NLS-1$
 
-            + " boundingbox    = " + (boundingbox != null //       //$NON-NLS-1$
-                  ? Arrays.toString(boundingbox)
-                  : UI.EMPTY_STRING) + NL
+//          + " boundingbox    = " + (boundingbox != null //       //$NON-NLS-1$
+//               ? Arrays.toString(boundingbox)
+//               : UI.EMPTY_STRING) + NL
 
             + NL
 
             + " address        = " + address + NL //              //$NON-NLS-1$
 
-//          + "]" + NL //                                         //$NON-NLS-1$
       ;
    }
 
