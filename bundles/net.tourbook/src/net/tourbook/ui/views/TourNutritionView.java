@@ -15,8 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
+import de.byteholder.geoclipse.poi.PostSelectionProvider;
 import de.byteholder.gpx.PointOfInterest;
 
 import java.beans.PropertyChangeEvent;
@@ -27,18 +26,23 @@ import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.views.nutrition.DialogSearchProduct;
+import net.tourbook.tour.ActionOpenSearchProduct;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -52,6 +56,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.ViewPart;
@@ -79,6 +84,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private IPropertyChangeListener       _prefChangeListener;
    final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
+   private PostSelectionProvider         _postSelectionProvider;
+
    /*
     * UI controls
     */
@@ -86,9 +93,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private Combo                         _cboSearchQuery;
 
-   private Section                       _sectionSummary;
    private Section                       _sectionProductsList;
-   private FormToolkit                   _tk;
+   private FormToolkit                    _tk;
+   private ActionOpenSearchProduct       _actionOpenSearchProduct;
 
    public class SearchContentProvider implements IStructuredContentProvider {
 
@@ -103,7 +110,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
-
    class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
@@ -121,7 +127,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
-
    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
       @Override
@@ -234,12 +239,22 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _nutritionQuery.addPropertyChangeListener(this);
    }
 
+   private void createActions() {
+
+
+      _actionOpenSearchProduct = new ActionOpenSearchProduct();
+
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
       initImageRegistry();
 
       createUI(parent);
+
+      createActions();
+      fillToolbar();
 
       addPrefListener();
 
@@ -284,17 +299,53 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
    }
 
+   private void createUI_210_Viewer(final Composite parent) {
+
+      /*
+       * table viewer: poi items
+       */
+      final Table poiTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(poiTable);
+      poiTable.setLinesVisible(true);
+      poiTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      poiTable.setHeaderVisible(true);
+
+      // column: category
+      final TableColumn columnCategory = new TableColumn(poiTable, SWT.LEFT);
+      columnCategory.setText("Category"); //$NON-NLS-1$
+      columnCategory.setWidth(75);
+
+      // column: name
+      final TableColumn columnName = new TableColumn(poiTable, SWT.LEFT);
+      columnName.setText("Name"); //$NON-NLS-1$
+      columnName.setWidth(300);
+
+      _poiViewer = new TableViewer(poiTable);
+
+      _poiViewer.setContentProvider(new ViewContentProvider());
+      _poiViewer.setLabelProvider(new ViewLabelProvider());
+
+      _poiViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
+
+         final ISelection selection = selectionChangedEvent.getSelection();
+         final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+         final PointOfInterest selectedPoi = (PointOfInterest) firstElement;
+
+         _postSelectionProvider.setSelection(selectedPoi);
+      });
+   }
+
    private void createUI_Section_10_Summary(final Composite parent) {
 
-      _sectionSummary = createSection(parent, _tk, "Summary/Report card" /*
-                                                                          * Messages.
-                                                                          * tour_editor_section_characteristics
-                                                                          */, false, true);
-      final Composite container = (Composite) _sectionSummary.getClient();
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-
+         /*
+          * Label: Calories
+          */
+         final Label label = UI.createLabel(parent, "Summary/Report card");
+         label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
       }
    }
 
@@ -309,25 +360,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
                                                                          */, false, true);
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         {
-            /*
-             * label: POI
-             */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText("Messages.Poi_View_Label_POI");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-         }
-         {
-            /*
-             * button: search
-             */
-            _btnSearch = new Button(container, SWT.PUSH);
-            _btnSearch.setText("Messages.Poi_View_Button_Search");
-            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell())
-                  .open()));
-         }
+         createUI_210_Viewer(container);
       }
    }
 
@@ -338,6 +372,19 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _nutritionQuery.removePropertyChangeListener(this);
 
       super.dispose();
+   }
+
+   private void fillToolbar() {
+
+      /*
+       * fill view toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(new Separator());
+      tbm.add(_actionOpenSearchProduct);
+
+      tbm.update(true);
    }
 
    private void initImageRegistry() {
@@ -412,8 +459,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    @Override
    public void setFocus() {
 
-      // set default button
-      _btnSearch.getShell().setDefaultButton(_btnSearch);
+
 
    }
 
