@@ -147,14 +147,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public static final int               DB_LENGTH_TOUR_DESCRIPTION        = 4096;
    public static final int               DB_LENGTH_TOUR_DESCRIPTION_V10    = 32000;
    public static final int               DB_LENGTH_TOUR_START_PLACE        = 255;
+   public static final int               DB_LENGTH_TOUR_START_PLACE_V52    = 4096;
    public static final int               DB_LENGTH_TOUR_END_PLACE          = 255;
+   public static final int               DB_LENGTH_TOUR_END_PLACE_V52      = 4096;
    public static final int               DB_LENGTH_TOUR_IMPORT_FILE_PATH   = 255;
    public static final int               DB_LENGTH_TOUR_IMPORT_FILE_NAME   = 255;
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
-   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
+   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
    public static final int               DB_LENGTH_POWER_DATA_SOURCE       = 255;
@@ -4396,7 +4398,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (isElevationAvailable) {
 
-         final boolean isAltitudeSmoothed = _prefStore.getBoolean(//
+         final boolean isAltitudeSmoothed = _prefStore.getBoolean(
                ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
 
          // convert altitude into double
@@ -11320,9 +11322,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public boolean isValidForSave() {
 
       /*
-       * check: tour title
+       * Check: Tour title
        */
-      FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(//
+      FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
             tourTitle,
             DB_LENGTH_TOUR_TITLE,
             Messages.Db_Field_TourData_Title,
@@ -11335,7 +11337,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       /*
-       * check: tour description
+       * Check: Tour description
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             tourDescription,
@@ -11350,37 +11352,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       /*
-       * check: tour start location
+       * Check: Tour start location
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             tourStartPlace,
-            DB_LENGTH_TOUR_START_PLACE,
+            DB_LENGTH_TOUR_START_PLACE_V52,
             Messages.Db_Field_TourData_StartPlace,
             false);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-         tourStartPlace = tourStartPlace.substring(0, DB_LENGTH_TOUR_START_PLACE);
+         tourStartPlace = tourStartPlace.substring(0, DB_LENGTH_TOUR_START_PLACE_V52);
       }
 
       /*
-       * check: tour end location
+       * Check: Tour end location
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             tourEndPlace,
-            DB_LENGTH_TOUR_END_PLACE,
+            DB_LENGTH_TOUR_END_PLACE_V52,
             Messages.Db_Field_TourData_EndPlace,
             false);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-         tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE);
+         tourEndPlace = tourEndPlace.substring(0, DB_LENGTH_TOUR_END_PLACE_V52);
       }
 
       /*
-       * check: tour import file path
+       * Check: Tour import file path
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             tourImportFilePath,
@@ -11395,7 +11397,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       /*
-       * check: tour import file name
+       * Check: Tour import file name
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             tourImportFileName,
@@ -11410,9 +11412,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       /*
-       * check: weather
+       * Check: Weather
        */
-      fieldValidation = TourDatabase.isFieldValidForSave(//
+      fieldValidation = TourDatabase.isFieldValidForSave(
             weather,
             DB_LENGTH_WEATHER_V48,
             Messages.Db_Field_TourData_Weather,

@@ -617,15 +617,17 @@ public class TourDatabase {
 
       private static void AlterColumn_VarChar_Width(final Statement stmt,
                                                     final String table,
-                                                    final String field,
+                                                    final String columnName,
                                                     final int newWidth) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING
-               + "ALTER TABLE " + table + NL //                         //$NON-NLS-1$
-               + "   ALTER COLUMN " + field + NL //                     //$NON-NLS-1$
-               + "   SET DATA TYPE   VARCHAR(" + newWidth + ")"; //     //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName) == false) {
 
-         exec(stmt, sql);
+            // column do not exist -> this should not happen
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ALTER COLUMN " + columnName + " SET DATA TYPE VARCHAR(" + newWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       }
 
       /**
@@ -3974,11 +3976,12 @@ public class TourDatabase {
             + "   maxSpeed                               FLOAT,                                                   " + NL //$NON-NLS-1$
             + "   tourTitle                              VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            // OLD + "   tourDescription         VARCHAR(4096),                                   " + NL //// version <= 9
-            + "   tourDescription                        VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + "),   " + NL //// modified in version 10 //$NON-NLS-1$ //$NON-NLS-2$
+            // OLD + "tourDescription                    VARCHAR(4096),                                           " + NL // version <= 9
+            + "   tourDescription                        VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + ")," + NL // modified in version 10 //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   tourStartPlace                         VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   tourEndPlace                           VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tourStartPlace                         VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE_V52 + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tourEndPlace                           VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE_V52 + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
             + "   calories                               INTEGER,                                                 " + NL //$NON-NLS-1$
 //
 // RENAMED FIELD - bikerWeight
@@ -10014,6 +10017,24 @@ public class TourDatabase {
        */
 
       final int newDbVersion = 52;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // alter columns
+
+// SET_FORMATTING_OFF
+
+         SQL.AlterColumn_VarChar_Width(stmt, TABLE_TOUR_DATA, "tourStartPlace", TourData.DB_LENGTH_TOUR_START_PLACE_V52); //$NON-NLS-1$
+         SQL.AlterColumn_VarChar_Width(stmt, TABLE_TOUR_DATA, "tourEndPlace",   TourData.DB_LENGTH_TOUR_END_PLACE_V52); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
