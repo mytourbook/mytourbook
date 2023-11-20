@@ -78,7 +78,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
    private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
 
-   private TableViewer                   _poiViewer;
+   private TableViewer                   _productsViewer;
    private List<String>                  _pois;
    private List<String>                  _searchHistory                  = new ArrayList<>();
 
@@ -229,8 +229,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-            _poiViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-            _poiViewer.refresh();
+            _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _productsViewer.refresh();
          }
       };
 
@@ -320,12 +320,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       columnName.setText("Name"); //$NON-NLS-1$
       columnName.setWidth(300);
 
-      _poiViewer = new TableViewer(poiTable);
+      _productsViewer = new TableViewer(poiTable);
 
-      _poiViewer.setContentProvider(new ViewContentProvider());
-      _poiViewer.setLabelProvider(new ViewLabelProvider());
+      _productsViewer.setContentProvider(new ViewContentProvider());
+      _productsViewer.setLabelProvider(new ViewLabelProvider());
 
-      _poiViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
+      _productsViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
 
          final ISelection selection = selectionChangedEvent.getSelection();
          final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
@@ -421,16 +421,16 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
 
          // refresh viewer
-         _poiViewer.setInput(new Object());
+         _productsViewer.setInput(new Object());
 
          // select first entry, if there is one
-         final Table poiTable = _poiViewer.getTable();
+         final Table poiTable = _productsViewer.getTable();
          if (poiTable.getItemCount() > 0) {
 
             final Object firstData = poiTable.getItem(0).getData();
             if (firstData instanceof PointOfInterest) {
 
-               _poiViewer.setSelection(new StructuredSelection(firstData));
+               _productsViewer.setSelection(new StructuredSelection(firstData));
                setViewerFocus();
             }
          }
@@ -468,7 +468,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
     */
    private void setViewerFocus() {
 
-      final Table table = _poiViewer.getTable();
+      final Table table = _productsViewer.getTable();
 
       table.setSelection(table.getSelectionIndex());
       table.setFocus();
