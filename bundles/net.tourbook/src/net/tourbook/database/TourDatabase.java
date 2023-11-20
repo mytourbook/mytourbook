@@ -4293,7 +4293,7 @@ public class TourDatabase {
    private void createTable_TourFuelProduct(final Statement stmt) throws SQLException {
 
       /*
-       * CREATE TABLE TourMarker
+       * CREATE TABLE TourFuelProduct
        */
       exec(stmt, "CREATE TABLE " + TABLE_TOUR_FUEL_PRODUCT + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
@@ -4301,8 +4301,7 @@ public class TourDatabase {
 
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   caffeine                 BIGINT                                    " + NL //$NON-NLS-1$
+            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + ")        " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             + ")"); //$NON-NLS-1$
    }
