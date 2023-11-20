@@ -55,13 +55,13 @@ import net.tourbook.database.TourDatabase;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productId")
 public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
 
-   private static final long    serialVersionUID      = 1L;
+   private static final long          serialVersionUID = 1L;
 
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static final AtomicInteger _createCounter                            = new AtomicInteger();
+   private static final AtomicInteger _createCounter   = new AtomicInteger();
 
    /**
     * Unique id for the {@link TourFuelProduct} entity
@@ -72,21 +72,21 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
    private long                       productCode      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
-   private TourData tourData;
+   private TourData                   tourData;
 
-   private String   barCode;
-   private String   name;
+   private String                     barCode;
+   private String                     name;
 
-   private int      calories;
+   private int                        calories;
 
-   private double   carbohydrates;
+   private double                     carbohydrates;
 
    private double                     sodium;
 
-   private double   fluidVolume;
+   private double                     fluidVolume;
    private double                     containerName;
 
-   private double   caffeine;
+   private double                     caffeine;
 
    public TourFuelProduct() {}
 
@@ -104,8 +104,6 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
       this.tourData = tourData;
    }
-
-
 
    @Override
    public TourFuelProduct clone() {
@@ -126,6 +124,7 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
     * sets the state that the marker as not yet saved
     *
     * @param newTourData
+    *
     * @return
     */
    public TourFuelProduct clone(final TourData newTourData) {
@@ -157,7 +156,8 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
    }
 
    /**
-    * Tourmarker is compared with the {@link TourFuelProduct#markerId} or {@link TourFuelProduct#_createId}
+    * Tourmarker is compared with the {@link TourFuelProduct#markerId} or
+    * {@link TourFuelProduct#_createId}
     * <p>
     * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
     * markers are deleted</b>
@@ -199,13 +199,9 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
       return false;
    }
 
-
-
    public TourData getTourData() {
       return tourData;
    }
-
-
 
    /**
     * !!!!!!!!!!!!!!!!!<br>
@@ -229,8 +225,6 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
       return result;
    }
-
-
 
    /**
     * This method is called in the "Tour Data" view !!!
@@ -257,7 +251,5 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
       return null;
    }
-
-
 
 }
