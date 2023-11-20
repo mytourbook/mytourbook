@@ -24,12 +24,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ActionOpenSearchProduct;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
+import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IToolBarManager;
@@ -57,6 +67,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.ViewPart;
@@ -67,16 +78,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
 
-   private static final String           IMG_KEY_ANCHOR                  = "anchor";                                  //$NON-NLS-1$
-   private static final String           IMG_KEY_CAR                     = "car";                                     //$NON-NLS-1$
-   private static final String           IMG_KEY_CART                    = "cart";                                    //$NON-NLS-1$
-   private static final String           IMG_KEY_FLAG                    = "flag";                                    //$NON-NLS-1$
-   private static final String           IMG_KEY_HOUSE                   = "house";                                   //$NON-NLS-1$
-   private static final String           IMG_KEY_SOCCER                  = "soccer";                                  //$NON-NLS-1$
-   private static final String           IMG_KEY_STAR                    = "star";                                    //$NON-NLS-1$
-
    private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
    private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
+
+   private TourData                      _tourData;
 
    private TableViewer                   _productsViewer;
    private List<String>                  _pois;
@@ -84,6 +89,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private IPropertyChangeListener       _prefChangeListener;
    final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
+   private ISelectionListener            _postSelectionListener;
+
    private PostSelectionProvider         _postSelectionProvider;
 
    /*
@@ -110,6 +117,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
+
    class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
@@ -184,7 +192,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          if (obj instanceof PointOfInterest) {
 
-            Image img;
+            final Image img;
             final PointOfInterest poi = (PointOfInterest) obj;
 
             // TODO find/make better matching icons
@@ -192,31 +200,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
             final String poiCategory = poi.getCategory();
 
-            if (poiCategory.equals("highway")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_CAR);
-            } else if (poiCategory.equals("place")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_HOUSE);
-            } else if (poiCategory.equals("waterway")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_ANCHOR);
-            } else if (poiCategory.equals("amenity")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_CART);
-            } else if (poiCategory.equals("leisure")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_STAR);
-            } else if (poiCategory.equals("sport")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_SOCCER);
-            } else {
-               img = imageRegistry.get(IMG_KEY_FLAG);
-            }
-
-            return img;
+            return null;
          } else {
             return null;
          }
       }
    }
-
    public TourNutritionView() {}
-
    public TourNutritionView(final List<String> pois) {
       _pois = pois;
    }
@@ -239,17 +229,31 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _nutritionQuery.addPropertyChangeListener(this);
    }
 
+   /**
+    * listen for events when a tour is selected
+    */
+   private void addSelectionListener() {
+
+      _postSelectionListener = (workbenchPart, selection) -> {
+
+         if (workbenchPart == TourNutritionView.this) {
+            return;
+         }
+
+         onSelectionChanged(selection);
+      };
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
+
    private void createActions() {
 
 
-      _actionOpenSearchProduct = new ActionOpenSearchProduct();
+      _actionOpenSearchProduct = new ActionOpenSearchProduct(_tourData);
 
    }
 
    @Override
    public void createPartControl(final Composite parent) {
-
-      initImageRegistry();
 
       createUI(parent);
 
@@ -387,21 +391,79 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       tbm.update(true);
    }
 
-   private void initImageRegistry() {
+   private void onSelectionChanged(final ISelection selection) {
 
-      final TourbookPlugin activator = TourbookPlugin.getDefault();
-      final ImageRegistry imageRegistry = activator.getImageRegistry();
-
-      if (imageRegistry.get(Images.POI_Anchor) == null) {
-
-         imageRegistry.put(IMG_KEY_ANCHOR, TourbookPlugin.getImageDescriptor(Images.POI_Anchor));
-         imageRegistry.put(IMG_KEY_CAR, TourbookPlugin.getImageDescriptor(Images.POI_Car));
-         imageRegistry.put(IMG_KEY_CART, TourbookPlugin.getImageDescriptor(Images.POI_Cart));
-         imageRegistry.put(IMG_KEY_FLAG, TourbookPlugin.getImageDescriptor(Images.POI_Flag));
-         imageRegistry.put(IMG_KEY_HOUSE, TourbookPlugin.getImageDescriptor(Images.POI_House));
-         imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Images.POI_Soccer));
-         imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Images.POI_Star));
+      if (selection == null) {
+         return;
       }
+
+//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tonSelectionChanged: " + selection));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
+      long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      TourData tourData = null;
+
+      if (selection instanceof SelectionTourData) {
+
+         // a tour was selected, get the chart and update the marker viewer
+
+         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+         tourData = tourDataSelection.getTourData();
+
+      } else if (selection instanceof SelectionTourId) {
+
+         tourId = ((SelectionTourId) selection).getTourId();
+
+      } else if (selection instanceof SelectionTourIds) {
+
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+
+         if (tourIds != null && tourIds.size() > 0) {
+
+            if (tourIds.size() == 1) {
+               tourId = tourIds.get(0);
+            } else {
+               tourData = TourManager.createJoinedTourData(tourIds);
+            }
+         }
+
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
+
+         final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
+         if (refItem != null) {
+            tourId = refItem.getTourId();
+         }
+
+      } else if (selection instanceof StructuredSelection) {
+
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         if (firstElement instanceof TVIRefTour_ComparedTour) {
+            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
+         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
+            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         }
+
+      } else if (selection instanceof SelectionDeletedTours) {
+
+         // clearView();
+      }
+
+      if (tourData == null) {
+
+         if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+            tourData = TourManager.getInstance().getTourData(tourId);
+            if (tourData != null) {
+               _tourData = tourData;
+            }
+         }
+      } else {
+
+         _tourData = tourData;
+      }
+
+      //updateUI_MarkerViewer();
    }
 
    @Override

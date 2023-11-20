@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.Product;
 
 /**
  * A tour marker has a position within a tour.
@@ -74,21 +75,24 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
-   private String                     barCode;
    private String                     name;
 
-   private int                        calories;
-
-   private double                     carbohydrates;
-
-   private double                     sodium;
-
-   private double                     fluidVolume;
-   private double                     containerName;
-
-   private double                     caffeine;
+//   private int                        calories;
+//
+//   private double                     carbohydrates;
+//
+//   private double                     sodium;
+//
+//   private double                     fluidVolume;
+//   private double                     containerName;
+//
+//   private double                     caffeine;
 
    public TourFuelProduct() {}
+
+   public TourFuelProduct(final Product product) {
+      name = product.getName();
+   }
 
    /**
     * Used for MT import/export

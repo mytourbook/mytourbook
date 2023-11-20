@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.data.TourData;
 import net.tourbook.ui.views.nutrition.DialogSearchProduct;
 
 import org.eclipse.jface.action.Action;
@@ -25,10 +26,13 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionOpenSearchProduct extends Action {
 
-   public ActionOpenSearchProduct() {
+   private TourData _tourData;
+
+   public ActionOpenSearchProduct(final TourData tourData) {
 
       setText(Messages.app_action_edit_adjust_altitude);
 
+      _tourData = tourData;
       //todo fb display a plus symbol, easy to draw in inkscape
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Add));
       // for when a tour is not selected
@@ -37,6 +41,6 @@ public class ActionOpenSearchProduct extends Action {
 
    @Override
    public void run() {
-      new DialogSearchProduct(Display.getCurrent().getActiveShell()).open();
+      new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData).open();
    }
 }

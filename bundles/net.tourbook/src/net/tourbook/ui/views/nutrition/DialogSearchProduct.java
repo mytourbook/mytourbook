@@ -29,10 +29,10 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.Product;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -65,7 +65,6 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Widget;
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
    private static final int              MAX_ADJUST_SECONDS     = 120;
@@ -80,11 +79,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
 
-   private TourData                      _sourceTour;
-   private TourData                      _targetTour;
+   private TourData                      _tourData;
 
    private Composite                     _dlgContainer;
-   private TourChart                     _tourChart;
 
    private PixelConverter                _pc;
    private boolean                       _isInUIInit;
@@ -92,6 +89,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    /*
     * UI controls
     */
+   private Button                _btnAdd;
    private Button                _btnSearch;
    private List<String>          _searchHistory  = new ArrayList<>();
 
@@ -238,12 +236,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    /**
     * @param parentShell
-    * @param mergeSourceTour
-    *           {@link TourData} for the tour which is merge into the other tour
-    * @param mergeTargetTour
-    *           {@link TourData} for the tour into which the other tour is merged
+    * @param tourData
+    *           {@link TourData} for the tour
     */
-   public DialogSearchProduct(final Shell parentShell) {
+   public DialogSearchProduct(final Shell parentShell, final TourData tourData) {
 
       super(parentShell);
 
@@ -253,6 +249,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // set icon for the window
       setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage());
 
+      _tourData = tourData;
       _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
 
    }
@@ -397,6 +394,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             _btnSearch.setText("Messages.Poi_View_Button_Search");
             _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
          }
+         {
+            /*
+             * Button: Add
+             */
+            _btnAdd = new Button(queryContainer, SWT.PUSH);
+            _btnAdd.setText("Add");
+            _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAddProduct()));
+         }
       }
 
       _queryViewer = new ComboViewer(_cboSearchQuery);
@@ -492,8 +497,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _scaleAdjustSeconds.setMinimum(0);
       _scaleAdjustSeconds.setMaximum(MAX_ADJUST_SECONDS * 2);
       _scaleAdjustSeconds.setPageIncrement(20);
-      _scaleAdjustSeconds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyProperties()));
-      _scaleAdjustSeconds.addListener(SWT.MouseDoubleClick, event -> onScaleDoubleClick(event.widget));
 
       /*
        * scale: adjust minutes
@@ -516,8 +519,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _scaleAdjustMinutes.setMinimum(0);
       _scaleAdjustMinutes.setMaximum(MAX_ADJUST_MINUTES * 2);
       _scaleAdjustMinutes.setPageIncrement(20);
-      _scaleAdjustMinutes.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyProperties()));
-      _scaleAdjustMinutes.addListener(SWT.MouseDoubleClick, event -> onScaleDoubleClick(event.widget));
    }
 
    /**
@@ -549,8 +550,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _scaleAltitude1.setMinimum(0);
       _scaleAltitude1.setMaximum(MAX_ADJUST_ALTITUDE_1 * 2);
       _scaleAltitude1.setPageIncrement(5);
-      _scaleAltitude1.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyProperties()));
-      _scaleAltitude1.addListener(SWT.MouseDoubleClick, event -> onScaleDoubleClick(event.widget));
 
       /*
        * scale: altitude 100m
@@ -566,8 +565,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleAltitude10);
       _scaleAltitude10.setMinimum(0);
       _scaleAltitude10.setMaximum(MAX_ADJUST_ALTITUDE_10 * 2);
-      _scaleAltitude10.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyProperties()));
-      _scaleAltitude10.addListener(SWT.MouseDoubleClick, event -> onScaleDoubleClick(event.widget));
    }
 
    private void createUISectionDisplayOptions(final Composite parent) {
@@ -586,7 +583,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       GridDataFactory.swtDefaults()/* .indent(5, 5) .span(4, 1) */.applyTo(_chkValueDiffScaling);
       _chkValueDiffScaling.setText(Messages.tour_merger_chk_alti_diff_scaling);
       _chkValueDiffScaling.setToolTipText(Messages.tour_merger_chk_alti_diff_scaling_tooltip);
-      _chkValueDiffScaling.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyProperties()));
 
       /*
        * checkbox: preview chart
@@ -656,6 +652,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       super.okPressed();
    }
 
+   private void onAddProduct() {
+
+      final ISelection selection = _productsViewer.getSelection();
+      final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+      final Product selectedPoi = (Product) firstElement;
+      final TourFuelProduct tfp = new TourFuelProduct(selectedPoi);
+      _tourData.addFuelProduct(tfp);
+
+   }
+
    private void onDispose() {
 
       _iconPlaceholder.dispose();
@@ -663,24 +669,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _graphImages.values().forEach(Image::dispose);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-   }
-
-   private void onModifyProperties() {
-
-      _targetTour.setMergedAltitudeOffset(getFromUIAltitudeOffset());
-      _targetTour.setMergedTourTimeOffset(getFromUITourTimeOffset());
-
-      enableActions();
-   }
-
-   private void onScaleDoubleClick(final Widget widget) {
-
-      final Scale scale = (Scale) widget;
-      final int max = scale.getMaximum();
-
-      scale.setSelection(max / 2);
-
-      onModifyProperties();
    }
 
    private void onSearchPoi() {
@@ -705,7 +693,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _nutritionQuery.asyncFind(searchText);
    }
-
 
 
 
@@ -767,30 +754,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       table.setFocus();
    }
 
-   /**
-    * set data from the tour into the UI
-    */
-   private void updateUIFromTourData() {
-
-      /*
-       * show time offset
-       */
-      updateUITourTimeOffset(_targetTour.getMergedTourTimeOffset());
-
-      /*
-       * show altitude offset
-       */
-      final int mergedMetricAltitudeOffset = _targetTour.getMergedAltitudeOffset();
-
-      final float altitudeOffset = mergedMetricAltitudeOffset;
-      final int altitudeOffset1 = (int) (altitudeOffset % 10);
-      final int altitudeOffset10 = (int) (altitudeOffset / 10);
-
-      _scaleAltitude1.setSelection(altitudeOffset1 + MAX_ADJUST_ALTITUDE_1);
-      _scaleAltitude10.setSelection(altitudeOffset10 + MAX_ADJUST_ALTITUDE_10);
-
-      onModifyProperties();
-   }
 
    private void updateUITourTimeOffset(final int tourTimeOffset) {
 
