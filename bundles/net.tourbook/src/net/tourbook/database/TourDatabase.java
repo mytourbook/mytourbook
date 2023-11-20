@@ -10023,6 +10023,20 @@ public class TourDatabase {
 
       final int newDbVersion = 52;
 
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db already exists
+         if (isTableAvailable(conn, TABLE_TOUR_FUEL_PRODUCT) == false) {
+            createTable_TourFuelProduct(stmt);
+         }
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
       return newDbVersion;
    }
 

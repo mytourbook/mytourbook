@@ -257,6 +257,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       createUI(parent);
 
+      addSelectionListener();
+
       createActions();
       fillToolbar();
 
