@@ -329,12 +329,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    protected final void createButtonsForButtonBar(final Composite parent) {
 
       super.createButtonsForButtonBar(parent);
-
-      // rename OK button
-      final Button buttonOK = getButton(IDialogConstants.OK_ID);
-      buttonOK.setText(Messages.tour_merger_save_target_tour);
-
-      setButtonLayoutData(buttonOK);
+      getButton(IDialogConstants.OK_ID).setVisible(false);
+      getButton(IDialogConstants.CANCEL_ID).setVisible(false);
    }
 
    @Override
