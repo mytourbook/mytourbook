@@ -10816,6 +10816,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourEndTime;
    }
 
+   public  Set<TourFuelProduct> getTourFuelProducts() {
+     return tourFuelProducts;
+   }
+
    /**
     * @return Returns the unique key in the database for this {@link TourData} entity
     */

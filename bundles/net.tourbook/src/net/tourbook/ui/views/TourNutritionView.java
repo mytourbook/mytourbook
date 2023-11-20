@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import de.byteholder.gpx.PointOfInterest;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -51,11 +49,9 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -131,11 +127,18 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       @Override
       public Object[] getElements(final Object parent) {
-         if (_pois == null) {
-            return new String[] {};
-         } else {
-            return _pois.toArray();
+
+         if (_tourData == null || _tourData.isMultipleTours()) {
+            return new Object[0];
          }
+
+         final Object[] tourFuelProducts = _tourData.getTourFuelProducts().toArray();
+
+//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//                  + ("\n\t_tourData: " + _tourData));
+//            // TODO remove SYSTEM.OUT.PRINTLN
+
+         return tourFuelProducts;
       }
 
       @Override
@@ -197,20 +200,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public Image getImage(final Object obj) {
 
-         if (obj instanceof PointOfInterest) {
-
-            final Image img;
-            final PointOfInterest poi = (PointOfInterest) obj;
-
-            // TODO find/make better matching icons
-
-            final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
-            final String poiCategory = poi.getCategory();
-
             return null;
-         } else {
-            return null;
-         }
       }
    }
 
@@ -421,15 +411,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());
-
-      _productsViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
-
-         final ISelection selection = selectionChangedEvent.getSelection();
-         final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-         final PointOfInterest selectedPoi = (PointOfInterest) firstElement;
-
-         _postSelectionProvider.setSelection(selectedPoi);
-      });
    }
 
    private void createUI_Section_10_Summary(final Composite parent) {
@@ -583,18 +564,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          // refresh viewer
          _productsViewer.setInput(new Object());
-
-         // select first entry, if there is one
-         final Table poiTable = _productsViewer.getTable();
-         if (poiTable.getItemCount() > 0) {
-
-            final Object firstData = poiTable.getItem(0).getData();
-            if (firstData instanceof PointOfInterest) {
-
-               _productsViewer.setSelection(new StructuredSelection(firstData));
-               setViewerFocus();
-            }
-         }
 
          _cboSearchQuery.setEnabled(true);
          _btnSearch.setEnabled(true);
