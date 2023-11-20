@@ -10016,11 +10016,6 @@ public class TourDatabase {
 
    private int updateDb_051_To_052(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      /*
-       * This db update is necessary even when it is doing nothing, otherwise the db-update process
-       * fails
-       */
-
       final int newDbVersion = 52;
 
       logDbUpdate_Start(newDbVersion);
