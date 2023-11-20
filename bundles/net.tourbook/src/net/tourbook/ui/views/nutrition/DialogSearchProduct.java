@@ -33,6 +33,9 @@ import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.Product;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -659,6 +662,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final Product selectedPoi = (Product) firstElement;
       final TourFuelProduct tfp = new TourFuelProduct(selectedPoi);
       _tourData.addFuelProduct(tfp);
+
+      TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData));
 
    }
 

@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import de.byteholder.geoclipse.poi.PostSelectionProvider;
 import de.byteholder.gpx.PointOfInterest;
 
 import java.beans.PropertyChangeEvent;
@@ -26,15 +25,19 @@ import java.util.stream.Stream;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ActionOpenSearchProduct;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
@@ -90,19 +93,22 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private IPropertyChangeListener       _prefChangeListener;
    final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
    private ISelectionListener            _postSelectionListener;
+   private ITourEventListener            _tourEventListener;
 
    private PostSelectionProvider         _postSelectionProvider;
 
    /*
     * UI controls
     */
-   private Button                        _btnSearch;
+   private boolean                 _isInUpdate;
 
-   private Combo                         _cboSearchQuery;
+   private Button                  _btnSearch;
 
-   private Section                       _sectionProductsList;
-   private FormToolkit                    _tk;
-   private ActionOpenSearchProduct       _actionOpenSearchProduct;
+   private Combo                   _cboSearchQuery;
+
+   private Section                 _sectionProductsList;
+   private FormToolkit             _tk;
+   private ActionOpenSearchProduct _actionOpenSearchProduct;
 
    public class SearchContentProvider implements IStructuredContentProvider {
 
@@ -135,6 +141,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
+
    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
       @Override
@@ -206,7 +213,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
       }
    }
+
    public TourNutritionView() {}
+
    public TourNutritionView(final List<String> pois) {
       _pois = pois;
    }
@@ -245,8 +254,88 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
-   private void createActions() {
+   private void addTourEventListener() {
 
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
+
+         if (/* _isInUpdate || */ workbenchPart == TourNutritionView.this) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else {
+
+            if (_tourData == null) {
+               return;
+            }
+
+            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
+
+                  // update modified tour
+
+                  final long viewTourId = _tourData.getTourId();
+
+                  // The view contains multiple tours
+                  if (_tourData.isMultipleTours()) {
+
+                     final List<Long> tourIds = new ArrayList<>();
+
+                     modifiedTours.forEach(tour -> tourIds.add(tour.getTourId()));
+                     _tourData = TourManager.createJoinedTourData(tourIds);
+
+                     updateUI_ProductViewer();
+
+                     // removed old tour data from the selection provider
+                     _postSelectionProvider.clearSelection();
+
+                  } else {
+
+                     // The view contains a single tour
+                     for (final TourData tourData : modifiedTours) {
+                        if (tourData.getTourId() == viewTourId) {
+
+                           // get modified tour
+                           _tourData = tourData;
+
+                           updateUI_ProductViewer();
+
+                           // removed old tour data from the selection provider
+                           _postSelectionProvider.clearSelection();
+
+                           // nothing more to do, the view contains only one tour
+                           return;
+                        }
+                     }
+                  }
+
+               }
+
+            } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+               clearView();
+            }
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
+
+   private void clearView() {
+
+      _tourData = null;
+
+      updateUI_ProductViewer();
+
+      _postSelectionProvider.clearSelection();
+   }
+
+   private void createActions() {
 
       _actionOpenSearchProduct = new ActionOpenSearchProduct();
 
@@ -258,6 +347,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       createUI(parent);
 
       addSelectionListener();
+      addTourEventListener();
 
       createActions();
       fillToolbar();
@@ -265,7 +355,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       addPrefListener();
 
       // this part is a selection provider
-      //getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider());
+      _postSelectionProvider = new PostSelectionProvider(ID);
+      getSite().setSelectionProvider(_postSelectionProvider);
 
       restoreState();
    }
@@ -378,6 +469,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _nutritionQuery.removePropertyChangeListener(this);
 
       super.dispose();
+   }
+
+   private void enableActions() {
+      // TODO Auto-generated method stub
+
    }
 
    private void fillToolbar() {
@@ -524,8 +620,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    @Override
    public void setFocus() {
 
-
-
    }
 
    /**
@@ -537,6 +631,17 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       table.setSelection(table.getSelectionIndex());
       table.setFocus();
+   }
+
+   private void updateUI_ProductViewer() {
+
+      _isInUpdate = true;
+      {
+         _productsViewer.setInput(new Object[0]);
+      }
+      _isInUpdate = false;
+
+      enableActions();
    }
 
 }
