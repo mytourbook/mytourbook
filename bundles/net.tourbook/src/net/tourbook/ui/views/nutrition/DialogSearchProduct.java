@@ -26,7 +26,6 @@ import java.util.List;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourFuelProduct;
@@ -62,23 +61,15 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
-   private static final int              MAX_ADJUST_SECONDS     = 120;
-   private static final int              MAX_ADJUST_MINUTES     = 120;                                                                      // x 60
-   private static final int              MAX_ADJUST_ALTITUDE_1  = 20;
-   private static final int              MAX_ADJUST_ALTITUDE_10 = 40;                                                                       // x 10
-
-   private static final int              VH_SPACING             = 2;
-
-   private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
 
@@ -92,57 +83,18 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    /*
     * UI controls
     */
-   private Button                _btnAdd;
-   private Button                _btnSearch;
-   private List<String>          _searchHistory  = new ArrayList<>();
+   private Button                        _btnAdd;
+   private Button                        _btnSearch;
+   private List<String>                  _searchHistory  = new ArrayList<>();
 
-   private Combo                 _cboSearchQuery;
-   private ComboViewer           _queryViewer;
-   final NutritionQuery          _nutritionQuery = new NutritionQuery();
+   private Combo                         _cboSearchQuery;
+   private ComboViewer                   _queryViewer;
+   final NutritionQuery                  _nutritionQuery = new NutritionQuery();
 
-   private PostSelectionProvider _postSelectionProvider;
-
-   /*
-    * vertical adjustment options
-    */
-   private Group _groupAltitude;
-
-   private Label _lblAltitudeDiff1;
-   private Label _lblAltitudeDiff10;
-
-   private Scale _scaleAltitude1;
-   private Scale _scaleAltitude10;
-
-   /*
-    * horizontal adjustment options
-    */
-   private Button _chkSynchStartTime;
-
-   private Label  _lblAdjustMinuteValue;
-   private Label  _lblAdjustSecondsValue;
-
-   private Scale  _scaleAdjustMinutes;
-   private Scale  _scaleAdjustSeconds;
-
-   private Label  _lblAdjustMinuteUnit;
-   private Label  _lblAdjustSecondsUnit;
-
-
-
-   /*
-    * display actions
-    */
-   private Button  _chkValueDiffScaling;
-
-   private Button  _chkPreviewChart;
-
-
-
+   private PostSelectionProvider         _postSelectionProvider;
 
    private final Image                   _iconPlaceholder;
-   private final HashMap<Integer, Image> _graphImages = new HashMap<>();
-
-
+   private final HashMap<Integer, Image> _graphImages    = new HashMap<>();
 
    private IPropertyChangeListener       _prefChangeListener;
 
@@ -283,8 +235,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       return super.close();
    }
 
-
-
    @Override
    protected void configureShell(final Shell shell) {
 
@@ -321,7 +271,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    }
 
    private void createActions() {
-
 
    }
 
@@ -448,169 +397,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       });
    }
 
-   /**
-    * group: adjust time
-    */
-   private void createUIGroupHorizontalAdjustment(final Composite parent) {
-
-      final int valueWidth = _pc.convertWidthInCharsToPixels(4);
-      Label label;
-
-      final Group groupTime = new Group(parent, SWT.NONE);
-      groupTime.setText(Messages.tour_merger_group_adjust_time);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(groupTime);
-      GridLayoutFactory.swtDefaults()//
-            .numColumns(1)
-            .spacing(VH_SPACING, VH_SPACING)
-            .applyTo(groupTime);
-
-      /*
-       * Checkbox: keep horizontal and vertical adjustments
-       */
-      _chkSynchStartTime = new Button(groupTime, SWT.CHECK);
-      GridDataFactory.fillDefaults().applyTo(_chkSynchStartTime);
-      _chkSynchStartTime.setText(Messages.tour_merger_chk_use_synced_start_time);
-      _chkSynchStartTime.setToolTipText(Messages.tour_merger_chk_use_synced_start_time_tooltip);
-
-      /*
-       * container: seconds scale
-       */
-      final Composite timeContainer = new Composite(groupTime, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(timeContainer);
-      GridLayoutFactory.fillDefaults().numColumns(4).spacing(0, 0).applyTo(timeContainer);
-
-      /*
-       * scale: adjust seconds
-       */
-      _lblAdjustSecondsValue = new Label(timeContainer, SWT.TRAIL);
-      GridDataFactory
-            .fillDefaults()
-            .align(SWT.END, SWT.CENTER)
-            .hint(valueWidth, SWT.DEFAULT)
-            .applyTo(_lblAdjustSecondsValue);
-
-      label = new Label(timeContainer, SWT.NONE);
-      label.setText(UI.SPACE1);
-
-      _lblAdjustSecondsUnit = new Label(timeContainer, SWT.NONE);
-      _lblAdjustSecondsUnit.setText(Messages.tour_merger_label_adjust_seconds);
-
-      _scaleAdjustSeconds = new Scale(timeContainer, SWT.HORIZONTAL);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleAdjustSeconds);
-      _scaleAdjustSeconds.setMinimum(0);
-      _scaleAdjustSeconds.setMaximum(MAX_ADJUST_SECONDS * 2);
-      _scaleAdjustSeconds.setPageIncrement(20);
-
-      /*
-       * scale: adjust minutes
-       */
-      _lblAdjustMinuteValue = new Label(timeContainer, SWT.TRAIL);
-      GridDataFactory
-            .fillDefaults()
-            .align(SWT.END, SWT.CENTER)
-            .hint(valueWidth, SWT.DEFAULT)
-            .applyTo(_lblAdjustMinuteValue);
-
-      label = new Label(timeContainer, SWT.NONE);
-      label.setText(UI.SPACE1);
-
-      _lblAdjustMinuteUnit = new Label(timeContainer, SWT.NONE);
-      _lblAdjustMinuteUnit.setText(Messages.tour_merger_label_adjust_minutes);
-
-      _scaleAdjustMinutes = new Scale(timeContainer, SWT.HORIZONTAL);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleAdjustMinutes);
-      _scaleAdjustMinutes.setMinimum(0);
-      _scaleAdjustMinutes.setMaximum(MAX_ADJUST_MINUTES * 2);
-      _scaleAdjustMinutes.setPageIncrement(20);
-   }
-
-   /**
-    * group: adjust altitude
-    */
-   private void createUIGroupVerticalAdjustment(final Composite parent) {
-
-      _groupAltitude = new Group(parent, SWT.NONE);
-      _groupAltitude.setText(Messages.tour_merger_group_adjust_altitude);
-      GridDataFactory.swtDefaults().grab(true, false).align(SWT.FILL, SWT.BEGINNING).applyTo(_groupAltitude);
-      GridLayoutFactory.swtDefaults().numColumns(4)
-//				.extendedMargins(0, 0, 0, 0)
-//				.spacing(0, 0)
-            .spacing(VH_SPACING, VH_SPACING)
-            .applyTo(_groupAltitude);
-
-      /*
-       * scale: altitude 20m
-       */
-      _lblAltitudeDiff1 = new Label(_groupAltitude, SWT.TRAIL);
-      GridDataFactory
-            .fillDefaults()
-            .align(SWT.END, SWT.CENTER)
-            .hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
-            .applyTo(_lblAltitudeDiff1);
-
-      _scaleAltitude1 = new Scale(_groupAltitude, SWT.HORIZONTAL);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleAltitude1);
-      _scaleAltitude1.setMinimum(0);
-      _scaleAltitude1.setMaximum(MAX_ADJUST_ALTITUDE_1 * 2);
-      _scaleAltitude1.setPageIncrement(5);
-
-      /*
-       * scale: altitude 100m
-       */
-      _lblAltitudeDiff10 = new Label(_groupAltitude, SWT.TRAIL);
-      GridDataFactory
-            .fillDefaults()
-            .align(SWT.END, SWT.CENTER)
-            .hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT)
-            .applyTo(_lblAltitudeDiff10);
-
-      _scaleAltitude10 = new Scale(_groupAltitude, SWT.HORIZONTAL);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleAltitude10);
-      _scaleAltitude10.setMinimum(0);
-      _scaleAltitude10.setMaximum(MAX_ADJUST_ALTITUDE_10 * 2);
-   }
-
-   private void createUISectionDisplayOptions(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.FILL).applyTo(container);
-      GridLayoutFactory.fillDefaults()//
-            .numColumns(1)
-            .spacing(VH_SPACING, VH_SPACING)
-            .applyTo(container);
-
-      /*
-       * checkbox: display relative or absolute scale
-       */
-      _chkValueDiffScaling = new Button(container, SWT.CHECK);
-      GridDataFactory.swtDefaults()/* .indent(5, 5) .span(4, 1) */.applyTo(_chkValueDiffScaling);
-      _chkValueDiffScaling.setText(Messages.tour_merger_chk_alti_diff_scaling);
-      _chkValueDiffScaling.setToolTipText(Messages.tour_merger_chk_alti_diff_scaling_tooltip);
-
-      /*
-       * checkbox: preview chart
-       */
-      _chkPreviewChart = new Button(container, SWT.CHECK);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).applyTo(_chkPreviewChart);
-      _chkPreviewChart.setText(Messages.tour_merger_chk_preview_graphs);
-      _chkPreviewChart.setToolTipText(Messages.tour_merger_chk_preview_graphs_tooltip);
-
-   }
-
-
-
    private void enableActions() {
 
-   }
-
-
-
-   private void enableMergeButton(final boolean isEnabled) {
-
-      final Button okButton = getButton(IDialogConstants.OK_ID);
-      if (okButton != null) {
-         okButton.setEnabled(isEnabled);
-      }
    }
 
    @Override
@@ -619,34 +407,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // keep window size and position
 //		return null;
       return _state;
-   }
-
-   private int getFromUIAltitudeOffset() {
-
-      final int altiDiff1 = _scaleAltitude1.getSelection() - MAX_ADJUST_ALTITUDE_1;
-      final int altiDiff10 = (_scaleAltitude10.getSelection() - MAX_ADJUST_ALTITUDE_10) * 10;
-
-      final float localAltiDiff1 = altiDiff1 / UI.UNIT_VALUE_ELEVATION;
-      final float localAltiDiff10 = altiDiff10 / UI.UNIT_VALUE_ELEVATION;
-
-      _lblAltitudeDiff1.setText(Integer.toString((int) localAltiDiff1) + UI.SPACE + UI.UNIT_LABEL_ELEVATION);
-      _lblAltitudeDiff10.setText(Integer.toString((int) localAltiDiff10) + UI.SPACE + UI.UNIT_LABEL_ELEVATION);
-
-      return altiDiff1 + altiDiff10;
-   }
-
-   /**
-    * @return tour time offset which is set in the UI
-    */
-   private int getFromUITourTimeOffset() {
-
-      final int seconds = _scaleAdjustSeconds.getSelection() - MAX_ADJUST_SECONDS;
-      final int minutes = _scaleAdjustMinutes.getSelection() - MAX_ADJUST_MINUTES;
-
-      _lblAdjustSecondsValue.setText(Integer.toString(seconds));
-      _lblAdjustMinuteValue.setText(Integer.toString(minutes));
-
-      return minutes * 60 + seconds;
    }
 
    @Override
@@ -698,9 +458,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _nutritionQuery.asyncFind(searchText);
    }
-
-
-
 
    @Override
    public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
@@ -759,27 +516,4 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       table.setFocus();
    }
 
-
-   private void updateUITourTimeOffset(final int tourTimeOffset) {
-
-      final int seconds = tourTimeOffset % 60;
-      final int minutes = tourTimeOffset / 60;
-
-      _scaleAdjustSeconds.setSelection(seconds + MAX_ADJUST_SECONDS);
-      _scaleAdjustMinutes.setSelection(minutes + MAX_ADJUST_MINUTES);
-   }
-
-   private void validateFields() {
-
-      if (_isInUIInit) {
-         return;
-      }
-
-      /*
-       * validate fields
-       */
-      final boolean enableMergeButton = false;
-
-      enableMergeButton(enableMergeButton);
-   }
 }
