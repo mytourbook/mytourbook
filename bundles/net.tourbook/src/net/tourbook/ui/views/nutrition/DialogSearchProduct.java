@@ -419,8 +419,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final ISelection selection = _productsViewer.getSelection();
       final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-      final Product selectedPoi = (Product) firstElement;
-      final TourFuelProduct tfp = new TourFuelProduct(selectedPoi);
+      final Product selectedProduct = (Product) firstElement;
+      final TourFuelProduct tfp = new TourFuelProduct(_tourData, selectedProduct);
       _tourData.addFuelProduct(tfp);
 
       TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData));

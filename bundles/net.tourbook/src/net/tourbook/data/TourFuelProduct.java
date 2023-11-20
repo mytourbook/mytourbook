@@ -90,10 +90,6 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
    public TourFuelProduct() {}
 
-   public TourFuelProduct(final Product product) {
-      name = product.getName();
-   }
-
    /**
     * Used for MT import/export
     *
@@ -104,9 +100,10 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
       this.tourData = tourData;
    }
 
-   public TourFuelProduct(final TourData tourData, final int markerType) {
+   public TourFuelProduct(final TourData tourData, final Product product) {
 
       this.tourData = tourData;
+      name = product.getName();
    }
 
    @Override
