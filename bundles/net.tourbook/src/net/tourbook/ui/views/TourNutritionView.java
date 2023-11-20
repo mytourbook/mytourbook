@@ -248,7 +248,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private void createActions() {
 
 
-      _actionOpenSearchProduct = new ActionOpenSearchProduct(_tourData);
+      _actionOpenSearchProduct = new ActionOpenSearchProduct();
 
    }
 
@@ -462,6 +462,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          _tourData = tourData;
       }
+      _actionOpenSearchProduct.setTourData(_tourData);
 
       //updateUI_MarkerViewer();
    }
