@@ -10824,8 +10824,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourEndTime;
    }
 
-   public  Set<TourFuelProduct> getTourFuelProducts() {
-     return tourFuelProducts;
+   public Set<TourFuelProduct> getTourFuelProducts() {
+      return tourFuelProducts;
    }
 
    /**
