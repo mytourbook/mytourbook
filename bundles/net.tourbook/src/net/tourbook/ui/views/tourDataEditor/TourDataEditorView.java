@@ -164,7 +164,6 @@ import org.eclipse.nebula.widgets.tablecombo.TableCombo;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -659,7 +658,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ControlDecoration      _decoTimeZone;
    //
    private Combo                  _comboTitle;
-   private CCombo             _comboFoodSearch;
    private Combo                  _comboLocation_Start;
    private Combo                  _comboLocation_End;
    private Combo                  _comboTimeZone;
