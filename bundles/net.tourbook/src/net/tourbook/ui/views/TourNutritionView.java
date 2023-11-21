@@ -266,9 +266,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
                return;
             }
 
-            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEventData)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final ArrayList<TourData> modifiedTours = tourEventData.getModifiedTours();
                if (modifiedTours != null) {
 
                   // update modified tour
@@ -552,7 +552,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
       _actionOpenSearchProduct.setTourData(_tourData);
 
-      //updateUI_MarkerViewer();
+      updateUI_ProductViewer();
    }
 
    @Override
