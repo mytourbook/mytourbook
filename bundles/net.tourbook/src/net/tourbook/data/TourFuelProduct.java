@@ -155,7 +155,6 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
       return 0;
    }
-
    /**
     * Tourmarker is compared with the {@link TourFuelProduct#markerId} or
     * {@link TourFuelProduct#_createId}
@@ -204,6 +203,10 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
    {
       //todo fb
       return 10;
+   }
+
+   public String getName() {
+      return name;
    }
 
    public TourData getTourData() {
