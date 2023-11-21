@@ -73,6 +73,10 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
+   //TODO FB
+   //https://fdc.nal.usda.gov/api-guide.html
+
+//https://world.openfoodfacts.org/data
    public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$

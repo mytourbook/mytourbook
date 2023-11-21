@@ -230,11 +230,6 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   //TODO FB
-   //https://fdc.nal.usda.gov/api-guide.html
-
-//https://world.openfoodfacts.org/data
-
    public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
    //
    private static final char             NL                                               = UI.NEW_LINE;
@@ -5061,12 +5056,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
          }
       }
-   }
-
-   private void createUI_SectionSeparator(final Composite parent) {
-
-      final Composite sep = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
    }
 
    private Composite createUI_Tab_10_Tour(final Composite parent) {
