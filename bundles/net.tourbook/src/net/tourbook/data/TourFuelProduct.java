@@ -65,9 +65,8 @@ public class TourFuelProduct implements Serializable {
 
    private String                     name;
 
-   public TourFuelProduct() {}
 
-//   private int                        calories;
+   private int                        calories;
 //
 //   private double                     carbohydrates;
 //
@@ -78,20 +77,13 @@ public class TourFuelProduct implements Serializable {
 //
 //   private double                     caffeine;
 
-   /**
-    * Used for MT import/export
-    *
-    * @param tourData
-    */
-   public TourFuelProduct(final TourData tourData) {
-
-      this.tourData = tourData;
-   }
+   public TourFuelProduct() {}
 
    public TourFuelProduct(final TourData tourData, final Product product) {
 
       this.tourData = tourData;
       name = product.getName();
+      //calories = product.get
    }
 
    /**
@@ -145,6 +137,10 @@ public class TourFuelProduct implements Serializable {
 
    public String getName() {
       return name;
+   }
+
+   public int getServingsConsumed() {
+      return 1;
    }
 
    public TourData getTourData() {

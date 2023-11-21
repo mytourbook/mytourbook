@@ -159,14 +159,20 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          switch (index) {
          case 0:
-            return tourFuelProduct.getName();
-
+            return String.valueOf(tourFuelProduct.getServingsConsumed());
          case 1:
-
             return tourFuelProduct.getName();
+         case 2:
+            return String.valueOf(tourFuelProduct.getCalories());
+         case 3:
+            //    return String.valueOf(tourFuelProduct.getCarbohydrates());
+         case 4:
+            //    return String.valueOf(tourFuelProduct.getSodium());
+         case 5:
+            //    return String.valueOf(tourFuelProduct.getCaffeine());
 
          default:
-            return getText(obj);
+            return UI.EMPTY_STRING;
          }
       }
 
@@ -365,25 +371,40 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private void createUI_210_Viewer(final Composite parent) {
 
       /*
-       * table viewer: poi items
+       * table viewer: products
        */
-      final Table poiTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(poiTable);
-      poiTable.setLinesVisible(true);
-      poiTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-      poiTable.setHeaderVisible(true);
+      final Table productsTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
+      productsTable.setLinesVisible(true);
+      productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      productsTable.setHeaderVisible(true);
 
-      // column: category
-      final TableColumn columnCategory = new TableColumn(poiTable, SWT.LEFT);
-      columnCategory.setText("Category"); //$NON-NLS-1$
-      columnCategory.setWidth(75);
+      // Column: Quantity
+      final TableColumn columnQuantity = new TableColumn(productsTable, SWT.LEFT);
+      columnQuantity.setText("Quantity"); //$NON-NLS-1$
+      columnQuantity.setWidth(25);
 
-      // column: name
-      final TableColumn columnName = new TableColumn(poiTable, SWT.LEFT);
+      // Column: name
+      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText("Name"); //$NON-NLS-1$
       columnName.setWidth(300);
 
-      _productsViewer = new TableViewer(poiTable);
+      // Column: Calories
+      final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
+      columnCalories.setText("Calories"); //$NON-NLS-1$
+      columnCalories.setWidth(75);
+
+      // Column: Carbohydrates
+      final TableColumn columnCarbohydrates = new TableColumn(productsTable, SWT.LEFT);
+      columnCarbohydrates.setText("Carbohydrates"); //$NON-NLS-1$
+      columnCarbohydrates.setWidth(75);
+
+      // Column: Sodium
+      final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
+      columnSodium.setText("Sodium"); //$NON-NLS-1$
+      columnSodium.setWidth(75);
+
+      _productsViewer = new TableViewer(productsTable);
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());

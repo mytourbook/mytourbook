@@ -55,6 +55,7 @@ public class NutritionUtils {
    {
       final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
       final ProductResponse productResponse = wrapper.fetchProductByCode("737628064502");
+      final var toto = productResponse.getProduct();
 
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
