@@ -26,6 +26,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourFuelProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.NutritionUtils;
@@ -149,52 +150,26 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       @Override
       public Image getColumnImage(final Object obj, final int index) {
-         switch (index) {
-         case 0:
-            return getImage(obj);
 
-         default:
             return null;
-         }
       }
 
       @Override
       public String getColumnText(final Object obj, final int index) {
 
-         return obj.toString();
-//         final PointOfInterest poi = (PointOfInterest) obj;
-//
-//         switch (index) {
-//         case 0:
-//            return poi.getCategory();
-//         case 1:
-//
-//            final StringBuilder sb = new StringBuilder(poi.getName());
-//
-//            final List<? extends Waypoint> nearestPlaces = poi.getNearestPlaces();
-//            if (nearestPlaces != null && nearestPlaces.size() > 0) {
-//
-//               // create a string with all nearest waypoints
-//               boolean isFirstPoi = true;
-//               for (final Waypoint waypoint : nearestPlaces) {
-//
-//                  if (isFirstPoi) {
-//                     isFirstPoi = false;
-//                     sb.append("Messages.Poi_View_Label_NearestPlacesPart1");
-//                     sb.append("Messages.Poi_View_Label_Near");
-//                  } else {
-//                     sb.append("Messages.Poi_View_Label_NearestPlacesPart2");
-//                  }
-//
-//                  sb.append("Messages.Poi_View_Label_NearestPlacesPart3");
-//                  sb.append(waypoint.getName());
-//               }
-//               sb.append("Messages.Poi_View_Label_NearestPlacesPart4");
-//            }
-//            return sb.toString();
-//         default:
-//            return getText(obj);
-//         }
+         final TourFuelProduct poi = (TourFuelProduct) obj;
+
+         switch (index) {
+         case 0:
+            return poi.getName();
+
+         case 1:
+
+            return poi.getName();
+
+         default:
+            return getText(obj);
+         }
       }
 
       @Override
