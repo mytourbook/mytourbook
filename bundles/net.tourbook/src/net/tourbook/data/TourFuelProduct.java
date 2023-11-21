@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -28,9 +27,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
@@ -53,8 +49,8 @@ import net.tourbook.nutrition.Product;
  */
 
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productId")
-public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
+public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializable {
 
    private static final long          serialVersionUID = 1L;
 
@@ -155,6 +151,7 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
       return 0;
    }
+
    /**
     * Tourmarker is compared with the {@link TourFuelProduct#markerId} or
     * {@link TourFuelProduct#_createId}
@@ -199,8 +196,7 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
       return false;
    }
 
-   public int getCalories()
-   {
+   public int getCalories() {
       //todo fb
       return 10;
    }
@@ -246,20 +242,4 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
 
       ; //
    }
-
-   @Override
-   public String toXml() {
-      try {
-         final JAXBContext context = JAXBContext.newInstance(this.getClass());
-         final Marshaller marshaller = context.createMarshaller();
-         final StringWriter sw = new StringWriter();
-         marshaller.marshal(this, sw);
-         return sw.toString();
-      } catch (final JAXBException e) {
-         e.printStackTrace();
-      }
-
-      return null;
-   }
-
 }
