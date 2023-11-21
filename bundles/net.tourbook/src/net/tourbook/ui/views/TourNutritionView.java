@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -69,6 +70,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
@@ -99,6 +101,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    /*
     * UI controls
     */
+   private PageBook                _pageBook;
+   private Composite               _pageNoData;
+   private Composite               _viewerContainer;
    private boolean                 _isInUpdate;
 
    private Button                  _btnSearch;
@@ -203,7 +208,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public Image getImage(final Object obj) {
 
-            return null;
+         return null;
       }
    }
 
@@ -347,6 +352,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _postSelectionProvider = new PostSelectionProvider(ID);
       getSite().setSelectionProvider(_postSelectionProvider);
 
+      // show default page
+      _pageBook.showPage(_pageNoData);
+
       restoreState();
    }
 
@@ -373,15 +381,17 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void createUI(final Composite parent) {
 
-      final Display display = parent.getDisplay();
+      _pageBook = new PageBook(parent, SWT.NONE);
 
-      _tk = new FormToolkit(display);
+      _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
+      _tk = new FormToolkit(parent.getDisplay());
+
+      _viewerContainer = new Composite(_pageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
       {
-         createUI_Section_10_Summary(container);
-         createUI_Section_20_ProductsList(container);
+         createUI_Section_10_Summary(_viewerContainer);
+         createUI_Section_20_ProductsList(_viewerContainer);
       }
    }
 
@@ -586,24 +596,22 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    }
 
-   /**
-    * set focus to selected item, selection and focus are not the same !!!
-    */
-   private void setViewerFocus() {
-
-      final Table table = _productsViewer.getTable();
-
-      table.setSelection(table.getSelectionIndex());
-      table.setFocus();
-   }
-
    private void updateUI_ProductViewer() {
 
-      _isInUpdate = true;
-      {
-         _productsViewer.setInput(new Object[0]);
+      if (_tourData == null) {
+
+         _pageBook.showPage(_pageNoData);
+
+      } else {
+
+         _isInUpdate = true;
+         {
+            _productsViewer.setInput(new Object[0]);
+         }
+         _isInUpdate = false;
+
+         _pageBook.showPage(_viewerContainer);
       }
-      _isInUpdate = false;
 
       enableActions();
    }
