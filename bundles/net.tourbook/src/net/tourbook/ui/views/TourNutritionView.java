@@ -62,7 +62,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -114,15 +113,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private Text                    _txtCalories;
 
-
-   private Button                  _btnSearch;
-
    private Combo                   _cboSearchQuery;
 
    private Section                 _sectionProductsList;
    private FormToolkit             _tk;
    private ActionOpenSearchProduct _actionOpenSearchProduct;
-
 
    private class ViewContentProvider implements IStructuredContentProvider {
 
@@ -154,7 +149,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public Image getColumnImage(final Object obj, final int index) {
 
-            return null;
+         return null;
       }
 
       @Override
@@ -326,6 +321,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       // show default page
       _pageBook.showPage(_pageNoData);
 
+      enableControls();
       restoreState();
    }
 
@@ -444,9 +440,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       super.dispose();
    }
 
-   private void enableActions() {
-      // TODO Auto-generated method stub
+   private void enableControls() {
 
+      final boolean isTourSelected = _tourData != null;
+
+      _actionOpenSearchProduct.setEnabled(isTourSelected);
    }
 
    private void fillToolbar() {
@@ -542,15 +540,14 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       Display.getDefault().asyncExec(() -> {
 
          // check if view is closed
-         if (_btnSearch.isDisposed()) {
-            return;
-         }
+//         if (_btnSearch.isDisposed()) {
+//            return;
+//         }
 
          // refresh viewer
          _productsViewer.setInput(new Object());
 
          _cboSearchQuery.setEnabled(true);
-         _btnSearch.setEnabled(true);
       });
 
    }
@@ -590,11 +587,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          _isInUpdate = false;
 
          _pageBook.showPage(_viewerContainer);
+
+         updateUI_SummaryFromModel();
       }
 
-      updateUI_SummaryFromModel();
-
-      enableActions();
+      enableControls();
    }
 
    private void updateUI_SummaryFromModel() {
