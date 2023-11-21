@@ -27,30 +27,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.Product;
 
-/**
- * A tour marker has a position within a tour.
- *
- * <pre>
- *
- *  Planned features in 14.8:
- *
- *    - different icons, size, with/without text
- *    - new marker description field
- *    - create marker in the map
- *    - a marker can have another position than the tour track
- *
- *    icons from http://mapicons.nicolasmollet.com/
- * </pre>
- */
-
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
-public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializable {
+public class TourFuelProduct implements Serializable {
 
    private static final long          serialVersionUID = 1L;
 
@@ -60,6 +45,13 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializa
     */
    private static final AtomicInteger _createCounter   = new AtomicInteger();
 
+   /**
+    * Unique id for manually created markers because the {@link #productCode} is 0 when the marker
+    * is
+    * not persisted
+    */
+   @Transient
+   private long                       _createId        = 0;
    /**
     * Unique id for the {@link TourFuelProduct} entity
     */
@@ -73,6 +65,8 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializa
 
    private String                     name;
 
+   public TourFuelProduct() {}
+
 //   private int                        calories;
 //
 //   private double                     carbohydrates;
@@ -83,8 +77,6 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializa
 //   private double                     containerName;
 //
 //   private double                     caffeine;
-
-   public TourFuelProduct() {}
 
    /**
     * Used for MT import/export
@@ -100,56 +92,6 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializa
 
       this.tourData = tourData;
       name = product.getName();
-   }
-
-   @Override
-   public TourFuelProduct clone() {
-
-      TourFuelProduct newTourMarker = null;
-
-      try {
-         newTourMarker = (TourFuelProduct) super.clone();
-      } catch (final CloneNotSupportedException e) {
-         e.printStackTrace();
-      }
-
-      return newTourMarker;
-   }
-
-   /**
-    * Creates a clone of a marker but sets it in the new {@link TourData} and
-    * sets the state that the marker as not yet saved
-    *
-    * @param newTourData
-    *
-    * @return
-    */
-   public TourFuelProduct clone(final TourData newTourData) {
-
-      final TourFuelProduct newTourMarker = clone();
-
-      newTourMarker.tourData = newTourData;
-
-      //  newTourMarker.markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-
-      return newTourMarker;
-   }
-
-   @Override
-   public int compareTo(final Object other) {
-
-      /*
-       * Set sorting for tour markers by (time) index
-       */
-
-      if (other instanceof TourFuelProduct) {
-
-         final TourFuelProduct otherTourMarker = (TourFuelProduct) other;
-
-         //return serieIndex - otherTourMarker.getSerieIndex();
-      }
-
-      return 0;
    }
 
    /**
@@ -230,6 +172,15 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, Serializa
       }
 
       return result;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      productCode = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
    }
 
    /**

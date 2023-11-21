@@ -4301,7 +4301,11 @@ public class TourDatabase {
 
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
+            // Version 52 - begin
+
             + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + ")        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // Version 52 - end
 
             + ")"); //$NON-NLS-1$
    }

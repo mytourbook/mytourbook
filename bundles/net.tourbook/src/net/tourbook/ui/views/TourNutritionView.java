@@ -82,6 +82,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    //https://fdc.nal.usda.gov/api-guide.html
 
 //https://world.openfoodfacts.org/data
+
+   // in the pref page, add a button to "Refresh product's information"
+   // this will retrieve the updated (if any), info for each product)
    public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
