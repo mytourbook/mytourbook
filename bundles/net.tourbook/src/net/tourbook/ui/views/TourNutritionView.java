@@ -28,6 +28,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionQuery;
+import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ActionOpenSearchProduct;
 import net.tourbook.tour.ITourEventListener;
@@ -67,6 +68,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -105,6 +107,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private Composite               _pageNoData;
    private Composite               _viewerContainer;
    private boolean                 _isInUpdate;
+
+   private Text                    _txtCalories;
+
 
    private Button                  _btnSearch;
 
@@ -212,6 +217,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _productsViewer.refresh();
          }
+
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
@@ -417,7 +423,19 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          /*
           * Label: Calories
           */
-         final Label label = UI.createLabel(parent, "Summary/Report card");
+         Label label = UI.createLabel(container, "Summary/Report card");
+         label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+         _txtCalories = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.END, SWT.FILL)
+               .applyTo(_txtCalories);
+
+         /*
+          * Label: Carbohydrates
+          */
+         label = UI.createLabel(container, "Carbohydrates");
          label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
       }
@@ -596,7 +614,15 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          _pageBook.showPage(_viewerContainer);
       }
 
+      updateUI_SummaryFromModel();
+
       enableActions();
+   }
+
+   private void updateUI_SummaryFromModel() {
+
+      _txtCalories.setText(NutritionUtils.getTotalCalories(_tourData.getTourFuelProducts()));
+
    }
 
 }

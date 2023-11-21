@@ -200,6 +200,12 @@ public class TourFuelProduct implements Cloneable, Comparable<Object>, IXmlSeria
       return false;
    }
 
+   public int getCalories()
+   {
+      //todo fb
+      return 10;
+   }
+
    public TourData getTourData() {
       return tourData;
    }

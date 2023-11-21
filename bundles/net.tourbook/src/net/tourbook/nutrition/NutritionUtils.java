@@ -27,9 +27,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
 import pl.coderion.model.ProductResponse;
@@ -41,6 +43,13 @@ public class NutritionUtils {
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms="; //$NON-NLS-1$
 
    private static HttpClient _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+
+   public static String getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
+
+    final int toto= tourFuelProducts.stream().mapToInt(i -> i.getCalories()).sum();
+
+    return String.valueOf(toto);
+   }
 
    public static List<Product> searchProduct(final String productName)
    {
@@ -81,21 +90,5 @@ public class NutritionUtils {
       }
 
       return null;
-   }
-
-   public static void testSdk() {
-
-      // perform the search by name
-      //
-      //perform the search by code
-
-      //get a response
-//      final ProductResponse response = new ProductResponse();
-//      final String productName = response.getProduct().getProductName();
-//      final float carbs = response.getProduct().getNutriments().getCarbohydrates();
-//      final float sodium = response.getProduct().getNutriments().getSodium();
-      //didn't find the caffeine, ask them ?
-      //it's harder for the fluid because we need to know the size of the flask...
-
    }
 }
