@@ -33,6 +33,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.location.ITourLocationConsumer;
 import net.tourbook.tour.location.TourLocationData;
@@ -1020,12 +1021,70 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
       _lblWeather_CloudIcon.setImage(cloudIcon);
    }
 
+   @Override
+   public void downloadAndSetTourEndLocation() {
+
+      TourLocationData endLocationData = _tourData.tourLocationData_End;
+
+      if (endLocationData == null) {
+
+         final int lastIndex = _tourData.latitudeSerie.length - 1;
+
+         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
+               _tourData.latitudeSerie[lastIndex],
+               _tourData.longitudeSerie[lastIndex]);
+
+         if (retrievedLocationData == null) {
+            return;
+         }
+
+         _tourData.setTourLocationEnd(retrievedLocationData.tourLocation);
+         endLocationData = _tourData.tourLocationData_End = retrievedLocationData;
+
+         // show different action image
+         _actionEndLocation.setHasLocationData(true);
+         _toolbarManager_EndLocation.update(true);
+      }
+
+      _comboLocation_End.setText(TourLocationManager.createLocationDisplayName(endLocationData.tourLocation));
+
+      enableControls();
+   }
+
+   @Override
+   public void downloadAndSetTourStartLocation() {
+
+      TourLocationData startLocationData = _tourData.tourLocationData_Start;
+
+      if (startLocationData == null) {
+
+         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
+               _tourData.latitudeSerie[0],
+               _tourData.longitudeSerie[0]);
+
+         if (retrievedLocationData == null) {
+            return;
+         }
+
+         _tourData.setTourLocationStart(retrievedLocationData.tourLocation);
+         startLocationData = _tourData.tourLocationData_Start = retrievedLocationData;
+
+         // show different action image
+         _actionStartLocation.setHasLocationData(true);
+         _toolbarManager_StartLocation.update(true);
+      }
+
+      _comboLocation_Start.setText(TourLocationManager.createLocationDisplayName(startLocationData.tourLocation));
+
+      enableControls();
+   }
+
    private void enableControls() {
 
-      final boolean hasGeoLocationData = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 0;
+      final boolean hasGeoData = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 0;
 
-      _actionStartLocation.setEnabled(hasGeoLocationData);
-      _actionEndLocation.setEnabled(hasGeoLocationData);
+      _actionStartLocation.setEnabled(hasGeoData);
+      _actionEndLocation.setEnabled(hasGeoData);
 
       _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
@@ -1157,62 +1216,6 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
       _comboLocation_Start.setText(startLocation);
    }
 
-   @Override
-   public void downloadAndSetTourEndLocation() {
-
-      TourLocationData endLocationData = _tourData.tourLocationData_End;
-
-      if (endLocationData == null) {
-
-         final int lastIndex = _tourData.latitudeSerie.length - 1;
-
-         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
-               _tourData.latitudeSerie[lastIndex],
-               _tourData.longitudeSerie[lastIndex]);
-
-         if (retrievedLocationData == null) {
-            return;
-         }
-
-         endLocationData = _tourData.tourLocationData_End = retrievedLocationData;
-
-         // show different action image
-         _actionEndLocation.setHasLocationData(true);
-         _toolbarManager_EndLocation.update(true);
-      }
-
-      _comboLocation_End.setText(TourLocationManager.createLocationDisplayName(endLocationData.osmLocation));
-
-      enableControls();
-   }
-
-   @Override
-   public void downloadAndSetTourStartLocation() {
-
-      TourLocationData startLocationData = _tourData.tourLocationData_Start;
-
-      if (startLocationData == null) {
-
-         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
-               _tourData.latitudeSerie[0],
-               _tourData.longitudeSerie[0]);
-
-         if (retrievedLocationData == null) {
-            return;
-         }
-
-         startLocationData = _tourData.tourLocationData_Start = retrievedLocationData;
-
-         // show different action image
-         _actionStartLocation.setHasLocationData(true);
-         _toolbarManager_StartLocation.update(true);
-      }
-
-      _comboLocation_Start.setText(TourLocationManager.createLocationDisplayName(startLocationData.osmLocation));
-
-      enableControls();
-   }
-
    /**
     * update tourdata from the fields
     */
@@ -1292,8 +1295,23 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          _comboTitle.setText(_tourData.getTourTitle());
          _txtTourDescription.setText(_tourData.getTourDescription());
 
+         /*
+          * Tour location
+          */
          _comboLocation_Start.setText(_tourData.getTourStartPlace());
          _comboLocation_End.setText(_tourData.getTourEndPlace());
+
+         final TourLocation tourLocationStart = _tourData.getTourLocationStart();
+         final TourLocation tourLocationEnd = _tourData.getTourLocationEnd();
+
+         if (tourLocationStart != null) {
+            _actionStartLocation.setHasLocationData(true);
+            _toolbarManager_StartLocation.update(true);
+         }
+         if (tourLocationEnd != null) {
+            _actionEndLocation.setHasLocationData(true);
+            _toolbarManager_EndLocation.update(true);
+         }
 
          /*
           * Personal details

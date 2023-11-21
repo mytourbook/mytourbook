@@ -373,6 +373,45 @@ public class Util {
       return concatenatedValues;
    }
 
+   public static int convertDouble_ToE6(final double doubleValue) {
+
+      return (int) (doubleValue * 1E6);
+   }
+
+   public static double[] convertDoubleSeries_FromE6(final int[] dataSerieE6) {
+
+      if (dataSerieE6 == null || dataSerieE6.length == 0) {
+         return null;
+      }
+      
+      final int serieSize = dataSerieE6.length;
+
+      final double[] doubleSerie = new double[serieSize];
+
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         doubleSerie[serieIndex] = dataSerieE6[serieIndex] / 1E6;
+      }
+
+      return doubleSerie;
+   }
+
+   public static int[] convertDoubleSeries_ToE6(final double[] doubleSerie) {
+
+      if (doubleSerie == null || doubleSerie.length == 0) {
+         return null;
+      }
+
+      final int serieSize = doubleSerie.length;
+
+      final int[] dataSerieE6 = new int[serieSize];
+
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         dataSerieE6[serieIndex] = (int) (doubleSerie[serieIndex] * 1E6);
+      }
+
+      return dataSerieE6;
+   }
+
    public static float[][] convertDoubleToFloat(final double[][] doubleSeries) {
 
       final float[][] floatSeries = new float[doubleSeries.length][];
@@ -2998,9 +3037,9 @@ public class Util {
     * Source: <a href=
     * "https://stackoverflow.com/questions/3938122/how-to-get-amount-of-serialized-bytes-representing-a-java-object"
     * >https://stackoverflow.com/questions/3938122/how-to-get-amount-of-serialized-bytes-representing-a-java-object</a>
-    * 
+    *
     * @param object
-    * 
+    *
     * @return
     */
    public static byte[] serializeObject(final Object object) {

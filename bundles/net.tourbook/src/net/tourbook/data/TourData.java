@@ -83,6 +83,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StreamUtils;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
@@ -2488,10 +2489,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       _rasterizedLatLon = null;
       geoGrid = null;
-//      latitudeMinE6 = 0;
-//      longitudeMinE6 = 0;
-//      latitudeMaxE6 = 0;
-//      longitudeMaxE6 = 0;
 
       _hrZones = null;
       _hrZoneContext = null;
@@ -6189,39 +6186,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
       }
-   }
-
-   private double[] convertDataSeries_FromE6(final int[] dataSerieE6) {
-
-      if (dataSerieE6 == null || dataSerieE6.length == 0) {
-         return null;
-      }
-      final int serieSize = dataSerieE6.length;
-
-      final double[] doubleDataSerie = new double[serieSize];
-
-      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-         doubleDataSerie[serieIndex] = dataSerieE6[serieIndex] / 1E6;
-      }
-
-      return doubleDataSerie;
-   }
-
-   private int[] convertDataSeries_ToE6(final double[] dataSerieDouble) {
-
-      if (dataSerieDouble == null || dataSerieDouble.length == 0) {
-         return null;
-      }
-
-      final int serieSize = dataSerieDouble.length;
-
-      final int[] dataSerieE6 = new int[serieSize];
-
-      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-         dataSerieE6[serieIndex] = (int) (dataSerieDouble[serieIndex] * 1E6);
-      }
-
-      return dataSerieE6;
    }
 
    private float[] convertDataSeries_ToFloat(final int[] intDataSerie, final int scale) {
@@ -11512,8 +11476,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          /*
           * Db version >= 43 contain lat/lon in E6 format
           */
-         latitudeSerie        = convertDataSeries_FromE6(serieData.latitudeE6);
-         longitudeSerie       = convertDataSeries_FromE6(serieData.longitudeE6);
+         latitudeSerie        = Util.convertDoubleSeries_FromE6(serieData.latitudeE6);
+         longitudeSerie       = Util.convertDoubleSeries_FromE6(serieData.longitudeE6);
       }
       computeGeo_Grid();
 
@@ -11595,8 +11559,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          serieData.powerSerie20 = powerSerie;
       }
 
-      serieData.latitudeE6          = convertDataSeries_ToE6(latitudeSerie);
-      serieData.longitudeE6         = convertDataSeries_ToE6(longitudeSerie);
+      serieData.latitudeE6          = Util.convertDoubleSeries_ToE6(latitudeSerie);
+      serieData.longitudeE6         = Util.convertDoubleSeries_ToE6(longitudeSerie);
 
       serieData.gears               = gearSerie;
 

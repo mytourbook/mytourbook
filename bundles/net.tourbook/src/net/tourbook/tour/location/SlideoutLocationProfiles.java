@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -29,6 +31,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -70,6 +73,23 @@ import org.eclipse.swt.widgets.Text;
  * Slideout for the start/end location
  */
 public class SlideoutLocationProfiles extends AdvancedSlideout {
+
+   /**
+    * Fields in {@link TourLocation} which are not displayed as location part
+    */
+   private static final Set<String>        _ignoredFields    = Stream.of(
+
+         "ISO3166_2_lvl4",                                                                       //$NON-NLS-1$
+
+         "name",                                                                                 //$NON-NLS-1$
+         "display_name",                                                                         //$NON-NLS-1$
+
+         "latitudeMinE6_Normalized",                                                             //$NON-NLS-1$
+         "latitudeMaxE6_Normalized",                                                             //$NON-NLS-1$
+         "longitudeMinE6_Normalized",                                                            //$NON-NLS-1$
+         "longitudeMaxE6_Normalized"                                                             //$NON-NLS-1$
+   )
+         .collect(Collectors.toCollection(HashSet::new));
 
    private PixelConverter                  _pc;
 
@@ -247,23 +267,23 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       setTitleText(title);
    }
 
-   private void addAllAddressParts(final OSMAddress address, final List<MT_DLItem> allItems) {
+   private void addAllAddressParts(final TourLocation tourLocation, final List<MT_DLItem> allItems) {
 
       try {
 
-         final Field[] allAddressFields = address.getClass().getFields();
+         final Field[] allAddressFields = tourLocation.getClass().getFields();
 
          // loop: all fields in the retrieved address
          for (final Field field : allAddressFields) {
 
             final String fieldName = field.getName();
 
-            // skip field names which are not needed
-            if ("ISO3166_2_lvl4".equals(fieldName)) { //$NON-NLS-1$
+            // skip field names which are not address parts
+            if (_ignoredFields.contains(fieldName)) {
                continue;
             }
 
-            final Object fieldValue = field.get(address);
+            final Object fieldValue = field.get(tourLocation);
 
             if (fieldValue instanceof final String stringValue) {
 
@@ -983,11 +1003,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void setupUI() {
 
-      final OSMLocation osmLocation = _isStartLocation
-            ? _tourData.tourLocationData_Start.osmLocation
-            : _tourData.tourLocationData_End.osmLocation;
-
-      final OSMAddress address = osmLocation.address;
+      final TourLocation tourLocation = _isStartLocation
+            ? _tourData.getTourLocationStart()
+            : _tourData.getTourLocationEnd();
 
       /*
        * Fill address part widget
@@ -996,36 +1014,36 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 // SET_FORMATTING_OFF
 
       // add customized parts
-      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(address);
-      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(address);
-      final String largestCity            = TourLocationManager.getCombined_City_Largest(address);
-      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(address);
-      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber(address);
+      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(tourLocation);
+      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(tourLocation);
+      final String largestCity            = TourLocationManager.getCombined_City_Largest(tourLocation);
+      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(tourLocation);
+      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber(tourLocation);
 
       boolean isShowSmallestCity = false;
       if (largestCity != null && largestCity.equals(smallestCity) == false) {
          isShowSmallestCity = true;
       }
 
-      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                  osmLocation.display_name, _allDualListItems);
-      addCombinedPart(LocationPartID    .OSM_NAME,                          osmLocation.name,         _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                  tourLocation.display_name,   _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_NAME,                          tourLocation.name,           _allDualListItems);
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity,              _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity,                 _allDualListItems);
       if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity,             _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity,                _allDualListItems);
       }
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip,       _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip,          _allDualListItems);
       if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip,      _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip,         _allDualListItems);
       }
 
-      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber,    _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber,       _allDualListItems);
 
 // SET_FORMATTING_ON
 
       // add address parts
-      addAllAddressParts(address, _allDualListItems);
+      addAllAddressParts(tourLocation, _allDualListItems);
 
       _listLocationParts.setItems(_allDualListItems);
    }

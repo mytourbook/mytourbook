@@ -24,8 +24,8 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.ITourLocationConsumer;
-import net.tourbook.tour.location.OSMLocation;
 import net.tourbook.tour.location.SlideoutLocationProfiles;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.location.TourLocationProfile;
@@ -203,10 +203,12 @@ public class ActionTourLocation extends ContributionItem {
       if (_isStartLocation) {
 
          _tourData.tourLocationData_Start = null;
+         _tourData.setTourLocationStart(null);
 
       } else {
 
          _tourData.tourLocationData_End = null;
+         _tourData.setTourLocationEnd(null);
       }
 
       downloadAndSetLocationData();
@@ -308,9 +310,9 @@ public class ActionTourLocation extends ContributionItem {
 
    private String createProfileDisplayName(final TourLocationProfile locationProfile) {
 
-      final OSMLocation osmLocation = _isStartLocation
-            ? _tourData.tourLocationData_Start.osmLocation
-            : _tourData.tourLocationData_End.osmLocation;
+      final TourLocation osmLocation = _isStartLocation
+            ? _tourData.getTourLocationStart()
+            : _tourData.getTourLocationEnd();
 
       return TourLocationManager.createLocationDisplayName(osmLocation, locationProfile);
    }

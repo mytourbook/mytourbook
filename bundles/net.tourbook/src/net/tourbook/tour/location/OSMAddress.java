@@ -26,6 +26,51 @@ import net.tourbook.common.util.StatusUtil;
 /**
  * Possible address fields are from <a href=
  * "https://nominatim.org/release-docs/develop/api/Output/#addressdetails">https://nominatim.org/release-docs/develop/api/Output/#addressdetails</a>
+ *
+ * <pre>
+ *
+ *   {
+ *      "place_id"      : 78981669,
+ *      "osm_id"        : 44952014,
+
+ *      "licence"       : "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+ *
+ *      "place_rank"    : 30,
+ *      "importance"    : 0.00000999999999995449,
+ *
+ *      "addresstype"   : "leisure",
+ *      "class"         : "leisure",
+ *      "osm_type"      : "way",
+ *      "type"          : "pitch",
+
+ *      "lat"           : "47.116116899999994",
+ *      "lon"           : "7.989645450000001",
+ *
+ *      "name"          : "",
+ *      "display_name"  : "5a, Schlossfeldstrasse, St. Niklausenberg, Guon, Willisau, Luzern, 6130, Schweiz/Suisse/Svizzera/Svizra",
+ *
+ *      "address": {
+ *         "house_number"     : "5a",
+ *         "road"             : "Schlossfeldstrasse",
+ *         "neighbourhood"    : "St. Niklausenberg",
+ *         "farm"             : "Guon",
+ *         "village"          : "Willisau",
+ *         "state"            : "Luzern",
+ *         "ISO3166-2-lvl4"   : "CH-LU",
+ *         "postcode"         : "6130",
+ *         "country"          : "Schweiz/Suisse/Svizzera/Svizra",
+ *         "country_code"     : "ch"
+ *      },
+ *
+ *      "boundingbox": [
+ *         "47.1159171",
+ *         "47.1163167",
+ *         "7.9895150",
+ *         "7.9897759"
+ *      ]
+ *   }
+ *
+ * </pre>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 class OSMAddress {
@@ -92,7 +137,15 @@ class OSMAddress {
    public String               man_made;
    public String               military;
    public String               mountain_pass;
-   public String               natural;
+
+   /**
+    * "natural" seems to be a SQL name :-?
+    * <p>
+    * ERROR 42X01: Syntax error: Encountered "natural" at line 55, column 4.
+    *
+    */
+   @JsonAlias({ "natural" })
+   public String               natural2;
    public String               office;
    public String               place;
    public String               railway;

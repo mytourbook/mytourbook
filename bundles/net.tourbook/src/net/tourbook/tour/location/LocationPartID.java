@@ -92,7 +92,7 @@ public enum LocationPartID {
    man_made, //
    military, //
    mountain_pass, //
-   natural, //
+   natural2, //
    office, //
    place, //
    railway, //

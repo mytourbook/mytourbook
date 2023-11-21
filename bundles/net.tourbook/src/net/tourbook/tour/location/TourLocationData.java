@@ -17,16 +17,20 @@ package net.tourbook.tour.location;
 
 import de.byteholder.geoclipse.map.UI;
 
+import net.tourbook.data.TourLocation;
+
 public class TourLocationData {
 
    private static final String NL = UI.NEW_LINE;
 
    String                      downloadedData;
 
-   public OSMLocation          osmLocation;
-
    long                        downloadTime;
    long                        waitingTime;
+
+   public TourLocation         tourLocation;
+
+   public TourLocationData() {}
 
    public TourLocationData(final String downloadedData, final long retrievalTime, final long waitingTime) {
 
@@ -34,6 +38,11 @@ public class TourLocationData {
 
       this.downloadTime = retrievalTime;
       this.waitingTime = waitingTime;
+   }
+
+   public TourLocationData(final TourLocation tourLocation) {
+
+      this.tourLocation = tourLocation;
    }
 
    @Override
@@ -47,8 +56,6 @@ public class TourLocationData {
             + " downloadTime   = " + downloadTime + NL //         //$NON-NLS-1$
             + " waitingTime    = " + waitingTime + NL //          //$NON-NLS-1$
 
-            + " osmLocation    = " + NL //                        //$NON-NLS-1$
-            + osmLocation + NL //
       ;
    }
 }

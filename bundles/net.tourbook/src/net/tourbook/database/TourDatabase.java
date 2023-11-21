@@ -57,6 +57,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -480,6 +481,15 @@ public class TourDatabase {
     */
    private static class SQL {
 
+      /**
+       * @param stmt
+       * @param table
+       * @param columnName
+       * @param defaultValue
+       *           Can be <code>null</code> then a default is not set
+       *
+       * @throws SQLException
+       */
       private static void AddColumn_BigInt(final Statement stmt,
                                            final String table,
                                            final String columnName,
@@ -492,7 +502,16 @@ public class TourDatabase {
             return;
          }
 
-         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " BIGINT DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         if (defaultValue == null) {
+
+            // ignore default value
+
+            exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " BIGINT"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+         } else {
+
+            exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " BIGINT DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         }
       }
 
       /**
@@ -839,14 +858,19 @@ public class TourDatabase {
    }
 
    /**
-    * This error can occur when transient instances are not saved.
+    * This error can occur when transient instances are not yet saved which belong to
+    * {@link TourData}.
     *
     * <pre>
     *
     * !ENTRY net.tourbook.common 4 0 2015-05-08 16:10:55.578
     * !MESSAGE Tour cannot be saved in the database
     * !STACK 0
-    * org.hibernate.TransientObjectException: object references an unsaved transient instance - save the transient instance before flushing: net.tourbook.data.TourData.tourType -> net.tourbook.data.TourType
+    * org.hibernate.TransientObjectException:
+    *
+    *    object references an unsaved transient instance - save the transient instance before flushing:
+    *      net.tourbook.data.TourData.tourType -> net.tourbook.data.TourType
+    *
     *    at org.hibernate.engine.CascadingAction$9.noCascade(CascadingAction.java:376)
     *    at org.hibernate.engine.Cascade.cascade(Cascade.java:163)
     *    at org.hibernate.event.def.AbstractFlushingEventListener.cascadeOnFlush(AbstractFlushingEventListener.java:154)
@@ -865,6 +889,7 @@ public class TourDatabase {
    private static void checkUnsavedTransientInstances(final TourData tourData) {
 
       checkUnsavedTransientInstances_Tags(tourData);
+      checkUnsavedTransientInstances_TourLocation(tourData);
       checkUnsavedTransientInstances_TourType(tourData);
       checkUnsavedTransientInstances_Sensors(tourData);
    }
@@ -1066,6 +1091,95 @@ public class TourDatabase {
       // replace tags in the tour, either with the old tags and/or with newly created tags
       allTourDataTags.clear();
       allTourDataTags.addAll(allAppliedTags);
+   }
+
+   /**
+    * Save {@link TourLocation} instances which are not yet saved
+    *
+    * @param tourData
+    */
+   private static void checkUnsavedTransientInstances_TourLocation(final TourData tourData) {
+
+      final TourLocation tourLocationStart = tourData.getTourLocationStart();
+      final TourLocation checkedLocationStart = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationStart);
+      if (checkedLocationStart != null) {
+
+         // replace tour location in the tour
+         tourData.setTourLocationStart(checkedLocationStart);
+      }
+
+      final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+      final TourLocation checkedLocationEnd = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationEnd);
+      if (checkedLocationEnd != null) {
+
+         // replace tour location in the tour
+         tourData.setTourLocationEnd(checkedLocationEnd);
+      }
+   }
+
+   /**
+    * @param requestedTourLocation
+    *           {@link TourLocation} which needs to be checked
+    *
+    * @return Returns <code>null</code> when the provided {@link TourLocation} is OK -> needs no
+    *         action
+    */
+   private static TourLocation checkUnsavedTransientInstances_TourLocation_OneLocation(final TourLocation requestedTourLocation) {
+
+      if (requestedTourLocation == null) {
+
+         // a tour location is not set -> nothing to do
+
+         return null;
+      }
+
+      if (requestedTourLocation.getLocationId() != ENTITY_IS_NOT_SAVED) {
+
+         // tour location is saved
+
+         return null;
+      }
+
+      TourLocation appliedLocation = null;
+
+      synchronized (TRANSIENT_LOCK) {
+
+         // location is not yet saved
+         // 1. location can still be new
+         // 2. location is already created but not updated in the not yet saved tour
+
+         final TourLocation loadedTourLocation = getTourLocation(
+               requestedTourLocation.getLatitudeE6(),
+               requestedTourLocation.getLongitudeE6());
+
+         if (loadedTourLocation != null) {
+
+            // use found tour location
+
+            appliedLocation = loadedTourLocation;
+
+         } else {
+
+            // create new tour location
+
+            final TourLocation savedLocation = saveEntity(
+
+                  requestedTourLocation,
+                  ENTITY_IS_NOT_SAVED,
+                  TourLocation.class);
+
+            if (savedLocation != null) {
+
+               appliedLocation = savedLocation;
+
+               // force reload of cached tour locations
+//               clearTourTypes();
+//               TourManager.getInstance().clearTourDataCache();
+            }
+         }
+      }
+
+      return appliedLocation;
    }
 
    /**
@@ -2447,6 +2561,115 @@ public class TourDatabase {
       return tourData;
    }
 
+   public static TourLocation getTourLocation(final double latitude, final double longitude) {
+
+      final int latitudeE6 = Util.convertDouble_ToE6(latitude);
+      final int longitudeE6 = Util.convertDouble_ToE6(longitude);
+
+      return getTourLocation(latitudeE6, longitudeE6);
+   }
+
+   @SuppressWarnings("unchecked")
+   public static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6) {
+
+      TourLocation tourLocation = null;
+
+      // convert possible negative values into positive values to make math easier
+      final int latitudeE6_Normalized = latitudeE6 + 90_000_000;
+      final int longitudeE6_Normalized = longitudeE6 + 180_000_000;
+
+      final long start = System.nanoTime();
+
+      synchronized (DB_LOCK) {
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         {
+            final String sql = UI.EMPTY_STRING
+
+                  + "SELECT TourLocation" + NL //                                      //$NON-NLS-1$
+
+                  + " FROM TourLocation AS tourLocation" + NL //                       //$NON-NLS-1$
+
+                  + " WHERE " + NL //                                                  //$NON-NLS-1$
+
+                  + "   tourLocation.latitudeMinE6_Normalized  <= ? AND " + NL //   1  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMaxE6_Normalized  >= ? AND " + NL //   2  //$NON-NLS-1$
+
+                  + "   tourLocation.longitudeMinE6_Normalized <= ? AND " + NL //   3  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMaxE6_Normalized >= ?" + NL //        4  //$NON-NLS-1$
+            ;
+
+            final Query emQuery = em.createQuery(sql);
+
+            emQuery.setParameter(1, latitudeE6_Normalized);
+            emQuery.setParameter(2, latitudeE6_Normalized);
+            emQuery.setParameter(3, longitudeE6_Normalized);
+            emQuery.setParameter(4, longitudeE6_Normalized);
+
+            try {
+
+               final List<TourLocation> allTourLocations = emQuery.getResultList();
+
+               final int numLocations = allTourLocations.size();
+
+               if (numLocations == 0) {
+
+                  // ignore
+
+               } else if (numLocations == 1) {
+
+                  tourLocation = allTourLocations.get(0);
+
+               } else {
+
+                  // numLocations > 1
+
+                  for (final TourLocation dbTourLocation : allTourLocations) {
+
+                     final int latitudeMinE6_Normalized = dbTourLocation.latitudeMinE6_Normalized;
+                     final int latitudeMaxE6_Normalized = dbTourLocation.latitudeMaxE6_Normalized;
+                     final int longitudeMinE6_Normalized = dbTourLocation.longitudeMinE6_Normalized;
+                     final int longitudeMaxE6_Normalized = dbTourLocation.longitudeMaxE6_Normalized;
+
+                     System.out.println("""
+                           %s    %s
+                           %s    %s
+                           %s    %s     """.formatted( //$NON-NLS-1$
+
+                           FormatManager.formatNumber_0(latitudeMinE6_Normalized),
+                           FormatManager.formatNumber_0(longitudeMinE6_Normalized),
+
+                           FormatManager.formatNumber_0(latitudeE6_Normalized),
+                           FormatManager.formatNumber_0(longitudeE6_Normalized),
+
+                           FormatManager.formatNumber_0(latitudeMaxE6_Normalized),
+                           FormatManager.formatNumber_0(longitudeMaxE6_Normalized)
+
+                     ));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+                  }
+
+                  tourLocation = allTourLocations.get(0);
+               }
+
+            } catch (final Exception e) {
+
+               StatusUtil.log(e);
+            }
+
+         }
+         em.close();
+      }
+      final long end = System.nanoTime();
+
+      System.out.println(("Loading TourLocation: ") //$NON-NLS-1$
+            + (((float) (end - start) / 1000000) + " ms")); //$NON-NLS-1$
+      // TODO remove SYSTEM.OUT.PRINTLN
+
+      return tourLocation;
+   }
+
    /**
     * Get {@link TourType} from all available tour type by it's id.
     *
@@ -2926,8 +3149,11 @@ public class TourDatabase {
          ts.commit();
 
       } catch (final Exception e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
+
          if (ts.isActive()) {
             ts.rollback();
          } else {
@@ -2937,8 +3163,8 @@ public class TourDatabase {
       }
 
       if (isSaved == false) {
-         MessageDialog.openError(
-               Display.getDefault().getActiveShell(),
+
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -4354,17 +4580,85 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_LOCATION, true)
 
-            + "   name                 VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   displayName          VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   display_name               VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   latitudeMin          DOUBLE DEFAULT 0,                               " + NL //$NON-NLS-1$
-            + "   latitudeMax          DOUBLE DEFAULT 0,                               " + NL //$NON-NLS-1$
-            + "   longitudeMin         DOUBLE DEFAULT 0,                               " + NL //$NON-NLS-1$
-            + "   longitudeMax         DOUBLE DEFAULT 0,                               " + NL //$NON-NLS-1$
+            + "   latitudeMinE6_Normalized   INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   latitudeMaxE6_Normalized   INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   longitudeMinE6_Normalized  INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   longitudeMaxE6_Normalized  INTEGER,                                        " + NL //$NON-NLS-1$
 
-            + "   continent            VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   country              VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   countryCode          VARCHAR(" + TourLocation.DB_FIELD_LENGTH + ")  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            /*
+             * Address fields
+             */
+
+            + "   continent                  VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   country                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   country_code               VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   region                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   state                      VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   state_district             VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   county                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   municipality               VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   city                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   town                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   village                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   city_district              VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   district                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   borough                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   suburb                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   subdivision                VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   hamlet                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   croft                      VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   isolated_dwelling          VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   neighbourhood              VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   allotments                 VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   quarter                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   city_block                 VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   residential                VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   farm                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   farmyard                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   industrial                 VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   commercial                 VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   retail                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   road                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   house_number               VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   house_name                 VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   aerialway                  VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   aeroway                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   amenity                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   boundary                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   bridge                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   club                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   craft                      VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   emergency                  VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   historic                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   landuse                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   leisure                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   man_made                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   military                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   mountain_pass              VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+//          fix for ERROR 42X01: Syntax error: Encountered "natural" at line 55, column 4.
+            + "   natural2                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   office                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   place                      VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   railway                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   shop                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tourism                    VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tunnel                     VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   waterway                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   postcode                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + ")   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             + ")" //                                                                          //$NON-NLS-1$
       );
@@ -10057,11 +10351,6 @@ public class TourDatabase {
 
    private int updateDb_051_To_052(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      /*
-       * This db update is necessary even when it is doing nothing, otherwise the db-update process
-       * fails
-       */
-
       final int newDbVersion = 52;
 
       logDbUpdate_Start(newDbVersion);
@@ -10073,10 +10362,19 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-         SQL.AlterColumn_VarChar_Width(stmt, TABLE_TOUR_DATA, "tourStartPlace", TourData.DB_LENGTH_TOUR_START_PLACE_V52); //$NON-NLS-1$
-         SQL.AlterColumn_VarChar_Width(stmt, TABLE_TOUR_DATA, "tourEndPlace",   TourData.DB_LENGTH_TOUR_END_PLACE_V52); //$NON-NLS-1$
+         // increase tour location size
+         SQL.AlterColumn_VarChar_Width (stmt, TABLE_TOUR_DATA, "tourStartPlace", TourData.DB_LENGTH_TOUR_START_PLACE_V52); //$NON-NLS-1$
+         SQL.AlterColumn_VarChar_Width (stmt, TABLE_TOUR_DATA, "tourEndPlace",   TourData.DB_LENGTH_TOUR_END_PLACE_V52); //$NON-NLS-1$
+
+         SQL.AddColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID",  null); //$NON-NLS-1$
+         SQL.AddColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID",    null); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
+
+         // double check if db already exists
+         if (isTableAvailable(conn, TABLE_TOUR_LOCATION) == false) {
+            createTable_TourLocation(stmt);
+         }
       }
       stmt.close();
 

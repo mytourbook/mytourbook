@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,13 +22,8 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.ui.SubMenu;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.SlideoutLocationProfiles;
 import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
@@ -157,6 +151,7 @@ public class ActionSetStartEndLocation extends SubMenu {
             return;
          }
 
+         tourData.setTourLocationStart(retrievedLocationData.tourLocation);
          tourData.tourLocationData_Start = retrievedLocationData;
       }
 
@@ -181,14 +176,9 @@ public class ActionSetStartEndLocation extends SubMenu {
    private void actionSetTourLocation(final TourLocationProfile locationProfile) {
 
       final List<TourData> selectedTours = _tourProvider.getSelectedTours();
-      final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
-      TourLocationManager.setLocationNames(selectedTours, modifiedTours, locationProfile);
+      TourLocationManager.setLocationNames(selectedTours, locationProfile);
 
-      if (modifiedTours.size() > 0) {
-
-         TourManager.saveModifiedTours(modifiedTours);
-      }
 
 //      System.out.println();
 //      System.out.println("       "
