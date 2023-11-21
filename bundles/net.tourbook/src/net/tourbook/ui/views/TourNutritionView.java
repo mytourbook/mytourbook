@@ -114,21 +114,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private FormToolkit             _tk;
    private ActionOpenSearchProduct _actionOpenSearchProduct;
 
-   public class SearchContentProvider implements IStructuredContentProvider {
 
-      @Override
-      public void dispose() {}
-
-      @Override
-      public Object[] getElements(final Object inputElement) {
-         return _searchHistory.toArray(new String[_searchHistory.size()]);
-      }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-   }
-
-   class ViewContentProvider implements IStructuredContentProvider {
+   private class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -485,16 +472,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          return;
       }
 
-//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//            + ("\tonSelectionChanged: " + selection));
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
 
       if (selection instanceof SelectionTourData) {
 
-         // a tour was selected, get the chart and update the marker viewer
+         // a tour was selected, get the chart and update the nutrition viewer
 
          final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          tourData = tourDataSelection.getTourData();
@@ -534,7 +517,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       } else if (selection instanceof SelectionDeletedTours) {
 
-         // clearView();
+         clearView();
       }
 
       if (tourData == null) {
@@ -556,9 +539,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    }
 
    @Override
-   public void propertyChange(final PropertyChangeEvent evt) {
+   public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 
-      final List<String> searchResult = (List<String>) evt.getNewValue();
+      final List<String> searchResult = (List<String>) propertyChangeEvent.getNewValue();
 
       Display.getDefault().asyncExec(() -> {
 
