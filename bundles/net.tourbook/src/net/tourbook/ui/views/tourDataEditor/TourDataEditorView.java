@@ -634,7 +634,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Section                  _sectionPersonal;
    private Section                  _sectionWeather;
    private Section                  _sectionCharacteristics;
-   private Section                  _sectionNutrition;
    //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
@@ -5064,46 +5063,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void createUI_Section_160_NutritionReport(final Composite parent) {
-
-      //put a link with "Not finding the product you used ? You can create it here"
-      //https://world.openfoodfacts.org/cgi/product.pl
-
-      _sectionNutrition = createSection(parent, _tk, "Nutrition" /*
-                                                                  * Messages.
-                                                                  * tour_editor_section_characteristics
-                                                                  */, false, true);
-      final Composite container = (Composite) _sectionNutrition.getClient();
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-      {
-         {
-            /*
-             * tags
-             */
-            // combo: tour title with history
-            _comboFoodSearch = new CCombo(container, SWT.BORDER | SWT.FLAT);
-            _comboFoodSearch.setText(UI.EMPTY_STRING);
-
-            _tk.adapt(_comboFoodSearch, true, false);
-
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .applyTo(_comboFoodSearch);
-
-            _comboFoodSearch.addModifyListener(modifyEvent -> {
-
-               if (_isSetField || _isSavingInProgress) {
-                  return;
-               }
-
-               System.out.println(modifyEvent.data.toString());
-            });
-         }
-      }
-   }
-
    private void createUI_SectionSeparator(final Composite parent) {
 
       final Composite sep = _tk.createComposite(parent);
@@ -5134,9 +5093,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             createUI_Section_130_Personal(_tourContainer);
             createUI_Section_140_Weather(_tourContainer);
             createUI_Section_150_Characteristics(_tourContainer);
-            createUI_SectionSeparator(_tourContainer);
-
-            createUI_Section_160_NutritionReport(_tourContainer);
          }
       }
 
