@@ -87,7 +87,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private TourData                      _tourData;
 
    private TableViewer                   _productsViewer;
-   private List<String>                  _pois;
    private List<String>                  _searchHistory                  = new ArrayList<>();
 
    private IPropertyChangeListener       _prefChangeListener;
@@ -209,10 +208,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    }
 
    public TourNutritionView() {}
-
-   public TourNutritionView(final List<String> pois) {
-      _pois = pois;
-   }
 
    private void addPrefListener() {
 
@@ -554,10 +549,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    public void propertyChange(final PropertyChangeEvent evt) {
 
       final List<String> searchResult = (List<String>) evt.getNewValue();
-
-      if (searchResult != null) {
-         _pois = searchResult;
-      }
 
       Display.getDefault().asyncExec(() -> {
 
