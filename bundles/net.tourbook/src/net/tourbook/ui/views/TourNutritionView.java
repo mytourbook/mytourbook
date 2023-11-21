@@ -157,15 +157,15 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public String getColumnText(final Object obj, final int index) {
 
-         final TourFuelProduct poi = (TourFuelProduct) obj;
+         final TourFuelProduct tourFuelProduct = (TourFuelProduct) obj;
 
          switch (index) {
          case 0:
-            return poi.getName();
+            return tourFuelProduct.getName();
 
          case 1:
 
-            return poi.getName();
+            return tourFuelProduct.getName();
 
          default:
             return getText(obj);
