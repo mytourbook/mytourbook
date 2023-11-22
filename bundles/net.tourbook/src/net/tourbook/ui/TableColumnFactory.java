@@ -31,84 +31,210 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory ALTITUDE_ALTITUDE;
    public static final TableColumnFactory ALTITUDE_AVG_CHANGE;
-   public static final String             ALTITUDE_AVG_CHANGE_ID                             = "ALTITUDE_AVG_CHANGE";                             //$NON-NLS-1$
+   public static final String             ALTITUDE_AVG_CHANGE_ID             = "ALTITUDE_AVG_CHANGE";             //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_BORDER;
    public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_COMPUTED;
    public static final TableColumnFactory ALTITUDE_ELEVATION_UP;
    public static final TableColumnFactory ALTITUDE_ELEVATION_DOWN;
    public static final TableColumnFactory ALTITUDE_ELEVATION_DIFF;
-   public static final String             ALTITUDE_ELEVATION_DIFF_ID                         = "ALTITUDE_ELEVATION_DIFF_ID";                      //$NON-NLS-1$
+   public static final String             ALTITUDE_ELEVATION_DIFF_ID         = "ALTITUDE_ELEVATION_DIFF_ID";      //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_GAIN;
-   public static final String             ALTITUDE_ELEVATION_GAIN_ID                         = "ALTITUDE_ELEVATION_GAIN_ID";                      //$NON-NLS-1$
+   public static final String             ALTITUDE_ELEVATION_GAIN_ID         = "ALTITUDE_ELEVATION_GAIN_ID";      //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_GAIN_DIFF;
-   public static final String             ALTITUDE_ELEVATION_GAIN_DIFF_ID                    = "ALTITUDE_ELEVATION_GAIN_DIFF_ID";                 //$NON-NLS-1$
+   public static final String             ALTITUDE_ELEVATION_GAIN_DIFF_ID    = "ALTITUDE_ELEVATION_GAIN_DIFF_ID"; //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_LOSS;
-   public static final String             ALTITUDE_ELEVATION_LOSS_ID                         = "ALTITUDE_ELEVATION_LOSS_ID";                      //$NON-NLS-1$
+   public static final String             ALTITUDE_ELEVATION_LOSS_ID         = "ALTITUDE_ELEVATION_LOSS_ID";      //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_LOSS_DIFF;
-   public static final String             ALTITUDE_ELEVATION_LOSS_DIFF_ID                    = "ALTITUDE_ELEVATION_LOSS_DIFF_ID";                 //$NON-NLS-1$
+   public static final String             ALTITUDE_ELEVATION_LOSS_DIFF_ID    = "ALTITUDE_ELEVATION_LOSS_DIFF_ID"; //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_UP;
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_DOWN;
    public static final TableColumnFactory ALTITUDE_GRADIENT;
-   public static final String             ALTITUDE_GRADIENT_ID                               = "ALTITUDE_GRADIENT";                               //$NON-NLS-1$
+   public static final String             ALTITUDE_GRADIENT_ID               = "ALTITUDE_GRADIENT";               //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_GRADIENT_AVG;
    public static final TableColumnFactory ALTITUDE_MAX;
-   public static final String             ALTITUDE_MAX_ID                                    = "ALTITUDE_MAX";                                    //$NON-NLS-1$
+   public static final String             ALTITUDE_MAX_ID                    = "ALTITUDE_MAX";                    //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_BORDER_DOWN;
-   public static final String             ALTITUDE_SUMMARIZED_BORDER_DOWN_ID                 = "ALTITUDE_SUMMARIZED_BORDER_DOWN";                 //$NON-NLS-1$
+   public static final String             ALTITUDE_SUMMARIZED_BORDER_DOWN_ID = "ALTITUDE_SUMMARIZED_BORDER_DOWN"; //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_BORDER_UP;
-   public static final String             ALTITUDE_SUMMARIZED_BORDER_UP_ID                   = "ALTITUDE_SUMMARIZED_BORDER_UP";                   //$NON-NLS-1$
+   public static final String             ALTITUDE_SUMMARIZED_BORDER_UP_ID   = "ALTITUDE_SUMMARIZED_BORDER_UP";   //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_COMPUTED_DOWN;
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_COMPUTED_UP;
 
    public static final TableColumnFactory BODY_AVG_PULSE;
-   public static final String             BODY_AVG_PULSE_ID                                  = "BODY_AVG_PULSE";                                  //$NON-NLS-1$
+   public static final String             BODY_AVG_PULSE_ID                  = "BODY_AVG_PULSE";                  //$NON-NLS-1$
    public static final TableColumnFactory BODY_AVG_PULSE_DIFFERENCE;
    public static final TableColumnFactory BODY_CALORIES;
-   public static final String             BODY_CALORIES_ID                                   = "BODY_CALORIES";                                   //$NON-NLS-1$
+   public static final String             BODY_CALORIES_ID                   = "BODY_CALORIES";                   //$NON-NLS-1$
    public static final TableColumnFactory BODY_PERSON;
-   public static final String             BODY_PERSON_ID                                     = "BODY_PERSON";                                     //$NON-NLS-1$
+   public static final String             BODY_PERSON_ID                     = "BODY_PERSON";                     //$NON-NLS-1$
    public static final TableColumnFactory BODY_PULSE;
    public static final TableColumnFactory BODY_PULSE_MAX;
-   public static final String             BODY_PULSE_MAX_ID                                  = "BODY_PULSE_MAX";                                  //$NON-NLS-1$
+   public static final String             BODY_PULSE_MAX_ID                  = "BODY_PULSE_MAX";                  //$NON-NLS-1$
    public static final TableColumnFactory BODY_PULSE_RR_AVG_BPM;
-   public static final String             BODY_PULSE_RR_AVG_BPM_ID                           = "BODY_PULSE_RR_AVG_BPM";                           //$NON-NLS-1$
+   public static final String             BODY_PULSE_RR_AVG_BPM_ID           = "BODY_PULSE_RR_AVG_BPM";           //$NON-NLS-1$
    public static final TableColumnFactory BODY_PULSE_RR_INDEX;
-   public static final String             BODY_PULSE_RR_INDEX_ID                             = "BODY_PULSE_RR_INDEX";                             //$NON-NLS-1$
+   public static final String             BODY_PULSE_RR_INDEX_ID             = "BODY_PULSE_RR_INDEX";             //$NON-NLS-1$
    public static final TableColumnFactory BODY_PULSE_RR_INTERVALS;
-   public static final String             BODY_PULSE_RR_INTERVALS_ID                         = "BODY_PULSE_RR_INTERVALS";                         //$NON-NLS-1$
+   public static final String             BODY_PULSE_RR_INTERVALS_ID         = "BODY_PULSE_RR_INTERVALS";         //$NON-NLS-1$
    public static final TableColumnFactory BODY_RESTPULSE;
-   public static final String             BODY_RESTPULSE_ID                                  = "BODY_RESTPULSE";                                  //$NON-NLS-1$
+   public static final String             BODY_RESTPULSE_ID                  = "BODY_RESTPULSE";                  //$NON-NLS-1$
    public static final TableColumnFactory BODY_WEIGHT;
-   public static final String             BODY_WEIGHT_ID                                     = "BODY_WEIGHT";                                     //$NON-NLS-1$
+   public static final String             BODY_WEIGHT_ID                     = "BODY_WEIGHT";                     //$NON-NLS-1$
 
    public static final TableColumnFactory DATA_DP_TOLERANCE;
-   public static final String             DATA_DP_TOLERANCE_ID                               = "DATA_DP_TOLERANCE";                               //$NON-NLS-1$
+   public static final String             DATA_DP_TOLERANCE_ID               = "DATA_DP_TOLERANCE";               //$NON-NLS-1$
    public static final TableColumnFactory DATA_FIRST_COLUMN;
-   public static final String             DATA_FIRST_COLUMN_ID                               = "DATA_FIRST_COLUMN";                               //$NON-NLS-1$
+   public static final String             DATA_FIRST_COLUMN_ID               = "DATA_FIRST_COLUMN";               //$NON-NLS-1$
    public static final TableColumnFactory DATA_IMPORT_FILE_NAME;
-   public static final String             DATA_IMPORT_FILE_NAME_ID                           = "DATA_IMPORT_FILE_NAME";                           //$NON-NLS-1$
+   public static final String             DATA_IMPORT_FILE_NAME_ID           = "DATA_IMPORT_FILE_NAME";           //$NON-NLS-1$
    public static final TableColumnFactory DATA_IMPORT_FILE_PATH;
-   public static final String             DATA_IMPORT_FILE_PATH_ID                           = "DATA_IMPORT_FILE_PATH";                           //$NON-NLS-1$
+   public static final String             DATA_IMPORT_FILE_PATH_ID           = "DATA_IMPORT_FILE_PATH";           //$NON-NLS-1$
    public static final TableColumnFactory DATA_NUM_TIME_SLICES;
-   public static final String             DATA_NUM_TIME_SLICES_ID                            = "DATA_NUM_TIME_SLICES";                            //$NON-NLS-1$
+   public static final String             DATA_NUM_TIME_SLICES_ID            = "DATA_NUM_TIME_SLICES";            //$NON-NLS-1$
    public static final TableColumnFactory DATA_SERIE_START_END_INDEX;
-   public static final String             DATA_SERIE_START_END_INDEX_ID                      = "DATA_SERIE_START_END_INDEX";                      //$NON-NLS-1$
+   public static final String             DATA_SERIE_START_END_INDEX_ID      = "DATA_SERIE_START_END_INDEX";      //$NON-NLS-1$
    public static final TableColumnFactory DATA_SEQUENCE;
-   public static final String             DATA_SEQUENCE_ID                                   = "DATA_SEQUENCE";                                   //$NON-NLS-1$
+   public static final String             DATA_SEQUENCE_ID                   = "DATA_SEQUENCE";                   //$NON-NLS-1$
    public static final TableColumnFactory DATA_TIME_INTERVAL;
-   public static final String             DATA_TIME_INTERVAL_ID                              = "DATA_TIME_INTERVAL";                              //$NON-NLS-1$
+   public static final String             DATA_TIME_INTERVAL_ID              = "DATA_TIME_INTERVAL";              //$NON-NLS-1$
    public static final TableColumnFactory DATA_TOUR_ID;
-   public static final String             DATA_TOUR_ID_ID                                    = "DATA_TOUR_ID";                                    //$NON-NLS-1$
+   public static final String             DATA_TOUR_ID_ID                    = "DATA_TOUR_ID";                    //$NON-NLS-1$
 
    public static final TableColumnFactory DEVICE_BATTERY_SOC_END;
-   public static final String             DEVICE_BATTERY_SOC_END_ID                          = "DEVICE_BATTERY_SOC_END_ID";                       //$NON-NLS-1$
+   public static final String             DEVICE_BATTERY_SOC_END_ID          = "DEVICE_BATTERY_SOC_END_ID";       //$NON-NLS-1$
    public static final TableColumnFactory DEVICE_BATTERY_SOC_START;
-   public static final String             DEVICE_BATTERY_SOC_START_ID                        = "DEVICE_BATTERY_SOC_START_ID";                     //$NON-NLS-1$
+   public static final String             DEVICE_BATTERY_SOC_START_ID        = "DEVICE_BATTERY_SOC_START_ID";     //$NON-NLS-1$
    public static final TableColumnFactory DEVICE_DISTANCE;
-   public static final String             DEVICE_DISTANCE_ID                                 = "DEVICE_DISTANCE";                                 //$NON-NLS-1$
+   public static final String             DEVICE_DISTANCE_ID                 = "DEVICE_DISTANCE";                 //$NON-NLS-1$
    public static final TableColumnFactory DEVICE_NAME;
-   public static final String             DEVICE_NAME_ID                                     = "DEVICE_NAME";                                     //$NON-NLS-1$
+   public static final String             DEVICE_NAME_ID                     = "DEVICE_NAME";                     //$NON-NLS-1$
    public static final TableColumnFactory DEVICE_PROFILE;
+
+   public static final TableColumnFactory LOCATION_DisplayName;
+   public static final String             LOCATION_DisplayName_ID            = "LOCATION_DisplayName_ID";         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_Name;
+   public static final String             LOCATION_Name_ID                   = "LOCATION_Name";                   //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_Continent;
+   public static final String             LOCATION_Continent_ID              = "LOCATION_Continent_ID";           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_Country;
+   public static final String             LOCATION_Country_ID                = "LOCATION_Country_ID";             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_CountryCode;
+   public static final String             LOCATION_CountryCode_ID            = "LOCATION_CountryCode_ID";         //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_Region;
+   public static final String             LOCATION_Region_ID                 = "LOCATION_Region_ID";              //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_State;
+   public static final String             LOCATION_State_ID                  = "LOCATION_State_ID";               //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_StateDistrict;
+   public static final String             LOCATION_StateDistrict_ID          = "LOCATION_StateDistrict_ID";       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_County;
+   public static final String             LOCATION_County_ID                 = "LOCATION_County_ID";              //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_Municipality;
+   public static final String             LOCATION_Municipality_ID           = "LOCATION_Municipality_ID";        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_City;
+   public static final String             LOCATION_City_ID                   = "LOCATION_City_ID";                //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_Town;
+   public static final String             LOCATION_Town_ID                   = "LOCATION_Town_ID";                //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_Village;
+   public static final String             LOCATION_Village_ID                = "LOCATION_Village_ID";             //$NON-NLS-1$
+
+//   public static final TableColumnFactory LOCATION_CityDistrict;
+//   public static final String             LOCATION_CityDistrict_ID                           = "LOCATION_CityDistrict_ID";                        //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_District;
+//   public static final String             LOCATION_District_ID                               = "LOCATION_District_ID";                            //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Borough;
+//   public static final String             LOCATION_Borough_ID                                = "LOCATION_Borough_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Suburb;
+//   public static final String             LOCATION_Suburb_ID                                 = "LOCATION_Suburb_ID";                              //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Subdivision;
+//   public static final String             LOCATION_Subdivision_ID                            = "LOCATION_Subdivision_ID";                         //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_Hamlet;
+//   public static final String             LOCATION_Hamlet_ID                                 = "LOCATION_Hamlet_ID";                              //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Croft;
+//   public static final String             LOCATION_Croft_ID                                  = "LOCATION_Croft_ID";                               //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_IsolatedDwelling;
+//   public static final String             LOCATION_IsolatedDwelling_ID                       = "LOCATION_IsolatedDwelling_ID";                    //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_Neighbourhood;
+//   public static final String             LOCATION_Neighbourhood_ID                          = "LOCATION_Neighbourhood_ID";                       //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Allotments;
+//   public static final String             LOCATION_Allotments_ID                             = "LOCATION_Allotments_ID";                          //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Quarter;
+//   public static final String             LOCATION_Quarter_ID                                = "LOCATION_Quarter_ID";                             //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_CityBlock;
+//   public static final String             LOCATION_CityBlock_ID                              = "LOCATION_CityBlock_ID";                           //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Residential;
+//   public static final String             LOCATION_Residential_ID                            = "LOCATION_Residential_ID";                         //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Farm;
+//   public static final String             LOCATION_Farm_ID                                   = "LOCATION_Farm_ID";                                //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Farmyard;
+//   public static final String             LOCATION_Farmyard_ID                               = "LOCATION_Farmyard_ID";                            //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Industrial;
+//   public static final String             LOCATION_Industrial_ID                             = "LOCATION_Industrial_ID";                          //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Commercial;
+//   public static final String             LOCATION_Commercial_ID                             = "LOCATION_Commercial_ID";                          //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Retail;
+//   public static final String             LOCATION_Retail_ID                                 = "LOCATION_Retail_ID";                              //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_Road;
+//   public static final String             LOCATION_Road_ID                                   = "LOCATION_Road_ID";                                //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_HouseName;
+//   public static final String             LOCATION_HouseName_ID                              = "LOCATION_HouseName_ID";                           //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_HouseNumber;
+//   public static final String             LOCATION_HouseNumber_ID                            = "LOCATION_HouseNumber_ID";                         //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_Aerialway;
+//   public static final String             LOCATION_Aerialway_ID                              = "LOCATION_Aerialway_ID";                           //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Aeroway;
+//   public static final String             LOCATION_Aeroway_ID                                = "LOCATION_Aeroway_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Amenity;
+//   public static final String             LOCATION_Amenity_ID                                = "LOCATION_Amenity_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Boundary;
+//   public static final String             LOCATION_Boundary_ID                               = "LOCATION_Boundary_ID";                            //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Bridge;
+//   public static final String             LOCATION_Bridge_ID                                 = "LOCATION_Bridge_ID";                              //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Club;
+//   public static final String             LOCATION_Club_ID                                   = "LOCATION_Club_ID";                                //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Craft;
+//   public static final String             LOCATION_Craft_ID                                  = "LOCATION_Craft_ID";                               //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Emergency;
+//   public static final String             LOCATION_Emergency_ID                              = "LOCATION_Emergency_ID";                           //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Historic;
+//   public static final String             LOCATION_Historic_ID                               = "LOCATION_Historic_ID";                            //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Landuse;
+//   public static final String             LOCATION_Landuse_ID                                = "LOCATION_Landuse_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Leisure;
+//   public static final String             LOCATION_Leisure_ID                                = "LOCATION_Leisure_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_ManMade;
+//   public static final String             LOCATION_ManMade_ID                                = "LOCATION_ManMade_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Military;
+//   public static final String             LOCATION_Military_ID                               = "LOCATION_Military_ID";                            //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_MountainPass;
+//   public static final String             LOCATION_MountainPass_ID                           = "LOCATION_MountainPass_ID";                        //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Natural;
+//   public static final String             LOCATION_Natural_ID                                = "LOCATION_Natural_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Office;
+//   public static final String             LOCATION_Office_ID                                 = "LOCATION_Office_ID";                              //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Place;
+//   public static final String             LOCATION_Place_ID                                  = "LOCATION_Place_ID";                               //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Railway;
+//   public static final String             LOCATION_Railway_ID                                = "LOCATION_Railway_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Shop;
+//   public static final String             LOCATION_Shop_ID                                   = "LOCATION_Shop_ID";                                //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Tourism;
+//   public static final String             LOCATION_Tourism_ID                                = "LOCATION_Tourism_ID";                             //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Tunnel;
+//   public static final String             LOCATION_Tunnel_ID                                 = "LOCATION_Tunnel_ID";                              //$NON-NLS-1$
+//   public static final TableColumnFactory LOCATION_Waterway;
+//   public static final String             LOCATION_Waterway_ID                               = "LOCATION_Waterway_ID";                            //$NON-NLS-1$
+//
+//   public static final TableColumnFactory LOCATION_Postcode;
+//   public static final String             LOCATION_Postcode_ID                               = "LOCATION_Postcode_ID";                            //$NON-NLS-1$
 
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_GAIN_DELTA;
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_LOSS_DELTA;
@@ -340,9 +466,9 @@ public abstract class TableColumnFactory {
    public static final String             TRAINING_STRESS_SCORE_ID                           = "TRAINING_STRESS_SCORE";                           //$NON-NLS-1$
 
    public static final TableColumnFactory WAYPOINT_ALTITUDE;
-   public static final TableColumnFactory WAYPOINT_DATE;
    public static final TableColumnFactory WAYPOINT_CATEGORY;
    public static final TableColumnFactory WAYPOINT_COMMENT;
+   public static final TableColumnFactory WAYPOINT_DATE;
    public static final TableColumnFactory WAYPOINT_DESCRIPTION;
    public static final TableColumnFactory WAYPOINT_ID;
    public static final TableColumnFactory WAYPOINT_NAME;
@@ -352,11 +478,11 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory WEATHER_CLOUDS;
    public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";                                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG;
-   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG_ID";                      //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
    public static final String             WEATHER_TEMPERATURE_AVG_COMBINED_ID                = "WEATHER_TEMPERATURE_AVG_COMBINED_ID";             //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
    public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG_DEVICE";                  //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG_ID";                      //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN;
    public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN_ID";                      //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_COMBINED;
@@ -1397,6 +1523,81 @@ public abstract class TableColumnFactory {
             return colDef;
          }
       };
+
+
+      /*
+       * Location
+       */
+
+      LOCATION_DisplayName    = createColumn_Location(LOCATION_DisplayName_ID,   Messages.Location_Part_OsmDefaultName);
+      LOCATION_Name           = createColumn_Location(LOCATION_Name_ID,          Messages.Location_Part_OsmName);
+
+      LOCATION_Continent      = createColumn_Location(LOCATION_Continent_ID,     Messages.Location_Part_Continent);
+      LOCATION_Country        = createColumn_Location(LOCATION_Country_ID,       Messages.Location_Part_Country);
+      LOCATION_CountryCode    = createColumn_Location(LOCATION_CountryCode_ID,   Messages.Location_Part_CountryCode);
+
+      LOCATION_Region         = createColumn_Location(LOCATION_Region_ID,        Messages.Location_Part_Region);
+      LOCATION_State          = createColumn_Location(LOCATION_State_ID,         Messages.Location_Part_State);
+      LOCATION_StateDistrict  = createColumn_Location(LOCATION_StateDistrict_ID, Messages.Location_Part_StateDistrict);
+      LOCATION_County         = createColumn_Location(LOCATION_County_ID,        Messages.Location_Part_County);
+
+      LOCATION_Municipality   = createColumn_Location(LOCATION_Municipality_ID,  Messages.Location_Part_Municipality);
+      LOCATION_City           = createColumn_Location(LOCATION_City_ID,          Messages.Location_Part_City);
+      LOCATION_Town           = createColumn_Location(LOCATION_Town_ID,          Messages.Location_Part_Town);
+      LOCATION_Village        = createColumn_Location(LOCATION_Village_ID,       Messages.Location_Part_Village);
+
+//      LOCATION_CityDistrict;
+//      LOCATION_District;
+//      LOCATION_Borough;
+//      LOCATION_Suburb;
+//      LOCATION_Subdivision;
+//
+//      LOCATION_Hamlet;
+//      LOCATION_Croft;
+//      LOCATION_IsolatedDwelling;
+//
+//      LOCATION_Neighbourhood;
+//      LOCATION_Allotments;
+//      LOCATION_Quarter;
+//
+//      LOCATION_CityBlock;
+//      LOCATION_Residential;
+//      LOCATION_Farm;
+//      LOCATION_Farmyard;
+//      LOCATION_Industrial;
+//      LOCATION_Commercial;
+//      LOCATION_Retail;
+//
+//      LOCATION_Road;
+//
+//      LOCATION_HouseName;
+//      LOCATION_HouseNumber;
+//
+//      LOCATION_Aerialway;
+//      LOCATION_Aeroway;
+//      LOCATION_Amenity;
+//      LOCATION_Boundary;
+//      LOCATION_Bridge;
+//      LOCATION_Club;
+//      LOCATION_Craft;
+//      LOCATION_Emergency;
+//      LOCATION_Historic;
+//      LOCATION_Landuse;
+//      LOCATION_Leisure;
+//      LOCATION_ManMade;
+//      LOCATION_Military;
+//      LOCATION_MountainPass;
+//      LOCATION_Natural;
+//      LOCATION_Office;
+//      LOCATION_Place;
+//      LOCATION_Railway;
+//      LOCATION_Shop;
+//      LOCATION_Tourism;
+//      LOCATION_Tunnel;
+//      LOCATION_Waterway;
+//
+//      LOCATION_Postcode;
+
 
       /*
        * Marker
@@ -4575,55 +4776,55 @@ public abstract class TableColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_AVG = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_AVG = createColumn_Temperature(
             WEATHER_TEMPERATURE_AVG_ID,
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Label,
             Messages.ColumnFactory_Temperature_Avg_Tooltip);
 
-      WEATHER_TEMPERATURE_AVG_COMBINED = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_AVG_COMBINED = createColumn_Temperature(
             WEATHER_TEMPERATURE_AVG_COMBINED_ID,
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Combined_Label,
             Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
 
-      WEATHER_TEMPERATURE_AVG_DEVICE = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_AVG_DEVICE = createColumn_Temperature(
             WEATHER_TEMPERATURE_AVG_DEVICE_ID,
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Device_Label,
             Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MIN = createColumn_Temperature(
             WEATHER_TEMPERATURE_MIN_ID,
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Label,
             Messages.ColumnFactory_Temperature_Min_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN_COMBINED = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MIN_COMBINED = createColumn_Temperature(
             WEATHER_TEMPERATURE_MIN_COMBINED_ID,
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Combined_Label,
             Messages.ColumnFactory_Temperature_Min_Combined_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN_DEVICE = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MIN_DEVICE = createColumn_Temperature(
             WEATHER_TEMPERATURE_MIN_DEVICE_ID,
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Device_Label,
             Messages.ColumnFactory_Temperature_Min_Device_Tooltip);
 
-      WEATHER_TEMPERATURE_MAX = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MAX = createColumn_Temperature(
             WEATHER_TEMPERATURE_MAX_ID,
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Label,
             Messages.ColumnFactory_Temperature_Max_Tooltip);
 
-      WEATHER_TEMPERATURE_MAX_COMBINED = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MAX_COMBINED = createColumn_Temperature(
             WEATHER_TEMPERATURE_MAX_COMBINED_ID,
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Combined_Label,
             Messages.ColumnFactory_Temperature_Max_Combined_Tooltip);
 
-      WEATHER_TEMPERATURE_MAX_DEVICE = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MAX_DEVICE = createColumn_Temperature(
             WEATHER_TEMPERATURE_MAX_DEVICE_ID,
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Device_Label,
@@ -4694,12 +4895,36 @@ public abstract class TableColumnFactory {
       };
    }
 
-   private static TableColumnFactory createTableColumnFactory_Temperature(final String columnId,
-                                                                          final String symbol,
-                                                                          final String columnLabel,
-                                                                          final String columnHeaderToolTipText) {
+
+// SET_FORMATTING_ON
+
+   private static TableColumnFactory createColumn_Location(final String columnID,
+                                                           final String label) {
 
       return new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, columnID, SWT.LEAD);
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Location);
+            colDef.setColumnLabel(label);
+            colDef.setColumnHeaderText(label);
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+   }
+
+   private static TableColumnFactory createColumn_Temperature(final String columnId,
+                                                              final String symbol,
+                                                              final String columnLabel,
+                                                              final String columnHeaderToolTipText) {
+
+      return new TableColumnFactory() {
+
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
@@ -4708,12 +4933,12 @@ public abstract class TableColumnFactory {
 
             final String unitLabel = symbol + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              columnLabel);
-            colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  columnHeaderToolTipText);
-            colDef.setColumnUnit(               unitLabel);
+            colDef.setColumnLabel(columnLabel);
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnHeaderToolTipText(columnHeaderToolTipText);
+            colDef.setColumnUnit(unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
             colDef.setValueFormats(
@@ -4727,11 +4952,10 @@ public abstract class TableColumnFactory {
       };
    }
 
-// SET_FORMATTING_ON
-
    /**
     * @param columnManager
     * @param pixelConverter
+    *
     * @return Returns a {@link TableColumnDefinition}
     */
    public abstract TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter);

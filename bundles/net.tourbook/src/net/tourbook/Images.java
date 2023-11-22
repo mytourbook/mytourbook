@@ -361,6 +361,7 @@ public class Images {
    public static final String TourInfo                                   = "tour-info.png";                                       //$NON-NLS-1$
    public static final String TourInfo_Disabled                          = "tour-info-disabled.png";                              //$NON-NLS-1$
    public static final String TourInfo_Hovered                           = "tour-info-hovered.png";                               //$NON-NLS-1$
+   public static final String TourLocations                              = "tour-locations.png";                                  //$NON-NLS-1$
    public static final String TourLog                                    = "tour-log.png";                                        //$NON-NLS-1$
    public static final String TourLog_Layout_Color                       = "tour-log-layout-color.png";                           //$NON-NLS-1$
    public static final String TourLog_Layout_Simple                      = "tour-log-layout-simple.png";                          //$NON-NLS-1$

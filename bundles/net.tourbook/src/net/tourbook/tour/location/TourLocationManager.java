@@ -191,7 +191,7 @@ public class TourLocationManager {
          Map.entry(LocationPartID.subdivision,                       Messages.Location_Part_Subdivision),
 
          Map.entry(LocationPartID.hamlet,                            Messages.Location_Part_Hamlet),
-         Map.entry(LocationPartID.croft,                             Messages.Location_Part_Craft),
+         Map.entry(LocationPartID.croft,                             Messages.Location_Part_Croft),
          Map.entry(LocationPartID.isolated_dwelling,                 Messages.Location_Part_IsolatedDwelling),
 
          Map.entry(LocationPartID.neighbourhood,                     Messages.Location_Part_Neighbourhood),
@@ -436,6 +436,126 @@ public class TourLocationManager {
    }
 
    /**
+    * Create a {@link TourLocation}
+    *
+    * @param osmLocation
+    * @param latitude
+    * @param longitude
+    *
+    * @return
+    */
+   private static TourLocation createTourLocation(final OSMLocation osmLocation,
+                                                  final double latitude,
+                                                  final double longitude) {
+
+      if (osmLocation == null) {
+         return null;
+      }
+
+      final OSMAddress osmAddress = osmLocation.address;
+
+      final TourLocation tourLocation = new TourLocation(latitude, longitude);
+
+      // "boundingbox":
+      // [
+      //    "47.1159171",
+      //    "47.1163167",
+      //    "7.9895150",
+      //    "7.9897759"
+      // ]
+      final double[] boundingbox = osmLocation.boundingbox;
+      if (boundingbox != null && boundingbox.length > 3) {
+
+         final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
+
+         // convert possible negative values into positive values, it's easier to math it
+         tourLocation.latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
+         tourLocation.latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
+         tourLocation.longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
+         tourLocation.longitudeMaxE6_Normalized = boundingBoxE6[3] + 180_000_000;
+      }
+
+// SET_FORMATTING_OFF
+
+      tourLocation.name                      = validString(osmLocation.name);
+      tourLocation.display_name              = validString(osmLocation.display_name);
+
+
+      if (osmAddress != null) {
+
+         tourLocation.continent              = validString(osmAddress.continent);
+         tourLocation.country                = validString(osmAddress.country);
+         tourLocation.country_code           = validString(osmAddress.country_code);
+
+         tourLocation.region                 = validString(osmAddress.region);
+         tourLocation.state                  = validString(osmAddress.state);
+         tourLocation.state_district         = validString(osmAddress.state_district);
+         tourLocation.county                 = validString(osmAddress.county);
+
+         tourLocation.municipality           = validString(osmAddress.municipality);
+         tourLocation.city                   = validString(osmAddress.city);
+         tourLocation.town                   = validString(osmAddress.town);
+         tourLocation.village                = validString(osmAddress.village);
+
+         tourLocation.city_district          = validString(osmAddress.city_district);
+         tourLocation.district               = validString(osmAddress.district);
+         tourLocation.borough                = validString(osmAddress.borough);
+         tourLocation.suburb                 = validString(osmAddress.suburb);
+         tourLocation.subdivision            = validString(osmAddress.subdivision);
+
+         tourLocation.hamlet                 = validString(osmAddress.hamlet);
+         tourLocation.croft                  = validString(osmAddress.croft);
+         tourLocation.isolated_dwelling      = validString(osmAddress.isolated_dwelling);
+
+         tourLocation.neighbourhood          = validString(osmAddress.neighbourhood);
+         tourLocation.allotments             = validString(osmAddress.allotments);
+         tourLocation.quarter                = validString(osmAddress.quarter);
+
+         tourLocation.city_block             = validString(osmAddress.city_block);
+         tourLocation.residential            = validString(osmAddress.residential);
+         tourLocation.farm                   = validString(osmAddress.farm);
+         tourLocation.farmyard               = validString(osmAddress.farmyard);
+         tourLocation.industrial             = validString(osmAddress.industrial);
+         tourLocation.commercial             = validString(osmAddress.commercial);
+         tourLocation.retail                 = validString(osmAddress.retail);
+
+         tourLocation.road                   = validString(osmAddress.road);
+
+         tourLocation.house_number           = validString(osmAddress.house_number);
+         tourLocation.house_name             = validString(osmAddress.house_name);
+
+         tourLocation.aerialway              = validString(osmAddress.aerialway);
+         tourLocation.aeroway                = validString(osmAddress.aeroway);
+         tourLocation.amenity                = validString(osmAddress.amenity);
+         tourLocation.boundary               = validString(osmAddress.boundary);
+         tourLocation.bridge                 = validString(osmAddress.bridge);
+         tourLocation.club                   = validString(osmAddress.club);
+         tourLocation.craft                  = validString(osmAddress.craft);
+         tourLocation.emergency              = validString(osmAddress.emergency);
+         tourLocation.historic               = validString(osmAddress.historic);
+         tourLocation.landuse                = validString(osmAddress.landuse);
+         tourLocation.leisure                = validString(osmAddress.leisure);
+         tourLocation.man_made               = validString(osmAddress.man_made);
+         tourLocation.military               = validString(osmAddress.military);
+         tourLocation.mountain_pass          = validString(osmAddress.mountain_pass);
+         tourLocation.natural2               = validString(osmAddress.natural2);
+         tourLocation.office                 = validString(osmAddress.office);
+         tourLocation.place                  = validString(osmAddress.place);
+         tourLocation.railway                = validString(osmAddress.railway);
+         tourLocation.shop                   = validString(osmAddress.shop);
+         tourLocation.tourism                = validString(osmAddress.tourism);
+         tourLocation.tunnel                 = validString(osmAddress.tunnel);
+         tourLocation.waterway               = validString(osmAddress.waterway);
+
+         tourLocation.postcode               = validString(osmAddress.postcode);
+      }
+
+// SET_FORMATTING_ON
+
+      return tourLocation;
+   }
+
+   /**
     * Places are sorted by number of inhabitants, only some or nothing are available
     *
     * place = city,
@@ -622,7 +742,7 @@ public class TourLocationManager {
 
       final OSMLocation osmLocation = getName_20_DeserializeData(tourLocationData.downloadedData);
 
-      tourLocationData.tourLocation = getTourLocation(osmLocation, latitude, longitude);
+      tourLocationData.tourLocation = createTourLocation(osmLocation, latitude, longitude);
 
       if (_isLogging_AddressRetrieval && osmLocation != null) {
 
@@ -778,135 +898,6 @@ public class TourLocationManager {
       return _allLocationProfiles;
    }
 
-   /**
-    * Get or create a {@link TourLocation}
-    *
-    * @param osmLocation
-    * @param latitude
-    * @param longitude
-    *
-    * @return
-    */
-   private static TourLocation getTourLocation(final OSMLocation osmLocation,
-                                               final double latitude,
-                                               final double longitude) {
-
-      if (osmLocation == null) {
-         return null;
-      }
-
-      final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude);
-
-      if (dbTourLocation != null) {
-         return dbTourLocation;
-      }
-
-      /*
-       * Create a new tour location
-       */
-      final OSMAddress osmAddress = osmLocation.address;
-
-      final TourLocation tourLocation = new TourLocation(latitude, longitude);
-
-      // "boundingbox":
-      // [
-      //    "47.1159171",
-      //    "47.1163167",
-      //    "7.9895150",
-      //    "7.9897759"
-      // ]
-      final double[] boundingbox = osmLocation.boundingbox;
-      if (boundingbox != null && boundingbox.length > 3) {
-
-         final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
-
-         // convert possible negative values into positive values, it's easier to math it
-         tourLocation.latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
-         tourLocation.latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
-         tourLocation.longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
-         tourLocation.longitudeMaxE6_Normalized = boundingBoxE6[3] + 180_000_000;
-      }
-
-// SET_FORMATTING_OFF
-
-      tourLocation.name                      = validString(osmLocation.name);
-      tourLocation.display_name              = validString(osmLocation.display_name);
-
-
-      if (osmAddress != null) {
-
-         tourLocation.continent              = validString(osmAddress.continent);
-         tourLocation.country                = validString(osmAddress.country);
-         tourLocation.country_code           = validString(osmAddress.country_code);
-
-         tourLocation.region                 = validString(osmAddress.region);
-         tourLocation.state                  = validString(osmAddress.state);
-         tourLocation.state_district         = validString(osmAddress.state_district);
-         tourLocation.county                 = validString(osmAddress.county);
-
-         tourLocation.municipality           = validString(osmAddress.municipality);
-         tourLocation.city                   = validString(osmAddress.city);
-         tourLocation.town                   = validString(osmAddress.town);
-         tourLocation.village                = validString(osmAddress.village);
-
-         tourLocation.city_district          = validString(osmAddress.city_district);
-         tourLocation.district               = validString(osmAddress.district);
-         tourLocation.borough                = validString(osmAddress.borough);
-         tourLocation.suburb                 = validString(osmAddress.suburb);
-         tourLocation.subdivision            = validString(osmAddress.subdivision);
-
-         tourLocation.hamlet                 = validString(osmAddress.hamlet);
-         tourLocation.croft                  = validString(osmAddress.croft);
-         tourLocation.isolated_dwelling      = validString(osmAddress.isolated_dwelling);
-
-         tourLocation.neighbourhood          = validString(osmAddress.neighbourhood);
-         tourLocation.allotments             = validString(osmAddress.allotments);
-         tourLocation.quarter                = validString(osmAddress.quarter);
-
-         tourLocation.city_block             = validString(osmAddress.city_block);
-         tourLocation.residential            = validString(osmAddress.residential);
-         tourLocation.farm                   = validString(osmAddress.farm);
-         tourLocation.farmyard               = validString(osmAddress.farmyard);
-         tourLocation.industrial             = validString(osmAddress.industrial);
-         tourLocation.commercial             = validString(osmAddress.commercial);
-         tourLocation.retail                 = validString(osmAddress.retail);
-
-         tourLocation.road                   = validString(osmAddress.road);
-
-         tourLocation.house_number           = validString(osmAddress.house_number);
-         tourLocation.house_name             = validString(osmAddress.house_name);
-
-         tourLocation.aerialway              = validString(osmAddress.aerialway);
-         tourLocation.aeroway                = validString(osmAddress.aeroway);
-         tourLocation.amenity                = validString(osmAddress.amenity);
-         tourLocation.boundary               = validString(osmAddress.boundary);
-         tourLocation.bridge                 = validString(osmAddress.bridge);
-         tourLocation.club                   = validString(osmAddress.club);
-         tourLocation.craft                  = validString(osmAddress.craft);
-         tourLocation.emergency              = validString(osmAddress.emergency);
-         tourLocation.historic               = validString(osmAddress.historic);
-         tourLocation.landuse                = validString(osmAddress.landuse);
-         tourLocation.leisure                = validString(osmAddress.leisure);
-         tourLocation.man_made               = validString(osmAddress.man_made);
-         tourLocation.military               = validString(osmAddress.military);
-         tourLocation.mountain_pass          = validString(osmAddress.mountain_pass);
-         tourLocation.natural2               = validString(osmAddress.natural2);
-         tourLocation.office                 = validString(osmAddress.office);
-         tourLocation.place                  = validString(osmAddress.place);
-         tourLocation.railway                = validString(osmAddress.railway);
-         tourLocation.shop                   = validString(osmAddress.shop);
-         tourLocation.tourism                = validString(osmAddress.tourism);
-         tourLocation.tunnel                 = validString(osmAddress.tunnel);
-         tourLocation.waterway               = validString(osmAddress.waterway);
-
-         tourLocation.postcode               = validString(osmAddress.postcode);
-      }
-
-// SET_FORMATTING_ON
-
-      return tourLocation;
-   }
-
    private static File getXmlFile() {
 
       final File layerFile = _stateLocation.append(TOUR_LOCATION_FILE_NAME).toFile();
@@ -960,7 +951,7 @@ public class TourLocationManager {
                final int numRequests = numTours * 2;
                int numWorked = 0;
 
-               monitor.beginTask("Retrieving %d tour locations".formatted(numRequests), numTours);
+               monitor.beginTask("Retrieving %d tour locations".formatted(numRequests), numRequests);
 
                for (final TourData tourData : requestedTours) {
 
@@ -975,9 +966,10 @@ public class TourLocationManager {
 
                      // needed data are not available
 
-                     ++numWorked;
-                     ++numWorked;
+                     numWorked++;
+                     numWorked++;
 
+                     monitor.worked(2);
                      monitor.subTask(SUB_TASK_MESSAGE_SKIPPED.formatted(numWorked, numRequests));
 
                      continue;
@@ -1010,8 +1002,8 @@ public class TourLocationManager {
                      }
                   }
 
-                  monitor.worked(++numWorked);
-                  monitor.subTask(SUB_TASK_MESSAGE.formatted(numWorked, numRequests, waitingTime));
+                  monitor.worked(1);
+                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
 
                   /*
                    * End location
@@ -1038,8 +1030,8 @@ public class TourLocationManager {
                      }
                   }
 
-                  monitor.worked(++numWorked);
-                  monitor.subTask(SUB_TASK_MESSAGE.formatted(numWorked, numRequests, waitingTime));
+                  monitor.worked(1);
+                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
 
                   if (isModified) {
 

@@ -106,28 +106,42 @@ public class TourLocation implements Serializable {
     */
 
    /**
-    * Contains a normalized latitude value
+    * Contains the normalized latitude value of the requested location
+    * <p>
+    * <code>normalized = latitude + 90</code>
+    */
+   public int latitudeE6_Normalized;
+
+   /**
+    * Contains the normalized longitude value of the requested location
+    * <p>
+    * normalized = longitude + 180
+    */
+   public int longitudeE6_Normalized;
+
+   /**
+    * Contains the normalized latitude min value
     * <p>
     * <code>normalized = latitude + 90</code>
     */
    public int latitudeMinE6_Normalized;
 
    /**
-    * Contains a normalized latitude value
+    * Contains the normalized latitude max value
     * <p>
     * normalized = latitude + 90
     */
    public int latitudeMaxE6_Normalized;
 
    /**
-    * Contains a normalized longitude value
+    * Contains the normalized longitude min value
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMinE6_Normalized;
 
    /**
-    * Contains a normalized longitude value
+    * Contains the normalized longitude max value
     * <p>
     * normalized = longitude + 180
     */
@@ -192,6 +206,7 @@ public class TourLocation implements Serializable {
    public String man_made;
    public String military;
    public String mountain_pass;
+
    /**
     * "natural" seems to be a SQL name :-?
     * <p>
@@ -208,15 +223,9 @@ public class TourLocation implements Serializable {
    public String waterway;
    public String postcode;
 
-   /**
-    * This value is needed only for new instances to can lookup for existing instances
-    */
    @Transient
    private int   latitudeE6;
 
-   /**
-    * This value is needed only for new instances to can lookup for existing instances
-    */
    @Transient
    private int   longitudeE6;
 
@@ -227,8 +236,11 @@ public class TourLocation implements Serializable {
 
    public TourLocation(final double latitude, final double longitude) {
 
-      this.latitudeE6 = Util.convertDouble_ToE6(latitude);
-      this.longitudeE6 = Util.convertDouble_ToE6(longitude);
+      latitudeE6 = Util.convertDouble_ToE6(latitude);
+      longitudeE6 = Util.convertDouble_ToE6(longitude);
+
+      latitudeE6_Normalized = latitudeE6 + 90_000_000;
+      longitudeE6_Normalized = longitudeE6 + 180_000_000;
    }
 
    @Override
@@ -294,7 +306,7 @@ public class TourLocation implements Serializable {
 
             + log(" name                = ", name) //                      //$NON-NLS-1$
             + log(" display_name        = ", display_name) //              //$NON-NLS-1$
-                                                                           
+
             + log(" continent           = ", continent) //                 //$NON-NLS-1$
             + log(" country             = ", country) //                   //$NON-NLS-1$
             + log(" country_code        = ", country_code) //              //$NON-NLS-1$

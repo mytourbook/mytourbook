@@ -858,71 +858,6 @@ public class TourDatabase {
    }
 
    /**
-    * @param requestedTourLocation
-    *           {@link TourLocation} which needs to be checked
-    *
-    * @return Returns <code>null</code> when the provided {@link TourLocation} is OK -> needs no
-    *         action
-    */
-   private static TourLocation checkUnsavedTransientInstances_TourLocation_OneLocation(final TourLocation requestedTourLocation) {
-
-      if (requestedTourLocation == null) {
-
-         // a tour location is not set -> nothing to do
-
-         return null;
-      }
-
-      if (requestedTourLocation.getLocationId() != ENTITY_IS_NOT_SAVED) {
-
-         // tour location is saved
-
-         return null;
-      }
-
-      TourLocation appliedLocation = null;
-
-      synchronized (TRANSIENT_LOCK) {
-
-         // location is not yet saved
-         // 1. location can still be new
-         // 2. location is already created but not updated in the not yet saved tour
-
-         final TourLocation loadedTourLocation = getTourLocation(
-               requestedTourLocation.getLatitudeE6(),
-               requestedTourLocation.getLongitudeE6());
-
-         if (loadedTourLocation != null) {
-
-            // use found tour location
-
-            appliedLocation = loadedTourLocation;
-
-         } else {
-
-            // create new tour location
-
-            final TourLocation savedLocation = saveEntity(
-
-                  requestedTourLocation,
-                  ENTITY_IS_NOT_SAVED,
-                  TourLocation.class);
-
-            if (savedLocation != null) {
-
-               appliedLocation = savedLocation;
-
-               // force reload of cached tour locations
-//               clearTourTypes();
-//               TourManager.getInstance().clearTourDataCache();
-            }
-         }
-      }
-
-      return appliedLocation;
-   }
-
-   /**
     * Removes all sensors which are loaded from the database so the next time they will be
     * reloaded.
     */
@@ -3519,7 +3454,7 @@ public class TourDatabase {
    private static void saveTransientInstances_TourLocation(final TourData tourData) {
 
       final TourLocation tourLocationStart = tourData.getTourLocationStart();
-      final TourLocation checkedLocationStart = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationStart);
+      final TourLocation checkedLocationStart = saveTransientInstances_TourLocation_OneLocation(tourLocationStart);
       if (checkedLocationStart != null) {
 
          // replace tour location in the tour
@@ -3527,12 +3462,77 @@ public class TourDatabase {
       }
 
       final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-      final TourLocation checkedLocationEnd = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationEnd);
+      final TourLocation checkedLocationEnd = saveTransientInstances_TourLocation_OneLocation(tourLocationEnd);
       if (checkedLocationEnd != null) {
 
          // replace tour location in the tour
          tourData.setTourLocationEnd(checkedLocationEnd);
       }
+   }
+
+   /**
+    * @param requestedTourLocation
+    *           {@link TourLocation} which needs to be checked
+    *
+    * @return Returns <code>null</code> when the provided {@link TourLocation} is OK -> needs no
+    *         action
+    */
+   private static TourLocation saveTransientInstances_TourLocation_OneLocation(final TourLocation requestedTourLocation) {
+
+      if (requestedTourLocation == null) {
+
+         // a tour location is not set -> nothing to do
+
+         return null;
+      }
+
+      if (requestedTourLocation.getLocationId() != ENTITY_IS_NOT_SAVED) {
+
+         // tour location is saved
+
+         return null;
+      }
+
+      TourLocation appliedLocation = null;
+
+      synchronized (TRANSIENT_LOCK) {
+
+         // location is not yet saved
+         // 1. location can still be new
+         // 2. location is already created but not updated in the not yet saved tour
+
+         final TourLocation loadedTourLocation = getTourLocation(
+               requestedTourLocation.getLatitudeE6(),
+               requestedTourLocation.getLongitudeE6());
+
+         if (loadedTourLocation != null) {
+
+            // use found tour location
+
+            appliedLocation = loadedTourLocation;
+
+         } else {
+
+            // create new tour location
+
+            final TourLocation savedLocation = saveEntity(
+
+                  requestedTourLocation,
+                  ENTITY_IS_NOT_SAVED,
+                  TourLocation.class);
+
+            if (savedLocation != null) {
+
+               appliedLocation = savedLocation;
+
+               // force reload of cached tour locations
+//               clearTourTypes();
+//               TourManager.getInstance().clearTourDataCache();
+            }
+         }
+      }
+
+      return appliedLocation;
    }
 
    /**
@@ -4582,6 +4582,9 @@ public class TourDatabase {
 
             + "   name                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   display_name               VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   latitudeE6_Normalized      INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   longitudeE6_Normalized     INTEGER,                                        " + NL //$NON-NLS-1$
 
             + "   latitudeMinE6_Normalized   INTEGER,                                        " + NL //$NON-NLS-1$
             + "   latitudeMaxE6_Normalized   INTEGER,                                        " + NL //$NON-NLS-1$

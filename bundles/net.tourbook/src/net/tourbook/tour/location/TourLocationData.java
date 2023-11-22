@@ -56,6 +56,8 @@ public class TourLocationData {
             + " downloadTime   = " + downloadTime + NL //         //$NON-NLS-1$
             + " waitingTime    = " + waitingTime + NL //          //$NON-NLS-1$
 
+            + " tourLocation   = " + NL + tourLocation + NL //    //$NON-NLS-1$
+
       ;
    }
 }
