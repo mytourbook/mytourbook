@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -29,22 +28,19 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 
 import pl.coderion.model.Nutriments;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
-public class TourFuelProduct implements Serializable {
-
-   private static final long          serialVersionUID = 1L;
+public class TourFuelProduct {
 
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static final AtomicInteger _createCounter   = new AtomicInteger();
+   private static final AtomicInteger _createCounter = new AtomicInteger();
 
    /**
     * Unique id for manually created markers because the {@link #productCode} is 0 when the marker
@@ -52,20 +48,19 @@ public class TourFuelProduct implements Serializable {
     * not persisted
     */
    @Transient
-   private long                       _createId        = 0;
+   private long                       _createId      = 0;
    /**
     * Unique id for the {@link TourFuelProduct} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @JsonProperty
-   private long                       productCode      = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       productCode    = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
    private String                     name;
-
 
    private int                        calories;
 //
@@ -150,29 +145,6 @@ public class TourFuelProduct implements Serializable {
       return tourData;
    }
 
-   /**
-    * !!!!!!!!!!!!!!!!!<br>
-    * serieIndex is not used for equals or hashcode because this is modified when markers are
-    * deleted<br>
-    * !!!!!!!!!!!!!!!!!<br>
-    *
-    * @see java.lang.Object#hashCode()
-    */
-   @Override
-   public int hashCode() {
-
-      final int prime = 31;
-      int result = 1;
-
-      if (productCode == TourDatabase.ENTITY_IS_NOT_SAVED) {
-         result = prime * result + (int) (productCode ^ (productCode >>> 32));
-      } else {
-         result = prime * result + (int) (productCode ^ (productCode >>> 32));
-      }
-
-      return result;
-   }
-
    public void setupDeepClone(final TourData tourDataFromClone) {
 
       _createId = _createCounter.incrementAndGet();
@@ -182,14 +154,4 @@ public class TourFuelProduct implements Serializable {
       tourData = tourDataFromClone;
    }
 
-   /**
-    * This method is called in the "Tour Data" view !!!
-    */
-   @Override
-   public String toString() {
-
-      return UI.EMPTY_STRING
-
-      ; //
-   }
 }

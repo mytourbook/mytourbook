@@ -311,6 +311,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    }
 
    private void createColumns(final Table productsTable) {
+
       // Column: Quantity
       final TableColumn columnQuantity = new TableColumn(productsTable, SWT.LEFT);
       columnQuantity.setText("Quantity"); //$NON-NLS-1$
