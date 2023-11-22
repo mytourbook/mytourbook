@@ -77,8 +77,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    //todo fb
    // enable the "add" button only if an element is selected in the table
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$
+   private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$
    private static final String           STATE_SEARCHED_QUERIES = "searched.queries";                                                            //$NON-NLS-1$
 
    private TableViewer                   _productsViewer;
@@ -98,7 +98,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private Combo                         _cboSearchQuery;
    private ComboViewer                   _queryViewer;
-   final NutritionQuery                  _nutritionQuery = new NutritionQuery();
+   private final NutritionQuery          _nutritionQuery = new NutritionQuery();
 
    private PostSelectionProvider         _postSelectionProvider;
 
@@ -107,7 +107,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private IPropertyChangeListener       _prefChangeListener;
 
-   public class SearchContentProvider implements IStructuredContentProvider {
+   private class SearchContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {
@@ -125,7 +125,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
    }
 
-   class ViewContentProvider implements IStructuredContentProvider {
+   private class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {
@@ -147,7 +147,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
    }
 
-   class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+   private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
       @Override
       public Image getColumnImage(final Object obj, final int index) {
