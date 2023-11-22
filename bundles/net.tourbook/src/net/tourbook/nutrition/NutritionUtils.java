@@ -34,28 +34,21 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
-import pl.coderion.model.ProductResponse;
-import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
-
 public class NutritionUtils {
 
    private static final String OPENFOODFACTS_SEARCH_URL =
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms="; //$NON-NLS-1$
 
-   private static HttpClient _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
    public static String getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
 
-    final int toto= tourFuelProducts.stream().mapToInt(i -> i.getCalories()).sum();
+      final int toto = tourFuelProducts.stream().mapToInt(i -> i.getCalories()).sum();
 
-    return String.valueOf(toto);
+      return String.valueOf(toto);
    }
 
-   public static List<Product> searchProduct(final String productName)
-   {
-      final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
-      final ProductResponse productResponse = wrapper.fetchProductByCode("737628064502");
-      final var toto = productResponse.getProduct().getNutriments();
+   public static List<Product> searchProduct(final String productName) {
 
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -67,15 +60,14 @@ public class NutritionUtils {
 
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
 
-            //weather
             final ObjectMapper mapper = new ObjectMapper();
-            final String weatherResults = mapper.readValue(response.body(), JsonNode.class)
+            final String productsResults = mapper.readValue(response.body(), JsonNode.class)
                   .get("products") //$NON-NLS-1$
                   .toString();
 
-            final var serializedWeatherData = mapper.readValue(weatherResults,
+            final var serializedProductsResults = mapper.readValue(productsResults,
                   new TypeReference<List<Product>>() {});
-            return serializedWeatherData;
+            return serializedProductsResults;
 
             //      final String titi = response.body();
 

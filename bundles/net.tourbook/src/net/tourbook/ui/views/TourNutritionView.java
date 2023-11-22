@@ -160,10 +160,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          switch (index) {
          case 0:
             return String.valueOf(tourFuelProduct.getServingsConsumed());
+
          case 1:
             return tourFuelProduct.getName();
+
          case 2:
             return String.valueOf(tourFuelProduct.getCalories());
+
          case 3:
             //    return String.valueOf(tourFuelProduct.getCarbohydrates());
          case 4:
@@ -379,6 +382,15 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
+      createColumns(productsTable);
+
+      _productsViewer = new TableViewer(productsTable);
+
+      _productsViewer.setContentProvider(new ViewContentProvider());
+      _productsViewer.setLabelProvider(new ViewLabelProvider());
+   }
+
+   private void createColumns(final Table productsTable) {
       // Column: Quantity
       final TableColumn columnQuantity = new TableColumn(productsTable, SWT.LEFT);
       columnQuantity.setText("Quantity"); //$NON-NLS-1$
@@ -403,11 +415,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
       columnSodium.setText("Sodium"); //$NON-NLS-1$
       columnSodium.setWidth(75);
-
-      _productsViewer = new TableViewer(productsTable);
-
-      _productsViewer.setContentProvider(new ViewContentProvider());
-      _productsViewer.setLabelProvider(new ViewLabelProvider());
    }
 
    private void createUI_Section_10_Summary(final Composite parent) {
