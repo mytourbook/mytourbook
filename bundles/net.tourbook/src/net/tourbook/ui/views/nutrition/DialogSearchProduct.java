@@ -22,6 +22,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -78,6 +79,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$
+   private static final String           STATE_SEARCHED_QUERIES = "searched.queries";                                                            //$NON-NLS-1$
+
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
 
@@ -284,6 +287,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider("ID");
 
+      // set download as default button
+      dlgContainer.getShell().setDefaultButton(_btnSearch);
+
+      restoreState();
+
       return dlgContainer;
    }
 
@@ -445,7 +453,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       if (_searchHistory.contains(searchText) == false) {
 
          // update model
-         // _searchHistory.add(searchText);
+         _searchHistory.add(searchText);
 
          // update viewer
          _queryViewer.add(searchText);
@@ -497,9 +505,18 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void restoreState() {
 
+      // restore old used queries
+      final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_QUERIES);
+      if (stateSearchedQueries != null) {
+         Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
+      }
+
+      // update content in the comboviewer
+      _queryViewer.setInput(new Object());
    }
 
    private void saveState() {
+      _state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
 
    }
 
