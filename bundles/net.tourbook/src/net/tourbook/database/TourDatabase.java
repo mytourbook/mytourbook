@@ -4303,7 +4303,8 @@ public class TourDatabase {
 
             // Version 52 - begin
 
-            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + ")        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   calories                BIGINT                       " + NL //$NON-NLS-1$
 
             // Version 52 - end
 

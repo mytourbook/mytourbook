@@ -18,14 +18,15 @@ package net.tourbook.nutrition.openfoodfacts;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.eclipse.jface.viewers.ISelection;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Product {
+public record Product(@JsonProperty("product_name") String productName,
+                      String code) implements ISelection {
 
-   @JsonProperty("product_name")
-   private String productName;
-
-   public String getProductName() {
-
-      return productName;
+   @Override
+   public boolean isEmpty() {
+      // TODO Auto-generated method stub
+      return false;
    }
 }

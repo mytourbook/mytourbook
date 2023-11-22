@@ -30,7 +30,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.NutritionQuery;
-import net.tourbook.nutrition.Product;
+import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -65,6 +65,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+
+import pl.coderion.model.ProductResponse;
+import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
@@ -146,40 +149,19 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       @Override
       public String getColumnText(final Object obj, final int index) {
 
-         return obj.toString();
-//         final PointOfInterest poi = (PointOfInterest) obj;
-//
-//         switch (index) {
-//         case 0:
-//            return poi.getCategory();
-//         case 1:
-//
-//            final StringBuilder sb = new StringBuilder(poi.getName());
-//
-//            final List<? extends Waypoint> nearestPlaces = poi.getNearestPlaces();
-//            if (nearestPlaces != null && nearestPlaces.size() > 0) {
-//
-//               // create a string with all nearest waypoints
-//               boolean isFirstPoi = true;
-//               for (final Waypoint waypoint : nearestPlaces) {
-//
-//                  if (isFirstPoi) {
-//                     isFirstPoi = false;
-//                     sb.append("Messages.Poi_View_Label_NearestPlacesPart1");
-//                     sb.append("Messages.Poi_View_Label_Near");
-//                  } else {
-//                     sb.append("Messages.Poi_View_Label_NearestPlacesPart2");
-//                  }
-//
-//                  sb.append("Messages.Poi_View_Label_NearestPlacesPart3");
-//                  sb.append(waypoint.getName());
-//               }
-//               sb.append("Messages.Poi_View_Label_NearestPlacesPart4");
-//            }
-//            return sb.toString();
-//         default:
-//            return getText(obj);
-//         }
+         final Product product = (Product) obj;
+
+         switch (index) {
+         case 0:
+            return product.code();
+
+         case 1:
+
+            return product.productName();
+
+         default:
+            return getText(obj);
+         }
       }
 
       @Override
@@ -420,7 +402,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final ISelection selection = _productsViewer.getSelection();
       final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
       final Product selectedProduct = (Product) firstElement;
-      final TourFuelProduct tfp = new TourFuelProduct(_tourData, selectedProduct);
+
+
+      final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
+      final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
+
+      final TourFuelProduct tfp = new TourFuelProduct(_tourData, productResponse.getProduct());
       _tourData.addFuelProduct(tfp);
 
       TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData));
@@ -463,7 +450,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 
       @SuppressWarnings("unchecked")
-      final List<Product> searchResults = (List<Product>) propertyChangeEvent.getNewValue();
+      final List<net.tourbook.nutrition.openfoodfacts.Product> searchResults =
+            (List<net.tourbook.nutrition.openfoodfacts.Product>) propertyChangeEvent.getNewValue();
 
       if (searchResults != null) {
          _products = searchResults;

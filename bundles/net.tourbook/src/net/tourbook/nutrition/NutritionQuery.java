@@ -20,6 +20,8 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.nutrition.openfoodfacts.Product;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -79,13 +81,7 @@ public class NutritionQuery implements Runnable {
 
          _searchResult.clear();
 
-         final var toto = NutritionUtils.searchProduct(_query);
-
-         toto.stream().forEach(product -> {
-            final var titi = new Product();
-            titi.setName(product.getProductName());
-            _searchResult.add(titi);
-         });
+         _searchResult.addAll(NutritionUtils.searchProduct(_query));
 
       } catch (final Exception e) {
          _exception = e;
