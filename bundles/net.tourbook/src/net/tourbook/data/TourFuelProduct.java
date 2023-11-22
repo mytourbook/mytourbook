@@ -32,6 +32,8 @@ import javax.persistence.Transient;
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 
+import pl.coderion.model.Nutriments;
+
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
 public class TourFuelProduct implements Serializable {
@@ -67,14 +69,14 @@ public class TourFuelProduct implements Serializable {
 
    private int                        calories;
 //
-//   private double                     carbohydrates;
+   // private float                      carbohydrates;
 //
 //   private double                     sodium;
 //
 //   private double                     fluidVolume;
 //   private double                     containerName;
 //
-//   private double                     caffeine;
+   // private double caffeine;
 
    public TourFuelProduct() {}
 
@@ -82,7 +84,10 @@ public class TourFuelProduct implements Serializable {
 
       this.tourData = tourData;
       name = product.getProductName();
-      calories = product.getNutriments().getEnergyKcal();
+
+      final Nutriments nutriments = product.getNutriments();
+      calories = nutriments.getEnergyKcal();
+      // carbohydrates = nutriments.getCarbohydrates();
    }
 
    /**
