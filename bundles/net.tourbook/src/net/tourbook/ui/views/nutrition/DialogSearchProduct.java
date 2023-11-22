@@ -79,7 +79,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private TourData                      _tourData;
 
-   private Composite                     _dlgContainer;
 
    private PixelConverter                _pc;
    private boolean                       _isInUIInit;
@@ -236,8 +235,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // create UI widgets
       super.create();
 
-      _dlgContainer.layout(true, true);
-
       createActions();
 //      _isInUIInit = true;
 //      {
@@ -268,20 +265,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      _dlgContainer = (Composite) super.createDialogArea(parent);
+      final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
-      createUI(_dlgContainer);
+      createUI(dlgContainer);
 
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider("ID");
 
-      return _dlgContainer;
+      return dlgContainer;
    }
 
    private void createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
+      final Composite container = new Composite(parent, SWT.BORDER);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_10_Header(container);
          createUI_20_Viewer(container);
@@ -346,26 +343,30 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void createUI_20_Viewer(final Composite parent) {
 
+      final Composite tableContainer = new Composite(parent, SWT.BORDER);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(tableContainer);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(1)
+            .applyTo(tableContainer);
       /*
        * table viewer: poi items
        */
-      final Table poiTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(poiTable);
-      poiTable.setLinesVisible(true);
-      poiTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-      poiTable.setHeaderVisible(true);
+      final Table productsTable = new Table(tableContainer, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
+      productsTable.setLinesVisible(true);
+      productsTable.setHeaderVisible(true);
 
       // column: category
-      final TableColumn columnCategory = new TableColumn(poiTable, SWT.LEFT);
+      final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
       columnCategory.setText("Category"); //$NON-NLS-1$
       columnCategory.setWidth(75);
 
       // column: name
-      final TableColumn columnName = new TableColumn(poiTable, SWT.LEFT);
+      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText("Name"); //$NON-NLS-1$
       columnName.setWidth(300);
 
-      _productsViewer = new TableViewer(poiTable);
+      _productsViewer = new TableViewer(productsTable);
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());
@@ -403,7 +404,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final ISelection selection = _productsViewer.getSelection();
       final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
       final Product selectedProduct = (Product) firstElement;
-
 
       final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
       final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
