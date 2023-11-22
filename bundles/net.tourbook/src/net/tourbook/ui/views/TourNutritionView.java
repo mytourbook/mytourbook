@@ -112,6 +112,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private boolean                 _isInUpdate;
 
    private Text                    _txtCalories;
+   private Text                    _txtFluids;
 
    private Combo                   _cboSearchQuery;
 
@@ -141,7 +142,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
 
       @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -199,7 +200,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _productsViewer.refresh();
          }
-
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
@@ -310,6 +310,33 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    }
 
+   private void createColumns(final Table productsTable) {
+      // Column: Quantity
+      final TableColumn columnQuantity = new TableColumn(productsTable, SWT.LEFT);
+      columnQuantity.setText("Quantity"); //$NON-NLS-1$
+      columnQuantity.setWidth(25);
+
+      // Column: name
+      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
+      columnName.setText("Name"); //$NON-NLS-1$
+      columnName.setWidth(300);
+
+      // Column: Calories
+      final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
+      columnCalories.setText("Calories"); //$NON-NLS-1$
+      columnCalories.setWidth(75);
+
+      // Column: Carbohydrates
+      final TableColumn columnCarbohydrates = new TableColumn(productsTable, SWT.LEFT);
+      columnCarbohydrates.setText("Carbohydrates"); //$NON-NLS-1$
+      columnCarbohydrates.setWidth(75);
+
+      // Column: Sodium
+      final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
+      columnSodium.setText("Sodium"); //$NON-NLS-1$
+      columnSodium.setWidth(75);
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
@@ -390,56 +417,53 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _productsViewer.setLabelProvider(new ViewLabelProvider());
    }
 
-   private void createColumns(final Table productsTable) {
-      // Column: Quantity
-      final TableColumn columnQuantity = new TableColumn(productsTable, SWT.LEFT);
-      columnQuantity.setText("Quantity"); //$NON-NLS-1$
-      columnQuantity.setWidth(25);
-
-      // Column: name
-      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText("Name"); //$NON-NLS-1$
-      columnName.setWidth(300);
-
-      // Column: Calories
-      final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
-      columnCalories.setText("Calories"); //$NON-NLS-1$
-      columnCalories.setWidth(75);
-
-      // Column: Carbohydrates
-      final TableColumn columnCarbohydrates = new TableColumn(productsTable, SWT.LEFT);
-      columnCarbohydrates.setText("Carbohydrates"); //$NON-NLS-1$
-      columnCarbohydrates.setWidth(75);
-
-      // Column: Sodium
-      final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
-      columnSodium.setText("Sodium"); //$NON-NLS-1$
-      columnSodium.setWidth(75);
-   }
-
    private void createUI_Section_10_Summary(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          /*
-          * Label: Calories
+          * Title: Summary report card
           */
-         Label label = UI.createLabel(container, "Summary/Report card");
-         label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+         {
+            final Label label = UI.createLabel(container, "Summary/Report card");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+         }
 
-         _txtCalories = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.END, SWT.FILL)
-               .applyTo(_txtCalories);
+         // Fluids
+         {
+            final Label label = UI.createLabel(container, "Fluids");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-         /*
-          * Label: Carbohydrates
-          */
-         label = UI.createLabel(container, "Carbohydrates");
-         label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+            _txtFluids = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtFluids);
+         }
+
+         // Calories
+         {
+            final Label label = UI.createLabel(container, "Calories");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            _txtCalories = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtCalories);
+         }
+
+         // Carbohydrates
+         {
+            /*
+             * Label: Carbohydrates
+             */
+            final Label label = UI.createLabel(container, "Carbohydrates");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+         }
       }
    }
 
@@ -625,6 +649,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private void updateUI_SummaryFromModel() {
 
       _txtCalories.setText(NutritionUtils.getTotalCalories(_tourData.getTourFuelProducts()));
+      _txtFluids.setText(NutritionUtils.getTotalFluids(_tourData.getTourFuelProducts()));
 
    }
 

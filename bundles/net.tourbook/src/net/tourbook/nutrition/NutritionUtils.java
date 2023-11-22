@@ -48,6 +48,13 @@ public class NutritionUtils {
       return String.valueOf(toto);
    }
 
+   public static String getTotalFluids(final Set<TourFuelProduct> tourFuelProducts) {
+
+      final int toto = tourFuelProducts.stream().mapToInt(i -> i.getCalories()).sum();
+
+      return String.valueOf(toto);
+   }
+
    public static List<Product> searchProduct(final String productName) {
 
       final HttpRequest request = HttpRequest.newBuilder()
