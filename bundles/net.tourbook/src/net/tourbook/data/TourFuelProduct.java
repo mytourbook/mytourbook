@@ -36,6 +36,8 @@ import pl.coderion.model.Nutriments;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
 public class TourFuelProduct {
 
+   // todo fb rename to TourNutritionItem ? TourNutritionProduct ?
+
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
