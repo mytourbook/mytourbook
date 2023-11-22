@@ -69,6 +69,9 @@ import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
+   //todo fb
+   //put a link with "Not finding the product you used ? You can create it here"
+   //https://world.openfoodfacts.org/cgi/product.pl
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
    private TableViewer                   _productsViewer;

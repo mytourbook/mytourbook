@@ -470,9 +470,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void createUI_Section_20_ProductsList(final Composite parent) {
 
-      //put a link with "Not finding the product you used ? You can create it here"
-      //https://world.openfoodfacts.org/cgi/product.pl
-
       _sectionProductsList = createSection(parent, _tk, "Products List" /*
                                                                          * Messages.
                                                                          * tour_editor_section_characteristics
@@ -480,6 +477,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
+         // todo fb create buttons (remove item, add recent item, define container (flask...)
          createUI_210_Viewer(container);
       }
    }
