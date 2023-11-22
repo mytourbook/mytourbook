@@ -69,6 +69,8 @@ public class TourFuelProduct {
 //   private double                     sodium;
 //
 //   private double                     fluidVolume;
+
+   //link it to an object defined by the user ?
 //   private double                     containerName;
 //
    // private double caffeine;

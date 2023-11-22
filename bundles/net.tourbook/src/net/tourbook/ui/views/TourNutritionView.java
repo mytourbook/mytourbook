@@ -84,6 +84,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    // in the pref page, add a button to "Refresh product's information"
    // this will retrieve the updated (if any), info for each product)
+   // display the previous total calories vs new total calories
    public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
@@ -365,7 +366,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private Section createSection(final Composite parent,
                                  final FormToolkit tk,
                                  final String title,
-                                 final boolean isGrabVertical,
                                  final boolean isExpandable) {
 
       final int style = isExpandable
@@ -375,7 +375,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       final Section section = tk.createSection(parent, style);
 
       section.setText(title);
-      GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
 
       final Composite sectionContainer = tk.createComposite(section);
       section.setClient(sectionContainer);
@@ -476,9 +476,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _sectionProductsList = createSection(parent, _tk, "Products List" /*
                                                                          * Messages.
                                                                          * tour_editor_section_characteristics
-                                                                         */, false, true);
+                                                                         */, true);
       final Composite container = (Composite) _sectionProductsList.getClient();
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_210_Viewer(container);
       }
