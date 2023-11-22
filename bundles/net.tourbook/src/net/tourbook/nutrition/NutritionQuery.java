@@ -31,9 +31,9 @@ public class NutritionQuery implements Runnable {
 
    private List<Product>         _searchResult = new ArrayList<>();
 
-   private Exception           _exception;
+   private Exception             _exception;
 
-   private String              _query;
+   private String                _query;
 
    private PropertyChangeSupport support;
 
@@ -70,18 +70,25 @@ public class NutritionQuery implements Runnable {
    }
 
    public void removePropertyChangeListener(final PropertyChangeListener pcl) {
-         support.removePropertyChangeListener(pcl);
-     }
+      support.removePropertyChangeListener(pcl);
+   }
 
-     @Override
-     public void run() {
+   @Override
+   public void run() {
 
       final var oldValue = List.copyOf(_searchResult);
+      //todo fb
+      //if the current one only contains the not found product then oldvalue should be empty
       try {
 
          _searchResult.clear();
 
-         _searchResult.addAll(NutritionUtils.searchProduct(_query));
+         final List<Product> searchProductResults = NutritionUtils.searchProduct(_query);
+
+         if (searchProductResults.isEmpty()) {
+            searchProductResults.add(new Product("Not found", "not found"));
+         }
+         _searchResult.addAll(searchProductResults);
 
       } catch (final Exception e) {
          _exception = e;
@@ -89,6 +96,4 @@ public class NutritionQuery implements Runnable {
 
       support.firePropertyChange("_searchResult", oldValue, _searchResult);
    }
-
-
 }

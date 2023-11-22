@@ -26,6 +26,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -62,6 +63,8 @@ public class NutritionUtils {
             .uri(URI.create(OPENFOODFACTS_SEARCH_URL + productName.replace(" ", "+")))
             .build();
 
+      List<Product> serializedProductsResults = new ArrayList<>();
+
       try {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -72,7 +75,7 @@ public class NutritionUtils {
                   .get("products") //$NON-NLS-1$
                   .toString();
 
-            final var serializedProductsResults = mapper.readValue(productsResults,
+            serializedProductsResults = mapper.readValue(productsResults,
                   new TypeReference<List<Product>>() {});
             return serializedProductsResults;
 
@@ -89,6 +92,6 @@ public class NutritionUtils {
          Thread.currentThread().interrupt();
       }
 
-      return null;
+      return serializedProductsResults;
    }
 }
