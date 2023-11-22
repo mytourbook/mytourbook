@@ -72,13 +72,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    //todo fb
    //put a link with "Not finding the product you used ? You can create it here"
    //https://world.openfoodfacts.org/cgi/product.pl
+
+   //todo fb
+   // enable the "add" button only if an element is selected in the table
+
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.ui.views.rawData.DialogMergeTours");//$NON-NLS-1$
+   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
 
    private TourData                      _tourData;
-
 
    private PixelConverter                _pc;
    private boolean                       _isInUIInit;
@@ -104,7 +107,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    public class SearchContentProvider implements IStructuredContentProvider {
 
       @Override
-      public void dispose() {}
+      public void dispose() {
+         //Nothing to do
+      }
 
       @Override
       public Object[] getElements(final Object inputElement) {
@@ -112,13 +117,17 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
 
       @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+         // Nothing to do
+      }
    }
 
    class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
-      public void dispose() {}
+      public void dispose() {
+         //Nothing to do
+      }
 
       @Override
       public Object[] getElements(final Object parent) {
@@ -130,7 +139,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
 
       @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+         // Nothing to do
+      }
    }
 
    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -167,6 +178,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       @Override
       public Image getImage(final Object obj) {
 
+         //todo fb display the image from the url ?
          return null;
       }
    }
@@ -277,7 +289,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.BORDER);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_10_Header(container);
@@ -343,17 +356,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void createUI_20_Viewer(final Composite parent) {
 
-      final Composite tableContainer = new Composite(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(tableContainer);
-      GridLayoutFactory.fillDefaults()
-            .numColumns(1)
-            .applyTo(tableContainer);
       /*
        * table viewer: poi items
        */
-      final Table productsTable = new Table(tableContainer, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      final Table productsTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
-      productsTable.setLinesVisible(true);
+      productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
       // column: category

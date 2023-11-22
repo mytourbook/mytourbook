@@ -406,7 +406,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
        */
       final Table productsTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
-      productsTable.setLinesVisible(true);
+      productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
       createColumns(productsTable);
