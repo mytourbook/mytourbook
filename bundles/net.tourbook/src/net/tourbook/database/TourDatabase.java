@@ -858,266 +858,6 @@ public class TourDatabase {
    }
 
    /**
-    * This error can occur when transient instances are not yet saved which belong to
-    * {@link TourData}.
-    *
-    * <pre>
-    *
-    * !ENTRY net.tourbook.common 4 0 2015-05-08 16:10:55.578
-    * !MESSAGE Tour cannot be saved in the database
-    * !STACK 0
-    * org.hibernate.TransientObjectException:
-    *
-    *    object references an unsaved transient instance - save the transient instance before flushing:
-    *      net.tourbook.data.TourData.tourType -> net.tourbook.data.TourType
-    *
-    *    at org.hibernate.engine.CascadingAction$9.noCascade(CascadingAction.java:376)
-    *    at org.hibernate.engine.Cascade.cascade(Cascade.java:163)
-    *    at org.hibernate.event.def.AbstractFlushingEventListener.cascadeOnFlush(AbstractFlushingEventListener.java:154)
-    *    at org.hibernate.event.def.AbstractFlushingEventListener.prepareEntityFlushes(AbstractFlushingEventListener.java:145)
-    *    at org.hibernate.event.def.AbstractFlushingEventListener.flushEverythingToExecutions(AbstractFlushingEventListener.java:88)
-    *    at org.hibernate.event.def.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:49)
-    *    at org.hibernate.impl.SessionImpl.flush(SessionImpl.java:1028)
-    *    at org.hibernate.impl.SessionImpl.managedFlush(SessionImpl.java:366)
-    *    at org.hibernate.transaction.JDBCTransaction.commit(JDBCTransaction.java:137)
-    *    at org.hibernate.ejb.TransactionImpl.commit(TransactionImpl.java:54)
-    *    at net.tourbook.database.TourDatabase.saveTour(TourDatabase.java:1731)
-    * </pre>
-    *
-    * @param tourData
-    */
-   private static void checkUnsavedTransientInstances(final TourData tourData) {
-
-      checkUnsavedTransientInstances_Tags(tourData);
-      checkUnsavedTransientInstances_TourLocation(tourData);
-      checkUnsavedTransientInstances_TourType(tourData);
-      checkUnsavedTransientInstances_Sensors(tourData);
-   }
-
-   /**
-    * @param tourData
-    */
-   private static void checkUnsavedTransientInstances_Sensors(final TourData tourData) {
-
-      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
-
-      if (allTourData_SensorValues.isEmpty()) {
-         return;
-      }
-
-      final ArrayList<DeviceSensor> allNotSavedSensors = new ArrayList<>();
-
-      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors_BySerialNo());
-
-      // loop: all sensor values in the tour -> find sensors which are not yet saved
-      for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
-
-         final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
-
-         final long sensorId = tourData_Sensor.getSensorId();
-
-         if (sensorId != ENTITY_IS_NOT_SAVED) {
-
-            // sensor is saved
-
-            continue;
-         }
-
-         // sensor is not yet saved
-         // 1. sensor can still be new
-         // 2. sensor is already created but not updated in the not yet saved tour
-
-         final DeviceSensor dbSensor = allDbSensors.get(tourData_Sensor.getSerialNumber().toUpperCase());
-
-         if (dbSensor == null) {
-
-            // sensor not available -> create a new sensor
-
-            allNotSavedSensors.add(tourData_Sensor);
-         }
-      }
-
-      boolean isNewSensorSaved = false;
-
-      if (allNotSavedSensors.size() > 0) {
-
-         // create new sensors
-
-         synchronized (TRANSIENT_LOCK) {
-
-            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
-
-            for (final DeviceSensor newSensor : allNotSavedSensors) {
-
-               // check again, sensor list could be updated in another thread
-               final DeviceSensor dbSensor = allDbSensors_InLock.get(newSensor.getSerialNumber().toUpperCase());
-
-               if (dbSensor == null) {
-
-                  // sensor is not yet in db -> create it
-
-                  saveEntity(
-                        newSensor,
-                        ENTITY_IS_NOT_SAVED,
-                        DeviceSensor.class);
-
-                  isNewSensorSaved = true;
-               }
-            }
-
-            if (isNewSensorSaved) {
-
-               /*
-                * Replace sensor in sensor values
-                */
-
-               // force to reload db sensors
-               clearDeviceSensors();
-               TourManager.getInstance().clearTourDataCache();
-
-               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
-
-               // loop: all sensor values in the tour -> find sensors which are not yet saved
-               for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
-
-                  final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
-
-                  final String serialNumberKey = tourData_Sensor.getSerialNumber().toUpperCase();
-
-                  final DeviceSensor deviceSensor = allDbSensors_InLock.get(serialNumberKey);
-
-                  tourData_SensorValue.setDeviceSensor(deviceSensor);
-               }
-            }
-         }
-      }
-
-   }
-
-   /**
-    * @param tourData
-    */
-   private static void checkUnsavedTransientInstances_Tags(final TourData tourData) {
-
-      final Set<TourTag> allTourDataTags = tourData.getTourTags();
-
-      if (allTourDataTags.isEmpty()) {
-         return;
-      }
-
-      final ArrayList<TourTag> allAppliedTags = new ArrayList<>();
-      final ArrayList<TourTag> allNewTags = new ArrayList<>();
-
-      final HashMap<String, TourTag> allDbTags_ByName = new HashMap<>(getAllTourTags_ByTagName());
-
-      // loop: all tags in the tour -> find tags which are not yet saved
-      for (final TourTag tourDataTag : allTourDataTags) {
-
-         final long tagId = tourDataTag.getTagId();
-
-         if (tagId != ENTITY_IS_NOT_SAVED) {
-
-            // tag is saved
-
-            allAppliedTags.add(tourDataTag);
-
-            continue;
-         }
-
-         // tag is not yet saved
-         // 1. tag can still be new
-         // 2. tag is already created but not updated in the not yet saved tour
-
-         final TourTag dbTag = allDbTags_ByName.get(tourDataTag.getTagName().toUpperCase());
-
-         if (dbTag == null) {
-
-            // tag not available -> create a new tag
-
-            allNewTags.add(tourDataTag);
-
-         } else {
-
-            // use found tag
-
-            allAppliedTags.add(dbTag);
-         }
-      }
-
-      boolean isNewTagSaved = false;
-
-      if (allNewTags.size() > 0) {
-
-         // create new tags
-
-         synchronized (TRANSIENT_LOCK) {
-
-            final HashMap<String, TourTag> allDbTags_ByName_InLock = new HashMap<>(getAllTourTags_ByTagName());
-
-            for (final TourTag newTag : allNewTags) {
-
-               // check again, tour tag list could be updated in another thread
-               final TourTag dbTag = allDbTags_ByName_InLock.get(newTag.getTagName().toUpperCase());
-
-               if (dbTag == null) {
-
-                  // tag is not yet in db -> create it
-
-                  final TourTag savedTag = saveEntity(
-                        newTag,
-                        ENTITY_IS_NOT_SAVED,
-                        TourTag.class);
-
-                  isNewTagSaved = true;
-
-                  allAppliedTags.add(savedTag);
-
-               } else {
-
-                  allAppliedTags.add(dbTag);
-               }
-            }
-
-            if (isNewTagSaved) {
-
-               // force to reload db tags
-
-               clearTourTags();
-               TourManager.getInstance().clearTourDataCache();
-            }
-         }
-      }
-
-      // replace tags in the tour, either with the old tags and/or with newly created tags
-      allTourDataTags.clear();
-      allTourDataTags.addAll(allAppliedTags);
-   }
-
-   /**
-    * Save {@link TourLocation} instances which are not yet saved
-    *
-    * @param tourData
-    */
-   private static void checkUnsavedTransientInstances_TourLocation(final TourData tourData) {
-
-      final TourLocation tourLocationStart = tourData.getTourLocationStart();
-      final TourLocation checkedLocationStart = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationStart);
-      if (checkedLocationStart != null) {
-
-         // replace tour location in the tour
-         tourData.setTourLocationStart(checkedLocationStart);
-      }
-
-      final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-      final TourLocation checkedLocationEnd = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationEnd);
-      if (checkedLocationEnd != null) {
-
-         // replace tour location in the tour
-         tourData.setTourLocationEnd(checkedLocationEnd);
-      }
-   }
-
-   /**
     * @param requestedTourLocation
     *           {@link TourLocation} which needs to be checked
     *
@@ -1180,68 +920,6 @@ public class TourDatabase {
       }
 
       return appliedLocation;
-   }
-
-   /**
-    * @param tourData
-    */
-   private static void checkUnsavedTransientInstances_TourType(final TourData tourData) {
-
-      final TourType tourType = tourData.getTourType();
-
-      if (tourType == null) {
-
-         // a tour type is not set -> nothing to do
-
-         return;
-      }
-
-      if (tourType.getTypeId() != ENTITY_IS_NOT_SAVED) {
-
-         // tour type is saved
-
-         return;
-      }
-
-      TourType appliedType = null;
-
-      synchronized (TRANSIENT_LOCK) {
-
-         // type is not yet saved
-         // 1. type can still be new
-         // 2. type is already created but not updated in the not yet saved tour
-
-         final String tourTypeNameKEY = tourType.getName().toUpperCase();
-         final TourType dbType = getAllTourTypes_ByName().get(tourTypeNameKEY);
-
-         if (dbType != null) {
-
-            // use found tag
-
-            appliedType = dbType;
-
-         } else {
-
-            // create new tag
-
-            final TourType savedType = saveEntity(
-                  tourType,
-                  ENTITY_IS_NOT_SAVED,
-                  TourType.class);
-
-            if (savedType != null) {
-
-               appliedType = savedType;
-
-               // force reload of the db tour types
-               clearTourTypes();
-               TourManager.getInstance().clearTourDataCache();
-            }
-         }
-      }
-
-      // replace tour type in the tour
-      tourData.setTourType(appliedType);
    }
 
    /**
@@ -3592,9 +3270,331 @@ public class TourDatabase {
        */
       tourData.getNumberOfHrZones();
 
-      checkUnsavedTransientInstances(tourData);
+      saveTransientInstances(tourData);
 
       return true;
+   }
+
+   /**
+    * This error can occur when transient instances are not yet saved which belong to
+    * {@link TourData}.
+    *
+    * <pre>
+    *
+    * !ENTRY net.tourbook.common 4 0 2015-05-08 16:10:55.578
+    * !MESSAGE Tour cannot be saved in the database
+    * !STACK 0
+    * org.hibernate.TransientObjectException:
+    *
+    *    object references an unsaved transient instance - save the transient instance before flushing:
+    *      net.tourbook.data.TourData.tourType -> net.tourbook.data.TourType
+    *
+    *    at org.hibernate.engine.CascadingAction$9.noCascade(CascadingAction.java:376)
+    *    at org.hibernate.engine.Cascade.cascade(Cascade.java:163)
+    *    at org.hibernate.event.def.AbstractFlushingEventListener.cascadeOnFlush(AbstractFlushingEventListener.java:154)
+    *    at org.hibernate.event.def.AbstractFlushingEventListener.prepareEntityFlushes(AbstractFlushingEventListener.java:145)
+    *    at org.hibernate.event.def.AbstractFlushingEventListener.flushEverythingToExecutions(AbstractFlushingEventListener.java:88)
+    *    at org.hibernate.event.def.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:49)
+    *    at org.hibernate.impl.SessionImpl.flush(SessionImpl.java:1028)
+    *    at org.hibernate.impl.SessionImpl.managedFlush(SessionImpl.java:366)
+    *    at org.hibernate.transaction.JDBCTransaction.commit(JDBCTransaction.java:137)
+    *    at org.hibernate.ejb.TransactionImpl.commit(TransactionImpl.java:54)
+    *    at net.tourbook.database.TourDatabase.saveTour(TourDatabase.java:1731)
+    * </pre>
+    *
+    * @param tourData
+    */
+   private static void saveTransientInstances(final TourData tourData) {
+
+      saveTransientInstances_Tags(tourData);
+      saveTransientInstances_TourLocation(tourData);
+      saveTransientInstances_TourType(tourData);
+      saveTransientInstances_Sensors(tourData);
+   }
+
+   /**
+    * @param tourData
+    */
+   private static void saveTransientInstances_Sensors(final TourData tourData) {
+
+      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
+
+      if (allTourData_SensorValues.isEmpty()) {
+         return;
+      }
+
+      final ArrayList<DeviceSensor> allNotSavedSensors = new ArrayList<>();
+
+      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors_BySerialNo());
+
+      // loop: all sensor values in the tour -> find sensors which are not yet saved
+      for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+         final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+         final long sensorId = tourData_Sensor.getSensorId();
+
+         if (sensorId != ENTITY_IS_NOT_SAVED) {
+
+            // sensor is saved
+
+            continue;
+         }
+
+         // sensor is not yet saved
+         // 1. sensor can still be new
+         // 2. sensor is already created but not updated in the not yet saved tour
+
+         final DeviceSensor dbSensor = allDbSensors.get(tourData_Sensor.getSerialNumber().toUpperCase());
+
+         if (dbSensor == null) {
+
+            // sensor not available -> create a new sensor
+
+            allNotSavedSensors.add(tourData_Sensor);
+         }
+      }
+
+      boolean isNewSensorSaved = false;
+
+      if (allNotSavedSensors.size() > 0) {
+
+         // create new sensors
+
+         synchronized (TRANSIENT_LOCK) {
+
+            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
+
+            for (final DeviceSensor newSensor : allNotSavedSensors) {
+
+               // check again, sensor list could be updated in another thread
+               final DeviceSensor dbSensor = allDbSensors_InLock.get(newSensor.getSerialNumber().toUpperCase());
+
+               if (dbSensor == null) {
+
+                  // sensor is not yet in db -> create it
+
+                  saveEntity(
+                        newSensor,
+                        ENTITY_IS_NOT_SAVED,
+                        DeviceSensor.class);
+
+                  isNewSensorSaved = true;
+               }
+            }
+
+            if (isNewSensorSaved) {
+
+               /*
+                * Replace sensor in sensor values
+                */
+
+               // force to reload db sensors
+               clearDeviceSensors();
+               TourManager.getInstance().clearTourDataCache();
+
+               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
+
+               // loop: all sensor values in the tour -> find sensors which are not yet saved
+               for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+                  final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+                  final String serialNumberKey = tourData_Sensor.getSerialNumber().toUpperCase();
+
+                  final DeviceSensor deviceSensor = allDbSensors_InLock.get(serialNumberKey);
+
+                  tourData_SensorValue.setDeviceSensor(deviceSensor);
+               }
+            }
+         }
+      }
+
+   }
+
+   /**
+    * @param tourData
+    */
+   private static void saveTransientInstances_Tags(final TourData tourData) {
+
+      final Set<TourTag> allTourDataTags = tourData.getTourTags();
+
+      if (allTourDataTags.isEmpty()) {
+         return;
+      }
+
+      final ArrayList<TourTag> allAppliedTags = new ArrayList<>();
+      final ArrayList<TourTag> allNewTags = new ArrayList<>();
+
+      final HashMap<String, TourTag> allDbTags_ByName = new HashMap<>(getAllTourTags_ByTagName());
+
+      // loop: all tags in the tour -> find tags which are not yet saved
+      for (final TourTag tourDataTag : allTourDataTags) {
+
+         final long tagId = tourDataTag.getTagId();
+
+         if (tagId != ENTITY_IS_NOT_SAVED) {
+
+            // tag is saved
+
+            allAppliedTags.add(tourDataTag);
+
+            continue;
+         }
+
+         // tag is not yet saved
+         // 1. tag can still be new
+         // 2. tag is already created but not updated in the not yet saved tour
+
+         final TourTag dbTag = allDbTags_ByName.get(tourDataTag.getTagName().toUpperCase());
+
+         if (dbTag == null) {
+
+            // tag not available -> create a new tag
+
+            allNewTags.add(tourDataTag);
+
+         } else {
+
+            // use found tag
+
+            allAppliedTags.add(dbTag);
+         }
+      }
+
+      boolean isNewTagSaved = false;
+
+      if (allNewTags.size() > 0) {
+
+         // create new tags
+
+         synchronized (TRANSIENT_LOCK) {
+
+            final HashMap<String, TourTag> allDbTags_ByName_InLock = new HashMap<>(getAllTourTags_ByTagName());
+
+            for (final TourTag newTag : allNewTags) {
+
+               // check again, tour tag list could be updated in another thread
+               final TourTag dbTag = allDbTags_ByName_InLock.get(newTag.getTagName().toUpperCase());
+
+               if (dbTag == null) {
+
+                  // tag is not yet in db -> create it
+
+                  final TourTag savedTag = saveEntity(
+                        newTag,
+                        ENTITY_IS_NOT_SAVED,
+                        TourTag.class);
+
+                  isNewTagSaved = true;
+
+                  allAppliedTags.add(savedTag);
+
+               } else {
+
+                  allAppliedTags.add(dbTag);
+               }
+            }
+
+            if (isNewTagSaved) {
+
+               // force to reload db tags
+
+               clearTourTags();
+               TourManager.getInstance().clearTourDataCache();
+            }
+         }
+      }
+
+      // replace tags in the tour, either with the old tags and/or with newly created tags
+      allTourDataTags.clear();
+      allTourDataTags.addAll(allAppliedTags);
+   }
+
+   /**
+    * Save {@link TourLocation} instances which are not yet saved
+    *
+    * @param tourData
+    */
+   private static void saveTransientInstances_TourLocation(final TourData tourData) {
+
+      final TourLocation tourLocationStart = tourData.getTourLocationStart();
+      final TourLocation checkedLocationStart = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationStart);
+      if (checkedLocationStart != null) {
+
+         // replace tour location in the tour
+         tourData.setTourLocationStart(checkedLocationStart);
+      }
+
+      final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+      final TourLocation checkedLocationEnd = checkUnsavedTransientInstances_TourLocation_OneLocation(tourLocationEnd);
+      if (checkedLocationEnd != null) {
+
+         // replace tour location in the tour
+         tourData.setTourLocationEnd(checkedLocationEnd);
+      }
+   }
+
+   /**
+    * @param tourData
+    */
+   private static void saveTransientInstances_TourType(final TourData tourData) {
+
+      final TourType tourType = tourData.getTourType();
+
+      if (tourType == null) {
+
+         // a tour type is not set -> nothing to do
+
+         return;
+      }
+
+      if (tourType.getTypeId() != ENTITY_IS_NOT_SAVED) {
+
+         // tour type is saved
+
+         return;
+      }
+
+      TourType appliedType = null;
+
+      synchronized (TRANSIENT_LOCK) {
+
+         // type is not yet saved
+         // 1. type can still be new
+         // 2. type is already created but not updated in the not yet saved tour
+
+         final String tourTypeNameKEY = tourType.getName().toUpperCase();
+         final TourType dbType = getAllTourTypes_ByName().get(tourTypeNameKEY);
+
+         if (dbType != null) {
+
+            // use found tag
+
+            appliedType = dbType;
+
+         } else {
+
+            // create new tag
+
+            final TourType savedType = saveEntity(
+                  tourType,
+                  ENTITY_IS_NOT_SAVED,
+                  TourType.class);
+
+            if (savedType != null) {
+
+               appliedType = savedType;
+
+               // force reload of the db tour types
+               clearTourTypes();
+               TourManager.getInstance().clearTourDataCache();
+            }
+         }
+      }
+
+      // replace tour type in the tour
+      tourData.setTourType(appliedType);
    }
 
    public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
