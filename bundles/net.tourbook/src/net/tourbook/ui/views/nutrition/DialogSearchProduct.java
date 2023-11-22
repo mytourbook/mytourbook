@@ -287,7 +287,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider("ID");
 
-      // set download as default button
+      //todo fb why doesn't that work !?
+      // set search as default button
       dlgContainer.getShell().setDefaultButton(_btnSearch);
 
       restoreState();
