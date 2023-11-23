@@ -267,6 +267,19 @@ public class Messages extends NLS {
    public static String        ColumnFactory_InetAddress_Label;
    public static String        ColumnFactory_InetAddress_Url;
 
+   public static String        ColumnFactory_Location_Geo_BBox_LatitudeMax;
+   public static String        ColumnFactory_Location_Geo_BBox_LatitudeMax_Tooltip;
+   public static String        ColumnFactory_Location_Geo_BBox_LatitudeMin;
+   public static String        ColumnFactory_Location_Geo_BBox_LatitudeMin_Tooltip;
+   public static String        ColumnFactory_Location_Geo_BBox_LongitudeMax;
+   public static String        ColumnFactory_Location_Geo_BBox_LongitudeMax_Tooltip;
+   public static String        ColumnFactory_Location_Geo_BBox_LongitudeMin;
+   public static String        ColumnFactory_Location_Geo_BBox_LongitudeMin_Tooltip;
+   public static String        ColumnFactory_Location_Geo_Latitude;
+   public static String        ColumnFactory_Location_Geo_Latitude_Tooltip;
+   public static String        ColumnFactory_Location_Geo_Longitude;
+   public static String        ColumnFactory_Location_Geo_Longitude_Tooltip;
+
    public static String        ColumnFactory_Motion_Altimeter;
    public static String        ColumnFactory_Motion_Altimeter_Tooltip;
 

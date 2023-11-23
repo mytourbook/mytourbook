@@ -108,11 +108,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private final NumberFormat      _nf1                            = NumberFormat.getNumberInstance();
    private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf6                            = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
+      _nf6.setMinimumFractionDigits(6);
+      _nf6.setMaximumFractionDigits(6);
    }
 
    /*
@@ -139,36 +142,132 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          double rc = 0;
 
-         // Determine which column and do the appropriate sort
-//         switch (__sortColumnId) {
-//
-//         case TableColumnFactory.SENSOR_MANUFACTURER_NAME_ID:
-//            rc = item1.location.getManufacturerName().compareTo(item2.location.getManufacturerName());
-//            break;
-//
-//         case TableColumnFactory.SENSOR_PRODUCT_NAME_ID:
-//            rc = item1.location.getProductName().compareTo(item2.location.getProductName());
-//            break;
-//
-//         case TableColumnFactory.SENSOR_NAME_ID:
-//         default:
-//            rc = item1.location.getSensorName().compareTo(item2.location.getSensorName());
-//         }
-//
-//         // 2nd sort by sensor custom name
-//         if (rc == 0) {
-//            rc = item1.location.getSensorName().compareTo(item2.location.getSensorName());
-//         }
-//
-//         // 3nd sort by manufacturer name
-//         if (rc == 0) {
-//            rc = item1.location.getManufacturerName().compareTo(item2.location.getManufacturerName());
-//         }
-//
-//         // 4nd sort by product name
-//         if (rc == 0) {
-//            rc = item1.location.getProductName().compareTo(item2.location.getProductName());
-//         }
+         final TourLocation location1 = item1.location;
+         final TourLocation location2 = item2.location;
+
+         // determine which column and do the appropriate sort
+         switch (__sortColumnId) {
+
+// SET_FORMATTING_OFF
+
+         case TableColumnFactory.LOCATION_PART_Name_ID:         rc = compareText(location1.name,         location2.name);        break;
+
+         case TableColumnFactory.LOCATION_PART_Continent_ID:
+         case TableColumnFactory.LOCATION_PART_Country_ID:
+         case TableColumnFactory.LOCATION_PART_CountryCode_ID:
+
+         case TableColumnFactory.LOCATION_PART_Region_ID:
+         case TableColumnFactory.LOCATION_PART_State_ID:
+         case TableColumnFactory.LOCATION_PART_StateDistrict_ID:
+         case TableColumnFactory.LOCATION_PART_County_ID:         rc = compareText(location1.county,       location2.county);        break;
+
+         case TableColumnFactory.LOCATION_PART_Municipality_ID:
+         case TableColumnFactory.LOCATION_PART_City_ID:
+         case TableColumnFactory.LOCATION_PART_Town_ID:           rc = compareText(location1.town,          location2.town);           break;
+         case TableColumnFactory.LOCATION_PART_Village_ID:
+
+         case TableColumnFactory.LOCATION_PART_CityDistrict_ID:
+         case TableColumnFactory.LOCATION_PART_District_ID:
+         case TableColumnFactory.LOCATION_PART_Borough_ID:
+         case TableColumnFactory.LOCATION_PART_Suburb_ID:
+         case TableColumnFactory.LOCATION_PART_Subdivision_ID:
+
+         case TableColumnFactory.LOCATION_PART_Hamlet_ID:
+         case TableColumnFactory.LOCATION_PART_Croft_ID:
+         case TableColumnFactory.LOCATION_PART_IsolatedDwelling_ID:
+
+         case TableColumnFactory.LOCATION_PART_Neighbourhood_ID:
+         case TableColumnFactory.LOCATION_PART_Allotments_ID:
+         case TableColumnFactory.LOCATION_PART_Quarter_ID:
+
+         case TableColumnFactory.LOCATION_PART_CityBlock_ID:
+         case TableColumnFactory.LOCATION_PART_Residential_ID:
+         case TableColumnFactory.LOCATION_PART_Farm_ID:
+         case TableColumnFactory.LOCATION_PART_Farmyard_ID:
+         case TableColumnFactory.LOCATION_PART_Industrial_ID:
+         case TableColumnFactory.LOCATION_PART_Commercial_ID:
+         case TableColumnFactory.LOCATION_PART_Retail_ID:
+
+         case TableColumnFactory.LOCATION_PART_Road_ID:           rc = compareText(location1.road,          location2.road);           break;
+
+         case TableColumnFactory.LOCATION_PART_HouseName_ID:
+         case TableColumnFactory.LOCATION_PART_HouseNumber_ID:    rc = compareText(location1.house_number,  location2.house_number);   break;
+
+         case TableColumnFactory.LOCATION_PART_Aerialway_ID:
+         case TableColumnFactory.LOCATION_PART_Aeroway_ID:
+         case TableColumnFactory.LOCATION_PART_Amenity_ID:
+         case TableColumnFactory.LOCATION_PART_Boundary_ID:
+         case TableColumnFactory.LOCATION_PART_Bridge_ID:
+         case TableColumnFactory.LOCATION_PART_Club_ID:
+         case TableColumnFactory.LOCATION_PART_Craft_ID:
+         case TableColumnFactory.LOCATION_PART_Emergency_ID:
+         case TableColumnFactory.LOCATION_PART_Historic_ID:
+         case TableColumnFactory.LOCATION_PART_Landuse_ID:
+         case TableColumnFactory.LOCATION_PART_Leisure_ID:
+         case TableColumnFactory.LOCATION_PART_ManMade_ID:
+         case TableColumnFactory.LOCATION_PART_Military_ID:
+         case TableColumnFactory.LOCATION_PART_MountainPass_ID:
+         case TableColumnFactory.LOCATION_PART_Natural_ID:
+         case TableColumnFactory.LOCATION_PART_Office_ID:
+         case TableColumnFactory.LOCATION_PART_Place_ID:
+         case TableColumnFactory.LOCATION_PART_Railway_ID:
+         case TableColumnFactory.LOCATION_PART_Shop_ID:
+         case TableColumnFactory.LOCATION_PART_Tourism_ID:
+         case TableColumnFactory.LOCATION_PART_Tunnel_ID:
+         case TableColumnFactory.LOCATION_PART_Waterway_ID:
+
+         case TableColumnFactory.LOCATION_PART_Postcode_ID:       rc = compareText(location1.postcode,      location2.postcode);       break;
+
+         case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
+            rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_LONGITUDE_ID:
+            rc = location1.longitudeE6_Normalized - location2.longitudeE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MIN_ID:
+            rc = location1.latitudeMinE6_Normalized - location2.latitudeMinE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MAX_ID:
+            rc = location1.latitudeMaxE6_Normalized - location2.latitudeMaxE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MIN_ID:
+            rc = location1.longitudeMinE6_Normalized - location2.longitudeMinE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MAX_ID:
+            rc = location1.longitudeMaxE6_Normalized - location2.longitudeMaxE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_PART_DisplayName_ID:
+         default:
+            rc = location1.display_name.compareTo(location2.display_name);
+         }
+
+// SET_FORMATTING_ON
+
+         // nth sort by town
+         if (rc == 0) {
+            rc = compareText(location1.town, location2.town);
+         }
+
+         // nth sort by city
+         if (rc == 0) {
+            rc = compareText(location1.city, location2.city);
+         }
+
+         // nth sort by road
+         if (rc == 0) {
+            rc = compareText(location1.road, location2.road);
+         }
+
+         // nth sort by house number
+         if (rc == 0) {
+            rc = compareText(location1.house_number, location2.house_number);
+         }
 
          // If descending order, flip the direction
          if (__sortDirection == DESCENDING) {
@@ -176,13 +275,31 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          }
 
          /*
-          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          * MUST return 1 or -1 otherwise long values are not sorted correctly
           */
          return rc > 0
                ? 1
                : rc < 0
                      ? -1
                      : 0;
+      }
+
+      private double compareText(final String text1, final String text2) {
+
+         if (text1 != null && text2 != null) {
+
+            return text1.compareTo(text2);
+
+         } else if (text1 != null) {
+
+            return 1;
+
+         } else if (text2 != null) {
+
+            return -1;
+         }
+
+         return 0;
       }
 
       public void setSortColumn(final Widget widget) {
@@ -224,7 +341,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    class LocationItem {
 
-      TourLocation location;
+      TourLocation  location;
+
+      public String latitudeE6_Normalized;
+      public String longitudeE6_Normalized;
+
+      public String latitudeMinE6_Normalized;
+      public String latitudeMaxE6_Normalized;
+      public String longitudeMinE6_Normalized;
+      public String longitudeMaxE6_Normalized;
 
       @Override
       public boolean equals(final Object obj) {
@@ -532,79 +657,178 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
-      defineColumn_10_Name();
-      defineColumn_10_DisplayName();
+      defineColumn_Part_10_Name();
+      defineColumn_Part_10_DisplayName();
 
-      defineColumn_20_Continent();
-      defineColumn_20_Country();
-      defineColumn_20_CountryCode();
+      defineColumn_Part_30_Continent();
+      defineColumn_Part_30_Country();
+      defineColumn_Part_30_CountryCode();
 
-      defineColumn_30_Region();
-      defineColumn_30_State();
-      defineColumn_30_StateDistrict();
-      defineColumn_30_County();
+      defineColumn_Part_35_Region();
+      defineColumn_Part_35_State();
+      defineColumn_Part_35_StateDistrict();
+      defineColumn_Part_35_County();
 
-      defineColumn_40_Municipality();
-      defineColumn_40_City();
-      defineColumn_40_Town();
-      defineColumn_40_Village();
+      defineColumn_Part_40_Municipality();
+      defineColumn_Part_40_City();
+      defineColumn_Part_40_Town();
+      defineColumn_Part_40_Village();
 
-      defineColumn_45_CityDistrict();
-      defineColumn_45_District();
-      defineColumn_45_Borough();
-      defineColumn_45_Suburb();
-      defineColumn_45_Subdivision();
+      defineColumn_Part_45_CityDistrict();
+      defineColumn_Part_45_District();
+      defineColumn_Part_45_Borough();
+      defineColumn_Part_45_Suburb();
+      defineColumn_Part_45_Subdivision();
 
-      defineColumn_50_Hamlet();
-      defineColumn_50_Croft();
-      defineColumn_50_IsolatedDwelling();
+      defineColumn_Part_50_Hamlet();
+      defineColumn_Part_50_Croft();
+      defineColumn_Part_50_IsolatedDwelling();
 
-      defineColumn_55_Neighbourhood();
-      defineColumn_55_Allotments();
-      defineColumn_55_Quarter();
+      defineColumn_Part_55_Neighbourhood();
+      defineColumn_Part_55_Allotments();
+      defineColumn_Part_55_Quarter();
 
-      defineColumn_60_CityBlock();
-      defineColumn_60_Residential();
-      defineColumn_60_Farm();
-      defineColumn_60_Farmyard();
-      defineColumn_60_Industrial();
-      defineColumn_60_Commercial();
-      defineColumn_60_Retail();
+      defineColumn_Part_60_CityBlock();
+      defineColumn_Part_60_Residential();
+      defineColumn_Part_60_Farm();
+      defineColumn_Part_60_Farmyard();
+      defineColumn_Part_60_Industrial();
+      defineColumn_Part_60_Commercial();
+      defineColumn_Part_60_Retail();
 
-      defineColumn_65_Road();
+      defineColumn_Part_65_Road();
 
-      defineColumn_70_HouseName();
-      defineColumn_70_HouseNumber();
+      defineColumn_Part_70_HouseName();
+      defineColumn_Part_70_HouseNumber();
 
-      defineColumn_80_Aerialway();
-      defineColumn_80_Aeroway();
-      defineColumn_80_Amenity();
-      defineColumn_80_Boundary();
-      defineColumn_80_Bridge();
-      defineColumn_80_Club();
-      defineColumn_80_Craft();
-      defineColumn_80_Emergency();
-      defineColumn_80_Historic();
-      defineColumn_80_Landuse();
-      defineColumn_80_Leisure();
-      defineColumn_80_ManMade();
-      defineColumn_80_Military();
-      defineColumn_80_MountainPass();
-      defineColumn_80_Natural();
-      defineColumn_80_Office();
-      defineColumn_80_Place();
-      defineColumn_80_Railway();
-      defineColumn_80_Shop();
-      defineColumn_80_Tourism();
-      defineColumn_80_Tunnel();
-      defineColumn_80_Waterway();
+      defineColumn_Part_80_Aerialway();
+      defineColumn_Part_80_Aeroway();
+      defineColumn_Part_80_Amenity();
+      defineColumn_Part_80_Boundary();
+      defineColumn_Part_80_Bridge();
+      defineColumn_Part_80_Club();
+      defineColumn_Part_80_Craft();
+      defineColumn_Part_80_Emergency();
+      defineColumn_Part_80_Historic();
+      defineColumn_Part_80_Landuse();
+      defineColumn_Part_80_Leisure();
+      defineColumn_Part_80_ManMade();
+      defineColumn_Part_80_Military();
+      defineColumn_Part_80_MountainPass();
+      defineColumn_Part_80_Natural();
+      defineColumn_Part_80_Office();
+      defineColumn_Part_80_Place();
+      defineColumn_Part_80_Railway();
+      defineColumn_Part_80_Shop();
+      defineColumn_Part_80_Tourism();
+      defineColumn_Part_80_Tunnel();
+      defineColumn_Part_80_Waterway();
 
-      defineColumn_90_Postcode();
+      defineColumn_Part_90_Postcode();
+
+      defineColumn_Geo_10_Latitude();
+      defineColumn_Geo_12_Longitude();
+      defineColumn_Geo_20_BBox_LatitudeMin();
+      defineColumn_Geo_22_BBox_LatitudeMax();
+      defineColumn_Geo_24_BBox_LongitudeMin();
+      defineColumn_Geo_26_BBox_LongitudeMax();
    }
 
-   private void defineColumn_10_DisplayName() {
+   private void defineColumn_Geo_10_Latitude() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_DisplayName.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final LocationItem locationItem = ((LocationItem) cell.getElement());
+
+            cell.setText(locationItem.latitudeE6_Normalized);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_12_Longitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).longitudeE6_Normalized);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_20_BBox_LatitudeMin() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MIN.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).latitudeMinE6_Normalized);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_22_BBox_LatitudeMax() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MAX.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).latitudeMaxE6_Normalized);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_24_BBox_LongitudeMin() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MIN.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).longitudeMinE6_Normalized);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_26_BBox_LongitudeMax() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MAX.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).longitudeMaxE6_Normalized);
+         }
+      });
+   }
+
+   private void defineColumn_Part_10_DisplayName() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_DisplayName.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -618,9 +842,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_10_Name() {
+   private void defineColumn_Part_10_Name() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Name.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Name.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -634,9 +858,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_20_Continent() {
+   private void defineColumn_Part_30_Continent() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Continent.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Continent.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -649,9 +873,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_20_Country() {
+   private void defineColumn_Part_30_Country() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Country.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Country.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -665,9 +889,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_20_CountryCode() {
+   private void defineColumn_Part_30_CountryCode() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_CountryCode.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CountryCode.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -680,9 +904,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_30_County() {
+   private void defineColumn_Part_35_County() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_County.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_County.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -695,9 +919,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_30_Region() {
+   private void defineColumn_Part_35_Region() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Region.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Region.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -710,9 +934,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_30_State() {
+   private void defineColumn_Part_35_State() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_State.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_State.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -726,9 +950,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_30_StateDistrict() {
+   private void defineColumn_Part_35_StateDistrict() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_StateDistrict.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_StateDistrict.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -741,9 +965,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_40_City() {
+   private void defineColumn_Part_40_City() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_City.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_City.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -757,9 +981,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_40_Municipality() {
+   private void defineColumn_Part_40_Municipality() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Municipality.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Municipality.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -772,9 +996,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_40_Town() {
+   private void defineColumn_Part_40_Town() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Town.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Town.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -788,9 +1012,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_40_Village() {
+   private void defineColumn_Part_40_Village() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Village.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Village.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -803,9 +1027,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_45_Borough() {
+   private void defineColumn_Part_45_Borough() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Borough.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Borough.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -818,9 +1042,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_45_CityDistrict() {
+   private void defineColumn_Part_45_CityDistrict() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_CityDistrict.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CityDistrict.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -833,9 +1057,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_45_District() {
+   private void defineColumn_Part_45_District() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_District.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_District.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -848,9 +1072,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_45_Subdivision() {
+   private void defineColumn_Part_45_Subdivision() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Subdivision.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Subdivision.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -863,9 +1087,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_45_Suburb() {
+   private void defineColumn_Part_45_Suburb() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Suburb.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Suburb.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -878,9 +1102,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_50_Croft() {
+   private void defineColumn_Part_50_Croft() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Croft.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Croft.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -893,9 +1117,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_50_Hamlet() {
+   private void defineColumn_Part_50_Hamlet() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Hamlet.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Hamlet.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -908,9 +1132,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_50_IsolatedDwelling() {
+   private void defineColumn_Part_50_IsolatedDwelling() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_IsolatedDwelling.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_IsolatedDwelling.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -923,9 +1147,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_55_Allotments() {
+   private void defineColumn_Part_55_Allotments() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Allotments.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Allotments.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -938,9 +1162,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_55_Neighbourhood() {
+   private void defineColumn_Part_55_Neighbourhood() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Neighbourhood.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Neighbourhood.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -953,9 +1177,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_55_Quarter() {
+   private void defineColumn_Part_55_Quarter() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Quarter.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Quarter.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -968,9 +1192,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_CityBlock() {
+   private void defineColumn_Part_60_CityBlock() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_CityBlock.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CityBlock.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -983,9 +1207,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_Commercial() {
+   private void defineColumn_Part_60_Commercial() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Commercial.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Commercial.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -998,9 +1222,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_Farm() {
+   private void defineColumn_Part_60_Farm() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Farm.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Farm.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1013,9 +1237,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_Farmyard() {
+   private void defineColumn_Part_60_Farmyard() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Farmyard.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Farmyard.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1028,9 +1252,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_Industrial() {
+   private void defineColumn_Part_60_Industrial() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Industrial.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Industrial.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1043,9 +1267,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_Residential() {
+   private void defineColumn_Part_60_Residential() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Residential.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Residential.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1058,9 +1282,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_Retail() {
+   private void defineColumn_Part_60_Retail() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Retail.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Retail.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1073,9 +1297,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_65_Road() {
+   private void defineColumn_Part_65_Road() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Road.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Road.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1089,9 +1313,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_70_HouseName() {
+   private void defineColumn_Part_70_HouseName() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_HouseName.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_HouseName.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1105,9 +1329,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_70_HouseNumber() {
+   private void defineColumn_Part_70_HouseNumber() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_HouseNumber.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_HouseNumber.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1121,9 +1345,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Aerialway() {
+   private void defineColumn_Part_80_Aerialway() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Aerialway.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Aerialway.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1136,9 +1360,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Aeroway() {
+   private void defineColumn_Part_80_Aeroway() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Aeroway.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Aeroway.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1151,9 +1375,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Amenity() {
+   private void defineColumn_Part_80_Amenity() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Amenity.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Amenity.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1167,9 +1391,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Boundary() {
+   private void defineColumn_Part_80_Boundary() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Boundary.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Boundary.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1182,9 +1406,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Bridge() {
+   private void defineColumn_Part_80_Bridge() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Bridge.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Bridge.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1197,9 +1421,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Club() {
+   private void defineColumn_Part_80_Club() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Club.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Club.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1212,9 +1436,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Craft() {
+   private void defineColumn_Part_80_Craft() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Craft.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Craft.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1227,9 +1451,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Emergency() {
+   private void defineColumn_Part_80_Emergency() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Emergency.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Emergency.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1242,9 +1466,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Historic() {
+   private void defineColumn_Part_80_Historic() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Historic.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Historic.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1257,9 +1481,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Landuse() {
+   private void defineColumn_Part_80_Landuse() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Landuse.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Landuse.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1272,9 +1496,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Leisure() {
+   private void defineColumn_Part_80_Leisure() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Leisure.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Leisure.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1287,9 +1511,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_ManMade() {
+   private void defineColumn_Part_80_ManMade() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_ManMade.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_ManMade.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1302,9 +1526,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Military() {
+   private void defineColumn_Part_80_Military() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Military.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Military.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1317,9 +1541,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_MountainPass() {
+   private void defineColumn_Part_80_MountainPass() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_MountainPass.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_MountainPass.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1332,9 +1556,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Natural() {
+   private void defineColumn_Part_80_Natural() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Natural.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Natural.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1347,9 +1571,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Office() {
+   private void defineColumn_Part_80_Office() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Office.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Office.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1362,9 +1586,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Place() {
+   private void defineColumn_Part_80_Place() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Place.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Place.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1377,9 +1601,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Railway() {
+   private void defineColumn_Part_80_Railway() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Railway.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Railway.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1392,9 +1616,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Shop() {
+   private void defineColumn_Part_80_Shop() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Shop.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Shop.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1407,9 +1631,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Tourism() {
+   private void defineColumn_Part_80_Tourism() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Tourism.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Tourism.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1422,9 +1646,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Tunnel() {
+   private void defineColumn_Part_80_Tunnel() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Tunnel.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Tunnel.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1437,9 +1661,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_80_Waterway() {
+   private void defineColumn_Part_80_Waterway() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Waterway.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Waterway.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1452,9 +1676,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_90_Postcode() {
+   private void defineColumn_Part_90_Postcode() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_Postcode.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Postcode.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1593,7 +1817,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          final String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                       //$NON-NLS-1$
+               + "SELECT" + NL //                        //$NON-NLS-1$
 
                + "name," + NL //                      1  //$NON-NLS-1$
                + "display_name," + NL //              2  //$NON-NLS-1$
@@ -1662,9 +1886,18 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                + "tunnel," + NL //                    55 //$NON-NLS-1$
                + "waterway," + NL //                  56 //$NON-NLS-1$
 
-               + "postcode" + NL //                  57 //$NON-NLS-1$
+               + "postcode," + NL //                  57 //$NON-NLS-1$
+
+               + "latitudeE6_Normalized," + NL //     58 //$NON-NLS-1$
+               + "longitudeE6_Normalized," + NL //    59 //$NON-NLS-1$
+
+               + "latitudeMinE6_Normalized," + NL //  60 //$NON-NLS-1$
+               + "latitudeMaxE6_Normalized," + NL //  61 //$NON-NLS-1$
+               + "longitudeMinE6_Normalized," + NL // 62 //$NON-NLS-1$
+               + "longitudeMaxE6_Normalized" + NL //  63 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_LOCATION + NL //$NON-NLS-1$
+
          ;
 
          statement = conn.prepareStatement(sql);
@@ -1750,6 +1983,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             tourLocation.postcode            = result.getString(57);
 
+            locationItem.latitudeE6_Normalized        = _nf6.format((result.getInt(58) -  90_000_000) / 1E6);
+            locationItem.longitudeE6_Normalized       = _nf6.format((result.getInt(59) - 180_000_000) / 1E6);
+
+            locationItem.latitudeMinE6_Normalized     = _nf6.format((result.getInt(60) -  90_000_000) / 1E6);
+            locationItem.latitudeMaxE6_Normalized     = _nf6.format((result.getInt(61) -  90_000_000) / 1E6);
+            locationItem.longitudeMinE6_Normalized    = _nf6.format((result.getInt(62) - 180_000_000) / 1E6);
+            locationItem.longitudeMaxE6_Normalized    = _nf6.format((result.getInt(63) - 180_000_000) / 1E6);
+
 //SET_FORMATTING_ON
          }
 
@@ -1770,7 +2011,16 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          {
             // update viewer with new sorting
             _locationComparator.setSortColumn(e.widget);
+
+            final long start = System.nanoTime();
+
             _locationViewer.refresh();
+
+            final long end = System.nanoTime();
+
+            System.out.println((UI.timeStampNano() + " sorting\t")
+                  + (((float) (end - start) / 1000000) + " ms"));
+            // TODO remove SYSTEM.OUT.PRINTLN
          }
          updateUI_SelectLocation(selectionBackup);
       }

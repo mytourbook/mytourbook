@@ -110,131 +110,144 @@ public abstract class TableColumnFactory {
    public static final String             DEVICE_NAME_ID                                     = "DEVICE_NAME";                                     //$NON-NLS-1$
    public static final TableColumnFactory DEVICE_PROFILE;
 
-   public static final TableColumnFactory LOCATION_DisplayName;
-   public static final String             LOCATION_DisplayName_ID                            = "LOCATION_DisplayName_ID";                         //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Name;
-   public static final String             LOCATION_Name_ID                                   = "LOCATION_Name";                                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LATITUDE;
+   public static final String             LOCATION_GEO_LATITUDE_ID                           = "LOCATION_GEO_LATITUDE_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LONGITUDE;
+   public static final String             LOCATION_GEO_LONGITUDE_ID                          = "LOCATION_GEO_LONGITUDE_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BBOX_LATITUDE_MIN;
+   public static final String             LOCATION_GEO_BBOX_LATITUDE_MIN_ID                  = "LOCATION_GEO_BBOX_LATITUDE_MIN_ID";               //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BBOX_LATITUDE_MAX;
+   public static final String             LOCATION_GEO_BBOX_LATITUDE_MAX_ID                  = "LOCATION_GEO_BBOX_LATITUDE_MAX_ID";               //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BBOX_LONGITUDE_MIN;
+   public static final String             LOCATION_GEO_BBOX_LONGITUDE_MIN_ID                 = "LOCATION_GEO_BBOX_LONGITUDE_MIN_ID";              //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BBOX_LONGITUDE_MAX;
+   public static final String             LOCATION_GEO_BBOX_LONGITUDE_MAX_ID                 = "LOCATION_GEO_BBOX_LONGITUDE_MAX_ID";              //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Continent;
-   public static final String             LOCATION_Continent_ID                              = "LOCATION_Continent_ID";                           //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Country;
-   public static final String             LOCATION_Country_ID                                = "LOCATION_Country_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_CountryCode;
-   public static final String             LOCATION_CountryCode_ID                            = "LOCATION_CountryCode_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_DisplayName;
+   public static final String             LOCATION_PART_DisplayName_ID                       = "LOCATION_PART_DisplayName_ID";                    //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Name;
+   public static final String             LOCATION_PART_Name_ID                              = "LOCATION_PART_Name";                              //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Region;
-   public static final String             LOCATION_Region_ID                                 = "LOCATION_Region_ID";                              //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_State;
-   public static final String             LOCATION_State_ID                                  = "LOCATION_State_ID";                               //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_StateDistrict;
-   public static final String             LOCATION_StateDistrict_ID                          = "LOCATION_StateDistrict_ID";                       //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_County;
-   public static final String             LOCATION_County_ID                                 = "LOCATION_County_ID";                              //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Continent;
+   public static final String             LOCATION_PART_Continent_ID                         = "LOCATION_PART_Continent_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Country;
+   public static final String             LOCATION_PART_Country_ID                           = "LOCATION_PART_Country_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_CountryCode;
+   public static final String             LOCATION_PART_CountryCode_ID                       = "LOCATION_PART_CountryCode_ID";                    //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Municipality;
-   public static final String             LOCATION_Municipality_ID                           = "LOCATION_Municipality_ID";                        //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_City;
-   public static final String             LOCATION_City_ID                                   = "LOCATION_City_ID";                                //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Town;
-   public static final String             LOCATION_Town_ID                                   = "LOCATION_Town_ID";                                //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Village;
-   public static final String             LOCATION_Village_ID                                = "LOCATION_Village_ID";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Region;
+   public static final String             LOCATION_PART_Region_ID                            = "LOCATION_PART_Region_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_State;
+   public static final String             LOCATION_PART_State_ID                             = "LOCATION_PART_State_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_StateDistrict;
+   public static final String             LOCATION_PART_StateDistrict_ID                     = "LOCATION_PART_StateDistrict_ID";                  //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_County;
+   public static final String             LOCATION_PART_County_ID                            = "LOCATION_PART_County_ID";                         //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_CityDistrict;
-   public static final String             LOCATION_CityDistrict_ID                           = "LOCATION_CityDistrict_ID";                        //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_District;
-   public static final String             LOCATION_District_ID                               = "LOCATION_District_ID";                            //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Borough;
-   public static final String             LOCATION_Borough_ID                                = "LOCATION_Borough_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Suburb;
-   public static final String             LOCATION_Suburb_ID                                 = "LOCATION_Suburb_ID";                              //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Subdivision;
-   public static final String             LOCATION_Subdivision_ID                            = "LOCATION_Subdivision_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Municipality;
+   public static final String             LOCATION_PART_Municipality_ID                      = "LOCATION_PART_Municipality_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_City;
+   public static final String             LOCATION_PART_City_ID                              = "LOCATION_PART_City_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Town;
+   public static final String             LOCATION_PART_Town_ID                              = "LOCATION_PART_Town_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Village;
+   public static final String             LOCATION_PART_Village_ID                           = "LOCATION_PART_Village_ID";                        //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Hamlet;
-   public static final String             LOCATION_Hamlet_ID                                 = "LOCATION_Hamlet_ID";                              //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Croft;
-   public static final String             LOCATION_Croft_ID                                  = "LOCATION_Croft_ID";                               //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_IsolatedDwelling;
-   public static final String             LOCATION_IsolatedDwelling_ID                       = "LOCATION_IsolatedDwelling_ID";                    //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_CityDistrict;
+   public static final String             LOCATION_PART_CityDistrict_ID                      = "LOCATION_PART_CityDistrict_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_District;
+   public static final String             LOCATION_PART_District_ID                          = "LOCATION_PART_District_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Borough;
+   public static final String             LOCATION_PART_Borough_ID                           = "LOCATION_PART_Borough_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Suburb;
+   public static final String             LOCATION_PART_Suburb_ID                            = "LOCATION_PART_Suburb_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Subdivision;
+   public static final String             LOCATION_PART_Subdivision_ID                       = "LOCATION_PART_Subdivision_ID";                    //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Neighbourhood;
-   public static final String             LOCATION_Neighbourhood_ID                          = "LOCATION_Neighbourhood_ID";                       //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Allotments;
-   public static final String             LOCATION_Allotments_ID                             = "LOCATION_Allotments_ID";                          //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Quarter;
-   public static final String             LOCATION_Quarter_ID                                = "LOCATION_Quarter_ID";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Hamlet;
+   public static final String             LOCATION_PART_Hamlet_ID                            = "LOCATION_PART_Hamlet_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Croft;
+   public static final String             LOCATION_PART_Croft_ID                             = "LOCATION_PART_Croft_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_IsolatedDwelling;
+   public static final String             LOCATION_PART_IsolatedDwelling_ID                  = "LOCATION_PART_IsolatedDwelling_ID";               //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_CityBlock;
-   public static final String             LOCATION_CityBlock_ID                              = "LOCATION_CityBlock_ID";                           //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Residential;
-   public static final String             LOCATION_Residential_ID                            = "LOCATION_Residential_ID";                         //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Farm;
-   public static final String             LOCATION_Farm_ID                                   = "LOCATION_Farm_ID";                                //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Farmyard;
-   public static final String             LOCATION_Farmyard_ID                               = "LOCATION_Farmyard_ID";                            //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Industrial;
-   public static final String             LOCATION_Industrial_ID                             = "LOCATION_Industrial_ID";                          //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Commercial;
-   public static final String             LOCATION_Commercial_ID                             = "LOCATION_Commercial_ID";                          //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Retail;
-   public static final String             LOCATION_Retail_ID                                 = "LOCATION_Retail_ID";                              //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Neighbourhood;
+   public static final String             LOCATION_PART_Neighbourhood_ID                     = "LOCATION_PART_Neighbourhood_ID";                  //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Allotments;
+   public static final String             LOCATION_PART_Allotments_ID                        = "LOCATION_PART_Allotments_ID";                     //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Quarter;
+   public static final String             LOCATION_PART_Quarter_ID                           = "LOCATION_PART_Quarter_ID";                        //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Road;
-   public static final String             LOCATION_Road_ID                                   = "LOCATION_Road_ID";                                //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_CityBlock;
+   public static final String             LOCATION_PART_CityBlock_ID                         = "LOCATION_PART_CityBlock_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Residential;
+   public static final String             LOCATION_PART_Residential_ID                       = "LOCATION_PART_Residential_ID";                    //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Farm;
+   public static final String             LOCATION_PART_Farm_ID                              = "LOCATION_PART_Farm_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Farmyard;
+   public static final String             LOCATION_PART_Farmyard_ID                          = "LOCATION_PART_Farmyard_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Industrial;
+   public static final String             LOCATION_PART_Industrial_ID                        = "LOCATION_PART_Industrial_ID";                     //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Commercial;
+   public static final String             LOCATION_PART_Commercial_ID                        = "LOCATION_PART_Commercial_ID";                     //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Retail;
+   public static final String             LOCATION_PART_Retail_ID                            = "LOCATION_PART_Retail_ID";                         //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_HouseName;
-   public static final String             LOCATION_HouseName_ID                              = "LOCATION_HouseName_ID";                           //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_HouseNumber;
-   public static final String             LOCATION_HouseNumber_ID                            = "LOCATION_HouseNumber_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Road;
+   public static final String             LOCATION_PART_Road_ID                              = "LOCATION_PART_Road_ID";                           //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Aerialway;
-   public static final String             LOCATION_Aerialway_ID                              = "LOCATION_Aerialway_ID";                           //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Aeroway;
-   public static final String             LOCATION_Aeroway_ID                                = "LOCATION_Aeroway_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Amenity;
-   public static final String             LOCATION_Amenity_ID                                = "LOCATION_Amenity_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Boundary;
-   public static final String             LOCATION_Boundary_ID                               = "LOCATION_Boundary_ID";                            //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Bridge;
-   public static final String             LOCATION_Bridge_ID                                 = "LOCATION_Bridge_ID";                              //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Club;
-   public static final String             LOCATION_Club_ID                                   = "LOCATION_Club_ID";                                //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Craft;
-   public static final String             LOCATION_Craft_ID                                  = "LOCATION_Craft_ID";                               //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Emergency;
-   public static final String             LOCATION_Emergency_ID                              = "LOCATION_Emergency_ID";                           //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Historic;
-   public static final String             LOCATION_Historic_ID                               = "LOCATION_Historic_ID";                            //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Landuse;
-   public static final String             LOCATION_Landuse_ID                                = "LOCATION_Landuse_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Leisure;
-   public static final String             LOCATION_Leisure_ID                                = "LOCATION_Leisure_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_ManMade;
-   public static final String             LOCATION_ManMade_ID                                = "LOCATION_ManMade_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Military;
-   public static final String             LOCATION_Military_ID                               = "LOCATION_Military_ID";                            //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_MountainPass;
-   public static final String             LOCATION_MountainPass_ID                           = "LOCATION_MountainPass_ID";                        //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Natural;
-   public static final String             LOCATION_Natural_ID                                = "LOCATION_Natural_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Office;
-   public static final String             LOCATION_Office_ID                                 = "LOCATION_Office_ID";                              //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Place;
-   public static final String             LOCATION_Place_ID                                  = "LOCATION_Place_ID";                               //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Railway;
-   public static final String             LOCATION_Railway_ID                                = "LOCATION_Railway_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Shop;
-   public static final String             LOCATION_Shop_ID                                   = "LOCATION_Shop_ID";                                //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Tourism;
-   public static final String             LOCATION_Tourism_ID                                = "LOCATION_Tourism_ID";                             //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Tunnel;
-   public static final String             LOCATION_Tunnel_ID                                 = "LOCATION_Tunnel_ID";                              //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_Waterway;
-   public static final String             LOCATION_Waterway_ID                               = "LOCATION_Waterway_ID";                            //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_HouseName;
+   public static final String             LOCATION_PART_HouseName_ID                         = "LOCATION_PART_HouseName_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_HouseNumber;
+   public static final String             LOCATION_PART_HouseNumber_ID                       = "LOCATION_PART_HouseNumber_ID";                    //$NON-NLS-1$
 
-   public static final TableColumnFactory LOCATION_Postcode;
-   public static final String             LOCATION_Postcode_ID                               = "LOCATION_Postcode_ID";                            //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Aerialway;
+   public static final String             LOCATION_PART_Aerialway_ID                         = "LOCATION_PART_Aerialway_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Aeroway;
+   public static final String             LOCATION_PART_Aeroway_ID                           = "LOCATION_PART_Aeroway_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Amenity;
+   public static final String             LOCATION_PART_Amenity_ID                           = "LOCATION_PART_Amenity_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Boundary;
+   public static final String             LOCATION_PART_Boundary_ID                          = "LOCATION_PART_Boundary_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Bridge;
+   public static final String             LOCATION_PART_Bridge_ID                            = "LOCATION_PART_Bridge_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Club;
+   public static final String             LOCATION_PART_Club_ID                              = "LOCATION_PART_Club_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Craft;
+   public static final String             LOCATION_PART_Craft_ID                             = "LOCATION_PART_Craft_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Emergency;
+   public static final String             LOCATION_PART_Emergency_ID                         = "LOCATION_PART_Emergency_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Historic;
+   public static final String             LOCATION_PART_Historic_ID                          = "LOCATION_PART_Historic_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Landuse;
+   public static final String             LOCATION_PART_Landuse_ID                           = "LOCATION_PART_Landuse_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Leisure;
+   public static final String             LOCATION_PART_Leisure_ID                           = "LOCATION_PART_Leisure_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_ManMade;
+   public static final String             LOCATION_PART_ManMade_ID                           = "LOCATION_PART_ManMade_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Military;
+   public static final String             LOCATION_PART_Military_ID                          = "LOCATION_PART_Military_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_MountainPass;
+   public static final String             LOCATION_PART_MountainPass_ID                      = "LOCATION_PART_MountainPass_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Natural;
+   public static final String             LOCATION_PART_Natural_ID                           = "LOCATION_PART_Natural_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Office;
+   public static final String             LOCATION_PART_Office_ID                            = "LOCATION_PART_Office_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Place;
+   public static final String             LOCATION_PART_Place_ID                             = "LOCATION_PART_Place_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Railway;
+   public static final String             LOCATION_PART_Railway_ID                           = "LOCATION_PART_Railway_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Shop;
+   public static final String             LOCATION_PART_Shop_ID                              = "LOCATION_PART_Shop_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Tourism;
+   public static final String             LOCATION_PART_Tourism_ID                           = "LOCATION_PART_Tourism_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Tunnel;
+   public static final String             LOCATION_PART_Tunnel_ID                            = "LOCATION_PART_Tunnel_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Waterway;
+   public static final String             LOCATION_PART_Waterway_ID                          = "LOCATION_PART_Waterway_ID";                       //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Postcode;
+   public static final String             LOCATION_PART_Postcode_ID                          = "LOCATION_PART_Postcode_ID";                       //$NON-NLS-1$
 
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_GAIN_DELTA;
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_LOSS_DELTA;
@@ -1529,74 +1542,188 @@ public abstract class TableColumnFactory {
        * Location
        */
 
-      LOCATION_DisplayName       = createColumn_Location(LOCATION_DisplayName_ID,      Messages.Location_Part_OsmDefaultName);
-      LOCATION_Name              = createColumn_Location(LOCATION_Name_ID,             Messages.Location_Part_OsmName);
+      LOCATION_GEO_LATITUDE = new TableColumnFactory() {
 
-      LOCATION_Continent         = createColumn_Location(LOCATION_Continent_ID,        Messages.Location_Part_Continent);
-      LOCATION_Country           = createColumn_Location(LOCATION_Country_ID,          Messages.Location_Part_Country);
-      LOCATION_CountryCode       = createColumn_Location(LOCATION_CountryCode_ID,      Messages.Location_Part_CountryCode);
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
 
-      LOCATION_Region            = createColumn_Location(LOCATION_Region_ID,           Messages.Location_Part_Region);
-      LOCATION_State             = createColumn_Location(LOCATION_State_ID,            Messages.Location_Part_State);
-      LOCATION_StateDistrict     = createColumn_Location(LOCATION_StateDistrict_ID,    Messages.Location_Part_StateDistrict);
-      LOCATION_County            = createColumn_Location(LOCATION_County_ID,           Messages.Location_Part_County);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LATITUDE_ID, SWT.TRAIL);
 
-      LOCATION_Municipality      = createColumn_Location(LOCATION_Municipality_ID,     Messages.Location_Part_Municipality);
-      LOCATION_City              = createColumn_Location(LOCATION_City_ID,             Messages.Location_Part_City);
-      LOCATION_Town              = createColumn_Location(LOCATION_Town_ID,             Messages.Location_Part_Town);
-      LOCATION_Village           = createColumn_Location(LOCATION_Village_ID,          Messages.Location_Part_Village);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
 
-      LOCATION_CityDistrict      = createColumn_Location(LOCATION_CityDistrict_ID,     Messages.Location_Part_CityDistrict);
-      LOCATION_District          = createColumn_Location(LOCATION_District_ID,         Messages.Location_Part_District);
-      LOCATION_Borough           = createColumn_Location(LOCATION_Borough_ID,          Messages.Location_Part_Borough);
-      LOCATION_Suburb            = createColumn_Location(LOCATION_Suburb_ID,           Messages.Location_Part_Suburb);
-      LOCATION_Subdivision       = createColumn_Location(LOCATION_Subdivision_ID,      Messages.Location_Part_Subdivision);
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Latitude);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Latitude_Tooltip);
 
-      LOCATION_Hamlet            = createColumn_Location(LOCATION_Hamlet_ID,           Messages.Location_Part_Hamlet);
-      LOCATION_Croft             = createColumn_Location(LOCATION_Croft_ID,            Messages.Location_Part_Croft);
-      LOCATION_IsolatedDwelling  = createColumn_Location(LOCATION_IsolatedDwelling_ID, Messages.Location_Part_IsolatedDwelling);
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
-      LOCATION_Neighbourhood     = createColumn_Location(LOCATION_Neighbourhood_ID,    Messages.Location_Part_Neighbourhood);
-      LOCATION_Allotments        = createColumn_Location(LOCATION_Allotments_ID,       Messages.Location_Part_Allotments);
-      LOCATION_Quarter           = createColumn_Location(LOCATION_Quarter_ID,          Messages.Location_Part_Quarter);
+            return colDef;
+         }
+      };
 
-      LOCATION_CityBlock         = createColumn_Location(LOCATION_CityBlock_ID,        Messages.Location_Part_CityBlock);
-      LOCATION_Residential       = createColumn_Location(LOCATION_Residential_ID,      Messages.Location_Part_Residential);
-      LOCATION_Farm              = createColumn_Location(LOCATION_Farm_ID,             Messages.Location_Part_Farm);
-      LOCATION_Farmyard          = createColumn_Location(LOCATION_Farmyard_ID,         Messages.Location_Part_Farmyard);
-      LOCATION_Industrial        = createColumn_Location(LOCATION_Industrial_ID,       Messages.Location_Part_Industrial);
-      LOCATION_Commercial        = createColumn_Location(LOCATION_Commercial_ID,       Messages.Location_Part_Commercial);
-      LOCATION_Retail            = createColumn_Location(LOCATION_Retail_ID,           Messages.Location_Part_Retail);
+      LOCATION_GEO_LONGITUDE = new TableColumnFactory() {
 
-      LOCATION_Road              = createColumn_Location(LOCATION_Road_ID,             Messages.Location_Part_Road);
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
 
-      LOCATION_HouseName         = createColumn_Location(LOCATION_HouseName_ID,        Messages.Location_Part_HouseName);
-      LOCATION_HouseNumber       = createColumn_Location(LOCATION_HouseNumber_ID,      Messages.Location_Part_HouseNumber);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LONGITUDE_ID, SWT.TRAIL);
 
-      LOCATION_Aerialway         = createColumn_Location(LOCATION_Aerialway_ID,        Messages.Location_Part_Aerialway);
-      LOCATION_Aeroway           = createColumn_Location(LOCATION_Aeroway_ID,          Messages.Location_Part_Aeroway);
-      LOCATION_Amenity           = createColumn_Location(LOCATION_Amenity_ID,          Messages.Location_Part_Amenity);
-      LOCATION_Boundary          = createColumn_Location(LOCATION_Boundary_ID,         Messages.Location_Part_Boundary);
-      LOCATION_Bridge            = createColumn_Location(LOCATION_Bridge_ID,           Messages.Location_Part_Bridge);
-      LOCATION_Club              = createColumn_Location(LOCATION_Club_ID,             Messages.Location_Part_Club);
-      LOCATION_Craft             = createColumn_Location(LOCATION_Craft_ID,            Messages.Location_Part_Craft);
-      LOCATION_Emergency         = createColumn_Location(LOCATION_Emergency_ID,        Messages.Location_Part_Emergency);
-      LOCATION_Historic          = createColumn_Location(LOCATION_Historic_ID,         Messages.Location_Part_Historic);
-      LOCATION_Landuse           = createColumn_Location(LOCATION_Landuse_ID,          Messages.Location_Part_Landuse);
-      LOCATION_Leisure           = createColumn_Location(LOCATION_Leisure_ID,          Messages.Location_Part_Leisure);
-      LOCATION_ManMade           = createColumn_Location(LOCATION_ManMade_ID,          Messages.Location_Part_ManMade);
-      LOCATION_Military          = createColumn_Location(LOCATION_Military_ID,         Messages.Location_Part_Military);
-      LOCATION_MountainPass      = createColumn_Location(LOCATION_MountainPass_ID,     Messages.Location_Part_MountainPass);
-      LOCATION_Natural           = createColumn_Location(LOCATION_Natural_ID,          Messages.Location_Part_Natural);
-      LOCATION_Office            = createColumn_Location(LOCATION_Office_ID,           Messages.Location_Part_Office);
-      LOCATION_Place             = createColumn_Location(LOCATION_Place_ID,            Messages.Location_Part_Place);
-      LOCATION_Railway           = createColumn_Location(LOCATION_Railway_ID,          Messages.Location_Part_Railway);
-      LOCATION_Shop              = createColumn_Location(LOCATION_Shop_ID,             Messages.Location_Part_Shop);
-      LOCATION_Tourism           = createColumn_Location(LOCATION_Tourism_ID,          Messages.Location_Part_Tourism);
-      LOCATION_Tunnel            = createColumn_Location(LOCATION_Tunnel_ID,           Messages.Location_Part_Tunnel);
-      LOCATION_Waterway          = createColumn_Location(LOCATION_Waterway_ID,         Messages.Location_Part_Waterway);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
 
-      LOCATION_Postcode          = createColumn_Location(LOCATION_Postcode_ID,         Messages.Location_Part_Postcode);
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Longitude);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Longitude_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BBOX_LATITUDE_MIN = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LATITUDE_MIN_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LatitudeMin);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LatitudeMin_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BBOX_LATITUDE_MAX = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LATITUDE_MAX_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LatitudeMax);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LatitudeMax_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BBOX_LONGITUDE_MIN = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LONGITUDE_MIN_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LongitudeMin);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LongitudeMin_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BBOX_LONGITUDE_MAX = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LONGITUDE_MAX_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LongitudeMax);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LongitudeMax_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_PART_DisplayName      = createColumn_Location(LOCATION_PART_DisplayName_ID,        Messages.Location_Part_OsmDefaultName);
+      LOCATION_PART_Name             = createColumn_Location(LOCATION_PART_Name_ID,               Messages.Location_Part_OsmName);
+
+      LOCATION_PART_Continent        = createColumn_Location(LOCATION_PART_Continent_ID,          Messages.Location_Part_Continent);
+      LOCATION_PART_Country          = createColumn_Location(LOCATION_PART_Country_ID,            Messages.Location_Part_Country);
+      LOCATION_PART_CountryCode      = createColumn_Location(LOCATION_PART_CountryCode_ID,        Messages.Location_Part_CountryCode);
+
+      LOCATION_PART_Region           = createColumn_Location(LOCATION_PART_Region_ID,             Messages.Location_Part_Region);
+      LOCATION_PART_State            = createColumn_Location(LOCATION_PART_State_ID,              Messages.Location_Part_State);
+      LOCATION_PART_StateDistrict    = createColumn_Location(LOCATION_PART_StateDistrict_ID,      Messages.Location_Part_StateDistrict);
+      LOCATION_PART_County           = createColumn_Location(LOCATION_PART_County_ID,             Messages.Location_Part_County);
+
+      LOCATION_PART_Municipality     = createColumn_Location(LOCATION_PART_Municipality_ID,       Messages.Location_Part_Municipality);
+      LOCATION_PART_City             = createColumn_Location(LOCATION_PART_City_ID,               Messages.Location_Part_City);
+      LOCATION_PART_Town             = createColumn_Location(LOCATION_PART_Town_ID,               Messages.Location_Part_Town);
+      LOCATION_PART_Village          = createColumn_Location(LOCATION_PART_Village_ID,            Messages.Location_Part_Village);
+
+      LOCATION_PART_CityDistrict     = createColumn_Location(LOCATION_PART_CityDistrict_ID,       Messages.Location_Part_CityDistrict);
+      LOCATION_PART_District         = createColumn_Location(LOCATION_PART_District_ID,           Messages.Location_Part_District);
+      LOCATION_PART_Borough          = createColumn_Location(LOCATION_PART_Borough_ID,            Messages.Location_Part_Borough);
+      LOCATION_PART_Suburb           = createColumn_Location(LOCATION_PART_Suburb_ID,             Messages.Location_Part_Suburb);
+      LOCATION_PART_Subdivision      = createColumn_Location(LOCATION_PART_Subdivision_ID,        Messages.Location_Part_Subdivision);
+
+      LOCATION_PART_Hamlet           = createColumn_Location(LOCATION_PART_Hamlet_ID,             Messages.Location_Part_Hamlet);
+      LOCATION_PART_Croft            = createColumn_Location(LOCATION_PART_Croft_ID,              Messages.Location_Part_Croft);
+      LOCATION_PART_IsolatedDwelling = createColumn_Location(LOCATION_PART_IsolatedDwelling_ID,   Messages.Location_Part_IsolatedDwelling);
+
+      LOCATION_PART_Neighbourhood    = createColumn_Location(LOCATION_PART_Neighbourhood_ID,      Messages.Location_Part_Neighbourhood);
+      LOCATION_PART_Allotments       = createColumn_Location(LOCATION_PART_Allotments_ID,         Messages.Location_Part_Allotments);
+      LOCATION_PART_Quarter          = createColumn_Location(LOCATION_PART_Quarter_ID,            Messages.Location_Part_Quarter);
+
+      LOCATION_PART_CityBlock        = createColumn_Location(LOCATION_PART_CityBlock_ID,          Messages.Location_Part_CityBlock);
+      LOCATION_PART_Residential      = createColumn_Location(LOCATION_PART_Residential_ID,        Messages.Location_Part_Residential);
+      LOCATION_PART_Farm             = createColumn_Location(LOCATION_PART_Farm_ID,               Messages.Location_Part_Farm);
+      LOCATION_PART_Farmyard         = createColumn_Location(LOCATION_PART_Farmyard_ID,           Messages.Location_Part_Farmyard);
+      LOCATION_PART_Industrial       = createColumn_Location(LOCATION_PART_Industrial_ID,         Messages.Location_Part_Industrial);
+      LOCATION_PART_Commercial       = createColumn_Location(LOCATION_PART_Commercial_ID,         Messages.Location_Part_Commercial);
+      LOCATION_PART_Retail           = createColumn_Location(LOCATION_PART_Retail_ID,             Messages.Location_Part_Retail);
+
+      LOCATION_PART_Road             = createColumn_Location(LOCATION_PART_Road_ID,               Messages.Location_Part_Road);
+
+      LOCATION_PART_HouseName        = createColumn_Location(LOCATION_PART_HouseName_ID,          Messages.Location_Part_HouseName);
+      LOCATION_PART_HouseNumber      = createColumn_Location(LOCATION_PART_HouseNumber_ID,        Messages.Location_Part_HouseNumber);
+
+      LOCATION_PART_Aerialway        = createColumn_Location(LOCATION_PART_Aerialway_ID,          Messages.Location_Part_Aerialway);
+      LOCATION_PART_Aeroway          = createColumn_Location(LOCATION_PART_Aeroway_ID,            Messages.Location_Part_Aeroway);
+      LOCATION_PART_Amenity          = createColumn_Location(LOCATION_PART_Amenity_ID,            Messages.Location_Part_Amenity);
+      LOCATION_PART_Boundary         = createColumn_Location(LOCATION_PART_Boundary_ID,           Messages.Location_Part_Boundary);
+      LOCATION_PART_Bridge           = createColumn_Location(LOCATION_PART_Bridge_ID,             Messages.Location_Part_Bridge);
+      LOCATION_PART_Club             = createColumn_Location(LOCATION_PART_Club_ID,               Messages.Location_Part_Club);
+      LOCATION_PART_Craft            = createColumn_Location(LOCATION_PART_Craft_ID,              Messages.Location_Part_Craft);
+      LOCATION_PART_Emergency        = createColumn_Location(LOCATION_PART_Emergency_ID,          Messages.Location_Part_Emergency);
+      LOCATION_PART_Historic         = createColumn_Location(LOCATION_PART_Historic_ID,           Messages.Location_Part_Historic);
+      LOCATION_PART_Landuse          = createColumn_Location(LOCATION_PART_Landuse_ID,            Messages.Location_Part_Landuse);
+      LOCATION_PART_Leisure          = createColumn_Location(LOCATION_PART_Leisure_ID,            Messages.Location_Part_Leisure);
+      LOCATION_PART_ManMade          = createColumn_Location(LOCATION_PART_ManMade_ID,            Messages.Location_Part_ManMade);
+      LOCATION_PART_Military         = createColumn_Location(LOCATION_PART_Military_ID,           Messages.Location_Part_Military);
+      LOCATION_PART_MountainPass     = createColumn_Location(LOCATION_PART_MountainPass_ID,       Messages.Location_Part_MountainPass);
+      LOCATION_PART_Natural          = createColumn_Location(LOCATION_PART_Natural_ID,            Messages.Location_Part_Natural);
+      LOCATION_PART_Office           = createColumn_Location(LOCATION_PART_Office_ID,             Messages.Location_Part_Office);
+      LOCATION_PART_Place            = createColumn_Location(LOCATION_PART_Place_ID,              Messages.Location_Part_Place);
+      LOCATION_PART_Railway          = createColumn_Location(LOCATION_PART_Railway_ID,            Messages.Location_Part_Railway);
+      LOCATION_PART_Shop             = createColumn_Location(LOCATION_PART_Shop_ID,               Messages.Location_Part_Shop);
+      LOCATION_PART_Tourism          = createColumn_Location(LOCATION_PART_Tourism_ID,            Messages.Location_Part_Tourism);
+      LOCATION_PART_Tunnel           = createColumn_Location(LOCATION_PART_Tunnel_ID,             Messages.Location_Part_Tunnel);
+      LOCATION_PART_Waterway         = createColumn_Location(LOCATION_PART_Waterway_ID,           Messages.Location_Part_Waterway);
+
+      LOCATION_PART_Postcode         = createColumn_Location(LOCATION_PART_Postcode_ID,           Messages.Location_Part_Postcode);
 
 
       /*
