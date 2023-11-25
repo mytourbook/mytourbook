@@ -53,6 +53,7 @@ public class Utils {
    public static final String DIRECTORY                        = Messages.App_Action_Menu_Directory;
    public static final String SAVE_MODIFIED_TOUR               = "Save modified tour (Ctrl+S)";                                   //$NON-NLS-1$
    public static final String TOOLS                            = "Tools ";                                                        //$NON-NLS-1$
+   public static final String TOUR                             = "Tour";                                                          //$NON-NLS-1$
 
    public static final String VIEW_NAME_COLLATEDTOURS          = PluginProperties.getText("View_Name_CollatedTours");             //$NON-NLS-1$
    public static final String VIEW_NAME_ELEVATIONCOMPARE       = PluginProperties.getText("View_Name_Compare_ByElevation");       //$NON-NLS-1$
@@ -80,6 +81,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURLOG                = PluginProperties.getText("View_Name_TourLog");                   //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP25              = PluginProperties.getText("View_Name_TourMap25");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP3               = PluginProperties.getText("View_Name_TourMap3");                  //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURNUTRITION          = PluginProperties.getText("View_Name_TourNutrition");             //$NON-NLS-1$
    public static final String VIEW_NAME_ALLTOURMARKERS         = PluginProperties.getText("View_Name_AllTourMarkers");            //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMARKERS            = PluginProperties.getText("view_name_Marker");                    //$NON-NLS-1$
    public static final String VIEW_NAME_TOURPAUSES             = PluginProperties.getText("View_Name_TourPauses");                //$NON-NLS-1$

@@ -149,7 +149,7 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView photosAndToursView = Utils.showView(bot, Utils.VIEW_NAME_PHOTOSANDTOURS);
 
-      Utils.showViewFromMenu(bot, "Tour", Utils.VIEW_NAME_PHOTOSTOURSPHOTOS); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_PHOTOSTOURSPHOTOS);
       final SWTBotView tourPhotosView = Utils.showView(bot, Utils.VIEW_NAME_PHOTOSTOURSPHOTOS);
 
       Utils.showViewFromMenu(bot, "Map", Utils.VIEW_NAME_MAPBOOKMARK); //$NON-NLS-1$

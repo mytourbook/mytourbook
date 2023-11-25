@@ -25,7 +25,7 @@ public class TourBlogViewTests extends UITest {
 
    private SWTBotView getTourBlogView() {
 
-      Utils.showViewFromMenu(bot, "Tour", Utils.VIEW_NAME_TOURBLOG); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURBLOG);
       return Utils.showView(bot, Utils.VIEW_NAME_TOURBLOG);
    }
 
