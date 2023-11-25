@@ -54,6 +54,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -428,9 +429,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final TourFuelProduct tfp = new TourFuelProduct(_tourData, productResponse.getProduct());
       _tourData.addFuelProduct(tfp);
 
-      TourManager.saveModifiedTour(_tourData);
-      //TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData));
-
+      BusyIndicator.showWhile(Display.getCurrent(), () -> TourManager.saveModifiedTour(_tourData));
    }
 
    private void onDispose() {

@@ -114,6 +114,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private Text                    _txtCalories;
    private Text                    _txtFluid;
+   private Text                    _txtSodium;
 
    private Combo                   _cboSearchQuery;
 
@@ -417,7 +418,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void createUI_Section_10_Summary(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
+      final Composite container = new Composite(parent, SWT.BORDER);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          /*
@@ -461,6 +462,21 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             final Label label = UI.createLabel(container, "Sodium");
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            _txtSodium = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtSodium);
+         }
+
+         // Grade
+         {
+            /*
+             * Label: Grade
+             */
+            final Label label = UI.createLabel(container, "Grade");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
       }
    }
@@ -483,6 +499,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    public void dispose() {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
       _nutritionQuery.removePropertyChangeListener(this);
 
       super.dispose();
@@ -646,6 +663,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       _txtCalories.setText(NutritionUtils.getTotalCalories(_tourData.getTourFuelProducts()));
       _txtFluid.setText(NutritionUtils.getTotalFluids(_tourData.getTourFuelProducts()));
+      _txtSodium.setText(NutritionUtils.getTotalSodium(_tourData.getTourFuelProducts()));
 
    }
 

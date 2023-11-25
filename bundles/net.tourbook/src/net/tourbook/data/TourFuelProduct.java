@@ -31,6 +31,7 @@ import javax.persistence.Transient;
 import net.tourbook.database.TourDatabase;
 
 import pl.coderion.model.Nutriments;
+import pl.coderion.model.Product;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
@@ -65,10 +66,8 @@ public class TourFuelProduct {
    private String                     name;
 
    private int                        calories;
-//
-//
-//   private double                     fluidVolume;
-//   private double                     sodium;
+   private float                      fluid;
+   private float                      sodium;
 
    //link it to an object defined by the user ?
 //   private double                     containerName;
@@ -77,13 +76,14 @@ public class TourFuelProduct {
 
    public TourFuelProduct() {}
 
-   public TourFuelProduct(final TourData tourData, final pl.coderion.model.Product product) {
+   public TourFuelProduct(final TourData tourData, final Product product) {
 
       this.tourData = tourData;
       name = product.getProductName();
 
       final Nutriments nutriments = product.getNutriments();
-      calories = nutriments.getEnergyKcal();
+      calories = nutriments.getEnergyKcalServing();
+      sodium = nutriments.getSodiumServing();
    }
 
    /**
@@ -153,6 +153,14 @@ public class TourFuelProduct {
       productCode = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
+   }
+
+   public float getFluid() {
+      return fluid;
+   }
+
+   public float getSodium() {
+      return sodium;
    }
 
 }
