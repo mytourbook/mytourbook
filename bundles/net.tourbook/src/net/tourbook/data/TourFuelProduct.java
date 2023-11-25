@@ -66,11 +66,9 @@ public class TourFuelProduct {
 
    private int                        calories;
 //
-   // private float                      carbohydrates;
-//
-//   private double                     sodium;
 //
 //   private double                     fluidVolume;
+//   private double                     sodium;
 
    //link it to an object defined by the user ?
 //   private double                     containerName;
@@ -86,7 +84,6 @@ public class TourFuelProduct {
 
       final Nutriments nutriments = product.getNutriments();
       calories = nutriments.getEnergyKcal();
-      // carbohydrates = nutriments.getCarbohydrates();
    }
 
    /**

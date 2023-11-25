@@ -113,7 +113,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private boolean                 _isInUpdate;
 
    private Text                    _txtCalories;
-   private Text                    _txtFluids;
+   private Text                    _txtFluid;
 
    private Combo                   _cboSearchQuery;
 
@@ -170,10 +170,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return String.valueOf(tourFuelProduct.getCalories());
 
          case 3:
-            //    return String.valueOf(tourFuelProduct.getCarbohydrates());
-         case 4:
             //    return String.valueOf(tourFuelProduct.getSodium());
-         case 5:
+         case 4:
             //    return String.valueOf(tourFuelProduct.getCaffeine());
 
          default:
@@ -328,10 +326,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       columnCalories.setText("Calories"); //$NON-NLS-1$
       columnCalories.setWidth(75);
 
-      // Column: Carbohydrates
-      final TableColumn columnCarbohydrates = new TableColumn(productsTable, SWT.LEFT);
-      columnCarbohydrates.setText("Carbohydrates"); //$NON-NLS-1$
-      columnCarbohydrates.setWidth(75);
+      // Column: Fluid
+      final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
+      columnFluid.setText("Fluid"); //$NON-NLS-1$
+      columnFluid.setWidth(75);
 
       // Column: Sodium
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
@@ -431,18 +429,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
 
-         // Fluids
-         {
-            final Label label = UI.createLabel(container, "Fluids");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-            _txtFluids = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtFluids);
-         }
-
          // Calories
          {
             final Label label = UI.createLabel(container, "Calories");
@@ -455,12 +441,24 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
                   .applyTo(_txtCalories);
          }
 
-         // Carbohydrates
+         // Fluid
+         {
+            final Label label = UI.createLabel(container, "Fluid");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            _txtFluid = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtFluid);
+         }
+
+         // Sodium
          {
             /*
-             * Label: Carbohydrates
+             * Label: Sodium
              */
-            final Label label = UI.createLabel(container, "Carbohydrates");
+            final Label label = UI.createLabel(container, "Sodium");
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
@@ -647,7 +645,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private void updateUI_SummaryFromModel() {
 
       _txtCalories.setText(NutritionUtils.getTotalCalories(_tourData.getTourFuelProducts()));
-      _txtFluids.setText(NutritionUtils.getTotalFluids(_tourData.getTourFuelProducts()));
+      _txtFluid.setText(NutritionUtils.getTotalFluids(_tourData.getTourFuelProducts()));
 
    }
 
