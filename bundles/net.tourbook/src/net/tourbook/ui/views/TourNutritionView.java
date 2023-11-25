@@ -136,10 +136,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          final Object[] tourFuelProducts = _tourData.getTourFuelProducts().toArray();
 
-//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//                  + ("\n\t_tourData: " + _tourData));
-//            // TODO remove SYSTEM.OUT.PRINTLN
-
          return tourFuelProducts;
       }
 
@@ -171,9 +167,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return String.valueOf(tourFuelProduct.getCalories());
 
          case 3:
-            //    return String.valueOf(tourFuelProduct.getSodium());
+            return String.valueOf(tourFuelProduct.getFluid());
+
          case 4:
-            //    return String.valueOf(tourFuelProduct.getCaffeine());
+            return String.valueOf(tourFuelProduct.getSodium());
 
          default:
             return UI.EMPTY_STRING;
@@ -231,9 +228,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return;
          }
 
-         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection eventDataSelection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(eventDataSelection);
 
          } else {
 
