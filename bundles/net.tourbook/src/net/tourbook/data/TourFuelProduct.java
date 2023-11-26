@@ -39,6 +39,10 @@ public class TourFuelProduct {
 
    // todo fb rename to TourNutritionItem ? TourNutritionProduct ?
 
+   //todo fb implement swt.del on the table
+   // fluidContainerName
+   // fluidContainerCapacity
+   // fluidQuantityConsumed
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
