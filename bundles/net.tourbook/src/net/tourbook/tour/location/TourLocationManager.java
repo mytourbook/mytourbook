@@ -496,21 +496,30 @@ public class TourLocationManager {
          tourLocation.city                   = validString(osmAddress.city);
          tourLocation.town                   = validString(osmAddress.town);
          tourLocation.village                = validString(osmAddress.village);
+         tourLocation.postcode               = validString(osmAddress.postcode);
 
+         tourLocation.road                   = validString(osmAddress.road);
+         tourLocation.house_number           = validString(osmAddress.house_number);
+         tourLocation.house_name             = validString(osmAddress.house_name);
+
+         // Area I
          tourLocation.city_district          = validString(osmAddress.city_district);
          tourLocation.district               = validString(osmAddress.district);
          tourLocation.borough                = validString(osmAddress.borough);
          tourLocation.suburb                 = validString(osmAddress.suburb);
          tourLocation.subdivision            = validString(osmAddress.subdivision);
 
+         // Area II
          tourLocation.hamlet                 = validString(osmAddress.hamlet);
          tourLocation.croft                  = validString(osmAddress.croft);
          tourLocation.isolated_dwelling      = validString(osmAddress.isolated_dwelling);
 
+         // Area III
          tourLocation.neighbourhood          = validString(osmAddress.neighbourhood);
          tourLocation.allotments             = validString(osmAddress.allotments);
          tourLocation.quarter                = validString(osmAddress.quarter);
 
+         // Area IV
          tourLocation.city_block             = validString(osmAddress.city_block);
          tourLocation.residential            = validString(osmAddress.residential);
          tourLocation.farm                   = validString(osmAddress.farm);
@@ -518,11 +527,6 @@ public class TourLocationManager {
          tourLocation.industrial             = validString(osmAddress.industrial);
          tourLocation.commercial             = validString(osmAddress.commercial);
          tourLocation.retail                 = validString(osmAddress.retail);
-
-         tourLocation.road                   = validString(osmAddress.road);
-
-         tourLocation.house_number           = validString(osmAddress.house_number);
-         tourLocation.house_name             = validString(osmAddress.house_name);
 
          tourLocation.aerialway              = validString(osmAddress.aerialway);
          tourLocation.aeroway                = validString(osmAddress.aeroway);
@@ -546,8 +550,6 @@ public class TourLocationManager {
          tourLocation.tourism                = validString(osmAddress.tourism);
          tourLocation.tunnel                 = validString(osmAddress.tunnel);
          tourLocation.waterway               = validString(osmAddress.waterway);
-
-         tourLocation.postcode               = validString(osmAddress.postcode);
       }
 
 // SET_FORMATTING_ON

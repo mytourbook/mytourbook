@@ -150,73 +150,73 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
-         case TableColumnFactory.LOCATION_PART_Name_ID:         rc = compareText(location1.name,         location2.name);        break;
+         case TableColumnFactory.LOCATION_PART_Name_ID:              rc = compareText(location1.name,                location2.name);              break;
 
-         case TableColumnFactory.LOCATION_PART_Continent_ID:
-         case TableColumnFactory.LOCATION_PART_Country_ID:
-         case TableColumnFactory.LOCATION_PART_CountryCode_ID:
+         case TableColumnFactory.LOCATION_PART_Continent_ID:         rc = compareText(location1.continent,           location2.continent);         break;
+         case TableColumnFactory.LOCATION_PART_Country_ID:           rc = compareText(location1.country,             location2.country);           break;
+         case TableColumnFactory.LOCATION_PART_CountryCode_ID:       rc = compareText(location1.country_code,        location2.country_code);      break;
 
-         case TableColumnFactory.LOCATION_PART_Region_ID:
-         case TableColumnFactory.LOCATION_PART_State_ID:
-         case TableColumnFactory.LOCATION_PART_StateDistrict_ID:
-         case TableColumnFactory.LOCATION_PART_County_ID:         rc = compareText(location1.county,       location2.county);        break;
+         case TableColumnFactory.LOCATION_PART_Region_ID:            rc = compareText(location1.region,              location2.region);            break;
+         case TableColumnFactory.LOCATION_PART_State_ID:             rc = compareText(location1.state,               location2.state);             break;
+         case TableColumnFactory.LOCATION_PART_StateDistrict_ID:     rc = compareText(location1.state_district,      location2.state_district);    break;
+         case TableColumnFactory.LOCATION_PART_County_ID:            rc = compareText(location1.county,              location2.county);            break;
 
-         case TableColumnFactory.LOCATION_PART_Municipality_ID:
-         case TableColumnFactory.LOCATION_PART_City_ID:
-         case TableColumnFactory.LOCATION_PART_Town_ID:           rc = compareText(location1.town,          location2.town);           break;
-         case TableColumnFactory.LOCATION_PART_Village_ID:
+         case TableColumnFactory.LOCATION_PART_Municipality_ID:      rc = compareText(location1.municipality,        location2.municipality);      break;
+         case TableColumnFactory.LOCATION_PART_City_ID:              rc = compareText(location1.city,                location2.city);              break;
+         case TableColumnFactory.LOCATION_PART_Town_ID:              rc = compareText(location1.town,                location2.town);              break;
+         case TableColumnFactory.LOCATION_PART_Village_ID:           rc = compareText(location1.village,             location2.village);           break;
 
-         case TableColumnFactory.LOCATION_PART_CityDistrict_ID:
-         case TableColumnFactory.LOCATION_PART_District_ID:
-         case TableColumnFactory.LOCATION_PART_Borough_ID:
-         case TableColumnFactory.LOCATION_PART_Suburb_ID:
-         case TableColumnFactory.LOCATION_PART_Subdivision_ID:
+         case TableColumnFactory.LOCATION_PART_CityDistrict_ID:      rc = compareText(location1.city_district,       location2.city_district);     break;
+         case TableColumnFactory.LOCATION_PART_District_ID:          rc = compareText(location1.district,            location2.district);          break;
+         case TableColumnFactory.LOCATION_PART_Borough_ID:           rc = compareText(location1.borough,             location2.borough);           break;
+         case TableColumnFactory.LOCATION_PART_Suburb_ID:            rc = compareText(location1.suburb,              location2.suburb);            break;
+         case TableColumnFactory.LOCATION_PART_Subdivision_ID:       rc = compareText(location1.subdivision,         location2.subdivision);       break;
 
-         case TableColumnFactory.LOCATION_PART_Hamlet_ID:
-         case TableColumnFactory.LOCATION_PART_Croft_ID:
-         case TableColumnFactory.LOCATION_PART_IsolatedDwelling_ID:
+         case TableColumnFactory.LOCATION_PART_Hamlet_ID:            rc = compareText(location1.hamlet,              location2.hamlet);            break;
+         case TableColumnFactory.LOCATION_PART_Croft_ID:             rc = compareText(location1.croft,               location2.croft);             break;
+         case TableColumnFactory.LOCATION_PART_IsolatedDwelling_ID:  rc = compareText(location1.isolated_dwelling,   location2.isolated_dwelling); break;
 
-         case TableColumnFactory.LOCATION_PART_Neighbourhood_ID:
-         case TableColumnFactory.LOCATION_PART_Allotments_ID:
-         case TableColumnFactory.LOCATION_PART_Quarter_ID:
+         case TableColumnFactory.LOCATION_PART_Neighbourhood_ID:     rc = compareText(location1.neighbourhood,       location2.neighbourhood);     break;
+         case TableColumnFactory.LOCATION_PART_Allotments_ID:        rc = compareText(location1.allotments,          location2.allotments);        break;
+         case TableColumnFactory.LOCATION_PART_Quarter_ID:           rc = compareText(location1.quarter,             location2.quarter);           break;
 
-         case TableColumnFactory.LOCATION_PART_CityBlock_ID:
-         case TableColumnFactory.LOCATION_PART_Residential_ID:
-         case TableColumnFactory.LOCATION_PART_Farm_ID:
-         case TableColumnFactory.LOCATION_PART_Farmyard_ID:
-         case TableColumnFactory.LOCATION_PART_Industrial_ID:
-         case TableColumnFactory.LOCATION_PART_Commercial_ID:
-         case TableColumnFactory.LOCATION_PART_Retail_ID:
+         case TableColumnFactory.LOCATION_PART_CityBlock_ID:         rc = compareText(location1.city_block,          location2.city_block);        break;
+         case TableColumnFactory.LOCATION_PART_Residential_ID:       rc = compareText(location1.residential,         location2.residential);       break;
+         case TableColumnFactory.LOCATION_PART_Farm_ID:              rc = compareText(location1.farm,                location2.farm);              break;
+         case TableColumnFactory.LOCATION_PART_Farmyard_ID:          rc = compareText(location1.farmyard,            location2.farmyard);          break;
+         case TableColumnFactory.LOCATION_PART_Industrial_ID:        rc = compareText(location1.industrial,          location2.industrial);        break;
+         case TableColumnFactory.LOCATION_PART_Commercial_ID:        rc = compareText(location1.commercial,          location2.commercial);        break;
+         case TableColumnFactory.LOCATION_PART_Retail_ID:            rc = compareText(location1.retail,              location2.retail);            break;
 
-         case TableColumnFactory.LOCATION_PART_Road_ID:           rc = compareText(location1.road,          location2.road);           break;
+         case TableColumnFactory.LOCATION_PART_Road_ID:              rc = compareText(location1.road,                location2.road);              break;
 
-         case TableColumnFactory.LOCATION_PART_HouseName_ID:
-         case TableColumnFactory.LOCATION_PART_HouseNumber_ID:    rc = compareText(location1.house_number,  location2.house_number);   break;
+         case TableColumnFactory.LOCATION_PART_HouseName_ID:         rc = compareText(location1.house_name,          location2.house_name);        break;
+         case TableColumnFactory.LOCATION_PART_HouseNumber_ID:       rc = compareText(location1.house_number,        location2.house_number);      break;
 
-         case TableColumnFactory.LOCATION_PART_Aerialway_ID:
-         case TableColumnFactory.LOCATION_PART_Aeroway_ID:
-         case TableColumnFactory.LOCATION_PART_Amenity_ID:
-         case TableColumnFactory.LOCATION_PART_Boundary_ID:
-         case TableColumnFactory.LOCATION_PART_Bridge_ID:
-         case TableColumnFactory.LOCATION_PART_Club_ID:
-         case TableColumnFactory.LOCATION_PART_Craft_ID:
-         case TableColumnFactory.LOCATION_PART_Emergency_ID:
-         case TableColumnFactory.LOCATION_PART_Historic_ID:
-         case TableColumnFactory.LOCATION_PART_Landuse_ID:
-         case TableColumnFactory.LOCATION_PART_Leisure_ID:
-         case TableColumnFactory.LOCATION_PART_ManMade_ID:
-         case TableColumnFactory.LOCATION_PART_Military_ID:
-         case TableColumnFactory.LOCATION_PART_MountainPass_ID:
-         case TableColumnFactory.LOCATION_PART_Natural_ID:
-         case TableColumnFactory.LOCATION_PART_Office_ID:
-         case TableColumnFactory.LOCATION_PART_Place_ID:
-         case TableColumnFactory.LOCATION_PART_Railway_ID:
-         case TableColumnFactory.LOCATION_PART_Shop_ID:
-         case TableColumnFactory.LOCATION_PART_Tourism_ID:
-         case TableColumnFactory.LOCATION_PART_Tunnel_ID:
-         case TableColumnFactory.LOCATION_PART_Waterway_ID:
+         case TableColumnFactory.LOCATION_PART_Aerialway_ID:         rc = compareText(location1.aerialway,           location2.aerialway);         break;
+         case TableColumnFactory.LOCATION_PART_Aeroway_ID:           rc = compareText(location1.aeroway,             location2.aeroway);           break;
+         case TableColumnFactory.LOCATION_PART_Amenity_ID:           rc = compareText(location1.amenity,             location2.amenity);           break;
+         case TableColumnFactory.LOCATION_PART_Boundary_ID:          rc = compareText(location1.boundary,            location2.boundary);          break;
+         case TableColumnFactory.LOCATION_PART_Bridge_ID:            rc = compareText(location1.bridge,              location2.bridge);            break;
+         case TableColumnFactory.LOCATION_PART_Club_ID:              rc = compareText(location1.club,                location2.club);              break;
+         case TableColumnFactory.LOCATION_PART_Craft_ID:             rc = compareText(location1.craft,               location2.craft);             break;
+         case TableColumnFactory.LOCATION_PART_Emergency_ID:         rc = compareText(location1.emergency,           location2.emergency);         break;
+         case TableColumnFactory.LOCATION_PART_Historic_ID:          rc = compareText(location1.historic,            location2.historic);          break;
+         case TableColumnFactory.LOCATION_PART_Landuse_ID:           rc = compareText(location1.landuse,             location2.landuse);           break;
+         case TableColumnFactory.LOCATION_PART_Leisure_ID:           rc = compareText(location1.leisure,             location2.leisure);           break;
+         case TableColumnFactory.LOCATION_PART_ManMade_ID:           rc = compareText(location1.man_made,            location2.man_made);          break;
+         case TableColumnFactory.LOCATION_PART_Military_ID:          rc = compareText(location1.military,            location2.military);          break;
+         case TableColumnFactory.LOCATION_PART_MountainPass_ID:      rc = compareText(location1.mountain_pass,       location2.mountain_pass);     break;
+         case TableColumnFactory.LOCATION_PART_Natural_ID:           rc = compareText(location1.natural2,            location2.natural2);          break;
+         case TableColumnFactory.LOCATION_PART_Office_ID:            rc = compareText(location1.office,              location2.office);            break;
+         case TableColumnFactory.LOCATION_PART_Place_ID:             rc = compareText(location1.place,               location2.place);             break;
+         case TableColumnFactory.LOCATION_PART_Railway_ID:           rc = compareText(location1.railway,             location2.railway);           break;
+         case TableColumnFactory.LOCATION_PART_Shop_ID:              rc = compareText(location1.shop,                location2.shop);              break;
+         case TableColumnFactory.LOCATION_PART_Tourism_ID:           rc = compareText(location1.tourism,             location2.tourism);           break;
+         case TableColumnFactory.LOCATION_PART_Tunnel_ID:            rc = compareText(location1.tunnel,              location2.tunnel);            break;
+         case TableColumnFactory.LOCATION_PART_Waterway_ID:          rc = compareText(location1.waterway,            location2.waterway);          break;
 
-         case TableColumnFactory.LOCATION_PART_Postcode_ID:       rc = compareText(location1.postcode,      location2.postcode);       break;
+         case TableColumnFactory.LOCATION_PART_Postcode_ID:          rc = compareText(location1.postcode,            location2.postcode);          break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
             rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
@@ -224,6 +224,26 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          case TableColumnFactory.LOCATION_GEO_LONGITUDE_ID:
             rc = location1.longitudeE6_Normalized - location2.longitudeE6_Normalized;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF_ID:
+
+            rc = item1.latitudeDiffValue - item2.latitudeDiffValue;
+
+            if (rc == 0) {
+               rc = item1.longitudeDiffValue - item2.longitudeDiffValue;
+            }
+
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_LONGITUDE_DIFF_ID:
+
+            rc = item1.longitudeDiffValue - item2.longitudeDiffValue;
+
+            if (rc == 0) {
+               rc = item1.latitudeDiffValue - item2.latitudeDiffValue;
+            }
+
             break;
 
          case TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MIN_ID:
@@ -343,13 +363,19 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       TourLocation  location;
 
-      public String latitudeE6_Normalized;
-      public String longitudeE6_Normalized;
+      public String latitude;
+      public String longitude;
 
-      public String latitudeMinE6_Normalized;
-      public String latitudeMaxE6_Normalized;
-      public String longitudeMinE6_Normalized;
-      public String longitudeMaxE6_Normalized;
+      public String latitudeMin;
+      public String latitudeMax;
+      public String longitudeMin;
+      public String longitudeMax;
+
+      public String latitudeDiffText;
+      public String longitudeDiffText;
+
+      public int    latitudeDiffValue;
+      public int    longitudeDiffValue;
 
       @Override
       public boolean equals(final Object obj) {
@@ -620,6 +646,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationViewer = new TableViewer(table);
 
       _columnManager.createColumns(_locationViewer);
+      _columnManager.setIsCategoryAvailable(true);
 
       _locationViewer.setUseHashlookup(true);
       _locationViewer.setContentProvider(new LocationContentProvider());
@@ -657,50 +684,60 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
-      defineColumn_Part_10_Name();
+      // Name
       defineColumn_Part_10_DisplayName();
+      defineColumn_Part_10_Name();
 
-      defineColumn_Part_30_Continent();
+      // Country
       defineColumn_Part_30_Country();
       defineColumn_Part_30_CountryCode();
+      defineColumn_Part_30_Continent();
 
+      // State
       defineColumn_Part_35_Region();
       defineColumn_Part_35_State();
       defineColumn_Part_35_StateDistrict();
       defineColumn_Part_35_County();
 
+      // City
       defineColumn_Part_40_Municipality();
       defineColumn_Part_40_City();
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
+      defineColumn_Part_40_Postcode();
 
-      defineColumn_Part_45_CityDistrict();
-      defineColumn_Part_45_District();
-      defineColumn_Part_45_Borough();
-      defineColumn_Part_45_Suburb();
-      defineColumn_Part_45_Subdivision();
+      // Road
+      defineColumn_Part_45_Road();
+      defineColumn_Part_45_HouseNumber();
+      defineColumn_Part_45_HouseName();
 
-      defineColumn_Part_50_Hamlet();
-      defineColumn_Part_50_Croft();
-      defineColumn_Part_50_IsolatedDwelling();
+      // Area I
+      defineColumn_Part_50_CityDistrict();
+      defineColumn_Part_50_District();
+      defineColumn_Part_50_Borough();
+      defineColumn_Part_50_Suburb();
+      defineColumn_Part_50_Subdivision();
 
-      defineColumn_Part_55_Neighbourhood();
-      defineColumn_Part_55_Allotments();
-      defineColumn_Part_55_Quarter();
+      // Area II
+      defineColumn_Part_55_Hamlet();
+      defineColumn_Part_55_Croft();
+      defineColumn_Part_55_IsolatedDwelling();
 
-      defineColumn_Part_60_CityBlock();
-      defineColumn_Part_60_Residential();
-      defineColumn_Part_60_Farm();
-      defineColumn_Part_60_Farmyard();
-      defineColumn_Part_60_Industrial();
-      defineColumn_Part_60_Commercial();
-      defineColumn_Part_60_Retail();
+      // Area III
+      defineColumn_Part_60_Neighbourhood();
+      defineColumn_Part_60_Allotments();
+      defineColumn_Part_60_Quarter();
 
-      defineColumn_Part_65_Road();
+      // Area IV
+      defineColumn_Part_65_CityBlock();
+      defineColumn_Part_65_Residential();
+      defineColumn_Part_65_Farm();
+      defineColumn_Part_65_Farmyard();
+      defineColumn_Part_65_Commercial();
+      defineColumn_Part_65_Industrial();
+      defineColumn_Part_65_Retail();
 
-      defineColumn_Part_70_HouseName();
-      defineColumn_Part_70_HouseNumber();
-
+      // Other
       defineColumn_Part_80_Aerialway();
       defineColumn_Part_80_Aeroway();
       defineColumn_Part_80_Amenity();
@@ -724,14 +761,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_80_Tunnel();
       defineColumn_Part_80_Waterway();
 
-      defineColumn_Part_90_Postcode();
-
       defineColumn_Geo_10_Latitude();
-      defineColumn_Geo_12_Longitude();
       defineColumn_Geo_20_BBox_LatitudeMin();
       defineColumn_Geo_22_BBox_LatitudeMax();
+      defineColumn_Geo_14_LatitudeDiff();
+
+      defineColumn_Geo_12_Longitude();
       defineColumn_Geo_24_BBox_LongitudeMin();
       defineColumn_Geo_26_BBox_LongitudeMax();
+      defineColumn_Geo_16_LongitudeDiff();
    }
 
    private void defineColumn_Geo_10_Latitude() {
@@ -746,7 +784,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
-            cell.setText(locationItem.latitudeE6_Normalized);
+            cell.setText(locationItem.latitude);
          }
       });
    }
@@ -761,7 +799,39 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).longitudeE6_Normalized);
+            cell.setText(((LocationItem) cell.getElement()).longitude);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_14_LatitudeDiff() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final LocationItem locationItem = ((LocationItem) cell.getElement());
+
+            cell.setText(locationItem.latitudeDiffText);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_16_LongitudeDiff() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE_DIFF.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).longitudeDiffText);
          }
       });
    }
@@ -776,7 +846,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).latitudeMinE6_Normalized);
+            cell.setText(((LocationItem) cell.getElement()).latitudeMin);
          }
       });
    }
@@ -791,7 +861,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).latitudeMaxE6_Normalized);
+            cell.setText(((LocationItem) cell.getElement()).latitudeMax);
          }
       });
    }
@@ -806,7 +876,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).longitudeMinE6_Normalized);
+            cell.setText(((LocationItem) cell.getElement()).longitudeMin);
          }
       });
    }
@@ -821,7 +891,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).longitudeMaxE6_Normalized);
+            cell.setText(((LocationItem) cell.getElement()).longitudeMax);
          }
       });
    }
@@ -996,6 +1066,22 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
+   private void defineColumn_Part_40_Postcode() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Postcode.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.postcode);
+         }
+      });
+   }
+
    private void defineColumn_Part_40_Town() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Town.createColumn(_columnManager, _pc);
@@ -1027,293 +1113,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Part_45_Borough() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Borough.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.borough);
-         }
-      });
-   }
-
-   private void defineColumn_Part_45_CityDistrict() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CityDistrict.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.city_district);
-         }
-      });
-   }
-
-   private void defineColumn_Part_45_District() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_District.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.district);
-         }
-      });
-   }
-
-   private void defineColumn_Part_45_Subdivision() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Subdivision.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.subdivision);
-         }
-      });
-   }
-
-   private void defineColumn_Part_45_Suburb() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Suburb.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.suburb);
-         }
-      });
-   }
-
-   private void defineColumn_Part_50_Croft() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Croft.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.croft);
-         }
-      });
-   }
-
-   private void defineColumn_Part_50_Hamlet() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Hamlet.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.hamlet);
-         }
-      });
-   }
-
-   private void defineColumn_Part_50_IsolatedDwelling() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_IsolatedDwelling.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.isolated_dwelling);
-         }
-      });
-   }
-
-   private void defineColumn_Part_55_Allotments() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Allotments.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.allotments);
-         }
-      });
-   }
-
-   private void defineColumn_Part_55_Neighbourhood() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Neighbourhood.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.neighbourhood);
-         }
-      });
-   }
-
-   private void defineColumn_Part_55_Quarter() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Quarter.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.quarter);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_CityBlock() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CityBlock.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.city_block);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_Commercial() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Commercial.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.commercial);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_Farm() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Farm.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.farm);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_Farmyard() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Farmyard.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.farmyard);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_Industrial() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Industrial.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.industrial);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_Residential() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Residential.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.residential);
-         }
-      });
-   }
-
-   private void defineColumn_Part_60_Retail() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Retail.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.retail);
-         }
-      });
-   }
-
-   private void defineColumn_Part_65_Road() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Road.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.road);
-         }
-      });
-   }
-
-   private void defineColumn_Part_70_HouseName() {
+   private void defineColumn_Part_45_HouseName() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_HouseName.createColumn(_columnManager, _pc);
 
@@ -1329,7 +1129,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Part_70_HouseNumber() {
+   private void defineColumn_Part_45_HouseNumber() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_HouseNumber.createColumn(_columnManager, _pc);
 
@@ -1341,6 +1141,292 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             cell.setText(((LocationItem) cell.getElement()).location.house_number);
+         }
+      });
+   }
+
+   private void defineColumn_Part_45_Road() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Road.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.road);
+         }
+      });
+   }
+
+   private void defineColumn_Part_50_Borough() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Borough.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.borough);
+         }
+      });
+   }
+
+   private void defineColumn_Part_50_CityDistrict() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CityDistrict.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.city_district);
+         }
+      });
+   }
+
+   private void defineColumn_Part_50_District() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_District.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.district);
+         }
+      });
+   }
+
+   private void defineColumn_Part_50_Subdivision() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Subdivision.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.subdivision);
+         }
+      });
+   }
+
+   private void defineColumn_Part_50_Suburb() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Suburb.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.suburb);
+         }
+      });
+   }
+
+   private void defineColumn_Part_55_Croft() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Croft.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.croft);
+         }
+      });
+   }
+
+   private void defineColumn_Part_55_Hamlet() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Hamlet.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.hamlet);
+         }
+      });
+   }
+
+   private void defineColumn_Part_55_IsolatedDwelling() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_IsolatedDwelling.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.isolated_dwelling);
+         }
+      });
+   }
+
+   private void defineColumn_Part_60_Allotments() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Allotments.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.allotments);
+         }
+      });
+   }
+
+   private void defineColumn_Part_60_Neighbourhood() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Neighbourhood.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.neighbourhood);
+         }
+      });
+   }
+
+   private void defineColumn_Part_60_Quarter() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Quarter.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.quarter);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_CityBlock() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_CityBlock.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.city_block);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_Commercial() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Commercial.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.commercial);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_Farm() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Farm.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.farm);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_Farmyard() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Farmyard.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.farmyard);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_Industrial() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Industrial.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.industrial);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_Residential() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Residential.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.residential);
+         }
+      });
+   }
+
+   private void defineColumn_Part_65_Retail() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Retail.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).location.retail);
          }
       });
    }
@@ -1676,22 +1762,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Part_90_Postcode() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Postcode.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).location.postcode);
-         }
-      });
-   }
-
    @Override
    public void dispose() {
 
@@ -1983,15 +2053,82 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             tourLocation.postcode            = result.getString(57);
 
-            locationItem.latitudeE6_Normalized        = _nf6.format((result.getInt(58) -  90_000_000) / 1E6);
-            locationItem.longitudeE6_Normalized       = _nf6.format((result.getInt(59) - 180_000_000) / 1E6);
+            final int latitudeE6_Normalized     = result.getInt(58);
+            final int longitudeE6_Normalized    = result.getInt(59);
+            final int latitudeMinE6_Normalized  = result.getInt(60);
+            final int latitudeMaxE6_Normalized  = result.getInt(61);
+            final int longitudeMinE6_Normalized = result.getInt(62);
+            final int longitudeMaxE6_Normalized = result.getInt(63);
 
-            locationItem.latitudeMinE6_Normalized     = _nf6.format((result.getInt(60) -  90_000_000) / 1E6);
-            locationItem.latitudeMaxE6_Normalized     = _nf6.format((result.getInt(61) -  90_000_000) / 1E6);
-            locationItem.longitudeMinE6_Normalized    = _nf6.format((result.getInt(62) - 180_000_000) / 1E6);
-            locationItem.longitudeMaxE6_Normalized    = _nf6.format((result.getInt(63) - 180_000_000) / 1E6);
+            final double latitude               = (latitudeE6_Normalized  -  90_000_000) / 1E6;
+            final double longitude              = (longitudeE6_Normalized - 180_000_000) / 1E6;
+
+            final double latitudeMin            = (latitudeMinE6_Normalized  -  90_000_000) / 1E6;
+            final double latitudeMax            = (latitudeMaxE6_Normalized  -  90_000_000) / 1E6;
+            final double longitudeMin           = (longitudeMinE6_Normalized - 180_000_000) / 1E6;
+            final double longitudeMax           = (longitudeMaxE6_Normalized - 180_000_000) / 1E6;
+
+            tourLocation.latitudeE6_Normalized     = latitudeE6_Normalized;
+            tourLocation.longitudeE6_Normalized    = longitudeE6_Normalized;
+
+            tourLocation.latitudeMinE6_Normalized  = latitudeMinE6_Normalized;
+            tourLocation.latitudeMaxE6_Normalized  = latitudeMaxE6_Normalized;
+            tourLocation.longitudeMinE6_Normalized = longitudeMinE6_Normalized;
+            tourLocation.longitudeMaxE6_Normalized = longitudeMaxE6_Normalized;
+
+            locationItem.latitude     = _nf6.format(latitude);
+            locationItem.longitude    = _nf6.format(longitude);
+
+            locationItem.latitudeMin  = _nf6.format(latitudeMin);
+            locationItem.latitudeMax  = _nf6.format(latitudeMax);
+            locationItem.longitudeMin = _nf6.format(longitudeMin);
+            locationItem.longitudeMax = _nf6.format(longitudeMax);
 
 //SET_FORMATTING_ON
+
+            final int latitudeDiff = latitudeE6_Normalized < latitudeMinE6_Normalized
+                  ? latitudeE6_Normalized - latitudeMinE6_Normalized
+                  : latitudeE6_Normalized > latitudeMaxE6_Normalized
+                        ? latitudeE6_Normalized - latitudeMaxE6_Normalized
+                        : 0;
+
+            final int longitudeDiff = longitudeE6_Normalized < longitudeMinE6_Normalized
+                  ? longitudeE6_Normalized - longitudeMinE6_Normalized
+                  : longitudeE6_Normalized > longitudeMaxE6_Normalized
+                        ? longitudeE6_Normalized - longitudeMaxE6_Normalized
+                        : 0;
+
+//            int latitudeDiffMeter = 0;
+//            int longitudeDiffMeter = 0;
+//
+//            if (latitudeDiff > 0) {
+//
+//               latitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMax, longitudeMax);
+//
+//            } else if (latitudeDiff < 0) {
+//
+//               latitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMin, longitudeMin);
+//            }
+//
+//            if (longitudeDiff > 0) {
+//
+//               longitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMax, longitudeMax);
+//
+//            } else if (longitudeDiff < 0) {
+//
+//               longitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMin, longitudeMin);
+//            }
+
+            locationItem.latitudeDiffText = latitudeDiff == 0
+                  ? UI.EMPTY_STRING
+                  : Integer.toString(latitudeDiff);// + " - " + Integer.toString(latitudeDiffMeter);
+
+            locationItem.longitudeDiffText = longitudeDiff == 0
+                  ? UI.EMPTY_STRING
+                  : Integer.toString(longitudeDiff);// + " - " + Integer.toString(longitudeDiffMeter);
+
+            locationItem.latitudeDiffValue = latitudeDiff;
+            locationItem.longitudeDiffValue = longitudeDiff;
          }
 
       } catch (final SQLException e) {
@@ -2018,7 +2155,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final long end = System.nanoTime();
 
-            System.out.println((UI.timeStampNano() + " sorting\t")
+            System.out.println(("Sorting locations\t")
                   + (((float) (end - start) / 1000000) + " ms"));
             // TODO remove SYSTEM.OUT.PRINTLN
          }

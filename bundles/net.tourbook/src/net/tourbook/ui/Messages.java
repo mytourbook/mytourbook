@@ -197,7 +197,17 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_Body;
    public static String        ColumnFactory_Category_Data;
    public static String        ColumnFactory_Category_Device;
-   public static String        ColumnFactory_Category_Location;
+   public static String        ColumnFactory_Category_Geo;
+   public static String        ColumnFactory_Category_AddressArea1;
+   public static String        ColumnFactory_Category_AddressArea2;
+   public static String        ColumnFactory_Category_AddressArea3;
+   public static String        ColumnFactory_Category_AddressArea4;
+   public static String        ColumnFactory_Category_AddressCity;
+   public static String        ColumnFactory_Category_AddressCountry;
+   public static String        ColumnFactory_Category_AddressName;
+   public static String        ColumnFactory_Category_AddressOther;
+   public static String        ColumnFactory_Category_AddressRoad;
+   public static String        ColumnFactory_Category_AddressState;
    public static String        ColumnFactory_Category_Marker;
    public static String        ColumnFactory_Category_Motion;
    public static String        ColumnFactory_Category_Photo;
@@ -277,7 +287,11 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_Geo_BBox_LongitudeMin_Tooltip;
    public static String        ColumnFactory_Location_Geo_Latitude;
    public static String        ColumnFactory_Location_Geo_Latitude_Tooltip;
+   public static String        ColumnFactory_Location_Geo_LatitudeDiff;
+   public static String        ColumnFactory_Location_Geo_LatitudeDiff_Tooltip;
    public static String        ColumnFactory_Location_Geo_Longitude;
+   public static String        ColumnFactory_Location_Geo_Longitude_Diff;
+   public static String        ColumnFactory_Location_Geo_Longitude_Diff_Tooltip;
    public static String        ColumnFactory_Location_Geo_Longitude_Tooltip;
 
    public static String        ColumnFactory_Motion_Altimeter;

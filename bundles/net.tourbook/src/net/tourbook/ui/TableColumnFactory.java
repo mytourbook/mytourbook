@@ -112,8 +112,12 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory LOCATION_GEO_LATITUDE;
    public static final String             LOCATION_GEO_LATITUDE_ID                           = "LOCATION_GEO_LATITUDE_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LATITUDE_DIFF;
+   public static final String             LOCATION_GEO_LATITUDE_DIFF_ID                      = "LOCATION_GEO_LATITUDE_DIFF_ID";                   //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LONGITUDE;
    public static final String             LOCATION_GEO_LONGITUDE_ID                          = "LOCATION_GEO_LONGITUDE_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LONGITUDE_DIFF;
+   public static final String             LOCATION_GEO_LONGITUDE_DIFF_ID                     = "LOCATION_GEO_LONGITUDE_DIFF_ID";                  //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_BBOX_LATITUDE_MIN;
    public static final String             LOCATION_GEO_BBOX_LATITUDE_MIN_ID                  = "LOCATION_GEO_BBOX_LATITUDE_MIN_ID";               //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_BBOX_LATITUDE_MAX;
@@ -1550,7 +1554,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LATITUDE_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Latitude);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Latitude_Tooltip);
@@ -1569,10 +1573,48 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LONGITUDE_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Longitude);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Longitude_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_LATITUDE_DIFF = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LATITUDE_DIFF_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_LatitudeDiff);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LatitudeDiff_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_LONGITUDE_DIFF = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LONGITUDE_DIFF_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Longitude_Diff);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Longitude_Diff_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1588,7 +1630,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LATITUDE_MIN_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LatitudeMin);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LatitudeMin_Tooltip);
@@ -1607,7 +1649,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LATITUDE_MAX_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LatitudeMax);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LatitudeMax_Tooltip);
@@ -1626,7 +1668,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LONGITUDE_MIN_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LongitudeMin);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LongitudeMin_Tooltip);
@@ -1645,7 +1687,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BBOX_LONGITUDE_MAX_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_BBox_LongitudeMax);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BBox_LongitudeMax_Tooltip);
@@ -1656,74 +1698,85 @@ public abstract class TableColumnFactory {
          }
       };
 
-      LOCATION_PART_DisplayName      = createColumn_Location(LOCATION_PART_DisplayName_ID,        Messages.Location_Part_OsmDefaultName);
-      LOCATION_PART_Name             = createColumn_Location(LOCATION_PART_Name_ID,               Messages.Location_Part_OsmName);
+      final String categoryName     = Messages.ColumnFactory_Category_AddressName;
+      final String categoryCountry  = Messages.ColumnFactory_Category_AddressCountry;
+      final String categoryState    = Messages.ColumnFactory_Category_AddressState;
+      final String categoryCity     = Messages.ColumnFactory_Category_AddressCity;
+      final String categoryRoad     = Messages.ColumnFactory_Category_AddressRoad;
+      final String categoryArea1    = Messages.ColumnFactory_Category_AddressArea1;
+      final String categoryArea2    = Messages.ColumnFactory_Category_AddressArea2;
+      final String categoryArea3    = Messages.ColumnFactory_Category_AddressArea3;
+      final String categoryArea4    = Messages.ColumnFactory_Category_AddressArea4;
+      final String categoryOther    = Messages.ColumnFactory_Category_AddressOther;
 
-      LOCATION_PART_Continent        = createColumn_Location(LOCATION_PART_Continent_ID,          Messages.Location_Part_Continent);
-      LOCATION_PART_Country          = createColumn_Location(LOCATION_PART_Country_ID,            Messages.Location_Part_Country);
-      LOCATION_PART_CountryCode      = createColumn_Location(LOCATION_PART_CountryCode_ID,        Messages.Location_Part_CountryCode);
 
-      LOCATION_PART_Region           = createColumn_Location(LOCATION_PART_Region_ID,             Messages.Location_Part_Region);
-      LOCATION_PART_State            = createColumn_Location(LOCATION_PART_State_ID,              Messages.Location_Part_State);
-      LOCATION_PART_StateDistrict    = createColumn_Location(LOCATION_PART_StateDistrict_ID,      Messages.Location_Part_StateDistrict);
-      LOCATION_PART_County           = createColumn_Location(LOCATION_PART_County_ID,             Messages.Location_Part_County);
+      LOCATION_PART_DisplayName      = createColumn_Address(categoryName,     LOCATION_PART_DisplayName_ID,        Messages.Location_Part_OsmDefaultName);
+      LOCATION_PART_Name             = createColumn_Address(categoryName,     LOCATION_PART_Name_ID,               Messages.Location_Part_OsmName);
 
-      LOCATION_PART_Municipality     = createColumn_Location(LOCATION_PART_Municipality_ID,       Messages.Location_Part_Municipality);
-      LOCATION_PART_City             = createColumn_Location(LOCATION_PART_City_ID,               Messages.Location_Part_City);
-      LOCATION_PART_Town             = createColumn_Location(LOCATION_PART_Town_ID,               Messages.Location_Part_Town);
-      LOCATION_PART_Village          = createColumn_Location(LOCATION_PART_Village_ID,            Messages.Location_Part_Village);
+      LOCATION_PART_Country          = createColumn_Address(categoryCountry,  LOCATION_PART_Country_ID,            Messages.Location_Part_Country);
+      LOCATION_PART_CountryCode      = createColumn_Address(categoryCountry,  LOCATION_PART_CountryCode_ID,        Messages.Location_Part_CountryCode);
+      LOCATION_PART_Continent        = createColumn_Address(categoryCountry,  LOCATION_PART_Continent_ID,          Messages.Location_Part_Continent);
 
-      LOCATION_PART_CityDistrict     = createColumn_Location(LOCATION_PART_CityDistrict_ID,       Messages.Location_Part_CityDistrict);
-      LOCATION_PART_District         = createColumn_Location(LOCATION_PART_District_ID,           Messages.Location_Part_District);
-      LOCATION_PART_Borough          = createColumn_Location(LOCATION_PART_Borough_ID,            Messages.Location_Part_Borough);
-      LOCATION_PART_Suburb           = createColumn_Location(LOCATION_PART_Suburb_ID,             Messages.Location_Part_Suburb);
-      LOCATION_PART_Subdivision      = createColumn_Location(LOCATION_PART_Subdivision_ID,        Messages.Location_Part_Subdivision);
+      LOCATION_PART_Region           = createColumn_Address(categoryState,    LOCATION_PART_Region_ID,             Messages.Location_Part_Region);
+      LOCATION_PART_State            = createColumn_Address(categoryState,    LOCATION_PART_State_ID,              Messages.Location_Part_State);
+      LOCATION_PART_StateDistrict    = createColumn_Address(categoryState,    LOCATION_PART_StateDistrict_ID,      Messages.Location_Part_StateDistrict);
+      LOCATION_PART_County           = createColumn_Address(categoryState,    LOCATION_PART_County_ID,             Messages.Location_Part_County);
 
-      LOCATION_PART_Hamlet           = createColumn_Location(LOCATION_PART_Hamlet_ID,             Messages.Location_Part_Hamlet);
-      LOCATION_PART_Croft            = createColumn_Location(LOCATION_PART_Croft_ID,              Messages.Location_Part_Croft);
-      LOCATION_PART_IsolatedDwelling = createColumn_Location(LOCATION_PART_IsolatedDwelling_ID,   Messages.Location_Part_IsolatedDwelling);
+      LOCATION_PART_Municipality     = createColumn_Address(categoryCity,     LOCATION_PART_Municipality_ID,       Messages.Location_Part_Municipality);
+      LOCATION_PART_City             = createColumn_Address(categoryCity,     LOCATION_PART_City_ID,               Messages.Location_Part_City);
+      LOCATION_PART_Town             = createColumn_Address(categoryCity,     LOCATION_PART_Town_ID,               Messages.Location_Part_Town);
+      LOCATION_PART_Village          = createColumn_Address(categoryCity,     LOCATION_PART_Village_ID,            Messages.Location_Part_Village);
+      LOCATION_PART_Postcode         = createColumn_Address(categoryCity,     LOCATION_PART_Postcode_ID,           Messages.Location_Part_Postcode);
 
-      LOCATION_PART_Neighbourhood    = createColumn_Location(LOCATION_PART_Neighbourhood_ID,      Messages.Location_Part_Neighbourhood);
-      LOCATION_PART_Allotments       = createColumn_Location(LOCATION_PART_Allotments_ID,         Messages.Location_Part_Allotments);
-      LOCATION_PART_Quarter          = createColumn_Location(LOCATION_PART_Quarter_ID,            Messages.Location_Part_Quarter);
+      LOCATION_PART_Road             = createColumn_Address(categoryRoad,     LOCATION_PART_Road_ID,               Messages.Location_Part_Road);
+      LOCATION_PART_HouseName        = createColumn_Address(categoryRoad,     LOCATION_PART_HouseName_ID,          Messages.Location_Part_HouseName);
+      LOCATION_PART_HouseNumber      = createColumn_Address(categoryRoad,     LOCATION_PART_HouseNumber_ID,        Messages.Location_Part_HouseNumber);
 
-      LOCATION_PART_CityBlock        = createColumn_Location(LOCATION_PART_CityBlock_ID,          Messages.Location_Part_CityBlock);
-      LOCATION_PART_Residential      = createColumn_Location(LOCATION_PART_Residential_ID,        Messages.Location_Part_Residential);
-      LOCATION_PART_Farm             = createColumn_Location(LOCATION_PART_Farm_ID,               Messages.Location_Part_Farm);
-      LOCATION_PART_Farmyard         = createColumn_Location(LOCATION_PART_Farmyard_ID,           Messages.Location_Part_Farmyard);
-      LOCATION_PART_Industrial       = createColumn_Location(LOCATION_PART_Industrial_ID,         Messages.Location_Part_Industrial);
-      LOCATION_PART_Commercial       = createColumn_Location(LOCATION_PART_Commercial_ID,         Messages.Location_Part_Commercial);
-      LOCATION_PART_Retail           = createColumn_Location(LOCATION_PART_Retail_ID,             Messages.Location_Part_Retail);
+      LOCATION_PART_CityDistrict     = createColumn_Address(categoryArea1,    LOCATION_PART_CityDistrict_ID,       Messages.Location_Part_CityDistrict);
+      LOCATION_PART_District         = createColumn_Address(categoryArea1,    LOCATION_PART_District_ID,           Messages.Location_Part_District);
+      LOCATION_PART_Borough          = createColumn_Address(categoryArea1,    LOCATION_PART_Borough_ID,            Messages.Location_Part_Borough);
+      LOCATION_PART_Suburb           = createColumn_Address(categoryArea1,    LOCATION_PART_Suburb_ID,             Messages.Location_Part_Suburb);
+      LOCATION_PART_Subdivision      = createColumn_Address(categoryArea1,    LOCATION_PART_Subdivision_ID,        Messages.Location_Part_Subdivision);
 
-      LOCATION_PART_Road             = createColumn_Location(LOCATION_PART_Road_ID,               Messages.Location_Part_Road);
+      LOCATION_PART_Hamlet           = createColumn_Address(categoryArea2,    LOCATION_PART_Hamlet_ID,             Messages.Location_Part_Hamlet);
+      LOCATION_PART_Croft            = createColumn_Address(categoryArea2,    LOCATION_PART_Croft_ID,              Messages.Location_Part_Croft);
+      LOCATION_PART_IsolatedDwelling = createColumn_Address(categoryArea2,    LOCATION_PART_IsolatedDwelling_ID,   Messages.Location_Part_IsolatedDwelling);
 
-      LOCATION_PART_HouseName        = createColumn_Location(LOCATION_PART_HouseName_ID,          Messages.Location_Part_HouseName);
-      LOCATION_PART_HouseNumber      = createColumn_Location(LOCATION_PART_HouseNumber_ID,        Messages.Location_Part_HouseNumber);
+      LOCATION_PART_Neighbourhood    = createColumn_Address(categoryArea3,    LOCATION_PART_Neighbourhood_ID,      Messages.Location_Part_Neighbourhood);
+      LOCATION_PART_Allotments       = createColumn_Address(categoryArea3,    LOCATION_PART_Allotments_ID,         Messages.Location_Part_Allotments);
+      LOCATION_PART_Quarter          = createColumn_Address(categoryArea3,    LOCATION_PART_Quarter_ID,            Messages.Location_Part_Quarter);
 
-      LOCATION_PART_Aerialway        = createColumn_Location(LOCATION_PART_Aerialway_ID,          Messages.Location_Part_Aerialway);
-      LOCATION_PART_Aeroway          = createColumn_Location(LOCATION_PART_Aeroway_ID,            Messages.Location_Part_Aeroway);
-      LOCATION_PART_Amenity          = createColumn_Location(LOCATION_PART_Amenity_ID,            Messages.Location_Part_Amenity);
-      LOCATION_PART_Boundary         = createColumn_Location(LOCATION_PART_Boundary_ID,           Messages.Location_Part_Boundary);
-      LOCATION_PART_Bridge           = createColumn_Location(LOCATION_PART_Bridge_ID,             Messages.Location_Part_Bridge);
-      LOCATION_PART_Club             = createColumn_Location(LOCATION_PART_Club_ID,               Messages.Location_Part_Club);
-      LOCATION_PART_Craft            = createColumn_Location(LOCATION_PART_Craft_ID,              Messages.Location_Part_Craft);
-      LOCATION_PART_Emergency        = createColumn_Location(LOCATION_PART_Emergency_ID,          Messages.Location_Part_Emergency);
-      LOCATION_PART_Historic         = createColumn_Location(LOCATION_PART_Historic_ID,           Messages.Location_Part_Historic);
-      LOCATION_PART_Landuse          = createColumn_Location(LOCATION_PART_Landuse_ID,            Messages.Location_Part_Landuse);
-      LOCATION_PART_Leisure          = createColumn_Location(LOCATION_PART_Leisure_ID,            Messages.Location_Part_Leisure);
-      LOCATION_PART_ManMade          = createColumn_Location(LOCATION_PART_ManMade_ID,            Messages.Location_Part_ManMade);
-      LOCATION_PART_Military         = createColumn_Location(LOCATION_PART_Military_ID,           Messages.Location_Part_Military);
-      LOCATION_PART_MountainPass     = createColumn_Location(LOCATION_PART_MountainPass_ID,       Messages.Location_Part_MountainPass);
-      LOCATION_PART_Natural          = createColumn_Location(LOCATION_PART_Natural_ID,            Messages.Location_Part_Natural);
-      LOCATION_PART_Office           = createColumn_Location(LOCATION_PART_Office_ID,             Messages.Location_Part_Office);
-      LOCATION_PART_Place            = createColumn_Location(LOCATION_PART_Place_ID,              Messages.Location_Part_Place);
-      LOCATION_PART_Railway          = createColumn_Location(LOCATION_PART_Railway_ID,            Messages.Location_Part_Railway);
-      LOCATION_PART_Shop             = createColumn_Location(LOCATION_PART_Shop_ID,               Messages.Location_Part_Shop);
-      LOCATION_PART_Tourism          = createColumn_Location(LOCATION_PART_Tourism_ID,            Messages.Location_Part_Tourism);
-      LOCATION_PART_Tunnel           = createColumn_Location(LOCATION_PART_Tunnel_ID,             Messages.Location_Part_Tunnel);
-      LOCATION_PART_Waterway         = createColumn_Location(LOCATION_PART_Waterway_ID,           Messages.Location_Part_Waterway);
+      LOCATION_PART_CityBlock        = createColumn_Address(categoryArea4,    LOCATION_PART_CityBlock_ID,          Messages.Location_Part_CityBlock);
+      LOCATION_PART_Residential      = createColumn_Address(categoryArea4,    LOCATION_PART_Residential_ID,        Messages.Location_Part_Residential);
+      LOCATION_PART_Farm             = createColumn_Address(categoryArea4,    LOCATION_PART_Farm_ID,               Messages.Location_Part_Farm);
+      LOCATION_PART_Farmyard         = createColumn_Address(categoryArea4,    LOCATION_PART_Farmyard_ID,           Messages.Location_Part_Farmyard);
+      LOCATION_PART_Industrial       = createColumn_Address(categoryArea4,    LOCATION_PART_Industrial_ID,         Messages.Location_Part_Industrial);
+      LOCATION_PART_Commercial       = createColumn_Address(categoryArea4,    LOCATION_PART_Commercial_ID,         Messages.Location_Part_Commercial);
+      LOCATION_PART_Retail           = createColumn_Address(categoryArea4,    LOCATION_PART_Retail_ID,             Messages.Location_Part_Retail);
 
-      LOCATION_PART_Postcode         = createColumn_Location(LOCATION_PART_Postcode_ID,           Messages.Location_Part_Postcode);
+      LOCATION_PART_Aerialway        = createColumn_Address(categoryOther,    LOCATION_PART_Aerialway_ID,          Messages.Location_Part_Aerialway);
+      LOCATION_PART_Aeroway          = createColumn_Address(categoryOther,    LOCATION_PART_Aeroway_ID,            Messages.Location_Part_Aeroway);
+      LOCATION_PART_Amenity          = createColumn_Address(categoryOther,    LOCATION_PART_Amenity_ID,            Messages.Location_Part_Amenity);
+      LOCATION_PART_Boundary         = createColumn_Address(categoryOther,    LOCATION_PART_Boundary_ID,           Messages.Location_Part_Boundary);
+      LOCATION_PART_Bridge           = createColumn_Address(categoryOther,    LOCATION_PART_Bridge_ID,             Messages.Location_Part_Bridge);
+      LOCATION_PART_Club             = createColumn_Address(categoryOther,    LOCATION_PART_Club_ID,               Messages.Location_Part_Club);
+      LOCATION_PART_Craft            = createColumn_Address(categoryOther,    LOCATION_PART_Craft_ID,              Messages.Location_Part_Craft);
+      LOCATION_PART_Emergency        = createColumn_Address(categoryOther,    LOCATION_PART_Emergency_ID,          Messages.Location_Part_Emergency);
+      LOCATION_PART_Historic         = createColumn_Address(categoryOther,    LOCATION_PART_Historic_ID,           Messages.Location_Part_Historic);
+      LOCATION_PART_Landuse          = createColumn_Address(categoryOther,    LOCATION_PART_Landuse_ID,            Messages.Location_Part_Landuse);
+      LOCATION_PART_Leisure          = createColumn_Address(categoryOther,    LOCATION_PART_Leisure_ID,            Messages.Location_Part_Leisure);
+      LOCATION_PART_ManMade          = createColumn_Address(categoryOther,    LOCATION_PART_ManMade_ID,            Messages.Location_Part_ManMade);
+      LOCATION_PART_Military         = createColumn_Address(categoryOther,    LOCATION_PART_Military_ID,           Messages.Location_Part_Military);
+      LOCATION_PART_MountainPass     = createColumn_Address(categoryOther,    LOCATION_PART_MountainPass_ID,       Messages.Location_Part_MountainPass);
+      LOCATION_PART_Natural          = createColumn_Address(categoryOther,    LOCATION_PART_Natural_ID,            Messages.Location_Part_Natural);
+      LOCATION_PART_Office           = createColumn_Address(categoryOther,    LOCATION_PART_Office_ID,             Messages.Location_Part_Office);
+      LOCATION_PART_Place            = createColumn_Address(categoryOther,    LOCATION_PART_Place_ID,              Messages.Location_Part_Place);
+      LOCATION_PART_Railway          = createColumn_Address(categoryOther,    LOCATION_PART_Railway_ID,            Messages.Location_Part_Railway);
+      LOCATION_PART_Shop             = createColumn_Address(categoryOther,    LOCATION_PART_Shop_ID,               Messages.Location_Part_Shop);
+      LOCATION_PART_Tourism          = createColumn_Address(categoryOther,    LOCATION_PART_Tourism_ID,            Messages.Location_Part_Tourism);
+      LOCATION_PART_Tunnel           = createColumn_Address(categoryOther,    LOCATION_PART_Tunnel_ID,             Messages.Location_Part_Tunnel);
+      LOCATION_PART_Waterway         = createColumn_Address(categoryOther,    LOCATION_PART_Waterway_ID,           Messages.Location_Part_Waterway);
+
 
 
       /*
@@ -5025,8 +5078,9 @@ public abstract class TableColumnFactory {
 
 // SET_FORMATTING_ON
 
-   private static TableColumnFactory createColumn_Location(final String columnID,
-                                                           final String columnLabel) {
+   private static TableColumnFactory createColumn_Address(final String category,
+                                                          final String columnID,
+                                                          final String columnLabel) {
 
       return new TableColumnFactory() {
 
@@ -5036,7 +5090,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, columnID, SWT.LEAD);
 
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Location);
+            colDef.setColumnCategory(category);
 
             colDef.setColumnLabel(columnLabel);
             colDef.setColumnHeaderText(columnLabel);
