@@ -56,12 +56,11 @@ public class NutritionUtils {
       return totalFluids;
    }
 
-   public static int getTotalSodium(final Set<TourFuelProduct> tourFuelProducts) {
+   public static double getTotalSodium(final Set<TourFuelProduct> tourFuelProducts) {
 
       final double totalSodium = tourFuelProducts.stream().mapToDouble(i -> i.getSodium() * i.getServingsConsumed()).sum();
-      final int totalSodiumInteger = (int) Math.round(totalSodium * 1000);
 
-      return totalSodiumInteger;
+      return totalSodium;
    }
 
    public static List<Product> searchProduct(final String productName) {

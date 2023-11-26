@@ -421,17 +421,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void onAddProduct() {
 
-      final ISelection selection = _productsViewer.getSelection();
-      final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-      final Product selectedProduct = (Product) firstElement;
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-      final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
-      final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
+         final ISelection selection = _productsViewer.getSelection();
+         final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+         final Product selectedProduct = (Product) firstElement;
 
-      final TourFuelProduct tfp = new TourFuelProduct(_tourData, productResponse.getProduct());
-      _tourData.addFuelProduct(tfp);
+         final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
+         final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
 
-      BusyIndicator.showWhile(Display.getCurrent(), () -> TourManager.saveModifiedTour(_tourData));
+         final TourFuelProduct tfp = new TourFuelProduct(_tourData, productResponse.getProduct());
+         _tourData.addFuelProduct(tfp);
+
+         TourManager.saveModifiedTour(_tourData);
+      });
    }
 
    private void onDispose() {

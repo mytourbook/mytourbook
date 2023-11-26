@@ -708,7 +708,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       final int totalFluid = (int) Math.round(NutritionUtils.getTotalFluids(_tourData.getTourFuelProducts()));
       _txtFluid_Total.setText(String.valueOf(totalFluid));
 
-      final int totalSodium = NutritionUtils.getTotalSodium(_tourData.getTourFuelProducts());
+      final int totalSodium = (int) NutritionUtils.getTotalSodium(_tourData.getTourFuelProducts());
       _txtSodium_Total.setText(String.valueOf(totalSodium));
 
       final long averageCaloriesPerHour = computeAveragePerHour(totalCalories);

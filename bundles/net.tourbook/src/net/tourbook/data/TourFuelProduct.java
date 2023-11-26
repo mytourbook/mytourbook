@@ -134,12 +134,21 @@ public class TourFuelProduct {
       return calories;
    }
 
+   public float getFluid() {
+      return fluid;
+   }
+
    public String getName() {
       return name;
    }
 
    public int getServingsConsumed() {
+      //todo fb
       return 1;
+   }
+
+   public float getSodium() {
+      return Math.round(sodium / 1000);
    }
 
    public TourData getTourData() {
@@ -153,14 +162,6 @@ public class TourFuelProduct {
       productCode = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
-   }
-
-   public float getFluid() {
-      return fluid;
-   }
-
-   public float getSodium() {
-      return sodium;
    }
 
 }
