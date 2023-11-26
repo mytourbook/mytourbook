@@ -77,6 +77,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    //todo fb
    // enable the "add" button only if an element is selected in the table
+   //todo fb
+   //Sync error after adding a 2nd product
 
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$

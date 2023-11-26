@@ -42,26 +42,26 @@ public class NutritionUtils {
 
    private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
-   public static String getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
+   public static int getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
 
       final int totalCalories = tourFuelProducts.stream().mapToInt(i -> i.getCalories() * i.getServingsConsumed()).sum();
 
-      return String.valueOf(totalCalories);
+      return totalCalories;
    }
 
-   public static String getTotalFluids(final Set<TourFuelProduct> tourFuelProducts) {
+   public static double getTotalFluids(final Set<TourFuelProduct> tourFuelProducts) {
 
       final double totalFluids = tourFuelProducts.stream().mapToDouble(i -> i.getFluid() * i.getServingsConsumed()).sum();
 
-      return String.valueOf(totalFluids);
+      return totalFluids;
    }
 
-   public static String getTotalSodium(final Set<TourFuelProduct> tourFuelProducts) {
+   public static int getTotalSodium(final Set<TourFuelProduct> tourFuelProducts) {
 
       final double totalSodium = tourFuelProducts.stream().mapToDouble(i -> i.getSodium() * i.getServingsConsumed()).sum();
       final int totalSodiumInteger = (int) Math.round(totalSodium * 1000);
 
-      return String.valueOf(totalSodiumInteger);
+      return totalSodiumInteger;
    }
 
    public static List<Product> searchProduct(final String productName) {
