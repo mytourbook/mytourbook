@@ -26,7 +26,9 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -68,6 +70,7 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -334,6 +337,44 @@ public class TourBlogView extends ViewPart {
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   private String buildDescription(String tourDescription) {
+
+      final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.Default);
+      final List<Url> found = parser.detect();
+
+      if (found.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      // Because the tour description can contain similar URLs, this can create
+      // an issue when URLs can be replaced several times when replacing original
+      // text to formatted URLs.
+      // To avoid this, original URLs are first replaced by a unique random string
+      // and then this string is replaced by the formatted URL
+      final HashMap<String, Url> toto = new HashMap<>();
+      for (final Url element : found) {
+
+         final String randomString = RandomStringUtils.random(10, true, true);
+         toto.put(randomString, element);
+
+         final String originalUrl = element.getOriginalUrl();
+         tourDescription = tourDescription.replace(originalUrl, randomString);
+      }
+
+      for (final Map.Entry<String, Url> set : toto.entrySet()) {
+
+         final String fullUrl = set.getValue().getFullUrl();
+         tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>");
+
+      }
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourDescription = UI.scrambleText(tourDescription);
+      }
+
+      return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
    private void clearView() {
 
       _tourData = null;
@@ -439,7 +480,7 @@ public class TourBlogView extends ViewPart {
       final boolean isSaveWeatherLogInWeatherDescription = _prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION);
 
       String tourTitle = _tourData.getTourTitle();
-      String tourDescription = _tourData.getTourDescription();
+      final String tourDescription = _tourData.getTourDescription();
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
@@ -492,22 +533,7 @@ public class TourBlogView extends ViewPart {
                 * Description
                 */
                if (isDescription) {
-
-                  final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.Default);
-                  final List<Url> found = parser.detect();
-
-                  for (final Url url : found) {
-                     final var original = url.getOriginalUrl();
-                     final var fullurl = url.getFullUrl();
-                     tourDescription = tourDescription.replace(original, "<a href=\"" + fullurl + "\">" + fullurl + "</a>");
-                  }
-
-
-                  if (UI.IS_SCRAMBLE_DATA) {
-                     tourDescription = UI.scrambleText(tourDescription);
-                  }
-
-                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+                  sb.append(buildDescription(tourDescription));
                }
 
                /*
