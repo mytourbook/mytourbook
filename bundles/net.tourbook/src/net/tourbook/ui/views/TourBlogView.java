@@ -437,7 +437,7 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
-      String tourNutrition = NutritionUtils.buildNutritionDataString(_tourData);
+      String tourNutrition = NutritionUtils.buildNutritionDataString(_tourData.getTourFuelProducts());
 
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature

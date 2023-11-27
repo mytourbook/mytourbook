@@ -33,7 +33,6 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
@@ -44,9 +43,28 @@ public class NutritionUtils {
 
    private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
-   public static String buildNutritionDataString(final TourData _tourData) {
-      // TODO FB
-      return UI.EMPTY_STRING;
+   public static String buildNutritionDataString(final Set<TourFuelProduct> set) {
+
+      if (set.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      final StringBuilder sb = new StringBuilder() ;
+      set.stream().forEach(i -> {
+
+         //todo fb serving (eng), portion (french)
+
+         sb.append(i.getServingsConsumed() + " serving of " + i.getName() + UI.NEW_LINE);
+
+         //todo fb
+         if (i.isFluid()) {
+            // 1.5 flask (.75L) of Gu Brew
+            //sb.append(i.getServingsConsumed() + " serving of " + i.getName() + UI.NEW_LINE);
+
+         }
+      });
+
+      return sb.toString();
    }
 
    public static int getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {

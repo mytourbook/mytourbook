@@ -97,7 +97,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
-   private static final int              _hintTextColumnWidth            = UI.IS_OSX ? 200 : 150;
+   private static final int              _hintTextColumnWidth            = UI.IS_OSX ? 100 : 50;
 
    private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
 
@@ -184,13 +184,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return new Object[0];
          }
 
-         final Object[] tourFuelProducts = _tourData.getTourFuelProducts().toArray();
-
-         return tourFuelProducts;
+         return _tourData.getTourFuelProducts().toArray();
       }
 
       @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+         // Nothing to do
+      }
    }
 
    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -242,8 +242,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          return null;
       }
    }
-
-   public TourNutritionView() {}
 
    private void addPrefListener() {
 
