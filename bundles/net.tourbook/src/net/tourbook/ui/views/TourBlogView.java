@@ -339,7 +339,7 @@ public class TourBlogView extends ViewPart {
 
    private String buildDescription(String tourDescription) {
 
-      final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.Default);
+      final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.QUOTE_MATCH);
       final List<Url> found = parser.detect();
 
       if (found.isEmpty()) {
