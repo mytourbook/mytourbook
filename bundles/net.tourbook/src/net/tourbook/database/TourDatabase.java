@@ -57,7 +57,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -2185,13 +2184,11 @@ public class TourDatabase {
    @SuppressWarnings("unchecked")
    public static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6) {
 
-      TourLocation tourLocation = null;
+      TourLocation dbTourLocation = null;
 
       // convert possible negative values into positive values to make math easier
       final int latitudeE6_Normalized = latitudeE6 + 90_000_000;
       final int longitudeE6_Normalized = longitudeE6 + 180_000_000;
-
-      final long start = System.nanoTime();
 
       synchronized (DB_LOCK) {
 
@@ -2231,39 +2228,40 @@ public class TourDatabase {
 
                } else if (numLocations == 1) {
 
-                  tourLocation = allTourLocations.get(0);
+                  dbTourLocation = allTourLocations.get(0);
 
                } else {
 
                   // numLocations > 1
 
-                  for (final TourLocation dbTourLocation : allTourLocations) {
+//                  for (final TourLocation dbTourLocation : allTourLocations) {
+//
+//                     final int latitudeMinE6_Normalized = dbTourLocation.latitudeMinE6_Normalized;
+//                     final int latitudeMaxE6_Normalized = dbTourLocation.latitudeMaxE6_Normalized;
+//                     final int longitudeMinE6_Normalized = dbTourLocation.longitudeMinE6_Normalized;
+//                     final int longitudeMaxE6_Normalized = dbTourLocation.longitudeMaxE6_Normalized;
+//
+//                     System.out.println("""
+//                           %s    %s
+//                           %s    %s
+//                           %s    %s     """.formatted( //$NON-NLS-1$
+//
+//                           FormatManager.formatNumber_0(latitudeMinE6_Normalized),
+//                           FormatManager.formatNumber_0(longitudeMinE6_Normalized),
+//
+//                           FormatManager.formatNumber_0(latitudeE6_Normalized),
+//                           FormatManager.formatNumber_0(longitudeE6_Normalized),
+//
+//                           FormatManager.formatNumber_0(latitudeMaxE6_Normalized),
+//                           FormatManager.formatNumber_0(longitudeMaxE6_Normalized)
+//
+//                     ));
+//                  }
+//
+//                  System.out.println("Found %d locations, using first location".formatted(allTourLocations.size()));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
-                     final int latitudeMinE6_Normalized = dbTourLocation.latitudeMinE6_Normalized;
-                     final int latitudeMaxE6_Normalized = dbTourLocation.latitudeMaxE6_Normalized;
-                     final int longitudeMinE6_Normalized = dbTourLocation.longitudeMinE6_Normalized;
-                     final int longitudeMaxE6_Normalized = dbTourLocation.longitudeMaxE6_Normalized;
-
-                     System.out.println("""
-                           %s    %s
-                           %s    %s
-                           %s    %s     """.formatted( //$NON-NLS-1$
-
-                           FormatManager.formatNumber_0(latitudeMinE6_Normalized),
-                           FormatManager.formatNumber_0(longitudeMinE6_Normalized),
-
-                           FormatManager.formatNumber_0(latitudeE6_Normalized),
-                           FormatManager.formatNumber_0(longitudeE6_Normalized),
-
-                           FormatManager.formatNumber_0(latitudeMaxE6_Normalized),
-                           FormatManager.formatNumber_0(longitudeMaxE6_Normalized)
-
-                     ));
-// TODO remove SYSTEM.OUT.PRINTLN
-
-                  }
-
-                  tourLocation = allTourLocations.get(0);
+                  dbTourLocation = allTourLocations.get(0);
                }
 
             } catch (final Exception e) {
@@ -2274,13 +2272,8 @@ public class TourDatabase {
          }
          em.close();
       }
-      final long end = System.nanoTime();
 
-      System.out.println(("Loading TourLocation: ") //$NON-NLS-1$
-            + (((float) (end - start) / 1000000) + " ms")); //$NON-NLS-1$
-      // TODO remove SYSTEM.OUT.PRINTLN
-
-      return tourLocation;
+      return dbTourLocation;
    }
 
    /**
@@ -3502,8 +3495,8 @@ public class TourDatabase {
          // 2. location is already created but not updated in the not yet saved tour
 
          final TourLocation loadedTourLocation = getTourLocation(
-               requestedTourLocation.getLatitudeE6(),
-               requestedTourLocation.getLongitudeE6());
+               requestedTourLocation.latitudeE6,
+               requestedTourLocation.longitudeE6);
 
          if (loadedTourLocation != null) {
 
@@ -4663,7 +4656,7 @@ public class TourDatabase {
 
             + "   postcode                   VARCHAR(" + TourLocation.DB_FIELD_LENGTH + ")   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + ")" //                                                                          //$NON-NLS-1$
+            + ")" //                                                                                //$NON-NLS-1$
       );
 
       SQL.CreateIndex(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$

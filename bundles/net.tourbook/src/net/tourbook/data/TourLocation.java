@@ -224,10 +224,23 @@ public class TourLocation implements Serializable {
    public String postcode;
 
    @Transient
-   private int   latitudeE6;
+   public double latitude;
+   @Transient
+   public double longitude;
 
    @Transient
-   private int   longitudeE6;
+   public int    latitudeE6;
+   @Transient
+   public int    longitudeE6;
+
+   @Transient
+   public double latitudeMin;
+   @Transient
+   public double latitudeMax;
+   @Transient
+   public double longitudeMin;
+   @Transient
+   public double longitudeMax;
 
    /**
     * Default constructor used also in ejb
@@ -235,6 +248,9 @@ public class TourLocation implements Serializable {
    public TourLocation() {}
 
    public TourLocation(final double latitude, final double longitude) {
+
+      this.latitude = latitude;
+      this.longitude = longitude;
 
       latitudeE6 = Util.convertDouble_ToE6(latitude);
       longitudeE6 = Util.convertDouble_ToE6(longitude);
@@ -263,16 +279,8 @@ public class TourLocation implements Serializable {
       return locationID == other.locationID;
    }
 
-   public int getLatitudeE6() {
-      return latitudeE6;
-   }
-
    public long getLocationId() {
       return locationID;
-   }
-
-   public int getLongitudeE6() {
-      return longitudeE6;
    }
 
    @Override

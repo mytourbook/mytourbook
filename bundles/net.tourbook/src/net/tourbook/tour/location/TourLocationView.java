@@ -289,6 +289,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             rc = compareText(location1.house_number, location2.house_number);
          }
 
+         // nth sort by house number lat/lon diff
+         if (rc == 0) {
+            rc = item1.latitudeDiffValue - item2.latitudeDiffValue;
+         }
+         if (rc == 0) {
+            rc = item1.longitudeDiffValue - item2.longitudeDiffValue;
+         }
+
          // If descending order, flip the direction
          if (__sortDirection == DESCENDING) {
             rc = -rc;
@@ -2068,6 +2076,13 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final double longitudeMin           = (longitudeMinE6_Normalized - 180_000_000) / 1E6;
             final double longitudeMax           = (longitudeMaxE6_Normalized - 180_000_000) / 1E6;
 
+            tourLocation.latitude      = latitude;
+            tourLocation.longitude     = longitude;
+            tourLocation.latitudeMin   = latitudeMin;
+            tourLocation.latitudeMax   = latitudeMax;
+            tourLocation.longitudeMin  = longitudeMin;
+            tourLocation.longitudeMax  = longitudeMax;
+
             tourLocation.latitudeE6_Normalized     = latitudeE6_Normalized;
             tourLocation.longitudeE6_Normalized    = longitudeE6_Normalized;
 
@@ -2149,15 +2164,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             // update viewer with new sorting
             _locationComparator.setSortColumn(e.widget);
 
-            final long start = System.nanoTime();
+//            final long start = System.nanoTime();
 
             _locationViewer.refresh();
 
-            final long end = System.nanoTime();
+//            final long end = System.nanoTime();
 
-            System.out.println(("Sorting locations\t")
-                  + (((float) (end - start) / 1000000) + " ms"));
-            // TODO remove SYSTEM.OUT.PRINTLN
+//            System.out.println(("Sorting locations\t")
+//                  + (((float) (end - start) / 1000000) + " ms"));
+//            // TODO remove SYSTEM.OUT.PRINTLN
          }
          updateUI_SelectLocation(selectionBackup);
       }
@@ -2171,19 +2186,25 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       final IStructuredSelection selection = _locationViewer.getStructuredSelection();
-      final Object firstElement = selection.getFirstElement();
 
-      if (firstElement == null) {
+      if (selection.isEmpty()) {
          return;
       }
 
-      final TourLocation selectedLocation = ((LocationItem) firstElement).location;
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      for (final Object object : selection.toArray()) {
+
+         if (object instanceof final LocationItem locationItem) {
+            allTourLocations.add(locationItem.location);
+         }
+      }
 
       // this view could be inactive -> selection is not fired with the SelectionProvider interface
-//      TourManager.fireEventWithCustomData(
-//            TourEventId.SELECTION_SENSOR,
-//            new SelectionSensor(selectedLocation, null),
-//            this);
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_LOCATION_SELECTION,
+            allTourLocations,
+            this);
    }
 
    @Override

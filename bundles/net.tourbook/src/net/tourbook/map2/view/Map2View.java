@@ -68,6 +68,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
@@ -195,6 +196,7 @@ import org.oscim.core.MapPosition;
 
 /**
  * @author Wolfgang Schramm
+ *
  * @since 1.3.0
  */
 public class Map2View extends ViewPart implements
@@ -385,7 +387,7 @@ public class Map2View extends ViewPart implements
    private Long                              _lastSelectedTourInsideMap;
    //
    /**
-    * contains photos which are displayed in the map
+    * Contains photos which are displayed in the map
     */
    private final ArrayList<Photo>            _allPhotos                  = new ArrayList<>();
    private final ArrayList<Photo>            _filteredPhotos             = new ArrayList<>();
@@ -398,6 +400,8 @@ public class Map2View extends ViewPart implements
    private boolean                           _isShowPhoto;
    private boolean                           _isShowLegend;
    private boolean                           _isInSelectBookmark;
+   //
+   private List<TourLocation>                _allTourLocations;
    //
    private int                               _defaultZoom;
    private GeoPosition                       _defaultPosition;
@@ -1250,7 +1254,8 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData);
+            _sliderPathPaintingData,
+            _allTourLocations);
 
       _map.redraw();
    }
@@ -1311,8 +1316,8 @@ public class Map2View extends ViewPart implements
       _map.addPOIListener           (mapPOIEvent               -> mapListener_POI(mapPOIEvent));
       _map.addTourSelectionListener (selection                 -> mapListener_InsideMap(selection));
 
-      _map.addMapGridBoxListener    ((mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData)     -> mapListener_MapGridBox(mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData));
-      _map.addMapPositionListener   ((mapCenter, mapZoomLevel, isZoomed)                           -> mapListener_MapPosition(mapCenter, mapZoomLevel, isZoomed));
+      _map.addMapGridBoxListener    ((mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData)  -> mapListener_MapGridBox(mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData));
+      _map.addMapPositionListener   ((mapCenter, mapZoomLevel, isZoomed)                        -> mapListener_MapPosition(mapCenter, mapZoomLevel, isZoomed));
 
       _map.addControlListener       (controlResizedAdapter(controlEvent -> mapListener_ControlResize(controlEvent)));
 
@@ -1579,6 +1584,10 @@ public class Map2View extends ViewPart implements
          } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
 
             onSelection_HoveredValue((HoveredValueData) eventData);
+
+         } else if (eventId == TourEventId.TOUR_LOCATION_SELECTION && eventData instanceof final List allTourLocations) {
+
+            moveToTourLocation(allTourLocations);
 
          } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
@@ -2513,6 +2522,7 @@ public class Map2View extends ViewPart implements
     * Calculate lat/lon bounds for all photos.
     *
     * @param allPhotos
+    *
     * @return
     */
    private Set<GeoPosition> getPhotoBounds(final ArrayList<Photo> allPhotos) {
@@ -2848,7 +2858,8 @@ public class Map2View extends ViewPart implements
                _actionShowSliderInLegend.isChecked(),
                _actionShowValuePoint.isChecked(),
 
-               _sliderPathPaintingData);
+               _sliderPathPaintingData,
+               _allTourLocations);
 
          _map.redraw();
       }
@@ -2955,7 +2966,8 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      if (isZoomed && _map.getCenterMapBy().equals(CenterMapBy.Tour)) {
+      // fixed NPE when _map.getCenterMapBy() == null
+      if (isZoomed && CenterMapBy.Tour.equals(_map.getCenterMapBy())) {
          centerTour();
       }
 
@@ -3022,7 +3034,8 @@ public class Map2View extends ViewPart implements
                   _actionShowSliderInLegend.isChecked(),
                   _actionShowValuePoint.isChecked(),
 
-                  _sliderPathPaintingData);
+                  _sliderPathPaintingData,
+                  _allTourLocations);
 
             _map.redraw();
          }
@@ -3064,6 +3077,43 @@ public class Map2View extends ViewPart implements
 
       _map.setZoom(mapPosition.zoomLevel + 1);
       _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
+   }
+
+   @SuppressWarnings("unchecked")
+   private void moveToTourLocation(final List<?> allTourLocations) {
+
+      _allTourLocations = (List<TourLocation>) allTourLocations;
+
+      if (allTourLocations.isEmpty()) {
+         return;
+      }
+
+      final TourData tourData = _allTourData.size() > 0 ? _allTourData.get(0) : null;
+
+      // repaint map
+      _directMappingPainter.setPaintContext(
+
+            _map,
+            _isShowTour,
+            tourData,
+
+            _currentSliderValueIndex_Left,
+            _currentSliderValueIndex_Right,
+            _externalValuePointIndex,
+
+            _actionShowSliderInMap.isChecked(),
+            _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
+            _sliderPathPaintingData,
+            _allTourLocations);
+
+      _map.redraw();
+
+      // center map to the first location
+      final TourLocation firstLocation = (TourLocation) allTourLocations.get(0);
+
+      _map.setMapCenter(new GeoPosition(firstLocation.latitude, firstLocation.longitude));
    }
 
    @Override
@@ -3637,6 +3687,7 @@ public class Map2View extends ViewPart implements
 
    /**
     * @param selection
+    *
     * @return Returns a list which contains all photos.
     */
    private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
@@ -3857,7 +3908,8 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData);
+            _sliderPathPaintingData,
+            _allTourLocations);
 
       // set the tour bounds
       final GeoPosition[] tourBounds = tourData.getGeoBounds();
@@ -4085,7 +4137,8 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData);
+            _sliderPathPaintingData,
+            _allTourLocations);
 
       if (_isMapSyncWith_Slider_One) {
 
@@ -4146,6 +4199,7 @@ public class Map2View extends ViewPart implements
     *
     * @param tourData
     * @param valueIndex
+    *
     * @return
     */
    private void positionMapTo_ValueIndex(final TourData tourData, final int valueIndex) {
@@ -4895,7 +4949,8 @@ public class Map2View extends ViewPart implements
             false,
             false, // show value point
 
-            _sliderPathPaintingData);
+            _sliderPathPaintingData,
+            null);
 
       _map.resetTours_HoveredData();
 
@@ -5211,7 +5266,8 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData);
+            _sliderPathPaintingData,
+            _allTourLocations);
 
       _map.paint();
 
