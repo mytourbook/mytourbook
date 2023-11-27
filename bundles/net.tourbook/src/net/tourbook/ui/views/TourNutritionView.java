@@ -97,16 +97,18 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
+   private static final int              _hintTextColumnWidth            = UI.IS_OSX ? 200 : 150;
+
    private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
 
    private TourData                      _tourData;
-
    private TableViewer                   _productsViewer;
-   private List<String>                  _searchHistory                  = new ArrayList<>();
 
+   private List<String>                  _searchHistory                  = new ArrayList<>();
    private IPropertyChangeListener       _prefChangeListener;
    final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
    private ISelectionListener            _postSelectionListener;
+
    private ITourEventListener            _tourEventListener;
 
    private PostSelectionProvider         _postSelectionProvider;
@@ -150,7 +152,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          final TourFuelProduct task = (TourFuelProduct) element;
 
          if (property.equals("Fluid")) {
-            return new Boolean(task.isFluid());
+            return Boolean.valueOf(task.isFluid());
          }
          return UI.EMPTY_STRING;
       }
@@ -558,18 +560,19 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-            _txtCalories_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            _txtCalories_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
             GridDataFactory.fillDefaults()//
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Total);
 
-            _txtFluid_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            _txtFluid_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
             GridDataFactory.fillDefaults()//
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Total);
 
-            _txtSodium_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            _txtSodium_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
             GridDataFactory.fillDefaults()//
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Total);
          }
@@ -582,17 +585,17 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-            _txtCalories_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            _txtCalories_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
             GridDataFactory.fillDefaults()//
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Average);
 
-            _txtFluid_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            _txtFluid_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
             GridDataFactory.fillDefaults()//
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Average);
 
-            _txtSodium_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL);
+            _txtSodium_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
             GridDataFactory.fillDefaults()//
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
