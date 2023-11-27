@@ -76,8 +76,6 @@ public class TourFuelProduct {
    //link it to an object defined by the user ?
 //   private double                     containerName;
 //
-   // private double caffeine;
-
    public TourFuelProduct() {}
 
    public TourFuelProduct(final TourData tourData, final Product product) {

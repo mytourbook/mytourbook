@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -44,8 +45,8 @@ public class NutritionUtils {
    private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
    public static String buildNutritionDataString(final TourData _tourData) {
-      // TODO Auto-generated method stub
-      return null;
+      // TODO FB
+      return UI.EMPTY_STRING;
    }
 
    public static int getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
