@@ -32,6 +32,7 @@ import java.util.Set;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourFuelProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
@@ -41,6 +42,11 @@ public class NutritionUtils {
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms="; //$NON-NLS-1$
 
    private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+
+   public static String buildNutritionDataString(final TourData _tourData) {
+      // TODO Auto-generated method stub
+      return null;
+   }
 
    public static int getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
 

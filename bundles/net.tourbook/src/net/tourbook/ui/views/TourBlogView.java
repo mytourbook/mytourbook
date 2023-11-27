@@ -44,6 +44,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.DialogQuickEdit;
@@ -436,6 +437,8 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
+      String tourNutrition = NutritionUtils.buildNutritionDataString(_tourData);
+
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
@@ -443,6 +446,7 @@ public class TourBlogView extends ViewPart {
       );
 
       final boolean isDescription = tourDescription.length() > 0;
+      final boolean isNutrition = tourNutrition.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
       final boolean isWeather = tourWeather.length() > 0;
 
@@ -514,6 +518,24 @@ public class TourBlogView extends ViewPart {
 
                   sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                   sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+               }
+
+               /*
+                * Nutrition
+                */
+               if (isNutrition) {
+
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourNutrition = UI.scrambleText(tourNutrition);
+                  }
+
+                  if (isDescription || isWeather) {
+                     // write spacer
+                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+                  }
+
+                  sb.append("<div class='title'>" + "Nutrition" + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourNutrition) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
