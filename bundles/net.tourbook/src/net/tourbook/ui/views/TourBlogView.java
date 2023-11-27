@@ -339,10 +339,10 @@ public class TourBlogView extends ViewPart {
 
    private String buildDescription(String tourDescription) {
 
-      final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.QUOTE_MATCH | UrlDetectorOptions.SINGLE_QUOTE_MATCH | UrlDetectorOptions.BRACKET_MATCH);
-      final List<Url> found = parser.detect();
+      final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.JAVASCRIPT);
+      final List<Url> detectedUrls = parser.detect();
 
-      if (found.isEmpty()) {
+      if (detectedUrls.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
@@ -351,20 +351,20 @@ public class TourBlogView extends ViewPart {
       // text to formatted URLs.
       // To avoid this, original URLs are first replaced by a unique random string
       // and then this string is replaced by the formatted URL
-      final HashMap<String, Url> toto = new HashMap<>();
-      for (final Url element : found) {
+      final HashMap<String, Url> detectedUrlMap = new HashMap<>();
+      for (final Url detectedUrl : detectedUrls) {
 
          final String randomString = RandomStringUtils.random(10, true, true);
-         toto.put(randomString, element);
+         detectedUrlMap.put(randomString, detectedUrl);
 
-         final String originalUrl = element.getOriginalUrl();
+         final String originalUrl = detectedUrl.getOriginalUrl();
          tourDescription = tourDescription.replace(originalUrl, randomString);
       }
 
-      for (final Map.Entry<String, Url> set : toto.entrySet()) {
+      for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
 
          final String fullUrl = set.getValue().getFullUrl();
-         tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>");
+         tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       }
 
