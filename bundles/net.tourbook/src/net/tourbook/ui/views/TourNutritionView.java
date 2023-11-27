@@ -63,7 +63,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -375,32 +374,49 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    }
 
-   private void createColumns(final Table productsTable) {
+   private void createColumns(final Table productsTable, final String[] tableColumns) {
+
+      int index = 0;
 
       // Column: Quantity
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
-      columnServings.setText("Servings"); //$NON-NLS-1$
+      columnServings.setText(tableColumns[index++]);
       columnServings.setWidth(25);
 
       // Column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText("Name"); //$NON-NLS-1$
+      columnName.setText(tableColumns[index++]);
       columnName.setWidth(300);
 
       // Column: Calories
       final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
-      columnCalories.setText("Calories"); //$NON-NLS-1$
+      columnCalories.setText(tableColumns[index++]);
       columnCalories.setWidth(75);
 
       // Column: Sodium
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
-      columnSodium.setText("Sodium"); //$NON-NLS-1$
+      columnSodium.setText(tableColumns[index++]);
       columnSodium.setWidth(75);
 
       // Column: Fluid
       final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
-      columnFluid.setText("Fluid"); //$NON-NLS-1$
+      columnFluid.setText(tableColumns[index++]);
       columnFluid.setWidth(75);
+
+      // Column: Fluid Container Name
+      final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
+      columnFluidContainerName.setText(tableColumns[index++]);
+      columnFluidContainerName.setWidth(75);
+
+      // Column: Containers
+      final TableColumn columnFluidContainers = new TableColumn(productsTable, SWT.LEFT);
+      columnFluidContainers.setText(tableColumns[index++]);
+      columnFluidContainers.setWidth(75);
+
+      // Column: Containers Consumed
+      final TableColumn columnFluidContainersConsumed = new TableColumn(productsTable, SWT.LEFT);
+      columnFluidContainersConsumed.setText(tableColumns[index++]);
+      columnFluidContainersConsumed.setWidth(75);
    }
 
    @Override
@@ -473,20 +489,24 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      createColumns(productsTable);
-      final String[] PROPS = { "Servings", "Name", "Calories", "Sodium", "Fluid" };
-      _productsViewer = new TableViewer(productsTable);
-      _productsViewer.setColumnProperties(PROPS);
+      final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Fluid", "Fluid Container Name", "Containers",
+            "Containers Consumed" };
+      createColumns(productsTable, tableColumns);
 
-      // Column 1 : Completed (Checkbox)
+      _productsViewer = new TableViewer(productsTable);
+      _productsViewer.setColumnProperties(tableColumns);
+
       // Create the cell editors
-      final CellEditor[] editors = new CellEditor[PROPS.length];
-      // Column 1 : Completed (Checkbox)
-      editors[0] = new TextCellEditor(productsTable);
-      editors[1] = new TextCellEditor(productsTable, SWT.READ_ONLY);
-      editors[2] = new TextCellEditor(productsTable, SWT.READ_ONLY);
-      editors[3] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+      final CellEditor[] editors = new CellEditor[tableColumns.length];
+      final int index = 0;
+//      editors[index++] = new TextCellEditor(productsTable);
+//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
       editors[4] = new CheckboxCellEditor(productsTable);
+//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 
       // Assign the cell editors to the viewer
       _productsViewer.setCellEditors(editors);
