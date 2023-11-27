@@ -358,7 +358,7 @@ public class TourBlogView extends ViewPart {
          detectedUrlMap.put(randomString, detectedUrl);
 
          final String originalUrl = detectedUrl.getOriginalUrl();
-         tourDescription = tourDescription.replace(originalUrl, randomString);
+         tourDescription = tourDescription.replaceFirst(originalUrl, randomString);
       }
 
       for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
