@@ -70,8 +70,9 @@ public class TourFuelProduct {
    private String                     name;
 
    private int                        calories;
-   private float                      fluid;
    private float                      sodium;
+
+   private boolean                    isFluid;
 
    //link it to an object defined by the user ?
 //   private double                     containerName;
@@ -136,10 +137,6 @@ public class TourFuelProduct {
       return calories;
    }
 
-   public float getFluid() {
-      return fluid;
-   }
-
    public String getName() {
       return name;
    }
@@ -155,6 +152,15 @@ public class TourFuelProduct {
 
    public TourData getTourData() {
       return tourData;
+   }
+
+   public boolean isFluid() {
+      return isFluid;
+   }
+
+   public void setIsFluid(final boolean booleanValue) {
+     isFluid = booleanValue;
+
    }
 
    public void setupDeepClone(final TourData tourDataFromClone) {

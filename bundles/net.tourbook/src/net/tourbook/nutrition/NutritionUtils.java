@@ -58,9 +58,10 @@ public class NutritionUtils {
 
    public static double getTotalFluids(final Set<TourFuelProduct> tourFuelProducts) {
 
-      final double totalFluids = tourFuelProducts.stream().mapToDouble(i -> i.getFluid() * i.getServingsConsumed()).sum();
+      //todo fb
+      //final double totalFluids = tourFuelProducts.stream().mapToDouble(i -> i.getFluid() * i.getServingsConsumed()).sum();
 
-      return totalFluids;
+      return 0;
    }
 
    public static double getTotalSodium(final Set<TourFuelProduct> tourFuelProducts) {

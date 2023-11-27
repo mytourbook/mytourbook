@@ -4306,7 +4306,8 @@ public class TourDatabase {
             + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                                    " + NL //$NON-NLS-1$
             + "   sodium              FLOAT,                                                      " + NL //$NON-NLS-1$
-            + "   fluid               FLOAT                                                       " + NL //$NON-NLS-1$
+            + "   fluid               FLOAT,                                                      " + NL //$NON-NLS-1$
+            + "   isFluid             BOOLEAN DEFAULT FALSE                                       " + NL //$NON-NLS-1$
 
             // Version 52 - end
 

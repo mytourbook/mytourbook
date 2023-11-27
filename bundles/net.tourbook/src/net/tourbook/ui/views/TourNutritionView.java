@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -53,18 +54,23 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
+import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -85,6 +91,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    // in the pref page, add a button to "Refresh product's information"
    // this will retrieve the updated (if any), info for each product)
    // display the previous total calories vs new total calories
+
+   //add the possibility to add custom products (i.e: water...)
    public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
@@ -125,6 +133,44 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private FormToolkit             _tk;
    private ActionOpenSearchProduct _actionOpenSearchProduct;
 
+   class TourFuelProductCellModifier implements ICellModifier {
+
+      private Viewer viewer;
+
+      public TourFuelProductCellModifier(final Viewer viewer) {
+         this.viewer = viewer;
+      }
+
+      @Override
+      public boolean canModify(final Object element, final String property) {
+         return true;
+      }
+
+      @Override
+      public Object getValue(final Object element, final String property) {
+         final TourFuelProduct task = (TourFuelProduct) element;
+
+         if (property.equals("Fluid")) {
+            return new Boolean(task.isFluid());
+         }
+         return UI.EMPTY_STRING;
+      }
+
+      @Override
+      public void modify(Object element, final String property, final Object value) {
+
+         if (element instanceof final Item elementItem) {
+            element = (elementItem).getData();
+         }
+         final TourFuelProduct tourFuelProduct = (TourFuelProduct) element;
+
+         if (property.equals("Fluid")) {
+            tourFuelProduct.setIsFluid(((Boolean) value).booleanValue());
+         }
+         _productsViewer.refresh();
+      }
+   }
+
    private class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
@@ -151,7 +197,18 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public Image getColumnImage(final Object obj, final int index) {
 
-         return null;
+         final TourFuelProduct tourFuelProduct = (TourFuelProduct) obj;
+
+         switch (index) {
+         case 4:
+            if (tourFuelProduct.isFluid()) {
+               return TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+            }
+            return TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+
+         default:
+            return null;
+         }
       }
 
       @Override
@@ -170,11 +227,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return String.valueOf(tourFuelProduct.getCalories());
 
          case 3:
-            return String.valueOf(tourFuelProduct.getFluid());
-
-         case 4:
             return String.valueOf(tourFuelProduct.getSodium());
 
+         case 4:
          default:
             return UI.EMPTY_STRING;
          }
@@ -323,9 +378,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private void createColumns(final Table productsTable) {
 
       // Column: Quantity
-      final TableColumn columnQuantity = new TableColumn(productsTable, SWT.LEFT);
-      columnQuantity.setText("Quantity"); //$NON-NLS-1$
-      columnQuantity.setWidth(25);
+      final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
+      columnServings.setText("Servings"); //$NON-NLS-1$
+      columnServings.setWidth(25);
 
       // Column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
@@ -337,15 +392,15 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       columnCalories.setText("Calories"); //$NON-NLS-1$
       columnCalories.setWidth(75);
 
-      // Column: Fluid
-      final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
-      columnFluid.setText("Fluid"); //$NON-NLS-1$
-      columnFluid.setWidth(75);
-
       // Column: Sodium
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
       columnSodium.setText("Sodium"); //$NON-NLS-1$
       columnSodium.setWidth(75);
+
+      // Column: Fluid
+      final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
+      columnFluid.setText("Fluid"); //$NON-NLS-1$
+      columnFluid.setWidth(75);
    }
 
    @Override
@@ -419,8 +474,23 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       productsTable.setHeaderVisible(true);
 
       createColumns(productsTable);
-
+      final String[] PROPS = { "Servings", "Name", "Calories", "Sodium", "Fluid" };
       _productsViewer = new TableViewer(productsTable);
+      _productsViewer.setColumnProperties(PROPS);
+
+      // Column 1 : Completed (Checkbox)
+      // Create the cell editors
+      final CellEditor[] editors = new CellEditor[PROPS.length];
+      // Column 1 : Completed (Checkbox)
+      editors[0] = new TextCellEditor(productsTable);
+      editors[1] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+      editors[2] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+      editors[3] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+      editors[4] = new CheckboxCellEditor(productsTable);
+
+      // Assign the cell editors to the viewer
+      _productsViewer.setCellEditors(editors);
+      _productsViewer.setCellModifier(new TourFuelProductCellModifier(_productsViewer));
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());
