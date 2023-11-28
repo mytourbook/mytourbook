@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -71,6 +70,7 @@ import net.tourbook.weather.WeatherUtils;
 import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -140,10 +140,7 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                                                    //$NON-NLS-1$
-
-   private static final Pattern          HTTP_PATTERN      = Pattern.compile("(http|https|ftp):\\/\\/(\\S*)", Pattern.DOTALL); //$NON-NLS-1$
-   private static final String           HTTP_REPLACEMENT  = "<a href=\"$1://$2\">$1://$2</a>";                                //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                 //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
@@ -339,6 +336,11 @@ public class TourBlogView extends ViewPart {
 
    private String buildDescription(String tourDescription) {
 
+      // Using the option {@link UrlDetectorOptions#JAVASCRIPT} because it encompasses
+      // {@link UrlDetectorOptions#QUOTE_MATCH},
+      // {@link UrlDetectorOptions#SINGLE_QUOTE_MATCH} and
+      // {@link UrlDetectorOptions#BRACKET_MATCH}
+
       final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.JAVASCRIPT);
       final List<Url> detectedUrls = parser.detect();
 
@@ -358,7 +360,7 @@ public class TourBlogView extends ViewPart {
          detectedUrlMap.put(randomString, detectedUrl);
 
          final String originalUrl = detectedUrl.getOriginalUrl();
-         tourDescription = tourDescription.replaceFirst(originalUrl, randomString);
+         tourDescription = StringUtils.replaceOnce(tourDescription, originalUrl, randomString);
       }
 
       for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
