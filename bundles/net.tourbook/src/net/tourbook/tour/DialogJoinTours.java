@@ -1548,11 +1548,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       if (_chkDeleteSourceTours.isEnabled() &&
             _chkDeleteSourceTours.getSelection() &&
-            _tourProvider instanceof final TourBookView tourBookView) {
+            _tourProvider instanceof TourBookView) {
 
          super.close();
 
-         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour(tourBookView);
+         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
          actionDeleteTours.run();
       }
 
