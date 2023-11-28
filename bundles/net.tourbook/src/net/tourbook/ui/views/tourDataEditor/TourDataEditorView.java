@@ -2691,7 +2691,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                Display.getCurrent().asyncExec(() -> updateUI_FromModelRunnable());
 
                /*
-                * Ensure that the save/retore icons display correctly, otherwise the bright icons
+                * Ensure that the save/restore icons display correctly, otherwise the bright icons
                 * (with dark theme) could be displayed until a refresh occurs
                 */
                final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
