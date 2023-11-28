@@ -41,44 +41,44 @@ import utils.Initializer;
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class TourExporterTests {
 
-   private static final String FIT_FILES_PATH        = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
-   private static final String FILES_PATH            = FilesUtils.rootPath + "export/files/";            //$NON-NLS-1$
-   private static final String TEST_TOURFILEPATH_FIT = FILES_PATH + "FITExport.fit";                     //$NON-NLS-1$
-   private static final String TEST_TOURFILEPATH_CSV = FILES_PATH + "FITExport.csv";                     //$NON-NLS-1$
-   private static final String TEST_TOURFILEPATH_TCX = FILES_PATH + "TCXExport.tcx";                     //$NON-NLS-1$
-   private static final String TEST_TOURFILEPATH_FPX = FILES_PATH + "GPXExport.gpx";                     //$NON-NLS-1$
+   private static final String FIT_FILES_PATH            = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
+   private static final String FILES_PATH                = FilesUtils.rootPath + "export/files/";            //$NON-NLS-1$
+   private static final String EXPORTEDTOUR_FILEPATH_FIT = FILES_PATH + "FITExport.fit";                     //$NON-NLS-1$
+   private static final String EXPORTEDTOUR_FILEPATH_CSV = FILES_PATH + "FITExport.csv";                     //$NON-NLS-1$
+   private static final String EXPORTEDTOUR_FILEPATH_TCX = FILES_PATH + "TCXExport.tcx";                     //$NON-NLS-1$
+   private static final String EXPORTEDTOUR_FILEPATH_GPX = FILES_PATH + "GPXExport.gpx";                     //$NON-NLS-1$
 
    private TourData            _tour;
    private TourExporter        _tourExporter;
 
    private void executeFitTest(final String controlTourFileName) {
 
-      _tourExporter.export(TEST_TOURFILEPATH_FIT);
+      _tourExporter.export(EXPORTEDTOUR_FILEPATH_FIT);
 
       Comparison.compareFitAgainstControl(FILES_PATH + controlTourFileName,
-            TEST_TOURFILEPATH_FIT);
+            EXPORTEDTOUR_FILEPATH_FIT);
    }
 
    private void executeGpxTest(final String controlTourFileName) {
 
-      _tourExporter.export(TEST_TOURFILEPATH_FPX);
+      _tourExporter.export(EXPORTEDTOUR_FILEPATH_GPX);
 
       final List<String> nodesToFilter = Arrays.asList("Cadence", "mt:tourType", "mt:tourDistance"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       final List<String> attributesToFilter = Arrays.asList("creator"); //$NON-NLS-1$
       Comparison.compareXmlAgainstControl(FILES_PATH + controlTourFileName,
-            TEST_TOURFILEPATH_FPX,
+            EXPORTEDTOUR_FILEPATH_GPX,
             nodesToFilter,
             attributesToFilter);
    }
 
    private void executeTcxTest(final String controlTourFileName) {
 
-      _tourExporter.export(TEST_TOURFILEPATH_TCX);
+      _tourExporter.export(EXPORTEDTOUR_FILEPATH_TCX);
 
       final List<String> nodesToFilter = Arrays.asList("Cadence", "Author", "Creator"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       final List<String> attributesToFilter = new ArrayList<>();
       Comparison.compareXmlAgainstControl(FILES_PATH + controlTourFileName,
-            TEST_TOURFILEPATH_TCX,
+            EXPORTEDTOUR_FILEPATH_TCX,
             nodesToFilter,
             attributesToFilter);
    }
@@ -137,10 +137,10 @@ public class TourExporterTests {
    @AfterEach
    void tearDown() {
 
-      FileUtils.deleteIfExists(Paths.get(TEST_TOURFILEPATH_FIT));
-      FileUtils.deleteIfExists(Paths.get(TEST_TOURFILEPATH_CSV));
-      FileUtils.deleteIfExists(Paths.get(TEST_TOURFILEPATH_FPX));
-      FileUtils.deleteIfExists(Paths.get(TEST_TOURFILEPATH_TCX));
+      FileUtils.deleteIfExists(Paths.get(EXPORTEDTOUR_FILEPATH_FIT));
+      FileUtils.deleteIfExists(Paths.get(EXPORTEDTOUR_FILEPATH_CSV));
+      FileUtils.deleteIfExists(Paths.get(EXPORTEDTOUR_FILEPATH_GPX));
+      FileUtils.deleteIfExists(Paths.get(EXPORTEDTOUR_FILEPATH_TCX));
    }
 
    @Test
