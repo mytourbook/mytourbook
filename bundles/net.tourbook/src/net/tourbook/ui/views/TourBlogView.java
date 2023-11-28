@@ -782,7 +782,7 @@ public class TourBlogView extends ViewPart {
 
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-         _browser.addLocationListener(changingAdapter(this::onBrowserLocationChanging));
+         _browser.addLocationListener(changingAdapter(locationEvent -> onBrowserLocationChanging(locationEvent)));
 
          _browser.addProgressListener(completedAdapter(progressEvent -> onBrowserCompleted()));
 
