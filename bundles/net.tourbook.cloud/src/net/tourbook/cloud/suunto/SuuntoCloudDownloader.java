@@ -214,6 +214,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       job.schedule();
 
       job.addJobChangeListener(new JobChangeAdapter() {
+
          @Override
          public void done(final IJobChangeEvent event) {
 
@@ -230,6 +231,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                   UI.openNotificationPopup(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, infoText);
                });
             }
+         }
+
+         @Override
+         public void running(final IJobChangeEvent event) {
+            // todo fb detect if no new files to be downloaded but how ?
+
          }
       });
    }
