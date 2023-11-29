@@ -35,10 +35,21 @@ public class PrefPagePeopleTests extends UITest {
       setMetricSystem();
    }
 
-   private static void setMetricSystem() {
+   private static void setMeasurementSystem(final String measurementSystemName) {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
+      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+      bot.comboBox(0).setSelection(measurementSystemName);
+      Utils.clickApplyAndCloseButton(bot);
 
       MeasurementSystem_Manager.setActiveSystemProfileIndex(0, true);
       UI.updateUnits();
+   }
+
+   private static void setMetricSystem() {
+
+      setMeasurementSystem("Metric"); //$NON-NLS-1$
    }
 
    @Test
@@ -71,14 +82,12 @@ public class PrefPagePeopleTests extends UITest {
 
    private void setDistanceNauticalMile() {
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(2, true);
-      UI.updateUnits();
+      setMeasurementSystem("Nautical"); //$NON-NLS-1$
    }
 
    private void setImperialSystem() {
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(1, true);
-      UI.updateUnits();
+      setMeasurementSystem("Imperial"); //$NON-NLS-1$
    }
 
    @Test
@@ -99,7 +108,7 @@ public class PrefPagePeopleTests extends UITest {
       bot.spinner(1).setSelection(180);
 
       //21.6 BMI
-      assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
+      assertEquals("21.6toto", bot.text(3).getText()); //$NON-NLS-1$
 
 //      bot.cTabItem(Messages.Pref_People_Tab_HRZone).activate();
 //      bot.cTabItem(Messages.Pref_People_Tab_DataTransfer).activate();
