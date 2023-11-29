@@ -28,8 +28,6 @@ import utils.Utils;
 
 public class PrefPagePeopleTests extends UITest {
 
-   //todo fb, show ontification popup when no tours are fetched
-
    @AfterAll
    static void cleanUp() {
       setMetricSystem();
