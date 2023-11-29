@@ -33,18 +33,18 @@ public class PrefPagePeopleTests extends UITest {
       setMetricSystem();
    }
 
-   private static void setMeasurementSystem(final String measurementSystemName) {
+   private static void setMeasurementSystem(final int measurementSystemIndex) {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(measurementSystemName);
+      bot.comboBox(0).setSelection(measurementSystemIndex);
       Utils.clickApplyAndCloseButton(bot);
    }
 
    private static void setMetricSystem() {
 
-      setMeasurementSystem("Metric"); //$NON-NLS-1$
+      setMeasurementSystem(0);
    }
 
    @Test
@@ -77,12 +77,12 @@ public class PrefPagePeopleTests extends UITest {
 
    private void setDistanceNauticalMile() {
 
-      setMeasurementSystem("Nautical"); //$NON-NLS-1$
+      setMeasurementSystem(2);
    }
 
    private void setImperialSystem() {
 
-      setMeasurementSystem("Imperial"); //$NON-NLS-1$
+      setMeasurementSystem(1);
    }
 
    @Test
