@@ -18,13 +18,18 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.browser.LocationListener.changingAdapter;
 import static org.eclipse.swt.browser.ProgressListener.completedAdapter;
 
+import com.linkedin.urls.Url;
+import com.linkedin.urls.detection.UrlDetector;
+import com.linkedin.urls.detection.UrlDetectorOptions;
+
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -64,6 +69,8 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -133,10 +140,7 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                                                    //$NON-NLS-1$
-
-   private static final Pattern          HTTP_PATTERN      = Pattern.compile("(http|https|ftp):\\/\\/(\\S*)", Pattern.DOTALL); //$NON-NLS-1$
-   private static final String           HTTP_REPLACEMENT  = "<a href=\"$1://$2\">$1://$2</a>";                                //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                 //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
@@ -330,6 +334,49 @@ public class TourBlogView extends ViewPart {
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   private String buildDescription(String tourDescription) {
+
+      // Using the option {@link UrlDetectorOptions#JAVASCRIPT} because it encompasses
+      // {@link UrlDetectorOptions#QUOTE_MATCH},
+      // {@link UrlDetectorOptions#SINGLE_QUOTE_MATCH} and
+      // {@link UrlDetectorOptions#BRACKET_MATCH}
+
+      final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.JAVASCRIPT);
+      final List<Url> detectedUrls = parser.detect();
+
+      if (detectedUrls.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      // Because the tour description can contain similar URLs, this can create
+      // an issue when URLs can be replaced several times when replacing original
+      // text to formatted URLs.
+      // To avoid this, original URLs are first replaced by a unique random string
+      // and then this string is replaced by the formatted URL
+      final HashMap<String, Url> detectedUrlMap = new HashMap<>();
+      for (final Url detectedUrl : detectedUrls) {
+
+         final String randomString = RandomStringUtils.random(10, true, true);
+         detectedUrlMap.put(randomString, detectedUrl);
+
+         final String originalUrl = detectedUrl.getOriginalUrl();
+         tourDescription = StringUtils.replaceOnce(tourDescription, originalUrl, randomString);
+      }
+
+      for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
+
+         final String fullUrl = set.getValue().getFullUrl();
+         tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      }
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourDescription = UI.scrambleText(tourDescription);
+      }
+
+      return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
    private void clearView() {
 
       _tourData = null;
@@ -435,7 +482,7 @@ public class TourBlogView extends ViewPart {
       final boolean isSaveWeatherLogInWeatherDescription = _prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION);
 
       String tourTitle = _tourData.getTourTitle();
-      String tourDescription = _tourData.getTourDescription();
+      final String tourDescription = _tourData.getTourDescription();
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
@@ -488,14 +535,7 @@ public class TourBlogView extends ViewPart {
                 * Description
                 */
                if (isDescription) {
-
-                  tourDescription = HTTP_PATTERN.matcher(tourDescription).replaceAll(HTTP_REPLACEMENT);
-
-                  if (UI.IS_SCRAMBLE_DATA) {
-                     tourDescription = UI.scrambleText(tourDescription);
-                  }
-
-                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+                  sb.append(buildDescription(tourDescription));
                }
 
                /*
@@ -742,7 +782,7 @@ public class TourBlogView extends ViewPart {
 
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-         _browser.addLocationListener(changingAdapter(this::onBrowserLocationChanging));
+         _browser.addLocationListener(changingAdapter(locationEvent -> onBrowserLocationChanging(locationEvent)));
 
          _browser.addProgressListener(completedAdapter(progressEvent -> onBrowserCompleted()));
 

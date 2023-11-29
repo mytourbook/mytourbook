@@ -9,9 +9,9 @@
 	<classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
 	<classpathentry exported="true" kind="lib" path="commons-lang3-3.13.0.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/> <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
-	<classpathentry exported="true" kind="lib" path="jackson-core-2.15.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
-	<classpathentry exported="true" kind="lib" path="jackson-databind-2.15.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.15.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+	<classpathentry exported="true" kind="lib" path="jackson-core-2.16.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+	<classpathentry exported="true" kind="lib" path="jackson-databind-2.16.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.16.0.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
    <classpathentry exported="true" kind="lib" path="joda-time-2.10.14.jar"> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
       <attributes>
          <attribute name="javadoc_location" value="https://www.javadoc.io/doc/joda-time/joda-time/2.10.14"/>
@@ -21,6 +21,7 @@
 	<classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" /> <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
 	<classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"/> <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
 	<classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/> <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
-	<classpathentry exported="true" kind="lib" path="fit-21.120.2.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://mvnrepository.com/artifact/com.garmin/fit https://github.com/garmin/fit-java-sdk -->
+	<classpathentry exported="true" kind="lib" path="fit-21.126.0.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://mvnrepository.com/artifact/com.garmin/fit https://github.com/garmin/fit-java-sdk -->
+	<classpathentry exported="true" kind="lib" path="url-detector-0.1.23.jar"/> <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
