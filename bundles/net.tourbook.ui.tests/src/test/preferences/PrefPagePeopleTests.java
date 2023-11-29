@@ -18,8 +18,6 @@ package preferences;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -44,9 +42,6 @@ public class PrefPagePeopleTests extends UITest {
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
       bot.comboBox(0).setSelection(measurementSystemName);
       Utils.clickApplyAndCloseButton(bot);
-
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(0, true);
-      UI.updateUnits();
    }
 
    private static void setMetricSystem() {
