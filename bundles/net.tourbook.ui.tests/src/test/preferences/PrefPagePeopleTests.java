@@ -105,7 +105,7 @@ public class PrefPagePeopleTests extends UITest {
       bot.spinner(1).setSelection(180);
 
       //21.6 BMI
-      assertEquals("21.6toto", bot.text(3).getText()); //$NON-NLS-1$
+      assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
 
 //      bot.cTabItem(Messages.Pref_People_Tab_HRZone).activate();
 //      bot.cTabItem(Messages.Pref_People_Tab_DataTransfer).activate();
