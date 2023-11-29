@@ -40,7 +40,7 @@ Experimental
 New
 ===
 
-* All Tour Markers View (Frederic):
+* All Tour Markers View (Frederic)
   - Added the ability to delete markers
 
 
@@ -64,6 +64,14 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1222 
     https://github.com/mytourbook/mytourbook/discussions/1210
 
+* Fit Export (Frederic)
+  - Added the pause types
+
+* Tour Blog (Frederic)
+  -Improved the detection of http links in the tour description to make them clickable by using a third party library
+    https://github.com/URL-Detector/URL-Detector
+    https://github.com/mytourbook/mytourbook/issues/1102
+  
 
 Changes
 =======
@@ -79,6 +87,9 @@ Changes
 * Tour Editor
   - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar
     https://github.com/mytourbook/mytourbook/issues/1201
+
+* Tour Concatenation (Frederic)
+  - The weather data is deleted from the concatenated tour
 
 
 Bugfix
@@ -107,6 +118,6 @@ System
 * MyTourbook Milestone 23.10  https://github.com/mytourbook/mytourbook/milestone/12?closed=1
 * Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
-* FIT SDK 21.120.2            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.126.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
