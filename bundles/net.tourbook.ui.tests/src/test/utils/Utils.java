@@ -220,9 +220,7 @@ public class Utils {
       showTourBookView(bot);
 
       // Get a tour that can be duplicated
-      SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      SWTBotTreeItem tour = getTourWithSRTM(bot);
 
       // Duplicate the tour
       tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
