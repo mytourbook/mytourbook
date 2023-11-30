@@ -110,42 +110,75 @@ public class TourLocation implements Serializable {
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int latitudeE6_Normalized;
+   public int  latitudeE6_Normalized;
 
    /**
     * Contains the normalized longitude value of the requested location
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeE6_Normalized;
+   public int  longitudeE6_Normalized;
 
    /**
     * Contains the normalized latitude min value
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int latitudeMinE6_Normalized;
+   public int  latitudeMinE6_Normalized;
 
    /**
     * Contains the normalized latitude max value
     * <p>
     * normalized = latitude + 90
     */
-   public int latitudeMaxE6_Normalized;
+   public int  latitudeMaxE6_Normalized;
 
    /**
     * Contains the normalized longitude min value
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeMinE6_Normalized;
+   public int  longitudeMinE6_Normalized;
 
    /**
     * Contains the normalized longitude max value
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeMaxE6_Normalized;
+   public int  longitudeMaxE6_Normalized;
+
+   /**
+    * Contains the expanded normalized longitude max value
+    * <p>
+    * normalized = longitude + 180
+    */
+   public int  longitudeMaxExpandedE6_Normalized;
+
+   /**
+    * Contains the expanded normalized latitude min value
+    * <p>
+    * <code>normalized = latitude + 90</code>
+    */
+   public int  latitudeMinExpandedE6_Normalized;
+
+   /**
+    * Contains the expanded normalized latitude max value
+    * <p>
+    * normalized = latitude + 90
+    */
+   public int  latitudeMaxExpandedE6_Normalized;
+
+   /**
+    * Contains the expanded normalized longitude min value
+    * <p>
+    * normalized = longitude + 180
+    */
+   public int  longitudeMinExpandedE6_Normalized;
+
+   /**
+    * Key for the <b>NOT</b> expanded bounding box
+    */
+   public long boundingBoxKey;
 
    /*
     * Fields from {@link OSMAddress}
@@ -224,6 +257,12 @@ public class TourLocation implements Serializable {
    public String postcode;
 
    @Transient
+   public int    houseNumberValue = Integer.MIN_VALUE;
+
+   @Transient
+   public int    postcodeValue    = Integer.MIN_VALUE;
+
+   @Transient
    public double latitude;
    @Transient
    public double longitude;
@@ -242,6 +281,15 @@ public class TourLocation implements Serializable {
    @Transient
    public double longitudeMax;
 
+   @Transient
+   public double latitudeMinExpanded;
+   @Transient
+   public double latitudeMaxExpanded;
+   @Transient
+   public double longitudeMinExpanded;
+   @Transient
+   public double longitudeMaxExpanded;
+
    /**
     * Default constructor used also in ejb
     */
@@ -257,6 +305,31 @@ public class TourLocation implements Serializable {
 
       latitudeE6_Normalized = latitudeE6 + 90_000_000;
       longitudeE6_Normalized = longitudeE6 + 180_000_000;
+   }
+
+   /**
+    * Convert string values, e.g. postcode or house number into number values
+    */
+   public void convertStringValues() {
+
+      try {
+
+         houseNumberValue = Integer.parseInt(house_number);
+
+      } catch (final Exception e) {
+
+         // ignore
+      }
+
+      try {
+
+         postcodeValue = Integer.parseInt(postcode);
+
+      } catch (final Exception e) {
+
+         // ignore
+      }
+
    }
 
    @Override
@@ -279,8 +352,35 @@ public class TourLocation implements Serializable {
       return locationID == other.locationID;
    }
 
+   public int getLatitudeDiff() {
+
+      final int latitudeDiff = latitudeE6_Normalized < latitudeMinE6_Normalized
+
+            ? latitudeE6_Normalized - latitudeMinE6_Normalized
+            : latitudeE6_Normalized > latitudeMaxE6_Normalized
+
+                  ? latitudeE6_Normalized - latitudeMaxE6_Normalized
+                  : 0;
+
+      return latitudeDiff;
+   }
+
    public long getLocationId() {
+
       return locationID;
+   }
+
+   public int getLongitudeDiff() {
+
+      final int longitudeDiff = longitudeE6_Normalized < longitudeMinE6_Normalized
+
+            ? longitudeE6_Normalized - longitudeMinE6_Normalized
+            : longitudeE6_Normalized > longitudeMaxE6_Normalized
+
+                  ? longitudeE6_Normalized - longitudeMaxE6_Normalized
+                  : 0;
+
+      return longitudeDiff;
    }
 
    @Override
@@ -289,7 +389,7 @@ public class TourLocation implements Serializable {
       return Objects.hash(locationID);
    }
 
-   private String log(final String field, final int value) {
+   private String log(final String field, final long value) {
 
       return field + value + NL;
    }
@@ -301,6 +401,11 @@ public class TourLocation implements Serializable {
       }
 
       return field + value + NL;
+   }
+
+   public void setLocationID(final long locationID) {
+
+      this.locationID = locationID;
    }
 
    @Override
@@ -373,14 +478,24 @@ public class TourLocation implements Serializable {
 
             + NL
 
-            + log(" latitudeE6                = ", latitudeE6) //                   //$NON-NLS-1$
-            + log(" longitudeE6               = ", longitudeE6) //                  //$NON-NLS-1$
-            + log(" latitudeMinE6_Normalized  = ", latitudeMinE6_Normalized) //     //$NON-NLS-1$
-            + log(" latitudeMaxE6_Normalized  = ", latitudeMaxE6_Normalized) //     //$NON-NLS-1$
-            + log(" longitudeMinE6_Normalized = ", longitudeMinE6_Normalized) //    //$NON-NLS-1$
-            + log(" longitudeMaxE6_Normalized = ", longitudeMaxE6_Normalized) //    //$NON-NLS-1$
+            + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
+            + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
+
+            + log(" latitudeMinE6_Normalized          = ", latitudeMinE6_Normalized) //            //$NON-NLS-1$
+            + log(" latitudeMaxE6_Normalized          = ", latitudeMaxE6_Normalized) //            //$NON-NLS-1$
+            + log(" longitudeMinE6_Normalized         = ", longitudeMinE6_Normalized) //           //$NON-NLS-1$
+            + log(" longitudeMaxE6_Normalized         = ", longitudeMaxE6_Normalized) //           //$NON-NLS-1$
+
+            + log(" latitudeMinExpandedE6_Normalized  = ", latitudeMinExpandedE6_Normalized) //    //$NON-NLS-1$
+            + log(" latitudeMaxExpandedE6_Normalized  = ", latitudeMaxExpandedE6_Normalized) //    //$NON-NLS-1$
+            + log(" longitudeMinExpandedE6_Normalized = ", longitudeMinExpandedE6_Normalized) //   //$NON-NLS-1$
+            + log(" longitudeMaxExpandedE6_Normalized = ", longitudeMaxExpandedE6_Normalized) //   //$NON-NLS-1$
+
+            + log(" boundingBoxKey                    = ", boundingBoxKey) //                      //$NON-NLS-1$
+
+            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
+            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
 
       ;
    }
-
 }

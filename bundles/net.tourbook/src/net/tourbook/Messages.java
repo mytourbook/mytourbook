@@ -3104,6 +3104,7 @@ public class Messages extends NLS {
 
    public static String        Tour_Location_Action_Customize_End_Tooltip;
    public static String        Tour_Location_Action_Customize_Start_Tooltip;
+   public static String        Tour_Location_Action_DeleteLocation;
    public static String        Tour_Location_Action_Download_End_Tooltip;
    public static String        Tour_Location_Action_Download_Start_Tooltip;
    public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;

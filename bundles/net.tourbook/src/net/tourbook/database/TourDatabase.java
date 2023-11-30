@@ -255,6 +255,9 @@ public class TourDatabase {
 
 // SET_FORMATTING_ON
 
+   public static final String  PARAMETER_FIRST                            = "?";                                  //$NON-NLS-1$
+   public static final String  PARAMETER_FOLLOWING                        = ", ?";                                //$NON-NLS-1$
+
    /**
     * Renaming existing fields in the tour database causes lots of troubles and additional work to
     * fix and test it for ALL possible cases -> It is not a good idea to rename fields
@@ -757,7 +760,9 @@ public class TourDatabase {
        *
        * @throws SQLException
        */
-      private static void CreateIndex(final Statement stmt, final String tableName, final String indexAndColumnName) throws SQLException {
+      private static void CreateIndex(final Statement stmt,
+                                      final String tableName,
+                                      final String indexAndColumnName) throws SQLException {
 
          if (isIndexAvailable(stmt.getConnection(), tableName, indexAndColumnName)) {
 
@@ -2181,8 +2186,15 @@ public class TourDatabase {
       return getTourLocation(latitudeE6, longitudeE6);
    }
 
-   @SuppressWarnings("unchecked")
-   public static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6) {
+   /**
+    * Searches for a tour location which is within all saved bounding boxes
+    *
+    * @param latitudeE6
+    * @param longitudeE6
+    *
+    * @return
+    */
+   private static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6) {
 
       TourLocation dbTourLocation = null;
 
@@ -2196,17 +2208,17 @@ public class TourDatabase {
          {
             final String sql = UI.EMPTY_STRING
 
-                  + "SELECT TourLocation" + NL //                                      //$NON-NLS-1$
+                  + "SELECT TourLocation" + NL //                                               //$NON-NLS-1$
 
-                  + " FROM TourLocation AS tourLocation" + NL //                       //$NON-NLS-1$
+                  + " FROM TourLocation AS tourLocation" + NL //                                //$NON-NLS-1$
 
-                  + " WHERE " + NL //                                                  //$NON-NLS-1$
+                  + " WHERE " + NL //                                                           //$NON-NLS-1$
 
-                  + "   tourLocation.latitudeMinE6_Normalized  <= ? AND " + NL //   1  //$NON-NLS-1$
-                  + "   tourLocation.latitudeMaxE6_Normalized  >= ? AND " + NL //   2  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMinExpandedE6_Normalized  <= ? AND " + NL //   1  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMaxExpandedE6_Normalized  >= ? AND " + NL //   2  //$NON-NLS-1$
 
-                  + "   tourLocation.longitudeMinE6_Normalized <= ? AND " + NL //   3  //$NON-NLS-1$
-                  + "   tourLocation.longitudeMaxE6_Normalized >= ?" + NL //        4  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMinExpandedE6_Normalized <= ? AND " + NL //   3  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMaxExpandedE6_Normalized >= ?" + NL //        4  //$NON-NLS-1$
             ;
 
             final Query emQuery = em.createQuery(sql);
@@ -2218,28 +2230,29 @@ public class TourDatabase {
 
             try {
 
-               final List<TourLocation> allTourLocations = emQuery.getResultList();
+               @SuppressWarnings("unchecked")
+               final List<TourLocation> allDbTourLocations = emQuery.getResultList();
 
-               final int numLocations = allTourLocations.size();
+               final int numLocations = allDbTourLocations.size();
 
                if (numLocations == 0) {
 
-                  // ignore
+                  // a new location will be created
 
                } else if (numLocations == 1) {
 
-                  dbTourLocation = allTourLocations.get(0);
+                  dbTourLocation = allDbTourLocations.get(0);
 
                } else {
 
                   // numLocations > 1
 
-//                  for (final TourLocation dbTourLocation : allTourLocations) {
+//                  for (final TourLocation dbTourLocation2 : allDbTourLocations) {
 //
-//                     final int latitudeMinE6_Normalized = dbTourLocation.latitudeMinE6_Normalized;
-//                     final int latitudeMaxE6_Normalized = dbTourLocation.latitudeMaxE6_Normalized;
-//                     final int longitudeMinE6_Normalized = dbTourLocation.longitudeMinE6_Normalized;
-//                     final int longitudeMaxE6_Normalized = dbTourLocation.longitudeMaxE6_Normalized;
+//                     final int latitudeMinE6_Normalized = dbTourLocation2.latitudeMinE6_Normalized;
+//                     final int latitudeMaxE6_Normalized = dbTourLocation2.latitudeMaxE6_Normalized;
+//                     final int longitudeMinE6_Normalized = dbTourLocation2.longitudeMinE6_Normalized;
+//                     final int longitudeMaxE6_Normalized = dbTourLocation2.longitudeMaxE6_Normalized;
 //
 //                     System.out.println("""
 //                           %s    %s
@@ -2253,22 +2266,73 @@ public class TourDatabase {
 //                           FormatManager.formatNumber_0(longitudeE6_Normalized),
 //
 //                           FormatManager.formatNumber_0(latitudeMaxE6_Normalized),
-//                           FormatManager.formatNumber_0(longitudeMaxE6_Normalized)
-//
+//                           FormatManager.formatNumber_0(longitudeMaxE6_Normalized) //
 //                     ));
 //                  }
 //
-//                  System.out.println("Found %d locations, using first location".formatted(allTourLocations.size()));
-//// TODO remove SYSTEM.OUT.PRINTLN
+//                  System.out.println("Found %d locations, using first location".formatted(allDbTourLocations.size()));
 
-                  dbTourLocation = allTourLocations.get(0);
+                  dbTourLocation = allDbTourLocations.get(0);
                }
 
             } catch (final Exception e) {
 
                StatusUtil.log(e);
             }
+         }
+         em.close();
+      }
 
+      return dbTourLocation;
+   }
+
+   public static TourLocation getTourLocation(final TourLocation tourLocation) {
+      // TODO Auto-generated method stub
+
+      TourLocation dbTourLocation = null;
+
+      synchronized (DB_LOCK) {
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         {
+            final String sql = UI.EMPTY_STRING
+
+                  + "SELECT TourLocation" + NL //                          //$NON-NLS-1$
+
+                  + " FROM TourLocation AS tourLocation" + NL //           //$NON-NLS-1$
+
+                  + " WHERE " + NL //                                      //$NON-NLS-1$
+
+                  + "   tourLocation.boundingBoxKey = ?" + NL //       1  //$NON-NLS-1$
+            ;
+
+            final Query emQuery = em.createQuery(sql);
+
+            emQuery.setParameter(1, tourLocation.boundingBoxKey);
+
+            try {
+
+               @SuppressWarnings("unchecked")
+               final List<TourLocation> allDbTourLocations = emQuery.getResultList();
+
+               final int numLocations = allDbTourLocations.size();
+
+               if (numLocations == 0) {
+
+                  // a new location will be created
+
+               } else {
+
+                  // reuse loaded tour location by expanding it's bounding box
+
+                  dbTourLocation = allDbTourLocations.get(0);
+
+               }
+
+            } catch (final Exception e) {
+
+               StatusUtil.log(e);
+            }
          }
          em.close();
       }
@@ -3506,7 +3570,7 @@ public class TourDatabase {
 
          } else {
 
-            // create new tour location
+            // save requested tour location
 
             final TourLocation savedLocation = saveEntity(
 
@@ -4533,6 +4597,9 @@ public class TourDatabase {
       createIndex_TourData_037(stmt);
 
       SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
+
+      SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "TourLocationStart_LocationID"); //$NON-NLS-1$
+      SQL.CreateIndex_Combined(stmt, TABLE_TOUR_DATA, "TourLocationEnd_LocationID"); //$NON-NLS-1$
    }
 
    /**
@@ -4573,16 +4640,23 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_LOCATION, true)
 
-            + "   name                       VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   display_name               VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                                VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   display_name                        VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   latitudeE6_Normalized      INTEGER,                                        " + NL //$NON-NLS-1$
-            + "   longitudeE6_Normalized     INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   latitudeE6_Normalized               INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeE6_Normalized              INTEGER,                               " + NL //$NON-NLS-1$
 
-            + "   latitudeMinE6_Normalized   INTEGER,                                        " + NL //$NON-NLS-1$
-            + "   latitudeMaxE6_Normalized   INTEGER,                                        " + NL //$NON-NLS-1$
-            + "   longitudeMinE6_Normalized  INTEGER,                                        " + NL //$NON-NLS-1$
-            + "   longitudeMaxE6_Normalized  INTEGER,                                        " + NL //$NON-NLS-1$
+            + "   latitudeMinE6_Normalized            INTEGER,                               " + NL //$NON-NLS-1$
+            + "   latitudeMaxE6_Normalized            INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeMinE6_Normalized           INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeMaxE6_Normalized           INTEGER,                               " + NL //$NON-NLS-1$
+
+            + "   latitudeMinExpandedE6_Normalized    INTEGER,                               " + NL //$NON-NLS-1$
+            + "   latitudeMaxExpandedE6_Normalized    INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeMinExpandedE6_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeMaxExpandedE6_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
+
+            + "   boundingBoxKey                      BIGINT,                                " + NL //$NON-NLS-1$
 
             /*
              * Address fields
@@ -4659,7 +4733,6 @@ public class TourDatabase {
             + ")" //                                                                                //$NON-NLS-1$
       );
 
-      SQL.CreateIndex(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$
    }
 
    /**
@@ -10360,10 +10433,13 @@ public class TourDatabase {
 
          // increase tour location size
          SQL.AlterColumn_VarChar_Width (stmt, TABLE_TOUR_DATA, "tourStartPlace", TourData.DB_LENGTH_TOUR_START_PLACE_V52); //$NON-NLS-1$
-         SQL.AlterColumn_VarChar_Width (stmt, TABLE_TOUR_DATA, "tourEndPlace",   TourData.DB_LENGTH_TOUR_END_PLACE_V52); //$NON-NLS-1$
+         SQL.AlterColumn_VarChar_Width (stmt, TABLE_TOUR_DATA, "tourEndPlace",   TourData.DB_LENGTH_TOUR_END_PLACE_V52);   //$NON-NLS-1$
 
-         SQL.AddColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID",  null); //$NON-NLS-1$
-         SQL.AddColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID",    null); //$NON-NLS-1$
+         SQL.AddColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID",  null);   //$NON-NLS-1$
+         SQL.AddColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID",    null);   //$NON-NLS-1$
+
+         SQL.CreateIndex_Combined      (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID");          //$NON-NLS-1$
+         SQL.CreateIndex_Combined      (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID");            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 

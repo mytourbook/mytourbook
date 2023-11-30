@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -32,6 +34,7 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
@@ -43,6 +46,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -106,6 +110,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private boolean                 _isInUIUpdate;
 
+   private Action_DeleteLocation   _action_DeleteLocation;
+
    private final NumberFormat      _nf1                            = NumberFormat.getNumberInstance();
    private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
    private final NumberFormat      _nf6                            = NumberFormat.getNumberInstance();
@@ -125,6 +131,23 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private Composite      _viewerContainer;
 
    private Menu           _tableContextMenu;
+
+   private class Action_DeleteLocation extends Action {
+
+      public Action_DeleteLocation() {
+
+         setText(Messages.Tour_Location_Action_DeleteLocation);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         onAction_DeleteLocation();
+      }
+   }
 
    private class LocationComparator extends ViewerComparator {
 
@@ -191,7 +214,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_Road_ID:              rc = compareText(location1.road,                location2.road);              break;
 
          case TableColumnFactory.LOCATION_PART_HouseName_ID:         rc = compareText(location1.house_name,          location2.house_name);        break;
-         case TableColumnFactory.LOCATION_PART_HouseNumber_ID:       rc = compareText(location1.house_number,        location2.house_number);      break;
+         case TableColumnFactory.LOCATION_PART_HouseNumber_ID:       rc = compareHouseNumber(location1,              location2);                   break;
 
          case TableColumnFactory.LOCATION_PART_Aerialway_ID:         rc = compareText(location1.aerialway,           location2.aerialway);         break;
          case TableColumnFactory.LOCATION_PART_Aeroway_ID:           rc = compareText(location1.aeroway,             location2.aeroway);           break;
@@ -216,7 +239,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_Tunnel_ID:            rc = compareText(location1.tunnel,              location2.tunnel);            break;
          case TableColumnFactory.LOCATION_PART_Waterway_ID:          rc = compareText(location1.waterway,            location2.waterway);          break;
 
-         case TableColumnFactory.LOCATION_PART_Postcode_ID:          rc = compareText(location1.postcode,            location2.postcode);          break;
+         case TableColumnFactory.LOCATION_PART_Postcode_ID:          rc = comparePostcode(location1,                 location2);                   break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
             rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
@@ -228,38 +251,52 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF_ID:
 
-            rc = item1.latitudeDiffValue - item2.latitudeDiffValue;
+            rc = item1.latitudeDiff_Value - item2.latitudeDiff_Value;
 
             if (rc == 0) {
-               rc = item1.longitudeDiffValue - item2.longitudeDiffValue;
+               rc = item1.longitudeDiff_Value - item2.longitudeDiff_Value;
             }
 
             break;
 
          case TableColumnFactory.LOCATION_GEO_LONGITUDE_DIFF_ID:
 
-            rc = item1.longitudeDiffValue - item2.longitudeDiffValue;
+            rc = item1.longitudeDiff_Value - item2.longitudeDiff_Value;
 
             if (rc == 0) {
-               rc = item1.latitudeDiffValue - item2.latitudeDiffValue;
+               rc = item1.latitudeDiff_Value - item2.latitudeDiff_Value;
             }
 
             break;
 
-         case TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MIN_ID:
-            rc = location1.latitudeMinE6_Normalized - location2.latitudeMinE6_Normalized;
+         case TableColumnFactory.LOCATION_GEO_LATITUDE_HEIGHT_ID:
+
+            rc = item1.latitudeHeight_Value- item2.latitudeHeight_Value;
+
+            if (rc == 0) {
+               rc = item1.longitudeWidth_Value - item2.longitudeWidth_Value;
+            }
+
             break;
 
-         case TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MAX_ID:
-            rc = location1.latitudeMaxE6_Normalized - location2.latitudeMaxE6_Normalized;
+         case TableColumnFactory.LOCATION_GEO_LONGITUDE_WIDTH_ID:
+
+            rc = item1.longitudeWidth_Value - item2.longitudeWidth_Value;
+
+            if (rc == 0) {
+               rc = item1.latitudeHeight_Value - item2.latitudeHeight_Value;
+            }
+
             break;
 
-         case TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MIN_ID:
-            rc = location1.longitudeMinE6_Normalized - location2.longitudeMinE6_Normalized;
-            break;
+         case TableColumnFactory.LOCATION_DATA_ID_ID:
 
-         case TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MAX_ID:
-            rc = location1.longitudeMaxE6_Normalized - location2.longitudeMaxE6_Normalized;
+            rc = location1.getLocationId() - location2.getLocationId();
+
+            if (rc == 0) {
+               rc = item1.latitudeHeight_Value - item2.latitudeHeight_Value;
+            }
+
             break;
 
          case TableColumnFactory.LOCATION_PART_DisplayName_ID:
@@ -286,15 +323,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          // nth sort by house number
          if (rc == 0) {
-            rc = compareText(location1.house_number, location2.house_number);
+            rc = compareHouseNumber(location1, location2);
          }
 
-         // nth sort by house number lat/lon diff
+         // nth sort by lat/lon diff
          if (rc == 0) {
-            rc = item1.latitudeDiffValue - item2.latitudeDiffValue;
+            rc = item1.latitudeDiff_Value - item2.latitudeDiff_Value;
          }
          if (rc == 0) {
-            rc = item1.longitudeDiffValue - item2.longitudeDiffValue;
+            rc = item1.longitudeDiff_Value - item2.longitudeDiff_Value;
          }
 
          // If descending order, flip the direction
@@ -310,6 +347,30 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                : rc < 0
                      ? -1
                      : 0;
+      }
+
+      private double compareHouseNumber(final TourLocation location1, final TourLocation location2) {
+
+         if (location1.houseNumberValue != Integer.MIN_VALUE && location2.houseNumberValue != Integer.MIN_VALUE) {
+
+            return location1.houseNumberValue - location2.houseNumberValue;
+
+         } else {
+
+            return compareText(location1.house_number, location2.house_number);
+         }
+      }
+
+      private double comparePostcode(final TourLocation location1, final TourLocation location2) {
+
+         if (location1.postcodeValue != Integer.MIN_VALUE && location2.postcodeValue != Integer.MIN_VALUE) {
+
+            return location1.postcodeValue - location2.postcodeValue;
+
+         } else {
+
+            return compareText(location1.postcode, location2.postcode);
+         }
       }
 
       private double compareText(final String text1, final String text2) {
@@ -379,11 +440,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       public String longitudeMin;
       public String longitudeMax;
 
-      public String latitudeDiffText;
-      public String longitudeDiffText;
+      public String latitudeDiff_Text;
+      public String longitudeDiff_Text;
+      public int    latitudeDiff_Value;
+      public int    longitudeDiff_Value;
 
-      public int    latitudeDiffValue;
-      public int    longitudeDiffValue;
+      public String latitudeHeight_Text;
+      public String longitudeWidth_Text;
+      public int    latitudeHeight_Value;
+      public int    longitudeWidth_Value;
 
       @Override
       public boolean equals(final Object obj) {
@@ -467,7 +532,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          return _tableContextMenu;
       }
-
    }
 
    private void addPartListener() {
@@ -568,7 +632,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          }
 
          if (eventId == TourEventId.UPDATE_UI
-               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED
+               || eventId == TourEventId.TOUR_CHANGED
+
+         ) {
 
             // new locations could be added
 
@@ -581,6 +648,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void createActions() {
 
+      _action_DeleteLocation = new Action_DeleteLocation();
    }
 
    private void createMenuManager() {
@@ -677,9 +745,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-      final Table table = (Table) _locationViewer.getControl();
+      _columnManager.createHeaderContextMenu(
 
-      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+            (Table) _locationViewer.getControl(),
+            _tableViewerContextMenuProvider);
    }
 
    private Menu createUI_22_CreateViewerContextMenu() {
@@ -770,14 +839,32 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_80_Waterway();
 
       defineColumn_Geo_10_Latitude();
-      defineColumn_Geo_20_BBox_LatitudeMin();
-      defineColumn_Geo_22_BBox_LatitudeMax();
       defineColumn_Geo_14_LatitudeDiff();
 
       defineColumn_Geo_12_Longitude();
-      defineColumn_Geo_24_BBox_LongitudeMin();
-      defineColumn_Geo_26_BBox_LongitudeMax();
       defineColumn_Geo_16_LongitudeDiff();
+
+      defineColumn_Geo_18_LatitudeWidth();
+      defineColumn_Geo_19_LongitudeHeight();
+
+      defineColumn_Data_10_ID();
+   }
+
+   private void defineColumn_Data_10_ID() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_DATA_ID.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final LocationItem locationItem = ((LocationItem) cell.getElement());
+
+            cell.setText(Long.toString(locationItem.location.getLocationId()));
+         }
+      });
    }
 
    private void defineColumn_Geo_10_Latitude() {
@@ -824,7 +911,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
-            cell.setText(locationItem.latitudeDiffText);
+            cell.setText(locationItem.latitudeDiff_Text);
          }
       });
    }
@@ -839,14 +926,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).longitudeDiffText);
+            cell.setText(((LocationItem) cell.getElement()).longitudeDiff_Text);
          }
       });
    }
 
-   private void defineColumn_Geo_20_BBox_LatitudeMin() {
+   private void defineColumn_Geo_18_LatitudeWidth() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MIN.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE_HEIGHT.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -854,14 +941,16 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).latitudeMin);
+            final LocationItem locationItem = ((LocationItem) cell.getElement());
+
+            cell.setText(locationItem.latitudeHeight_Text);
          }
       });
    }
 
-   private void defineColumn_Geo_22_BBox_LatitudeMax() {
+   private void defineColumn_Geo_19_LongitudeHeight() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LATITUDE_MAX.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE_WIDTH.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -869,37 +958,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).latitudeMax);
-         }
-      });
-   }
-
-   private void defineColumn_Geo_24_BBox_LongitudeMin() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MIN.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).longitudeMin);
-         }
-      });
-   }
-
-   private void defineColumn_Geo_26_BBox_LongitudeMax() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BBOX_LONGITUDE_MAX.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).longitudeMax);
+            cell.setText(((LocationItem) cell.getElement()).longitudeWidth_Text);
          }
       });
    }
@@ -1789,7 +1848,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final boolean isLocationSelected = selectedLocationItem != null;
 
 //      _action_OpenSensorChartView.setEnabled(isSensorSelected);
-//      _action_DeleteSensor.setEnabled(isSensorSelected);
+      _action_DeleteLocation.setEnabled(isLocationSelected);
 //      _action_EditSensor.setEnabled(isSensorSelected);
    }
 
@@ -1801,7 +1860,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 //      menuMgr.add(_action_EditSensor);
 //      menuMgr.add(_action_OpenSensorChartView);
-//      menuMgr.add(_action_DeleteSensor);
+      menuMgr.add(_action_DeleteLocation);
 
       enableActions();
    }
@@ -1838,6 +1897,21 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       return null;
+   }
+
+   private List<TourLocation> getSelectedLocations() {
+
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      final IStructuredSelection structuredSelection = _locationViewer.getStructuredSelection();
+
+      for (final Object selection : structuredSelection) {
+         if (selection instanceof final LocationItem locationItem) {
+            allTourLocations.add(locationItem.location);
+         }
+      }
+
+      return allTourLocations;
    }
 
    /**
@@ -1887,6 +1961,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void loadAllLocations() {
 
       _allLocationItems.clear();
+
+      loadAllLocations_10_Locations();
+      loadAllLocations_20_NumberOfTours();
+   }
+
+   private void loadAllLocations_10_Locations() {
 
       PreparedStatement statement = null;
       ResultSet result = null;
@@ -1966,13 +2046,20 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
                + "postcode," + NL //                  57 //$NON-NLS-1$
 
-               + "latitudeE6_Normalized," + NL //     58 //$NON-NLS-1$
-               + "longitudeE6_Normalized," + NL //    59 //$NON-NLS-1$
+               + "latitudeE6_Normalized," + NL //                 58 //$NON-NLS-1$
+               + "longitudeE6_Normalized," + NL //                59 //$NON-NLS-1$
 
-               + "latitudeMinE6_Normalized," + NL //  60 //$NON-NLS-1$
-               + "latitudeMaxE6_Normalized," + NL //  61 //$NON-NLS-1$
-               + "longitudeMinE6_Normalized," + NL // 62 //$NON-NLS-1$
-               + "longitudeMaxE6_Normalized" + NL //  63 //$NON-NLS-1$
+               + "latitudeMinE6_Normalized," + NL //              60 //$NON-NLS-1$
+               + "latitudeMaxE6_Normalized," + NL //              61 //$NON-NLS-1$
+               + "longitudeMinE6_Normalized," + NL //             62 //$NON-NLS-1$
+               + "longitudeMaxE6_Normalized," + NL //             63 //$NON-NLS-1$
+
+               + "latitudeMinExpandedE6_Normalized," + NL //      64 //$NON-NLS-1$
+               + "latitudeMaxExpandedE6_Normalized," + NL //      65 //$NON-NLS-1$
+               + "longitudeMinExpandedE6_Normalized," + NL //     66 //$NON-NLS-1$
+               + "longitudeMaxExpandedE6_Normalized," + NL //     67 //$NON-NLS-1$
+
+               + "locationID" + NL //                             68 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_LOCATION + NL //$NON-NLS-1$
 
@@ -2061,12 +2148,22 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             tourLocation.postcode            = result.getString(57);
 
-            final int latitudeE6_Normalized     = result.getInt(58);
-            final int longitudeE6_Normalized    = result.getInt(59);
-            final int latitudeMinE6_Normalized  = result.getInt(60);
-            final int latitudeMaxE6_Normalized  = result.getInt(61);
-            final int longitudeMinE6_Normalized = result.getInt(62);
-            final int longitudeMaxE6_Normalized = result.getInt(63);
+            tourLocation.convertStringValues();
+
+            final int latitudeE6_Normalized              = result.getInt(58);
+            final int longitudeE6_Normalized             = result.getInt(59);
+
+            final int latitudeMinE6_Normalized           = result.getInt(60);
+            final int latitudeMaxE6_Normalized           = result.getInt(61);
+            final int longitudeMinE6_Normalized          = result.getInt(62);
+            final int longitudeMaxE6_Normalized          = result.getInt(63);
+
+            final int latitudeMinExpandedE6_Normalized   = result.getInt(64);
+            final int latitudeMaxExpandedE6_Normalized   = result.getInt(65);
+            final int longitudeMinExpandedE6_Normalized  = result.getInt(66);
+            final int longitudeMaxExpandedE6_Normalized  = result.getInt(67);
+
+            tourLocation.setLocationID(                    result.getLong(68));
 
             final double latitude               = (latitudeE6_Normalized  -  90_000_000) / 1E6;
             final double longitude              = (longitudeE6_Normalized - 180_000_000) / 1E6;
@@ -2076,20 +2173,40 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final double longitudeMin           = (longitudeMinE6_Normalized - 180_000_000) / 1E6;
             final double longitudeMax           = (longitudeMaxE6_Normalized - 180_000_000) / 1E6;
 
-            tourLocation.latitude      = latitude;
-            tourLocation.longitude     = longitude;
-            tourLocation.latitudeMin   = latitudeMin;
-            tourLocation.latitudeMax   = latitudeMax;
-            tourLocation.longitudeMin  = longitudeMin;
-            tourLocation.longitudeMax  = longitudeMax;
+            final double latitudeMinExpanded    = (latitudeMinExpandedE6_Normalized  -  90_000_000) / 1E6;
+            final double latitudeMaxExpanded    = (latitudeMaxExpandedE6_Normalized  -  90_000_000) / 1E6;
+            final double longitudeMinExpanded   = (longitudeMinExpandedE6_Normalized - 180_000_000) / 1E6;
+            final double longitudeMaxExpanded   = (longitudeMaxExpandedE6_Normalized - 180_000_000) / 1E6;
 
-            tourLocation.latitudeE6_Normalized     = latitudeE6_Normalized;
-            tourLocation.longitudeE6_Normalized    = longitudeE6_Normalized;
+            tourLocation.latitude               = latitude;
+            tourLocation.longitude              = longitude;
+            tourLocation.latitudeMin            = latitudeMin;
+            tourLocation.latitudeMax            = latitudeMax;
+            tourLocation.longitudeMin           = longitudeMin;
+            tourLocation.longitudeMax           = longitudeMax;
 
-            tourLocation.latitudeMinE6_Normalized  = latitudeMinE6_Normalized;
-            tourLocation.latitudeMaxE6_Normalized  = latitudeMaxE6_Normalized;
-            tourLocation.longitudeMinE6_Normalized = longitudeMinE6_Normalized;
-            tourLocation.longitudeMaxE6_Normalized = longitudeMaxE6_Normalized;
+            tourLocation.latitudeMinExpanded    = latitudeMinExpanded;
+            tourLocation.latitudeMaxExpanded    = latitudeMaxExpanded;
+            tourLocation.longitudeMinExpanded   = longitudeMinExpanded;
+            tourLocation.longitudeMaxExpanded   = longitudeMaxExpanded;
+
+            tourLocation.latitudeE6_Normalized              = latitudeE6_Normalized;
+            tourLocation.longitudeE6_Normalized             = longitudeE6_Normalized;
+
+            tourLocation.latitudeMinE6_Normalized           = latitudeMinE6_Normalized;
+            tourLocation.latitudeMaxE6_Normalized           = latitudeMaxE6_Normalized;
+            tourLocation.longitudeMinE6_Normalized          = longitudeMinE6_Normalized;
+            tourLocation.longitudeMaxE6_Normalized          = longitudeMaxE6_Normalized;
+
+            tourLocation.latitudeMinExpandedE6_Normalized   = latitudeMinExpandedE6_Normalized;
+            tourLocation.latitudeMaxExpandedE6_Normalized   = latitudeMaxExpandedE6_Normalized;
+            tourLocation.longitudeMinExpandedE6_Normalized  = longitudeMinExpandedE6_Normalized;
+            tourLocation.longitudeMaxExpandedE6_Normalized  = longitudeMaxExpandedE6_Normalized;
+
+            tourLocation.boundingBoxKey = latitudeMinE6_Normalized
+                                        + latitudeMaxE6_Normalized
+                                        + longitudeMinE6_Normalized
+                                        + longitudeMaxE6_Normalized;
 
             locationItem.latitude     = _nf6.format(latitude);
             locationItem.longitude    = _nf6.format(longitude);
@@ -2113,37 +2230,28 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                         ? longitudeE6_Normalized - longitudeMaxE6_Normalized
                         : 0;
 
-//            int latitudeDiffMeter = 0;
-//            int longitudeDiffMeter = 0;
-//
-//            if (latitudeDiff > 0) {
-//
-//               latitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMax, longitudeMax);
-//
-//            } else if (latitudeDiff < 0) {
-//
-//               latitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMin, longitudeMin);
-//            }
-//
-//            if (longitudeDiff > 0) {
-//
-//               longitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMax, longitudeMax);
-//
-//            } else if (longitudeDiff < 0) {
-//
-//               longitudeDiffMeter = (int) MtMath.distanceVincenty(latitude, longitude, latitudeMin, longitudeMin);
-//            }
+            final int latitudeWidth_Value = latitudeMaxE6_Normalized - latitudeMinE6_Normalized;
+            final int longitudeHeight_Value = longitudeMaxE6_Normalized - longitudeMinE6_Normalized;
 
-            locationItem.latitudeDiffText = latitudeDiff == 0
+            final int latitudeDiffMeter = (int) MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMax, longitudeMin);
+            final int longitudeDiffMeter = (int) MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin, longitudeMax);
+
+            locationItem.latitudeDiff_Text = latitudeDiff == 0
                   ? UI.EMPTY_STRING
-                  : Integer.toString(latitudeDiff);// + " - " + Integer.toString(latitudeDiffMeter);
+                  : Integer.toString(latitudeDiff);
 
-            locationItem.longitudeDiffText = longitudeDiff == 0
+            locationItem.longitudeDiff_Text = longitudeDiff == 0
                   ? UI.EMPTY_STRING
-                  : Integer.toString(longitudeDiff);// + " - " + Integer.toString(longitudeDiffMeter);
+                  : Integer.toString(longitudeDiff);
 
-            locationItem.latitudeDiffValue = latitudeDiff;
-            locationItem.longitudeDiffValue = longitudeDiff;
+            locationItem.latitudeDiff_Value = latitudeDiff;
+            locationItem.longitudeDiff_Value = longitudeDiff;
+
+            locationItem.latitudeHeight_Value = latitudeWidth_Value;
+            locationItem.longitudeWidth_Value = longitudeHeight_Value;
+
+            locationItem.latitudeHeight_Text = Integer.toString(latitudeDiffMeter);
+            locationItem.longitudeWidth_Text = Integer.toString(longitudeDiffMeter);
          }
 
       } catch (final SQLException e) {
@@ -2152,6 +2260,119 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          Util.closeSql(statement);
          Util.closeSql(result);
       }
+   }
+
+   private void loadAllLocations_20_NumberOfTours() {
+      // TODO Auto-generated method stub
+
+      final long start = System.nanoTime();
+
+      PreparedStatement statement = null;
+      ResultSet result = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                   //$NON-NLS-1$
+               + "   TourLocation.LocationID," + NL //                             //$NON-NLS-1$
+               + "   TourLocation.Road," + NL //                                   //$NON-NLS-1$
+               + "   TourLocation.House_Number," + NL //                           //$NON-NLS-1$
+               + "   COUNT(TourDataStart.TourLocationSTART_LocationID)," + NL //   //$NON-NLS-1$
+               + "   0" + NL //                                                     //$NON-NLS-1$
+               + "FROM TourLocation" + NL //                                        //$NON-NLS-1$
+               + "LEFT JOIN TourData AS TourDataStart ON TourLocation.LocationID = TourDataStart.TourLocationSTART_LocationID " + NL //$NON-NLS-1$
+               + "GROUP BY" + NL //                                                //$NON-NLS-1$
+               + "   TourLocation.Road," + NL //                                  //$NON-NLS-1$
+               + "   TourLocation.House_Number," + NL //                          //$NON-NLS-1$
+               + "   TourLocation.LocationID" + NL //                               //$NON-NLS-1$
+
+               + "UNION" + NL //                                                       //$NON-NLS-1$
+
+               + "SELECT" + NL //                                                   //$NON-NLS-1$
+               + "   TourLocation.LocationID," + NL //                             //$NON-NLS-1$
+               + "   TourLocation.Road," + NL //                                   //$NON-NLS-1$
+               + "   TourLocation.House_Number," + NL //                           //$NON-NLS-1$
+               + "   0," + NL //                                                    //$NON-NLS-1$
+               + "   COUNT(TourDataEnd.TourLocationEND_LocationID)" + NL //         //$NON-NLS-1$
+               + "FROM TourLocation" + NL //                                        //$NON-NLS-1$
+               + "LEFT JOIN TourData AS TourDataEnd   ON TourLocation.LocationID = TourDataEnd.TourLocationEND_LocationID " + NL //$NON-NLS-1$
+               + "GROUP BY " + NL //                                                //$NON-NLS-1$
+               + "   TourLocation.Road," + NL //                                  //$NON-NLS-1$
+               + "   TourLocation.House_Number, " + NL //                          //$NON-NLS-1$
+               + "   TourLocation.LocationID" + NL //                               //$NON-NLS-1$
+         ;
+
+         statement = conn.prepareStatement(sql);
+         result = statement.executeQuery();
+
+         while (result.next()) {
+
+// SET_FORMATTING_OFF
+
+            final long locationID      = result.getLong(1);
+            final String road          = result.getString(2);
+            final String houseNumber   = result.getString(3);
+
+            final int numStartLocation = result.getInt(4);
+            final int numEndLocation   = result.getInt(5);
+
+// SET_FORMATTING_ON
+
+            System.out.println("%5d %-20s %5s - %4d %4d".formatted(locationID, road, houseNumber, numStartLocation, numEndLocation));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+         }
+
+      } catch (final SQLException e) {
+         SQL.showException(e);
+      } finally {
+         Util.closeSql(statement);
+         Util.closeSql(result);
+      }
+      final long end = System.nanoTime();
+
+      System.out.println((((float) (end - start) / 1000000) + " ms"));
+      // TODO remove SYSTEM.OUT.PRINTLN
+   }
+
+   private void onAction_DeleteLocation() {
+      // TODO Auto-generated method stub
+
+      final List<TourLocation> allSelectedLocations = getSelectedLocations();
+
+      if (TourLocationManager.deleteTourLocations(allSelectedLocations) == false) {
+         return;
+      }
+
+      /*
+       * Deletion was performed -> update viewer
+       */
+
+      final Table table = _locationViewer.getTable();
+
+      // get index for selected sensor
+      final int lastLocationIndex = table.getSelectionIndex();
+
+      // update model
+      loadAllLocations();
+
+      // reload viewer
+      updateUI_SetViewerInput();
+
+      // get next location
+      LocationItem nextLocationItem = (LocationItem) _locationViewer.getElementAt(lastLocationIndex);
+
+      if (nextLocationItem == null) {
+         nextLocationItem = (LocationItem) _locationViewer.getElementAt(lastLocationIndex - 1);
+      }
+
+      // select next location
+      if (nextLocationItem != null) {
+         _locationViewer.setSelection(new StructuredSelection(nextLocationItem), true);
+      }
+
+      table.setFocus();
    }
 
    private void onColumn_Select(final SelectionEvent e) {

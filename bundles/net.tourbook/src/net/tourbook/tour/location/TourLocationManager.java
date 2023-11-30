@@ -29,6 +29,10 @@ import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,6 +65,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -86,6 +91,8 @@ import org.osgi.framework.Version;
  * <p>
  */
 public class TourLocationManager {
+
+   private static final char   NL                              = UI.NEW_LINE;
 
    private static final String SYS_PROP__LOG_ADDRESS_RETRIEVAL = "logAddressRetrieval";                                      //$NON-NLS-1$
    private static boolean      _isLogging_AddressRetrieval     = System.getProperty(SYS_PROP__LOG_ADDRESS_RETRIEVAL) != null;
@@ -160,81 +167,81 @@ public class TourLocationManager {
 
    static Map<LocationPartID, String>             allLocationPartLabel = Map.ofEntries(
 
-         Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Location_Part_OsmDefaultName),
-         Map.entry(LocationPartID.OSM_NAME,                          Messages.Location_Part_OsmName),
+         Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
+         Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
 
-         Map.entry(LocationPartID.CUSTOM_CITY_LARGEST,               Messages.Location_Part_City_Largest),
-         Map.entry(LocationPartID.CUSTOM_CITY_SMALLEST,              Messages.Location_Part_City_Smallest),
-         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_LARGEST,      Messages.Location_Part_CityWithZip_Largest),
-         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_SMALLEST,     Messages.Location_Part_CityWithZip_Smalles),
+         Map.entry(LocationPartID.CUSTOM_CITY_LARGEST,               Messages.Tour_Location_Part_City_Largest),
+         Map.entry(LocationPartID.CUSTOM_CITY_SMALLEST,              Messages.Tour_Location_Part_City_Smallest),
+         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_LARGEST,      Messages.Tour_Location_Part_CityWithZip_Largest),
+         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_SMALLEST,     Messages.Tour_Location_Part_CityWithZip_Smalles),
 
-         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Location_Part_StreeWithHouseNumber),
+         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
 
-         Map.entry(LocationPartID.continent,                         Messages.Location_Part_Continent),
-         Map.entry(LocationPartID.country,                           Messages.Location_Part_Country),
-         Map.entry(LocationPartID.country_code,                      Messages.Location_Part_CountryCode),
+         Map.entry(LocationPartID.continent,                         Messages.Tour_Location_Part_Continent),
+         Map.entry(LocationPartID.country,                           Messages.Tour_Location_Part_Country),
+         Map.entry(LocationPartID.country_code,                      Messages.Tour_Location_Part_CountryCode),
 
-         Map.entry(LocationPartID.region,                            Messages.Location_Part_Region),
-         Map.entry(LocationPartID.state,                             Messages.Location_Part_State),
-         Map.entry(LocationPartID.state_district,                    Messages.Location_Part_StateDistrict),
-         Map.entry(LocationPartID.county,                            Messages.Location_Part_County),
+         Map.entry(LocationPartID.region,                            Messages.Tour_Location_Part_Region),
+         Map.entry(LocationPartID.state,                             Messages.Tour_Location_Part_State),
+         Map.entry(LocationPartID.state_district,                    Messages.Tour_Location_Part_StateDistrict),
+         Map.entry(LocationPartID.county,                            Messages.Tour_Location_Part_County),
 
-         Map.entry(LocationPartID.municipality,                      Messages.Location_Part_Municipality),
-         Map.entry(LocationPartID.city,                              Messages.Location_Part_City),
-         Map.entry(LocationPartID.town,                              Messages.Location_Part_Town),
-         Map.entry(LocationPartID.village,                           Messages.Location_Part_Village),
+         Map.entry(LocationPartID.municipality,                      Messages.Tour_Location_Part_Municipality),
+         Map.entry(LocationPartID.city,                              Messages.Tour_Location_Part_City),
+         Map.entry(LocationPartID.town,                              Messages.Tour_Location_Part_Town),
+         Map.entry(LocationPartID.village,                           Messages.Tour_Location_Part_Village),
 
-         Map.entry(LocationPartID.city_district,                     Messages.Location_Part_CityDistrict),
-         Map.entry(LocationPartID.district,                          Messages.Location_Part_District),
-         Map.entry(LocationPartID.borough,                           Messages.Location_Part_Borough),
-         Map.entry(LocationPartID.suburb,                            Messages.Location_Part_Suburb),
-         Map.entry(LocationPartID.subdivision,                       Messages.Location_Part_Subdivision),
+         Map.entry(LocationPartID.city_district,                     Messages.Tour_Location_Part_CityDistrict),
+         Map.entry(LocationPartID.district,                          Messages.Tour_Location_Part_District),
+         Map.entry(LocationPartID.borough,                           Messages.Tour_Location_Part_Borough),
+         Map.entry(LocationPartID.suburb,                            Messages.Tour_Location_Part_Suburb),
+         Map.entry(LocationPartID.subdivision,                       Messages.Tour_Location_Part_Subdivision),
 
-         Map.entry(LocationPartID.hamlet,                            Messages.Location_Part_Hamlet),
-         Map.entry(LocationPartID.croft,                             Messages.Location_Part_Croft),
-         Map.entry(LocationPartID.isolated_dwelling,                 Messages.Location_Part_IsolatedDwelling),
+         Map.entry(LocationPartID.hamlet,                            Messages.Tour_Location_Part_Hamlet),
+         Map.entry(LocationPartID.croft,                             Messages.Tour_Location_Part_Croft),
+         Map.entry(LocationPartID.isolated_dwelling,                 Messages.Tour_Location_Part_IsolatedDwelling),
 
-         Map.entry(LocationPartID.neighbourhood,                     Messages.Location_Part_Neighbourhood),
-         Map.entry(LocationPartID.allotments,                        Messages.Location_Part_Allotments),
-         Map.entry(LocationPartID.quarter,                           Messages.Location_Part_Quarter),
+         Map.entry(LocationPartID.neighbourhood,                     Messages.Tour_Location_Part_Neighbourhood),
+         Map.entry(LocationPartID.allotments,                        Messages.Tour_Location_Part_Allotments),
+         Map.entry(LocationPartID.quarter,                           Messages.Tour_Location_Part_Quarter),
 
-         Map.entry(LocationPartID.city_block,                        Messages.Location_Part_CityBlock),
-         Map.entry(LocationPartID.residential,                       Messages.Location_Part_Residential),
-         Map.entry(LocationPartID.farm,                              Messages.Location_Part_Farm),
-         Map.entry(LocationPartID.farmyard,                          Messages.Location_Part_Farmyard),
-         Map.entry(LocationPartID.industrial,                        Messages.Location_Part_Industrial),
-         Map.entry(LocationPartID.commercial,                        Messages.Location_Part_Commercial),
-         Map.entry(LocationPartID.retail,                            Messages.Location_Part_Retail),
+         Map.entry(LocationPartID.city_block,                        Messages.Tour_Location_Part_CityBlock),
+         Map.entry(LocationPartID.residential,                       Messages.Tour_Location_Part_Residential),
+         Map.entry(LocationPartID.farm,                              Messages.Tour_Location_Part_Farm),
+         Map.entry(LocationPartID.farmyard,                          Messages.Tour_Location_Part_Farmyard),
+         Map.entry(LocationPartID.industrial,                        Messages.Tour_Location_Part_Industrial),
+         Map.entry(LocationPartID.commercial,                        Messages.Tour_Location_Part_Commercial),
+         Map.entry(LocationPartID.retail,                            Messages.Tour_Location_Part_Retail),
 
-         Map.entry(LocationPartID.road,                              Messages.Location_Part_Road),
+         Map.entry(LocationPartID.road,                              Messages.Tour_Location_Part_Road),
 
-         Map.entry(LocationPartID.house_name,                        Messages.Location_Part_HouseName),
-         Map.entry(LocationPartID.house_number,                      Messages.Location_Part_HouseNumber),
+         Map.entry(LocationPartID.house_name,                        Messages.Tour_Location_Part_HouseName),
+         Map.entry(LocationPartID.house_number,                      Messages.Tour_Location_Part_HouseNumber),
 
-         Map.entry(LocationPartID.aerialway,                         Messages.Location_Part_Aerialway),
-         Map.entry(LocationPartID.aeroway,                           Messages.Location_Part_Aeroway),
-         Map.entry(LocationPartID.amenity,                           Messages.Location_Part_Amenity),
-         Map.entry(LocationPartID.boundary,                          Messages.Location_Part_Boundary),
-         Map.entry(LocationPartID.bridge,                            Messages.Location_Part_Bridge),
-         Map.entry(LocationPartID.club,                              Messages.Location_Part_Club),
-         Map.entry(LocationPartID.craft,                             Messages.Location_Part_Craft),
-         Map.entry(LocationPartID.emergency,                         Messages.Location_Part_Emergency),
-         Map.entry(LocationPartID.historic,                          Messages.Location_Part_Historic),
-         Map.entry(LocationPartID.landuse,                           Messages.Location_Part_Landuse),
-         Map.entry(LocationPartID.leisure,                           Messages.Location_Part_Leisure),
-         Map.entry(LocationPartID.man_made,                          Messages.Location_Part_ManMade),
-         Map.entry(LocationPartID.military,                          Messages.Location_Part_Military),
-         Map.entry(LocationPartID.mountain_pass,                     Messages.Location_Part_MountainPass),
-         Map.entry(LocationPartID.natural2,                          Messages.Location_Part_Natural),
-         Map.entry(LocationPartID.office,                            Messages.Location_Part_Office),
-         Map.entry(LocationPartID.place,                             Messages.Location_Part_Place),
-         Map.entry(LocationPartID.railway,                           Messages.Location_Part_Railway),
-         Map.entry(LocationPartID.shop,                              Messages.Location_Part_Shop),
-         Map.entry(LocationPartID.tourism,                           Messages.Location_Part_Tourism),
-         Map.entry(LocationPartID.tunnel,                            Messages.Location_Part_Tunnel),
-         Map.entry(LocationPartID.waterway,                          Messages.Location_Part_Waterway),
+         Map.entry(LocationPartID.aerialway,                         Messages.Tour_Location_Part_Aerialway),
+         Map.entry(LocationPartID.aeroway,                           Messages.Tour_Location_Part_Aeroway),
+         Map.entry(LocationPartID.amenity,                           Messages.Tour_Location_Part_Amenity),
+         Map.entry(LocationPartID.boundary,                          Messages.Tour_Location_Part_Boundary),
+         Map.entry(LocationPartID.bridge,                            Messages.Tour_Location_Part_Bridge),
+         Map.entry(LocationPartID.club,                              Messages.Tour_Location_Part_Club),
+         Map.entry(LocationPartID.craft,                             Messages.Tour_Location_Part_Craft),
+         Map.entry(LocationPartID.emergency,                         Messages.Tour_Location_Part_Emergency),
+         Map.entry(LocationPartID.historic,                          Messages.Tour_Location_Part_Historic),
+         Map.entry(LocationPartID.landuse,                           Messages.Tour_Location_Part_Landuse),
+         Map.entry(LocationPartID.leisure,                           Messages.Tour_Location_Part_Leisure),
+         Map.entry(LocationPartID.man_made,                          Messages.Tour_Location_Part_ManMade),
+         Map.entry(LocationPartID.military,                          Messages.Tour_Location_Part_Military),
+         Map.entry(LocationPartID.mountain_pass,                     Messages.Tour_Location_Part_MountainPass),
+         Map.entry(LocationPartID.natural2,                          Messages.Tour_Location_Part_Natural),
+         Map.entry(LocationPartID.office,                            Messages.Tour_Location_Part_Office),
+         Map.entry(LocationPartID.place,                             Messages.Tour_Location_Part_Place),
+         Map.entry(LocationPartID.railway,                           Messages.Tour_Location_Part_Railway),
+         Map.entry(LocationPartID.shop,                              Messages.Tour_Location_Part_Shop),
+         Map.entry(LocationPartID.tourism,                           Messages.Tour_Location_Part_Tourism),
+         Map.entry(LocationPartID.tunnel,                            Messages.Tour_Location_Part_Tunnel),
+         Map.entry(LocationPartID.waterway,                          Messages.Tour_Location_Part_Waterway),
 
-         Map.entry(LocationPartID.postcode,                          Messages.Location_Part_Postcode)
+         Map.entry(LocationPartID.postcode,                          Messages.Tour_Location_Part_Postcode)
       );
 
 // SET_FORMATTING_ON
@@ -454,8 +461,6 @@ public class TourLocationManager {
 
       final OSMAddress osmAddress = osmLocation.address;
 
-      final TourLocation tourLocation = new TourLocation(latitude, longitude);
-
       // "boundingbox":
       // [
       //    "47.1159171",
@@ -464,97 +469,195 @@ public class TourLocationManager {
       //    "7.9897759"
       // ]
       final double[] boundingbox = osmLocation.boundingbox;
-      if (boundingbox != null && boundingbox.length > 3) {
-
-         final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
-
-         // convert possible negative values into positive values, it's easier to math it
-         tourLocation.latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
-         tourLocation.latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
-         tourLocation.longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
-         tourLocation.longitudeMaxE6_Normalized = boundingBoxE6[3] + 180_000_000;
+      if (boundingbox == null || boundingbox.length != 4) {
+         return null;
       }
+
+      final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
+
+      // convert possible negative values into positive values, it's easier to math it
+      final int latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
+      final int latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
+      final int longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
+      final int longitudeMaxE6_Normalized = boundingBoxE6[3] + 180_000_000;
+
+      final long boundingBoxKey = latitudeMinE6_Normalized
+            + latitudeMaxE6_Normalized
+            + longitudeMinE6_Normalized
+            + longitudeMaxE6_Normalized;
+
+      final TourLocation osmTourLocation = new TourLocation(latitude, longitude);
 
 // SET_FORMATTING_OFF
 
-      tourLocation.name                      = validString(osmLocation.name);
-      tourLocation.display_name              = validString(osmLocation.display_name);
+      osmTourLocation.boundingBoxKey            = boundingBoxKey;
+      osmTourLocation.latitudeMinE6_Normalized  = osmTourLocation.latitudeMinExpandedE6_Normalized  = latitudeMinE6_Normalized;
+      osmTourLocation.latitudeMaxE6_Normalized  = osmTourLocation.latitudeMaxExpandedE6_Normalized  = latitudeMaxE6_Normalized;
+      osmTourLocation.longitudeMinE6_Normalized = osmTourLocation.longitudeMinExpandedE6_Normalized = longitudeMinE6_Normalized;
+      osmTourLocation.longitudeMaxE6_Normalized = osmTourLocation.longitudeMaxExpandedE6_Normalized = longitudeMaxE6_Normalized;
+
+//      final TourLocation bboxTourLocation = TourDatabase.getTourLocation(osmTourLocation);
+//      if (bboxTourLocation != null) {
+//
+//
+//
+//
+//         return bboxTourLocation;
+//      }
+
+      osmTourLocation.name                      = validString(osmLocation.name);
+      osmTourLocation.display_name              = validString(osmLocation.display_name);
 
 
       if (osmAddress != null) {
 
-         tourLocation.continent              = validString(osmAddress.continent);
-         tourLocation.country                = validString(osmAddress.country);
-         tourLocation.country_code           = validString(osmAddress.country_code);
+         osmTourLocation.continent              = validString(osmAddress.continent);
+         osmTourLocation.country                = validString(osmAddress.country);
+         osmTourLocation.country_code           = validString(osmAddress.country_code);
 
-         tourLocation.region                 = validString(osmAddress.region);
-         tourLocation.state                  = validString(osmAddress.state);
-         tourLocation.state_district         = validString(osmAddress.state_district);
-         tourLocation.county                 = validString(osmAddress.county);
+         osmTourLocation.region                 = validString(osmAddress.region);
+         osmTourLocation.state                  = validString(osmAddress.state);
+         osmTourLocation.state_district         = validString(osmAddress.state_district);
+         osmTourLocation.county                 = validString(osmAddress.county);
 
-         tourLocation.municipality           = validString(osmAddress.municipality);
-         tourLocation.city                   = validString(osmAddress.city);
-         tourLocation.town                   = validString(osmAddress.town);
-         tourLocation.village                = validString(osmAddress.village);
-         tourLocation.postcode               = validString(osmAddress.postcode);
+         osmTourLocation.municipality           = validString(osmAddress.municipality);
+         osmTourLocation.city                   = validString(osmAddress.city);
+         osmTourLocation.town                   = validString(osmAddress.town);
+         osmTourLocation.village                = validString(osmAddress.village);
+         osmTourLocation.postcode               = validString(osmAddress.postcode);
 
-         tourLocation.road                   = validString(osmAddress.road);
-         tourLocation.house_number           = validString(osmAddress.house_number);
-         tourLocation.house_name             = validString(osmAddress.house_name);
+         osmTourLocation.road                   = validString(osmAddress.road);
+         osmTourLocation.house_number           = validString(osmAddress.house_number);
+         osmTourLocation.house_name             = validString(osmAddress.house_name);
 
          // Area I
-         tourLocation.city_district          = validString(osmAddress.city_district);
-         tourLocation.district               = validString(osmAddress.district);
-         tourLocation.borough                = validString(osmAddress.borough);
-         tourLocation.suburb                 = validString(osmAddress.suburb);
-         tourLocation.subdivision            = validString(osmAddress.subdivision);
+         osmTourLocation.city_district          = validString(osmAddress.city_district);
+         osmTourLocation.district               = validString(osmAddress.district);
+         osmTourLocation.borough                = validString(osmAddress.borough);
+         osmTourLocation.suburb                 = validString(osmAddress.suburb);
+         osmTourLocation.subdivision            = validString(osmAddress.subdivision);
 
          // Area II
-         tourLocation.hamlet                 = validString(osmAddress.hamlet);
-         tourLocation.croft                  = validString(osmAddress.croft);
-         tourLocation.isolated_dwelling      = validString(osmAddress.isolated_dwelling);
+         osmTourLocation.hamlet                 = validString(osmAddress.hamlet);
+         osmTourLocation.croft                  = validString(osmAddress.croft);
+         osmTourLocation.isolated_dwelling      = validString(osmAddress.isolated_dwelling);
 
          // Area III
-         tourLocation.neighbourhood          = validString(osmAddress.neighbourhood);
-         tourLocation.allotments             = validString(osmAddress.allotments);
-         tourLocation.quarter                = validString(osmAddress.quarter);
+         osmTourLocation.neighbourhood          = validString(osmAddress.neighbourhood);
+         osmTourLocation.allotments             = validString(osmAddress.allotments);
+         osmTourLocation.quarter                = validString(osmAddress.quarter);
 
          // Area IV
-         tourLocation.city_block             = validString(osmAddress.city_block);
-         tourLocation.residential            = validString(osmAddress.residential);
-         tourLocation.farm                   = validString(osmAddress.farm);
-         tourLocation.farmyard               = validString(osmAddress.farmyard);
-         tourLocation.industrial             = validString(osmAddress.industrial);
-         tourLocation.commercial             = validString(osmAddress.commercial);
-         tourLocation.retail                 = validString(osmAddress.retail);
+         osmTourLocation.city_block             = validString(osmAddress.city_block);
+         osmTourLocation.residential            = validString(osmAddress.residential);
+         osmTourLocation.farm                   = validString(osmAddress.farm);
+         osmTourLocation.farmyard               = validString(osmAddress.farmyard);
+         osmTourLocation.industrial             = validString(osmAddress.industrial);
+         osmTourLocation.commercial             = validString(osmAddress.commercial);
+         osmTourLocation.retail                 = validString(osmAddress.retail);
 
-         tourLocation.aerialway              = validString(osmAddress.aerialway);
-         tourLocation.aeroway                = validString(osmAddress.aeroway);
-         tourLocation.amenity                = validString(osmAddress.amenity);
-         tourLocation.boundary               = validString(osmAddress.boundary);
-         tourLocation.bridge                 = validString(osmAddress.bridge);
-         tourLocation.club                   = validString(osmAddress.club);
-         tourLocation.craft                  = validString(osmAddress.craft);
-         tourLocation.emergency              = validString(osmAddress.emergency);
-         tourLocation.historic               = validString(osmAddress.historic);
-         tourLocation.landuse                = validString(osmAddress.landuse);
-         tourLocation.leisure                = validString(osmAddress.leisure);
-         tourLocation.man_made               = validString(osmAddress.man_made);
-         tourLocation.military               = validString(osmAddress.military);
-         tourLocation.mountain_pass          = validString(osmAddress.mountain_pass);
-         tourLocation.natural2               = validString(osmAddress.natural2);
-         tourLocation.office                 = validString(osmAddress.office);
-         tourLocation.place                  = validString(osmAddress.place);
-         tourLocation.railway                = validString(osmAddress.railway);
-         tourLocation.shop                   = validString(osmAddress.shop);
-         tourLocation.tourism                = validString(osmAddress.tourism);
-         tourLocation.tunnel                 = validString(osmAddress.tunnel);
-         tourLocation.waterway               = validString(osmAddress.waterway);
+         osmTourLocation.aerialway              = validString(osmAddress.aerialway);
+         osmTourLocation.aeroway                = validString(osmAddress.aeroway);
+         osmTourLocation.amenity                = validString(osmAddress.amenity);
+         osmTourLocation.boundary               = validString(osmAddress.boundary);
+         osmTourLocation.bridge                 = validString(osmAddress.bridge);
+         osmTourLocation.club                   = validString(osmAddress.club);
+         osmTourLocation.craft                  = validString(osmAddress.craft);
+         osmTourLocation.emergency              = validString(osmAddress.emergency);
+         osmTourLocation.historic               = validString(osmAddress.historic);
+         osmTourLocation.landuse                = validString(osmAddress.landuse);
+         osmTourLocation.leisure                = validString(osmAddress.leisure);
+         osmTourLocation.man_made               = validString(osmAddress.man_made);
+         osmTourLocation.military               = validString(osmAddress.military);
+         osmTourLocation.mountain_pass          = validString(osmAddress.mountain_pass);
+         osmTourLocation.natural2               = validString(osmAddress.natural2);
+         osmTourLocation.office                 = validString(osmAddress.office);
+         osmTourLocation.place                  = validString(osmAddress.place);
+         osmTourLocation.railway                = validString(osmAddress.railway);
+         osmTourLocation.shop                   = validString(osmAddress.shop);
+         osmTourLocation.tourism                = validString(osmAddress.tourism);
+         osmTourLocation.tunnel                 = validString(osmAddress.tunnel);
+         osmTourLocation.waterway               = validString(osmAddress.waterway);
+
+         osmTourLocation.convertStringValues();
       }
 
 // SET_FORMATTING_ON
 
-      return tourLocation;
+      return osmTourLocation;
+   }
+
+   public static boolean deleteTourLocations(final List<TourLocation> allLocations) {
+      // TODO Auto-generated method stub
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified(false)) {
+         return false;
+      }
+
+      final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
+
+      System.out.println("numTours: " + allTourIds.size());
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      String dialogMessage;
+      String actionDeleteTags;
+
+      if (allLocations.size() == 1) {
+
+         // delete one location
+
+         dialogMessage = Messages.Tour_Location_Dialog_DeleteLocation_Message.formatted(
+
+               allLocations.get(0).display_name,
+               allLocations.size());
+
+         actionDeleteTags = Messages.Tour_Location_Action_DeleteLocation;
+
+      } else {
+
+         // remove multiple tags
+
+         dialogMessage = Messages.Tour_Location_Dialog_DeleteLocations_Message.formatted(
+
+               allLocations.size(),
+               allTourIds.size());
+
+         actionDeleteTags = Messages.Tour_Location_Action_DeleteLocations;
+      }
+
+      final Display display = Display.getDefault();
+
+//      // confirm deletion, show tag name and number of tours which contain a tag
+//      final MessageDialog dialog = new MessageDialog(
+//            display.getActiveShell(),
+//            Messages.Tag_Manager_Dialog_DeleteTag_Title,
+//            null,
+//            dialogMessage,
+//            MessageDialog.QUESTION,
+//            new String[] {
+//                  actionDeleteTags,
+//                  IDialogConstants.CANCEL_LABEL },
+//            1);
+//
+      final boolean[] returnValue = { false };
+//
+//      if (dialog.open() == Window.OK) {
+//
+//         BusyIndicator.showWhile(display, () -> {
+//
+//            if (deleteTourTag_10(allLocations)) {
+//
+//               clearAllTagResourcesAndFireModifyEvent();
+//
+//               updateTourTagFilterProfiles(allLocations);
+//
+//               returnValue[0] = true;
+//            }
+//         });
+//      }
+
+      return returnValue[0];
    }
 
    /**
@@ -673,36 +776,31 @@ public class TourLocationManager {
       final String adrRoad = tourLocation.road;
       final String adrHouseNumber = tourLocation.house_number;
 
-      if (tourLocation.road == null || adrHouseNumber == null) {
+      if (adrRoad == null && adrHouseNumber == null) {
+
          return null;
+
+      } else if (adrRoad == null) {
+
+         return adrHouseNumber;
+
+      } else if (adrHouseNumber == null) {
+
+         return adrRoad;
       }
+
+      // road and house number are available
 
       final String countryCode = tourLocation.country_code;
 
-      String formattedStreet = UI.EMPTY_STRING;
-
       if ("us".equals(countryCode)) {
 
-         if (adrHouseNumber != null) {
-            formattedStreet += adrHouseNumber + UI.SPACE;
-         }
-
-         formattedStreet += adrRoad;
+         return adrHouseNumber + UI.SPACE + adrRoad;
 
       } else {
 
-         formattedStreet += adrRoad;
-
-         if (adrHouseNumber != null) {
-            formattedStreet += UI.SPACE + adrHouseNumber;
-         }
+         return adrRoad + UI.SPACE + adrHouseNumber;
       }
-
-      if (formattedStreet.length() == 0) {
-         return null;
-      }
-
-      return formattedStreet;
    }
 
    /**
@@ -889,7 +987,7 @@ public class TourLocationManager {
 
                TourLocationManager.class.getSimpleName() + ".deserializeLocationData : " //$NON-NLS-1$
                      + "Error while deserializing the location JSON object : " //$NON-NLS-1$
-                     + osmLocationString + UI.NEW_LINE + e.getMessage());
+                     + osmLocationString + NL + e.getMessage());
       }
 
       return osmLocation;
@@ -898,6 +996,81 @@ public class TourLocationManager {
    public static List<TourLocationProfile> getProfiles() {
 
       return _allLocationProfiles;
+   }
+
+   /**
+    * @param allLocations
+    *
+    * @return Returns a list with all tour id's which are containing the tour location.
+    */
+   private static ArrayList<Long> getToursWithLocations(final List<TourLocation> allLocations) {
+
+      final ArrayList<Long> allTourIds = new ArrayList<>();
+
+      final ArrayList<Long> allSqlParameter = new ArrayList<>();
+      final StringBuilder sqlParameterPlaceholder = new StringBuilder();
+
+      boolean isFirst = true;
+
+      for (final TourLocation tourLocation : allLocations) {
+
+         if (isFirst) {
+            isFirst = false;
+            sqlParameterPlaceholder.append(TourDatabase.PARAMETER_FIRST);
+         } else {
+            sqlParameterPlaceholder.append(TourDatabase.PARAMETER_FOLLOWING);
+         }
+
+         allSqlParameter.add(tourLocation.getLocationId());
+      }
+
+      final String sqlParameter = sqlParameterPlaceholder.toString();
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                             //$NON-NLS-1$
+
+            + " DISTINCT TourId" + NL //                                   //$NON-NLS-1$
+
+            + " FROM TourData" + NL //                                     //$NON-NLS-1$
+
+            + " WHERE tourLocationStart_LocationID IN (" + sqlParameter + ")" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+            + "    OR tourLocationEnd_LocationID IN   (" + sqlParameter + ")" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+
+            + " ORDER BY tourId" //                                        //$NON-NLS-1$
+      ;
+
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         statement = conn.prepareStatement(sql);
+
+         // fillup parameters for 2 fields
+         final int numParameters = allSqlParameter.size();
+         int sqlIndex = 1;
+         for (int parameterIndex = 0; parameterIndex < numParameters; parameterIndex++) {
+            statement.setLong(sqlIndex++, allSqlParameter.get(parameterIndex));
+         }
+         for (int parameterIndex = 0; parameterIndex < numParameters; parameterIndex++) {
+            statement.setLong(sqlIndex++, allSqlParameter.get(parameterIndex));
+         }
+
+         final ResultSet result = statement.executeQuery();
+         while (result.next()) {
+            allTourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.logError(sql);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+         Util.closeSql(statement);
+      }
+
+      return allTourIds;
    }
 
    private static File getXmlFile() {
@@ -937,7 +1110,14 @@ public class TourLocationManager {
       _defaultProfile = defaultProfile;
    }
 
-   public static void setLocationNames(final List<TourData> requestedTours,
+   /**
+    * Set tour locations for the requested tours, when not available, then download and save tour
+    * locations
+    *
+    * @param requestedTours
+    * @param locationProfile
+    */
+   public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
@@ -994,14 +1174,17 @@ public class TourLocationManager {
 
                         waitingTime = startLocationData.waitingTime;
                         tourLocationStart = startLocationData.tourLocation;
-
-                        final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
-
-                        tourData.setTourStartPlace(startLocationText);
-                        tourData.setTourLocationStart(tourLocationStart);
-
-                        isModified = true;
                      }
+                  }
+
+                  if (tourLocationStart != null) {
+
+                     final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
+
+                     tourData.setTourStartPlace(startLocationText);
+                     tourData.setTourLocationStart(tourLocationStart);
+
+                     isModified = true;
                   }
 
                   monitor.worked(1);
@@ -1022,14 +1205,17 @@ public class TourLocationManager {
 
                         waitingTime = endLocationData.waitingTime;
                         tourLocationEnd = endLocationData.tourLocation;
-
-                        final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
-
-                        tourData.setTourEndPlace(endLocationText);
-                        tourData.setTourLocationEnd(tourLocationEnd);
-
-                        isModified = true;
                      }
+                  }
+
+                  if (tourLocationEnd != null) {
+
+                     final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
+
+                     tourData.setTourEndPlace(endLocationText);
+                     tourData.setTourLocationEnd(tourLocationEnd);
+
+                     isModified = true;
                   }
 
                   monitor.worked(1);

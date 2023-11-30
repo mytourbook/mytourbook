@@ -73,24 +73,21 @@ import org.imgscalr.Scalr.Rotation;
 
 public class TagManager {
 
-   private static final char       NL                  = UI.NEW_LINE;
+   private static final char       NL                = UI.NEW_LINE;
 
-   protected static final String[] EXPAND_TYPE_NAMES   = {
+   protected static final String[] EXPAND_TYPE_NAMES = {
 
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
          Messages.app_action_expand_type_year_month_day
    };
 
-   protected static final int[]    EXPAND_TYPES        = {
+   protected static final int[]    EXPAND_TYPES      = {
 
          TourTag.EXPAND_TYPE_FLAT,
          TourTag.EXPAND_TYPE_YEAR_DAY,
          TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
    };
-
-   private static final String     PARAMETER_FIRST     = "?";        //$NON-NLS-1$
-   private static final String     PARAMETER_FOLLOWING = ", ?";      //$NON-NLS-1$
 
    private static TagContentLayout _tagContentLayout;
    private static int              _tagNumContentColumns;
@@ -207,6 +204,7 @@ public class TagManager {
     * {@link TourEventId#TAG_STRUCTURE_CHANGED} is fired when done.
     *
     * @param allTags
+    *
     * @return Returns <code>true</code> when deletion was successful
     */
    public static boolean deleteTourTag(final List<TourTag> allTags) {
@@ -357,6 +355,7 @@ public class TagManager {
    /**
     * @param categoryId
     * @param categoryName
+    *
     * @return Returns <code>true</code> when tag category is deleted.
     */
    public static boolean deleteTourTagCategory(final long categoryId, final String categoryName) {
@@ -568,6 +567,7 @@ public class TagManager {
     */
    /**
     * @param allTags
+    *
     * @return Returns a list with all tour id's which contain the tour tag.
     */
    private static ArrayList<Long> getTaggedTours(final List<TourTag> allTags) {
@@ -583,9 +583,9 @@ public class TagManager {
 
          if (isFirst) {
             isFirst = false;
-            sqlParameterPlaceholder.append(PARAMETER_FIRST);
+            sqlParameterPlaceholder.append(TourDatabase.PARAMETER_FIRST);
          } else {
-            sqlParameterPlaceholder.append(PARAMETER_FOLLOWING);
+            sqlParameterPlaceholder.append(TourDatabase.PARAMETER_FOLLOWING);
          }
 
          sqlParameters.add(tagTag.getTagId());
@@ -641,6 +641,7 @@ public class TagManager {
     * Otherwise, create an image resource, and put it in the cache
     *
     * @param tag
+    *
     * @return Return the tag image or <code>null</code> when not available
     */
    public static Image getTagImage(final TourTag tag) {

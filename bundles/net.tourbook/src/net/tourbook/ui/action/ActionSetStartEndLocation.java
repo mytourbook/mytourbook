@@ -177,7 +177,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       final List<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-      TourLocationManager.setLocationNames(selectedTours, locationProfile);
+      TourLocationManager.setTourLocations(selectedTours, locationProfile);
 
 
 //      System.out.println();

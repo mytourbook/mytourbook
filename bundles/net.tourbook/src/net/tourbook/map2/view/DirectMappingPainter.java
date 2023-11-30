@@ -62,6 +62,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private SliderPathPaintingData _sliderPathPaintingData;
 
    private Map<Long, Color>       _locationColors = new HashMap<>();
+   private int                    _colorSwitchCounter;
 
    /*
     * UI resources
@@ -337,7 +338,7 @@ public class DirectMappingPainter implements IDirectPainter {
                   new GeoPosition(
                         latitudeSerie[nextValueIndex],
                         longitudeSerie[nextValueIndex]),
-                  
+
                   zoomLevel);
 
             // convert awt to swt point
@@ -460,9 +461,13 @@ public class DirectMappingPainter implements IDirectPainter {
       final int arcSize2 = arcSize / 2;
 
       gc.setAntialias(SWT.ON);
+      gc.setLineWidth(2);
 
       // use different colors each time
-      _locationColors.clear();
+      if (_colorSwitchCounter++ % 50 == 0) {
+
+         _locationColors.clear();
+      }
 
       for (final TourLocation tourLocation : _allTourLocations) {
 
@@ -507,10 +512,7 @@ public class DirectMappingPainter implements IDirectPainter {
             /*
              * Paint each bbox with a different color but use the same color for the same bbox
              */
-            final long bboxKey = tourLocation.latitudeMinE6_Normalized
-                  + tourLocation.latitudeMaxE6_Normalized
-                  + tourLocation.longitudeMinE6_Normalized
-                  + tourLocation.longitudeMaxE6_Normalized;
+            final long bboxKey = tourLocation.boundingBoxKey;
 
             Color locationColor = _locationColors.get(bboxKey);
 
@@ -527,7 +529,6 @@ public class DirectMappingPainter implements IDirectPainter {
             gc.setBackground(locationColor);
 
             // draw requested location
-            gc.setLineWidth(2);
             gc.fillArc(
 
                   requestedDevXCenter,
@@ -537,6 +538,7 @@ public class DirectMappingPainter implements IDirectPainter {
                   0,
                   360);
 
+            // draw provided bbox
             gc.drawRectangle(
 
                   bboxTopLeft_DevX,
@@ -622,7 +624,21 @@ public class DirectMappingPainter implements IDirectPainter {
    @Override
    public void paint(final DirectPainterContext painterContext) {
 
-      if (_map == null || _tourData == null || _isTourVisible == false || _sliderPathPaintingData == null) {
+      if (_map == null) {
+
+         return;
+      }
+
+      if (_isShowTourLocation) {
+
+         // show tour locations
+         drawTourLocation(painterContext);
+      }
+
+      if (_tourData == null
+            || _isTourVisible == false
+            || _sliderPathPaintingData == null) {
+
          return;
       }
 
@@ -631,10 +647,6 @@ public class DirectMappingPainter implements IDirectPainter {
          // draw it even when the sliders are not visible but the tour can be visible !
 
          drawSliderPath(painterContext);
-      }
-
-      if (_isShowTourLocation) {
-         drawTourLocation(painterContext);
       }
 
       if (_isShowSliderInMap) {

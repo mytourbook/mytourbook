@@ -142,7 +142,9 @@ class TourBook_ColumnFactory {
       defineColumn_Tour_Tags();
       defineColumn_Tour_Location_Start();
       defineColumn_Tour_Location_End();
-//    defineColumn_Tour_TagIds();            // for debugging
+      defineColumn_Tour_LocationID_Start(); //  // for debugging
+      defineColumn_Tour_LocationID_End(); //    // for debugging
+//    defineColumn_Tour_TagIds(); //            // for debugging
 
       // Motion / Bewegung
       defineColumn_Motion_Distance();
@@ -3098,6 +3100,100 @@ class TourBook_ColumnFactory {
    }
 
    /**
+    * Column: Tour - Tour end location ID
+    */
+   private void defineColumn_Tour_LocationID_End() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_LOCATION_ID_END.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final Object tourLocation = ((TVITourBookItem) element).colTourLocationID_End;
+
+            if (tourLocation instanceof final Long value) {
+
+               return Long.toString((Long) tourLocation);
+
+            } else {
+
+               return UI.EMPTY_STRING;
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_LOCATION_ID_END.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final Object tourLocation = ((TVITourBookItem) element).colTourLocationID_End;
+
+            if (tourLocation instanceof final Long value) {
+
+               cell.setText(Long.toString((Long) tourLocation));
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Tour - Tour start location ID
+    */
+   private void defineColumn_Tour_LocationID_Start() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_LOCATION_ID_START.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final Object tourLocation = ((TVITourBookItem) element).colTourLocationID_Start;
+
+            if (tourLocation instanceof final Long value) {
+
+               return Long.toString((Long) tourLocation);
+
+            } else {
+
+               return UI.EMPTY_STRING;
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_LOCATION_ID_START.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final Object tourLocation = ((TVITourBookItem) element).colTourLocationID_Start;
+
+            if (tourLocation instanceof final Long value) {
+
+               cell.setText(Long.toString((Long) tourLocation));
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Tour - Markers
     */
    private void defineColumn_Tour_Marker() {
@@ -4133,6 +4229,7 @@ class TourBook_ColumnFactory {
     * displayed.
     *
     * @param value
+    *
     * @return
     */
    private float prepareTemperatureValue(final float value) {

@@ -3110,10 +3110,13 @@ public class Map2View extends ViewPart implements
 
       _map.redraw();
 
-      // center map to the first location
-      final TourLocation firstLocation = (TourLocation) allTourLocations.get(0);
+      if (_isMapSyncWith_Tour) {
 
-      _map.setMapCenter(new GeoPosition(firstLocation.latitude, firstLocation.longitude));
+         // center map to the first location
+         final TourLocation firstLocation = (TourLocation) allTourLocations.get(0);
+
+         _map.setMapCenter(new GeoPosition(firstLocation.latitude, firstLocation.longitude));
+      }
    }
 
    @Override

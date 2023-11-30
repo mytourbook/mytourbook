@@ -731,6 +731,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param hoveredRow
+    *
     * @return Returns the fetched tour by it's row index or <code>null</code> when tour is not yet
     *         fetched from the backend.
     */
@@ -741,6 +742,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param tourId
+    *
     * @return Returns the tour index but only when it was already fetched (which was done for
     *         displayed tour), otherwise -1.
     */
@@ -790,6 +792,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param allRequestedTourIds
+    *
     * @return Returns NatTable row indices from the requested tour id's.
     */
    public CompletableFuture<int[]> getRowIndexFromTourId(final List<Long> allRequestedTourIds) {
@@ -828,6 +831,7 @@ public class NatTable_DataLoader {
     * Maps column field -> database field
     *
     * @param sortColumnId
+    *
     * @return Returns database field
     */
    public String getSqlField_OrderBy(final String sortColumnId) {
@@ -988,6 +992,8 @@ public class NatTable_DataLoader {
        */
       case TableColumnFactory.TOUR_LOCATION_START_ID:                return "COALESCE(tourStartPlace, '')";                //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "COALESCE(tourEndPlace, '')";                  //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_ID_START_ID:             return "tourLocationStart_LocationID";                //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_ID_END_ID:               return "tourLocationEnd_LocationID";                  //$NON-NLS-1$
       case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;
@@ -1024,9 +1030,9 @@ public class NatTable_DataLoader {
 
       default:
 
-         // ensure a valid field is returned, this case should not happen
+         // ensure a valid field is returned, this case should not happen but it helps during development
 
-         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField()" //$NON-NLS-1$ //$NON-NLS-2$
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField_OrderBy()" //$NON-NLS-1$ //$NON-NLS-2$
                + "\tsortColumnId: \"" + sortColumnId + "\"" //$NON-NLS-1$ //$NON-NLS-2$
                + " has not a valid sql field" //$NON-NLS-1$
                );
@@ -1041,6 +1047,7 @@ public class NatTable_DataLoader {
     * Maps column field -> database field
     *
     * @param sortColumnId
+    *
     * @return Returns database field
     */
    private String getSqlField_SelectFields(final String sortColumnId) {
@@ -1070,6 +1077,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param rowIndex
+    *
     * @return Returns tour item at the requested row index or <code>null</code> when not yet
     *         available. When tour is not yet loaded then the data will be fetched from the backend.
     */
