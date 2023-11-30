@@ -7171,7 +7171,7 @@ public class RawDataView extends ViewPart implements
 
          if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
-            if (_browser.isDisposed()) {
+            if (_browser == null || _browser.isDisposed()) {
 
                // this occurred
                return;
