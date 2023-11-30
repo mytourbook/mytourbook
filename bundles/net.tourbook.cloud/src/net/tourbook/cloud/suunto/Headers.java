@@ -19,12 +19,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Headers {
-
-   @JsonProperty("x-ms-blob-type")
-   private String XMsBlobType;
-
-   public String getXMsBlobType() {
-      return XMsBlobType;
-   }
-}
+public record Headers(@JsonProperty("x-ms-blob-type") String xmsBlobType) {}

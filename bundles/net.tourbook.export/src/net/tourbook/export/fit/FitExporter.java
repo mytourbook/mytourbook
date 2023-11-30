@@ -46,6 +46,7 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -114,7 +115,7 @@ public class FitExporter {
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
 
-      messages.forEach(fileEncoder::write);
+      messages.forEach(message -> fileEncoder.write(message));
 
       // Close the output stream
       try {
@@ -229,6 +230,10 @@ public class FitExporter {
 
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
       final long[] pausedTime_End = _tourData.getPausedTime_End();
+      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+      final List<Long> listPausedTime_Data = pausedTime_Data == null
+            ? null
+            : Arrays.stream(pausedTime_Data).boxed().toList();
 
       if (pausedTime_Start != null && pausedTime_Start.length > 0) {
 
@@ -237,8 +242,12 @@ public class FitExporter {
             final EventMesg eventMesgStop = new EventMesg();
             final Date pausedTime_Start_Date = Date.from(Instant.ofEpochMilli(pausedTime_Start[index]));
             eventMesgStop.setTimestamp(new DateTime(pausedTime_Start_Date));
-            // By default: eventData == 1: auto-stop
-            eventMesgStop.setData(1L);
+            /**
+             * eventData == 0: user stop<br>
+             * eventData == 1: auto-stop
+             */
+            final Long pauseType = listPausedTime_Data == null ? 1L : listPausedTime_Data.get(index);
+            eventMesgStop.setData(pauseType);
             eventMesgStop.setEvent(Event.TIMER);
             eventMesgStop.setEventType(EventType.STOP);
 
@@ -307,6 +316,7 @@ public class FitExporter {
     * @param messages
     * @param pulseSerieIndex
     * @param timeSerieIndex
+    *
     * @return
     */
    private int createHrvMessage(final List<Mesg> messages,

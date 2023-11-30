@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -45,15 +44,17 @@ import net.tourbook.data.TourData;
 import net.tourbook.export.TourExporter;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.json.JSONObject;
 
 public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
@@ -176,10 +177,10 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
    private void logVendorError(final String exceptionMessage, final TourData tour) {
 
-      TourLogManager.subLog_ERROR(NLS.bind(
+      Display.getDefault().asyncExec(() -> TourLogManager.subLog_ERROR(NLS.bind(
             Messages.Log_UploadWorkoutsToSuunto_002_RetrievalError,
             TourManager.getTourDateTimeShort(tour),
-            exceptionMessage));
+            exceptionMessage)));
    }
 
    private void processTours(final List<TourData> selectedTours,
@@ -233,8 +234,8 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       HttpRequest request = null;
       try {
          request = HttpRequest.newBuilder()
-               .uri(URI.create(workoutUpload.getUrl()))
-               .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType()) //$NON-NLS-1$
+               .uri(URI.create(workoutUpload.url()))
+               .header("x-ms-blob-type", workoutUpload.headers().xmsBlobType()) //$NON-NLS-1$
                .header(OAuth2Constants.CONTENT_TYPE, "application/octet-stream") //$NON-NLS-1$
                .timeout(Duration.ofMinutes(5))
                .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get(tourAbsoluteFilePath)))
@@ -251,6 +252,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
     *
     * @param tourAbsoluteFilePath
     * @param tourData
+    *
     * @return
     */
    private WorkoutUpload uploadTour(final String tourAbsoluteFilePath,
@@ -268,10 +270,10 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
       // Check upload status
       while (workoutUpload != null &&
-            (StringUtils.isNullOrEmpty(workoutUpload.getStatus()) ||
-                  workoutUpload.getStatus().equalsIgnoreCase("new"))) { //$NON-NLS-1$
+            (StringUtils.isNullOrEmpty(workoutUpload.status()) ||
+                  workoutUpload.status().equalsIgnoreCase("new"))) { //$NON-NLS-1$
 
-         workoutUpload = checkUploadStatus(tourData, workoutUpload.getId());
+         workoutUpload = checkUploadStatus(tourData, workoutUpload.id());
       }
 
       return workoutUpload;
@@ -283,18 +285,18 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
 
-      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      final Job job = new Job(Messages.Dialog_UploadWorkoutsToSuunto_Task) {
 
          @Override
-         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+         public IStatus run(final IProgressMonitor monitor) {
 
-            monitor.beginTask(NLS.bind(Messages.Dialog_UploadWorkoutsToSuunto_Task, numberOfTours), numberOfTours * 2);
+            monitor.beginTask(UI.EMPTY_STRING, numberOfTours * 2);
 
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
-               TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
-               return;
+               Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
+               return Status.CANCEL_STATUS;
             }
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadWorkoutsToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
@@ -317,28 +319,40 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             monitor.subTask(NLS.bind(Messages.Dialog_UploadWorkoutsToSuunto_SubTask,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
+
+            monitor.done();
+
+            return Status.OK_STATUS;
          }
       };
 
-      try {
-         final long start = System.currentTimeMillis();
+      final long start = System.currentTimeMillis();
 
-         TourLogManager.showLogView(AutoOpenEvent.TOUR_UPLOAD);
-         TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadWorkoutsToSuunto_001_Start, numberOfTours));
+      TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadWorkoutsToSuunto_001_Start, numberOfTours));
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+      job.setPriority(Job.INTERACTIVE);
+      job.schedule();
+      TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-         TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+      job.addJobChangeListener(new JobChangeAdapter() {
+         @Override
+         public void done(final IJobChangeEvent event) {
 
-         MessageDialog.openInformation(
-               Display.getDefault().getActiveShell(),
-               Messages.Dialog_UploadWorkoutsToSuunto_Title,
-               NLS.bind(Messages.Dialog_UploadToursToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
+            if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
 
-      } catch (final InvocationTargetException | InterruptedException e) {
-         StatusUtil.log(e);
-         Thread.currentThread().interrupt();
-      }
+               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+                  TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+
+                  final String infoText = NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
+                        numberOfUploadedTours[0],
+                        numberOfTours - numberOfUploadedTours[0]);
+
+                  UI.openNotificationPopup(Messages.Dialog_UploadWorkoutsToSuunto_Title, infoText);
+               });
+            }
+         }
+      });
    }
 
    private int uploadTours(final Map<String, TourData> tours,
@@ -357,21 +371,21 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          final WorkoutUpload workoutUpload = uploadTour(compressedTourAbsoluteFilePath, tourData);
 
          if (workoutUpload == null ||
-               workoutUpload.getStatus().equalsIgnoreCase("error")) { //$NON-NLS-1$
+               workoutUpload.status().equalsIgnoreCase("error")) { //$NON-NLS-1$
 
-            final String message = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getMessage();
-            final String workoutId = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.getId();
+            final String message = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.message();
+            final String workoutId = workoutUpload == null ? UI.EMPTY_STRING : workoutUpload.id();
 
-            TourLogManager.log_ERROR(NLS.bind(
+            Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(NLS.bind(
                   Messages.Log_UploadWorkoutsToSuunto_004_UploadError,
-                  new Object[] { TourManager.getTourDateTimeShort(tourData), workoutId, message }));
+                  new Object[] { TourManager.getTourDateTimeShort(tourData), workoutId, message })));
 
          } else {
 
-            TourLogManager.log_OK(NLS.bind(
+            Display.getDefault().asyncExec(() -> TourLogManager.log_OK(NLS.bind(
                   Messages.Log_UploadWorkoutsToSuunto_003_UploadStatus,
                   TourManager.getTourDateTimeShort(tourData),
-                  workoutUpload.getId()));
+                  workoutUpload.id())));
 
             ++numberOfUploadedTours;
          }

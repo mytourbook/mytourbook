@@ -18,12 +18,16 @@ package utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.pgssoft.httpclient.HttpClientMock;
+
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 
@@ -31,6 +35,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -38,6 +43,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -71,6 +77,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURDATA               = PluginProperties.getText("View_Name_TourData");                  //$NON-NLS-1$
    public static final String VIEW_NAME_TOUREDITOR             = PluginProperties.getText("command_view_tourEditor");             //$NON-NLS-1$
    public static final String VIEW_NAME_TOURIMPORT             = PluginProperties.getText("view_name_Data_Import");               //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURLOG                = PluginProperties.getText("View_Name_TourLog");                   //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP25              = PluginProperties.getText("View_Name_TourMap25");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP3               = PluginProperties.getText("View_Name_TourMap3");                  //$NON-NLS-1$
    public static final String VIEW_NAME_ALLTOURMARKERS         = PluginProperties.getText("View_Name_AllTourMarkers");            //$NON-NLS-1$
@@ -88,6 +95,16 @@ public class Utils {
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
       bot.comboBox(0).setSelection(measurementSystem);
       Utils.clickApplyAndCloseButton(bot);
+   }
+
+   public static void clearTourLogView(final SWTWorkbenchBot bot) {
+
+      final SWTBotView tourLogView = showTourLogView(bot);
+      final SWTBotToolbarButton clearTourLogButton = Utils.getToolbarButton(tourLogView, Messages.Tour_Log_Action_Clear_Tooltip);
+      assertNotNull(clearTourLogButton);
+      if (clearTourLogButton.isEnabled()) {
+         clearTourLogButton.click();
+      }
    }
 
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
@@ -123,6 +140,29 @@ public class Utils {
    public static void clickYesButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.YES_LABEL, bot);
+   }
+
+   public static SWTBotTreeItem createManualTour(final SWTWorkbenchBot bot) {
+
+      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
+
+      final SWTBot tourDataEditorViewBot = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR).bot();
+
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      tourStartTimeCalendar.set(2005, 0, 1, 5, 0, 0);
+      // Set a different date than today's date
+      tourDataEditorViewBot.dateTime(0).setDate(tourStartTimeCalendar.getTime());
+
+      // Set a specific time
+      tourDataEditorViewBot.dateTime(1).setDate(tourStartTimeCalendar.getTime());
+
+      final SWTBotCombo tourTimeZone = tourDataEditorViewBot.comboBox(3);
+      assertNotNull(tourTimeZone);
+      tourTimeZone.setSelection("+01:00    +02:00    Europe/Paris   -   DST - 1 h - N"); //$NON-NLS-1$
+
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+
+      return selectManualTour(bot);
    }
 
    public static void deleteTour(final SWTWorkbenchBot bot, final SWTBotTreeItem tour) {
@@ -209,6 +249,25 @@ public class Utils {
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static String getAbsoluteFilePath(final String filePath) {
+
+      return Paths.get(filePath).toAbsolutePath().toString();
+   }
+
+   public static Object getInitialHttpClient() {
+
+      Field field = null;
+      try {
+         field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+         field.setAccessible(true);
+         return field.get(null);
+      } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+         StatusUtil.log(e);
+      }
+
+      return field;
    }
 
    /**
@@ -306,6 +365,15 @@ public class Utils {
       importTour(bot, "2022-02-04-152754-UBERDROID8A2F-9-0.fit"); //$NON-NLS-1$
    }
 
+   public static HttpClientMock initializeHttpClientMock() {
+
+      final HttpClientMock httpClientMock = new HttpClientMock();
+
+      setHttpClient(httpClientMock);
+
+      return httpClientMock;
+   }
+
    public static boolean isUrlReachable(final String url) {
 
       final HttpRequest request = HttpRequest.newBuilder()
@@ -346,6 +414,13 @@ public class Utils {
       treeItem.getNode(vendorName).select();
    }
 
+   public static String readFileContent(final String controlDocumentFileName) {
+
+      final String controlDocumentFilePath = getAbsoluteFilePath(controlDocumentFileName);
+
+      return FileUtils.readFileContentString(controlDocumentFilePath);
+   }
+
    public static SWTBotTreeItem selectDuplicatedTour(final SWTWorkbenchBot bot) {
 
       showTourBookView(bot);
@@ -356,6 +431,29 @@ public class Utils {
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static SWTBotTreeItem selectManualTour(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2005   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
+   public static void setHttpClient(final Object httpClient) {
+
+      Field field;
+      try {
+         field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+         field.setAccessible(true);
+         field.set(null, httpClient);
+      } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+         StatusUtil.log(e);
+      }
    }
 
    public static SWTBotView showImportView(final SWTWorkbenchBot bot) {
@@ -372,6 +470,11 @@ public class Utils {
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
       return showView(bot, VIEW_NAME_TOURBOOK);
+   }
+
+   public static SWTBotView showTourLogView(final SWTWorkbenchBot bot) {
+
+      return showView(bot, VIEW_NAME_TOURLOG);
    }
 
    public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {

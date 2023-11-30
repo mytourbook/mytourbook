@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -125,9 +125,9 @@ public class DialogLayerViewerToolTip extends ToolTip3 {
           */
          label = new Label(container, SWT.NONE);
 
-         label.setText(UI.FormatDoubleMinMaxElevationMeter(minActiveAltitude)
+         label.setText(UI.formatDoubleMinMaxElevationMeter(minActiveAltitude)
                + UI.ELLIPSIS_WITH_SPACE
-               + UI.FormatDoubleMinMaxElevationMeter(maxActiveAltitude));
+               + UI.formatDoubleMinMaxElevationMeter(maxActiveAltitude));
          label.setToolTipText(Messages.Prop_Viewer_Label_AltitudeRange_Tooltip);
       }
    }
