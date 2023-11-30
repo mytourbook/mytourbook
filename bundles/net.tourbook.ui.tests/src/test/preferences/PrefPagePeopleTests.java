@@ -18,8 +18,6 @@ package preferences;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -37,8 +35,7 @@ public class PrefPagePeopleTests extends UITest {
 
    private static void setMetricSystem() {
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(0, true);
-      UI.updateUnits();
+      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
    }
 
    @Test
@@ -71,14 +68,12 @@ public class PrefPagePeopleTests extends UITest {
 
    private void setDistanceNauticalMile() {
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(2, true);
-      UI.updateUnits();
+      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Nautic);
    }
 
    private void setImperialSystem() {
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(1, true);
-      UI.updateUnits();
+      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
    }
 
    @Test
