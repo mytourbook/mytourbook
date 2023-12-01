@@ -2342,7 +2342,7 @@ public class UI {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
-      final AbstractWorkbenchNotificationPopup notication = new AbstractWorkbenchNotificationPopup(Display.getCurrent(), imageDescriptor);
+      final MyTourbookNotificationPopup notication = new MyTourbookNotificationPopup(Display.getCurrent(), imageDescriptor);
       notication.setDelayClose(delay);
       notication.open();
    }
