@@ -1391,7 +1391,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             final TourPersonHRZone hrZone = allHrZones.get(zoneIndex);
             final Color hrZoneColor = new Color(hrZone.getColor());
 
-            label.setBackground(hrZoneColor);
+            if (label.isDisposed() == false) {
+               label.setBackground(hrZoneColor);
+            }
          }
       });
    }
