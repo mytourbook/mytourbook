@@ -1013,7 +1013,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _comboSystem_Profile.setItem(_activeSystemProfileIndex, newProfileText);
          _comboSystem_Profile.select(_activeSystemProfileIndex);
 
-         // by default the text is selected -> remove anoying selection
+         // by default the text is selected -> remove annoying selection
          _comboSystem_Profile.clearSelection();
       });
 
