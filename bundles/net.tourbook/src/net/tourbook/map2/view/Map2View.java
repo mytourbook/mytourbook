@@ -1585,9 +1585,9 @@ public class Map2View extends ViewPart implements
 
             onSelection_HoveredValue((HoveredValueData) eventData);
 
-         } else if (eventId == TourEventId.TOUR_LOCATION_SELECTION && eventData instanceof final List allTourLocations) {
+         } else if (eventId == TourEventId.TOUR_LOCATION_SELECTION) {
 
-            moveToTourLocation(allTourLocations);
+            moveToTourLocation(eventData);
 
          } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
@@ -3080,15 +3080,42 @@ public class Map2View extends ViewPart implements
    }
 
    @SuppressWarnings("unchecked")
-   private void moveToTourLocation(final List<?> allTourLocations) {
-
-      _allTourLocations = (List<TourLocation>) allTourLocations;
-
-      if (allTourLocations.isEmpty()) {
-         return;
-      }
+   private void moveToTourLocation(final Object eventData) {
 
       final TourData tourData = _allTourData.size() > 0 ? _allTourData.get(0) : null;
+
+      if (eventData instanceof final List allTourLocations) {
+
+         _allTourLocations = allTourLocations;
+      }
+
+      if (eventData == null
+            || _allTourLocations == null
+            || _allTourLocations.size() == 0) {
+
+         // hide tour locations
+
+         _directMappingPainter.setPaintContext(
+
+               _map,
+               _isShowTour,
+               tourData,
+
+               _currentSliderValueIndex_Left,
+               _currentSliderValueIndex_Right,
+               _externalValuePointIndex,
+
+               _actionShowSliderInMap.isChecked(),
+               _actionShowSliderInLegend.isChecked(),
+               _actionShowValuePoint.isChecked(),
+
+               _sliderPathPaintingData,
+               null);
+
+         _map.redraw();
+
+         return;
+      }
 
       // repaint map
       _directMappingPainter.setPaintContext(
@@ -3113,7 +3140,7 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_Tour) {
 
          // center map to the first location
-         final TourLocation firstLocation = (TourLocation) allTourLocations.get(0);
+         final TourLocation firstLocation = _allTourLocations.get(0);
 
          _map.setMapCenter(new GeoPosition(firstLocation.latitude, firstLocation.longitude));
       }

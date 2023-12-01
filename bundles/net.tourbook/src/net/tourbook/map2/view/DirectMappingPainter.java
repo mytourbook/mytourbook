@@ -712,10 +712,11 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _isShowSliderInMap         = isShowSliderInMap;
       _isShowSliderInLegend      = isShowSliderInLegend;
-      _isShowTourLocation        = allTourLocations != null && allTourLocations.size() > 0;
       _isShowValuePoint          = isShowValuePoint;
 
-      _sliderPathPaintingData = sliderRelationPaintingData;
+      _sliderPathPaintingData    = sliderRelationPaintingData;
+
+      _isShowTourLocation        = allTourLocations != null && allTourLocations.size() > 0;
       _allTourLocations          = allTourLocations;
 
 // SET_FORMATTING_ON

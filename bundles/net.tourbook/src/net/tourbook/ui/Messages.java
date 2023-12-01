@@ -287,6 +287,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_Geo_Longitude_Diff;
    public static String        ColumnFactory_Location_Geo_Longitude_Diff_Tooltip;
    public static String        ColumnFactory_Location_Geo_Longitude_Tooltip;
+   public static String        ColumnFactory_Location_Tour_AllLocations;
+   public static String        ColumnFactory_Location_Tour_AllLocations_Tooltip;
+   public static String        ColumnFactory_Location_Tour_EndLocations;
+   public static String        ColumnFactory_Location_Tour_EndLocations_Tooltip;
+   public static String        ColumnFactory_Location_Tour_StartLocations;
+   public static String        ColumnFactory_Location_Tour_StartLocations_Tooltip;
 
    public static String        ColumnFactory_Motion_Altimeter;
    public static String        ColumnFactory_Motion_Altimeter_Tooltip;
@@ -554,6 +560,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_DeleteLocation;
    public static String        Tour_Location_Action_DeleteLocations;
    public static String        Tour_Location_Dialog_DeleteLocation_Message;
+   public static String        Tour_Location_Dialog_DeleteLocation_Title;
    public static String        Tour_Location_Dialog_DeleteLocations_Message;
    public static String        Tour_Location_Part_Aerialway;
    public static String        Tour_Location_Part_Aeroway;
@@ -617,6 +624,8 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_Tunnel;
    public static String        Tour_Location_Part_Village;
    public static String        Tour_Location_Part_Waterway;
+   public static String        Tour_Location_Task_RetrievingTourLocations;
+   public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
 
    public static String        message_manager_pErrorSummary;
    public static String        message_manager_pMessageSummary;

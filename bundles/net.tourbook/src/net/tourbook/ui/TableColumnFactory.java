@@ -251,6 +251,13 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory LOCATION_PART_Postcode;
    public static final String             LOCATION_PART_Postcode_ID                          = "LOCATION_PART_Postcode_ID";                       //$NON-NLS-1$
 
+   public static final TableColumnFactory LOCATION_TOUR_USAGE;
+   public static final String             LOCATION_TOUR_USAGE_ID                             = "LOCATION_TOUR_USAGE";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_TOUR_USAGE_START_LOCATIONS;
+   public static final String             LOCATION_TOUR_USAGE_START_LOCATIONS_ID             = "LOCATION_TOUR_USAGE_START_LOCATIONS_ID";          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_TOUR_USAGE_END_LOCATIONS;
+   public static final String             LOCATION_TOUR_USAGE_END_LOCATIONS_ID               = "LOCATION_TOUR_USAGE_END_LOCATIONS_ID";            //$NON-NLS-1$
+
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_GAIN_DELTA;
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_LOSS_DELTA;
    public static final TableColumnFactory MARKER_MAP_VISIBLE;
@@ -1673,6 +1680,63 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
             colDef.setColumnName(               "Width");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_TOUR_USAGE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_TOUR_USAGE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Tour_AllLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_AllLocations_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_TOUR_USAGE_START_LOCATIONS= new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_TOUR_USAGE_START_LOCATIONS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Tour_StartLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_StartLocations_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_TOUR_USAGE_END_LOCATIONS = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_TOUR_USAGE_END_LOCATIONS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Tour_EndLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_EndLocations_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -5112,7 +5176,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(columnLabel);
             colDef.setColumnHeaderText(columnLabel);
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }

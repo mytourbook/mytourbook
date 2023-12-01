@@ -54,6 +54,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.Messages;
 import net.tourbook.web.WEB;
@@ -61,10 +62,14 @@ import net.tourbook.web.WEB;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
@@ -107,27 +112,29 @@ public class TourLocationManager {
    private static final Bundle                    _bundle                    = TourbookPlugin.getDefault().getBundle();
    private static final IPath                     _stateLocation             = Platform.getStateLocation(_bundle);
 
-   private static final String                    TOUR_LOCATION_FILE_NAME    = "tour-location.xml";                                   //$NON-NLS-1$
+   private static final String                    TOUR_LOCATION_FILE_NAME    = "tour-location.xml";                                        //$NON-NLS-1$
    private static final int                       TOUR_LOCATION_VERSION      = 1;
 
-   private static final String                    TAG_ROOT                   = "TourLocationProfiles";                                //$NON-NLS-1$
-   private static final String                    TAG_PROFILE                = "Profile";                                             //$NON-NLS-1$
-   private static final String                    TAG_PARTS                  = "Parts";                                               //$NON-NLS-1$
-   private static final String                    TAG_PART                   = "Part";                                                //$NON-NLS-1$
+   private static final String                    TAG_ROOT                   = "TourLocationProfiles";                                     //$NON-NLS-1$
+   private static final String                    TAG_PROFILE                = "Profile";                                                  //$NON-NLS-1$
+   private static final String                    TAG_PARTS                  = "Parts";                                                    //$NON-NLS-1$
+   private static final String                    TAG_PART                   = "Part";                                                     //$NON-NLS-1$
 
-   private static final String                    ATTR_ACTIVE_PROFILE_ID     = "activeProfileId";                                     //$NON-NLS-1$
-   private static final String                    ATTR_NAME                  = "name";                                                //$NON-NLS-1$
-   private static final String                    ATTR_PROFILE_ID            = "profileID";                                           //$NON-NLS-1$
-   private static final String                    ATTR_PROFILE_NAME          = "profileName";                                         //$NON-NLS-1$
-   private static final String                    ATTR_TOUR_LOCATION_VERSION = "tourLocationVersion";                                 //$NON-NLS-1$
+   private static final String                    ATTR_ACTIVE_PROFILE_ID     = "activeProfileId";                                          //$NON-NLS-1$
+   private static final String                    ATTR_NAME                  = "name";                                                     //$NON-NLS-1$
+   private static final String                    ATTR_PROFILE_ID            = "profileID";                                                //$NON-NLS-1$
+   private static final String                    ATTR_PROFILE_NAME          = "profileName";                                              //$NON-NLS-1$
+   private static final String                    ATTR_TOUR_LOCATION_VERSION = "tourLocationVersion";                                      //$NON-NLS-1$
 
-   static final String                            KEY_LOCATION_PART_ID       = "KEY_LOCATION_PART_ID";                                //$NON-NLS-1$
-   static final String                            KEY_IS_NOT_AVAILABLE       = "KEY_IS_NOT_AVAILABLE";                                //$NON-NLS-1$
+   static final String                            KEY_LOCATION_PART_ID       = "KEY_LOCATION_PART_ID";                                     //$NON-NLS-1$
+   static final String                            KEY_IS_NOT_AVAILABLE       = "KEY_IS_NOT_AVAILABLE";                                     //$NON-NLS-1$
 
-   private static final String                    SUB_TASK_MESSAGE           = "%d / %d - waited %d ms";                              //$NON-NLS-1$
-   private static final String                    SUB_TASK_MESSAGE_SKIPPED   = "%d / %d";                                             //$NON-NLS-1$
+   private static final String                    COUNTRY_CODE_US            = "us";                                                       //$NON-NLS-1$
 
-   private static final String                    _userAgent                 = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
+   private static final String                    SUB_TASK_MESSAGE           = Messages.Tour_Location_Task_RetrievingTourLocations_Subtask;
+   private static final String                    SUB_TASK_MESSAGE_SKIPPED   = "%d / %d";                                                  //$NON-NLS-1$
+
+   private static final String                    _userAgent                 = "MyTourbook/" + ApplicationVersion.getVersionSimple();      //$NON-NLS-1$
 
    private static final HttpClient                _httpClient                = HttpClient
 
@@ -596,68 +603,170 @@ public class TourLocationManager {
       }
 
       final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
-
-      System.out.println("numTours: " + allTourIds.size());
-// TODO remove SYSTEM.OUT.PRINTLN
+      final int numTours = allTourIds.size();
 
       String dialogMessage;
       String actionDeleteTags;
 
-      if (allLocations.size() == 1) {
+      final int numLocations = allLocations.size();
+
+      if (numLocations == 1) {
 
          // delete one location
 
          dialogMessage = Messages.Tour_Location_Dialog_DeleteLocation_Message.formatted(
 
                allLocations.get(0).display_name,
-               allLocations.size());
+               numTours);
 
          actionDeleteTags = Messages.Tour_Location_Action_DeleteLocation;
 
       } else {
 
-         // remove multiple tags
+         // remove multiple locations
 
          dialogMessage = Messages.Tour_Location_Dialog_DeleteLocations_Message.formatted(
 
-               allLocations.size(),
-               allTourIds.size());
+               numLocations,
+               numTours);
 
          actionDeleteTags = Messages.Tour_Location_Action_DeleteLocations;
       }
 
       final Display display = Display.getDefault();
 
-//      // confirm deletion, show tag name and number of tours which contain a tag
-//      final MessageDialog dialog = new MessageDialog(
-//            display.getActiveShell(),
-//            Messages.Tag_Manager_Dialog_DeleteTag_Title,
-//            null,
-//            dialogMessage,
-//            MessageDialog.QUESTION,
-//            new String[] {
-//                  actionDeleteTags,
-//                  IDialogConstants.CANCEL_LABEL },
-//            1);
-//
+      // confirm deletion, show tag name and number of tours which contain a tag
+      final MessageDialog dialog = new MessageDialog(
+            display.getActiveShell(),
+            Messages.Tour_Location_Dialog_DeleteLocation_Title,
+            null,
+            dialogMessage,
+            MessageDialog.QUESTION,
+            new String[] {
+                  actionDeleteTags,
+                  IDialogConstants.CANCEL_LABEL },
+            1);
+
       final boolean[] returnValue = { false };
-//
-//      if (dialog.open() == Window.OK) {
-//
-//         BusyIndicator.showWhile(display, () -> {
-//
-//            if (deleteTourTag_10(allLocations)) {
-//
+
+      if (dialog.open() == Window.OK) {
+
+         BusyIndicator.showWhile(display, () -> {
+
+            if (deleteTourLocations_10(allLocations)) {
+
 //               clearAllTagResourcesAndFireModifyEvent();
 //
 //               updateTourTagFilterProfiles(allLocations);
-//
-//               returnValue[0] = true;
-//            }
-//         });
-//      }
+
+               returnValue[0] = true;
+            }
+         });
+      }
 
       return returnValue[0];
+   }
+
+   private static boolean deleteTourLocations_10(final List<TourLocation> allLocations) {
+
+      boolean returnResult = false;
+
+      PreparedStatement prepStmt_TourData_Start = null;
+      PreparedStatement prepStmt_TourData_End = null;
+      PreparedStatement prepStmt_TourLocation = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         // remove locations from TOURDATA
+         final String sqlStartLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+               + "SET" + NL //                                             //$NON-NLS-1$
+
+               + " tourStartPlace               = NULL," + NL //           //$NON-NLS-1$
+               + " tourLocationStart_LocationID = NULL" + NL //            //$NON-NLS-1$
+
+               + "WHERE tourLocationStart_LocationID = ?" + NL //       1  //$NON-NLS-1$
+         ;
+
+         final String sqlEndLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+               + "SET" + NL //                                             //$NON-NLS-1$
+
+               + " tourEndPlace               = NULL," + NL //             //$NON-NLS-1$
+               + " tourLocationEnd_LocationID = NULL" + NL //              //$NON-NLS-1$
+
+               + "WHERE tourLocationEnd_LocationID = ?" + NL //         1  //$NON-NLS-1$
+         ;
+
+         // remove location from TOURLOCATION
+         final String sqlTourLocation = UI.EMPTY_STRING
+
+               + "DELETE" + NL //                                          //$NON-NLS-1$
+
+               + " FROM " + TourDatabase.TABLE_TOUR_LOCATION + NL //       //$NON-NLS-1$
+
+               + " WHERE locationID = ?"; //                            1  //$NON-NLS-1$
+
+         prepStmt_TourData_Start = conn.prepareStatement(sqlStartLocation);
+         prepStmt_TourData_End = conn.prepareStatement(sqlEndLocation);
+         prepStmt_TourLocation = conn.prepareStatement(sqlTourLocation);
+
+         int[] returnValue_TourData_Start;
+         int[] returnValue_TourData_End;
+         int[] returnValue_TourLocation;
+
+         conn.setAutoCommit(false);
+         {
+            for (final TourLocation location : allLocations) {
+
+               final long locationId = location.getLocationId();
+
+               prepStmt_TourData_Start.setLong(1, locationId);
+               prepStmt_TourData_Start.addBatch();
+
+               prepStmt_TourData_End.setLong(1, locationId);
+               prepStmt_TourData_End.addBatch();
+
+               prepStmt_TourLocation.setLong(1, locationId);
+               prepStmt_TourLocation.addBatch();
+            }
+
+            returnValue_TourData_Start = prepStmt_TourData_Start.executeBatch();
+            returnValue_TourData_End = prepStmt_TourData_End.executeBatch();
+            returnValue_TourLocation = prepStmt_TourLocation.executeBatch();
+         }
+         conn.commit();
+
+         // log result
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
+
+//         for (int tagIndex = 0; tagIndex < allTags.size(); tagIndex++) {
+//
+//            TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
+//                  returnValue_TourData[tagIndex],
+//                  returnValue_TagCategory[tagIndex],
+//                  returnValue_TourTag[tagIndex],
+//                  allTags.get(tagIndex).getTagName()));
+//         }
+
+         returnResult = true;
+
+      } catch (final SQLException e) {
+
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(prepStmt_TourData_Start);
+         Util.closeSql(prepStmt_TourData_End);
+         Util.closeSql(prepStmt_TourLocation);
+      }
+
+      return returnResult;
    }
 
    /**
@@ -732,7 +841,7 @@ public class TourLocationManager {
 
       final String adrCountryCode = tourLocation.country_code;
 
-      if ("us".equals(adrCountryCode)) {
+      if (COUNTRY_CODE_US.equals(adrCountryCode)) {
 
          // city + zip code
 
@@ -757,7 +866,7 @@ public class TourLocationManager {
 
       final String adrCountryCode = tourLocation.country_code;
 
-      if ("us".equals(adrCountryCode)) {
+      if (COUNTRY_CODE_US.equals(adrCountryCode)) {
 
          // city + zip code
 
@@ -793,7 +902,7 @@ public class TourLocationManager {
 
       final String countryCode = tourLocation.country_code;
 
-      if ("us".equals(countryCode)) {
+      if (COUNTRY_CODE_US.equals(countryCode)) {
 
          return adrHouseNumber + UI.SPACE + adrRoad;
 
@@ -834,26 +943,26 @@ public class TourLocationManager {
       /*
        * Retrieve location
        */
-      final TourLocationData tourLocationData = getName_10_RetrieveData(latitude, longitude, _zoomLevel);
+      final TourLocationData tourLocationData = getLocationData_10_RetrieveData(latitude, longitude, _zoomLevel);
 
       if (tourLocationData == null) {
          return null;
       }
 
-      final OSMLocation osmLocation = getName_20_DeserializeData(tourLocationData.downloadedData);
+      final OSMLocation osmLocation = getLocationData_20_DeserializeData(tourLocationData.downloadedData);
 
       tourLocationData.tourLocation = createTourLocation(osmLocation, latitude, longitude);
 
       if (_isLogging_AddressRetrieval && osmLocation != null) {
 
-         System.out.println("Default name      " + osmLocation.display_name);
+         System.out.println("Default name      " + osmLocation.display_name); //$NON-NLS-1$
 
          if (osmLocation.name != null && osmLocation.name.length() > 0) {
-            System.out.println("name              " + osmLocation.name);
+            System.out.println("name              " + osmLocation.name); //$NON-NLS-1$
          }
 
-         System.out.println(" Waiting time     %d ms".formatted(tourLocationData.waitingTime));
-         System.out.println(" Download time    %d ms".formatted(tourLocationData.downloadTime));
+         System.out.println(" Waiting time     %d ms".formatted(tourLocationData.waitingTime)); //$NON-NLS-1$
+         System.out.println(" Download time    %d ms".formatted(tourLocationData.downloadTime)); //$NON-NLS-1$
 
          if (osmLocation.address != null) {
             System.out.println(osmLocation.address.logAddress());
@@ -875,9 +984,9 @@ public class TourLocationManager {
     *
     * @return Returns <code>null</code> or {@link TourLocationData}
     */
-   private static TourLocationData getName_10_RetrieveData(final double latitude,
-                                                           final double longitude,
-                                                           final int zoomLevel) {
+   private static TourLocationData getLocationData_10_RetrieveData(final double latitude,
+                                                                   final double longitude,
+                                                                   final int zoomLevel) {
 
       final long now = System.currentTimeMillis();
       long waitingTime = now - _lastRetrievalTimeMS;
@@ -920,6 +1029,9 @@ public class TourLocationManager {
             + "&lat=" + latitude //          //$NON-NLS-1$
             + "&lon=" + longitude //         //$NON-NLS-1$
             + "&zoom=" + zoomLevel //        //$NON-NLS-1$
+
+//          + "&polygon_text=1" //           //$NON-NLS-1$
+//          + "&polygon_geojson=1" //        //$NON-NLS-1$
 
 //          + "&extratags=1" //$NON-NLS-1$
 //          + "&namedetails=1" //$NON-NLS-1$
@@ -973,7 +1085,7 @@ public class TourLocationManager {
       return new TourLocationData(downloadedData, retrievalDuration, waitingTime);
    }
 
-   private static OSMLocation getName_20_DeserializeData(final String osmLocationString) {
+   private static OSMLocation getLocationData_20_DeserializeData(final String osmLocationString) {
 
       OSMLocation osmLocation = null;
 
@@ -1133,7 +1245,7 @@ public class TourLocationManager {
                final int numRequests = numTours * 2;
                int numWorked = 0;
 
-               monitor.beginTask("Retrieving %d tour locations".formatted(numRequests), numRequests);
+               monitor.beginTask(Messages.Tour_Location_Task_RetrievingTourLocations.formatted(numRequests), numRequests);
 
                for (final TourData tourData : requestedTours) {
 
