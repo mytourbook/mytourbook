@@ -525,7 +525,9 @@ public class StravaUploader extends TourbookCloudUploader {
                         numberOfUploadedTours[0],
                         numberOfTours - numberOfUploadedTours[0]);
 
-                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title, infoText);
+                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo),
+                        infoText);
                });
             }
          }

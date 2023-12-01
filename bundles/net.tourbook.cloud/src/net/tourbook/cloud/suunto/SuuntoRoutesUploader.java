@@ -359,7 +359,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                         numberOfUploadedTours[0],
                         numberOfTours - numberOfUploadedTours[0]);
 
-                  UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title, infoText);
+                  UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo),
+                        infoText);
                });
             }
          }

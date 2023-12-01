@@ -227,7 +227,10 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                         numberOfDownloadedTours[0],
                         _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
 
-                  UI.openNotificationPopup(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, infoText);
+                  UI.openNotificationPopup(
+                        Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo),
+                        infoText);
                });
             }
          }
