@@ -105,21 +105,22 @@ import org.eclipse.swt.widgets.Display;
 
 public class FTSearchManager {
 
-   private static final String                  LUCENE_INDEX_FOLDER_NAME         = "lucene-index";                 //$NON-NLS-1$
+   private static final String                  LUCENE_INDEX_FOLDER_NAME         = "lucene-index";                       //$NON-NLS-1$
 
-   private static final String                  SEARCH_FIELD_DESCRIPTION         = "description";                  //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_DOC_SOURCE_INDEX    = "docSource_Index";              //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_DOC_SOURCE_SAVED    = "docSource_Saved";              //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_MARKER_ID           = "markerID";                     //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TITLE               = "title";                        //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_ID             = "tourID";                       //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_LOCATION_START = "startLocation";                //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_LOCATION_END   = "endLocation";                  //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_WEATHER        = "weather";                      //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TIME                = "time";                         //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                   //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_DESCRIPTION         = "description";                        //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_DOC_SOURCE_INDEX    = "docSource_Index";                    //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_DOC_SOURCE_SAVED    = "docSource_Saved";                    //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_MARKER_ID           = "markerID";                           //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TITLE               = "title";                              //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_ID             = "tourID";                             //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_LOCATION_START = "startLocation";                      //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_LOCATION_END   = "endLocation";                        //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TOUR_WEATHER        = "weather";                            //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_TIME                = "time";                               //$NON-NLS-1$
+   private static final String                  SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                         //$NON-NLS-1$
 
-   private static final String                  LOG_CREATE_INDEX                 = "Created ft index: %s\t %d ms"; //$NON-NLS-1$
+   private static final String                  LOG_CREATE_INDEX                 = "Created fulltext index: %s\t %d ms"; //$NON-NLS-1$
+   private static final String                  LOG_DELETED_INDEX                = "Deleted fulltext index: %d ms";      //$NON-NLS-1$
 
    private static final IPreferenceStore        _prefStore                       = TourbookPlugin.getPrefStore();
 
@@ -147,7 +148,7 @@ public class FTSearchManager {
    private static boolean                       _isSearch_Tour_Weather;
    private static boolean                       _isSearch_Waypoint;
    private static boolean                       _isShow_TitleDescription;
-   private static boolean                       _isSort_DateAscending            = false;                          // -> sort descending
+   private static boolean                       _isSort_DateAscending            = false;                                // -> sort descending
 
    private static final FieldType               fieldType_Int;
    private static final FieldType               fieldType_Long;
@@ -834,9 +835,11 @@ public class FTSearchManager {
    }
 
    /**
-    * Deletes the fulltext search index, this is useful when the index has new fields.
+    * Deletes the fulltext search index, this is useful when the index has new fields or is corrupt.
     */
    public static void deleteIndex() {
+
+      final long start = System.currentTimeMillis();
 
       setupIndexReader();
 
@@ -874,6 +877,8 @@ public class FTSearchManager {
       }
 
       closeIndexReaderSuggester();
+
+      StatusUtil.logInfo(LOG_DELETED_INDEX.formatted(System.currentTimeMillis() - start));
    }
 
    /**
@@ -1067,7 +1072,7 @@ public class FTSearchManager {
    /**
     * @return Returns <code>true</code> when the ft index is created.
     */
-   private static boolean isIndexCreated() {
+   public static boolean isIndexCreated() {
 
       FSDirectory indexStore = null;
       IndexWriter indexWriter = null;
@@ -1113,6 +1118,7 @@ public class FTSearchManager {
     * @param searchFromIndex
     * @param searchToIndex
     * @param searchResult
+    *
     * @return
     */
    private static void search(final String searchText,
@@ -1220,7 +1226,9 @@ public class FTSearchManager {
     *
     * @param searchText
     * @param analyzer
+    *
     * @return
+    *
     * @throws ParseException
     */
    private static QueryResult search_10_Search_All(final String searchText, final Analyzer analyzer) throws ParseException {
@@ -1250,6 +1258,7 @@ public class FTSearchManager {
     * Query text/marker/waypoint with OR
     *
     * @param analyzer
+    *
     * @throws ParseException
     */
    private static QueryResult search_20_Search_Parts(final String searchText, final Analyzer analyzer) throws ParseException {
@@ -1384,6 +1393,7 @@ public class FTSearchManager {
     * @param searchResult
     * @param docStartIndex
     * @param docids2
+    *
     * @throws IOException
     */
    private static void search_90_CreateResult(final Map<String, String[]> highlights,
@@ -1542,6 +1552,7 @@ public class FTSearchManager {
     * @param searchText
     * @param searchPosFrom
     * @param searchPosTo
+    *
     * @return Returns {@link SearchResult}
     */
    public static SearchResult searchByPosition(final String searchText,
@@ -1586,6 +1597,7 @@ public class FTSearchManager {
     *
     * @param conn
     * @param monitor
+    *
     * @throws SQLException
     */
    private static void setupIndex() {
