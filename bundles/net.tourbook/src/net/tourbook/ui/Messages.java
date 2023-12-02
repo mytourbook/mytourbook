@@ -562,6 +562,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Dialog_DeleteLocation_Message;
    public static String        Tour_Location_Dialog_DeleteLocation_Title;
    public static String        Tour_Location_Dialog_DeleteLocations_Message;
+   public static String        Tour_Location_Log_LocationIsDeleted;
    public static String        Tour_Location_Part_Aerialway;
    public static String        Tour_Location_Part_Aeroway;
    public static String        Tour_Location_Part_Allotments;

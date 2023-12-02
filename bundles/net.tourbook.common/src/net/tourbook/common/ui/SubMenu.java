@@ -41,13 +41,24 @@ public abstract class SubMenu extends Action implements IMenuCreator {
    }
 
    /**
-    * Add an action to the menu
+    * Add an action to this sub menu
     *
     * @param action
     */
    public void addActionToMenu(final Action action) {
 
       new ActionContributionItem(action).fill(_menu, -1);
+   }
+
+   /**
+    * Add an action to the provided menu
+    *
+    * @param menu
+    * @param action
+    */
+   public void addActionToMenu(final Menu menu, final Action action) {
+
+      new ActionContributionItem(action).fill(menu, -1);
    }
 
    public void addSeparatorToMenu() {

@@ -595,7 +595,6 @@ public class TourLocationManager {
    }
 
    public static boolean deleteTourLocations(final List<TourLocation> allLocations) {
-      // TODO Auto-generated method stub
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified(false)) {
@@ -655,9 +654,7 @@ public class TourLocationManager {
 
             if (deleteTourLocations_10(allLocations)) {
 
-//               clearAllTagResourcesAndFireModifyEvent();
-//
-//               updateTourTagFilterProfiles(allLocations);
+               TourManager.getInstance().clearTourDataCache();
 
                returnValue[0] = true;
             }
@@ -744,14 +741,16 @@ public class TourLocationManager {
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
-//         for (int tagIndex = 0; tagIndex < allTags.size(); tagIndex++) {
-//
-//            TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
-//                  returnValue_TourData[tagIndex],
-//                  returnValue_TagCategory[tagIndex],
-//                  returnValue_TourTag[tagIndex],
-//                  allTags.get(tagIndex).getTagName()));
-//         }
+         for (int locationIndex = 0; locationIndex < allLocations.size(); locationIndex++) {
+
+            // Location is deleted from %d start locations, %d end locations, %d location - "%s"
+
+            TourLogManager.log_INFO(Messages.Tour_Location_Log_LocationIsDeleted.formatted(
+                  returnValue_TourData_Start[locationIndex],
+                  returnValue_TourData_End[locationIndex],
+                  returnValue_TourLocation[locationIndex],
+                  allLocations.get(locationIndex).display_name));
+         }
 
          returnResult = true;
 
@@ -1230,7 +1229,9 @@ public class TourLocationManager {
     * @param locationProfile
     */
    public static void setTourLocations(final List<TourData> requestedTours,
-                                       final TourLocationProfile locationProfile) {
+                                       final TourLocationProfile locationProfile,
+                                       final boolean isSetStartLocation,
+                                       final boolean isSetEndLocation) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -1275,63 +1276,69 @@ public class TourLocationManager {
                   /*
                    * Start location
                    */
-                  waitingTime = 0;
+                  if (isSetStartLocation) {
 
-                  TourLocation tourLocationStart = tourData.getTourLocationStart();
-                  if (tourLocationStart == null) {
+                     waitingTime = 0;
 
-                     final TourLocationData startLocationData = getLocationData(latitudeSerie[0], longitudeSerie[0]);
+                     TourLocation tourLocationStart = tourData.getTourLocationStart();
+                     if (tourLocationStart == null) {
 
-                     if (startLocationData != null) {
+                        final TourLocationData startLocationData = getLocationData(latitudeSerie[0], longitudeSerie[0]);
 
-                        waitingTime = startLocationData.waitingTime;
-                        tourLocationStart = startLocationData.tourLocation;
+                        if (startLocationData != null) {
+
+                           waitingTime = startLocationData.waitingTime;
+                           tourLocationStart = startLocationData.tourLocation;
+                        }
                      }
+
+                     if (tourLocationStart != null) {
+
+                        final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
+
+                        tourData.setTourStartPlace(startLocationText);
+                        tourData.setTourLocationStart(tourLocationStart);
+
+                        isModified = true;
+                     }
+
+                     monitor.worked(1);
+                     monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
                   }
-
-                  if (tourLocationStart != null) {
-
-                     final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
-
-                     tourData.setTourStartPlace(startLocationText);
-                     tourData.setTourLocationStart(tourLocationStart);
-
-                     isModified = true;
-                  }
-
-                  monitor.worked(1);
-                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
 
                   /*
                    * End location
                    */
-                  waitingTime = 0;
+                  if (isSetEndLocation) {
 
-                  TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-                  if (tourLocationEnd == null) {
+                     waitingTime = 0;
 
-                     final int lastIndex = latitudeSerie.length - 1;
-                     final TourLocationData endLocationData = getLocationData(latitudeSerie[lastIndex], longitudeSerie[lastIndex]);
+                     TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+                     if (tourLocationEnd == null) {
 
-                     if (endLocationData != null) {
+                        final int lastIndex = latitudeSerie.length - 1;
+                        final TourLocationData endLocationData = getLocationData(latitudeSerie[lastIndex], longitudeSerie[lastIndex]);
 
-                        waitingTime = endLocationData.waitingTime;
-                        tourLocationEnd = endLocationData.tourLocation;
+                        if (endLocationData != null) {
+
+                           waitingTime = endLocationData.waitingTime;
+                           tourLocationEnd = endLocationData.tourLocation;
+                        }
                      }
+
+                     if (tourLocationEnd != null) {
+
+                        final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
+
+                        tourData.setTourEndPlace(endLocationText);
+                        tourData.setTourLocationEnd(tourLocationEnd);
+
+                        isModified = true;
+                     }
+
+                     monitor.worked(1);
+                     monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
                   }
-
-                  if (tourLocationEnd != null) {
-
-                     final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
-
-                     tourData.setTourEndPlace(endLocationText);
-                     tourData.setTourLocationEnd(tourLocationEnd);
-
-                     isModified = true;
-                  }
-
-                  monitor.worked(1);
-                  monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
 
                   if (isModified) {
 

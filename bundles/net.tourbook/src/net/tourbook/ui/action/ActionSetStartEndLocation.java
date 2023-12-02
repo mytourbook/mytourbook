@@ -43,13 +43,26 @@ import org.eclipse.swt.widgets.Menu;
  *
  * <pre>
  *
- * -- Set start/end location
+ * -- Set Start/End Location
  *
  *   -- >> Profile <<
  *   ----------------------
  *   -- Profile 1
  *   -- Profile 2
  *   -- Profile 3
+ *   
+ *   ----------------------
+ *   
+ *   -- Set only Start Location
+ *     -- Profile 1
+ *     -- Profile 2
+ *     -- Profile 3
+ *      
+ *   -- Set only End Location
+ *     -- Profile 1
+ *     -- Profile 2
+ *     -- Profile 3
+ *     
  *   ----------------------
  *   -- Open Profile Editor
  *
@@ -65,6 +78,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private ActionEditProfiles           _actionEditProfiles;
    private Action                       _actionProfileTitle;
+   private ActionSetOnlyStartLocation   _actionSetOnlyStartLocation;
+   private ActionSetOnlyEndLocation     _actionSetOnlyEndLocation;
 
    private Control                      _ownerControl;
 
@@ -84,12 +99,20 @@ public class ActionSetStartEndLocation extends SubMenu {
    private class ActionLocationProfile extends Action {
 
       private TourLocationProfile _locationProfile;
+      private boolean             _isSetStartLocation;
+      private boolean             _isSetEndLocation;
 
-      public ActionLocationProfile(final TourLocationProfile locationProfile, final boolean isDefaultProfile) {
+      public ActionLocationProfile(final TourLocationProfile locationProfile,
+                                   final boolean isDefaultProfile,
+                                   final boolean isSetStartLocation,
+                                   final boolean isSetEndLocation) {
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          _locationProfile = locationProfile;
+
+         _isSetStartLocation = isSetStartLocation;
+         _isSetEndLocation = isSetEndLocation;
 
          final String profileName = _locationProfile.getName();
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
@@ -105,7 +128,59 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void run() {
 
-         actionSetTourLocation(_locationProfile);
+         actionSetTourLocation(_locationProfile, _isSetStartLocation, _isSetEndLocation);
+      }
+   }
+
+   private class ActionSetOnlyEndLocation extends SubMenu {
+
+      public ActionSetOnlyEndLocation() {
+
+         super(Messages.Tour_Action_SetLocation_Only_End, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         // create actions for each profile
+         final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
+         final int numProfiles = allProfiles.size();
+         if (numProfiles > 0) {
+
+            addActionToMenu(_actionProfileTitle);
+            addSeparatorToMenu();
+
+            fillMenu_AddAllProfileActions(menu, allProfiles, false, true);
+         }
+      }
+   }
+
+   private class ActionSetOnlyStartLocation extends SubMenu {
+
+      public ActionSetOnlyStartLocation() {
+
+         super(Messages.Tour_Action_SetLocation_Only_Start, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         // create actions for each profile
+         final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
+         final int numProfiles = allProfiles.size();
+         if (numProfiles > 0) {
+
+            addActionToMenu(_actionProfileTitle);
+            addSeparatorToMenu();
+
+            fillMenu_AddAllProfileActions(menu, allProfiles, true, false);
+         }
       }
    }
 
@@ -116,9 +191,9 @@ public class ActionSetStartEndLocation extends SubMenu {
    public ActionSetStartEndLocation(final ITourProvider tourProvider,
                                     final Control ownerControl) {
 
-      super(Messages.Tour_Action_SetStartEndLocation, AS_DROP_DOWN_MENU);
+      super(Messages.Tour_Action_SetLocation_StartEnd, AS_DROP_DOWN_MENU);
 
-      setToolTipText(Messages.Tour_Action_SetStartEndLocation_Tooltip);
+      setToolTipText(Messages.Tour_Action_SetLocation_StartEnd_Tooltip);
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd));
 
       _tourProvider = tourProvider;
@@ -173,68 +248,34 @@ public class ActionSetStartEndLocation extends SubMenu {
       slideoutLocationProfiles.open(false);
    }
 
-   private void actionSetTourLocation(final TourLocationProfile locationProfile) {
+   private void actionSetTourLocation(final TourLocationProfile locationProfile,
+                                      final boolean isSetStartLocation,
+                                      final boolean isSetEndLocation) {
 
       final List<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-      TourLocationManager.setTourLocations(selectedTours, locationProfile);
+      TourLocationManager.setTourLocations(
 
-
-//      System.out.println();
-//      System.out.println("       "
-//
-//            + "Date  "
-//
-////          + "TourData  "
-//            + "SerieData      "
-//
-//            + "Start        "
-//            + "End    "
-//
-//            + "%"
-//
-//      );
-//
-//      for (final TourData tourData : selectedTours) {
-//
-//         final TourDateTime tourDateTime = tourData.getTourDateTime();
-//
-//         final int sizeofSerieData = Util.sizeof(tourData.getSerieData());
-//         final int sizeofStart = Util.sizeof(tourData.tourLocationData_Start.osmLocation);
-//         final int sizeofEnd = Util.sizeof(tourData.tourLocationData_End.osmLocation);
-//
-//         final float percent = (float) (sizeofStart + sizeofEnd) / sizeofSerieData * 100f;
-//
-//         System.out.println(""
-//
-//               + " %8s".formatted(TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime))
-//
-////             + " %10s".formatted(FormatManager.formatNumber_0(Util.sizeof(tourData)))
-//               + " %10s".formatted(FormatManager.formatNumber_0(sizeofSerieData))
-//
-//               + " %10s".formatted(sizeofStart)
-//               + " %10s".formatted(sizeofEnd)
-//
-//               + " %4.1f".formatted(percent)
-//
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//      }
+            selectedTours,
+            locationProfile,
+            isSetStartLocation,
+            isSetEndLocation);
    }
 
    private void createActions() {
 
+      // create a dummy action for the profile title
       _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle) {};
       _actionProfileTitle.setEnabled(false);
 
       _actionEditProfiles = new ActionEditProfiles();
+
+      _actionSetOnlyStartLocation = new ActionSetOnlyStartLocation();
+      _actionSetOnlyEndLocation = new ActionSetOnlyEndLocation();
    }
 
    @Override
-   public void enableActions() {
-
-   }
+   public void enableActions() {}
 
    @Override
    public void fillMenu(final Menu menu) {
@@ -247,15 +288,23 @@ public class ActionSetStartEndLocation extends SubMenu {
          addActionToMenu(_actionProfileTitle);
          addSeparatorToMenu();
 
-         fillMenu_AddAllProfileActions(allProfiles);
+         fillMenu_AddAllProfileActions(menu, allProfiles, true, true);
 
          addSeparatorToMenu();
       }
 
+      addActionToMenu(_actionSetOnlyStartLocation);
+      addActionToMenu(_actionSetOnlyEndLocation);
+
+      addSeparatorToMenu();
+
       addActionToMenu(_actionEditProfiles);
    }
 
-   private void fillMenu_AddAllProfileActions(final List<TourLocationProfile> allProfiles) {
+   private void fillMenu_AddAllProfileActions(final Menu menu,
+                                              final List<TourLocationProfile> allProfiles,
+                                              final boolean isSetStartLocation,
+                                              final boolean isSetEndLocation) {
 
       final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
 
@@ -266,7 +315,14 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
 
-         addActionToMenu(new ActionLocationProfile(locationProfile, isDefaultProfile));
+         addActionToMenu(menu,
+
+               new ActionLocationProfile(
+                     locationProfile,
+                     isDefaultProfile,
+
+                     isSetStartLocation,
+                     isSetEndLocation));
       }
    }
 

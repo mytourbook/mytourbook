@@ -3095,6 +3095,9 @@ public class Map2View extends ViewPart implements
 
          // hide tour locations
 
+         // ensure that tour locations are NOT displayed, when eventData == null
+         _allTourLocations = null;
+
          _directMappingPainter.setPaintContext(
 
                _map,
