@@ -926,6 +926,13 @@
             mnemonic    ="%Command_DbTool_CompressDatabase_Mnemonic"
             style       ="push"/>
 
+         <!-- Rebuild Fulltext Index -->
+         <command
+            commandId   ="net.tourbook.command.DbTool.RebuildFulltextIndex"
+            label       ="%Command_DbTool_RebuildFulltextIndex"
+            mnemonic    ="%Command_DbTool_RebuildFulltextIndex_Mnemonic"
+            style       ="push"/>
+
       </menuContribution>
 
 
@@ -1447,6 +1454,11 @@
          name           ="%Command_DbTool_CompressDatabase"
          defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compress"
       />
+
+      <command
+         id             ="net.tourbook.command.DbTool.RebuildFulltextIndex"
+         name           ="%Command_DbTool_RebuildFulltext"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_RebuildFulltextIndex"/>
 
       <command
          id             ="net.tourbook.command.OpenHomePage"
