@@ -94,6 +94,7 @@ public class Utils {
       bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
       bot.comboBox(0).setText(measurementSystem);
+      bot.comboBox(0).setSelection(measurementSystem);
 
       Utils.clickApplyAndCloseButton(bot);
    }
