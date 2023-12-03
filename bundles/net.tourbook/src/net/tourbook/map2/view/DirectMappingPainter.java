@@ -109,7 +109,6 @@ public class DirectMappingPainter implements IDirectPainter {
     */
    public void disablePaintContext() {
 
-      _map = null;
       _tourData = null;
       _isTourVisible = false;
    }
@@ -471,6 +470,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
       for (final TourLocation tourLocation : _allTourLocations) {
 
+         tourLocation.setupTransientValues();
+
          final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
 
          final double latitudeMin = tourLocation.latitudeMin;
@@ -625,7 +626,6 @@ public class DirectMappingPainter implements IDirectPainter {
    public void paint(final DirectPainterContext painterContext) {
 
       if (_map == null) {
-
          return;
       }
 
@@ -698,8 +698,7 @@ public class DirectMappingPainter implements IDirectPainter {
                                final boolean isShowSliderInLegend,
                                final boolean isShowValuePoint,
 
-                               final SliderPathPaintingData sliderRelationPaintingData,
-                               final List<TourLocation> allTourLocations) {
+                               final SliderPathPaintingData sliderRelationPaintingData) {
 // SET_FORMATTING_OFF
 
       _map                       = map;
@@ -716,10 +715,13 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _sliderPathPaintingData    = sliderRelationPaintingData;
 
-      _isShowTourLocation        = allTourLocations != null && allTourLocations.size() > 0;
-      _allTourLocations          = allTourLocations;
 
 // SET_FORMATTING_ON
    }
 
+   public void setTourLocations(final List<TourLocation> allTourLocations) {
+
+      _isShowTourLocation = allTourLocations != null && allTourLocations.size() > 0;
+      _allTourLocations = allTourLocations;
+   }
 }

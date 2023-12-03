@@ -401,8 +401,6 @@ public class Map2View extends ViewPart implements
    private boolean                           _isShowLegend;
    private boolean                           _isInSelectBookmark;
    //
-   private List<TourLocation>                _allTourLocations;
-   //
    private int                               _defaultZoom;
    private GeoPosition                       _defaultPosition;
    //
@@ -599,7 +597,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutMap2Options(_parent, toolbar, Map2View.this, _state);
+         return new SlideoutMap2_Options(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
@@ -1254,8 +1252,7 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData,
-            _allTourLocations);
+            _sliderPathPaintingData);
 
       _map.redraw();
    }
@@ -2717,6 +2714,43 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private List<TourLocation> getTourLocations(final ArrayList<TourData> allTourData) {
+
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      for (final TourData tourData : allTourData) {
+
+         final TourLocation tourLocationStart = tourData.getTourLocationStart();
+         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+         if (tourLocationStart != null) {
+            allTourLocations.add(tourLocationStart);
+         }
+         if (tourLocationEnd != null) {
+            allTourLocations.add(tourLocationEnd);
+         }
+      }
+
+      return allTourLocations;
+   }
+
+   private List<TourLocation> getTourLocations(final TourData tourData) {
+
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      final TourLocation tourLocationStart = tourData.getTourLocationStart();
+      final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+      if (tourLocationStart != null) {
+         allTourLocations.add(tourLocationStart);
+      }
+      if (tourLocationEnd != null) {
+         allTourLocations.add(tourLocationEnd);
+      }
+
+      return allTourLocations;
+   }
+
    private Set<GeoPosition> getXSliderGeoPositions(final TourData tourData,
                                                    int valueIndex1,
                                                    int valueIndex2) {
@@ -2858,8 +2892,7 @@ public class Map2View extends ViewPart implements
                _actionShowSliderInLegend.isChecked(),
                _actionShowValuePoint.isChecked(),
 
-               _sliderPathPaintingData,
-               _allTourLocations);
+               _sliderPathPaintingData);
 
          _map.redraw();
       }
@@ -3034,8 +3067,7 @@ public class Map2View extends ViewPart implements
                   _actionShowSliderInLegend.isChecked(),
                   _actionShowValuePoint.isChecked(),
 
-                  _sliderPathPaintingData,
-                  _allTourLocations);
+                  _sliderPathPaintingData);
 
             _map.redraw();
          }
@@ -3082,38 +3114,19 @@ public class Map2View extends ViewPart implements
    @SuppressWarnings("unchecked")
    private void moveToTourLocation(final Object eventData) {
 
-      final TourData tourData = _allTourData.size() > 0 ? _allTourData.get(0) : null;
+      List<TourLocation> allTourLocations = null;
 
-      if (eventData instanceof final List allTourLocations) {
-
-         _allTourLocations = allTourLocations;
+      if (eventData instanceof final List allTourLocationsFromEvent) {
+         allTourLocations = allTourLocationsFromEvent;
       }
 
       if (eventData == null
-            || _allTourLocations == null
-            || _allTourLocations.size() == 0) {
+            || allTourLocations == null
+            || allTourLocations.size() == 0) {
 
          // hide tour locations
 
-         // ensure that tour locations are NOT displayed, when eventData == null
-         _allTourLocations = null;
-
-         _directMappingPainter.setPaintContext(
-
-               _map,
-               _isShowTour,
-               tourData,
-
-               _currentSliderValueIndex_Left,
-               _currentSliderValueIndex_Right,
-               _externalValuePointIndex,
-
-               _actionShowSliderInMap.isChecked(),
-               _actionShowSliderInLegend.isChecked(),
-               _actionShowValuePoint.isChecked(),
-
-               _sliderPathPaintingData,
-               null);
+         _directMappingPainter.setTourLocations(null);
 
          _map.redraw();
 
@@ -3121,29 +3134,14 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      _directMappingPainter.setPaintContext(
-
-            _map,
-            _isShowTour,
-            tourData,
-
-            _currentSliderValueIndex_Left,
-            _currentSliderValueIndex_Right,
-            _externalValuePointIndex,
-
-            _actionShowSliderInMap.isChecked(),
-            _actionShowSliderInLegend.isChecked(),
-            _actionShowValuePoint.isChecked(),
-
-            _sliderPathPaintingData,
-            _allTourLocations);
+      _directMappingPainter.setTourLocations(allTourLocations);
 
       _map.redraw();
 
       if (_isMapSyncWith_Tour) {
 
          // center map to the first location
-         final TourLocation firstLocation = _allTourLocations.get(0);
+         final TourLocation firstLocation = allTourLocations.get(0);
 
          _map.setMapCenter(new GeoPosition(firstLocation.latitude, firstLocation.longitude));
       }
@@ -3941,8 +3939,7 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData,
-            _allTourLocations);
+            _sliderPathPaintingData);
 
       // set the tour bounds
       final GeoPosition[] tourBounds = tourData.getGeoBounds();
@@ -4170,8 +4167,7 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData,
-            _allTourLocations);
+            _sliderPathPaintingData);
 
       if (_isMapSyncWith_Slider_One) {
 
@@ -4829,6 +4825,8 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.addAll(allTourData);
 
+      _directMappingPainter.setTourLocations(getTourLocations(allTourData));
+
       for (final TourData tourData : allTourData) {
          setVisibleDataPoints(tourData);
       }
@@ -4864,6 +4862,8 @@ public class Map2View extends ViewPart implements
 
       _allTourData.clear();
       _allTourData.add(tourData);
+
+      _directMappingPainter.setTourLocations(getTourLocations(tourData));
 
       setVisibleDataPoints(tourData);
 
@@ -4982,8 +4982,7 @@ public class Map2View extends ViewPart implements
             false,
             false, // show value point
 
-            _sliderPathPaintingData,
-            null);
+            _sliderPathPaintingData);
 
       _map.resetTours_HoveredData();
 
@@ -5299,8 +5298,7 @@ public class Map2View extends ViewPart implements
             _actionShowSliderInLegend.isChecked(),
             _actionShowValuePoint.isChecked(),
 
-            _sliderPathPaintingData,
-            _allTourLocations);
+            _sliderPathPaintingData);
 
       _map.paint();
 

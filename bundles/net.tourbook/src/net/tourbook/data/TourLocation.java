@@ -389,6 +389,11 @@ public class TourLocation implements Serializable {
       return Objects.hash(locationID);
    }
 
+   private String log(final String field, final double value) {
+
+      return field + value + NL;
+   }
+
    private String log(final String field, final long value) {
 
       return field + value + NL;
@@ -406,6 +411,42 @@ public class TourLocation implements Serializable {
    public void setLocationID(final long locationID) {
 
       this.locationID = locationID;
+   }
+
+   public void setupTransientValues() {
+
+      if (latitude != 0 || longitude != 0) {
+         return;
+      }
+
+// SET_FORMATTING_OFF
+
+      final double dbLatitude               = (latitudeE6_Normalized  -  90_000_000) / 1E6;
+      final double dbLongitude              = (longitudeE6_Normalized - 180_000_000) / 1E6;
+
+      final double dbLatitudeMin            = (latitudeMinE6_Normalized  -  90_000_000) / 1E6;
+      final double dbLatitudeMax            = (latitudeMaxE6_Normalized  -  90_000_000) / 1E6;
+      final double dbLongitudeMin           = (longitudeMinE6_Normalized - 180_000_000) / 1E6;
+      final double dbLongitudeMax           = (longitudeMaxE6_Normalized - 180_000_000) / 1E6;
+
+      final double dbLatitudeMinExpanded    = (latitudeMinExpandedE6_Normalized  -  90_000_000) / 1E6;
+      final double dbLatitudeMaxExpanded    = (latitudeMaxExpandedE6_Normalized  -  90_000_000) / 1E6;
+      final double dbLongitudeMinExpanded   = (longitudeMinExpandedE6_Normalized - 180_000_000) / 1E6;
+      final double dbLongitudeMaxExpanded   = (longitudeMaxExpandedE6_Normalized - 180_000_000) / 1E6;
+
+      latitude               = dbLatitude;
+      longitude              = dbLongitude;
+      latitudeMin            = dbLatitudeMin;
+      latitudeMax            = dbLatitudeMax;
+      longitudeMin           = dbLongitudeMin;
+      longitudeMax           = dbLongitudeMax;
+
+      latitudeMinExpanded    = dbLatitudeMinExpanded;
+      latitudeMaxExpanded    = dbLatitudeMaxExpanded;
+      longitudeMinExpanded   = dbLongitudeMinExpanded;
+      longitudeMaxExpanded   = dbLongitudeMaxExpanded;
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -478,6 +519,8 @@ public class TourLocation implements Serializable {
 
             + NL
 
+            + log(" latitude                          = ", latitude) //                            //$NON-NLS-1$
+            + log(" longitude                         = ", longitude) //                           //$NON-NLS-1$
             + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
             + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
 

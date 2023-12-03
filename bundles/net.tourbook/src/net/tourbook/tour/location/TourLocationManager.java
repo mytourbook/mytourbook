@@ -597,7 +597,7 @@ public class TourLocationManager {
    public static boolean deleteTourLocations(final List<TourLocation> allLocations) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified(false)) {
+      if (TourManager.isTourEditorModified()) {
          return false;
       }
 
@@ -1243,7 +1243,7 @@ public class TourLocationManager {
                   throws InvocationTargetException, InterruptedException {
 
                final int numTours = requestedTours.size();
-               final int numRequests = numTours * 2;
+               final int numRequests = numTours * (isSetStartLocation && isSetEndLocation ? 2 : 1);
                int numWorked = 0;
 
                monitor.beginTask(Messages.Tour_Location_Task_RetrievingTourLocations.formatted(numRequests), numRequests);

@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D Map properties
  */
-public class SlideoutMap2Options extends ToolbarSlideout implements
+public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       IColorSelectorListener,
       IActionResetToDefault,
@@ -88,7 +88,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
     * @param map2View
     * @param map2State
     */
-   public SlideoutMap2Options(final Control ownerControl,
+   public SlideoutMap2_Options(final Control ownerControl,
                               final ToolBar toolBar,
                               final Map2View map2View,
                               final IDialogSettings map2State) {
