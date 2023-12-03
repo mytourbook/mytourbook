@@ -834,6 +834,65 @@ public class FTSearchManager {
       return allPartitionedTourIDs;
    }
 
+   public static void deleteCorruptIndex() {
+
+      _prefStore.setValue(ITourbookPreferences.FULLTEXT_INDEX_DELETE, true);
+   }
+
+   public static void deleteCorruptIndex_InAppStartup() {
+
+      final boolean isDeleteFulltextIndex = _prefStore.getBoolean(ITourbookPreferences.FULLTEXT_INDEX_DELETE);
+
+      if (isDeleteFulltextIndex) {
+
+         _prefStore.setValue(ITourbookPreferences.FULLTEXT_INDEX_DELETE, false);
+
+         deleteFulltextIndexFiles();
+      }
+   }
+
+   /**
+    * Delete fulltext index files and directories
+    */
+   private static void deleteFulltextIndexFiles() {
+
+      final java.nio.file.Path rootPath = getLuceneIndexRootPath();
+
+      final String logMessage = String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString());
+
+      StatusUtil.logInfo(logMessage);
+      TourLogManager.log_INFO(logMessage);
+
+      try {
+
+         Files.walkFileTree(rootPath, new SimpleFileVisitor<java.nio.file.Path>() {
+
+            @Override
+            public FileVisitResult postVisitDirectory(final java.nio.file.Path dir, final IOException exc) throws IOException {
+
+               Files.delete(dir);
+
+               return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(final java.nio.file.Path file, final BasicFileAttributes attrs) throws IOException {
+
+               Files.delete(file);
+
+               return FileVisitResult.CONTINUE;
+            }
+         });
+
+      } catch (final IOException e) {
+
+         StatusUtil.log(e);
+      }
+
+      StatusUtil.logInfo(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
+      TourLogManager.log_INFO(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
+   }
+
    /**
     * Deletes the fulltext search index, this is useful when the index has new fields or is corrupt.
     */
@@ -978,30 +1037,7 @@ public class FTSearchManager {
 
          TourLogManager.log_ERROR(e.getMessage());
 
-         final java.nio.file.Path rootPath = getLuceneIndexRootPath();
-
-         TourLogManager.log_INFO(String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString()));
-
-         Files.walkFileTree(rootPath, new SimpleFileVisitor<java.nio.file.Path>() {
-
-            @Override
-            public FileVisitResult postVisitDirectory(final java.nio.file.Path dir, final IOException exc) throws IOException {
-
-               Files.delete(dir);
-
-               return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(final java.nio.file.Path file, final BasicFileAttributes attrs) throws IOException {
-
-               Files.delete(file);
-
-               return FileVisitResult.CONTINUE;
-            }
-         });
-
-         TourLogManager.log_INFO(Messages.Search_Manager_Log_LuceneRootFolderIsDeleted);
+         deleteFulltextIndexFiles();
 
          indexWriter = new IndexWriter(indexStore, getIndexWriterConfig());
       }
@@ -1071,8 +1107,10 @@ public class FTSearchManager {
 
    /**
     * @return Returns <code>true</code> when the ft index is created.
+    *
+    * @throws IOException
     */
-   public static boolean isIndexCreated() {
+   private static boolean isIndexCreated() {
 
       FSDirectory indexStore = null;
       IndexWriter indexWriter = null;
