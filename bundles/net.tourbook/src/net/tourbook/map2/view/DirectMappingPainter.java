@@ -30,10 +30,12 @@ import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -43,6 +45,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
+
+   private IDialogSettings        _state;
 
    private Map2                   _map;
    private TourData               _tourData;
@@ -71,10 +75,15 @@ public class DirectMappingPainter implements IDirectPainter {
    private final Image _imageRightSlider;
    private final Image _imageValuePoint;
 
+   private boolean     _isShowTourLocations_BoundingBox;
+
    /**
+    * @param state
     *
     */
-   public DirectMappingPainter() {
+   public DirectMappingPainter(final IDialogSettings state) {
+
+      _state = state;
 
       _imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
       _imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
@@ -501,15 +510,6 @@ public class DirectMappingPainter implements IDirectPainter {
             final int requestedDevXCenter = requestedDevX - arcSize2;
             final int requestedDevYCenter = requestedDevY - arcSize2;
 
-            final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
-            final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
-
-            final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
-            final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
-
-            final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
-            final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
-
             /*
              * Paint each bbox with a different color but use the same color for the same bbox
              */
@@ -539,15 +539,27 @@ public class DirectMappingPainter implements IDirectPainter {
                   0,
                   360);
 
-            // draw provided bbox
-            gc.drawRectangle(
+            if (_isShowTourLocations_BoundingBox) {
 
-                  bboxTopLeft_DevX,
-                  bboxTopLeft_DevY,
-                  bboxWidth,
-                  bboxHeight
+               final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
+               final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
 
-            );
+               final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
+               final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
+
+               final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
+               final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
+
+               // draw provided bbox
+               gc.drawRectangle(
+
+                     bboxTopLeft_DevX,
+                     bboxTopLeft_DevY,
+                     bboxWidth,
+                     bboxHeight
+
+               );
+            }
          }
       }
    }
@@ -719,9 +731,20 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
    }
 
+   public void setShowTourLocations(final boolean isShowTourLocations,
+                                    final boolean isShowTourLocations_BoundingBox) {
+
+      _isShowTourLocation = isShowTourLocations && _allTourLocations != null && _allTourLocations.size() > 0;
+      _isShowTourLocations_BoundingBox = isShowTourLocations_BoundingBox;
+   }
+
    public void setTourLocations(final List<TourLocation> allTourLocations) {
 
-      _isShowTourLocation = allTourLocations != null && allTourLocations.size() > 0;
+      final boolean isShowLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
+
+      _isShowTourLocation = isShowLocations && allTourLocations != null && allTourLocations.size() > 0;
       _allTourLocations = allTourLocations;
    }
 }

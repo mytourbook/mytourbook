@@ -216,9 +216,13 @@ public class Map2View extends ViewPart implements
 
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
    static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
-   private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
+   static final boolean          STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
+   static final String           STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX             = "STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX";                           //$NON-NLS-1$
+   static final boolean          STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT     = true;
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
 
@@ -362,7 +366,7 @@ public class Map2View extends ViewPart implements
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
    private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
    //
-   private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter();
+   private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter(_state);
    //
    private final MapInfoManager              _mapInfoManager             = MapInfoManager.getInstance();
    private final TourPainterConfiguration    _tourPainterConfig          = TourPainterConfiguration.getInstance();
@@ -4544,6 +4548,13 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.isShowUserPauses       = isShowUserPauses;
       _tourPainterConfig.pauseDuration          = pauseDuration;
       _tourPainterConfig.pauseDurationOperator  = pauseDurationOperator;
+
+      /*
+       * Tour locations
+       */
+      final boolean isShowTourLocations         = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS,              STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
+      final boolean isShowTourLocationsBBox     = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
+      _directMappingPainter.setShowTourLocations(isShowTourLocations, isShowTourLocationsBBox);
 
 // SET_FORMATTING_ON
 
