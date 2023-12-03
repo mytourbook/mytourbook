@@ -926,11 +926,11 @@
             mnemonic    ="%Command_DbTool_CompressDatabase_Mnemonic"
             style       ="push"/>
 
-         <!-- Rebuild Fulltext Index -->
+         <!-- Delete Fulltext Index Files -->
          <command
-            commandId   ="net.tourbook.command.DbTool.RebuildFulltextIndex"
-            label       ="%Command_DbTool_RebuildFulltextIndex"
-            mnemonic    ="%Command_DbTool_RebuildFulltextIndex_Mnemonic"
+            commandId   ="net.tourbook.command.DbTool.DeleteFulltextIndexFiles"
+            label       ="%Command_DbTool_DeleteFulltextIndexFiles"
+            mnemonic    ="%Command_DbTool_DeleteFulltextIndexFiles_Mnemonic"
             style       ="push"/>
 
       </menuContribution>
@@ -1456,9 +1456,9 @@
       />
 
       <command
-         id             ="net.tourbook.command.DbTool.RebuildFulltextIndex"
-         name           ="%Command_DbTool_RebuildFulltext"
-         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_RebuildFulltextIndex"/>
+         id             ="net.tourbook.command.DbTool.DeleteFulltextIndexFiles"
+         name           ="%Command_DbTool_DeleteFulltextIndexFiles"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_DeleteFulltextIndexFiles"/>
 
       <command
          id             ="net.tourbook.command.OpenHomePage"
