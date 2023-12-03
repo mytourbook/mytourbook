@@ -859,7 +859,7 @@ public class FTSearchManager {
       final java.nio.file.Path rootPath = getLuceneIndexRootPath();
 
       final String logMessage = String.format(Messages.Search_Manager_Log_DeletingLuceneRootFolder, rootPath.toString());
-      
+
       StatusUtil.logInfo(logMessage);
       TourLogManager.log_INFO(logMessage);
 
@@ -1110,7 +1110,7 @@ public class FTSearchManager {
     *
     * @throws IOException
     */
-   public static boolean isIndexCreated() throws IOException {
+   private static boolean isIndexCreated() {
 
       FSDirectory indexStore = null;
       IndexWriter indexWriter = null;
@@ -1125,6 +1125,8 @@ public class FTSearchManager {
             return true;
          }
 
+      } catch (final IOException e) {
+         StatusUtil.showStatus(e);
       } finally {
          closeIndexWriterAndStore(indexStore, indexWriter);
       }
@@ -1638,12 +1640,8 @@ public class FTSearchManager {
     */
    private static void setupIndex() {
 
-      try {
-         if (isIndexCreated()) {
-            return;
-         }
-      } catch (final IOException e) {
-         StatusUtil.showStatus(e);
+      if (isIndexCreated()) {
+         return;
       }
 
       Display.getDefault().syncExec(() -> {
