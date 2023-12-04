@@ -1523,6 +1523,14 @@ public class TourBookView extends ViewPart implements
 
                   // select tours from the tour locations
 
+                  // check if enabled
+                  if (_actionLinkWithOtherViews.getSelection() == false) {
+
+                     // linking is disabled
+
+                     return;
+                  }
+
                   final List<Long> allTourIds = TourLocationManager.getToursWithLocations(allTourLocations);
 
                   _selectedTourIds.clear();
