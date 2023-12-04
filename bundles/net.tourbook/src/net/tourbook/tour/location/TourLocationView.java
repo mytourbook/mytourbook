@@ -306,22 +306,22 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             break;
 
-         case TableColumnFactory.LOCATION_GEO_LATITUDE_HEIGHT_ID:
+         case TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID:
 
-            rc = item1.latitudeHeight_Value- item2.latitudeHeight_Value;
+            rc = item1.boundingBoxHeight_Value- item2.boundingBoxHeight_Value;
 
             if (rc == 0) {
-               rc = item1.longitudeWidth_Value - item2.longitudeWidth_Value;
+               rc = item1.boundingBoxWidth_Value - item2.boundingBoxWidth_Value;
             }
 
             break;
 
-         case TableColumnFactory.LOCATION_GEO_LONGITUDE_WIDTH_ID:
+         case TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH_ID:
 
-            rc = item1.longitudeWidth_Value - item2.longitudeWidth_Value;
+            rc = item1.boundingBoxWidth_Value - item2.boundingBoxWidth_Value;
 
             if (rc == 0) {
-               rc = item1.latitudeHeight_Value - item2.latitudeHeight_Value;
+               rc = item1.boundingBoxHeight_Value - item2.boundingBoxHeight_Value;
             }
 
             break;
@@ -331,7 +331,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             rc = location1.getLocationId() - location2.getLocationId();
 
             if (rc == 0) {
-               rc = item1.latitudeHeight_Value - item2.latitudeHeight_Value;
+               rc = item1.boundingBoxHeight_Value - item2.boundingBoxHeight_Value;
             }
 
             break;
@@ -482,10 +482,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       public int    latitudeDiff_Value;
       public int    longitudeDiff_Value;
 
-      public String latitudeHeight_Text;
-      public String longitudeWidth_Text;
-      public int    latitudeHeight_Value;
-      public int    longitudeWidth_Value;
+      public String boundingBoxHeight_Text;
+      public String boundingBoxWidth_Text;
+      public int    boundingBoxHeight_Value;
+      public int    boundingBoxWidth_Value;
 
       public long   numTourAllLocations;
       public long   numTourStartLocations;
@@ -649,6 +649,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
                // measurement system has changed
+
+               loadAllLocations();
 
                _columnManager.saveState(_state);
                _columnManager.clearColumns();
@@ -890,8 +892,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Geo_12_Longitude();
       defineColumn_Geo_16_LongitudeDiff();
 
-      defineColumn_Geo_18_LatitudeWidth();
-      defineColumn_Geo_19_LongitudeHeight();
+      defineColumn_Geo_19_BoundingBox_Height();
+      defineColumn_Geo_18_BoundingBox_Width();
 
       defineColumn_Data_10_ID();
    }
@@ -977,9 +979,24 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_18_LatitudeWidth() {
+   private void defineColumn_Geo_18_BoundingBox_Width() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE_HEIGHT.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).boundingBoxWidth_Text);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_19_BoundingBox_Height() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -989,22 +1006,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
-            cell.setText(locationItem.latitudeHeight_Text);
-         }
-      });
-   }
-
-   private void defineColumn_Geo_19_LongitudeHeight() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE_WIDTH.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).longitudeWidth_Text);
+            cell.setText(locationItem.boundingBoxHeight_Text);
          }
       });
    }
@@ -2334,40 +2336,95 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 //SET_FORMATTING_ON
 
-            final int latitudeDiff = latitudeE6_Normalized < latitudeMinE6_Normalized
-                  ? latitudeE6_Normalized - latitudeMinE6_Normalized
-                  : latitudeE6_Normalized > latitudeMaxE6_Normalized
-                        ? latitudeE6_Normalized - latitudeMaxE6_Normalized
-                        : 0;
+            final int latitudeDiff_Normalized =
 
-            final int longitudeDiff = longitudeE6_Normalized < longitudeMinE6_Normalized
-                  ? longitudeE6_Normalized - longitudeMinE6_Normalized
-                  : longitudeE6_Normalized > longitudeMaxE6_Normalized
-                        ? longitudeE6_Normalized - longitudeMaxE6_Normalized
-                        : 0;
+                  latitudeE6_Normalized < latitudeMinE6_Normalized
 
-            final int latitudeWidth_Value = latitudeMaxE6_Normalized - latitudeMinE6_Normalized;
-            final int longitudeHeight_Value = longitudeMaxE6_Normalized - longitudeMinE6_Normalized;
+                        ? latitudeE6_Normalized - latitudeMinE6_Normalized
+                        : latitudeE6_Normalized > latitudeMaxE6_Normalized
 
-            final int latitudeDiffMeter = (int) MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMax, longitudeMin);
-            final int longitudeDiffMeter = (int) MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin, longitudeMax);
+                              ? latitudeE6_Normalized - latitudeMaxE6_Normalized
+                              : 0;
 
-            locationItem.latitudeDiff_Text = latitudeDiff == 0
+            final int longitudeDiff_Normalized =
+
+                  longitudeE6_Normalized < longitudeMinE6_Normalized
+
+                        ? longitudeE6_Normalized - longitudeMinE6_Normalized
+                        : longitudeE6_Normalized > longitudeMaxE6_Normalized
+
+                              ? longitudeE6_Normalized - longitudeMaxE6_Normalized
+                              : 0;
+
+            final int latitudeHeight_Normalized = latitudeMaxE6_Normalized - latitudeMinE6_Normalized;
+            final int longitudeWidth_Normalized = longitudeMaxE6_Normalized - longitudeMinE6_Normalized;
+
+            final double bboxHeight_Distance = MtMath.distanceVincenty(
+
+                  latitudeMin,
+                  longitudeMin,
+                  latitudeMax,
+                  longitudeMin
+
+            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+            final double bboxWidth_Distance = MtMath.distanceVincenty(
+
+                  latitudeMin,
+                  longitudeMin,
+                  latitudeMin,
+                  longitudeMax
+
+            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+            final double latitudeDiff_Distance = MtMath.distanceVincenty(
+
+                  latitude,
+                  longitude,
+
+                  latitude + (latitudeDiff_Normalized / 10e5),
+                  longitude
+
+            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+            final double longitudeDiff_Distance = MtMath.distanceVincenty(
+
+                  latitude,
+                  longitude,
+
+                  latitude,
+                  longitude + (longitudeDiff_Normalized / 10e5)
+
+            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+            // create formatted text
+            final String latDiffText = latitudeDiff_Normalized == 0
+
                   ? UI.EMPTY_STRING
-                  : Integer.toString(latitudeDiff);
+                  : latitudeDiff_Normalized < 0
 
-            locationItem.longitudeDiff_Text = longitudeDiff == 0
+                        ? UI.DASH + Integer.toString((int) (latitudeDiff_Distance + 0.5))
+                        : Integer.toString((int) (latitudeDiff_Distance + 0.5));
+
+            final String lonDiffText = longitudeDiff_Normalized == 0
+
                   ? UI.EMPTY_STRING
-                  : Integer.toString(longitudeDiff);
+                  : longitudeDiff_Normalized < 0
 
-            locationItem.latitudeDiff_Value = latitudeDiff;
-            locationItem.longitudeDiff_Value = longitudeDiff;
+                        ? UI.DASH + Integer.toString((int) (longitudeDiff_Distance + 0.5))
+                        : Integer.toString((int) (longitudeDiff_Distance + 0.5));
 
-            locationItem.latitudeHeight_Value = latitudeWidth_Value;
-            locationItem.longitudeWidth_Value = longitudeHeight_Value;
+            locationItem.latitudeDiff_Value = latitudeDiff_Normalized;
+            locationItem.longitudeDiff_Value = longitudeDiff_Normalized;
 
-            locationItem.latitudeHeight_Text = Integer.toString(latitudeDiffMeter);
-            locationItem.longitudeWidth_Text = Integer.toString(longitudeDiffMeter);
+            locationItem.latitudeDiff_Text = latDiffText;
+            locationItem.longitudeDiff_Text = lonDiffText;
+
+            locationItem.boundingBoxHeight_Value = latitudeHeight_Normalized;
+            locationItem.boundingBoxWidth_Value = longitudeWidth_Normalized;
+
+            locationItem.boundingBoxHeight_Text = Integer.toString((int) (bboxHeight_Distance + 0.5));
+            locationItem.boundingBoxWidth_Text = Integer.toString((int) (bboxWidth_Distance + 0.5));
 
             /*
              * Keep location

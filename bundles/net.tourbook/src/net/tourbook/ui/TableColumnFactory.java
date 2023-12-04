@@ -112,18 +112,18 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory LOCATION_DATA_ID;
    public static final String             LOCATION_DATA_ID_ID                                = "LOCATION_DATA_ID_ID";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_HEIGHT;
+   public static final String             LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID                = "LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID";             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_WIDTH;
+   public static final String             LOCATION_GEO_BOUNDING_BOX_WIDTH_ID                 = "LOCATION_GEO_BOUNDING_BOX_WIDTH_ID";              //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LATITUDE;
    public static final String             LOCATION_GEO_LATITUDE_ID                           = "LOCATION_GEO_LATITUDE_ID";                        //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LATITUDE_DIFF;
    public static final String             LOCATION_GEO_LATITUDE_DIFF_ID                      = "LOCATION_GEO_LATITUDE_DIFF_ID";                   //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_GEO_LATITUDE_HEIGHT;
-   public static final String             LOCATION_GEO_LATITUDE_HEIGHT_ID                    = "LOCATION_GEO_LATITUDE_HEIGHT_ID";                 //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LONGITUDE;
    public static final String             LOCATION_GEO_LONGITUDE_ID                          = "LOCATION_GEO_LONGITUDE_ID";                       //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LONGITUDE_DIFF;
    public static final String             LOCATION_GEO_LONGITUDE_DIFF_ID                     = "LOCATION_GEO_LONGITUDE_DIFF_ID";                  //$NON-NLS-1$
-   public static final TableColumnFactory LOCATION_GEO_LONGITUDE_WIDTH;
-   public static final String             LOCATION_GEO_LONGITUDE_WIDTH_ID                    = "LOCATION_GEO_LONGITUDE_WIDTH_ID";                 //$NON-NLS-1$
 
    public static final TableColumnFactory LOCATION_PART_DisplayName;
    public static final String             LOCATION_PART_DisplayName_ID                       = "LOCATION_PART_DisplayName_ID";                    //$NON-NLS-1$
@@ -1575,6 +1575,48 @@ public abstract class TableColumnFactory {
          }
       };
 
+      LOCATION_GEO_BOUNDING_BOX_WIDTH = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BOUNDING_BOX_WIDTH_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_BoundingBox_Width_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_BoundingBox_Width_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BoundingBox_Width_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BOUNDING_BOX_HEIGHT = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_BoundingBox_Height_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_BoundingBox_Height_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BoundingBox_Height_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
       LOCATION_GEO_LATITUDE = new TableColumnFactory() {
 
          @Override
@@ -1623,26 +1665,10 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
-            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_LatitudeDiff);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LatitudeDiff_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-
-            return colDef;
-         }
-      };
-
-      LOCATION_GEO_LATITUDE_HEIGHT = new TableColumnFactory() {
-
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LATITUDE_HEIGHT_ID, SWT.TRAIL);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
-
-            colDef.setColumnName(               "Height");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_LatitudeDiff_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_LatitudeDiff_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LatitudeDiff_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1660,26 +1686,10 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
 
-            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Longitude_Diff);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Longitude_Diff_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-
-            return colDef;
-         }
-      };
-
-      LOCATION_GEO_LONGITUDE_WIDTH = new TableColumnFactory() {
-
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LONGITUDE_WIDTH_ID, SWT.TRAIL);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
-
-            colDef.setColumnName(               "Width");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_LongitudeDiff_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_LongitudeDiff_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LongitudeDiff_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1697,8 +1707,8 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
-            colDef.setColumnName(               Messages.ColumnFactory_Location_Tour_AllLocations);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_AllLocations_Tooltip);
+            colDef.setColumnName(               Messages.ColumnFactory_Location_TourUsage);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_TourUsage_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1716,8 +1726,8 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
-            colDef.setColumnName(               Messages.ColumnFactory_Location_Tour_StartLocations);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_StartLocations_Tooltip);
+            colDef.setColumnName(               Messages.ColumnFactory_Location_TourUsage_StartLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_TourUsage_StartLocations_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1735,8 +1745,8 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
-            colDef.setColumnName(               Messages.ColumnFactory_Location_Tour_EndLocations);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_EndLocations_Tooltip);
+            colDef.setColumnName(               Messages.ColumnFactory_Location_TourUsage_EndLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_TourUsage_EndLocations_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -4497,9 +4507,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
 
-            colDef.setColumnHeaderText(         "Start ID");
-            colDef.setColumnHeaderToolTipText(  "Start location ID");
-            colDef.setColumnLabel(              "Start Location ID");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Tour_LocationID_Start);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Tour_LocationID_Start_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_LocationID_Start);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
@@ -4516,9 +4526,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
 
-            colDef.setColumnHeaderText(         "End ID");
-            colDef.setColumnHeaderToolTipText(  "End location ID");
-            colDef.setColumnLabel(              "End Location ID");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Tour_LocationID_End);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Tour_LocationID_End_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_LocationID_End);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
