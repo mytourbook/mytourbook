@@ -152,7 +152,7 @@ public enum TourEventId {
    STATISTIC_VALUES,
 
    /**
-    * {@link TourLocation}s are selected, event data contains a list with all {@link TourLocation}s
+    * Tour locations are selected, event data contains a list with all {@link TourLocation}
     */
    TOUR_LOCATION_SELECTION,
 

@@ -39,10 +39,13 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -78,6 +81,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
@@ -96,6 +100,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
 
    private IPartListener2          _partListener;
+   private ISelectionListener      _postSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourPropertyListener;
@@ -106,6 +111,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private SelectionAdapter        _columnSortListener;
 
    private List<LocationItem>      _allLocationItems               = new ArrayList<>();
+
+   /**
+    * Contains all {@link LocationItem}s which are displayed in the viewer, the key is
+    * {@link TourLocation#locationID}
+    */
    private Map<Long, LocationItem> _locationItemsMap               = new HashMap<>();
 
    private MenuManager             _viewerMenuManager;
@@ -666,6 +676,23 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
+   private void addSelectionListener() {
+
+      // this view part is a selection listener
+      _postSelectionListener = (workbenchPart, selection) -> {
+
+         // prevent to listen to a selection which is originated by this view
+         if (workbenchPart == TourLocationView.this) {
+            return;
+         }
+
+         onSelectionChanged(selection);
+      };
+
+      // register selection listener in the page
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
+
    private void addTourEventListener() {
 
       _tourPropertyListener = (part, eventId, eventData) -> {
@@ -683,6 +710,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             // new locations could be added
 
             reloadViewer();
+
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
          }
       };
 
@@ -717,6 +748,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       addPrefListener();
       addPartListener();
+      addSelectionListener();
       addTourEventListener();
 
       createActions();
@@ -1948,6 +1980,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    @Override
    public void dispose() {
 
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -1963,9 +1996,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final LocationItem selectedLocationItem = getSelectedLocationItem();
       final boolean isLocationSelected = selectedLocationItem != null;
 
-//      _action_OpenSensorChartView.setEnabled(isSensorSelected);
       _action_DeleteLocation.setEnabled(isLocationSelected);
-//      _action_EditSensor.setEnabled(isSensorSelected);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1974,8 +2005,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
        * Fill menu
        */
 
-//      menuMgr.add(_action_EditSensor);
-//      menuMgr.add(_action_OpenSensorChartView);
       menuMgr.add(_action_DeleteLocation);
 
       enableActions();
@@ -2520,7 +2549,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    }
 
    private void onAction_DeleteLocation() {
-      // TODO Auto-generated method stub
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
@@ -2617,6 +2645,30 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             TourEventId.TOUR_LOCATION_SELECTION,
             allTourLocations,
             this);
+   }
+
+   private void onSelectionChanged(final ISelection selection) {
+
+      // select tour locations for the selected tours
+      if (selection instanceof SelectionTourId) {
+
+         final long tourId = ((SelectionTourId) selection).getTourId();
+         final TourData tourData = TourManager.getTour(tourId);
+         final List<TourData> tourDataList = List.of(tourData);
+
+         selectTourLocations(tourDataList);
+
+      } else if (selection instanceof SelectionTourIds) {
+
+         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+
+         final List<Long> allTourIds = selectionTourIds.getTourIds();
+         final List<TourData> allTourData = new ArrayList<>();
+
+         TourManager.loadTourData(allTourIds, allTourData, false);
+
+         selectTourLocations(allTourData);
+      }
    }
 
    @Override
@@ -2733,6 +2785,28 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       // keep selected tours
       Util.setState(_state, STATE_SELECTED_SENSOR_INDICES, _locationViewer.getTable().getSelectionIndices());
+   }
+
+   private void selectTourLocations(final List<TourData> allTourData) {
+
+      final List<TourLocation> allTourLocations = TourLocationManager.getTourLocations(allTourData);
+      final List<LocationItem> allLocationItems = new ArrayList<>();
+
+      /*
+       * Get viewer items from the provided tour locations
+       */
+      for (final TourLocation tourLocation : allTourLocations) {
+
+         final LocationItem locationItem = _locationItemsMap.get(tourLocation.getLocationId());
+
+         if (locationItem != null) {
+            allLocationItems.add(locationItem);
+         }
+      }
+
+      final StructuredSelection selection = new StructuredSelection(allLocationItems.toArray());
+
+      updateUI_SelectLocation(selection);
    }
 
    @Override

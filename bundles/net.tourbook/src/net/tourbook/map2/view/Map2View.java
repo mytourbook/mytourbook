@@ -149,6 +149,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
@@ -2718,26 +2719,6 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private List<TourLocation> getTourLocations(final ArrayList<TourData> allTourData) {
-
-      final List<TourLocation> allTourLocations = new ArrayList<>();
-
-      for (final TourData tourData : allTourData) {
-
-         final TourLocation tourLocationStart = tourData.getTourLocationStart();
-         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-
-         if (tourLocationStart != null) {
-            allTourLocations.add(tourLocationStart);
-         }
-         if (tourLocationEnd != null) {
-            allTourLocations.add(tourLocationEnd);
-         }
-      }
-
-      return allTourLocations;
-   }
-
    private List<TourLocation> getTourLocations(final TourData tourData) {
 
       final List<TourLocation> allTourLocations = new ArrayList<>();
@@ -4836,7 +4817,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.addAll(allTourData);
 
-      _directMappingPainter.setTourLocations(getTourLocations(allTourData));
+      _directMappingPainter.setTourLocations(TourLocationManager.getTourLocations(allTourData));
 
       for (final TourData tourData : allTourData) {
          setVisibleDataPoints(tourData);

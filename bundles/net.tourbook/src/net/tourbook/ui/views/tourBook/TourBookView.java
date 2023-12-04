@@ -68,6 +68,7 @@ import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.printing.ActionPrint;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.INatTable_TourProvider;
@@ -1148,7 +1149,7 @@ public class TourBookView extends ViewPart implements
 
             final int[] lastRowPosition = { numRows - 1 };
 
-            selectTours_NatTable(lastRowPosition, true, true, true);
+            selectTours_NatTable(lastRowPosition, true, true, true, true);
          }
 
       } else {
@@ -1488,6 +1489,7 @@ public class TourBookView extends ViewPart implements
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
+   @SuppressWarnings("unchecked")
    private void addTourEventListener() {
 
       _tourPropertyListener = (part, tourEventId, eventData) -> {
@@ -1512,8 +1514,44 @@ public class TourBookView extends ViewPart implements
                || tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
             reloadViewer();
+
+         } else if (tourEventId == TourEventId.TOUR_LOCATION_SELECTION) {
+
+            if (eventData instanceof final List allTourLocations) {
+
+               if (allTourLocations.size() > 0) {
+
+                  // select tours from the tour locations
+
+                  final List<Long> allTourIds = TourLocationManager.getToursWithLocations(allTourLocations);
+
+                  _selectedTourIds.clear();
+                  _selectedTourIds.addAll(allTourIds);
+
+                  _postSelectionProvider.clearSelection();
+
+                  if (_isLayoutNatTable) {
+
+                     reselectTourViewer_NatTable(false,
+
+                           /*
+                            * Very important, otherwise the tourbook view is getting the focus
+                            * however the selection was fired from another view
+                            */
+                           false);
+
+                  } else {
+
+                     /**
+                      * !!! This do not yet support the tree viewer, it's too complex !!!
+                      */
+//                   reselectTourViewer_Tree();
+                  }
+               }
+            }
          }
       };
+
       TourManager.getInstance().addTourEventListener(_tourPropertyListener);
    }
 
@@ -2273,7 +2311,6 @@ public class TourBookView extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-
       _actionCollapseAll.setEnabled(isTreeLayout);
       _actionCollapseOthers.setEnabled(isTreeLayout && (numSelectedItems == 1 && firstElementHasChildren));
 
@@ -2844,7 +2881,7 @@ public class TourBookView extends ViewPart implements
 
          // mouse is not hovering a tour selection -> select tour
 
-         selectTours_NatTable(new int[] { hoveredRow }, true, false, false);
+         selectTours_NatTable(new int[] { hoveredRow }, true, false, false, true);
 
          // show context menu again
          _pageBook.getDisplay().timerExec(10, () -> UI.openContextMenu(_tourViewer_NatTable));
@@ -3466,7 +3503,7 @@ public class TourBookView extends ViewPart implements
             _selectedTourIds.clear();
             _selectedTourIds.add(tourId);
 
-            reselectTourViewer(false);
+            reselectTourViewer(false, true);
 
          } else {
 
@@ -3480,7 +3517,7 @@ public class TourBookView extends ViewPart implements
          _selectedTourIds.clear();
          _selectedTourIds.addAll(selectionTourIds.getTourIds());
 
-         reselectTourViewer(false);
+         reselectTourViewer(false, true);
 
       } else if (selection instanceof StructuredSelection) {
 
@@ -3541,7 +3578,7 @@ public class TourBookView extends ViewPart implements
       }
       _viewerContainer_NatTable.setRedraw(true);
 
-      selectTours_NatTable(allRowPositions, true, true, false);
+      selectTours_NatTable(allRowPositions, true, true, false, true);
 
       return null;
    }
@@ -3662,21 +3699,22 @@ public class TourBookView extends ViewPart implements
     */
    private void reselectTourViewer() {
 
-      reselectTourViewer(true);
+      reselectTourViewer(true, true);
    }
 
    /**
     * Reselect tours from {@link #_selectedTourIds}
     *
     * @param isFireSelection
+    * @param isSetFocus
     */
-   private void reselectTourViewer(final boolean isFireSelection) {
+   private void reselectTourViewer(final boolean isFireSelection, final boolean isSetFocus) {
 
       _postSelectionProvider.clearSelection();
 
       if (_isLayoutNatTable) {
 
-         reselectTourViewer_NatTable(isFireSelection);
+         reselectTourViewer_NatTable(isFireSelection, isSetFocus);
 
       } else {
 
@@ -3688,8 +3726,9 @@ public class TourBookView extends ViewPart implements
     * Reselect tours from {@link #_selectedTourIds}
     *
     * @param isFireSelection
+    * @param isSetFocus
     */
-   private void reselectTourViewer_NatTable(final boolean isFireSelection) {
+   private void reselectTourViewer_NatTable(final boolean isFireSelection, final boolean isSetFocus) {
 
       final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
 
@@ -3707,8 +3746,8 @@ public class TourBookView extends ViewPart implements
 
                   true, // isClearSelection
                   true, // isScrollIntoView
-                  isFireSelection // isFireSelection
-            );
+                  isFireSelection,
+                  isSetFocus);
          });
       }
    }
@@ -4099,12 +4138,15 @@ public class TourBookView extends ViewPart implements
     *           When <code>true</code> then only the provided rows will be selected, otherwise the
     *           provided tours will be added to the existing selection.
     * @param isScrollIntoView
-    * @param isSetIsInReload
+    * @param isFireSelection
+    * @param isSetFocus
+    *           When <code>true</code> then the focus is set to the NatTable
     */
    void selectTours_NatTable(final int[] allRowPositions,
                              final boolean isClearSelection,
                              final boolean isScrollIntoView,
-                             final boolean isFireSelection) {
+                             final boolean isFireSelection,
+                             final boolean isSetFocus) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
@@ -4123,7 +4165,9 @@ public class TourBookView extends ViewPart implements
           */
          _postSelectionProvider.clearSelection();
 
-         _tourViewer_NatTable.setFocus();
+         if (isSetFocus) {
+            _tourViewer_NatTable.setFocus();
+         }
 
          // sort rows ascending
          Arrays.sort(allRowPositions);

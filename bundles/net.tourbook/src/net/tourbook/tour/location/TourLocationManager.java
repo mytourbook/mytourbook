@@ -756,7 +756,7 @@ public class TourLocationManager {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         UI.showSQLException(e);
 
       } finally {
 
@@ -1110,11 +1110,39 @@ public class TourLocationManager {
    }
 
    /**
+    * Collects all {@link TourLocation} from the provided {@link TourData}
+    *
+    * @param allTourData
+    *
+    * @return Returns all {@link TourLocation}s
+    */
+   public static List<TourLocation> getTourLocations(final List<TourData> allTourData) {
+
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      for (final TourData tourData : allTourData) {
+
+         final TourLocation tourLocationStart = tourData.getTourLocationStart();
+         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+         if (tourLocationStart != null) {
+            allTourLocations.add(tourLocationStart);
+         }
+
+         if (tourLocationEnd != null) {
+            allTourLocations.add(tourLocationEnd);
+         }
+      }
+
+      return allTourLocations;
+   }
+
+   /**
     * @param allLocations
     *
-    * @return Returns a list with all tour id's which are containing the tour location.
+    * @return Returns a list with all tour id's which are containing the tour locations.
     */
-   private static ArrayList<Long> getToursWithLocations(final List<TourLocation> allLocations) {
+   public static ArrayList<Long> getToursWithLocations(final List<TourLocation> allLocations) {
 
       final ArrayList<Long> allTourIds = new ArrayList<>();
 
@@ -1146,7 +1174,7 @@ public class TourLocationManager {
             + " FROM TourData" + NL //                                     //$NON-NLS-1$
 
             + " WHERE tourLocationStart_LocationID IN (" + sqlParameter + ")" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
-            + "    OR tourLocationEnd_LocationID IN   (" + sqlParameter + ")" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+            + "    OR tourLocationEnd_LocationID   IN (" + sqlParameter + ")" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
 
             + " ORDER BY tourId" //                                        //$NON-NLS-1$
       ;
@@ -1158,16 +1186,19 @@ public class TourLocationManager {
          statement = conn.prepareStatement(sql);
 
          // fillup parameters for 2 fields
-         final int numParameters = allSqlParameter.size();
          int sqlIndex = 1;
+         final int numParameters = allSqlParameter.size();
+
          for (int parameterIndex = 0; parameterIndex < numParameters; parameterIndex++) {
             statement.setLong(sqlIndex++, allSqlParameter.get(parameterIndex));
          }
+
          for (int parameterIndex = 0; parameterIndex < numParameters; parameterIndex++) {
             statement.setLong(sqlIndex++, allSqlParameter.get(parameterIndex));
          }
 
          final ResultSet result = statement.executeQuery();
+
          while (result.next()) {
             allTourIds.add(result.getLong(1));
          }
@@ -1175,7 +1206,7 @@ public class TourLocationManager {
       } catch (final SQLException e) {
 
          StatusUtil.logError(sql);
-         net.tourbook.ui.UI.showSQLException(e);
+         UI.showSQLException(e);
 
       } finally {
          Util.closeSql(statement);
