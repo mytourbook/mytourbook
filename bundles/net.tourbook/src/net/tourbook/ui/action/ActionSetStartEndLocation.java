@@ -50,19 +50,19 @@ import org.eclipse.swt.widgets.Menu;
  *   -- Profile 1
  *   -- Profile 2
  *   -- Profile 3
- *   
+ *
  *   ----------------------
- *   
+ *
  *   -- Set only Start Location
  *     -- Profile 1
  *     -- Profile 2
  *     -- Profile 3
- *      
+ *
  *   -- Set only End Location
  *     -- Profile 1
  *     -- Profile 2
  *     -- Profile 3
- *     
+ *
  *   ----------------------
  *   -- Open Profile Editor
  *
@@ -220,7 +220,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
                latitudeSerie[0],
-               longitudeSerie[0]);
+               longitudeSerie[0],
+               null);
 
          if (retrievedLocationData == null) {
             return;

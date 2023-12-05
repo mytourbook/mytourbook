@@ -11519,6 +11519,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       battery_Time               = serieData.battery_Time;
 
 // SET_FORMATTING_ON
+
+      /*
+       * Set transient values for the tour locations
+       */
+      if (tourLocationStart != null) {
+         tourLocationStart.setTransientValues();
+      }
+
+      if (tourLocationEnd != null) {
+         tourLocationEnd.setTransientValues();
+      }
    }
 
    /**

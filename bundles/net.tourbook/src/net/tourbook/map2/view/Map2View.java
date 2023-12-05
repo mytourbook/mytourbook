@@ -4855,7 +4855,8 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      _directMappingPainter.setTourLocations(getTourLocations(tourData));
+      final List<TourLocation> allTourLocations = getTourLocations(tourData);
+      _directMappingPainter.setTourLocations(allTourLocations);
 
       setVisibleDataPoints(tourData);
 

@@ -2292,8 +2292,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             tourLocation.postcode            = result.getString(57);
 
-            tourLocation.convertStringValues();
-
             final int latitudeE6_Normalized              = result.getInt(58);
             final int longitudeE6_Normalized             = result.getInt(59);
 
@@ -2310,33 +2308,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final long locationID                        = result.getLong(68);
 
             /*
-             * Setup geo positions
+             * Set geo positions
              */
-            final double latitude               = (latitudeE6_Normalized  -  90_000_000) / 1E6;
-            final double longitude              = (longitudeE6_Normalized - 180_000_000) / 1E6;
-
-            final double latitudeMin            = (latitudeMinE6_Normalized  -  90_000_000) / 1E6;
-            final double latitudeMax            = (latitudeMaxE6_Normalized  -  90_000_000) / 1E6;
-            final double longitudeMin           = (longitudeMinE6_Normalized - 180_000_000) / 1E6;
-            final double longitudeMax           = (longitudeMaxE6_Normalized - 180_000_000) / 1E6;
-
-            final double latitudeMinExpanded    = (latitudeMinExpandedE6_Normalized  -  90_000_000) / 1E6;
-            final double latitudeMaxExpanded    = (latitudeMaxExpandedE6_Normalized  -  90_000_000) / 1E6;
-            final double longitudeMinExpanded   = (longitudeMinExpandedE6_Normalized - 180_000_000) / 1E6;
-            final double longitudeMaxExpanded   = (longitudeMaxExpandedE6_Normalized - 180_000_000) / 1E6;
-
-            tourLocation.latitude               = latitude;
-            tourLocation.longitude              = longitude;
-            tourLocation.latitudeMin            = latitudeMin;
-            tourLocation.latitudeMax            = latitudeMax;
-            tourLocation.longitudeMin           = longitudeMin;
-            tourLocation.longitudeMax           = longitudeMax;
-
-            tourLocation.latitudeMinExpanded    = latitudeMinExpanded;
-            tourLocation.latitudeMaxExpanded    = latitudeMaxExpanded;
-            tourLocation.longitudeMinExpanded   = longitudeMinExpanded;
-            tourLocation.longitudeMaxExpanded   = longitudeMaxExpanded;
-
             tourLocation.latitudeE6_Normalized              = latitudeE6_Normalized;
             tourLocation.longitudeE6_Normalized             = longitudeE6_Normalized;
 
@@ -2355,13 +2328,23 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                                         + longitudeMinE6_Normalized
                                         + longitudeMaxE6_Normalized;
 
-            locationItem.latitude     = _nf6.format(latitude);
-            locationItem.longitude    = _nf6.format(longitude);
+            tourLocation.setTransientValues();
 
-            locationItem.latitudeMin  = _nf6.format(latitudeMin);
-            locationItem.latitudeMax  = _nf6.format(latitudeMax);
-            locationItem.longitudeMin = _nf6.format(longitudeMin);
-            locationItem.longitudeMax = _nf6.format(longitudeMax);
+            final double latitude        = tourLocation.latitude;
+            final double longitude       = tourLocation.longitude;
+
+            final double latitudeMin     = tourLocation.latitudeMin;
+            final double latitudeMax     = tourLocation.latitudeMax;
+            final double longitudeMin    = tourLocation.longitudeMin;
+            final double longitudeMax    = tourLocation.longitudeMax;
+
+            locationItem.latitude        = _nf6.format(latitude);
+            locationItem.longitude       = _nf6.format(longitude);
+
+            locationItem.latitudeMin     = _nf6.format(latitudeMin);
+            locationItem.latitudeMax     = _nf6.format(latitudeMax);
+            locationItem.longitudeMin    = _nf6.format(longitudeMin);
+            locationItem.longitudeMax    = _nf6.format(longitudeMax);
 
 //SET_FORMATTING_ON
 

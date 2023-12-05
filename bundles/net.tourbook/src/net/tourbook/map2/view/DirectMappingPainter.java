@@ -479,8 +479,6 @@ public class DirectMappingPainter implements IDirectPainter {
 
       for (final TourLocation tourLocation : _allTourLocations) {
 
-         tourLocation.setupTransientValues();
-
          final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
 
          final double latitudeMin = tourLocation.latitudeMin;

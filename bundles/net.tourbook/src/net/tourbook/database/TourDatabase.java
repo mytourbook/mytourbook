@@ -2286,60 +2286,6 @@ public class TourDatabase {
       return dbTourLocation;
    }
 
-   public static TourLocation getTourLocation(final TourLocation tourLocation) {
-      // TODO Auto-generated method stub
-
-      TourLocation dbTourLocation = null;
-
-      synchronized (DB_LOCK) {
-
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         {
-            final String sql = UI.EMPTY_STRING
-
-                  + "SELECT TourLocation" + NL //                          //$NON-NLS-1$
-
-                  + " FROM TourLocation AS tourLocation" + NL //           //$NON-NLS-1$
-
-                  + " WHERE " + NL //                                      //$NON-NLS-1$
-
-                  + "   tourLocation.boundingBoxKey = ?" + NL //       1  //$NON-NLS-1$
-            ;
-
-            final Query emQuery = em.createQuery(sql);
-
-            emQuery.setParameter(1, tourLocation.boundingBoxKey);
-
-            try {
-
-               @SuppressWarnings("unchecked")
-               final List<TourLocation> allDbTourLocations = emQuery.getResultList();
-
-               final int numLocations = allDbTourLocations.size();
-
-               if (numLocations == 0) {
-
-                  // a new location will be created
-
-               } else {
-
-                  // reuse loaded tour location by expanding it's bounding box
-
-                  dbTourLocation = allDbTourLocations.get(0);
-
-               }
-
-            } catch (final Exception e) {
-
-               StatusUtil.log(e);
-            }
-         }
-         em.close();
-      }
-
-      return dbTourLocation;
-   }
-
    /**
     * Get {@link TourType} from all available tour type by it's id.
     *

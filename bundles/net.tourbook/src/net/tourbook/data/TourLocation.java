@@ -307,31 +307,6 @@ public class TourLocation implements Serializable {
       longitudeE6_Normalized = longitudeE6 + 180_000_000;
    }
 
-   /**
-    * Convert string values, e.g. postcode or house number into number values
-    */
-   public void convertStringValues() {
-
-      try {
-
-         houseNumberValue = Integer.parseInt(house_number);
-
-      } catch (final Exception e) {
-
-         // ignore
-      }
-
-      try {
-
-         postcodeValue = Integer.parseInt(postcode);
-
-      } catch (final Exception e) {
-
-         // ignore
-      }
-
-   }
-
    @Override
    public boolean equals(final Object obj) {
 
@@ -413,9 +388,9 @@ public class TourLocation implements Serializable {
       this.locationID = locationID;
    }
 
-   public void setupTransientValues() {
+   public void setTransientValues() {
 
-      if (latitude != 0 || longitude != 0) {
+      if (latitudeMin != 0 || longitudeMin != 0) {
          return;
       }
 
@@ -436,6 +411,7 @@ public class TourLocation implements Serializable {
 
       latitude               = dbLatitude;
       longitude              = dbLongitude;
+
       latitudeMin            = dbLatitudeMin;
       latitudeMax            = dbLatitudeMax;
       longitudeMin           = dbLongitudeMin;
@@ -447,6 +423,27 @@ public class TourLocation implements Serializable {
       longitudeMaxExpanded   = dbLongitudeMaxExpanded;
 
 // SET_FORMATTING_ON
+
+      /*
+       * Convert string values, e.g. postcode or house number into number values
+       */
+      try {
+
+         houseNumberValue = Integer.parseInt(house_number);
+
+      } catch (final Exception e) {
+
+         // ignore
+      }
+
+      try {
+
+         postcodeValue = Integer.parseInt(postcode);
+
+      } catch (final Exception e) {
+
+         // ignore
+      }
    }
 
    @Override
@@ -538,7 +535,6 @@ public class TourLocation implements Serializable {
 
             + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
             + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
-
       ;
    }
 }
