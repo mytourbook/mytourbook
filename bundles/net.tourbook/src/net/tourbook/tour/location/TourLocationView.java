@@ -31,6 +31,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -2050,12 +2051,21 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final List<TourLocation> allLocations = getSelectedLocations();
 
       final boolean isLocationSelected = allLocations.size() > 0;
-      final boolean isOneLocationSelected = allLocations.size() == 1;
+      final boolean isOneLocation = allLocations.size() == 1;
 
       _action_DeleteLocation.setEnabled(isLocationSelected);
 
-      _action_ResetBoundingBox.setEnabled(isOneLocationSelected);
-      _action_BoundingBox_Increase_1.setEnabled(isOneLocationSelected);
+      _action_ResetBoundingBox.setEnabled(isLocationSelected);
+
+      _action_BoundingBox_Increase_1.setEnabled(isOneLocation);
+      _action_BoundingBox_Increase_5.setEnabled(isOneLocation);
+      _action_BoundingBox_Increase_10.setEnabled(isOneLocation);
+      _action_BoundingBox_Increase_100.setEnabled(isOneLocation);
+
+      _action_BoundingBox_Decrease_1.setEnabled(isOneLocation);
+      _action_BoundingBox_Decrease_5.setEnabled(isOneLocation);
+      _action_BoundingBox_Decrease_10.setEnabled(isOneLocation);
+      _action_BoundingBox_Decrease_100.setEnabled(isOneLocation);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -2264,10 +2274,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                + "longitudeMinE6_Normalized," + NL //             62 //$NON-NLS-1$
                + "longitudeMaxE6_Normalized," + NL //             63 //$NON-NLS-1$
 
-               + "latitudeMinExpandedE6_Normalized," + NL //      64 //$NON-NLS-1$
-               + "latitudeMaxExpandedE6_Normalized," + NL //      65 //$NON-NLS-1$
-               + "longitudeMinExpandedE6_Normalized," + NL //     66 //$NON-NLS-1$
-               + "longitudeMaxExpandedE6_Normalized," + NL //     67 //$NON-NLS-1$
+               + "latitudeMinE6_Resized_Normalized," + NL //      64 //$NON-NLS-1$
+               + "latitudeMaxE6_Resized_Normalized," + NL //      65 //$NON-NLS-1$
+               + "longitudeMinE6_Resized_Normalized," + NL //     66 //$NON-NLS-1$
+               + "longitudeMaxE6_Resized_Normalized," + NL //     67 //$NON-NLS-1$
 
                + "locationID" + NL //                             68 //$NON-NLS-1$
 
@@ -2364,10 +2374,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final int longitudeMinE6_Normalized          = result.getInt(62);
             final int longitudeMaxE6_Normalized          = result.getInt(63);
 
-            final int latitudeMinExpandedE6_Normalized   = result.getInt(64);
-            final int latitudeMaxExpandedE6_Normalized   = result.getInt(65);
-            final int longitudeMinExpandedE6_Normalized  = result.getInt(66);
-            final int longitudeMaxExpandedE6_Normalized  = result.getInt(67);
+            final int latitudeMinE6_Resized_Normalized   = result.getInt(64);
+            final int latitudeMaxE6_Resized_Normalized   = result.getInt(65);
+            final int longitudeMinE6_Resized_Normalized  = result.getInt(66);
+            final int longitudeMaxE6_Resized_Normalized  = result.getInt(67);
 
             final long locationID                        = result.getLong(68);
 
@@ -2382,10 +2392,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             tourLocation.longitudeMinE6_Normalized          = longitudeMinE6_Normalized;
             tourLocation.longitudeMaxE6_Normalized          = longitudeMaxE6_Normalized;
 
-            tourLocation.latitudeMinExpandedE6_Normalized   = latitudeMinExpandedE6_Normalized;
-            tourLocation.latitudeMaxExpandedE6_Normalized   = latitudeMaxExpandedE6_Normalized;
-            tourLocation.longitudeMinExpandedE6_Normalized  = longitudeMinExpandedE6_Normalized;
-            tourLocation.longitudeMaxExpandedE6_Normalized  = longitudeMaxExpandedE6_Normalized;
+            tourLocation.latitudeMinE6_Resized_Normalized   = latitudeMinE6_Resized_Normalized;
+            tourLocation.latitudeMaxE6_Resized_Normalized   = latitudeMaxE6_Resized_Normalized;
+            tourLocation.longitudeMinE6_Resized_Normalized  = longitudeMinE6_Resized_Normalized;
+            tourLocation.longitudeMaxE6_Resized_Normalized  = longitudeMaxE6_Resized_Normalized;
 
             tourLocation.boundingBoxKey = latitudeMinE6_Normalized
                                         + latitudeMaxE6_Normalized
@@ -2642,8 +2652,112 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    }
 
    private void onAction_ResizeBoundingBox(final int resizeValue) {
-      // TODO Auto-generated method stub
 
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final List<TourLocation> allSelectedLocations = getSelectedLocations();
+
+      if (resizeValue == 0) {
+
+         /*
+          * Reset bounding box
+          */
+
+         for (final TourLocation tourLocation : allSelectedLocations) {
+
+            setResizedBoundingBox(tourLocation.getLocationId(),
+
+                  tourLocation.latitudeMinE6_Normalized,
+                  tourLocation.latitudeMaxE6_Normalized,
+
+                  tourLocation.longitudeMinE6_Normalized,
+                  tourLocation.longitudeMaxE6_Normalized);
+         }
+
+      } else {
+
+         /*
+          * Set resized bouncing box is supported only for ONE location
+          */
+
+         final TourLocation tourLocation = allSelectedLocations.get(0);
+
+         // resize already resized box
+         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+
+         final double resizeValueMeter = resizeValue / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+         final GeoPosition destinationPointVertical = MtMath.destinationPoint(
+
+               latitudeMin_Resized,
+               longitudeMin_Resized,
+               resizeValueMeter,
+               0);
+
+         final GeoPosition destinationPointHorizontal = MtMath.destinationPoint(
+               latitudeMin_Resized,
+               longitudeMin_Resized,
+               resizeValueMeter,
+               90);
+
+         final double signum = Math.signum(resizeValueMeter);
+
+         final double latDiff = Math.abs(latitudeMin_Resized - destinationPointVertical.latitude);
+         final double lonDiff = Math.abs(longitudeMin_Resized - destinationPointHorizontal.longitude);
+
+         final double latitudeMin_WithDiff = latitudeMin_Resized - signum * latDiff;
+         final double latitudeMax_WithDiff = latitudeMax_Resized + signum * latDiff;
+
+         final double longitudeMin_WithDiff = longitudeMin_Resized - signum * lonDiff;
+         final double longitudeMax_WithDiff = longitudeMax_Resized + signum * lonDiff;
+
+         final int latitudeMin_WithDiffE6 = (int) (latitudeMin_WithDiff * 1E6);
+         final int latitudeMax_WithDiffE6 = (int) (latitudeMax_WithDiff * 1E6);
+         final int longitudeMin_WithDiffE6 = (int) (longitudeMin_WithDiff * 1E6);
+         final int longitudeMax_WithDiffE6 = (int) (longitudeMax_WithDiff * 1E6);
+
+         int latitudeMin_WithDiffE6_Normalized = latitudeMin_WithDiffE6 + 90_000_000;
+         int latitudeMax_WithDiffE6_Normalized = latitudeMax_WithDiffE6 + 90_000_000;
+         int longitudeMin_WithDiffE6_Normalized = longitudeMin_WithDiffE6 + 180_000_000;
+         int longitudeMax_WithDiffE6_Normalized = longitudeMax_WithDiffE6 + 180_000_000;
+
+         // ensure that min < max
+         if (latitudeMin_WithDiffE6_Normalized > latitudeMax_WithDiffE6_Normalized) {
+
+            final int swapValue = latitudeMin_WithDiffE6_Normalized;
+
+            latitudeMin_WithDiffE6_Normalized = latitudeMax_WithDiffE6_Normalized;
+            latitudeMax_WithDiffE6_Normalized = swapValue;
+         }
+
+         if (longitudeMin_WithDiffE6_Normalized > longitudeMax_WithDiffE6_Normalized) {
+
+            final int swapValue = longitudeMin_WithDiffE6_Normalized;
+
+            longitudeMin_WithDiffE6_Normalized = longitudeMax_WithDiffE6_Normalized;
+            longitudeMax_WithDiffE6_Normalized = swapValue;
+         }
+
+         final long locationId = tourLocation.getLocationId();
+
+         setResizedBoundingBox(locationId,
+               latitudeMin_WithDiffE6_Normalized,
+               latitudeMax_WithDiffE6_Normalized,
+               longitudeMin_WithDiffE6_Normalized,
+               longitudeMax_WithDiffE6_Normalized);
+      }
+
+      // cached tours are not valid any more
+      TourManager.getInstance().clearTourDataCache();
+
+      // fire modify event
+      TourManager.fireEvent(TourEventId.UPDATE_UI);
    }
 
    private void onColumn_Select(final SelectionEvent e) {
@@ -2856,6 +2970,47 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    @Override
    public void setFocus() {
       _locationViewer.getTable().setFocus();
+   }
+
+   private void setResizedBoundingBox(final long locationId,
+
+                                      final int latitudeMinE6_Normalized,
+                                      final int latitudeMaxE6_Normalized,
+
+                                      final int longitudeMinE6_Normalized,
+                                      final int longitudeMaxE6_Normalized) {
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sql = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_LOCATION + NL //      //$NON-NLS-1$
+
+               + "SET" + NL //                                             //$NON-NLS-1$
+
+               + " latitudeMinE6_Resized_Normalized  = ?," + NL //      1  //$NON-NLS-1$
+               + " latitudeMaxE6_Resized_Normalized  = ?," + NL //      2  //$NON-NLS-1$
+
+               + " longitudeMinE6_Resized_Normalized = ?," + NL //      3  //$NON-NLS-1$
+               + " longitudeMaxE6_Resized_Normalized = ? " + NL //      4  //$NON-NLS-1$
+
+               + " WHERE locationID = ?"; //                            5  //$NON-NLS-1$
+
+         final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
+
+         sqlUpdate.setInt(1, latitudeMinE6_Normalized);
+         sqlUpdate.setInt(2, latitudeMaxE6_Normalized);
+         sqlUpdate.setInt(3, longitudeMinE6_Normalized);
+         sqlUpdate.setInt(4, longitudeMaxE6_Normalized);
+
+         sqlUpdate.setLong(5, locationId);
+
+         sqlUpdate.executeUpdate();
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+      }
    }
 
    @Override

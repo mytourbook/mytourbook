@@ -25,7 +25,6 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 
 /**
@@ -148,35 +147,35 @@ public class TourLocation implements Serializable {
    public int  longitudeMaxE6_Normalized;
 
    /**
-    * Contains the expanded normalized longitude max value
-    * <p>
-    * normalized = longitude + 180
-    */
-   public int  longitudeMaxExpandedE6_Normalized;
-
-   /**
-    * Contains the expanded normalized latitude min value
+    * Contains the resized normalized latitude min value
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int  latitudeMinExpandedE6_Normalized;
+   public int  latitudeMinE6_Resized_Normalized;
 
    /**
-    * Contains the expanded normalized latitude max value
+    * Contains the resized normalized latitude max value
     * <p>
     * normalized = latitude + 90
     */
-   public int  latitudeMaxExpandedE6_Normalized;
+   public int  latitudeMaxE6_Resized_Normalized;
 
    /**
-    * Contains the expanded normalized longitude min value
+    * Contains the resized normalized longitude min value
     * <p>
     * normalized = longitude + 180
     */
-   public int  longitudeMinExpandedE6_Normalized;
+   public int  longitudeMinE6_Resized_Normalized;
 
    /**
-    * Key for the <b>NOT</b> expanded bounding box
+    * Contains the resized normalized longitude max value
+    * <p>
+    * normalized = longitude + 180
+    */
+   public int  longitudeMaxE6_Resized_Normalized;
+
+   /**
+    * Key for the <b>NOT</b> resized bounding box, is e.g. used to identify the location color
     */
    public long boundingBoxKey;
 
@@ -282,13 +281,13 @@ public class TourLocation implements Serializable {
    public double longitudeMax;
 
    @Transient
-   public double latitudeMinExpanded;
+   public double latitudeMin_Resized;
    @Transient
-   public double latitudeMaxExpanded;
+   public double latitudeMax_Resized;
    @Transient
-   public double longitudeMinExpanded;
+   public double longitudeMin_Resized;
    @Transient
-   public double longitudeMaxExpanded;
+   public double longitudeMax_Resized;
 
    /**
     * Default constructor used also in ejb
@@ -300,8 +299,8 @@ public class TourLocation implements Serializable {
       this.latitude = latitude;
       this.longitude = longitude;
 
-      latitudeE6 = Util.convertDouble_ToE6(latitude);
-      longitudeE6 = Util.convertDouble_ToE6(longitude);
+      latitudeE6 = (int) (latitude * 1E6);
+      longitudeE6 = (int) (longitude * 1E6);
 
       latitudeE6_Normalized = latitudeE6 + 90_000_000;
       longitudeE6_Normalized = longitudeE6 + 180_000_000;
@@ -404,10 +403,10 @@ public class TourLocation implements Serializable {
       final double dbLongitudeMin           = (longitudeMinE6_Normalized - 180_000_000) / 1E6;
       final double dbLongitudeMax           = (longitudeMaxE6_Normalized - 180_000_000) / 1E6;
 
-      final double dbLatitudeMinExpanded    = (latitudeMinExpandedE6_Normalized  -  90_000_000) / 1E6;
-      final double dbLatitudeMaxExpanded    = (latitudeMaxExpandedE6_Normalized  -  90_000_000) / 1E6;
-      final double dbLongitudeMinExpanded   = (longitudeMinExpandedE6_Normalized - 180_000_000) / 1E6;
-      final double dbLongitudeMaxExpanded   = (longitudeMaxExpandedE6_Normalized - 180_000_000) / 1E6;
+      final double dbLatitudeMin_Resized    = (latitudeMinE6_Resized_Normalized  -  90_000_000) / 1E6;
+      final double dbLatitudeMax_Resized    = (latitudeMaxE6_Resized_Normalized  -  90_000_000) / 1E6;
+      final double dbLongitudeMin_Resized   = (longitudeMinE6_Resized_Normalized - 180_000_000) / 1E6;
+      final double dbLongitudeMax_Resized   = (longitudeMaxE6_Resized_Normalized - 180_000_000) / 1E6;
 
       latitude               = dbLatitude;
       longitude              = dbLongitude;
@@ -417,10 +416,10 @@ public class TourLocation implements Serializable {
       longitudeMin           = dbLongitudeMin;
       longitudeMax           = dbLongitudeMax;
 
-      latitudeMinExpanded    = dbLatitudeMinExpanded;
-      latitudeMaxExpanded    = dbLatitudeMaxExpanded;
-      longitudeMinExpanded   = dbLongitudeMinExpanded;
-      longitudeMaxExpanded   = dbLongitudeMaxExpanded;
+      latitudeMin_Resized    = dbLatitudeMin_Resized;
+      latitudeMax_Resized    = dbLatitudeMax_Resized;
+      longitudeMin_Resized   = dbLongitudeMin_Resized;
+      longitudeMax_Resized   = dbLongitudeMax_Resized;
 
 // SET_FORMATTING_ON
 
@@ -518,6 +517,7 @@ public class TourLocation implements Serializable {
 
             + log(" latitude                          = ", latitude) //                            //$NON-NLS-1$
             + log(" longitude                         = ", longitude) //                           //$NON-NLS-1$
+
             + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
             + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
 
@@ -526,10 +526,10 @@ public class TourLocation implements Serializable {
             + log(" longitudeMinE6_Normalized         = ", longitudeMinE6_Normalized) //           //$NON-NLS-1$
             + log(" longitudeMaxE6_Normalized         = ", longitudeMaxE6_Normalized) //           //$NON-NLS-1$
 
-            + log(" latitudeMinExpandedE6_Normalized  = ", latitudeMinExpandedE6_Normalized) //    //$NON-NLS-1$
-            + log(" latitudeMaxExpandedE6_Normalized  = ", latitudeMaxExpandedE6_Normalized) //    //$NON-NLS-1$
-            + log(" longitudeMinExpandedE6_Normalized = ", longitudeMinExpandedE6_Normalized) //   //$NON-NLS-1$
-            + log(" longitudeMaxExpandedE6_Normalized = ", longitudeMaxExpandedE6_Normalized) //   //$NON-NLS-1$
+            + log(" latitudeMinE6_Resized_Normalized  = ", latitudeMinE6_Resized_Normalized) //    //$NON-NLS-1$
+            + log(" latitudeMaxE6_Resized_Normalized  = ", latitudeMaxE6_Resized_Normalized) //    //$NON-NLS-1$
+            + log(" longitudeMinE6_Resized_Normalized = ", longitudeMinE6_Resized_Normalized) //   //$NON-NLS-1$
+            + log(" longitudeMaxE6_Resized_Normalized = ", longitudeMaxE6_Resized_Normalized) //   //$NON-NLS-1$
 
             + log(" boundingBoxKey                    = ", boundingBoxKey) //                      //$NON-NLS-1$
 

@@ -2214,11 +2214,11 @@ public class TourDatabase {
 
                   + " WHERE " + NL //                                                           //$NON-NLS-1$
 
-                  + "   tourLocation.latitudeMinExpandedE6_Normalized  <= ? AND " + NL //   1  //$NON-NLS-1$
-                  + "   tourLocation.latitudeMaxExpandedE6_Normalized  >= ? AND " + NL //   2  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMinE6_Resized_Normalized  <= ? AND " + NL //   1  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMaxE6_Resized_Normalized  >= ? AND " + NL //   2  //$NON-NLS-1$
 
-                  + "   tourLocation.longitudeMinExpandedE6_Normalized <= ? AND " + NL //   3  //$NON-NLS-1$
-                  + "   tourLocation.longitudeMaxExpandedE6_Normalized >= ?" + NL //        4  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMinE6_Resized_Normalized <= ? AND " + NL //   3  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMaxE6_Resized_Normalized >= ?" + NL //        4  //$NON-NLS-1$
             ;
 
             final Query emQuery = em.createQuery(sql);
@@ -4597,10 +4597,10 @@ public class TourDatabase {
             + "   longitudeMinE6_Normalized           INTEGER,                               " + NL //$NON-NLS-1$
             + "   longitudeMaxE6_Normalized           INTEGER,                               " + NL //$NON-NLS-1$
 
-            + "   latitudeMinExpandedE6_Normalized    INTEGER,                               " + NL //$NON-NLS-1$
-            + "   latitudeMaxExpandedE6_Normalized    INTEGER,                               " + NL //$NON-NLS-1$
-            + "   longitudeMinExpandedE6_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
-            + "   longitudeMaxExpandedE6_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
+            + "   latitudeMinE6_Resized_Normalized    INTEGER,                               " + NL //$NON-NLS-1$
+            + "   latitudeMaxE6_Resized_Normalized    INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeMinE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
+            + "   longitudeMaxE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
 
             + "   boundingBoxKey                      BIGINT,                                " + NL //$NON-NLS-1$
 

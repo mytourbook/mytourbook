@@ -499,10 +499,10 @@ public class TourLocationManager {
 
       tourLocation.boundingBoxKey            = boundingBoxKey;
 
-      tourLocation.latitudeMinE6_Normalized  = tourLocation.latitudeMinExpandedE6_Normalized  = latitudeMinE6_Normalized;
-      tourLocation.latitudeMaxE6_Normalized  = tourLocation.latitudeMaxExpandedE6_Normalized  = latitudeMaxE6_Normalized;
-      tourLocation.longitudeMinE6_Normalized = tourLocation.longitudeMinExpandedE6_Normalized = longitudeMinE6_Normalized;
-      tourLocation.longitudeMaxE6_Normalized = tourLocation.longitudeMaxExpandedE6_Normalized = longitudeMaxE6_Normalized;
+      tourLocation.latitudeMinE6_Normalized  = tourLocation.latitudeMinE6_Resized_Normalized  = latitudeMinE6_Normalized;
+      tourLocation.latitudeMaxE6_Normalized  = tourLocation.latitudeMaxE6_Resized_Normalized  = latitudeMaxE6_Normalized;
+      tourLocation.longitudeMinE6_Normalized = tourLocation.longitudeMinE6_Resized_Normalized = longitudeMinE6_Normalized;
+      tourLocation.longitudeMaxE6_Normalized = tourLocation.longitudeMaxE6_Resized_Normalized = longitudeMaxE6_Normalized;
 
 //      final TourLocation bboxTourLocation = TourDatabase.getTourLocation(osmTourLocation);
 //      if (bboxTourLocation != null) {

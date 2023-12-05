@@ -482,9 +482,10 @@ public class DirectMappingPainter implements IDirectPainter {
          final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
 
          final double latitudeMin = tourLocation.latitudeMin;
+         final double latitudeMax = tourLocation.latitudeMax;
          final double longitudeMin = tourLocation.longitudeMin;
          final double longitudeMax = tourLocation.longitudeMax;
-         final double latitudeMax = tourLocation.latitudeMax;
+
 
          final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
          final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
@@ -557,6 +558,38 @@ public class DirectMappingPainter implements IDirectPainter {
                      bboxHeight
 
                );
+
+               final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+               final boolean isResized = latitudeMin != latitudeMin_Resized;
+
+               if (isResized) {
+
+                  final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+                  final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+                  final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+
+                  final Point providedBBox_TopLeft_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
+                  final Point providedBBox_TopRight_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
+                  final Point providedBBox_BottomLeft_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMin_Resized, zoomLevel);
+
+                  final int bboxTopLeft_DevX_Resized = providedBBox_TopLeft_Resized.x - viewportX;
+                  final int bboxTopRight_DevX_Resized = providedBBox_TopRight_Resized.x - viewportX;
+                  final int bboxTopLeft_DevY_Resized = providedBBox_TopLeft_Resized.y - viewportY;
+                  final int bboxBottomLeft_DevY_Resized = providedBBox_BottomLeft_Resized.y - viewportY;
+
+                  final int bboxWidth_Resized = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
+                  final int bboxHeight_Resized = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
+
+                  // draw provided bbox
+                  gc.drawRectangle(
+
+                        bboxTopLeft_DevX_Resized,
+                        bboxTopLeft_DevY_Resized,
+                        bboxWidth_Resized,
+                        bboxHeight_Resized
+
+                  );
+               }
             }
          }
       }

@@ -89,10 +89,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          "longitudeMinE6_Normalized",                                                            //$NON-NLS-1$
          "longitudeMaxE6_Normalized",                                                            //$NON-NLS-1$
 
-         "latitudeMinExpandedE6_Normalized",                                                     //$NON-NLS-1$
-         "latitudeMaxExpandedE6_Normalized",                                                     //$NON-NLS-1$
-         "longitudeMinExpandedE6_Normalized",                                                    //$NON-NLS-1$
-         "longitudeMaxExpandedE6_Normalized"                                                     //$NON-NLS-1$
+         "latitudeMinE6_Resized_Normalized",                                                     //$NON-NLS-1$
+         "latitudeMaxE6_Resized_Normalized",                                                     //$NON-NLS-1$
+         "longitudeMinE6_Resized_Normalized",                                                    //$NON-NLS-1$
+         "longitudeMaxE6_Resized_Normalized"                                                     //$NON-NLS-1$
 
    )
          .collect(Collectors.toCollection(HashSet::new));
