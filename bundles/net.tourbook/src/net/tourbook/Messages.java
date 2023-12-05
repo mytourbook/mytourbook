@@ -3114,14 +3114,17 @@ public class Messages extends NLS {
 
    public static String        Tour_Location_Action_Customize_End_Tooltip;
    public static String        Tour_Location_Action_Customize_Start_Tooltip;
+   public static String        Tour_Location_Action_BoundingBox_Increase;
+   public static String        Tour_Location_Action_BoundingBox_Decrease;
    public static String        Tour_Location_Action_DeleteLocation;
-   public static String        Tour_Location_Action_Download_End_Tooltip;
    public static String        Tour_Location_Action_Download_Start_Tooltip;
-   public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;
+   public static String        Tour_Location_Action_Download_End_Tooltip;
    public static String        Tour_Location_Action_Download_WithProfile_Start_Tooltip;
+   public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;
    public static String        Tour_Location_Action_OpenProfileEditor;
    public static String        Tour_Location_Action_Profile_Tooltip;
    public static String        Tour_Location_Action_ProfileTitle;
+   public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_RetrieveLocationAgain;
    public static String        Tour_Location_Action_RetrieveLocationAgain_Tooltip;
    public static String        Tour_Location_DefaultProfileName;

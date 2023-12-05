@@ -54,6 +54,7 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -87,47 +88,56 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourLocationView extends ViewPart implements ITourViewer {
 
-   public static final String      ID                              = "net.tourbook.tour.location.TourLocationView"; //$NON-NLS-1$
+   public static final String       ID                              = "net.tourbook.tour.location.TourLocationView"; //$NON-NLS-1$
 
-   private static final char       NL                              = UI.NEW_LINE;
+   private static final char        NL                              = UI.NEW_LINE;
 
-   private static final String     STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
-   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
-   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
+   private static final String      STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
+   private static final String      STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
+   private static final String      STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings    _state                          = TourbookPlugin.getState(ID);
 
-   private IPartListener2          _partListener;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourPropertyListener;
+   private IPartListener2           _partListener;
+   private ISelectionListener       _postSelectionListener;
+   private IPropertyChangeListener  _prefChangeListener;
+   private IPropertyChangeListener  _prefChangeListener_Common;
+   private ITourEventListener       _tourPropertyListener;
 
-   private TableViewer             _locationViewer;
-   private LocationComparator      _locationComparator             = new LocationComparator();
-   private ColumnManager           _columnManager;
-   private SelectionAdapter        _columnSortListener;
+   private TableViewer              _locationViewer;
+   private LocationComparator       _locationComparator             = new LocationComparator();
+   private ColumnManager            _columnManager;
+   private SelectionAdapter         _columnSortListener;
 
-   private List<LocationItem>      _allLocationItems               = new ArrayList<>();
+   private List<LocationItem>       _allLocationItems               = new ArrayList<>();
 
    /**
     * Contains all {@link LocationItem}s which are displayed in the viewer, the key is
     * {@link TourLocation#locationID}
     */
-   private Map<Long, LocationItem> _locationItemsMap               = new HashMap<>();
+   private Map<Long, LocationItem>  _locationItemsMap               = new HashMap<>();
 
-   private MenuManager             _viewerMenuManager;
-   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager              _viewerMenuManager;
+   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private boolean                 _isInUIUpdate;
+   private boolean                  _isInUIUpdate;
 
-   private Action_DeleteLocation   _action_DeleteLocation;
+   private Action_DeleteLocation    _action_DeleteLocation;
+   private Action_ResizeBoundingBox _action_ResetBoundingBox;
+   private Action_ResizeBoundingBox _action_BoundingBox_Increase_1;
+   private Action_ResizeBoundingBox _action_BoundingBox_Increase_5;
+   private Action_ResizeBoundingBox _action_BoundingBox_Increase_10;
+   private Action_ResizeBoundingBox _action_BoundingBox_Increase_100;
+   private Action_ResizeBoundingBox _action_BoundingBox_Decrease_1;
+   private Action_ResizeBoundingBox _action_BoundingBox_Decrease_5;
+   private Action_ResizeBoundingBox _action_BoundingBox_Decrease_10;
+   private Action_ResizeBoundingBox _action_BoundingBox_Decrease_100;
 
-   private final NumberFormat      _nf1                            = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf6                            = NumberFormat.getNumberInstance();
+   private final NumberFormat       _nf1                            = NumberFormat.getNumberInstance();
+   private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat       _nf6                            = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -162,6 +172,33 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
    }
 
+   private class Action_ResizeBoundingBox extends Action {
+
+      private int resizeValue;
+
+      public Action_ResizeBoundingBox() {}
+
+      public Action_ResizeBoundingBox(final String label) {
+
+         // reset bounding box
+
+         setText(label);
+      }
+
+      @Override
+      public void run() {
+
+         onAction_ResizeBoundingBox(resizeValue);
+      }
+
+      public void setLabel(final String label, final int resizeValue) {
+
+         this.resizeValue = resizeValue;
+
+         setText(label.formatted(Math.abs(resizeValue), UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+      }
+   }
+
    private class LocationComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
@@ -186,7 +223,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
-         case TableColumnFactory.LOCATION_PART_Name_ID:              rc = compareText(location1.name,                location2.name);              break;
+         case TableColumnFactory.LOCATION_PART_Name_ID:              rc = compareText(location1.name, location2.name);              break;
 
          case TableColumnFactory.LOCATION_TOUR_USAGE_ID:
 
@@ -660,6 +697,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
                // measurement system has changed
 
+               // update action label after measurement is changed
+               updateUI_Actions();
+
                loadAllLocations();
 
                _columnManager.saveState(_state);
@@ -723,6 +763,20 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void createActions() {
 
       _action_DeleteLocation = new Action_DeleteLocation();
+
+      _action_ResetBoundingBox = new Action_ResizeBoundingBox(Messages.Tour_Location_Action_ResetBoundingBox);
+
+      _action_BoundingBox_Increase_1 = new Action_ResizeBoundingBox();
+      _action_BoundingBox_Increase_5 = new Action_ResizeBoundingBox();
+      _action_BoundingBox_Increase_10 = new Action_ResizeBoundingBox();
+      _action_BoundingBox_Increase_100 = new Action_ResizeBoundingBox();
+
+      _action_BoundingBox_Decrease_1 = new Action_ResizeBoundingBox();
+      _action_BoundingBox_Decrease_5 = new Action_ResizeBoundingBox();
+      _action_BoundingBox_Decrease_10 = new Action_ResizeBoundingBox();
+      _action_BoundingBox_Decrease_100 = new Action_ResizeBoundingBox();
+
+      updateUI_Actions();
    }
 
    private void createMenuManager() {
@@ -1993,10 +2047,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void enableActions() {
 
-      final LocationItem selectedLocationItem = getSelectedLocationItem();
-      final boolean isLocationSelected = selectedLocationItem != null;
+      final List<TourLocation> allLocations = getSelectedLocations();
+
+      final boolean isLocationSelected = allLocations.size() > 0;
+      final boolean isOneLocationSelected = allLocations.size() == 1;
 
       _action_DeleteLocation.setEnabled(isLocationSelected);
+
+      _action_ResetBoundingBox.setEnabled(isOneLocationSelected);
+      _action_BoundingBox_Increase_1.setEnabled(isOneLocationSelected);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -2004,6 +2063,24 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       /*
        * Fill menu
        */
+
+      menuMgr.add(_action_ResetBoundingBox);
+
+      menuMgr.add(new Separator());
+
+      menuMgr.add(_action_BoundingBox_Increase_1);
+      menuMgr.add(_action_BoundingBox_Increase_5);
+      menuMgr.add(_action_BoundingBox_Increase_10);
+      menuMgr.add(_action_BoundingBox_Increase_100);
+
+      menuMgr.add(new Separator());
+
+      menuMgr.add(_action_BoundingBox_Decrease_1);
+      menuMgr.add(_action_BoundingBox_Decrease_5);
+      menuMgr.add(_action_BoundingBox_Decrease_10);
+      menuMgr.add(_action_BoundingBox_Decrease_100);
+
+      menuMgr.add(new Separator());
 
       menuMgr.add(_action_DeleteLocation);
 
@@ -2029,19 +2106,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
-   }
-
-   private LocationItem getSelectedLocationItem() {
-
-      final IStructuredSelection selection = _locationViewer.getStructuredSelection();
-      final Object firstElement = selection.getFirstElement();
-
-      if (firstElement != null) {
-
-         return ((LocationItem) firstElement);
-      }
-
-      return null;
    }
 
    private List<TourLocation> getSelectedLocations() {
@@ -2577,6 +2641,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             this);
    }
 
+   private void onAction_ResizeBoundingBox(final int resizeValue) {
+      // TODO Auto-generated method stub
+
+   }
+
    private void onColumn_Select(final SelectionEvent e) {
 
       _viewerContainer.setRedraw(false);
@@ -2587,15 +2656,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             // update viewer with new sorting
             _locationComparator.setSortColumn(e.widget);
 
-//            final long start = System.nanoTime();
-
             _locationViewer.refresh();
-
-//            final long end = System.nanoTime();
-
-//            System.out.println(("Sorting locations\t")
-//                  + (((float) (end - start) / 1000000) + " ms"));
-//            // TODO remove SYSTEM.OUT.PRINTLN
          }
          updateUI_SelectLocation(selectionBackup);
       }
@@ -2799,6 +2860,19 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   private void updateUI_Actions() {
+
+      _action_BoundingBox_Increase_1.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 1);
+      _action_BoundingBox_Increase_5.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 5);
+      _action_BoundingBox_Increase_10.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 10);
+      _action_BoundingBox_Increase_100.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 100);
+
+      _action_BoundingBox_Decrease_1.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -1);
+      _action_BoundingBox_Decrease_5.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -5);
+      _action_BoundingBox_Decrease_10.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -10);
+      _action_BoundingBox_Decrease_100.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -100);
+   }
 
    /**
     * Select and reveal tour marker item.
