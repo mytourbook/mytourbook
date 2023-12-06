@@ -1956,6 +1956,12 @@ public class Map2View extends ViewPart implements
       // initialize map when part is created and the map size is > 0
       _map.getDisplay().asyncExec(() -> {
 
+         if (_map.getDisplay().isDisposed()) {
+            
+            // fixing https://github.com/mytourbook/mytourbook/issues/1233
+            return;
+         }
+
          restoreState();
          enableActions();
 
