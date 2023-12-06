@@ -90,7 +90,9 @@ public class Utils {
 
    private static void changeMeasurementSystem(final SWTWorkbenchBot bot, final int measurementSystemIndex) {
 
-      bot.comboBox(1).setSelection(measurementSystemIndex);
+      final SWTBotCombo comboBoxMeasurementSystem = bot.comboBox(1);
+      assertNotNull(comboBoxMeasurementSystem);
+      comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
 
       // The below code doesn't work because, for a reason I can't explain nor
       // solve, when selecting the "Metric" dropdown item, it saves it as an
