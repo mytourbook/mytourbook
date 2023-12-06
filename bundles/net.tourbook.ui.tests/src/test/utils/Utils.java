@@ -92,7 +92,7 @@ public class Utils {
 
    private static void changeMeasurementSystem(final SWTWorkbenchBot bot, final int measurementSystemIndex) {
 
-      final SWTBotCombo comboBoxMeasurementSystem = bot.comboBoxWithId("measurementSystem");
+      final SWTBotCombo comboBoxMeasurementSystem = bot.comboBox(1);
       assertNotNull(comboBoxMeasurementSystem);
       assertTrue(comboBoxMeasurementSystem.itemCount() > 0);
       comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
