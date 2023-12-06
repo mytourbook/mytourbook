@@ -38,12 +38,12 @@ public class TourBlogViewTests extends UITest {
       tourBlogView.show();
 
       //Change the measurement system to imperial
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
+      Utils.setImperialSystem(bot);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+      Utils.setDistanceNauticalMile(bot);
 
       tourBlogView.close();
    }
