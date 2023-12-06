@@ -10,6 +10,8 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import net.tourbook.common.util.StringUtils;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.notifications.AbstractNotificationPopup;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -28,20 +30,24 @@ import org.eclipse.swt.widgets.Text;
  */
 public class MyTourbookNotificationPopup extends AbstractNotificationPopup {
 
-   private ImageDescriptor  IMAGEDESCRIPTOR;
+   private ImageDescriptor IMAGEDESCRIPTOR;
 
-   MyTourbookNotificationPopup(final Display display, final ImageDescriptor imageDescriptor) {
-		super(display);
+   private String          _title;
+   private String          _text;
+
+   MyTourbookNotificationPopup(final Display display,
+                               final ImageDescriptor imageDescriptor,
+                               final String title,
+                               final String text) {
+      super(display);
       IMAGEDESCRIPTOR = imageDescriptor;
+      _title = title;
+      _text = text;
    }
-
-   // public static final Color HYPERLINK_WIDGET_COLOR = new Color(Display.getDefault(), 12, 81, 172);
-
-   //private List<AbstractNotification> notifications;
 
    @Override
    protected void createContentArea(final Composite parent) {
-      final int count = 0;
+
       final Composite notificationComposite = new Composite(parent, SWT.NO_FOCUS);
       GridDataFactory.fillDefaults().grab(true, true).align(SWT.FILL, SWT.FILL).applyTo(notificationComposite);
       notificationComposite.setLayout(new GridLayout(2, false));
@@ -83,11 +89,10 @@ public class MyTourbookNotificationPopup extends AbstractNotificationPopup {
 //                   }
 //               });
 
-      final String descriptionText = null;
+      if (StringUtils.hasContent(_text)) {
 
-      if (descriptionText != null && !descriptionText.trim().equals("")) { //$NON-NLS-1$
          final Text descriptionLabel = new Text(notificationComposite, SWT.NO_FOCUS | SWT.WRAP | SWT.MULTI);
-         descriptionLabel.setText("LegacyActionTools.escapeMnemonics(descriptionText)");
+         descriptionLabel.setText(_text);
          descriptionLabel.setBackground(parent.getBackground());
          GridDataFactory.fillDefaults()
                .span(2, SWT.DEFAULT)
