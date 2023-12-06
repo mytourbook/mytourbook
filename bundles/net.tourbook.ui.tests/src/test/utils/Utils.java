@@ -466,17 +466,17 @@ public class Utils {
       }
    }
 
-   public static void setImperialSystem(final SWTWorkbenchBot bot) {
+   public static void setMeasurementSystem_Imperial(final SWTWorkbenchBot bot) {
 
       changeMeasurementSystem(bot, 1);
    }
 
-   public static void setMetricSystem(final SWTWorkbenchBot bot) {
+   public static void setMeasurementSystem_Metric(final SWTWorkbenchBot bot) {
 
       changeMeasurementSystem(bot, 0);
    }
 
-   public static void setNauticalSystem(final SWTWorkbenchBot bot) {
+   public static void setMeasurementSystem_Nautical(final SWTWorkbenchBot bot) {
 
       changeMeasurementSystem(bot, 2);
    }

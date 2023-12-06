@@ -79,12 +79,12 @@ public class TourSegmenterViewTests extends UITest {
       assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       //Change the measurement system to imperial
-      Utils.setImperialSystem(bot);
+      Utils.setMeasurementSystem_Imperial(bot);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setMetricSystem(bot);
+      Utils.setMeasurementSystem_Metric(bot);
 
       bot.sleep(5000);
 

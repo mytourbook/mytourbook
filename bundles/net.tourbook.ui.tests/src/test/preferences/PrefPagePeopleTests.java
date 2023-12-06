@@ -30,7 +30,7 @@ public class PrefPagePeopleTests extends UITest {
 
    @AfterAll
    static void cleanUp() {
-      Utils.setMetricSystem(bot);
+      Utils.setMeasurementSystem_Metric(bot);
    }
 
    @Test
@@ -66,7 +66,7 @@ public class PrefPagePeopleTests extends UITest {
    void testPeopleBmi() {
 
       //Metric system
-      Utils.setMetricSystem(bot);
+      Utils.setMeasurementSystem_Metric(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -87,7 +87,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Imperial system
-      Utils.setImperialSystem(bot);
+      Utils.setMeasurementSystem_Imperial(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -99,7 +99,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Nautical mile system
-      Utils.setNauticalSystem(bot);
+      Utils.setMeasurementSystem_Nautical(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
