@@ -95,12 +95,13 @@ public class Utils {
       // The below code doesn't work because, for a reason I can't explain nor
       // solve, when selecting the "Metric" dropdown item, it saves it as an
       // empty string in the preferences
-//      Utils.openPreferences(bot);
-//      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
-//      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-//      bot.comboBox(0).setSelection(measurementSystem);
-//
-//      Utils.clickApplyAndCloseButton(bot);
+      /*
+       * Utils.openPreferences(bot);
+       * bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
+       * bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+       * bot.comboBox(0).setSelection(measurementSystem);
+       * Utils.clickApplyAndCloseButton(bot);
+       */
    }
 
    public static void clearTourLogView(final SWTWorkbenchBot bot) {
