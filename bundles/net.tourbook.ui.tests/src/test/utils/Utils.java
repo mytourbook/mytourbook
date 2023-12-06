@@ -98,7 +98,7 @@ public class Utils {
       if (measurementSystemIndex > 0) {
          bot.comboBox(0).setSelection(measurementSystemIndex);
       } else {
-         // The above code doesn't work whem selecting the metric system
+         // The above code doesn't work when selecting the metric system
          // (measurementSystemIndex = 0) because, for a reason I can't explain nor
          // solve, when selecting the "Metric" dropdown item, it saves it as an
          // empty string in the preferences.

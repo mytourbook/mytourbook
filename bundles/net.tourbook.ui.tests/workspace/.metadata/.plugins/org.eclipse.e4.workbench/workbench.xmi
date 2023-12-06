@@ -375,9 +375,6 @@
       <children xsi:type="menu:ToolBar" xmi:id="_mr4mwOKKEeyB59fpdb3pkQ" elementId="people">
         <tags>Draggable</tags>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_v_KA4FGDEe2BgplfLNzDmg" elementId="measurementSystem">
-        <tags>Draggable</tags>
-      </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mr4mweKKEeyB59fpdb3pkQ" elementId="tourtype">
         <tags>Draggable</tags>
       </children>
@@ -407,6 +404,9 @@
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_nZMYsOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.edit.text.actionSet.navigation" visible="false">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_v_KA4FGDEe2BgplfLNzDmg" elementId="measurementSystem">
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolControl" xmi:id="_nWXHIuKKEeyB59fpdb3pkQ" elementId="PerspectiveSpacer" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
@@ -1793,7 +1793,7 @@
   <commands xmi:id="_mdqlNuKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.edit.text.delete.line.to.beginning" commandName="Delete to Beginning of Line" description="Delete to the beginning of a line of text" category="_mdgzl-KKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_mdqlN-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.ide.configureColumns" commandName="Configure Columns..." description="Configure the columns in the markers view" category="_mdgzmeKKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_mdqlOOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.edit.findPrevious" commandName="Find Previous" description="Find previous item" category="_mdgzlOKKEeyB59fpdb3pkQ"/>
-  <commands xmi:id="_mdqlOeKKEeyB59fpdb3pkQ" elementId="command.net.tourbook.photo.LinkPhotoWithTourInFolder" commandName="Link all Photos in this Folder with Tours..." category="_mdgzmeKKEeyB59fpdb3pkQ"/>
+  <commands xmi:id="_mdqlOeKKEeyB59fpdb3pkQ" elementId="command.net.tourbook.photo.LinkPhotoWithTourInFolder" commandName="Link all Photos in this Folder with Tours... " category="_mdgzmeKKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_mdqlOuKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.file.exit" commandName="Exit" description="Exit the application" category="_mdgzleKKEeyB59fpdb3pkQ">
     <parameters xmi:id="_mdqlO-KKEeyB59fpdb3pkQ" elementId="mayPrompt" name="may prompt"/>
   </commands>
