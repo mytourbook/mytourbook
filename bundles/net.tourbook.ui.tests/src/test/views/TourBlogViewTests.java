@@ -32,18 +32,19 @@ public class TourBlogViewTests extends UITest {
    @Test
    void testBlogView_Basic() {
 
+      final var originalBot = bot;
       Utils.getTour(bot);
 
       final SWTBotView tourBlogView = getTourBlogView();
       tourBlogView.show();
 
       //Change the measurement system to imperial
-      Utils.setImperialSystem(bot);
+      Utils.setImperialSystem(originalBot);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setMetricSystem(bot);
+      Utils.setMetricSystem(originalBot);
 
       tourBlogView.close();
    }
