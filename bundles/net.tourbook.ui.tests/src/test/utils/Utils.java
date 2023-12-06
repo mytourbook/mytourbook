@@ -37,6 +37,7 @@ import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -93,7 +94,12 @@ public class Utils {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(measurementSystem);
+      final SWTBotCombo comboBox = bot.comboBox(0);
+      comboBox.setSelection(measurementSystem);
+
+      if (StringUtils.isNullOrEmpty(comboBox.getText())) {
+         comboBox.setText(measurementSystem);
+      }
 
       Utils.clickApplyAndCloseButton(bot);
    }
