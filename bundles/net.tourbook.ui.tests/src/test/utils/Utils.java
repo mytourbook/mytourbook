@@ -17,6 +17,7 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
@@ -91,6 +92,7 @@ public class Utils {
 
    private static void changeMeasurementSystem(final SWTBotCombo comboBoxMeasurementSystem, final int measurementSystemIndex) {
 
+      assertTrue(comboBoxMeasurementSystem.itemCount() > 0);
       comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
 
       // The below code doesn't work because, for a reason I can't explain nor
