@@ -509,6 +509,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
        */
       WorkbenchPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.RUN_IN_BACKGROUND, false);
 
+      FTSearchManager.deleteCorruptIndex_InAppStartup();
+
       // must be initialized early to set photoServiceProvider in the Photo
       TourPhotoManager.restoreState();
 

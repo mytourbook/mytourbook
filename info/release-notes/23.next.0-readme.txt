@@ -43,6 +43,9 @@ New
 * All Tour Markers View (Frederic)
   - Added the ability to delete markers
 
+* Fulltext search
+  - Added action to rebuild a corrupted fulltext search index
+    https://github.com/mytourbook/mytourbook/issues/1232
 
 Improvements
 ============
@@ -71,6 +74,7 @@ Improvements
   -Improved the detection of http links in the tour description to make them clickable by using a third party library
     https://github.com/URL-Detector/URL-Detector
     https://github.com/mytourbook/mytourbook/issues/1102
+        
   
 
 Changes
