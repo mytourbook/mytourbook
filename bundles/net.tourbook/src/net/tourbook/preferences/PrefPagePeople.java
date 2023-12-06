@@ -333,7 +333,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    /**
     * @param isCheckPeople
-    *
     * @return Returns <code>true</code> when all tours has been updated and the update process was
     *         not canceled.
     */
@@ -2037,7 +2036,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    /**
     * @param isAskToSave
     * @param isRevert
-    *
     * @return Returns <code>false</code> when person is not saved, modifications will be reverted.
     */
    private boolean savePerson(final boolean isAskToSave, final boolean isRevert) {
