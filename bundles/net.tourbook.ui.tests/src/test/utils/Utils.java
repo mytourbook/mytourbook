@@ -37,7 +37,6 @@ import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -91,17 +90,17 @@ public class Utils {
 
    public static void changeMeasurementSystem(final SWTWorkbenchBot bot, final String measurementSystem) {
 
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
-      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      final SWTBotCombo comboBox = bot.comboBox(0);
-      comboBox.setSelection(measurementSystem);
+      bot.comboBox(1).setSelection(measurementSystem);
 
-      if (StringUtils.isNullOrEmpty(comboBox.getText())) {
-         comboBox.setText(measurementSystem);
-      }
-
-      Utils.clickApplyAndCloseButton(bot);
+      // The below code doesn't work because, for a reason I can't explain nor
+      // solve, when selecting the "Metric" dropdown item, it saves it as an
+      // empty string in the preferences
+//      Utils.openPreferences(bot);
+//      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
+//      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+//      bot.comboBox(0).setSelection(measurementSystem);
+//
+//      Utils.clickApplyAndCloseButton(bot);
    }
 
    public static void clearTourLogView(final SWTWorkbenchBot bot) {
