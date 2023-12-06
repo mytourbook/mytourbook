@@ -451,7 +451,7 @@ public class Utils {
 
    public static void setDistanceNauticalMile(final SWTWorkbenchBot bot) {
 
-      Utils.changeMeasurementSystem(bot, 2);
+      changeMeasurementSystem(bot, 2);
    }
 
    public static void setHttpClient(final Object httpClient) {
@@ -468,7 +468,7 @@ public class Utils {
 
    public static void setImperialSystem(final SWTWorkbenchBot bot) {
 
-      Utils.changeMeasurementSystem(bot, 1);
+      changeMeasurementSystem(bot, 1);
    }
 
    public static void setMetricSystem(final SWTWorkbenchBot bot) {
