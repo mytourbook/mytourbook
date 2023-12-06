@@ -354,7 +354,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
                   TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
                   UI.openNotificationPopup(Messages.Dialog_UploadWorkoutsToSuunto_Title,
-                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo),
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
                         infoText[0]);
                });
             }
