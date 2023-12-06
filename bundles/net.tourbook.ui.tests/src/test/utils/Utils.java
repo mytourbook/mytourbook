@@ -95,6 +95,8 @@ public class Utils {
       final SWTBotCombo comboBoxMeasurementSystem = bot.comboBox(1);
       assertNotNull(comboBoxMeasurementSystem);
       assertTrue(comboBoxMeasurementSystem.itemCount() > 0);
+      assertEquals("Metric", comboBoxMeasurementSystem.items()[0]); //$NON-NLS-1$
+
       comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
 
       // The below code doesn't work because, for a reason I can't explain nor
