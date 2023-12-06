@@ -769,7 +769,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
       final int year = filterDate.getYear();
       final int month = filterDate.getMonth() + 1;
       final int day = filterDate.getDay();
-      final var toto = ZonedDateTime.of(
+      return ZonedDateTime.of(
             year,
             month,
             day,
@@ -778,7 +778,6 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             0,
             0,
             ZoneId.of("Etc/GMT")).toEpochSecond() * 1000; //$NON-NLS-1$
-      return toto;
    }
 
    private long getFilterEndDate() {
