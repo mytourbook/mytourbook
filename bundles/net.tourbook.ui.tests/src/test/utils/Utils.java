@@ -90,8 +90,10 @@ public class Utils {
    public static final String VIEW_NAME_WAYPOINTS              = PluginProperties.getText("View_Name_Waypoint");                  //$NON-NLS-1$
    public static final String WORKING_DIRECTORY                = System.getProperty("user.dir");                                  //$NON-NLS-1$
 
-   private static void changeMeasurementSystem(final SWTBotCombo comboBoxMeasurementSystem, final int measurementSystemIndex) {
+   private static void changeMeasurementSystem(final SWTWorkbenchBot bot, final int measurementSystemIndex) {
 
+      final SWTBotCombo comboBoxMeasurementSystem = bot.comboBoxWithId("measurementSystem");
+      assertNotNull(comboBoxMeasurementSystem);
       assertTrue(comboBoxMeasurementSystem.itemCount() > 0);
       comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
 
@@ -464,19 +466,19 @@ public class Utils {
       }
    }
 
-   public static void setImperialSystem(final SWTBotCombo comboBoxMeasurementSystem) {
+   public static void setImperialSystem(final SWTWorkbenchBot bot) {
 
-      changeMeasurementSystem(comboBoxMeasurementSystem, 1);
+      changeMeasurementSystem(bot, 1);
    }
 
-   public static void setMetricSystem(final SWTBotCombo comboBoxMeasurementSystem) {
+   public static void setMetricSystem(final SWTWorkbenchBot bot) {
 
-      changeMeasurementSystem(comboBoxMeasurementSystem, 0);
+      changeMeasurementSystem(bot, 0);
    }
 
-   public static void setNauticalSystem(final SWTBotCombo comboBoxMeasurementSystem) {
+   public static void setNauticalSystem(final SWTWorkbenchBot bot) {
 
-      changeMeasurementSystem(comboBoxMeasurementSystem, 2);
+      changeMeasurementSystem(bot, 2);
    }
 
    public static SWTBotView showImportView(final SWTWorkbenchBot bot) {

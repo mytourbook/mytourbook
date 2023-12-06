@@ -25,18 +25,12 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourSegmenterViewTests extends UITest {
-
-   @BeforeAll
-   static void initAll() {
-      comboBoxMeasurementSystem = bot.comboBox(1);
-   }
 
    private SWTBotView getTourSegmenterView() {
 
@@ -85,12 +79,12 @@ public class TourSegmenterViewTests extends UITest {
       assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       //Change the measurement system to imperial
-      Utils.setImperialSystem(comboBoxMeasurementSystem);
+      Utils.setImperialSystem(bot);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setMetricSystem(comboBoxMeasurementSystem);
+      Utils.setMetricSystem(bot);
 
       bot.sleep(5000);
 
