@@ -23,11 +23,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-/**
- * A popup window that uses the workbench shell image in the title.
- *
- * @author Steffen Pingel
- */
 public class MyTourbookNotificationPopup extends AbstractNotificationPopup {
 
    private ImageDescriptor IMAGEDESCRIPTOR;
@@ -55,39 +50,6 @@ public class MyTourbookNotificationPopup extends AbstractNotificationPopup {
 
       final Label notificationLabelIcon = new Label(notificationComposite, SWT.NO_FOCUS);
       notificationLabelIcon.setBackground(parent.getBackground());
-//               if (notification instanceof AbstractUiNotification) {
-//                   notificationLabelIcon.setImage(((AbstractUiNotification) notification).getNotificationKindImage());
-//               }
-
-//               final ScalingHyperlink itemLink = new ScalingHyperlink(notificationComposite, SWT.BEGINNING | SWT.NO_FOCUS);
-//               GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.TOP).applyTo(itemLink);
-//               itemLink.setForeground(HYPERLINK_WIDGET_COLOR);
-//               itemLink.registerMouseTrackListener();
-//               itemLink.setText(LegacyActionTools.escapeMnemonics(notification.getLabel()));
-//               if (notification instanceof AbstractUiNotification) {
-//                   itemLink.setImage(((AbstractUiNotification) notification).getNotificationImage());
-//               }
-//               itemLink.setBackground(parent.getBackground());
-//               itemLink.addHyperlinkListener(new HyperlinkAdapter() {
-//                   @Override
-//                   public void linkActivated(HyperlinkEvent e) {
-//                       if (notification instanceof AbstractUiNotification) {
-//                           ((AbstractUiNotification) notification).open();
-//                       }
-//                       IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-//                       if (window != null) {
-//                           Shell windowShell = window.getShell();
-//                           if (windowShell != null) {
-//                               if (windowShell.getMinimized()) {
-//                                   windowShell.setMinimized(false);
-//                               }
-//
-//                               windowShell.open();
-//                               windowShell.forceActive();
-//                           }
-//                       }
-//                   }
-//               });
 
       if (StringUtils.hasContent(_text)) {
 
@@ -100,12 +62,16 @@ public class MyTourbookNotificationPopup extends AbstractNotificationPopup {
                .align(SWT.FILL, SWT.FILL)
                .applyTo(descriptionLabel);
       }
-
    }
 
    @Override
    protected Image getPopupShellImage(final int maximumHeight) {
       return IMAGEDESCRIPTOR.createImage();
+   }
+
+   @Override
+   protected String getPopupShellTitle() {
+      return _title;
    }
 
 }
