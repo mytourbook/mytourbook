@@ -465,7 +465,9 @@ public class StravaUploader extends TourbookCloudUploader {
       final int[] numberOfUploadedTours = new int[1];
       final String[] notificationText = new String[1];
 
-      final Job job = new Job(Messages.Dialog_UploadToursToStrava_Task) {
+      final Job job = new Job(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
+            numberOfTours,
+            _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME))) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
