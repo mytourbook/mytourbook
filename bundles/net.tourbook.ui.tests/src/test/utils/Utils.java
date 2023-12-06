@@ -17,7 +17,6 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
@@ -92,23 +91,11 @@ public class Utils {
 
    private static void changeMeasurementSystem(final SWTWorkbenchBot bot, final int measurementSystemIndex) {
 
-      final SWTBotCombo comboBoxMeasurementSystem = bot.comboBox(1);
-      assertNotNull(comboBoxMeasurementSystem);
-      assertTrue(comboBoxMeasurementSystem.itemCount() > 0);
-      assertEquals("Metric", comboBoxMeasurementSystem.items()[0]); //$NON-NLS-1$
-
-      comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
-
-      // The below code doesn't work because, for a reason I can't explain nor
-      // solve, when selecting the "Metric" dropdown item, it saves it as an
-      // empty string in the preferences
-      /*
-       * Utils.openPreferences(bot);
-       * bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
-       * bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-       * bot.comboBox(0).setSelection(measurementSystem);
-       * Utils.clickApplyAndCloseButton(bot);
-       */
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
+      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+      bot.comboBox(0).setSelection(measurementSystemIndex);
+      Utils.clickApplyAndCloseButton(bot);
    }
 
    public static void clearTourLogView(final SWTWorkbenchBot bot) {
