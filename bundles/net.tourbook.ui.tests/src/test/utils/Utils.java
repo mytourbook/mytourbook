@@ -94,7 +94,18 @@ public class Utils {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").select(); //$NON-NLS-1$
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
-      bot.comboBox(0).setSelection(measurementSystemIndex);
+
+      if (measurementSystemIndex > 0) {
+         bot.comboBox(0).setSelection(measurementSystemIndex);
+      } else {
+         // The above code doesn't work whem selecting the metric system
+         // (measurementSystemIndex = 0) because, for a reason I can't explain nor
+         // solve, when selecting the "Metric" dropdown item, it saves it as an
+         // empty string in the preferences.
+         // As a result, we restore the default preferences for which metric is
+         // the selected measurement system
+         Utils.clickButton("Restore Defaults", bot);
+      }
       Utils.clickApplyAndCloseButton(bot);
    }
 
