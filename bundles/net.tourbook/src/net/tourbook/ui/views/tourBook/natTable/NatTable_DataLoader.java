@@ -124,7 +124,7 @@ public class NatTable_DataLoader {
     * Contains all tour id's for the current tour filter and tour sorting, this is used
     * to get the row index for a tour.
     */
-   private long[]                                         _allTourIds;
+   private long[]                                         _allSortedTourIds;
 
    private SQLData                                        _tourCollectionFilter          = EMPTY_SQL_DATA;
 
@@ -195,7 +195,7 @@ public class NatTable_DataLoader {
       }
 
       final IntArrayList allRowIndices = new IntArrayList();
-      final int numAllAvailableTourIds = _allTourIds.length;
+      final int numAllAvailableTourIds = _allSortedTourIds.length;
 
       // loop: all requested tour id's
       for (final Long requestedTourId : allRequestedTourIds) {
@@ -203,7 +203,7 @@ public class NatTable_DataLoader {
          // loop: all available tour id's
          for (int rowPosition = 0; rowPosition < numAllAvailableTourIds; rowPosition++) {
 
-            final long loadedTourId = _allTourIds[rowPosition];
+            final long loadedTourId = _allSortedTourIds[rowPosition];
 
             if (loadedTourId == requestedTourId) {
 
@@ -400,7 +400,7 @@ public class NatTable_DataLoader {
          SQL.showException(e, sql);
       }
 
-      _allTourIds = allTourIds.toArray();
+      _allSortedTourIds = allTourIds.toArray();
    }
 
    private int fetchNumberOfTours() {
@@ -797,7 +797,7 @@ public class NatTable_DataLoader {
     */
    public CompletableFuture<int[]> getRowIndexFromTourId(final List<Long> allRequestedTourIds) {
 
-      if (_allTourIds == null) {
+      if (_allSortedTourIds == null) {
 
          // firstly load all tour id's
 
@@ -843,10 +843,10 @@ public class NatTable_DataLoader {
             ? "tourDeviceTime_Recorded" //$NON-NLS-1$
             : "tourComputedTime_Moving"; //$NON-NLS-1$
 
-      final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
-      final String sortByPace = "avgPace(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
-
 // SET_FORMATTING_OFF
+
+      final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sortByPace     = "avgPace("  + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
 
       switch (sortColumnId) {
 
@@ -1157,13 +1157,13 @@ public class NatTable_DataLoader {
 
    long getTourId(final int rowIndex) {
 
-      if (_allTourIds == null) {
+      if (_allSortedTourIds == null) {
 
          return -1;
 
       } else {
 
-         return _allTourIds[rowIndex];
+         return _allSortedTourIds[rowIndex];
       }
    }
 
@@ -1182,7 +1182,7 @@ public class NatTable_DataLoader {
       _pageNumbers_Fetched.clear();
       _pageNumbers_Loading.clear();
 
-      _allTourIds = null;
+      _allSortedTourIds = null;
 
       _numAllTourItems = -1;
 

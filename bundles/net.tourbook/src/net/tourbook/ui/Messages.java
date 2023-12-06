@@ -285,6 +285,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_Geo_BoundingBox_Width_Header;
    public static String        ColumnFactory_Location_Geo_BoundingBox_Width_Label;
    public static String        ColumnFactory_Location_Geo_BoundingBox_Width_Tooltip;
+   public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Header;
+   public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Label;
+   public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip;
    public static String        ColumnFactory_Location_Geo_Latitude;
    public static String        ColumnFactory_Location_Geo_Latitude_Tooltip;
    public static String        ColumnFactory_Location_Geo_LatitudeDiff_Header;
@@ -637,6 +640,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_Tunnel;
    public static String        Tour_Location_Part_Village;
    public static String        Tour_Location_Part_Waterway;
+   public static String        Tour_Location_Task_RemovingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
 

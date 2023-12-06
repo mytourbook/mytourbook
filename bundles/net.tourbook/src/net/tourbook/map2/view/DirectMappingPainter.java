@@ -77,6 +77,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private boolean     _isShowTourLocations_BoundingBox;
 
+   private boolean     _isMapBackgroundDark;
+
    /**
     * @param state
     *
@@ -103,14 +105,69 @@ public class DirectMappingPainter implements IDirectPainter {
    private Point convertGeoPoint(final MP mp, final double latitude, final double longitude, final int zoomLevel) {
 
       // get world position for the lat/lon coordinates
-      final java.awt.Point locationPixelAWT = mp.geoToPixel(
-            new GeoPosition(
-                  latitude,
-                  longitude),
-            zoomLevel);
+
+      final GeoPosition geoPosition = new GeoPosition(latitude, longitude);
+      
+      final java.awt.Point locationPixelAWT = mp.geoToPixel(geoPosition, zoomLevel);
 
       // convert awt to swt point
       return new Point(locationPixelAWT.x, locationPixelAWT.y);
+   }
+
+   private Color createBBoxColor() {
+
+      int red = (int) (Math.random() * 255);
+      int green = (int) (Math.random() * 255);
+      int blue = (int) (Math.random() * 255);
+
+      final float[] hsbValues = java.awt.Color.RGBtoHSB(red, green, blue, null);
+
+      final float hue = hsbValues[0];
+      final float saturation = hsbValues[1];
+      float brightness = hsbValues[2];
+
+      int adjustedRGB = Integer.MIN_VALUE;
+
+      final float brightnessClipValue = 0.3f;
+      final float darknessClipValue = 0.8f;
+
+      if (_isMapBackgroundDark) {
+
+         // background is dark -> ensure that a bright color is used
+
+         if (brightness < brightnessClipValue) {
+
+            brightness = brightnessClipValue;
+
+            adjustedRGB = java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+         }
+
+      } else {
+
+         // background is bright -> ensure that a darker color is used
+
+         if (brightness > darknessClipValue) {
+
+            brightness = darknessClipValue;
+
+            adjustedRGB = java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+         }
+      }
+
+      if (adjustedRGB != Integer.MIN_VALUE) {
+
+         // brightness is adjusted
+
+         final java.awt.Color adjustedColor = new java.awt.Color(adjustedRGB);
+
+         red = adjustedColor.getRed();
+         green = adjustedColor.getBlue();
+         blue = adjustedColor.getBlue();
+      }
+
+      final Color locationColor = new Color(red, green, blue);
+
+      return locationColor;
    }
 
    /**
@@ -486,7 +543,6 @@ public class DirectMappingPainter implements IDirectPainter {
          final double longitudeMin = tourLocation.longitudeMin;
          final double longitudeMax = tourLocation.longitudeMax;
 
-
          final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
          final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
 
@@ -520,7 +576,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
                // create bbox color
 
-               locationColor = new Color((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+               locationColor = createBBoxColor();
 
                _locationColors.put(bboxKey, locationColor);
             }
@@ -540,6 +596,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
             if (_isShowTourLocations_BoundingBox) {
 
+               // draw original bbox
+
                final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
                final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
 
@@ -549,7 +607,6 @@ public class DirectMappingPainter implements IDirectPainter {
                final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
                final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
 
-               // draw provided bbox
                gc.drawRectangle(
 
                      bboxTopLeft_DevX,
@@ -560,9 +617,11 @@ public class DirectMappingPainter implements IDirectPainter {
                );
 
                final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
-               final boolean isResized = latitudeMin != latitudeMin_Resized;
+               final boolean isBBoxResized = latitudeMin != latitudeMin_Resized;
 
-               if (isResized) {
+               if (isBBoxResized) {
+
+                  // draw expanded bbox
 
                   final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
                   final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
@@ -580,7 +639,6 @@ public class DirectMappingPainter implements IDirectPainter {
                   final int bboxWidth_Resized = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
                   final int bboxHeight_Resized = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
 
-                  // draw provided bbox
                   gc.drawRectangle(
 
                         bboxTopLeft_DevX_Resized,
@@ -762,11 +820,18 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
    }
 
-   public void setShowTourLocations(final boolean isShowTourLocations,
-                                    final boolean isShowTourLocations_BoundingBox) {
+   public void setPaintContextValues(final boolean isShowTourLocations,
+                                     final boolean isShowTourLocations_BoundingBox,
+                                     final boolean isMapBackgroundDark) {
 
-      _isShowTourLocation = isShowTourLocations && _allTourLocations != null && _allTourLocations.size() > 0;
+// SET_FORMATTING_OFF
+
+      _isShowTourLocation              = isShowTourLocations && _allTourLocations != null && _allTourLocations.size() > 0;
       _isShowTourLocations_BoundingBox = isShowTourLocations_BoundingBox;
+
+      _isMapBackgroundDark             = isMapBackgroundDark;
+
+// SET_FORMATTING_ON
    }
 
    public void setTourLocations(final List<TourLocation> allTourLocations) {

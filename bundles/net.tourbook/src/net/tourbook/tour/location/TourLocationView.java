@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -75,6 +76,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -354,6 +356,21 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             break;
 
+         case TableColumnFactory.LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID:
+
+            final boolean isResizedBoundingBox1 = item1.isResizedBoundingBox;
+            final boolean isResizedBoundingBox2 = item2.isResizedBoundingBox;
+
+            rc = isResizedBoundingBox1 == isResizedBoundingBox2
+
+                  ? 1
+                  : isResizedBoundingBox1
+
+                     ? 1
+                     : -1;
+
+            break;
+
          case TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID:
 
             rc = item1.boundingBoxHeight_Value- item2.boundingBoxHeight_Value;
@@ -515,29 +532,31 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    class LocationItem {
 
-      TourLocation  location;
+      TourLocation   location;
 
-      public String latitude;
-      public String longitude;
+      public String  latitude;
+      public String  longitude;
 
-      public String latitudeMin;
-      public String latitudeMax;
-      public String longitudeMin;
-      public String longitudeMax;
+      public String  latitudeMin;
+      public String  latitudeMax;
+      public String  longitudeMin;
+      public String  longitudeMax;
 
-      public String latitudeDiff_Text;
-      public String longitudeDiff_Text;
-      public int    latitudeDiff_Value;
-      public int    longitudeDiff_Value;
+      public String  latitudeDiff_Text;
+      public String  longitudeDiff_Text;
+      public int     latitudeDiff_Value;
+      public int     longitudeDiff_Value;
 
-      public String boundingBoxHeight_Text;
-      public String boundingBoxWidth_Text;
-      public int    boundingBoxHeight_Value;
-      public int    boundingBoxWidth_Value;
+      public String  boundingBoxHeight_Text;
+      public String  boundingBoxWidth_Text;
+      public int     boundingBoxHeight_Value;
+      public int     boundingBoxWidth_Value;
 
-      public long   numTourAllLocations;
-      public long   numTourStartLocations;
-      public long   numTourEndLocations;
+      public long    numTourAllLocations;
+      public long    numTourStartLocations;
+      public long    numTourEndLocations;
+
+      public boolean isResizedBoundingBox;
 
       @Override
       public boolean equals(final Object obj) {
@@ -839,12 +858,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       table.setHeaderVisible(true);
       table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-//      table.addKeyListener(keyPressedAdapter(keyEvent -> {
-//
-//         if (keyEvent.keyCode == SWT.DEL) {
-//            onAction_DeleteSensor();
-//         }
-//      }));
+      table.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
+
+         if (keyEvent.keyCode == SWT.DEL) {
+            onAction_DeleteLocation();
+         }
+      }));
 
       /*
        * Create table viewer
@@ -899,6 +918,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Tour_10_Usage();
       defineColumn_Tour_20_UsageStartLocations();
       defineColumn_Tour_30_UsageEndLocations();
+
+      defineColumn_Geo_30_IsResizedBoundingBox();
 
       // Country
       defineColumn_Part_30_Country();
@@ -974,13 +995,13 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_80_Waterway();
 
       defineColumn_Geo_10_Latitude();
-      defineColumn_Geo_14_LatitudeDiff();
+      defineColumn_Geo_12_LatitudeDiff();
 
-      defineColumn_Geo_12_Longitude();
-      defineColumn_Geo_16_LongitudeDiff();
+      defineColumn_Geo_20_Longitude();
+      defineColumn_Geo_22_LongitudeDiff();
 
-      defineColumn_Geo_19_BoundingBox_Height();
-      defineColumn_Geo_18_BoundingBox_Width();
+      defineColumn_Geo_40_BoundingBox_Height();
+      defineColumn_Geo_42_BoundingBox_Width();
 
       defineColumn_Data_10_ID();
    }
@@ -1019,22 +1040,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_12_Longitude() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).longitude);
-         }
-      });
-   }
-
-   private void defineColumn_Geo_14_LatitudeDiff() {
+   private void defineColumn_Geo_12_LatitudeDiff() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF.createColumn(_columnManager, _pc);
 
@@ -1051,7 +1057,22 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_16_LongitudeDiff() {
+   private void defineColumn_Geo_20_Longitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).longitude);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_22_LongitudeDiff() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE_DIFF.createColumn(_columnManager, _pc);
 
@@ -1066,22 +1087,26 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_18_BoundingBox_Width() {
+   private void defineColumn_Geo_30_IsResizedBoundingBox() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_IS_RESIZED_BOUNDING_BOX.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).boundingBoxWidth_Text);
+            final boolean isResizedBoundingBox = ((LocationItem) cell.getElement()).isResizedBoundingBox;
+
+            cell.setText(isResizedBoundingBox ? UI.SYMBOL_BOX : UI.EMPTY_STRING);
+
          }
       });
    }
 
-   private void defineColumn_Geo_19_BoundingBox_Height() {
+   private void defineColumn_Geo_40_BoundingBox_Height() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT.createColumn(_columnManager, _pc);
 
@@ -1094,6 +1119,21 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
             cell.setText(locationItem.boundingBoxHeight_Text);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_42_BoundingBox_Width() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).boundingBoxWidth_Text);
          }
       });
    }
@@ -2500,6 +2540,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                         ? UI.DASH + Integer.toString((int) (longitudeDiff_Distance + 0.5))
                         : Integer.toString((int) (longitudeDiff_Distance + 0.5));
 
+            final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+            final boolean isBBoxResized = latitudeMin != latitudeMin_Resized;
+
             locationItem.latitudeDiff_Value = latitudeDiff_Normalized;
             locationItem.longitudeDiff_Value = longitudeDiff_Normalized;
 
@@ -2511,6 +2554,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             locationItem.boundingBoxHeight_Text = Integer.toString((int) (bboxHeight_Distance + 0.5));
             locationItem.boundingBoxWidth_Text = Integer.toString((int) (bboxWidth_Distance + 0.5));
+
+            locationItem.isResizedBoundingBox = isBBoxResized;
 
             /*
              * Keep location

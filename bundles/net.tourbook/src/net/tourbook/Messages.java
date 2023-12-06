@@ -3124,6 +3124,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_OpenProfileEditor;
    public static String        Tour_Location_Action_Profile_Tooltip;
    public static String        Tour_Location_Action_ProfileTitle;
+   public static String        Tour_Location_Action_RemoveStartEndLocation;
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_RetrieveLocationAgain;
    public static String        Tour_Location_Action_RetrieveLocationAgain_Tooltip;

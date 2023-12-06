@@ -109,46 +109,46 @@ public class TourLocationManager {
       }
    }
 
-   private static final Bundle                    _bundle                    = TourbookPlugin.getDefault().getBundle();
-   private static final IPath                     _stateLocation             = Platform.getStateLocation(_bundle);
+   private static final Bundle                    _bundle                     = TourbookPlugin.getDefault().getBundle();
+   private static final IPath                     _stateLocation              = Platform.getStateLocation(_bundle);
 
-   private static final String                    TOUR_LOCATION_FILE_NAME    = "tour-location.xml";                                        //$NON-NLS-1$
-   private static final int                       TOUR_LOCATION_VERSION      = 1;
+   private static final String                    TOUR_LOCATION_FILE_NAME     = "tour-location.xml";                                        //$NON-NLS-1$
+   private static final int                       TOUR_LOCATION_VERSION       = 1;
 
-   private static final String                    TAG_ROOT                   = "TourLocationProfiles";                                     //$NON-NLS-1$
-   private static final String                    TAG_PROFILE                = "Profile";                                                  //$NON-NLS-1$
-   private static final String                    TAG_PARTS                  = "Parts";                                                    //$NON-NLS-1$
-   private static final String                    TAG_PART                   = "Part";                                                     //$NON-NLS-1$
+   private static final String                    TAG_ROOT                    = "TourLocationProfiles";                                     //$NON-NLS-1$
+   private static final String                    TAG_PROFILE                 = "Profile";                                                  //$NON-NLS-1$
+   private static final String                    TAG_PARTS                   = "Parts";                                                    //$NON-NLS-1$
+   private static final String                    TAG_PART                    = "Part";                                                     //$NON-NLS-1$
 
-   private static final String                    ATTR_ACTIVE_PROFILE_ID     = "activeProfileId";                                          //$NON-NLS-1$
-   private static final String                    ATTR_NAME                  = "name";                                                     //$NON-NLS-1$
-   private static final String                    ATTR_PROFILE_ID            = "profileID";                                                //$NON-NLS-1$
-   private static final String                    ATTR_PROFILE_NAME          = "profileName";                                              //$NON-NLS-1$
-   private static final String                    ATTR_TOUR_LOCATION_VERSION = "tourLocationVersion";                                      //$NON-NLS-1$
+   private static final String                    ATTR_ACTIVE_PROFILE_ID      = "activeProfileId";                                          //$NON-NLS-1$
+   private static final String                    ATTR_NAME                   = "name";                                                     //$NON-NLS-1$
+   private static final String                    ATTR_PROFILE_ID             = "profileID";                                                //$NON-NLS-1$
+   private static final String                    ATTR_PROFILE_NAME           = "profileName";                                              //$NON-NLS-1$
+   private static final String                    ATTR_TOUR_LOCATION_VERSION  = "tourLocationVersion";                                      //$NON-NLS-1$
 
-   static final String                            KEY_LOCATION_PART_ID       = "KEY_LOCATION_PART_ID";                                     //$NON-NLS-1$
-   static final String                            KEY_IS_NOT_AVAILABLE       = "KEY_IS_NOT_AVAILABLE";                                     //$NON-NLS-1$
+   static final String                            KEY_LOCATION_PART_ID        = "KEY_LOCATION_PART_ID";                                     //$NON-NLS-1$
+   static final String                            KEY_IS_NOT_AVAILABLE        = "KEY_IS_NOT_AVAILABLE";                                     //$NON-NLS-1$
 
-   private static final String                    COUNTRY_CODE_US            = "us";                                                       //$NON-NLS-1$
+   private static final String                    COUNTRY_CODE_US             = "us";                                                       //$NON-NLS-1$
 
-   private static final String                    SUB_TASK_MESSAGE           = Messages.Tour_Location_Task_RetrievingTourLocations_Subtask;
-   private static final String                    SUB_TASK_MESSAGE_SKIPPED   = "%d / %d";                                                  //$NON-NLS-1$
+   private static final String                    SUB_TASK_RETRIEVE_LOCATIONS = Messages.Tour_Location_Task_RetrievingTourLocations_Subtask;
+   private static final String                    SUB_TASK_NTH_OF_ALL         = "%d / %d";                                                  //$NON-NLS-1$
 
-   private static final String                    _userAgent                 = "MyTourbook/" + ApplicationVersion.getVersionSimple();      //$NON-NLS-1$
+   private static final String                    _userAgent                  = "MyTourbook/" + ApplicationVersion.getVersionSimple();      //$NON-NLS-1$
 
-   private static final HttpClient                _httpClient                = HttpClient
+   private static final HttpClient                _httpClient                 = HttpClient
 
          .newBuilder()
          .connectTimeout(Duration.ofSeconds(10))
          .build();
 
-   private static final StringBuilder             _displayNameBuffer         = new StringBuilder();
-   private static final Set<String>               _usedDisplayNames          = new HashSet<>();
+   private static final StringBuilder             _displayNameBuffer          = new StringBuilder();
+   private static final Set<String>               _usedDisplayNames           = new HashSet<>();
 
    /**
     * Contains all available profiles
     */
-   private static final List<TourLocationProfile> _allLocationProfiles       = new ArrayList<>();
+   private static final List<TourLocationProfile> _allLocationProfiles        = new ArrayList<>();
    private static TourLocationProfile             _defaultProfile;
 
    /**
@@ -166,7 +166,7 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   private static final int                       _zoomLevel                 = 18;
+   private static final int                       _zoomLevel                  = 18;
 
    private static long                            _lastRetrievalTimeMS;
 
@@ -1267,6 +1267,90 @@ public class TourLocationManager {
       TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving tour location data", ex); //$NON-NLS-1$
    }
 
+   public static void removeTourLocations(final List<TourData> requestedTours,
+                                          final boolean isSetStartLocation,
+                                          final boolean isSetEndLocation) {
+
+      final ArrayList<TourData> savedTours = new ArrayList<>();
+
+      try {
+
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor)
+                  throws InvocationTargetException, InterruptedException {
+
+               final int numTours = requestedTours.size();
+               final int numRequests = numTours * (isSetStartLocation && isSetEndLocation ? 2 : 1);
+               int numWorked = 0;
+
+               monitor.beginTask(Messages.Tour_Location_Task_RemovingTourLocations.formatted(numRequests), numRequests);
+
+               for (final TourData tourData : requestedTours) {
+
+                  if (monitor.isCanceled()) {
+                     break;
+                  }
+
+                  boolean isModified = false;
+
+                  /*
+                   * Start location
+                   */
+                  if (isSetStartLocation) {
+
+                     tourData.setTourStartPlace(null);
+                     tourData.setTourLocationStart(null);
+
+                     isModified = true;
+
+                     ++numWorked;
+                     monitor.worked(1);
+                  }
+
+                  /*
+                   * End location
+                   */
+                  if (isSetEndLocation) {
+
+                     tourData.setTourEndPlace(null);
+                     tourData.setTourLocationEnd(null);
+
+                     isModified = true;
+
+                     ++numWorked;
+                     monitor.worked(1);
+                  }
+
+                  monitor.subTask(SUB_TASK_NTH_OF_ALL.formatted(numWorked, numRequests));
+
+                  if (isModified) {
+
+                     TourManager.saveModifiedTour(tourData, false);
+
+                     savedTours.add(tourData);
+                  }
+               }
+            }
+         };
+
+         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+
+      } catch (final InvocationTargetException | InterruptedException e) {
+
+         StatusUtil.showStatus(e);
+         Thread.currentThread().interrupt();
+      }
+
+      if (savedTours.size() > 0) {
+
+         final TourEvent tourEvent = new TourEvent(savedTours);
+
+         // this must be fired in the UI thread
+         TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+      }
+   }
+
    public static void restoreState() {
 
       xmlRead_Profiles();
@@ -1291,6 +1375,8 @@ public class TourLocationManager {
     *
     * @param requestedTours
     * @param locationProfile
+    * @param isSetStartLocation
+    * @param isSetEndLocation
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
@@ -1302,6 +1388,7 @@ public class TourLocationManager {
       try {
 
          final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
             @Override
             public void run(final IProgressMonitor monitor)
                   throws InvocationTargetException, InterruptedException {
@@ -1329,7 +1416,7 @@ public class TourLocationManager {
                      numWorked++;
 
                      monitor.worked(2);
-                     monitor.subTask(SUB_TASK_MESSAGE_SKIPPED.formatted(numWorked, numRequests));
+                     monitor.subTask(SUB_TASK_NTH_OF_ALL.formatted(numWorked, numRequests));
 
                      continue;
                   }
@@ -1369,7 +1456,7 @@ public class TourLocationManager {
                      }
 
                      monitor.worked(1);
-                     monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
+                     monitor.subTask(SUB_TASK_RETRIEVE_LOCATIONS.formatted(++numWorked, numRequests, waitingTime));
                   }
 
                   /*
@@ -1409,7 +1496,7 @@ public class TourLocationManager {
                      }
 
                      monitor.worked(1);
-                     monitor.subTask(SUB_TASK_MESSAGE.formatted(++numWorked, numRequests, waitingTime));
+                     monitor.subTask(SUB_TASK_RETRIEVE_LOCATIONS.formatted(++numWorked, numRequests, waitingTime));
                   }
 
                   if (isModified) {
@@ -1424,18 +1511,18 @@ public class TourLocationManager {
 
          new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
 
-         if (savedTours.size() > 0) {
-
-            final TourEvent tourEvent = new TourEvent(savedTours);
-
-            // this must be fired in the UI thread
-            TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
-         }
-
       } catch (final InvocationTargetException | InterruptedException e) {
 
          StatusUtil.showStatus(e);
          Thread.currentThread().interrupt();
+      }
+
+      if (savedTours.size() > 0) {
+
+         final TourEvent tourEvent = new TourEvent(savedTours);
+
+         // this must be fired in the UI thread
+         TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
       }
    }
 

@@ -78,6 +78,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private ActionEditProfiles           _actionEditProfiles;
    private Action                       _actionProfileTitle;
+   private ActionRemoveStartEndLocation _actionRemoveStartEndLocation;
    private ActionSetOnlyStartLocation   _actionSetOnlyStartLocation;
    private ActionSetOnlyEndLocation     _actionSetOnlyEndLocation;
 
@@ -129,6 +130,19 @@ public class ActionSetStartEndLocation extends SubMenu {
       public void run() {
 
          actionSetTourLocation(_locationProfile, _isSetStartLocation, _isSetEndLocation);
+      }
+   }
+
+   private class ActionRemoveStartEndLocation extends Action {
+
+      public ActionRemoveStartEndLocation() {
+
+         super(Messages.Tour_Location_Action_RemoveStartEndLocation, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+         actionRemoveStartEndLocation();
       }
    }
 
@@ -249,6 +263,17 @@ public class ActionSetStartEndLocation extends SubMenu {
       slideoutLocationProfiles.open(false);
    }
 
+   private void actionRemoveStartEndLocation() {
+
+      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
+
+      TourLocationManager.removeTourLocations(
+
+            selectedTours,
+            true,
+            true);
+   }
+
    private void actionSetTourLocation(final TourLocationProfile locationProfile,
                                       final boolean isSetStartLocation,
                                       final boolean isSetEndLocation) {
@@ -273,6 +298,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       _actionSetOnlyStartLocation = new ActionSetOnlyStartLocation();
       _actionSetOnlyEndLocation = new ActionSetOnlyEndLocation();
+      _actionRemoveStartEndLocation = new ActionRemoveStartEndLocation();
    }
 
    @Override
@@ -296,6 +322,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       addActionToMenu(_actionSetOnlyStartLocation);
       addActionToMenu(_actionSetOnlyEndLocation);
+      addActionToMenu(_actionRemoveStartEndLocation);
 
       addSeparatorToMenu();
 

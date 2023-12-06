@@ -116,6 +116,8 @@ public abstract class TableColumnFactory {
    public static final String             LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID                = "LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID";             //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_WIDTH;
    public static final String             LOCATION_GEO_BOUNDING_BOX_WIDTH_ID                 = "LOCATION_GEO_BOUNDING_BOX_WIDTH_ID";              //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_IS_RESIZED_BOUNDING_BOX;
+   public static final String             LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID            = "LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID";         //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LATITUDE;
    public static final String             LOCATION_GEO_LATITUDE_ID                           = "LOCATION_GEO_LATITUDE_ID";                        //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LATITUDE_DIFF;
@@ -1612,6 +1614,26 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_IS_RESIZED_BOUNDING_BOX = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
 
             return colDef;
          }

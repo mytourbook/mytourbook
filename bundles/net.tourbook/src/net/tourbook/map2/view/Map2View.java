@@ -1957,7 +1957,7 @@ public class Map2View extends ViewPart implements
       _map.getDisplay().asyncExec(() -> {
 
          if (_map.getDisplay().isDisposed()) {
-            
+
             // fixing https://github.com/mytourbook/mytourbook/issues/1233
             return;
          }
@@ -4540,10 +4540,16 @@ public class Map2View extends ViewPart implements
        * Tour locations
        */
       final boolean isShowTourLocations         = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS,              STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
-      final boolean isShowTourLocationsBBox     = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
-      _directMappingPainter.setShowTourLocations(isShowTourLocations, isShowTourLocationsBBox);
+      final boolean isShowTourLocations_BBox    = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
 
 // SET_FORMATTING_ON
+
+      _directMappingPainter.setPaintContextValues(
+
+            isShowTourLocations,
+            isShowTourLocations_BBox,
+
+            isBackgroundDark);
 
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();
