@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,10 +65,8 @@ public class PrefPagePeopleTests extends UITest {
    @DisplayName("Verify the BMI")
    void testPeopleBmi() {
 
-      final SWTWorkbenchBot originalWorkbenchBot = bot;
-
       //Metric system
-      Utils.setMetricSystem(originalWorkbenchBot);
+      Utils.setMetricSystem(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -90,7 +87,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Imperial system
-      Utils.setImperialSystem(originalWorkbenchBot);
+      Utils.setImperialSystem(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -102,7 +99,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Nautical mile system
-      Utils.setDistanceNauticalMile(originalWorkbenchBot);
+      Utils.setNauticalSystem(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$

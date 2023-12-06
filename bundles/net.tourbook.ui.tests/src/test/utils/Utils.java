@@ -456,7 +456,7 @@ public class Utils {
       return tour;
    }
 
-   public static void setDistanceNauticalMile(final SWTWorkbenchBot bot) {
+   public static void setNauticalSystem(final SWTWorkbenchBot bot) {
 
       changeMeasurementSystem(bot, 2);
    }
