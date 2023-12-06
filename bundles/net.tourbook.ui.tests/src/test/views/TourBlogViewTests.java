@@ -43,7 +43,7 @@ public class TourBlogViewTests extends UITest {
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setDistanceNauticalMile(bot);
+      Utils.setMetricSystem(bot);
 
       tourBlogView.close();
    }
