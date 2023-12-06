@@ -282,7 +282,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       final int[] numberOfUploadedTours = new int[1];
       final String[] notificationText = new String[1];
 
-      final Job job = new Job(Messages.Dialog_UploadRoutesToSuunto_Task) {
+      final Job job = new Job(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Task, numberOfTours)) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
@@ -307,10 +307,10 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
                if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
 
-                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
-                        tourStartTime)));
-                  notificationText[0] = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
+                  final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
                         tourStartTime);
+                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
+                  notificationText[0] = errorMessage;
 
                   monitor.worked(2);
 

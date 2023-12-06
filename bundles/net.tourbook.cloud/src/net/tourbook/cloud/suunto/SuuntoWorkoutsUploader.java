@@ -286,7 +286,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       final int[] numberOfUploadedTours = new int[1];
       final String[] notificationText = new String[1];
 
-      final Job job = new Job(Messages.Dialog_UploadWorkoutsToSuunto_Task) {
+      final Job job = new Job(NLS.bind(Messages.Dialog_UploadWorkoutsToSuunto_Task, numberOfTours)) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
