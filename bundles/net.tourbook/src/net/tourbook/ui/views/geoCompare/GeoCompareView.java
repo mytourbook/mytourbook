@@ -130,7 +130,6 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -306,7 +305,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private GeoCompareState                 _slideoutGeoCompareState        = new GeoCompareState();
 
    private PixelConverter                  _pc;
-   private FormToolkit                     _tk;
 
    private ActionAppTourFilter             _actionAppTourFilter;
    private ActionGeoCompareOptions         _actionGeoCompareOptions;
@@ -1529,13 +1527,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              */
             {
                // Checkbox
-               _chkTourFilter_GeoDiff = _tk.createButton(
-                     parent,
-                     Messages.GeoCompare_View_Checkbox_GeoDifferenceFilter,
-                     SWT.CHECK);
-               GridDataFactory.fillDefaults() //
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_chkTourFilter_GeoDiff);
+               _chkTourFilter_GeoDiff = new Button(container, SWT.CHECK);
+               _chkTourFilter_GeoDiff.setText(Messages.GeoCompare_View_Checkbox_GeoDifferenceFilter);
                _chkTourFilter_GeoDiff.setToolTipText(Messages.GeoCompare_View_Checkbox_GeoDifferenceFilter_Tooltip);
                _chkTourFilter_GeoDiff.addSelectionListener(_filterSelectionListener);
             }
@@ -1619,11 +1612,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
              */
             {
                // Checkbox
-               _chkTourFilter_MaxResults =
-                     _tk.createButton(
-                           parent,
-                           Messages.GeoCompare_View_Checkbox_MaxResultsFilter,
-                           SWT.CHECK);
+               _chkTourFilter_MaxResults = new Button(container, SWT.CHECK);
+               _chkTourFilter_MaxResults.setText(Messages.GeoCompare_View_Checkbox_MaxResultsFilter);
                _chkTourFilter_MaxResults.setToolTipText(Messages.GeoCompare_View_Checkbox_MaxResultsFilter_Tooltip);
                _chkTourFilter_MaxResults.addSelectionListener(_compareSelectionListener);
             }
@@ -2667,7 +2657,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    /**
     * @param sortColumnId
-    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -2703,7 +2692,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _display = parent.getDisplay();
 
       _pc = new PixelConverter(parent);
-      _tk = new FormToolkit(parent.getDisplay());
 
       _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
       _compareSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CompareValues());
@@ -2776,7 +2764,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     *
     * @param minDiffValue
     *           A given value
-    *
     * @return true if the minDiffValue is between 0 and the current geo
     *         relative difference filter value, false otherwise.
     */
