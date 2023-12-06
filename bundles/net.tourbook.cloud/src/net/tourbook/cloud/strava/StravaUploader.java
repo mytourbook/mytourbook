@@ -531,6 +531,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
 
                   UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
+                        //todo fb resize?
                         Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo),
                         infoText[0]);
                });
