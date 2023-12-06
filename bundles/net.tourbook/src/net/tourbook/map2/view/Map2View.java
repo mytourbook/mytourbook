@@ -195,6 +195,7 @@ import org.oscim.core.MapPosition;
 
 /**
  * @author Wolfgang Schramm
+ *
  * @since 1.3.0
  */
 public class Map2View extends ViewPart implements
@@ -1945,6 +1946,12 @@ public class Map2View extends ViewPart implements
       // initialize map when part is created and the map size is > 0
       _map.getDisplay().asyncExec(() -> {
 
+         if (_map.getDisplay().isDisposed()) {
+            
+            // fixing https://github.com/mytourbook/mytourbook/issues/1233
+            return;
+         }
+
          restoreState();
          enableActions();
 
@@ -2513,6 +2520,7 @@ public class Map2View extends ViewPart implements
     * Calculate lat/lon bounds for all photos.
     *
     * @param allPhotos
+    *
     * @return
     */
    private Set<GeoPosition> getPhotoBounds(final ArrayList<Photo> allPhotos) {
@@ -3637,6 +3645,7 @@ public class Map2View extends ViewPart implements
 
    /**
     * @param selection
+    *
     * @return Returns a list which contains all photos.
     */
    private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
@@ -4146,6 +4155,7 @@ public class Map2View extends ViewPart implements
     *
     * @param tourData
     * @param valueIndex
+    *
     * @return
     */
    private void positionMapTo_ValueIndex(final TourData tourData, final int valueIndex) {
