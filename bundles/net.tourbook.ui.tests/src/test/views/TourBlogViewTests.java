@@ -15,6 +15,7 @@
  *******************************************************************************/
 package views;
 
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.Test;
 
@@ -32,19 +33,19 @@ public class TourBlogViewTests extends UITest {
    @Test
    void testBlogView_Basic() {
 
-      final var originalBot = bot;
+      final SWTWorkbenchBot originalWorkbenchBot = bot;
       Utils.getTour(bot);
 
       final SWTBotView tourBlogView = getTourBlogView();
       tourBlogView.show();
 
       //Change the measurement system to imperial
-      Utils.setImperialSystem(originalBot);
+      Utils.setImperialSystem(originalWorkbenchBot);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setMetricSystem(originalBot);
+      Utils.setMetricSystem(originalWorkbenchBot);
 
       tourBlogView.close();
    }
