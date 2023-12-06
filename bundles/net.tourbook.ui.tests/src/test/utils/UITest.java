@@ -21,10 +21,12 @@ import net.tourbook.application.TourbookPlugin;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 
 public abstract class UITest {
 
    protected static SWTWorkbenchBot bot                                     = new SWTWorkbenchBot();
+   protected static SWTBotCombo     comboBoxMeasurementSystem;
    protected static SWTBotView      tourBookView;
 
    protected int                    tourBookView_StartTime_Column_Index     = 2;

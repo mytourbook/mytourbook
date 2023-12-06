@@ -89,15 +89,9 @@ public class Utils {
    public static final String VIEW_NAME_WAYPOINTS              = PluginProperties.getText("View_Name_Waypoint");                  //$NON-NLS-1$
    public static final String WORKING_DIRECTORY                = System.getProperty("user.dir");                                  //$NON-NLS-1$
 
-   private static void changeMeasurementSystem(final SWTWorkbenchBot bot, final int measurementSystemIndex) {
+   private static void changeMeasurementSystem(final SWTBotCombo comboBoxMeasurementSystem, final int measurementSystemIndex) {
 
-      bot.sleep(1000);
-
-      final SWTBotCombo comboBoxMeasurementSystem = bot.comboBox(1);
-      assertNotNull(comboBoxMeasurementSystem);
       comboBoxMeasurementSystem.setSelection(measurementSystemIndex);
-
-      bot.sleep(1000);
 
       // The below code doesn't work because, for a reason I can't explain nor
       // solve, when selecting the "Metric" dropdown item, it saves it as an
@@ -456,11 +450,6 @@ public class Utils {
       return tour;
    }
 
-   public static void setNauticalSystem(final SWTWorkbenchBot bot) {
-
-      changeMeasurementSystem(bot, 2);
-   }
-
    public static void setHttpClient(final Object httpClient) {
 
       Field field;
@@ -473,14 +462,19 @@ public class Utils {
       }
    }
 
-   public static void setImperialSystem(final SWTWorkbenchBot bot) {
+   public static void setImperialSystem(final SWTBotCombo comboBoxMeasurementSystem) {
 
-      changeMeasurementSystem(bot, 1);
+      changeMeasurementSystem(comboBoxMeasurementSystem, 1);
    }
 
-   public static void setMetricSystem(final SWTWorkbenchBot bot) {
+   public static void setMetricSystem(final SWTBotCombo comboBoxMeasurementSystem) {
 
-      changeMeasurementSystem(bot, 0);
+      changeMeasurementSystem(comboBoxMeasurementSystem, 0);
+   }
+
+   public static void setNauticalSystem(final SWTBotCombo comboBoxMeasurementSystem) {
+
+      changeMeasurementSystem(comboBoxMeasurementSystem, 2);
    }
 
    public static SWTBotView showImportView(final SWTWorkbenchBot bot) {

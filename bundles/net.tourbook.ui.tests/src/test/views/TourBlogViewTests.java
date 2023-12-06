@@ -15,14 +15,19 @@
  *******************************************************************************/
 package views;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourBlogViewTests extends UITest {
+
+   @BeforeAll
+   static void initAll() {
+      comboBoxMeasurementSystem = bot.comboBox(1);
+   }
 
    private SWTBotView getTourBlogView() {
 
@@ -33,19 +38,18 @@ public class TourBlogViewTests extends UITest {
    @Test
    void testBlogView_Basic() {
 
-      final SWTWorkbenchBot originalWorkbenchBot = bot;
       Utils.getTour(bot);
 
       final SWTBotView tourBlogView = getTourBlogView();
       tourBlogView.show();
 
       //Change the measurement system to imperial
-      Utils.setImperialSystem(originalWorkbenchBot);
+      Utils.setImperialSystem(comboBoxMeasurementSystem);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setMetricSystem(originalWorkbenchBot);
+      Utils.setMetricSystem(comboBoxMeasurementSystem);
 
       tourBlogView.close();
    }

@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.Messages;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,12 @@ public class PrefPagePeopleTests extends UITest {
 
    @AfterAll
    static void cleanUp() {
-      Utils.setMetricSystem(bot);
+      Utils.setMetricSystem(comboBoxMeasurementSystem);
+   }
+
+   @BeforeAll
+   static void initAll() {
+      comboBoxMeasurementSystem = bot.comboBox(1);
    }
 
    @Test
@@ -66,7 +72,7 @@ public class PrefPagePeopleTests extends UITest {
    void testPeopleBmi() {
 
       //Metric system
-      Utils.setMetricSystem(bot);
+      Utils.setMetricSystem(comboBoxMeasurementSystem);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -87,7 +93,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Imperial system
-      Utils.setImperialSystem(bot);
+      Utils.setImperialSystem(comboBoxMeasurementSystem);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -99,7 +105,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Nautical mile system
-      Utils.setNauticalSystem(bot);
+      Utils.setNauticalSystem(comboBoxMeasurementSystem);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$

@@ -19,12 +19,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourChartAnalyzerViewTests extends UITest {
+
+   @BeforeAll
+   static void initAll() {
+      comboBoxMeasurementSystem = bot.comboBox(1);
+   }
 
    private SWTBotView getTourAnalyzerView() {
 
@@ -46,12 +52,12 @@ public class TourChartAnalyzerViewTests extends UITest {
       final SWTBotView tourAnalyzerView = getTourAnalyzerView();
 
       //Change the measurement system to imperial
-      Utils.setImperialSystem(bot);
+      Utils.setImperialSystem(comboBoxMeasurementSystem);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.setMetricSystem(bot);
+      Utils.setMetricSystem(comboBoxMeasurementSystem);
 
       tourAnalyzerView.close();
    }
