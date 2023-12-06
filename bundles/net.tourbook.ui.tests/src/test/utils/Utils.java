@@ -45,6 +45,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -240,7 +241,7 @@ public class Utils {
 
       bot.sleep(1000);
 
-      final var currentShells = bot.shells();
+      final SWTBotShell[] currentShells = bot.shells();
       // The experimental dialog message only appears once
       if (Arrays.stream(currentShells).anyMatch(shell -> shell.getText().equals("Experimental Feature"))) { //$NON-NLS-1$
 
