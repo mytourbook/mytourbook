@@ -3112,6 +3112,8 @@ public class Messages extends NLS {
    public static String        Tour_Info_Label_AllFields;
    public static String        Tour_Info_Label_AllFields_Tooltip;
 
+   public static String        Tour_Location_Action_CombineBoundingBox;
+   public static String        Tour_Location_Action_CombineBoundingBox_Tooltip;
    public static String        Tour_Location_Action_Customize_End_Tooltip;
    public static String        Tour_Location_Action_Customize_Start_Tooltip;
    public static String        Tour_Location_Action_BoundingBox_Increase;
@@ -3124,6 +3126,8 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_OpenProfileEditor;
    public static String        Tour_Location_Action_Profile_Tooltip;
    public static String        Tour_Location_Action_ProfileTitle;
+   public static String        Tour_Location_Action_ReapplyLocation;
+   public static String        Tour_Location_Action_ReapplyLocation_Tooltip;
    public static String        Tour_Location_Action_RemoveStartEndLocation;
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_RetrieveLocationAgain;

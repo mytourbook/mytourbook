@@ -1267,6 +1267,36 @@ public class TourLocationManager {
       TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving tour location data", ex); //$NON-NLS-1$
    }
 
+   public static boolean reapplyTourLocations(final List<TourLocation> allLocations) {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
+         return false;
+      }
+
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+      if (defaultProfile == null) {
+         return false;
+      }
+
+      final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
+      final List<TourData> allTourData = new ArrayList<>();
+
+      TourManager.loadTourData(allTourIds, allTourData, false);
+
+      setTourLocations(allTourData,
+
+            defaultProfile,
+
+            true, // is set start
+            true, // is set end
+
+            true // isForceReloadLocation
+      );
+
+      return true;
+   }
+
    public static void removeTourLocations(final List<TourData> requestedTours,
                                           final boolean isSetStartLocation,
                                           final boolean isSetEndLocation) {
@@ -1377,11 +1407,13 @@ public class TourLocationManager {
     * @param locationProfile
     * @param isSetStartLocation
     * @param isSetEndLocation
+    * @param isForceReloadLocation
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
                                        final boolean isSetStartLocation,
-                                       final boolean isSetEndLocation) {
+                                       final boolean isSetEndLocation,
+                                       final boolean isForceReloadLocation) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -1433,6 +1465,11 @@ public class TourLocationManager {
 
                      waitingTime = 0;
 
+                     if (isForceReloadLocation) {
+                        tourData.setTourStartPlace(null);
+                        tourData.setTourLocationStart(null);
+                     }
+
                      TourLocation tourLocationStart = tourData.getTourLocationStart();
                      if (tourLocationStart == null) {
 
@@ -1465,6 +1502,11 @@ public class TourLocationManager {
                   if (isSetEndLocation) {
 
                      waitingTime = 0;
+
+                     if (isForceReloadLocation) {
+                        tourData.setTourEndPlace(null);
+                        tourData.setTourLocationEnd(null);
+                     }
 
                      TourLocation tourLocationEnd = tourData.getTourLocationEnd();
                      if (tourLocationEnd == null) {

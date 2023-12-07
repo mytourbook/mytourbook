@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * Actions to set start/end location
+ * Actions to manage start/end location
  *
  * <pre>
  *
@@ -285,7 +285,10 @@ public class ActionSetStartEndLocation extends SubMenu {
             selectedTours,
             locationProfile,
             isSetStartLocation,
-            isSetEndLocation);
+            isSetEndLocation,
+
+            false // isForceReloadLocation
+      );
    }
 
    private void createActions() {

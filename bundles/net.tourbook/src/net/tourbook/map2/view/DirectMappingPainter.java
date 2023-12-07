@@ -107,7 +107,7 @@ public class DirectMappingPainter implements IDirectPainter {
       // get world position for the lat/lon coordinates
 
       final GeoPosition geoPosition = new GeoPosition(latitude, longitude);
-      
+
       final java.awt.Point locationPixelAWT = mp.geoToPixel(geoPosition, zoomLevel);
 
       // convert awt to swt point
@@ -538,16 +538,16 @@ public class DirectMappingPainter implements IDirectPainter {
 
          final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
 
-         final double latitudeMin = tourLocation.latitudeMin;
-         final double latitudeMax = tourLocation.latitudeMax;
-         final double longitudeMin = tourLocation.longitudeMin;
-         final double longitudeMax = tourLocation.longitudeMax;
+         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
 
-         final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
-         final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
+         final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
+         final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
 
-         final Point providedBBox_BottomLeft = convertGeoPoint(mp, latitudeMax, longitudeMin, zoomLevel);
-         final Point providedBBox_BottomRight = convertGeoPoint(mp, latitudeMax, longitudeMax, zoomLevel);
+         final Point providedBBox_BottomLeft = convertGeoPoint(mp, latitudeMax_Resized, longitudeMin_Resized, zoomLevel);
+         final Point providedBBox_BottomRight = convertGeoPoint(mp, latitudeMax_Resized, longitudeMax_Resized, zoomLevel);
 
          // check if location is visible
          if (viewport.contains(requestedLocation)
@@ -616,16 +616,22 @@ public class DirectMappingPainter implements IDirectPainter {
 
                );
 
-               final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
-               final boolean isBBoxResized = latitudeMin != latitudeMin_Resized;
+               final double latitudeMin = tourLocation.latitudeMin;
+               final double latitudeMax = tourLocation.latitudeMax;
+               final double longitudeMin = tourLocation.longitudeMin;
+               final double longitudeMax = tourLocation.longitudeMax;
+
+               final boolean isBBoxResized = false
+
+                     || latitudeMin != latitudeMin_Resized
+                     || latitudeMax != latitudeMax_Resized
+
+                     || longitudeMin != longitudeMin_Resized
+                     || longitudeMax != longitudeMax_Resized;
 
                if (isBBoxResized) {
 
-                  // draw expanded bbox
-
-                  final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
-                  final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
-                  final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+                  // draw resized bbox
 
                   final Point providedBBox_TopLeft_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
                   final Point providedBBox_TopRight_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
