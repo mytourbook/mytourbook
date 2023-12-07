@@ -30,17 +30,16 @@ import org.eclipse.swt.widgets.Text;
 
 class MTNotificationPopup extends AbstractNotificationPopup {
 
-   private ImageDescriptor IMAGEDESCRIPTOR;
-
-   private String          _title;
+   private ImageDescriptor _imageDescriptor;
    private String          _text;
+   private String          _title;
 
    MTNotificationPopup(final Display display,
                        final ImageDescriptor imageDescriptor,
                        final String title,
                        final String text) {
       super(display);
-      IMAGEDESCRIPTOR = imageDescriptor;
+      _imageDescriptor = imageDescriptor;
       _title = title;
       _text = text;
    }
@@ -71,7 +70,7 @@ class MTNotificationPopup extends AbstractNotificationPopup {
 
    @Override
    protected Image getPopupShellImage(final int maximumHeight) {
-      return IMAGEDESCRIPTOR.createImage();
+      return _imageDescriptor.createImage();
    }
 
    @Override
