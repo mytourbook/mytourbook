@@ -521,8 +521,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             if (PlatformUI.isWorkbenchRunning()) {
 
-               final String[] infoText = new String[1];
-               infoText[0] = event.getResult().isOK()
+               final String infoText = event.getResult().isOK()
                      ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
                            numberOfUploadedTours[0],
                            numberOfTours - numberOfUploadedTours[0])
@@ -534,7 +533,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
                   UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
                         Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo_Small),
-                        infoText[0]);
+                        infoText);
                });
             }
          }

@@ -223,8 +223,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             if (PlatformUI.isWorkbenchRunning()) {
 
-               final String[] infoText = new String[1];
-               infoText[0] = event.getResult().isOK()
+               final String infoText = event.getResult().isOK()
                      ? NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
                            numberOfDownloadedTours[0],
                            _numberOfAvailableTours[0] - numberOfDownloadedTours[0])
@@ -237,7 +236,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                   UI.openNotificationPopup(
                         Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
                         Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
-                        infoText[0]);
+                        infoText);
                });
             }
          }

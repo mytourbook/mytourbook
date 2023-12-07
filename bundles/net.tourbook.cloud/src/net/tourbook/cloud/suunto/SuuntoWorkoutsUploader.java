@@ -344,8 +344,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
-                  final String[] infoText = new String[1];
-                  infoText[0] = event.getResult().isOK()
+                  final String infoText = event.getResult().isOK()
                         ? NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
                               numberOfUploadedTours[0],
                               numberOfTours - numberOfUploadedTours[0])
@@ -355,7 +354,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
                   UI.openNotificationPopup(Messages.Dialog_UploadWorkoutsToSuunto_Title,
                         Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
-                        infoText[0]);
+                        infoText);
                });
             }
          }
