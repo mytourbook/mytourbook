@@ -2342,7 +2342,7 @@ public class UI {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
-      final MyTourbookNotificationPopup notication = new MyTourbookNotificationPopup(
+      final MTNotificationPopup notication = new MTNotificationPopup(
             Display.getCurrent(),
             imageDescriptor,
             title,

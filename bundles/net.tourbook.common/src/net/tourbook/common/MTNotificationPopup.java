@@ -28,17 +28,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-class MyTourbookNotificationPopup extends AbstractNotificationPopup {
+class MTNotificationPopup extends AbstractNotificationPopup {
 
    private ImageDescriptor IMAGEDESCRIPTOR;
 
    private String          _title;
    private String          _text;
 
-   MyTourbookNotificationPopup(final Display display,
-                               final ImageDescriptor imageDescriptor,
-                               final String title,
-                               final String text) {
+   MTNotificationPopup(final Display display,
+                       final ImageDescriptor imageDescriptor,
+                       final String title,
+                       final String text) {
       super(display);
       IMAGEDESCRIPTOR = imageDescriptor;
       _title = title;
