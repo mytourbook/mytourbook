@@ -2911,7 +2911,7 @@ public class TourBookView extends ViewPart implements
 
          // move selected tour into view
 
-         _pageBook.getDisplay().timerExec(1, this::natTable_ScrollSelectedToursIntoView);
+         _pageBook.getDisplay().timerExec(1, () -> natTable_ScrollSelectedToursIntoView());
       }
    }
 

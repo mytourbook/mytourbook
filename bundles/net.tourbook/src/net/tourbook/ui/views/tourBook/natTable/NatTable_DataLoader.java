@@ -63,7 +63,7 @@ public class NatTable_DataLoader {
    private static final String                            SQL_ASCENDING                  = "ASC";                           //$NON-NLS-1$
    private static final String                            SQL_DESCENDING                 = "DESC";                          //$NON-NLS-1$
 
-   private static final String                            SQL_DEFAULT_FIELD              = "TourStartTime";                 //$NON-NLS-1$
+   private static final String                            SQL_DEFAULT_SORT_FIELD         = "TourStartTime";                 //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
@@ -855,7 +855,7 @@ public class NatTable_DataLoader {
        */
 
       // tour date
-      case TableColumnFactory.TIME_DATE_ID:                          return SQL_DEFAULT_FIELD;
+      case TableColumnFactory.TIME_DATE_ID:                          return SQL_DEFAULT_SORT_FIELD;
 
       // tour time, THERE IS CURRENTLY NO DATE ONLY FIELD
       case TableColumnFactory.TIME_TOUR_START_TIME_ID:               return FIELD_WITHOUT_SORTING;
@@ -1037,7 +1037,7 @@ public class NatTable_DataLoader {
                + " has not a valid sql field" //$NON-NLS-1$
                );
 
-         return SQL_DEFAULT_FIELD;
+         return SQL_DEFAULT_SORT_FIELD;
       }
 
    // SET_FORMATTING_ON
@@ -1251,6 +1251,7 @@ public class NatTable_DataLoader {
       _allSqlSortFields_SelectFields.clear();
       _allSqlSortDirections.clear();
 
+      boolean isSortedByDateTime = false;
       final int numSortColumns = allSortDirections.size();
 
       for (int columnIndex = 0; columnIndex < numSortColumns; columnIndex++) {
@@ -1263,43 +1264,70 @@ public class NatTable_DataLoader {
           * Ensure that the dummy field is not used in the sql statement, this should not happen but
           * it did during development
           */
-         if (FIELD_WITHOUT_SORTING.equals(sqlField_OrderBy) == false) {
+         if (FIELD_WITHOUT_SORTING.equals(sqlField_OrderBy)) {
 
-            final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
+            // field is not sorted
 
-            // skip field which are not sorted
-            if (sortDirectionEnum.equals(SortDirectionEnum.NONE) == false) {
+            continue;
+         }
 
-               /*
-                * Set sort order
-                */
-               if (sortDirectionEnum == SortDirectionEnum.ASC) {
-                  _allSqlSortDirections.add(SQL_ASCENDING);
-               } else {
-                  _allSqlSortDirections.add(SQL_DESCENDING);
-               }
+         if (SQL_DEFAULT_SORT_FIELD.equals(sqlField_OrderBy)) {
+            
+            isSortedByDateTime = true;
+         }
 
-               /*
-                * Set sort field(s)
-                */
-               _allSqlSortFields_OrderBy.add(sqlField_OrderBy);
+         final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
 
-               final String sqlField_SelectFields = getSqlField_SelectFields(sortColumnId);
-               if (sqlField_SelectFields != null) {
+         // skip field which are not sorted
+         if (sortDirectionEnum.equals(SortDirectionEnum.NONE) == false) {
 
-                  // use special "select" fields
-
-                  _allSqlSortFields_SelectFields.add(sqlField_SelectFields);
-
-               } else {
-
-                  // use "order by" fields
-
-                  _allSqlSortFields_SelectFields.add(sqlField_OrderBy);
-               }
+            /*
+             * Set sort order
+             */
+            if (sortDirectionEnum == SortDirectionEnum.ASC) {
+               _allSqlSortDirections.add(SQL_ASCENDING);
+            } else {
+               _allSqlSortDirections.add(SQL_DESCENDING);
             }
 
+            /*
+             * Set sort field(s)
+             */
+            _allSqlSortFields_OrderBy.add(sqlField_OrderBy);
+
+            final String sqlField_SelectFields = getSqlField_SelectFields(sortColumnId);
+            if (sqlField_SelectFields != null) {
+
+               // use special "select" fields
+
+               _allSqlSortFields_SelectFields.add(sqlField_SelectFields);
+
+            } else {
+
+               // use "order by" fields
+
+               _allSqlSortFields_SelectFields.add(sqlField_OrderBy);
+            }
          }
+      }
+
+      if (isSortedByDateTime == false) {
+
+         /**
+          * Add an additional sorting by date/time.
+          * <p>
+          * Because of the different tour ID retrievals in fetchPagedTourItems() and
+          * fetchAllTourIds(), it happened, that the sorting of the not sorted tours were different
+          * and a selected tour was not the selected display tour because of different tour ID
+          * sortings !!!
+          * <p>
+          * It took me many hours to find/debug this simple workaround.
+          */
+
+         _allSqlSortDirections.add(SQL_ASCENDING);
+
+         _allSqlSortFields_OrderBy.add(SQL_DEFAULT_SORT_FIELD);
+         _allSqlSortFields_SelectFields.add(SQL_DEFAULT_SORT_FIELD);
       }
    }
 
