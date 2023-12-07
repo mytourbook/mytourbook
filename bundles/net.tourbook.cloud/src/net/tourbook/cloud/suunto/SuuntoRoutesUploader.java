@@ -54,7 +54,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.json.JSONObject;
@@ -188,8 +187,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       if (StringUtils.hasContent(routeUpload.getError())) {
 
-         Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(NLS.bind(
-               Messages.Log_UploadRoutesToSuunto_004_UploadError,
+         Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(Messages.Log_UploadRoutesToSuunto_004_UploadError.formatted(
                routeUpload.getTourDate(),
                routeUpload.getError())));
 
@@ -197,8 +195,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
          isRouteUploaded = true;
 
-         Display.getDefault().asyncExec(() -> TourLogManager.log_OK(NLS.bind(
-               Messages.Log_UploadRoutesToSuunto_003_UploadStatus,
+         Display.getDefault().asyncExec(() -> TourLogManager.log_OK(Messages.Log_UploadRoutesToSuunto_003_UploadStatus.formatted(
                routeUpload.getTourDate(),
                routeUpload.getId())));
 
@@ -282,7 +279,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       final int[] numberOfUploadedTours = new int[1];
       final String[] notificationText = new String[1];
 
-      final Job job = new Job(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Task, numberOfTours)) {
+      final Job job = new Job(Messages.Dialog_UploadRoutesToSuunto_Task.formatted(numberOfTours)) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
@@ -297,7 +294,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                return Status.CANCEL_STATUS;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
+            monitor.subTask(Messages.Dialog_UploadRoutesToSuunto_SubTask.formatted(UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
             for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
@@ -307,7 +304,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
                if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
 
-                  final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
+                  final String errorMessage = Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate.formatted(
                         tourStartTime);
                   Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
                   notificationText[0] = errorMessage;
@@ -322,7 +319,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
+            monitor.subTask(Messages.Dialog_UploadRoutesToSuunto_SubTask.formatted(
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
@@ -330,7 +327,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.worked(toursWithGpsSeries.size());
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
+            monitor.subTask(Messages.Dialog_UploadRoutesToSuunto_SubTask.formatted(
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
 
@@ -344,7 +341,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       final long start = System.currentTimeMillis();
 
-      TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadRoutesToSuunto_001_Start, numberOfTours));
+      TourLogManager.log_TITLE(Messages.Log_UploadRoutesToSuunto_001_Start.formatted(numberOfTours));
 
       job.setPriority(Job.INTERACTIVE);
       job.schedule();
@@ -358,7 +355,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
                   final String infoText = event.getResult().isOK()
-                        ? NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
+                        ? Messages.Dialog_UploadToursToSuunto_Message.formatted(
                               numberOfUploadedTours[0],
                               numberOfTours - numberOfUploadedTours[0])
                         : notificationText[0];

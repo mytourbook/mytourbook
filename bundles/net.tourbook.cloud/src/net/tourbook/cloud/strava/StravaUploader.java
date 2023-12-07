@@ -61,7 +61,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.json.JSONObject;
@@ -279,8 +278,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       if (StringUtils.hasContent(activityUpload.getError())) {
 
-         TourLogManager.log_ERROR(NLS.bind(
-               Messages.Log_UploadToursToStrava_004_UploadError,
+         TourLogManager.log_ERROR(Messages.Log_UploadToursToStrava_004_UploadError.formatted(
                activityUpload.getTourDate(),
                activityUpload.getError()));
 
@@ -290,18 +288,15 @@ public class StravaUploader extends TourbookCloudUploader {
 
          if (StringUtils.hasContent(activityUpload.getName())) {
 
-            TourLogManager.log_OK(NLS.bind(
-                  Messages.Log_UploadToursToStrava_003_ActivityLink,
+            TourLogManager.log_OK(Messages.Log_UploadToursToStrava_003_ActivityLink.formatted(
                   activityUpload.getTourDate(),
                   activityUpload.getId()));
          } else {
 
-            TourLogManager.log_OK(NLS.bind(
-                  Messages.Log_UploadToursToStrava_003_UploadStatus,
-                  new Object[] {
-                        activityUpload.getTourDate(),
-                        activityUpload.getId(),
-                        activityUpload.getStatus() }));
+            TourLogManager.log_OK(Messages.Log_UploadToursToStrava_003_UploadStatus.formatted(
+                  activityUpload.getTourDate(),
+                  activityUpload.getId(),
+                  activityUpload.getStatus()));
          }
       }
 
@@ -328,7 +323,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          final String tourDate = TourManager.getTourDateTimeShort(tourData);
 
-         TourLogManager.log_ERROR(NLS.bind(Messages.Log_UploadToursToStrava_002_NoTourTitle, tourDate));
+         TourLogManager.log_ERROR(Messages.Log_UploadToursToStrava_002_NoTourTitle.formatted(tourDate));
          monitor.worked(2);
 
       } else {
@@ -465,7 +460,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final int[] numberOfUploadedTours = new int[1];
       final String[] notificationText = new String[1];
 
-      final Job job = new Job(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
+      final Job job = new Job(Messages.Dialog_UploadToursToStrava_Task.formatted(
             numberOfTours,
             _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME))) {
 
@@ -480,7 +475,7 @@ public class StravaUploader extends TourbookCloudUploader {
                return Status.CANCEL_STATUS;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
+            monitor.subTask(Messages.Dialog_UploadToursToStrava_SubTask.formatted(UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final Map<TourData, String> manualTours = new HashMap<>();
@@ -490,7 +485,7 @@ public class StravaUploader extends TourbookCloudUploader {
                deleteTemporaryTourFiles(toursWithTimeSeries);
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask,
+            monitor.subTask(Messages.Dialog_UploadToursToStrava_SubTask.formatted(
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
@@ -498,7 +493,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask,
+            monitor.subTask(Messages.Dialog_UploadToursToStrava_SubTask.formatted(
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
 
@@ -510,7 +505,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final long start = System.currentTimeMillis();
 
-      TourLogManager.log_TITLE(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
+      TourLogManager.log_TITLE(Messages.Log_UploadToursToStrava_001_Start.formatted(numberOfTours));
 
       job.setPriority(Job.INTERACTIVE);
       job.schedule();
@@ -522,7 +517,7 @@ public class StravaUploader extends TourbookCloudUploader {
             if (PlatformUI.isWorkbenchRunning()) {
 
                final String infoText = event.getResult().isOK()
-                     ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
+                     ? Messages.Dialog_UploadToursToStrava_Message.formatted(
                            numberOfUploadedTours[0],
                            numberOfTours - numberOfUploadedTours[0])
                      : notificationText[0];
