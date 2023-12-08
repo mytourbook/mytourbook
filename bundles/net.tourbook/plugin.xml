@@ -942,6 +942,13 @@
             mnemonic    ="%Command_DbTool_CompressDatabase_Mnemonic"
             style       ="push"/>
 
+         <!-- Delete Fulltext Index Files -->
+         <command
+            commandId   ="net.tourbook.command.DbTool.DeleteFulltextIndexFiles"
+            label       ="%Command_DbTool_DeleteFulltextIndexFiles"
+            mnemonic    ="%Command_DbTool_DeleteFulltextIndexFiles_Mnemonic"
+            style       ="push"/>
+
       </menuContribution>
 
 
@@ -1469,6 +1476,11 @@
          name           ="%Command_DbTool_CompressDatabase"
          defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compress"
       />
+
+      <command
+         id             ="net.tourbook.command.DbTool.DeleteFulltextIndexFiles"
+         name           ="%Command_DbTool_DeleteFulltextIndexFiles"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_DeleteFulltextIndexFiles"/>
 
       <command
          id             ="net.tourbook.command.OpenHomePage"

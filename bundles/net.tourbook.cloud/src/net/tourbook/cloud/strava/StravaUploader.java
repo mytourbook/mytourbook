@@ -463,8 +463,11 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
+      final String[] notificationText = new String[1];
 
-      final Job job = new Job(Messages.Dialog_UploadToursToStrava_Task) {
+      final Job job = new Job(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
+            numberOfTours,
+            _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME))) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
@@ -473,6 +476,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             if (!getValidTokens()) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(Messages.Log_CloudAction_InvalidTokens));
+               notificationText[0] = Messages.Log_CloudAction_InvalidTokens;
                return Status.CANCEL_STATUS;
             }
 
@@ -515,17 +519,21 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+            if (PlatformUI.isWorkbenchRunning()) {
+
+               final String infoText = event.getResult().isOK()
+                     ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
+                           numberOfUploadedTours[0],
+                           numberOfTours - numberOfUploadedTours[0])
+                     : notificationText[0];
 
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
                   TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
 
-                  final String infoText = NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
-                        numberOfUploadedTours[0],
-                        numberOfTours - numberOfUploadedTours[0]);
-
-                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title, infoText);
+                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo_Small),
+                        infoText);
                });
             }
          }

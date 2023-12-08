@@ -46,12 +46,12 @@ public class TourChartAnalyzerViewTests extends UITest {
       final SWTBotView tourAnalyzerView = getTourAnalyzerView();
 
       //Change the measurement system to imperial
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
+      Utils.setMeasurementSystem_Imperial(bot);
 
       bot.sleep(5000);
 
       //Change back the measurement system to metric
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+      Utils.setMeasurementSystem_Metric(bot);
 
       tourAnalyzerView.close();
    }

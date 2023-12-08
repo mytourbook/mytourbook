@@ -612,6 +612,10 @@ public class Messages extends NLS {
    public static String        Dialog_ExtractTour_Label_DeviceName;
    public static String        Dialog_ExtractTour_Label_SplitMethod;
 
+   public static String        Dialog_Fulltext_Action_DeleteFulltextIndexFiles;
+   public static String        Dialog_Fulltext_DeleteFulltextIndexFiles_Message;
+   public static String        Dialog_Fulltext_DeleteFulltextIndexFiles_Title;
+
    public static String        Dialog_GotoMapLocation_Action_GotoLocation;
    public static String        Dialog_GotoMapLocation_Button_PasteLatLon_FromClipboard_Tooltip;
    public static String        Dialog_GotoMapLocation_Button_PasteLatLon_FromMapMousePosition_Tooltip;
