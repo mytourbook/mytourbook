@@ -143,6 +143,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       }
 
       _numberOfAvailableTours = new int[1];
+      final String[] notificationText = new String[1];
       final int[] numberOfDownloadedTours = new int[1];
 
       final Job job = new Job(Messages.Dialog_DownloadWorkoutsFromSuunto_Task) {
@@ -156,6 +157,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
+               notificationText[0] = LOG_CLOUDACTION_INVALIDTOKENS;
                return Status.CANCEL_STATUS;
             }
 
@@ -170,6 +172,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             final Workouts workouts = retrieveWorkoutsList();
             if (workouts == null || workouts.payload().isEmpty()) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound));
+               notificationText[0] = Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
                return Status.CANCEL_STATUS;
             }
 
@@ -183,6 +186,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             final int numNewWorkouts = newWorkouts.size();
             if (numNewWorkouts == 0) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist));
+               notificationText[0] = Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
                return Status.CANCEL_STATUS;
             }
 
@@ -217,17 +221,22 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+            if (PlatformUI.isWorkbenchRunning()) {
+
+               final String infoText = event.getResult().isOK()
+                     ? NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
+                           numberOfDownloadedTours[0],
+                           _numberOfAvailableTours[0] - numberOfDownloadedTours[0])
+                     : notificationText[0];
 
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
                   TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-                  final String infoText = NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
-                        numberOfDownloadedTours[0],
-                        _numberOfAvailableTours[0] - numberOfDownloadedTours[0]);
-
-                  UI.openNotificationPopup(Messages.Dialog_DownloadWorkoutsFromSuunto_Title, infoText);
+                  UI.openNotificationPopup(
+                        Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
+                        infoText);
                });
             }
          }

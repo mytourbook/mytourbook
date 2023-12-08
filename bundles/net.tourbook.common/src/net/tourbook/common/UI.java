@@ -57,7 +57,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.notifications.NotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -2336,17 +2335,19 @@ public class UI {
     * Open a notification popup for the number of seconds configured by the user
     *
     * @param title
+    * @param imageDescriptor
     * @param text
     */
-   public static void openNotificationPopup(final String title, final String text) {
+   public static void openNotificationPopup(final String title, final ImageDescriptor imageDescriptor, final String text) {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
-      final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
-            .title(title, false)
-            .text(text)
-            .delay(delay)
-            .build();
+      final MTNotificationPopup notication = new MTNotificationPopup(
+            Display.getCurrent(),
+            imageDescriptor,
+            title,
+            text);
+      notication.setDelayClose(delay);
       notication.open();
    }
 
