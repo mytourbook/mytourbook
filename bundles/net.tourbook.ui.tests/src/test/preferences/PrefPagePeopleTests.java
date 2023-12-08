@@ -18,8 +18,6 @@ package preferences;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -32,13 +30,7 @@ public class PrefPagePeopleTests extends UITest {
 
    @AfterAll
    static void cleanUp() {
-      setMetricSystem();
-   }
-
-   private static void setMetricSystem() {
-
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(0, true);
-      UI.updateUnits();
+      Utils.setMeasurementSystem_Metric(bot);
    }
 
    @Test
@@ -69,24 +61,12 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   private void setDistanceNauticalMile() {
-
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(2, true);
-      UI.updateUnits();
-   }
-
-   private void setImperialSystem() {
-
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(1, true);
-      UI.updateUnits();
-   }
-
    @Test
    @DisplayName("Verify the BMI")
    void testPeopleBmi() {
 
       //Metric system
-      setMetricSystem();
+      Utils.setMeasurementSystem_Metric(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -107,7 +87,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Imperial system
-      setImperialSystem();
+      Utils.setMeasurementSystem_Imperial(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -119,7 +99,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Nautical mile system
-      setDistanceNauticalMile();
+      Utils.setMeasurementSystem_Nautical(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
