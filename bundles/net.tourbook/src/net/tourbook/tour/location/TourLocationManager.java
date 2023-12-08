@@ -595,6 +595,54 @@ public class TourLocationManager {
       return tourLocation;
    }
 
+   /**
+    * Firstly the locations are deleted and the contained tours are retrieved again
+    *
+    * @param allLocations
+    *
+    * @return
+    */
+   public static boolean deleteAndRetrieve(final List<TourLocation> allLocations) {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
+         return false;
+      }
+
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+      if (defaultProfile == null) {
+         return false;
+      }
+
+      // get all tour IDs before locations are deleted !!!
+      final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
+
+      if (deleteTourLocations(allLocations) == false) {
+         return false;
+      }
+
+      final List<TourData> allTourData = new ArrayList<>();
+
+      TourManager.loadTourData(allTourIds, allTourData, false);
+
+      setTourLocations(allTourData,
+
+            defaultProfile,
+
+            true, // is set start
+            true, // is set end
+
+            true // isForceReloadLocation
+      );
+
+      return true;
+   }
+
+   /**
+    * @param allLocations
+    *
+    * @return Returns <code>true</code> when tour locations were deleted
+    */
    public static boolean deleteTourLocations(final List<TourLocation> allLocations) {
 
       // ensure that a tour is NOT modified in the tour editor
@@ -1267,36 +1315,6 @@ public class TourLocationManager {
       TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving tour location data", ex); //$NON-NLS-1$
    }
 
-   public static boolean reapplyTourLocations(final List<TourLocation> allLocations) {
-
-      // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
-         return false;
-      }
-
-      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
-      if (defaultProfile == null) {
-         return false;
-      }
-
-      final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
-      final List<TourData> allTourData = new ArrayList<>();
-
-      TourManager.loadTourData(allTourIds, allTourData, false);
-
-      setTourLocations(allTourData,
-
-            defaultProfile,
-
-            true, // is set start
-            true, // is set end
-
-            true // isForceReloadLocation
-      );
-
-      return true;
-   }
-
    public static void removeTourLocations(final List<TourData> requestedTours,
                                           final boolean isSetStartLocation,
                                           final boolean isSetEndLocation) {
@@ -1408,6 +1426,8 @@ public class TourLocationManager {
     * @param isSetStartLocation
     * @param isSetEndLocation
     * @param isForceReloadLocation
+    *           When <code>true</code> then existing locations are ignored and retrieved again from
+    *           the DB or location provider
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
