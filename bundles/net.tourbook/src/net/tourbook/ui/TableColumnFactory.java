@@ -156,6 +156,8 @@ public abstract class TableColumnFactory {
    public static final String             LOCATION_PART_Town_ID                              = "LOCATION_PART_Town_ID";                           //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_PART_Village;
    public static final String             LOCATION_PART_Village_ID                           = "LOCATION_PART_Village_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_VillageTownCity;
+   public static final String             LOCATION_PART_VillageTownCity_ID                   = "LOCATION_PART_VillageTownCity_ID";                //$NON-NLS-1$
 
    public static final TableColumnFactory LOCATION_PART_CityDistrict;
    public static final String             LOCATION_PART_CityDistrict_ID                      = "LOCATION_PART_CityDistrict_ID";                   //$NON-NLS-1$
@@ -1804,6 +1806,7 @@ public abstract class TableColumnFactory {
       LOCATION_PART_City             = createColumn_Address(      categoryCity,     LOCATION_PART_City_ID,               Messages.Tour_Location_Part_City);
       LOCATION_PART_Town             = createColumn_Address(      categoryCity,     LOCATION_PART_Town_ID,               Messages.Tour_Location_Part_Town);
       LOCATION_PART_Village          = createColumn_Address(      categoryCity,     LOCATION_PART_Village_ID,            Messages.Tour_Location_Part_Village);
+      LOCATION_PART_VillageTownCity  = createColumn_Address(      categoryCity,     LOCATION_PART_VillageTownCity_ID,    Messages.Tour_Location_Part_VillageTownCity);
       LOCATION_PART_Postcode         = createColumn_Address_Trail(categoryCity,     LOCATION_PART_Postcode_ID,           Messages.Tour_Location_Part_Postcode);
 
       LOCATION_PART_Road             = createColumn_Address(      categoryRoad,     LOCATION_PART_Road_ID,               Messages.Tour_Location_Part_Road);

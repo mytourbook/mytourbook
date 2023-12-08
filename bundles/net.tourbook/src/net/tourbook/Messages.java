@@ -3133,6 +3133,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
    public static String        Tour_Location_Action_DeleteAndRetrieveLocationAgain;
    public static String        Tour_Location_Action_DeleteAndRetrieveLocationAgain_Tooltip;
+   public static String        Tour_Location_Action_ShowLocationInfo_Tooltip;
    public static String        Tour_Location_DefaultProfileName;
 
    public static String        Tour_Log_Action_Clear_Tooltip;

@@ -262,6 +262,9 @@ public class TourLocation implements Serializable {
    public int    postcodeValue    = Integer.MIN_VALUE;
 
    @Transient
+   public String villageTownCity;
+
+   @Transient
    public double latitude;
    @Transient
    public double longitude;
@@ -387,6 +390,9 @@ public class TourLocation implements Serializable {
       this.locationID = locationID;
    }
 
+   /**
+    * Set values which are not saved in the database
+    */
    public void setTransientValues() {
 
       if (latitudeMin != 0 || longitudeMin != 0) {
@@ -443,6 +449,14 @@ public class TourLocation implements Serializable {
 
          // ignore
       }
+
+      villageTownCity =
+
+            village != null ? village
+
+                  : town != null ? town
+
+                        : city;
    }
 
    @Override

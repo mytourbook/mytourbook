@@ -97,6 +97,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private static final char            NL                              = UI.NEW_LINE;
 
    private static final String          STATE_IS_LINK_WITH_OTHER_VIEWS  = "STATE_IS_LINK_WITH_OTHER_VIEWS";              //$NON-NLS-1$
+   private static final String          STATE_IS_SHOW_INFO_TOOLTIP      = "STATE_IS_SHOW_INFO_TOOLTIP";                  //$NON-NLS-1$
    private static final String          STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
    private static final String          STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
    private static final String          STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
@@ -131,9 +132,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private ActionCombineBoundingBox     _actionCombineBoundingBoxes;
    private ActionDeleteLocation         _actionDeleteLocation;
+   private ActionDeleteAndRetrieveAgain _actionDeleteAndRetrieveAgain;
    private ActionIncludeGeoPosition     _actionIncludeGeoPosition;
    private ActionLinkWithOtherViews     _actionLinkWithOtherViews;
-   private ActionDeleteAndRetrieveAgain _actionReloadLocation;
+   private ActionShowLocationInfo       _actionShowLocationInfo;
 
    private ActionResizeBoundingBox      _actionResetBoundingBox;
    private ActionResizeBoundingBox      _actionBoundingBox_Increase_1;
@@ -156,6 +158,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _nf6.setMinimumFractionDigits(6);
       _nf6.setMaximumFractionDigits(6);
    }
+
+   private TourLocationToolTip _locationTooltip;
 
    /*
     * UI controls
@@ -270,6 +274,20 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
    }
 
+   private class ActionShowLocationInfo extends Action {
+
+      public ActionShowLocationInfo() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Tour_Location_Action_ShowLocationInfo_Tooltip);
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourInfo));
+      }
+
+      @Override
+      public void run() {}
+   }
+
    private class LocationComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
@@ -286,8 +304,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          double rc = 0;
 
-         final TourLocation location1 = item1.location;
-         final TourLocation location2 = item2.location;
+         final TourLocation location1 = item1.tourLocation;
+         final TourLocation location2 = item2.tourLocation;
 
          // determine which column and do the appropriate sort
          switch (__sortColumnId) {
@@ -343,6 +361,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_City_ID:              rc = compareText(location1.city,                location2.city);              break;
          case TableColumnFactory.LOCATION_PART_Town_ID:              rc = compareText(location1.town,                location2.town);              break;
          case TableColumnFactory.LOCATION_PART_Village_ID:           rc = compareText(location1.village,             location2.village);           break;
+         case TableColumnFactory.LOCATION_PART_VillageTownCity_ID:   rc = compareText(location1.villageTownCity,     location2.villageTownCity);   break;
 
          case TableColumnFactory.LOCATION_PART_CityDistrict_ID:      rc = compareText(location1.city_district,       location2.city_district);     break;
          case TableColumnFactory.LOCATION_PART_District_ID:          rc = compareText(location1.district,            location2.district);          break;
@@ -486,6 +505,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             rc = compareText(location1.town, location2.town);
          }
 
+         // nth sort by village
+         if (rc == 0) {
+            rc = compareText(location1.village, location2.village);
+         }
+
          // nth sort by road
          if (rc == 0) {
             rc = compareText(location1.road, location2.road);
@@ -600,7 +624,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    class LocationItem {
 
-      TourLocation   location;
+      TourLocation   tourLocation;
 
       public String  latitude;
       public String  longitude;
@@ -644,7 +668,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             return false;
          }
 
-         return location.getLocationId() == other.location.getLocationId();
+         return tourLocation.getLocationId() == other.tourLocation.getLocationId();
       }
 
       private TourLocationView getEnclosingInstance() {
@@ -657,31 +681,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          final int prime = 31;
          int result = 1;
          result = prime * result + getEnclosingInstance().hashCode();
-         result = prime * result + Objects.hash(location.getLocationId());
+         result = prime * result + Objects.hash(tourLocation.getLocationId());
 
          return result;
       }
-
-      @Override
-      public String toString() {
-
-         return UI.EMPTY_STRING
-
-               + "SensorItem" + NL //                                                  //$NON-NLS-1$
-
-               + "[" + NL //                                                           //$NON-NLS-1$
-
-               + "sensor                     = " + location + NL //                      //$NON-NLS-1$
-//               + "usedFirstTime              = " + usedFirstTime + NL //               //$NON-NLS-1$
-//               + "usedLastTime               = " + usedLastTime + NL //                //$NON-NLS-1$
-//               + "isBatteryLevelAvailable    = " + isBatteryLevelAvailable + NL //     //$NON-NLS-1$
-//               + "isBatteryStatusAvailable   = " + isBatteryStatusAvailable + NL //    //$NON-NLS-1$
-//               + "isBatteryVoltageAvailable  = " + isBatteryVoltageAvailable + NL //   //$NON-NLS-1$
-
-               + "]" + NL //                                                           //$NON-NLS-1$
-         ;
-      }
-
    }
 
    public class TableContextMenuProvider implements IContextMenuProvider {
@@ -709,6 +712,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          return _tableContextMenu;
       }
    }
+
+   /**
+    * This class is used to show a tooltip only when this cell is hovered
+    */
+   public abstract class TooltipLabelProvider extends CellLabelProvider {}
 
    private void addPartListener() {
 
@@ -837,10 +845,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 // SET_FORMATTING_OFF
 
       _actionCombineBoundingBoxes      = new ActionCombineBoundingBox();
+      _actionDeleteAndRetrieveAgain    = new ActionDeleteAndRetrieveAgain();
       _actionDeleteLocation            = new ActionDeleteLocation();
       _actionIncludeGeoPosition        = new ActionIncludeGeoPosition();
       _actionLinkWithOtherViews        = new ActionLinkWithOtherViews();
-      _actionReloadLocation            = new ActionDeleteAndRetrieveAgain();
+      _actionShowLocationInfo          = new ActionShowLocationInfo();
 
       _actionBoundingBox_Increase_1    = new ActionResizeBoundingBox();
       _actionBoundingBox_Increase_5    = new ActionResizeBoundingBox();
@@ -938,12 +947,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationViewer.setContentProvider(new LocationContentProvider());
       _locationViewer.setComparator(_locationComparator);
 
-      _locationViewer.addSelectionChangedListener(selectionChangedEvent -> onLocation_Select());
-//      _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
+      _locationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectLocation());
+//    _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
 
       updateUI_SetSortDirection(
             _locationComparator.__sortColumnId,
             _locationComparator.__sortDirection);
+
+      // set info tooltip provider
+      _locationTooltip = new TourLocationToolTip(this);
 
       createUI_20_ContextMenu();
    }
@@ -998,6 +1010,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_40_City();
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
+      defineColumn_Part_42_VillageTownCity();
       defineColumn_Part_40_Postcode();
 
       // Road
@@ -1079,7 +1092,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
-            cell.setText(Long.toString(locationItem.location.getLocationId()));
+            cell.setText(Long.toString(locationItem.tourLocation.getLocationId()));
          }
       });
    }
@@ -1206,11 +1219,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.display_name);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.display_name);
          }
       });
    }
@@ -1221,11 +1234,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.name);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.name);
          }
       });
    }
@@ -1236,11 +1249,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.continent);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.continent);
          }
       });
    }
@@ -1251,11 +1264,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.country);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.country);
          }
       });
    }
@@ -1266,11 +1279,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.country_code);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.country_code);
          }
       });
    }
@@ -1281,11 +1294,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.county);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.county);
          }
       });
    }
@@ -1296,11 +1309,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.region);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.region);
          }
       });
    }
@@ -1311,11 +1324,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.state);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.state);
          }
       });
    }
@@ -1326,11 +1339,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.state_district);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.state_district);
          }
       });
    }
@@ -1341,11 +1354,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.city);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.city);
          }
       });
    }
@@ -1356,11 +1369,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.municipality);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.municipality);
          }
       });
    }
@@ -1371,11 +1384,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.postcode);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.postcode);
          }
       });
    }
@@ -1387,11 +1400,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.town);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.town);
          }
       });
    }
@@ -1402,11 +1415,26 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.village);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.village);
+         }
+      });
+   }
+
+   private void defineColumn_Part_42_VillageTownCity() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_VillageTownCity.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new TooltipLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.villageTownCity);
          }
       });
    }
@@ -1417,11 +1445,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.house_name);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.house_name);
          }
       });
    }
@@ -1433,11 +1461,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.house_number);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.house_number);
          }
       });
    }
@@ -1449,11 +1477,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.road);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.road);
          }
       });
    }
@@ -1464,11 +1492,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.borough);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.borough);
          }
       });
    }
@@ -1479,11 +1507,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.city_district);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.city_district);
          }
       });
    }
@@ -1494,11 +1522,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.district);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.district);
          }
       });
    }
@@ -1509,11 +1537,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.subdivision);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.subdivision);
          }
       });
    }
@@ -1524,11 +1552,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.suburb);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.suburb);
          }
       });
    }
@@ -1539,11 +1567,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.croft);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.croft);
          }
       });
    }
@@ -1554,11 +1582,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.hamlet);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.hamlet);
          }
       });
    }
@@ -1569,11 +1597,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.isolated_dwelling);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.isolated_dwelling);
          }
       });
    }
@@ -1584,11 +1612,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.allotments);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.allotments);
          }
       });
    }
@@ -1599,11 +1627,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.neighbourhood);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.neighbourhood);
          }
       });
    }
@@ -1614,11 +1642,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.quarter);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.quarter);
          }
       });
    }
@@ -1629,11 +1657,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.city_block);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.city_block);
          }
       });
    }
@@ -1644,11 +1672,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.commercial);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.commercial);
          }
       });
    }
@@ -1659,11 +1687,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.farm);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.farm);
          }
       });
    }
@@ -1674,11 +1702,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.farmyard);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.farmyard);
          }
       });
    }
@@ -1689,11 +1717,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.industrial);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.industrial);
          }
       });
    }
@@ -1704,11 +1732,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.residential);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.residential);
          }
       });
    }
@@ -1719,11 +1747,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.retail);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.retail);
          }
       });
    }
@@ -1734,11 +1762,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.aerialway);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.aerialway);
          }
       });
    }
@@ -1749,11 +1777,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.aeroway);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.aeroway);
          }
       });
    }
@@ -1764,11 +1792,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.amenity);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.amenity);
          }
       });
    }
@@ -1779,11 +1807,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.boundary);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.boundary);
          }
       });
    }
@@ -1794,11 +1822,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.bridge);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.bridge);
          }
       });
    }
@@ -1809,11 +1837,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.club);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.club);
          }
       });
    }
@@ -1824,11 +1852,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.craft);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.craft);
          }
       });
    }
@@ -1839,11 +1867,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.emergency);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.emergency);
          }
       });
    }
@@ -1854,11 +1882,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.historic);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.historic);
          }
       });
    }
@@ -1869,11 +1897,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.landuse);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.landuse);
          }
       });
    }
@@ -1884,11 +1912,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.leisure);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.leisure);
          }
       });
    }
@@ -1899,11 +1927,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.man_made);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.man_made);
          }
       });
    }
@@ -1914,11 +1942,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.military);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.military);
          }
       });
    }
@@ -1929,11 +1957,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.mountain_pass);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.mountain_pass);
          }
       });
    }
@@ -1944,11 +1972,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.natural2);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.natural2);
          }
       });
    }
@@ -1959,11 +1987,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.office);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.office);
          }
       });
    }
@@ -1974,11 +2002,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.place);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.place);
          }
       });
    }
@@ -1989,11 +2017,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.railway);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.railway);
          }
       });
    }
@@ -2004,11 +2032,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.shop);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.shop);
          }
       });
    }
@@ -2019,11 +2047,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.tourism);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.tourism);
          }
       });
    }
@@ -2034,11 +2062,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.tunnel);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.tunnel);
          }
       });
    }
@@ -2049,11 +2077,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).location.waterway);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.waterway);
          }
       });
    }
@@ -2158,8 +2186,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       _actionCombineBoundingBoxes.setEnabled(numLocations > 1);
       _actionDeleteLocation.setEnabled(isLocationSelected);
+      _actionDeleteAndRetrieveAgain.setEnabled(isLocationSelected);
       _actionIncludeGeoPosition.setEnabled(isLocationSelected);
-      _actionReloadLocation.setEnabled(isLocationSelected);
       _actionResetBoundingBox.setEnabled(isLocationSelected);
 
       _actionBoundingBox_Increase_1.setEnabled(isOneLocation);
@@ -2199,7 +2227,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       menuMgr.add(new Separator());
 
-      menuMgr.add(_actionReloadLocation);
+      menuMgr.add(_actionDeleteAndRetrieveAgain);
       menuMgr.add(_actionDeleteLocation);
 
       enableActions();
@@ -2214,6 +2242,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
        */
       final IToolBarManager tbm = actionBars.getToolBarManager();
 
+      tbm.add(_actionShowLocationInfo);
       tbm.add(_actionLinkWithOtherViews);
    }
 
@@ -2231,6 +2260,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       return _columnManager;
    }
 
+   TableViewer getLocationViewer() {
+      return _locationViewer;
+   }
+
    private List<TourLocation> getSelectedLocations() {
 
       final List<TourLocation> allTourLocations = new ArrayList<>();
@@ -2239,7 +2272,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       for (final Object selection : structuredSelection) {
          if (selection instanceof final LocationItem locationItem) {
-            allTourLocations.add(locationItem.location);
+            allTourLocations.add(locationItem.tourLocation);
          }
       }
 
@@ -2288,6 +2321,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             onColumn_Select(e);
          }
       };
+   }
+
+   boolean isShowLocationTooltip() {
+
+      return _actionShowLocationInfo.isChecked();
    }
 
    private void loadAllLocations() {
@@ -2406,7 +2444,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final LocationItem locationItem = new LocationItem();
 
             // create detached tour location
-            final TourLocation tourLocation = locationItem.location = new TourLocation();
+            final TourLocation tourLocation = locationItem.tourLocation = new TourLocation();
 
 //SET_FORMATTING_OFF
 
@@ -2989,34 +3027,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _viewerContainer.setRedraw(true);
    }
 
-   private void onLocation_Select() {
-
-      if (_isInUIUpdate) {
-         return;
-      }
-
-      final IStructuredSelection selection = _locationViewer.getStructuredSelection();
-
-      if (selection.isEmpty()) {
-         return;
-      }
-
-      final List<TourLocation> allTourLocations = new ArrayList<>();
-
-      for (final Object object : selection.toArray()) {
-
-         if (object instanceof final LocationItem locationItem) {
-            allTourLocations.add(locationItem.location);
-         }
-      }
-
-      // this view could be inactive -> selection is not fired with the SelectionProvider interface
-      TourManager.fireEventWithCustomData(
-            TourEventId.TOUR_LOCATION_SELECTION,
-            allTourLocations,
-            this);
-   }
-
    private void onSelectionChanged(final ISelection selection) {
 
       if (_actionLinkWithOtherViews.isChecked() == false) {
@@ -3043,6 +3053,37 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          selectTourLocations(allTourData);
       }
+   }
+
+   private void onSelectLocation() {
+
+      // hide tooltip which can display content from the previous tour location
+      _locationTooltip.hide();
+
+      if (_isInUIUpdate) {
+         return;
+      }
+
+      final IStructuredSelection selection = _locationViewer.getStructuredSelection();
+
+      if (selection.isEmpty()) {
+         return;
+      }
+
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      for (final Object object : selection.toArray()) {
+
+         if (object instanceof final LocationItem locationItem) {
+            allTourLocations.add(locationItem.tourLocation);
+         }
+      }
+
+      // this view could be inactive -> selection is not fired with the SelectionProvider interface
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_LOCATION_SELECTION,
+            allTourLocations,
+            this);
    }
 
    @Override
@@ -3147,6 +3188,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       _actionLinkWithOtherViews.setChecked(Util.getStateBoolean(_state, STATE_IS_LINK_WITH_OTHER_VIEWS, false));
+      _actionShowLocationInfo.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_INFO_TOOLTIP, false));
 
       enableActions();
    }
@@ -3160,6 +3202,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _state.put(STATE_SORT_COLUMN_DIRECTION, _locationComparator.__sortDirection);
 
       _state.put(STATE_IS_LINK_WITH_OTHER_VIEWS, _actionLinkWithOtherViews.isChecked());
+      _state.put(STATE_IS_SHOW_INFO_TOOLTIP, _actionShowLocationInfo.isChecked());
 
       // keep selected tours
       Util.setState(_state, STATE_SELECTED_SENSOR_INDICES, _locationViewer.getTable().getSelectionIndices());

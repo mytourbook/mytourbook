@@ -3131,10 +3131,38 @@ public class Map2View extends ViewPart implements
 
       if (_isMapSyncWith_Tour) {
 
-         // center map to the first location
-         final TourLocation firstLocation = allTourLocations.get(0);
+         double latitudeMin_Resized = 0;
+         double latitudeMax_Resized = 0;
+         double longitudeMin_Resized = 0;
+         double longitudeMax_Resized = 0;
 
-         _map.setMapCenter(new GeoPosition(firstLocation.latitude, firstLocation.longitude));
+         boolean isFirst = true;
+
+         // center map to the center of all location bounding boxes
+         for (final TourLocation tourLocation : allTourLocations) {
+
+            if (isFirst) {
+
+               isFirst = false;
+
+               latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+               latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+               longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+               longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+            }
+
+            latitudeMin_Resized = Math.min(latitudeMin_Resized, tourLocation.latitudeMin_Resized);
+            latitudeMax_Resized = Math.max(latitudeMax_Resized, tourLocation.latitudeMax_Resized);
+
+            longitudeMin_Resized = Math.min(longitudeMin_Resized, tourLocation.longitudeMin_Resized);
+            longitudeMax_Resized = Math.max(longitudeMax_Resized, tourLocation.longitudeMax_Resized);
+
+         }
+
+         final double latitudeCenter = latitudeMin_Resized + (latitudeMax_Resized - latitudeMin_Resized) / 2;
+         final double longitudeCenter = longitudeMin_Resized + (longitudeMax_Resized - longitudeMin_Resized) / 2;
+
+         _map.setMapCenter(new GeoPosition(latitudeCenter, longitudeCenter));
       }
    }
 
