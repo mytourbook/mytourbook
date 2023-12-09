@@ -44,9 +44,11 @@ New
   - Import: Automatic completion of start and end location fields
     https://github.com/mytourbook/mytourbook/issues/878
   - Show/modify start/end location in
+    - Locations view
+    - 2D Map
+    - Tour info
     - Quick tour editor
     - Tour editor
-    - Tour info
 
 * All Tour Markers View (Frederic)
   - Added the ability to delete markers
@@ -57,6 +59,9 @@ New
 
 Improvements
 ============
+
+* 2D Map
+  - Sync map with tour locations
 
 * Quick Tour Editor
   - Resize height of the weather description field

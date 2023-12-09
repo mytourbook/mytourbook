@@ -311,6 +311,7 @@ public class Images {
    public static final String SyncWith_Slider_Disabled                   = "synch-with-tour-slider-disabled.png";                 //$NON-NLS-1$
    public static final String SyncWith_Tour                              = "synch-with-tour.png";                                 //$NON-NLS-1$
    public static final String SyncWith_Tour_Disabled                     = "synch-with-tour-disabled.png";                        //$NON-NLS-1$
+   public static final String SyncWith_TourLocation                      = "synch-with-tour-location.png";                        //$NON-NLS-1$
    public static final String Tag                                        = "tag-tag.png";                                         //$NON-NLS-1$
    public static final String Tag_Category                               = "tag-category.png";                                    //$NON-NLS-1$
    public static final String Tag_Root                                   = "tag-tag-root.png";                                    //$NON-NLS-1$

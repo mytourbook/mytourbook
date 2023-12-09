@@ -40,21 +40,18 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-/**
- * Tour info tooltip, implemented custom tooltip similar like
- * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
- * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
- */
 public class TourLocationToolTip extends ToolTip {
 
-   private static final int SHELL_MARGIN = 5;
+   private static final String USAGE_VALUES = "%d   ∙   %d   ∙   %d"; //$NON-NLS-1$
 
-   private Control          _ttControl;
+   private static final int    SHELL_MARGIN = 5;
 
-   private ColumnViewer     _tableViewer;
-   private ViewerCell       _viewerCell;
+   private Control             _ttControl;
 
-   private LocationItem     _locationItem;
+   private ColumnViewer        _tableViewer;
+   private ViewerCell          _viewerCell;
+
+   private LocationItem        _locationItem;
 
    /*
     * UI controls
@@ -149,6 +146,7 @@ public class TourLocationToolTip extends ToolTip {
 
             headerText.setText(Messages.Tour_Location_Title);
          }
+         UI.createSpacer_Vertical(container, 8, 2);
          {
             /*
              * Display name
@@ -167,7 +165,7 @@ public class TourLocationToolTip extends ToolTip {
             }
          }
 
-         UI.createSpacer_Vertical(container, 8, 2);
+         UI.createSpacer_Vertical(container, 16, 2);
 
 // SET_FORMATTING_OFF
 
@@ -238,25 +236,24 @@ public class TourLocationToolTip extends ToolTip {
          createUI_Content(container,   tourLocation.waterway,              Messages.Tour_Location_Part_Waterway);
 
 // SET_FORMATTING_ON
+
+         UI.createSpacer_Vertical(container, 16, 2);
+
+         {
+            /*
+             * Usage
+             */
+
+            final String usage = USAGE_VALUES.formatted(
+
+                  _locationItem.numTourAllLocations,
+                  _locationItem.numTourStartLocations,
+                  _locationItem.numTourEndLocations);
+
+            UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
+            UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
+         }
       }
-
-//      // Number of tour locations
-//      defineColumn_Tour_10_Usage();
-//      defineColumn_Tour_20_UsageStartLocations();
-//      defineColumn_Tour_30_UsageEndLocations();
-
-//      defineColumn_Geo_30_IsResizedBoundingBox();
-
-//      defineColumn_Geo_10_Latitude();
-//      defineColumn_Geo_12_LatitudeDiff();
-//
-//      defineColumn_Geo_20_Longitude();
-//      defineColumn_Geo_22_LongitudeDiff();
-//
-//      defineColumn_Geo_40_BoundingBox_Height();
-//      defineColumn_Geo_42_BoundingBox_Width();
-//
-//      defineColumn_Data_10_ID();
    }
 
    private Text createUI_Content(final Composite parent, final String contentValue, final String contentLabel) {
@@ -397,7 +394,7 @@ public class TourLocationToolTip extends ToolTip {
 
    private void setMaxContentWidth(final Control control) {
 
-      final int maxContentWidth = 400;
+      final int maxContentWidth = 300;
 
       final GridData gd = (GridData) control.getLayoutData();
       final Point contentSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);

@@ -1440,6 +1440,18 @@ public class UI {
    }
 
    /**
+    * Creates a {@link Label} without text.
+    *
+    * @param parent
+    *
+    * @return
+    */
+   public static Label createLabel(final Composite parent) {
+
+      return new Label(parent, SWT.NONE);
+   }
+
+   /**
     * Creates a {@link Label} with text.
     *
     * @param parent
@@ -1470,6 +1482,16 @@ public class UI {
       final Label label = new Label(parent, style);
 
       label.setText(text);
+
+      return label;
+   }
+
+   public static Label createLabel(final Composite parent, final String text, final String tooltip) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      label.setText(text);
+      label.setToolTipText(tooltip);
 
       return label;
    }
