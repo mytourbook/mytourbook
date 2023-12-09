@@ -3112,27 +3112,29 @@ public class Messages extends NLS {
    public static String        Tour_Info_Label_AllFields;
    public static String        Tour_Info_Label_AllFields_Tooltip;
 
-   public static String        Tour_Location_Action_CombineBoundingBox;
-   public static String        Tour_Location_Action_CombineBoundingBox_Tooltip;
-   public static String        Tour_Location_Action_Customize_End_Tooltip;
-   public static String        Tour_Location_Action_Customize_Start_Tooltip;
    public static String        Tour_Location_Action_BoundingBox_Increase;
    public static String        Tour_Location_Action_BoundingBox_Decrease;
+   public static String        Tour_Location_Action_CombineBoundingBox;
+   public static String        Tour_Location_Action_CombineBoundingBox_Tooltip;
+   public static String        Tour_Location_Action_Customize_Start_Tooltip;
+   public static String        Tour_Location_Action_Customize_End_Tooltip;
    public static String        Tour_Location_Action_DeleteLocation;
+   public static String        Tour_Location_Action_DeleteAndReapply;
+   public static String        Tour_Location_Action_DeleteAndReapply_Tooltip;
    public static String        Tour_Location_Action_Download_Start_Tooltip;
    public static String        Tour_Location_Action_Download_End_Tooltip;
    public static String        Tour_Location_Action_Download_WithProfile_Start_Tooltip;
    public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;
    public static String        Tour_Location_Action_IncludeGeoPosition;
    public static String        Tour_Location_Action_IncludeGeoPosition_Tooltip;
+   public static String        Tour_Location_Action_One;
+   public static String        Tour_Location_Action_One_Tooltip;
    public static String        Tour_Location_Action_OpenProfileEditor;
    public static String        Tour_Location_Action_Profile_Tooltip;
    public static String        Tour_Location_Action_ProfileTitle;
    public static String        Tour_Location_Action_RemoveStartEndLocation;
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
-   public static String        Tour_Location_Action_DeleteAndRetrieveLocationAgain;
-   public static String        Tour_Location_Action_DeleteAndRetrieveLocationAgain_Tooltip;
    public static String        Tour_Location_Action_ShowLocationInfo_Tooltip;
    public static String        Tour_Location_DefaultProfileName;
 

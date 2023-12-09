@@ -135,6 +135,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private ActionDeleteAndRetrieveAgain _actionDeleteAndRetrieveAgain;
    private ActionIncludeGeoPosition     _actionIncludeGeoPosition;
    private ActionLinkWithOtherViews     _actionLinkWithOtherViews;
+   private ActionOne                    _actionOne;
    private ActionShowLocationInfo       _actionShowLocationInfo;
 
    private ActionResizeBoundingBox      _actionResetBoundingBox;
@@ -189,14 +190,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       public ActionDeleteAndRetrieveAgain() {
 
-         setText(Messages.Tour_Location_Action_DeleteAndRetrieveLocationAgain);
-         setToolTipText(Messages.Tour_Location_Action_DeleteAndRetrieveLocationAgain_Tooltip);
+         setText(Messages.Tour_Location_Action_DeleteAndReapply);
+         setToolTipText(Messages.Tour_Location_Action_DeleteAndReapply_Tooltip);
       }
 
       @Override
       public void run() {
 
-         onAction_DeleteAndRetrieveAgain();
+         onAction_DeleteAndReapply(false);
       }
    }
 
@@ -244,6 +245,21 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       @Override
       public void run() {}
+   }
+
+   private class ActionOne extends Action {
+
+      public ActionOne() {
+
+         setText(Messages.Tour_Location_Action_One);
+         setToolTipText(Messages.Tour_Location_Action_One_Tooltip);
+      }
+
+      @Override
+      public void run() {
+
+         onAction_One();
+      }
    }
 
    private class ActionResizeBoundingBox extends Action {
@@ -626,13 +642,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       TourLocation   tourLocation;
 
-      public String  latitude;
-      public String  longitude;
-
-      public String  latitudeMin;
-      public String  latitudeMax;
-      public String  longitudeMin;
-      public String  longitudeMax;
+      public String  latitude_Text;
+      public String  longitude_Text;
 
       public String  latitudeDiff_Text;
       public String  longitudeDiff_Text;
@@ -849,6 +860,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _actionDeleteLocation            = new ActionDeleteLocation();
       _actionIncludeGeoPosition        = new ActionIncludeGeoPosition();
       _actionLinkWithOtherViews        = new ActionLinkWithOtherViews();
+      _actionOne                       = new ActionOne();
       _actionShowLocationInfo          = new ActionShowLocationInfo();
 
       _actionBoundingBox_Increase_1    = new ActionResizeBoundingBox();
@@ -1109,7 +1121,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
-            cell.setText(locationItem.latitude);
+            cell.setText(locationItem.latitude_Text);
          }
       });
    }
@@ -1141,7 +1153,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).longitude);
+            cell.setText(((LocationItem) cell.getElement()).longitude_Text);
          }
       });
    }
@@ -2184,21 +2196,26 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final boolean isLocationSelected = numLocations > 0;
       final boolean isOneLocation = numLocations == 1;
 
-      _actionCombineBoundingBoxes.setEnabled(numLocations > 1);
-      _actionDeleteLocation.setEnabled(isLocationSelected);
-      _actionDeleteAndRetrieveAgain.setEnabled(isLocationSelected);
-      _actionIncludeGeoPosition.setEnabled(isLocationSelected);
-      _actionResetBoundingBox.setEnabled(isLocationSelected);
+// SET_FORMATTING_OFF
+      
+      _actionCombineBoundingBoxes      .setEnabled(numLocations > 1);
+      _actionDeleteLocation            .setEnabled(isLocationSelected);
+      _actionDeleteAndRetrieveAgain    .setEnabled(isLocationSelected);
+      _actionIncludeGeoPosition        .setEnabled(isLocationSelected);
+      _actionOne                       .setEnabled(isLocationSelected);
+      _actionResetBoundingBox          .setEnabled(isLocationSelected);
 
-      _actionBoundingBox_Increase_1.setEnabled(isOneLocation);
-      _actionBoundingBox_Increase_5.setEnabled(isOneLocation);
-      _actionBoundingBox_Increase_10.setEnabled(isOneLocation);
-      _actionBoundingBox_Increase_100.setEnabled(isOneLocation);
+      _actionBoundingBox_Increase_1    .setEnabled(isOneLocation);
+      _actionBoundingBox_Increase_5    .setEnabled(isOneLocation);
+      _actionBoundingBox_Increase_10   .setEnabled(isOneLocation);
+      _actionBoundingBox_Increase_100  .setEnabled(isOneLocation);
 
-      _actionBoundingBox_Decrease_1.setEnabled(isOneLocation);
-      _actionBoundingBox_Decrease_5.setEnabled(isOneLocation);
-      _actionBoundingBox_Decrease_10.setEnabled(isOneLocation);
-      _actionBoundingBox_Decrease_100.setEnabled(isOneLocation);
+      _actionBoundingBox_Decrease_1    .setEnabled(isOneLocation);
+      _actionBoundingBox_Decrease_5    .setEnabled(isOneLocation);
+      _actionBoundingBox_Decrease_10   .setEnabled(isOneLocation);
+      _actionBoundingBox_Decrease_100  .setEnabled(isOneLocation);
+      
+// SET_FORMATTING_ON
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -2229,6 +2246,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       menuMgr.add(_actionDeleteAndRetrieveAgain);
       menuMgr.add(_actionDeleteLocation);
+
+      menuMgr.add(new Separator());
+
+      menuMgr.add(_actionOne);
 
       enableActions();
    }
@@ -2550,21 +2571,21 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             tourLocation.setTransientValues();
 
-            final double latitude        = tourLocation.latitude;
-            final double longitude       = tourLocation.longitude;
+            final double latitude               = tourLocation.latitude;
+            final double longitude              = tourLocation.longitude;
 
-            final double latitudeMin     = tourLocation.latitudeMin;
-            final double latitudeMax     = tourLocation.latitudeMax;
-            final double longitudeMin    = tourLocation.longitudeMin;
-            final double longitudeMax    = tourLocation.longitudeMax;
+            final double latitudeMin            = tourLocation.latitudeMin;
+            final double latitudeMax            = tourLocation.latitudeMax;
+            final double longitudeMin           = tourLocation.longitudeMin;
+            final double longitudeMax           = tourLocation.longitudeMax;
 
-            locationItem.latitude        = _nf6.format(latitude);
-            locationItem.longitude       = _nf6.format(longitude);
+            final double latitudeMin_Resized    = tourLocation.latitudeMin_Resized;
+            final double latitudeMax_Resized    = tourLocation.latitudeMax_Resized;
+            final double longitudeMin_Resized   = tourLocation.longitudeMin_Resized;
+            final double longitudeMax_Resized   = tourLocation.longitudeMax_Resized;
 
-            locationItem.latitudeMin     = _nf6.format(latitudeMin);
-            locationItem.latitudeMax     = _nf6.format(latitudeMax);
-            locationItem.longitudeMin    = _nf6.format(longitudeMin);
-            locationItem.longitudeMax    = _nf6.format(longitudeMax);
+            locationItem.latitude_Text    = _nf6.format(latitude);
+            locationItem.longitude_Text   = _nf6.format(longitude);
 
 //SET_FORMATTING_ON
 
@@ -2588,24 +2609,24 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                               ? longitudeE6_Normalized - longitudeMaxE6_Normalized
                               : 0;
 
-            final int latitudeHeight_Normalized = latitudeMaxE6_Normalized - latitudeMinE6_Normalized;
-            final int longitudeWidth_Normalized = longitudeMaxE6_Normalized - longitudeMinE6_Normalized;
+            final int latitudeHeight_Normalized = latitudeMaxE6_Resized_Normalized - latitudeMinE6_Resized_Normalized;
+            final int longitudeWidth_Normalized = longitudeMaxE6_Resized_Normalized - longitudeMinE6_Resized_Normalized;
 
             final double bboxHeight_Distance = MtMath.distanceVincenty(
 
-                  latitudeMin,
-                  longitudeMin,
-                  latitudeMax,
-                  longitudeMin
+                  latitudeMin_Resized,
+                  longitudeMin_Resized,
+                  latitudeMax_Resized,
+                  longitudeMin_Resized
 
             ) / UI.UNIT_VALUE_DISTANCE_SMALL;
 
             final double bboxWidth_Distance = MtMath.distanceVincenty(
 
-                  latitudeMin,
-                  longitudeMin,
-                  latitudeMin,
-                  longitudeMax
+                  latitudeMin_Resized,
+                  longitudeMin_Resized,
+                  latitudeMin_Resized,
+                  longitudeMax_Resized
 
             ) / UI.UNIT_VALUE_DISTANCE_SMALL;
 
@@ -2812,11 +2833,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       fireUpdateUI();
    }
 
-   private void onAction_DeleteAndRetrieveAgain() {
+   private void onAction_DeleteAndReapply(final boolean isSkipFirstLocation) {
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      if (TourLocationManager.deleteAndRetrieve(allSelectedLocations)) {
+      if (TourLocationManager.deleteAndReapply(allSelectedLocations, isSkipFirstLocation)) {
 
          fireUpdateUI();
       }
@@ -2868,7 +2889,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    }
 
    private void onAction_IncludeGeoPosition() {
-      // TODO Auto-generated method stub
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -2898,6 +2918,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       fireUpdateUI();
+   }
+
+   private void onAction_One() {
+
+      onAction_IncludeGeoPosition();
+      onAction_CombineBoundingBox();
+
+      onAction_DeleteAndReapply(true);
    }
 
    private void onAction_ResizeBoundingBox(final int resizeValue) {

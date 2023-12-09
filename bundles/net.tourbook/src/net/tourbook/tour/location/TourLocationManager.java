@@ -582,10 +582,12 @@ public class TourLocationManager {
     * Firstly the locations are deleted and the contained tours are retrieved again
     *
     * @param allLocations
+    * @param isSkipFirstLocation
     *
     * @return
     */
-   public static boolean deleteAndRetrieve(final List<TourLocation> allLocations) {
+   public static boolean deleteAndReapply(final List<TourLocation> allLocations,
+                                           final boolean isSkipFirstLocation) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -597,10 +599,30 @@ public class TourLocationManager {
          return false;
       }
 
-      // get all tour IDs before locations are deleted !!!
-      final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
+      List<TourLocation> allDelReapplyLocations;
 
-      if (deleteTourLocations(allLocations) == false) {
+      if (isSkipFirstLocation) {
+
+         final int numLocations = allLocations.size();
+
+         if (numLocations < 2) {
+
+            return false;
+         }
+
+         // skip 1st location
+
+         allDelReapplyLocations = allLocations.subList(1, numLocations);
+
+      } else {
+
+         allDelReapplyLocations = allLocations;
+      }
+
+      // get all tour IDs before locations are deleted !!!
+      final ArrayList<Long> allTourIds = getToursWithLocations(allDelReapplyLocations);
+
+      if (deleteTourLocations(allDelReapplyLocations) == false) {
          return false;
       }
 
@@ -634,11 +656,11 @@ public class TourLocationManager {
       }
 
       final ArrayList<Long> allTourIds = getToursWithLocations(allLocations);
-      final int numTours = allTourIds.size();
 
       String dialogMessage;
       String actionDeleteTags;
 
+      final int numTours = allTourIds.size();
       final int numLocations = allLocations.size();
 
       if (numLocations == 1) {

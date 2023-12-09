@@ -113,9 +113,9 @@ public class ActionTourLocation extends ContributionItem {
 
       public ActionRetrieveLocationAgain() {
 
-         super(Messages.Tour_Location_Action_DeleteAndRetrieveLocationAgain);
+         super(Messages.Tour_Location_Action_DeleteAndReapply);
 
-         setToolTipText(Messages.Tour_Location_Action_DeleteAndRetrieveLocationAgain_Tooltip);
+         setToolTipText(Messages.Tour_Location_Action_DeleteAndReapply_Tooltip);
       }
 
       @Override
