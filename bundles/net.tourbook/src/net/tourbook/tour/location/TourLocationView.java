@@ -432,11 +432,23 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_Postcode_ID:          rc = comparePostcode(location1,                 location2);                   break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
+
             rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
+
+            if (rc==0) {
+               rc = location1.longitudeE6_Normalized - location2.longitudeE6_Normalized;
+            }
+
             break;
 
          case TableColumnFactory.LOCATION_GEO_LONGITUDE_ID:
+
             rc = location1.longitudeE6_Normalized - location2.longitudeE6_Normalized;
+
+            if (rc==0) {
+               rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
+            }
+
             break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF_ID:
@@ -2197,7 +2209,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final boolean isOneLocation = numLocations == 1;
 
 // SET_FORMATTING_OFF
-      
+
       _actionCombineBoundingBoxes      .setEnabled(numLocations > 1);
       _actionDeleteLocation            .setEnabled(isLocationSelected);
       _actionDeleteAndRetrieveAgain    .setEnabled(isLocationSelected);
@@ -2214,7 +2226,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _actionBoundingBox_Decrease_5    .setEnabled(isOneLocation);
       _actionBoundingBox_Decrease_10   .setEnabled(isOneLocation);
       _actionBoundingBox_Decrease_100  .setEnabled(isOneLocation);
-      
+
 // SET_FORMATTING_ON
    }
 
