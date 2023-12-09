@@ -2548,11 +2548,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             tourLocation.longitudeMinE6_Resized_Normalized  = longitudeMinE6_Resized_Normalized;
             tourLocation.longitudeMaxE6_Resized_Normalized  = longitudeMaxE6_Resized_Normalized;
 
-            tourLocation.boundingBoxKey = latitudeMinE6_Normalized
-                                        + latitudeMaxE6_Normalized
-                                        + longitudeMinE6_Normalized
-                                        + longitudeMaxE6_Normalized;
-
             tourLocation.setTransientValues();
 
             final double latitude        = tourLocation.latitude;

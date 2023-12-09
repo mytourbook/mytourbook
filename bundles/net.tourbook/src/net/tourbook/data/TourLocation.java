@@ -109,75 +109,70 @@ public class TourLocation implements Serializable {
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int  latitudeE6_Normalized;
+   public int latitudeE6_Normalized;
 
    /**
     * Contains the normalized longitude value of the requested location
     * <p>
     * normalized = longitude + 180
     */
-   public int  longitudeE6_Normalized;
+   public int longitudeE6_Normalized;
 
    /**
     * Contains the normalized latitude min value
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int  latitudeMinE6_Normalized;
+   public int latitudeMinE6_Normalized;
 
    /**
     * Contains the normalized latitude max value
     * <p>
     * normalized = latitude + 90
     */
-   public int  latitudeMaxE6_Normalized;
+   public int latitudeMaxE6_Normalized;
 
    /**
     * Contains the normalized longitude min value
     * <p>
     * normalized = longitude + 180
     */
-   public int  longitudeMinE6_Normalized;
+   public int longitudeMinE6_Normalized;
 
    /**
     * Contains the normalized longitude max value
     * <p>
     * normalized = longitude + 180
     */
-   public int  longitudeMaxE6_Normalized;
+   public int longitudeMaxE6_Normalized;
 
    /**
     * Contains the resized normalized latitude min value
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int  latitudeMinE6_Resized_Normalized;
+   public int latitudeMinE6_Resized_Normalized;
 
    /**
     * Contains the resized normalized latitude max value
     * <p>
     * normalized = latitude + 90
     */
-   public int  latitudeMaxE6_Resized_Normalized;
+   public int latitudeMaxE6_Resized_Normalized;
 
    /**
     * Contains the resized normalized longitude min value
     * <p>
     * normalized = longitude + 180
     */
-   public int  longitudeMinE6_Resized_Normalized;
+   public int longitudeMinE6_Resized_Normalized;
 
    /**
     * Contains the resized normalized longitude max value
     * <p>
     * normalized = longitude + 180
     */
-   public int  longitudeMaxE6_Resized_Normalized;
-
-   /**
-    * Key for the <b>NOT</b> resized bounding box, is e.g. used to identify the location color
-    */
-   public long boundingBoxKey;
+   public int longitudeMaxE6_Resized_Normalized;
 
    /*
     * Fields from {@link OSMAddress}
@@ -291,6 +286,12 @@ public class TourLocation implements Serializable {
    public double longitudeMin_Resized;
    @Transient
    public double longitudeMax_Resized;
+
+   /**
+    * Key for the <b>NOT</b> resized bounding box, is e.g. used to identify the location color
+    */
+   @Transient
+   public long   boundingBoxKey;
 
    /**
     * Default constructor used also in ejb
@@ -414,18 +415,23 @@ public class TourLocation implements Serializable {
       final double dbLongitudeMin_Resized   = (longitudeMinE6_Resized_Normalized - 180_000_000) / 1E6;
       final double dbLongitudeMax_Resized   = (longitudeMaxE6_Resized_Normalized - 180_000_000) / 1E6;
 
-      latitude               = dbLatitude;
-      longitude              = dbLongitude;
+      latitude              = dbLatitude;
+      longitude             = dbLongitude;
 
-      latitudeMin            = dbLatitudeMin;
-      latitudeMax            = dbLatitudeMax;
-      longitudeMin           = dbLongitudeMin;
-      longitudeMax           = dbLongitudeMax;
+      latitudeMin           = dbLatitudeMin;
+      latitudeMax           = dbLatitudeMax;
+      longitudeMin          = dbLongitudeMin;
+      longitudeMax          = dbLongitudeMax;
 
-      latitudeMin_Resized    = dbLatitudeMin_Resized;
-      latitudeMax_Resized    = dbLatitudeMax_Resized;
-      longitudeMin_Resized   = dbLongitudeMin_Resized;
-      longitudeMax_Resized   = dbLongitudeMax_Resized;
+      latitudeMin_Resized   = dbLatitudeMin_Resized;
+      latitudeMax_Resized   = dbLatitudeMax_Resized;
+      longitudeMin_Resized  = dbLongitudeMin_Resized;
+      longitudeMax_Resized  = dbLongitudeMax_Resized;
+
+      boundingBoxKey        = latitudeMinE6_Normalized
+                            + latitudeMaxE6_Normalized
+                            + longitudeMinE6_Normalized
+                            + longitudeMaxE6_Normalized;
 
 // SET_FORMATTING_ON
 

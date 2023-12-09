@@ -4602,8 +4602,6 @@ public class TourDatabase {
             + "   longitudeMinE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
             + "   longitudeMaxE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
 
-            + "   boundingBoxKey                      BIGINT,                                " + NL //$NON-NLS-1$
-
             /*
              * Address fields
              */
