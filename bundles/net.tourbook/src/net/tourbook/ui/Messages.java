@@ -298,6 +298,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_Geo_LongitudeDiff_Header;
    public static String        ColumnFactory_Location_Geo_LongitudeDiff_Label;
    public static String        ColumnFactory_Location_Geo_LongitudeDiff_Tooltip;
+   public static String        ColumnFactory_Location_Geo_Zoomlevel_Header;
+   public static String        ColumnFactory_Location_Geo_Zoomlevel_Label;
    public static String        ColumnFactory_Location_Tour_LocationID_End;
    public static String        ColumnFactory_Location_Tour_LocationID_End_Header;
    public static String        ColumnFactory_Location_Tour_LocationID_Start;
@@ -647,6 +649,17 @@ public class Messages extends NLS {
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
    public static String        Tour_Location_Title;
+   public static String        Tour_Location_Zoomlevel_03_Country;
+   public static String        Tour_Location_Zoomlevel_05_State;
+   public static String        Tour_Location_Zoomlevel_08_County;
+   public static String        Tour_Location_Zoomlevel_10_City;
+   public static String        Tour_Location_Zoomlevel_12_TownBorough;
+   public static String        Tour_Location_Zoomlevel_13_VillageSuburb;
+   public static String        Tour_Location_Zoomlevel_14_Neighbourhood;
+   public static String        Tour_Location_Zoomlevel_15_AnySettlement;
+   public static String        Tour_Location_Zoomlevel_16_MajorStreets;
+   public static String        Tour_Location_Zoomlevel_17_MajorMinorStreets;
+   public static String        Tour_Location_Zoomlevel_18_Building;
 
    public static String        message_manager_pErrorSummary;
    public static String        message_manager_pMessageSummary;

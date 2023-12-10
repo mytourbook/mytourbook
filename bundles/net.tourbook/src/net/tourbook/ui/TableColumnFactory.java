@@ -126,6 +126,8 @@ public abstract class TableColumnFactory {
    public static final String             LOCATION_GEO_LONGITUDE_ID                          = "LOCATION_GEO_LONGITUDE_ID";                       //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_LONGITUDE_DIFF;
    public static final String             LOCATION_GEO_LONGITUDE_DIFF_ID                     = "LOCATION_GEO_LONGITUDE_DIFF_ID";                  //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_ZOOMLEVEL;
+   public static final String             LOCATION_GEO_ZOOMLEVEL_ID                          = "LOCATION_GEO_ZOOMLEVEL_ID";                       //$NON-NLS-1$
 
    public static final TableColumnFactory LOCATION_PART_DisplayName;
    public static final String             LOCATION_PART_DisplayName_ID                       = "LOCATION_PART_DisplayName_ID";                    //$NON-NLS-1$
@@ -1714,6 +1716,26 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_LongitudeDiff_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LongitudeDiff_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
             colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_ZOOMLEVEL = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_ZOOMLEVEL_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_Zoomlevel_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_Zoomlevel_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Zoomlevel_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

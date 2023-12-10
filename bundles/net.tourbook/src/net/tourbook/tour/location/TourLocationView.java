@@ -364,6 +364,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             break;
 
+         case TableColumnFactory.LOCATION_GEO_ZOOMLEVEL_ID:
+
+            rc = location1.zoomlevel - location2.zoomlevel;
+
+            break;
+
          case TableColumnFactory.LOCATION_PART_Continent_ID:         rc = compareText(location1.continent,           location2.continent);         break;
          case TableColumnFactory.LOCATION_PART_Country_ID:           rc = compareText(location1.country,             location2.country);           break;
          case TableColumnFactory.LOCATION_PART_CountryCode_ID:       rc = compareText(location1.country_code,        location2.country_code);      break;
@@ -1009,13 +1015,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       // Name
       defineColumn_Part_10_DisplayName();
-      defineColumn_Part_10_Name();
+      defineColumn_Part_12_Name();
 
       // Number of tour locations
       defineColumn_Tour_10_Usage();
       defineColumn_Tour_20_UsageStartLocations();
       defineColumn_Tour_30_UsageEndLocations();
 
+      defineColumn_Geo_50_Zoomlevel();
       defineColumn_Geo_30_IsResizedBoundingBox();
 
       // Country
@@ -1093,9 +1100,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_80_Waterway();
 
       defineColumn_Geo_10_Latitude();
-      defineColumn_Geo_12_LatitudeDiff();
-
       defineColumn_Geo_20_Longitude();
+
+      defineColumn_Geo_12_LatitudeDiff();
       defineColumn_Geo_22_LongitudeDiff();
 
       defineColumn_Geo_40_BoundingBox_Height();
@@ -1236,6 +1243,22 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
+   private void defineColumn_Geo_50_Zoomlevel() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_ZOOMLEVEL.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new TooltipLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(Integer.toString(((LocationItem) cell.getElement()).tourLocation.zoomlevel));
+         }
+      });
+   }
+
    private void defineColumn_Part_10_DisplayName() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_DisplayName.createColumn(_columnManager, _pc);
@@ -1252,7 +1275,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Part_10_Name() {
+   private void defineColumn_Part_12_Name() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Name.createColumn(_columnManager, _pc);
 
@@ -2463,7 +2486,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                + "longitudeMinE6_Resized_Normalized," + NL //     66 //$NON-NLS-1$
                + "longitudeMaxE6_Resized_Normalized," + NL //     67 //$NON-NLS-1$
 
-               + "locationID" + NL //                             68 //$NON-NLS-1$
+               + "zoomlevel," + NL //                             68 //$NON-NLS-1$
+
+               + "locationID" + NL //                             69 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_LOCATION + NL //$NON-NLS-1$
 
@@ -2563,7 +2588,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             final int longitudeMinE6_Resized_Normalized  = result.getInt(66);
             final int longitudeMaxE6_Resized_Normalized  = result.getInt(67);
 
-            final long locationID                        = result.getLong(68);
+            tourLocation.zoomlevel                       = result.getInt(68);
+
+            final long locationID                        = result.getLong(69);
 
             /*
              * Set geo positions

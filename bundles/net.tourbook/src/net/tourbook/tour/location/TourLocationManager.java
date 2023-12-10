@@ -125,6 +125,7 @@ public class TourLocationManager {
    private static final String                    ATTR_PROFILE_ID             = "profileID";                                                //$NON-NLS-1$
    private static final String                    ATTR_PROFILE_NAME           = "profileName";                                              //$NON-NLS-1$
    private static final String                    ATTR_TOUR_LOCATION_VERSION  = "tourLocationVersion";                                      //$NON-NLS-1$
+   private static final String                    ATTR_ZOOMLEVEL              = "zoomlevel";                                                //$NON-NLS-1$
 
    static final String                            KEY_LOCATION_PART_ID        = "KEY_LOCATION_PART_ID";                                     //$NON-NLS-1$
    static final String                            KEY_IS_NOT_AVAILABLE        = "KEY_IS_NOT_AVAILABLE";                                     //$NON-NLS-1$
@@ -151,6 +152,10 @@ public class TourLocationManager {
    private static final List<TourLocationProfile> _allLocationProfiles        = new ArrayList<>();
    private static TourLocationProfile             _defaultProfile;
 
+   private static long                            _lastRetrievalTimeMS;
+
+// SET_FORMATTING_OFF
+
    /**
     * Zoom address detail
     *
@@ -166,13 +171,25 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   private static final int                       _zoomLevel                  = 18;
+   public static int          DEFAULT_ZOOM_LEVEL_VALUE    = 18;
+   public static Zoomlevel    DEFAULT_ZOOM_LEVEL          = new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building);
 
-   private static long                            _lastRetrievalTimeMS;
+   static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
 
-// SET_FORMATTING_OFF
+         new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country),
+         new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State),
+         new Zoomlevel( 8, Messages.Tour_Location_Zoomlevel_08_County),
+         new Zoomlevel(10, Messages.Tour_Location_Zoomlevel_10_City),
+         new Zoomlevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough),
+         new Zoomlevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb),
+         new Zoomlevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood),
+         new Zoomlevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement),
+         new Zoomlevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets),
+         new Zoomlevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets),
+         DEFAULT_ZOOM_LEVEL
+   };
 
-   static Map<LocationPartID, String>             allLocationPartLabel = Map.ofEntries(
+   static Map<LocationPartID, String> ALL_LOCATION_PART_AND_LABEL = Map.ofEntries(
 
          Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
          Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
@@ -253,6 +270,18 @@ public class TourLocationManager {
 
 // SET_FORMATTING_ON
 
+   static class Zoomlevel {
+
+      int    zoomlevel;
+      String label;
+
+      public Zoomlevel(final int zoomlevel, final String label) {
+
+         this.zoomlevel = zoomlevel;
+         this.label = label;
+      }
+   }
+
    /**
     * Append text to the display name in {@link #_displayNameBuffer}
     *
@@ -300,7 +329,7 @@ public class TourLocationManager {
 
                default:
 
-                  label = TourLocationManager.allLocationPartLabel.get(locationPart);
+                  label = TourLocationManager.ALL_LOCATION_PART_AND_LABEL.get(locationPart);
                   break;
                }
 
@@ -437,14 +466,14 @@ public class TourLocationManager {
 
    static String createPartName_Combined(final LocationPartID locationPart) {
 
-      final String label = allLocationPartLabel.get(locationPart);
+      final String label = ALL_LOCATION_PART_AND_LABEL.get(locationPart);
 
       return UI.SYMBOL_STAR + UI.SPACE + label;
    }
 
    static String createPartName_NotAvailable(final LocationPartID locationPart) {
 
-      final String label = allLocationPartLabel.get(locationPart);
+      final String label = ALL_LOCATION_PART_AND_LABEL.get(locationPart);
 
       return UI.SYMBOL_STAR + UI.SYMBOL_STAR + UI.SPACE + label;
    }
@@ -455,12 +484,14 @@ public class TourLocationManager {
     * @param osmLocation
     * @param latitude
     * @param longitude
+    * @param zoomlevel
     *
     * @return
     */
    private static TourLocation createTourLocation(final OSMLocation osmLocation,
                                                   final double latitude,
-                                                  final double longitude) {
+                                                  final double longitude,
+                                                  final int zoomlevel) {
 
       if (osmLocation == null) {
          return null;
@@ -499,6 +530,7 @@ public class TourLocationManager {
 
       tourLocation.name                      = validString(osmLocation.name);
       tourLocation.display_name              = validString(osmLocation.display_name);
+      tourLocation.zoomlevel                 = zoomlevel;
 
       if (osmAddress != null) {
 
@@ -587,7 +619,7 @@ public class TourLocationManager {
     * @return
     */
    public static boolean deleteAndReapply(final List<TourLocation> allLocations,
-                                           final boolean isSkipFirstLocation) {
+                                          final boolean isSkipFirstLocation) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -978,12 +1010,15 @@ public class TourLocationManager {
     *
     * @param latitude
     * @param longitude
+    * @param existingLocationData
+    * @param zoomlevel
     *
     * @return
     */
    public static TourLocationData getLocationData(final double latitude,
                                                   final double longitude,
-                                                  final TourLocationData existingLocationData) {
+                                                  final TourLocationData existingLocationData,
+                                                  final int zoomlevel) {
 
       /*
        * Check if tour is contained in existing location data (which is not yet saved)
@@ -995,7 +1030,7 @@ public class TourLocationManager {
       /*
        * Check if a tour location is already saved
        */
-      final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude);
+      final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
       if (dbTourLocation != null) {
 
          return new TourLocationData(dbTourLocation);
@@ -1004,7 +1039,7 @@ public class TourLocationManager {
       /*
        * Retrieve location
        */
-      final TourLocationData tourLocationData = getLocationData_10_RetrieveData(latitude, longitude, _zoomLevel);
+      final TourLocationData tourLocationData = getLocationData_10_RetrieveData(latitude, longitude, zoomlevel);
 
       if (tourLocationData == null) {
          return null;
@@ -1012,7 +1047,7 @@ public class TourLocationManager {
 
       final OSMLocation osmLocation = getLocationData_20_DeserializeData(tourLocationData.downloadedData);
 
-      tourLocationData.tourLocation = createTourLocation(osmLocation, latitude, longitude);
+      tourLocationData.tourLocation = createTourLocation(osmLocation, latitude, longitude, zoomlevel);
 
       if (_isLogging_AddressRetrieval && osmLocation != null) {
 
@@ -1284,6 +1319,34 @@ public class TourLocationManager {
       return layerFile;
    }
 
+   /**
+    * Returns the index of the requested zoomlevel
+    *
+    * @param requestedZoomlevel
+    *
+    * @return
+    */
+   public static int getZoomlevelIndex(final int requestedZoomlevel) {
+
+      for (int zoomlevelIndex = 0; zoomlevelIndex < ALL_ZOOM_LEVEL.length; zoomlevelIndex++) {
+
+         if (ALL_ZOOM_LEVEL[zoomlevelIndex].zoomlevel >= requestedZoomlevel) {
+            return zoomlevelIndex;
+         }
+      }
+
+      final int defaultZoomlevel = DEFAULT_ZOOM_LEVEL.zoomlevel;
+
+      for (int zoomlevelIndex = 0; zoomlevelIndex < ALL_ZOOM_LEVEL.length; zoomlevelIndex++) {
+
+         if (ALL_ZOOM_LEVEL[zoomlevelIndex].zoomlevel >= defaultZoomlevel) {
+            return zoomlevelIndex;
+         }
+      }
+
+      return 0;
+   }
+
    private static boolean isLatLonInLocation(final double latitude,
                                              final double longitude,
                                              final TourLocationData existingLocationData) {
@@ -1498,7 +1561,12 @@ public class TourLocationManager {
                      TourLocation tourLocationStart = tourData.getTourLocationStart();
                      if (tourLocationStart == null) {
 
-                        startLocationData = getLocationData(latitudeSerie[0], longitudeSerie[0], null);
+                        startLocationData = getLocationData(
+
+                              latitudeSerie[0],
+                              longitudeSerie[0],
+                              null,
+                              locationProfile.getZoomlevel());
 
                         if (startLocationData != null) {
 
@@ -1543,7 +1611,8 @@ public class TourLocationManager {
                               latitudeSerie[lastIndex],
                               longitudeSerie[lastIndex],
 
-                              startLocationData);
+                              startLocationData,
+                              locationProfile.getZoomlevel());
 
                         if (endLocationData != null) {
 
@@ -1648,6 +1717,7 @@ public class TourLocationManager {
                   profile.profileId = profileId;
                }
 
+               profile.zoomlevel = Util.getXmlInteger(xmlProfile, ATTR_ZOOMLEVEL, DEFAULT_ZOOM_LEVEL_VALUE);
                profile.name = Util.getXmlString(xmlProfile, ATTR_PROFILE_NAME, UI.EMPTY_STRING);
 
                final IMemento xmlParts = xmlProfile.getChild(TAG_PARTS);
@@ -1719,6 +1789,7 @@ public class TourLocationManager {
             final IMemento xmlLocation = xmlRoot.createChild(TAG_PROFILE);
 
             xmlLocation.putInteger(ATTR_PROFILE_ID, locationProfile.profileId);
+            xmlLocation.putInteger(ATTR_ZOOMLEVEL, locationProfile.getZoomlevel());
             xmlLocation.putString(ATTR_PROFILE_NAME, locationProfile.getName());
 
             // <Parts>

@@ -2520,15 +2520,19 @@ public class Messages extends NLS {
    public static String        Slideout_TourInfoOptions_Label_TooltipDelaySimple_Tooltip;
    public static String        Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
 
+   public static String        Slideout_TourLocation_Action_ApplyAndClose_Tooltip;
    public static String        Slideout_TourLocation_Action_DefaultProfile;
    public static String        Slideout_TourLocation_Action_DefaultProfile_Tooltip;
    public static String        Slideout_TourLocation_Column_Default;
    public static String        Slideout_TourLocation_Column_Default_Tooltip;
    public static String        Slideout_TourLocation_Column_LocationParts;
+   public static String        Slideout_TourLocation_Column_Zoomlevel;
    public static String        Slideout_TourLocation_Label_EndLocation_Title;
    public static String        Slideout_TourLocation_Label_LocationParts;
    public static String        Slideout_TourLocation_Label_SelectedLocationParts;
    public static String        Slideout_TourLocation_Label_StartLocation_Title;
+   public static String        Slideout_TourLocation_Label_Zoomlevel;
+   public static String        Slideout_TourLocation_Label_Zoomlevel_Tooltip;
 
    public static String        Slideout_TourLogOptions_Checkbox_Event_DeleteSomething;
    public static String        Slideout_TourLogOptions_Checkbox_Event_DownloadSomething;

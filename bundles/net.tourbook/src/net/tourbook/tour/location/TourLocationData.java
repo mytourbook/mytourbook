@@ -17,11 +17,15 @@ package net.tourbook.tour.location;
 
 import de.byteholder.geoclipse.map.UI;
 
+import java.io.Serializable;
+
 import net.tourbook.data.TourLocation;
 
-public class TourLocationData {
+public class TourLocationData implements Serializable {
 
-   private static final String NL = UI.NEW_LINE;
+   private static final long   serialVersionUID = 1L;
+
+   private static final String NL               = UI.NEW_LINE;
 
    String                      downloadedData;
 

@@ -2178,12 +2178,12 @@ public class TourDatabase {
       return tourData;
    }
 
-   public static TourLocation getTourLocation(final double latitude, final double longitude) {
+   public static TourLocation getTourLocation(final double latitude, final double longitude, final int zoomlevel) {
 
       final int latitudeE6 = Util.convertDouble_ToE6(latitude);
       final int longitudeE6 = Util.convertDouble_ToE6(longitude);
 
-      return getTourLocation(latitudeE6, longitudeE6);
+      return getTourLocation(latitudeE6, longitudeE6, zoomlevel);
    }
 
    /**
@@ -2194,7 +2194,7 @@ public class TourDatabase {
     *
     * @return
     */
-   private static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6) {
+   private static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6, final int zoomlevel) {
 
       TourLocation dbTourLocation = null;
 
@@ -2214,11 +2214,13 @@ public class TourDatabase {
 
                   + " WHERE " + NL //                                                           //$NON-NLS-1$
 
-                  + "   tourLocation.latitudeMinE6_Resized_Normalized  <= ? AND " + NL //   1  //$NON-NLS-1$
-                  + "   tourLocation.latitudeMaxE6_Resized_Normalized  >= ? AND " + NL //   2  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMinE6_Resized_Normalized  <= ? AND " + NL //    1  //$NON-NLS-1$
+                  + "   tourLocation.latitudeMaxE6_Resized_Normalized  >= ? AND " + NL //    2  //$NON-NLS-1$
 
-                  + "   tourLocation.longitudeMinE6_Resized_Normalized <= ? AND " + NL //   3  //$NON-NLS-1$
-                  + "   tourLocation.longitudeMaxE6_Resized_Normalized >= ?" + NL //        4  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMinE6_Resized_Normalized <= ? AND " + NL //    3  //$NON-NLS-1$
+                  + "   tourLocation.longitudeMaxE6_Resized_Normalized >= ? AND " + NL //    4  //$NON-NLS-1$
+
+                  + "   tourLocation.zoomlevel >= ?" + NL //                                 5  //$NON-NLS-1$
             ;
 
             final Query emQuery = em.createQuery(sql);
@@ -2227,6 +2229,7 @@ public class TourDatabase {
             emQuery.setParameter(2, latitudeE6_Normalized);
             emQuery.setParameter(3, longitudeE6_Normalized);
             emQuery.setParameter(4, longitudeE6_Normalized);
+            emQuery.setParameter(5, zoomlevel);
 
             try {
 
@@ -3506,7 +3509,8 @@ public class TourDatabase {
 
          final TourLocation loadedTourLocation = getTourLocation(
                requestedTourLocation.latitudeE6,
-               requestedTourLocation.longitudeE6);
+               requestedTourLocation.longitudeE6,
+               requestedTourLocation.zoomlevel);
 
          if (loadedTourLocation != null) {
 
@@ -4588,6 +4592,8 @@ public class TourDatabase {
 
             + "   name                                VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   display_name                        VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   zoomlevel                           INTEGER,                               " + NL //$NON-NLS-1$
 
             + "   latitudeE6_Normalized               INTEGER,                               " + NL //$NON-NLS-1$
             + "   longitudeE6_Normalized              INTEGER,                               " + NL //$NON-NLS-1$

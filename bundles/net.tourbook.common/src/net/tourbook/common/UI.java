@@ -1496,6 +1496,18 @@ public class UI {
       return label;
    }
 
+   /**
+    * Create a spacer for one column
+    *
+    * @param parent
+    *
+    * @return
+    */
+   public static Label createSpacer_Horizontal(final Composite parent) {
+
+      return createSpacer_Horizontal(parent, 1);
+   }
+
    public static Label createSpacer_Horizontal(final Composite parent, final int columns) {
 
       final Label label = new Label(parent, SWT.NONE);

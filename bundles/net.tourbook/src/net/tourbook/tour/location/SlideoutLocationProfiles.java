@@ -32,6 +32,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -57,11 +58,14 @@ import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DLItem;
 import org.eclipse.nebula.widgets.opal.duallist.mt.MT_DualList;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -74,15 +78,19 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SlideoutLocationProfiles extends AdvancedSlideout {
 
+   private static final String             ZOOM_LEVEL_ITEM   = "%3d  %s";                        //$NON-NLS-1$
+
    /**
     * Fields in {@link TourLocation} which are not displayed as location part
     */
-   private static final Set<String>        _ignoredFields    = Stream.of(
+   private static final Set<String>        IGNORED_FIELDS    = Stream.of(
 
          "ISO3166_2_lvl4",                                                                       //$NON-NLS-1$
 
          "name",                                                                                 //$NON-NLS-1$
          "display_name",                                                                         //$NON-NLS-1$
+
+         "villageTownCity",                                                                      //$NON-NLS-1$
 
          "latitudeMinE6_Normalized",                                                             //$NON-NLS-1$
          "latitudeMaxE6_Normalized",                                                             //$NON-NLS-1$
@@ -105,6 +113,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private TableViewer                     _profileViewer;
 
    private ModifyListener                  _defaultModifyListener;
+   private FocusListener                   _keepOpenListener;
+
+   private boolean                         _isInUpdateUI;
 
    private final List<TourLocationProfile> _allProfiles      = TourLocationManager.getProfiles();
    private TourLocationProfile             _selectedProfile;
@@ -125,6 +136,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private Button      _btnCopyProfile;
    private Button      _btnDefaultProfile;
    private Button      _btnDeleteProfile;
+
+   private Combo       _comboZoomlevel;
 
    private Label       _lblLocationParts;
    private Label       _lblProfileName;
@@ -285,7 +298,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             final String fieldName = field.getName();
 
             // skip field names which are not address parts
-            if (_ignoredFields.contains(fieldName)) {
+            if (IGNORED_FIELDS.contains(fieldName)) {
                continue;
             }
 
@@ -298,7 +311,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
                   final LocationPartID locationPart = LocationPartID.valueOf(fieldName);
 
-                  final String label = TourLocationManager.allLocationPartLabel.get(locationPart);
+                  final String label = TourLocationManager.ALL_LOCATION_PART_AND_LABEL.get(locationPart);
 
                   final MT_DLItem dlItem = new MT_DLItem(
                         stringValue,
@@ -356,6 +369,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
       final TableColumn tc = tvc.getColumn();
+
       tc.setText(Messages.Slideout_TourLocation_Column_LocationParts);
 
       tvc.setLabelProvider(new CellLabelProvider() {
@@ -372,7 +386,28 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
    }
 
-   private void createColumn_30_IsDefaultProfile(final TableColumnLayout tableLayout) {
+   private void createColumn_30_Zoomlevel(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
+      final TableColumn tc = tvc.getColumn();
+
+      tc.setText(Messages.Slideout_TourLocation_Column_Zoomlevel);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
+
+            cell.setText(Integer.toString(profile.getZoomlevel()));
+         }
+      });
+
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
+   }
+
+   private void createColumn_40_IsDefaultProfile(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
       final TableColumn tc = tvc.getColumn();
@@ -410,6 +445,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       // load profile viewer
       _profileViewer.setInput(new Object());
 
+      fillUI();
+
       restoreState();
    }
 
@@ -432,7 +469,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-            .hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(12))
+            .hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(15))
             .applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
@@ -480,7 +517,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
        */
       createColumn_10_ProfileName(tableLayout);
       createColumn_20_LocationParts(tableLayout);
-      createColumn_30_IsDefaultProfile(tableLayout);
+      createColumn_30_Zoomlevel(tableLayout);
+      createColumn_40_IsDefaultProfile(tableLayout);
 
       /*
        * Create table viewer
@@ -572,6 +610,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_CYAN);
       {
          {
             // label: Profile name
@@ -589,7 +628,23 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                   .grab(true, false)
                   .applyTo(_txtProfileName);
          }
-         UI.createSpacer_Horizontal(container, 1);
+         UI.createSpacer_Horizontal(container);
+      }
+      {
+         /*
+          * Zoomlevel
+          */
+         UI.createLabel(container,
+               Messages.Slideout_TourLocation_Label_Zoomlevel,
+               Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
+
+         _comboZoomlevel = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboZoomlevel.setVisibleItemCount(20);
+         _comboZoomlevel.setToolTipText(Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
+         _comboZoomlevel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Modify()));
+         _comboZoomlevel.addFocusListener(_keepOpenListener);
+
+         UI.createSpacer_Horizontal(container);
       }
       {
          // label: selected location parts
@@ -609,6 +664,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                   .align(SWT.FILL, SWT.BEGINNING)
                   .grab(true, false)
                   .span(2, 1)
+
+                  // align to the label position
+                  .indent(-3, 0)
                   .applyTo(_txtSelectedLocationParts);
          }
          {
@@ -616,6 +674,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
             _btnApplyAndClose = new Button(container, SWT.PUSH);
             _btnApplyAndClose.setText(OtherMessages.APP_ACTION_APPLY_AND_CLOSE);
+            _btnApplyAndClose.setToolTipText(Messages.Slideout_TourLocation_Action_ApplyAndClose_Tooltip);
             _btnApplyAndClose.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doApplyAndClose()));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
@@ -695,10 +754,29 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _listLocationParts.setEnabled(isProfileSelected);
    }
 
+   private void fillUI() {
+
+      for (final Zoomlevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
+
+         _comboZoomlevel.add(ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
+      }
+   }
+
    @Override
    protected Rectangle getParentBounds() {
 
       return _ownerBounds;
+   }
+
+   private int getSelectedZoomlevel() {
+
+      int selectionIndex = _comboZoomlevel.getSelectionIndex();
+
+      if (selectionIndex < 0) {
+         selectionIndex = 0;
+      }
+
+      return TourLocationManager.ALL_ZOOM_LEVEL[selectionIndex].zoomlevel;
    }
 
    private void initUI(final Composite parent) {
@@ -708,6 +786,24 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _pc = new PixelConverter(parent);
 
       _defaultModifyListener = modifyEvent -> onProfile_Modify();
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsKeepOpenInternally(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+            setIsKeepOpenInternally(false);
+         }
+      };
 
       // cleanup previous slideout openings
       _selectedProfile = null;
@@ -727,16 +823,16 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void onProfile_Add() {
 
-      final TourLocationProfile filterProfile = new TourLocationProfile();
+      final TourLocationProfile locationProfile = new TourLocationProfile();
 
       // update model
-      _allProfiles.add(filterProfile);
+      _allProfiles.add(locationProfile);
 
       // update viewer
       _profileViewer.refresh();
 
       // select new profile
-      selectProfile(filterProfile);
+      selectProfile(locationProfile);
 
       _txtProfileName.setFocus();
    }
@@ -748,16 +844,16 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          return;
       }
 
-      final TourLocationProfile filterProfile = _selectedProfile.clone();
+      final TourLocationProfile locationProfile = _selectedProfile.clone();
 
       // update model
-      _allProfiles.add(filterProfile);
+      _allProfiles.add(locationProfile);
 
       // update viewer
       _profileViewer.refresh();
 
       // select new profile
-      selectProfile(filterProfile);
+      selectProfile(locationProfile);
 
       _txtProfileName.setFocus();
    }
@@ -836,10 +932,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       /*
        * Select another profile at the same position
        */
-      final int numFilters = _allProfiles.size();
-      final int nextFilterIndex = Math.min(numFilters - 1, lastIndex);
+      final int numProfiles = _allProfiles.size();
+      final int nextLocationIndex = Math.min(numProfiles - 1, lastIndex);
 
-      final Object nextSelectedProfile = _profileViewer.getElementAt(nextFilterIndex);
+      final Object nextSelectedProfile = _profileViewer.getElementAt(nextLocationIndex);
       if (nextSelectedProfile == null) {
 
          _selectedProfile = null;
@@ -859,19 +955,24 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void onProfile_Modify() {
 
+      if (_isInUpdateUI) {
+         return;
+      }
+
       if (_selectedProfile == null) {
          return;
       }
 
-      final String profileName = _txtProfileName.getText();
-
-      _selectedProfile.name = profileName;
+      _selectedProfile.name = _txtProfileName.getText();
+      _selectedProfile.zoomlevel = getSelectedZoomlevel();
 
       // a refresh() is needed to resort the viewer
       _profileViewer.refresh();
    }
 
    private void onProfile_Select() {
+
+      _isInUpdateUI = true;
 
       TourLocationProfile selectedProfile = null;
 
@@ -885,6 +986,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       if (_selectedProfile != null && _selectedProfile == selectedProfile) {
 
          // a new profile is not selected
+
+         _isInUpdateUI = false;
+
          return;
       }
 
@@ -899,6 +1003,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
          _txtProfileName.setText(UI.EMPTY_STRING);
 
+         _isInUpdateUI = false;
+
+         return;
+
       } else {
 
          _txtProfileName.setText(_selectedProfile.getName());
@@ -912,8 +1020,12 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          }
       }
 
-      // set selected/not selected parts
+      // zoomlevel
+      _comboZoomlevel.select(TourLocationManager.getZoomlevelIndex(_selectedProfile.getZoomlevel()));
 
+      /*
+       * Set selected/not selected parts
+       */
       final List<LocationPartID> allProfileParts = _selectedProfile.allParts;
 
       final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
@@ -969,6 +1081,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       updateModelAndUI_FromSelectedParts();
 
       enableControls();
+
+      _isInUpdateUI = false;
    }
 
    private void restoreState() {
@@ -1000,6 +1114,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    }
 
    private void selectProfile(final TourLocationProfile selectedProfile) {
+
+      final int zoomlevel = selectedProfile.getZoomlevel();
+      _comboZoomlevel.select(TourLocationManager.getZoomlevelIndex(zoomlevel));
 
       _profileViewer.setSelection(new StructuredSelection(selectedProfile));
 

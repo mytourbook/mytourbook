@@ -115,7 +115,7 @@ public class ActionSetStartEndLocation extends SubMenu {
          _isSetStartLocation = isSetStartLocation;
          _isSetEndLocation = isSetEndLocation;
 
-         final String profileName = _locationProfile.getName();
+         final String profileName = "%s - %d".formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
 
          setText(profileName);
@@ -235,7 +235,8 @@ public class ActionSetStartEndLocation extends SubMenu {
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
                latitudeSerie[0],
                longitudeSerie[0],
-               null);
+               null,
+               TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
 
          if (retrievedLocationData == null) {
             return;

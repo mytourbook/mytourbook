@@ -35,6 +35,23 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
     */
    String                    name       = Messages.Tour_Location_DefaultProfileName;
 
+   /**
+    * Zoom address detail
+    *
+    * 3 country
+    * 5 state
+    * 8 county
+    * 10 city
+    * 12 town / borough
+    * 13 village / suburb
+    * 14 neighbourhood
+    * 15 any settlement
+    * 16 major streets
+    * 17 major and minor streets
+    * 18 building
+    */
+   int                       zoomlevel  = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
+
    List<LocationPartID>      allParts   = new ArrayList<>();
 
    public TourLocationProfile() {
@@ -125,13 +142,18 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
 
       return UI.EMPTY_STRING
 
-            + "TourFilterProfile" + NL //                //$NON-NLS-1$
+            + "TourLocationProfile" + NL //              //$NON-NLS-1$
 
             + " name      = " + name + NL //             //$NON-NLS-1$
+            + " zoomlevel = " + zoomlevel + NL //        //$NON-NLS-1$
             + " profileId = " + profileId + NL //        //$NON-NLS-1$
             + " allParts  =" + allParts + NL //          //$NON-NLS-1$
 
             + NL;
+   }
+
+   public int getZoomlevel() {
+      return zoomlevel;
    }
 
 }

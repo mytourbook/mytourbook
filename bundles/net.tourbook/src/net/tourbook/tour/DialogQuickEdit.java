@@ -1033,7 +1033,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
                _tourData.latitudeSerie[lastIndex],
                _tourData.longitudeSerie[lastIndex],
-               null);
+               null,
+               TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
 
          if (retrievedLocationData == null) {
             return;
@@ -1062,7 +1063,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
                _tourData.latitudeSerie[0],
                _tourData.longitudeSerie[0],
-               null);
+               null,
+               TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
 
          if (retrievedLocationData == null) {
             return;

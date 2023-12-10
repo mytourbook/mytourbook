@@ -383,7 +383,7 @@ public class Util {
       if (dataSerieE6 == null || dataSerieE6.length == 0) {
          return null;
       }
-      
+
       final int serieSize = dataSerieE6.length;
 
       final double[] doubleSerie = new double[serieSize];
@@ -1830,7 +1830,15 @@ public class Util {
       return value;
    }
 
-   public static int getXmlInteger(final IMemento xmlMemento, final String key, final Integer defaultValue) {
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    *
+    * @return Supports <code>null</code> as return value, e.g. when
+    *         <code>defaultValue == null</code>
+    */
+   public static Integer getXmlInteger(final IMemento xmlMemento, final String key, final Integer defaultValue) {
 
       Integer value = xmlMemento.getInteger(key);
 

@@ -93,6 +93,8 @@ public class TourLocation implements Serializable {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long              locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
 
+   public int                zoomlevel;
+
    /*
     * Fields from {@link OSMLocation}, the field names are kept from the downloaded location data
     * when possible
