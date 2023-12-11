@@ -2541,7 +2541,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourLogOptions_Checkbox_Event_TourAdjustments;
    public static String        Slideout_TourLogOptions_Checkbox_Event_TourUpload;
    public static String        Slideout_TourLogOptions_Label_AutoOpenLogView;
-
    public static String        Slideout_TourLogOptions_Label_AutoOpenLogView_MoreInfo;
    public static String        Slideout_TourLogOptions_Label_Title;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_AllEvents;
@@ -2800,10 +2799,6 @@ public class Messages extends NLS {
    public static String        Tour_Action_SetMinMaxTemperature_Apply;
    public static String        Tour_Action_SetMinMaxTemperature_Message;
    public static String        Tour_Action_SetMinMaxTemperature_Title;
-   public static String        Tour_Action_SetLocation_Only_End;
-   public static String        Tour_Action_SetLocation_Only_Start;
-   public static String        Tour_Action_SetLocation_StartEnd;
-   public static String        Tour_Action_SetLocation_StartEnd_Tooltip;
    public static String        Tour_Action_SetTimeZone;
    public static String        Tour_Action_SetWeatherConditions;
    public static String        Tour_Action_ShowBreaktimeValues;
@@ -3138,9 +3133,15 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ProfileTitle;
    public static String        Tour_Location_Action_RelocateBoundingBox;
    public static String        Tour_Location_Action_RelocateBoundingBox_Tooltip;
-   public static String        Tour_Location_Action_RemoveStartEndLocation;
+   public static String        Tour_Location_Action_RemoveLocation_All;
+   public static String        Tour_Location_Action_RemoveLocation_End;
+   public static String        Tour_Location_Action_RemoveLocation_Start;
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
+   public static String        Tour_Location_Action_SetLocation_End;
+   public static String        Tour_Location_Action_SetLocation_Start;
+   public static String        Tour_Location_Action_SetLocation_StartEnd;
+   public static String        Tour_Location_Action_SetLocation_StartEnd_Tooltip;
    public static String        Tour_Location_Action_ShowLocationInfo_Tooltip;
    public static String        Tour_Location_DefaultProfileName;
 

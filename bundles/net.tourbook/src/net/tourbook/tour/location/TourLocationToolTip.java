@@ -253,6 +253,13 @@ public class TourLocationToolTip extends ToolTip {
             UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
             UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
          }
+         {
+            /*
+             * Zoomlevel
+             */
+            UI.createLabel(container, Messages.Tour_Location_Label_Zoomlevel);
+            UI.createLabel(container, Integer.toString(tourLocation.zoomlevel));
+         }
       }
    }
 

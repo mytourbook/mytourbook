@@ -122,7 +122,6 @@ public class TourLocationManager {
 
    private static final String                    ATTR_ACTIVE_PROFILE_ID      = "activeProfileId";                                          //$NON-NLS-1$
    private static final String                    ATTR_NAME                   = "name";                                                     //$NON-NLS-1$
-   private static final String                    ATTR_PROFILE_ID             = "profileID";                                                //$NON-NLS-1$
    private static final String                    ATTR_PROFILE_NAME           = "profileName";                                              //$NON-NLS-1$
    private static final String                    ATTR_TOUR_LOCATION_VERSION  = "tourLocationVersion";                                      //$NON-NLS-1$
    private static final String                    ATTR_ZOOMLEVEL              = "zoomlevel";                                                //$NON-NLS-1$
@@ -171,23 +170,23 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   public static int          DEFAULT_ZOOM_LEVEL_VALUE    = 18;
-   public static Zoomlevel    DEFAULT_ZOOM_LEVEL          = new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building);
-
    static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
 
-         new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country),
-         new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State),
-         new Zoomlevel( 8, Messages.Tour_Location_Zoomlevel_08_County),
-         new Zoomlevel(10, Messages.Tour_Location_Zoomlevel_10_City),
-         new Zoomlevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough),
-         new Zoomlevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb),
-         new Zoomlevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood),
-         new Zoomlevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement),
-         new Zoomlevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets),
-         new Zoomlevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets),
-         DEFAULT_ZOOM_LEVEL
+         new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
+         new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
+         new Zoomlevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
+         new Zoomlevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
+         new Zoomlevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
+         new Zoomlevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
+         new Zoomlevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
+         new Zoomlevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
+         new Zoomlevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
+         new Zoomlevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
+         new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
    };
+
+   public static Zoomlevel    DEFAULT_ZOOM_LEVEL          = ALL_ZOOM_LEVEL[5];
+   public static int          DEFAULT_ZOOM_LEVEL_VALUE    = DEFAULT_ZOOM_LEVEL.zoomlevel;
 
    static Map<LocationPartID, String> ALL_LOCATION_PART_AND_LABEL = Map.ofEntries(
 
@@ -1711,12 +1710,6 @@ public class TourLocationManager {
 
                final TourLocationProfile profile = new TourLocationProfile();
 
-               // id
-               final int profileId = Util.getXmlInteger(xmlProfile, ATTR_PROFILE_ID, -1);
-               if (profileId != -1) {
-                  profile.profileId = profileId;
-               }
-
                profile.zoomlevel = Util.getXmlInteger(xmlProfile, ATTR_ZOOMLEVEL, DEFAULT_ZOOM_LEVEL_VALUE);
                profile.name = Util.getXmlString(xmlProfile, ATTR_PROFILE_NAME, UI.EMPTY_STRING);
 
@@ -1788,7 +1781,6 @@ public class TourLocationManager {
             // <Profile>
             final IMemento xmlLocation = xmlRoot.createChild(TAG_PROFILE);
 
-            xmlLocation.putInteger(ATTR_PROFILE_ID, locationProfile.profileId);
             xmlLocation.putInteger(ATTR_ZOOMLEVEL, locationProfile.getZoomlevel());
             xmlLocation.putString(ATTR_PROFILE_NAME, locationProfile.getName());
 

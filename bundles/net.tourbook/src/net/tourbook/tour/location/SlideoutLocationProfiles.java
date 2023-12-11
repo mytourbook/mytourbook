@@ -90,7 +90,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          "name",                                                                                 //$NON-NLS-1$
          "display_name",                                                                         //$NON-NLS-1$
 
-         "villageTownCity",                                                                      //$NON-NLS-1$
+         "placeBySize",                                                                          //$NON-NLS-1$
 
          "latitudeMinE6_Normalized",                                                             //$NON-NLS-1$
          "latitudeMaxE6_Normalized",                                                             //$NON-NLS-1$

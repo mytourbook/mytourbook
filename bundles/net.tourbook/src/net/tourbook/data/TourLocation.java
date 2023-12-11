@@ -216,12 +216,11 @@ public class TourLocation implements Serializable {
    public String commercial;
    public String retail;
    public String road;
-
+   //
    public String house_number;
-
    public String house_name;
+   //
    public String aerialway;
-
    public String aeroway;
    public String amenity;
    public String boundary;
@@ -259,7 +258,7 @@ public class TourLocation implements Serializable {
    public int    postcodeValue    = Integer.MIN_VALUE;
 
    @Transient
-   public String villageTownCity;
+   public String placeBySize;
 
    @Transient
    public double latitude;
@@ -458,13 +457,27 @@ public class TourLocation implements Serializable {
          // ignore
       }
 
-      villageTownCity =
+// SET_FORMATTING_OFF
 
-            village != null ? village
+      placeBySize =
 
-                  : town != null ? town
+           allotments         != null ? allotments //          few               Schrebergärten
+         : farm               != null ? farm //                few               Bauernhof
+         : isolated_dwelling  != null ? isolated_dwelling //   few               Einzelsiedlung
+         : hamlet             != null ? hamlet //              100-1000          kleine Siedlung / Weiler
+         : city_block         != null ? city_block //                            Häuserblock
+         : neighbourhood      != null ? neighbourhood //                         Stadtviertel
+         : city_district      != null ? city_district //                         Stadtviertel
+         : village            != null ? village //           < 10'000            Dorf
+         : quarter            != null ? quarter //                               Ortsteil
+         : suburb             != null ? suburb //                                Stadtteil
+         : town               != null ? town //               10'000 - 100'000   Stadt
+         : borough            != null ? borough //                               Stadtbezirk
+         : city               != null ? city //             > 100'000            Grossstadt
 
-                        : city;
+         : country;
+
+// SET_FORMATTING_ON
    }
 
    @Override

@@ -399,7 +399,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_City_ID:              rc = compareText(location1.city,                location2.city);              break;
          case TableColumnFactory.LOCATION_PART_Town_ID:              rc = compareText(location1.town,                location2.town);              break;
          case TableColumnFactory.LOCATION_PART_Village_ID:           rc = compareText(location1.village,             location2.village);           break;
-         case TableColumnFactory.LOCATION_PART_VillageTownCity_ID:   rc = compareText(location1.villageTownCity,     location2.villageTownCity);   break;
+         case TableColumnFactory.LOCATION_PART_PlaceBySize_ID:       rc = compareText(location1.placeBySize,         location2.placeBySize);       break;
 
          case TableColumnFactory.LOCATION_PART_CityDistrict_ID:      rc = compareText(location1.city_district,       location2.city_district);     break;
          case TableColumnFactory.LOCATION_PART_District_ID:          rc = compareText(location1.district,            location2.district);          break;
@@ -1057,7 +1057,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_40_City();
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
-      defineColumn_Part_42_VillageTownCity();
+      defineColumn_Part_42_PlaceBySize();
       defineColumn_Part_40_Postcode();
 
       // Road
@@ -1487,9 +1487,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Part_42_VillageTownCity() {
+   private void defineColumn_Part_42_PlaceBySize() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_VillageTownCity.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_PlaceBySize.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1497,7 +1497,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).tourLocation.villageTownCity);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.placeBySize);
          }
       });
    }
