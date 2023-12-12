@@ -28,8 +28,11 @@ import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 
 /**
- * Possible address fields are from <a href=
- * "https://nominatim.org/release-docs/develop/api/Output/#addressdetails">https://nominatim.org/release-docs/develop/api/Output/#addressdetails</a>
+ * Possible address fields are from <br>
+ * <a href=
+ * "https://nominatim.org/release-docs/develop/api/Output/#addressdetails">https://nominatim.org/release-docs/develop/api/Output/#addressdetails</a><br>
+ * <a href=
+ * "https://nominatim.org/release-docs/develop/api/Reverse/">https://nominatim.org/release-docs/develop/api/Reverse/</a>
  *
  * <pre>
  *

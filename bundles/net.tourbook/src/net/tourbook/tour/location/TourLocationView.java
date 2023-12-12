@@ -74,6 +74,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyListener;
@@ -114,6 +115,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private TableViewer                  _locationViewer;
    private LocationComparator           _locationComparator             = new LocationComparator();
+   private LocationFilter               _locationFilter                 = new LocationFilter();
+   private LocationFilterTYPE           _locationFilterType;
    private ColumnManager                _columnManager;
    private SelectionAdapter             _columnSortListener;
 
@@ -545,6 +548,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_ON
 
+         // nth sort by country
+         if (rc == 0) {
+            rc = compareText(location1.country, location2.country);
+         }
+
          // nth sort by city
          if (rc == 0) {
             rc = compareText(location1.city, location2.city);
@@ -670,6 +678,44 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   private final class LocationFilter extends ViewerFilter {
+
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+
+         if (_locationFilterType == LocationFilterTYPE.ALL_IS_DISPLAYED) {
+
+            // nothing is filtered
+            return true;
+         }
+
+         // compare results are filtered
+
+         final LocationItem locationItem = (LocationItem) element;
+
+         if (_locationFilterType == LocationFilterTYPE.COUNTRY) {
+
+            // saved results are displayed
+
+            return true;
+
+         } else {
+
+            return false;
+         }
+      }
+   }
+
+   private enum LocationFilterTYPE {
+
+      ALL_IS_DISPLAYED,
+
+      /**
+       * Only saved tours are displayed
+       */
+      COUNTRY,
    }
 
    class LocationItem {
@@ -992,6 +1038,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationViewer.setUseHashlookup(true);
       _locationViewer.setContentProvider(new LocationContentProvider());
       _locationViewer.setComparator(_locationComparator);
+//      _locationViewer.setFilters(_locationFilter);
 
       _locationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectLocation());
 //    _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
@@ -1115,14 +1162,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_80_Tunnel();
       defineColumn_Part_80_Waterway();
 
-      defineColumn_Geo_10_Latitude();
-      defineColumn_Geo_20_Longitude();
-
-      defineColumn_Geo_12_LatitudeDiff();
-      defineColumn_Geo_22_LongitudeDiff();
-
-      defineColumn_Geo_40_BoundingBox_Height();
-      defineColumn_Geo_42_BoundingBox_Width();
+      defineColumn_Geo_10_BoundingBox_Width();
+      defineColumn_Geo_12_BoundingBox_Height();
+      defineColumn_Geo_20_Latitude();
+      defineColumn_Geo_22_Longitude();
+      defineColumn_Geo_30_LatitudeDiff();
+      defineColumn_Geo_32_LongitudeDiff();
 
       defineColumn_Data_10_ID();
    }
@@ -1144,10 +1189,45 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_10_Latitude() {
+   private void defineColumn_Geo_10_BoundingBox_Width() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).boundingBoxWidth_Text);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_12_BoundingBox_Height() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final LocationItem locationItem = ((LocationItem) cell.getElement());
+
+            cell.setText(locationItem.boundingBoxHeight_Text);
+         }
+      });
+   }
+
+   private void defineColumn_Geo_20_Latitude() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1161,27 +1241,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_12_LatitudeDiff() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final LocationItem locationItem = ((LocationItem) cell.getElement());
-
-            cell.setText(locationItem.latitudeDiff_Text);
-         }
-      });
-   }
-
-   private void defineColumn_Geo_20_Longitude() {
+   private void defineColumn_Geo_22_Longitude() {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1189,21 +1253,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             cell.setText(((LocationItem) cell.getElement()).longitude_Text);
-         }
-      });
-   }
-
-   private void defineColumn_Geo_22_LongitudeDiff() {
-
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE_DIFF.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((LocationItem) cell.getElement()).longitudeDiff_Text);
          }
       });
    }
@@ -1227,9 +1276,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Geo_40_BoundingBox_Height() {
+   private void defineColumn_Geo_30_LatitudeDiff() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE_DIFF.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1239,14 +1288,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             final LocationItem locationItem = ((LocationItem) cell.getElement());
 
-            cell.setText(locationItem.boundingBoxHeight_Text);
+            cell.setText(locationItem.latitudeDiff_Text);
          }
       });
    }
 
-   private void defineColumn_Geo_42_BoundingBox_Width() {
+   private void defineColumn_Geo_32_LongitudeDiff() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE_DIFF.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1254,7 +1303,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).boundingBoxWidth_Text);
+            cell.setText(((LocationItem) cell.getElement()).longitudeDiff_Text);
          }
       });
    }
@@ -1279,7 +1328,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_DisplayName.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new TooltipLabelProvider() {
@@ -1295,6 +1343,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Name.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new TooltipLabelProvider() {
@@ -1325,6 +1374,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Country.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new TooltipLabelProvider() {
@@ -1415,6 +1465,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_City.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new TooltipLabelProvider() {
@@ -1476,6 +1527,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_Village.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new TooltipLabelProvider() {
@@ -1491,6 +1543,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_PlaceBySize.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new TooltipLabelProvider() {

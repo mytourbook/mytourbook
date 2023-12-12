@@ -125,6 +125,10 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
       return name;
    }
 
+   public int getZoomlevel() {
+      return zoomlevel;
+   }
+
    @Override
    public int hashCode() {
 
@@ -150,10 +154,6 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
             + " allParts  =" + allParts + NL //          //$NON-NLS-1$
 
             + NL;
-   }
-
-   public int getZoomlevel() {
-      return zoomlevel;
    }
 
 }
