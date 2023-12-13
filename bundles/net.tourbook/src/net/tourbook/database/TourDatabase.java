@@ -2191,7 +2191,8 @@ public class TourDatabase {
     *
     * @param latitudeE6
     * @param longitudeE6
-    *
+    * @param zoomlevel
+    * 
     * @return
     */
    private static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6, final int zoomlevel) {
@@ -2284,6 +2285,11 @@ public class TourDatabase {
             }
          }
          em.close();
+      }
+
+      // set transient values
+      if (dbTourLocation != null) {
+         dbTourLocation.setTransientValues();
       }
 
       return dbTourLocation;

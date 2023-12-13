@@ -74,7 +74,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyListener;
@@ -115,8 +114,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private TableViewer                  _locationViewer;
    private LocationComparator           _locationComparator             = new LocationComparator();
-   private LocationFilter               _locationFilter                 = new LocationFilter();
-   private LocationFilterTYPE           _locationFilterType;
    private ColumnManager                _columnManager;
    private SelectionAdapter             _columnSortListener;
 
@@ -402,7 +399,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_City_ID:              rc = compareText(location1.city,                location2.city);              break;
          case TableColumnFactory.LOCATION_PART_Town_ID:              rc = compareText(location1.town,                location2.town);              break;
          case TableColumnFactory.LOCATION_PART_Village_ID:           rc = compareText(location1.village,             location2.village);           break;
-         case TableColumnFactory.LOCATION_PART_PlaceBySize_ID:       rc = compareText(location1.placeBySize,         location2.placeBySize);       break;
 
          case TableColumnFactory.LOCATION_PART_CityDistrict_ID:      rc = compareText(location1.city_district,       location2.city_district);     break;
          case TableColumnFactory.LOCATION_PART_District_ID:          rc = compareText(location1.district,            location2.district);          break;
@@ -455,6 +451,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_Waterway_ID:          rc = compareText(location1.waterway,            location2.waterway);          break;
 
          case TableColumnFactory.LOCATION_PART_Postcode_ID:          rc = comparePostcode(location1,                 location2);                   break;
+
+         case TableColumnFactory.LOCATION_PART_SettlementSmall_ID:   rc = compareText(location1.settlementSmall,     location2.settlementSmall);   break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
 
@@ -678,44 +676,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-   }
-
-   private final class LocationFilter extends ViewerFilter {
-
-      @Override
-      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-
-         if (_locationFilterType == LocationFilterTYPE.ALL_IS_DISPLAYED) {
-
-            // nothing is filtered
-            return true;
-         }
-
-         // compare results are filtered
-
-         final LocationItem locationItem = (LocationItem) element;
-
-         if (_locationFilterType == LocationFilterTYPE.COUNTRY) {
-
-            // saved results are displayed
-
-            return true;
-
-         } else {
-
-            return false;
-         }
-      }
-   }
-
-   private enum LocationFilterTYPE {
-
-      ALL_IS_DISPLAYED,
-
-      /**
-       * Only saved tours are displayed
-       */
-      COUNTRY,
    }
 
    class LocationItem {
@@ -1104,7 +1064,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_40_City();
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
-      defineColumn_Part_42_PlaceBySize();
+      defineColumn_Part_42_SettlementSmall();
       defineColumn_Part_40_Postcode();
 
       // Road
@@ -1539,9 +1499,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_Part_42_PlaceBySize() {
+   private void defineColumn_Part_42_SettlementSmall() {
 
-      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_PlaceBySize.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_SettlementSmall.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1550,7 +1510,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(((LocationItem) cell.getElement()).tourLocation.placeBySize);
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.settlementSmall);
          }
       });
    }

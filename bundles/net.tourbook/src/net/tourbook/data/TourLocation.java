@@ -261,7 +261,7 @@ public class TourLocation implements Serializable {
    public int    postcodeValue    = Integer.MIN_VALUE;
 
    @Transient
-   public String placeBySize;
+   public String settlementSmall;
 
    @Transient
    public double latitude;
@@ -460,9 +460,12 @@ public class TourLocation implements Serializable {
          // ignore
       }
 
+
 // SET_FORMATTING_OFF
 
-      placeBySize =
+      // https://wiki.openstreetmap.org/wiki/Template:Generic:Map_Features:place
+
+      settlementSmall =
 
            allotments         != null ? allotments //          few               Schrebergärten
          : farm               != null ? farm //                few               Bauernhof
@@ -474,11 +477,14 @@ public class TourLocation implements Serializable {
          : village            != null ? village //           < 10'000            Dorf
          : quarter            != null ? quarter //                               Ortsteil
          : suburb             != null ? suburb //                                Stadtteil
-         : town               != null ? town //               10'000 - 100'000   Stadt
          : borough            != null ? borough //                               Stadtbezirk
+         : town               != null ? town //               10'000 - 100'000   Stadt
          : city               != null ? city //             > 100'000            Grossstadt
+         : county             != null ? county //
+         : state              != null ? state //
+         : country
 
-         : country;
+      ;
 
 // SET_FORMATTING_ON
    }
@@ -550,6 +556,8 @@ public class TourLocation implements Serializable {
             + log(" tunnel              = ", tunnel) //                    //$NON-NLS-1$
             + log(" waterway            = ", waterway) //                  //$NON-NLS-1$
             + log(" postcode            = ", postcode) //                  //$NON-NLS-1$
+
+            + log(" settlementSmall     = ", settlementSmall) //           //$NON-NLS-1$
 
             + NL
 

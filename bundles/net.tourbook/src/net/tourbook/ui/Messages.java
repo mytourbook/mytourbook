@@ -644,7 +644,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_Town;
    public static String        Tour_Location_Part_Tunnel;
    public static String        Tour_Location_Part_Village;
-   public static String        Tour_Location_Part_PlaceBySize;
+   public static String        Tour_Location_Part_SettlementSmall;
    public static String        Tour_Location_Part_Waterway;
    public static String        Tour_Location_Task_RemovingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;

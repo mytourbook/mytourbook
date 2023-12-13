@@ -248,6 +248,7 @@ class TourBook_ColumnFactory {
       defineColumn_Data_ImportFileName();
       defineColumn_Data_TimeInterval();
       defineColumn_Data_NumTimeSlices();
+      defineColumn_Data_HasGeoData();
       defineColumn_Data_TourID();
    }
 
@@ -637,6 +638,37 @@ class TourBook_ColumnFactory {
             }
 
             setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Data - Has geo data
+    */
+   private void defineColumn_Data_HasGeoData() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_HAS_GEO_DATA.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            return ((TVITourBookTour) element).colHasGeoData ? UI.SYMBOL_BOX : UI.EMPTY_STRING;
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_HAS_GEO_DATA.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof final TVITourBookTour tourItem) {
+
+               cell.setText(tourItem.colHasGeoData ? UI.SYMBOL_BOX : UI.EMPTY_STRING);
+
+               setCellColor(cell, element);
+            }
          }
       });
    }
@@ -3030,9 +3062,19 @@ class TourBook_ColumnFactory {
 
             final String tourLocation = ((TVITourBookItem) element).colTourLocation_End;
 
-            if (tourLocation == null) {
-               return UI.EMPTY_STRING;
+            if (tourLocation == null || tourLocation.length() == 0) {
+
+               if (((TVITourBookItem) element).colTourLocationID_End != null) {
+
+                  return Messages.Tour_Book_Info_TourLocationIsAvailable;
+
+               } else {
+
+                  return UI.EMPTY_STRING;
+               }
+
             } else {
+
                return tourLocation;
             }
          }
@@ -3045,11 +3087,22 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
+
             final String tourLocation = ((TVITourBookItem) element).colTourLocation_End;
 
-            if (tourLocation == null) {
-               cell.setText(UI.EMPTY_STRING);
+            if (tourLocation == null || tourLocation.length() == 0) {
+
+               if (((TVITourBookItem) element).colTourLocationID_End != null) {
+
+                  cell.setText(Messages.Tour_Book_Info_TourLocationIsAvailable);
+
+               } else {
+
+                  cell.setText(UI.EMPTY_STRING);
+               }
+
             } else {
+
                cell.setText(tourLocation);
             }
 
@@ -3071,9 +3124,19 @@ class TourBook_ColumnFactory {
 
             final String tourLocation = ((TVITourBookItem) element).colTourLocation_Start;
 
-            if (tourLocation == null) {
-               return UI.EMPTY_STRING;
+            if (tourLocation == null || tourLocation.length() == 0) {
+
+               if (((TVITourBookItem) element).colTourLocationID_Start != null) {
+
+                  return Messages.Tour_Book_Info_TourLocationIsAvailable;
+
+               } else {
+
+                  return UI.EMPTY_STRING;
+               }
+
             } else {
+
                return tourLocation;
             }
          }
@@ -3086,11 +3149,22 @@ class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
+
             final String tourLocation = ((TVITourBookItem) element).colTourLocation_Start;
 
-            if (tourLocation == null) {
-               cell.setText(UI.EMPTY_STRING);
+            if (tourLocation == null || tourLocation.length() == 0) {
+
+               if (((TVITourBookItem) element).colTourLocationID_Start != null) {
+
+                  cell.setText(Messages.Tour_Book_Info_TourLocationIsAvailable);
+
+               } else {
+
+                  cell.setText(UI.EMPTY_STRING);
+               }
+
             } else {
+
                cell.setText(tourLocation);
             }
 

@@ -73,14 +73,14 @@ public class MT_DualList extends Composite {
    /*
     * UI controls
     */
-   private Button  _btnMoveFirst;
-   private Button  _btnMoveLast;
-   private Button  _btnMoveUp;
-   private Button  _btnMoveDown;
-   private Button  _btnSelect;
-   private Button  _btnSelectAll;
-   private Button  _btnDeselect;
-   private Button  _btnDeselectAll;
+   private Button _btnMoveFirst;
+   private Button _btnMoveLast;
+   private Button _btnMoveUp;
+   private Button _btnMoveDown;
+   private Button _btnSelect;
+   private Button _btnSelectAll;
+   private Button _btnDeselect;
+   private Button _btnDeselectAll;
 
    private Table  _tableAllItems;
    private Table  _tableAllSelectedItems;
@@ -815,8 +815,15 @@ public class MT_DualList extends Composite {
             tableItem.setFont(item.getFont());
          }
 
-         tableItem.setText(1, item.getText());
-         tableItem.setText(2, item.getText2());
+         final String text1 = item.getText();
+         final String text2 = item.getText2();
+
+         if (text1 != null) {
+            tableItem.setText(1, text1);
+         }
+         if (text2 != null) {
+            tableItem.setText(2, text2);
+         }
 
          if (configuration != null && item.getBackground() == null && counter % 2 == 0) {
             if (isSelected) {

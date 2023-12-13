@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,6 +89,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private Control                      _ownerControl;
 
+   private ArrayList<TourData>          _allSelectedTours;
+
    private class ActionEditProfiles extends Action {
 
       public ActionEditProfiles() {
@@ -121,6 +124,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          final String profileName = PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
+
 
          setText(profileName);
 
@@ -301,12 +305,10 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private void actionRemoveLocation(final boolean isStartLocation, final boolean isEndLocation) {
 
-      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       TourLocationManager.removeTourLocations(
 
-            selectedTours,
-
+            _allSelectedTours,
             isStartLocation,
             isEndLocation);
    }
@@ -315,11 +317,10 @@ public class ActionSetStartEndLocation extends SubMenu {
                                       final boolean isSetStartLocation,
                                       final boolean isSetEndLocation) {
 
-      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       TourLocationManager.setTourLocations(
 
-            selectedTours,
+            _allSelectedTours,
             locationProfile,
             isSetStartLocation,
             isSetEndLocation,
@@ -348,6 +349,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    @Override
    public void fillMenu(final Menu menu) {
+
+      _allSelectedTours = _tourProvider.getSelectedTours();
 
       // create actions for each profile
       final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();

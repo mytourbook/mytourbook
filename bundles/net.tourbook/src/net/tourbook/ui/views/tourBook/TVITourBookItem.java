@@ -213,7 +213,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "weather_Temperature_Min, " //                      93    //$NON-NLS-1$
 
             + "tourLocationStart_LocationID, " //                 94    //$NON-NLS-1$
-            + "tourLocationEnd_LocationID" //                     95    //$NON-NLS-1$
+            + "tourLocationEnd_LocationID, " //                   95    //$NON-NLS-1$
+
+            + "hasGeoData" //                                     96    //$NON-NLS-1$
 
       //////////////////////////////////////////////////////////////////////////////////////////
       //
@@ -226,7 +228,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       ;
 
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 96;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 97;
 
       /////////////////////////////////////////////////////////////////////////
       // -------- JOINT TABLES, they are added at the end --------------
@@ -484,6 +486,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    short  colBatterySoC_End;
    String colDeviceName;
    //
+   boolean colHasGeoData;
+
+   //
    TVITourBookItem(final TourBookView view) {
 
       tourBookView = view;
@@ -667,6 +672,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colTourLocationID_Start                = result.getObject(94);
       tourItem.colTourLocationID_End                  = result.getObject(95);
 
+      // -------- GEO DATA -----------
+
+      tourItem.colHasGeoData                          = result.getBoolean(96);
 
 // SET_FORMATTING_ON
 

@@ -123,9 +123,12 @@ public class MT_DLItem extends OpalItem {
       _lastAction = LAST_ACTION.NONE;
    }
 
-   public MT_DLItem(final String text, final String text2, final String dataKey, final Object data) {
+   public MT_DLItem(final String text1,
+                    final String text2,
+                    final String dataKey,
+                    final Object data) {
 
-      setText(text);
+      setText(text1);
       _text2 = text2;
 
       setData(dataKey, data);

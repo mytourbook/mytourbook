@@ -95,7 +95,10 @@ public class ActionTourLocation extends ContributionItem {
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
 
          setText(locationName);
-         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(profileName, joinedPartNames));
+         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(
+//               profileName,
+               joinedPartNames,
+               locationProfile.getZoomlevel()));
 
          if (isDefaultProfile) {
             setChecked(true);

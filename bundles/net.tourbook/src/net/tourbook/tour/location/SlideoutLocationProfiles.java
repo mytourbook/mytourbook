@@ -90,8 +90,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          "name",                                                                                 //$NON-NLS-1$
          "display_name",                                                                         //$NON-NLS-1$
 
-         "placeBySize",                                                                          //$NON-NLS-1$
-
          "latitudeMinE6_Normalized",                                                             //$NON-NLS-1$
          "latitudeMaxE6_Normalized",                                                             //$NON-NLS-1$
          "longitudeMinE6_Normalized",                                                            //$NON-NLS-1$
@@ -314,8 +312,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                   final String label = TourLocationManager.ALL_LOCATION_PART_AND_LABEL.get(locationPart);
 
                   final MT_DLItem dlItem = new MT_DLItem(
-                        stringValue,
+
                         label,
+                        stringValue,
+
                         TourLocationManager.KEY_LOCATION_PART_ID,
                         locationPart);
 
@@ -339,8 +339,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
          allParts.add(new MT_DLItem(
 
-               partValue,
                partName,
+               partValue,
+
                TourLocationManager.KEY_LOCATION_PART_ID,
                locationPart));
       }
@@ -388,7 +389,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void createColumn_30_Zoomlevel(final TableColumnLayout tableLayout) {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
       final TableColumn tc = tvc.getColumn();
 
       tc.setText(Messages.Slideout_TourLocation_Column_Zoomlevel);
@@ -516,8 +517,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
        * Create columns
        */
       createColumn_10_ProfileName(tableLayout);
-      createColumn_20_LocationParts(tableLayout);
       createColumn_30_Zoomlevel(tableLayout);
+      createColumn_20_LocationParts(tableLayout);
       createColumn_40_IsDefaultProfile(tableLayout);
 
       /*
@@ -1062,8 +1063,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       for (final LocationPartID remainingPart : allRemainingProfileParts) {
 
          final MT_DLItem dlItem = new MT_DLItem(
-               UI.EMPTY_STRING,
+
                TourLocationManager.createPartName_NotAvailable(remainingPart),
+               UI.EMPTY_STRING,
+
                TourLocationManager.KEY_LOCATION_PART_ID,
                remainingPart);
 
@@ -1137,31 +1140,32 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 // SET_FORMATTING_OFF
 
       // add customized parts
-      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(tourLocation);
-      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(tourLocation);
-      final String largestCity            = TourLocationManager.getCombined_City_Largest(tourLocation);
-      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(tourLocation);
-      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber(tourLocation);
+      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(         tourLocation);
+      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(  tourLocation);
+      final String largestCity            = TourLocationManager.getCombined_City_Largest(          tourLocation);
+      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(   tourLocation);
+      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber( tourLocation);
 
       boolean isShowSmallestCity = false;
       if (largestCity != null && largestCity.equals(smallestCity) == false) {
          isShowSmallestCity = true;
       }
 
-      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                  tourLocation.display_name,   _allDualListItems);
-      addCombinedPart(LocationPartID    .OSM_NAME,                          tourLocation.name,           _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                 tourLocation.display_name,    _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_NAME,                         tourLocation.name,            _allDualListItems);
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,               largestCity,                 _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,              largestCity,                  _allDualListItems);
       if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,              smallestCity,                _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,             smallestCity,                 _allDualListItems);
       }
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,      largestCityWithZip,          _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,     largestCityWithZip,           _allDualListItems);
       if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,     smallestCityWithZip,         _allDualListItems);
+         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,    smallestCityWithZip,          _allDualListItems);
       }
 
-      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,   streetWithHouseNumber,       _allDualListItems);
+      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,  streetWithHouseNumber,        _allDualListItems);
+
 
 // SET_FORMATTING_ON
 

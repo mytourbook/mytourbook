@@ -200,6 +200,9 @@ public class TourLocationManager {
 
          Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
 
+         //                                                          this is a computed part
+         Map.entry(LocationPartID.settlementSmall,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementSmall),
+
          Map.entry(LocationPartID.continent,                         Messages.Tour_Location_Part_Continent),
          Map.entry(LocationPartID.country,                           Messages.Tour_Location_Part_Country),
          Map.entry(LocationPartID.country_code,                      Messages.Tour_Location_Part_CountryCode),
@@ -265,6 +268,7 @@ public class TourLocationManager {
          Map.entry(LocationPartID.waterway,                          Messages.Tour_Location_Part_Waterway),
 
          Map.entry(LocationPartID.postcode,                          Messages.Tour_Location_Part_Postcode)
+
       );
 
 // SET_FORMATTING_ON
@@ -308,7 +312,9 @@ public class TourLocationManager {
 
    public static String createJoinedPartNames(final TourLocationProfile profile, final String delimiter) {
 
-      final String joinedParts = profile.allParts.stream()
+      final List<LocationPartID> allParts = profile.allParts;
+
+      final String joinedParts = allParts.stream()
 
             .map(locationPart -> {
 
@@ -360,7 +366,7 @@ public class TourLocationManager {
             continue;
          }
 
-         appendPart(partItem.getText());
+         appendPart(partItem.getText2());
       }
 
       return _displayNameBuffer.toString();
@@ -414,10 +420,6 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-         // ignore
-         case NONE:                             break;
-         case ISO3166_2_lvl4:                   break;
-
          case OSM_DEFAULT_NAME:                 appendPart(tourLocation.display_name);                         break;
          case OSM_NAME:                         appendPart(tourLocation.name);                                 break;
 
@@ -429,12 +431,16 @@ public class TourLocationManager {
 
          case CUSTOM_STREET_WITH_HOUSE_NUMBER:  appendPart(getCombined_StreetWithHouseNumber(tourLocation));   break;
 
+         // ignore
+         case NONE:                             break;
+         case ISO3166_2_lvl4:                   break;
+
 // SET_FORMATTING_ON
 
          default:
 
             /*
-             * Append all other fieds
+             * Append all other fields
              */
             try {
 

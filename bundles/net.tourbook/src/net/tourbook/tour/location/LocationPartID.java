@@ -28,6 +28,11 @@ public enum LocationPartID {
    CUSTOM_CITY_WITH_ZIP_SMALLEST, //
 
    CUSTOM_STREET_WITH_HOUSE_NUMBER, //
+   
+   /**
+    * This is a computed part
+    */
+   settlementSmall, //
 
    /**
     * The following names are all from <a href=
