@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.SlideoutLocationProfiles;
 import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
@@ -123,14 +124,9 @@ public class ActionSetStartEndLocation extends SubMenu {
          _isSetEndLocation = isSetEndLocation;
 
          final String profileName = PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
-         final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
-
 
          setText(profileName);
-
-         setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(
-               joinedPartNames,
-               locationProfile.getZoomlevel()));
+         setToolTipText(createLocationTooltipText(locationProfile, _isSetStartLocation, isSetEndLocation));
 
          if (isDefaultProfile) {
             setChecked(true);
@@ -305,7 +301,6 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private void actionRemoveLocation(final boolean isStartLocation, final boolean isEndLocation) {
 
-
       TourLocationManager.removeTourLocations(
 
             _allSelectedTours,
@@ -316,7 +311,6 @@ public class ActionSetStartEndLocation extends SubMenu {
    private void actionSetTourLocation(final TourLocationProfile locationProfile,
                                       final boolean isSetStartLocation,
                                       final boolean isSetEndLocation) {
-
 
       TourLocationManager.setTourLocations(
 
@@ -342,6 +336,50 @@ public class ActionSetStartEndLocation extends SubMenu {
       _actionRemoveLocation_End = new ActionRemoveLocation_End();
       _actionSetLocation_Start = new ActionSetLocation_Start();
       _actionSetLocation_End = new ActionSetLocation_End();
+   }
+
+   private String createLocationTooltipText(final TourLocationProfile locationProfile,
+                                            final boolean isSetStartLocation,
+                                            final boolean isSetEndLocation) {
+
+      final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
+      final TourData firstTour = _allSelectedTours.get(0);
+
+      final TourLocation tourLocationStart = firstTour.getTourLocationStart();
+      final TourLocation tourLocationEnd = firstTour.getTourLocationEnd();
+
+      String locationText = null;
+
+      if (tourLocationStart != null) {
+
+         locationText = TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile);
+      }
+
+      if (tourLocationEnd != null) {
+
+         final String endLocationText = TourLocationManager.createLocationDisplayName(tourLocationEnd, locationProfile);
+
+         if (endLocationText.length() > 0) {
+
+            if (locationText.length() > 0) {
+               locationText += UI.NEW_LINE2;
+            }
+
+            locationText += endLocationText;
+         }
+      }
+
+      String tooltipText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
+
+            joinedPartNames,
+            locationProfile.getZoomlevel());
+
+      if (locationText.length() > 0) {
+
+         tooltipText += UI.NEW_LINE2 + locationText;
+      }
+
+      return tooltipText;
    }
 
    @Override

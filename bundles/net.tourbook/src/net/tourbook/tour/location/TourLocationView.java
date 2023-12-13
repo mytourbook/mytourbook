@@ -3191,7 +3191,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void onSelectLocation() {
 
-      // hide tooltip which can display content from the previous tour location
+      // hide tooltip which could display content from the previous tour location
       _locationTooltip.hide();
 
       if (_isInUIUpdate) {

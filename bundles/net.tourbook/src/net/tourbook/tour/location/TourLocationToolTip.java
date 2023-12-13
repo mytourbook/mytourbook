@@ -15,12 +15,21 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+import java.util.ArrayList;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.NatTable_LabelProvider;
+import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.ToolTip;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationView.LocationItem;
 import net.tourbook.ui.Messages;
+import net.tourbook.ui.views.tourBook.TVITourBookTour;
+import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -28,6 +37,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
@@ -48,28 +58,58 @@ public class TourLocationToolTip extends ToolTip {
 
    private Control             _ttControl;
 
-   private ColumnViewer        _tableViewer;
-   private ViewerCell          _viewerCell;
+   private ColumnViewer        _columnViewer;
+   private TourBookView        _tourBookView;
+   private TourLocationView    _tourLocationView;
 
-   private LocationItem        _locationItem;
+   // TLV: TourLocationView
+   private ViewerCell   _tlvViewerCell;
+   private LocationItem _tlvLocationItem;
+
+   // TBV: TourBookView
+   private NatTable     _tbvNatTable;
+   private Rectangle    _tbvHoveredBounds;
+   private Long         _tbvHoveredTourId;
+   private Point        _tbvTooltipCellPos;
+   private boolean      _tbvIsStartLocation;
+
+   private boolean      _isLocationView;
+   private boolean      _isTourbookView;
+
+   private TourLocation _tourLocation;
 
    /*
     * UI controls
     */
-   private Composite        _ttContainer;
+   private Composite _ttContainer;
 
-   private TourLocationView _tourLocationView;
+   public TourLocationToolTip(final TourBookView tourBookView) {
+
+      super(tourBookView.getNatTable(), NO_RECREATE, false);
+
+      _isTourbookView = true;
+
+      _tourBookView = tourBookView;
+      _tbvNatTable = tourBookView.getNatTable();
+
+      _ttControl = _tbvNatTable;
+      _columnViewer = tourBookView.getViewer();
+
+      setHideOnMouseDown(false);
+   }
 
    public TourLocationToolTip(final TourLocationView tourLocationView) {
 
       super(tourLocationView.getLocationViewer().getTable(), NO_RECREATE, false);
+
+      _isLocationView = true;
 
       _tourLocationView = tourLocationView;
 
       final TableViewer locationViewer = tourLocationView.getLocationViewer();
 
       _ttControl = locationViewer.getTable();
-      _tableViewer = locationViewer;
+      _columnViewer = locationViewer;
 
       setHideOnMouseDown(false);
    }
@@ -79,7 +119,7 @@ public class TourLocationToolTip extends ToolTip {
 
       super.afterHideToolTip(event);
 
-      _viewerCell = null;
+      _tlvViewerCell = null;
    }
 
    @Override
@@ -119,8 +159,6 @@ public class TourLocationToolTip extends ToolTip {
 
    private void createUI_10_Info(final Composite parent) {
 
-      final TourLocation tourLocation = _locationItem.tourLocation;
-
       final GridDataFactory headerIndent = GridDataFactory.fillDefaults()
 
             .span(2, 1)
@@ -138,21 +176,36 @@ public class TourLocationToolTip extends ToolTip {
              * Title
              */
 
+            String locationTitle;
+
+            if (_isTourbookView) {
+
+               locationTitle = _tbvIsStartLocation
+
+                     ? Messages.Tour_Tooltip_Label_LocationStart
+                     : Messages.Tour_Tooltip_Label_LocationEnd;
+
+            } else {
+
+               locationTitle = Messages.Tour_Location_Title;
+            }
+
             // using text control that & is not displayed as mnemonic
             final Text headerText = new Text(container, SWT.READ_ONLY);
             headerIndent.applyTo(headerText);
-
             MTFont.setBannerFont(headerText);
 
-            headerText.setText(Messages.Tour_Location_Title);
+            headerText.setText(locationTitle);
          }
+
          UI.createSpacer_Vertical(container, 8, 2);
+
          {
             /*
              * Display name
              */
 
-            final String displayName = tourLocation.display_name;
+            final String displayName = _tourLocation.display_name;
 
             if (displayName != null && displayName.length() > 0) {
 
@@ -169,96 +222,99 @@ public class TourLocationToolTip extends ToolTip {
 
 // SET_FORMATTING_OFF
 
-         createUI_Content(container,   tourLocation.name,                  Messages.Tour_Location_Part_OsmName);
+         createUI_Content(container,   _tourLocation.name,                  Messages.Tour_Location_Part_OsmName);
 
-         createUI_Content(container,   tourLocation.country,               Messages.Tour_Location_Part_Country);
-         createUI_Content(container,   tourLocation.country_code,          Messages.Tour_Location_Part_CountryCode);
-         createUI_Content(container,   tourLocation.continent,             Messages.Tour_Location_Part_Continent);
+         createUI_Content(container,   _tourLocation.country,               Messages.Tour_Location_Part_Country);
+         createUI_Content(container,   _tourLocation.country_code,          Messages.Tour_Location_Part_CountryCode);
+         createUI_Content(container,   _tourLocation.continent,             Messages.Tour_Location_Part_Continent);
 
-         createUI_Content(container,   tourLocation.region,                Messages.Tour_Location_Part_Region);
-         createUI_Content(container,   tourLocation.state,                 Messages.Tour_Location_Part_State);
-         createUI_Content(container,   tourLocation.state_district,        Messages.Tour_Location_Part_StateDistrict);
-         createUI_Content(container,   tourLocation.county,                Messages.Tour_Location_Part_County);
+         createUI_Content(container,   _tourLocation.region,                Messages.Tour_Location_Part_Region);
+         createUI_Content(container,   _tourLocation.state,                 Messages.Tour_Location_Part_State);
+         createUI_Content(container,   _tourLocation.state_district,        Messages.Tour_Location_Part_StateDistrict);
+         createUI_Content(container,   _tourLocation.county,                Messages.Tour_Location_Part_County);
 
-         createUI_Content(container,   tourLocation.municipality,          Messages.Tour_Location_Part_Municipality);
-         createUI_Content(container,   tourLocation.city,                  Messages.Tour_Location_Part_City);
-         createUI_Content(container,   tourLocation.town,                  Messages.Tour_Location_Part_Town);
-         createUI_Content(container,   tourLocation.village,               Messages.Tour_Location_Part_Village);
-         createUI_Content(container,   tourLocation.postcode,              Messages.Tour_Location_Part_Postcode);
+         createUI_Content(container,   _tourLocation.municipality,          Messages.Tour_Location_Part_Municipality);
+         createUI_Content(container,   _tourLocation.city,                  Messages.Tour_Location_Part_City);
+         createUI_Content(container,   _tourLocation.town,                  Messages.Tour_Location_Part_Town);
+         createUI_Content(container,   _tourLocation.village,               Messages.Tour_Location_Part_Village);
+         createUI_Content(container,   _tourLocation.postcode,              Messages.Tour_Location_Part_Postcode);
 
-         createUI_Content(container,   tourLocation.road,                  Messages.Tour_Location_Part_Road);
-         createUI_Content(container,   tourLocation.house_number,          Messages.Tour_Location_Part_HouseNumber);
-         createUI_Content(container,   tourLocation.house_name,            Messages.Tour_Location_Part_HouseName);
+         createUI_Content(container,   _tourLocation.road,                  Messages.Tour_Location_Part_Road);
+         createUI_Content(container,   _tourLocation.house_number,          Messages.Tour_Location_Part_HouseNumber);
+         createUI_Content(container,   _tourLocation.house_name,            Messages.Tour_Location_Part_HouseName);
 
-         createUI_Content(container,   tourLocation.city_district,         Messages.Tour_Location_Part_CityDistrict);
-         createUI_Content(container,   tourLocation.district,              Messages.Tour_Location_Part_District);
-         createUI_Content(container,   tourLocation.borough,               Messages.Tour_Location_Part_Borough);
-         createUI_Content(container,   tourLocation.suburb,                Messages.Tour_Location_Part_Suburb);
-         createUI_Content(container,   tourLocation.subdivision,           Messages.Tour_Location_Part_Subdivision);
+         createUI_Content(container,   _tourLocation.city_district,         Messages.Tour_Location_Part_CityDistrict);
+         createUI_Content(container,   _tourLocation.district,              Messages.Tour_Location_Part_District);
+         createUI_Content(container,   _tourLocation.borough,               Messages.Tour_Location_Part_Borough);
+         createUI_Content(container,   _tourLocation.suburb,                Messages.Tour_Location_Part_Suburb);
+         createUI_Content(container,   _tourLocation.subdivision,           Messages.Tour_Location_Part_Subdivision);
 
-         createUI_Content(container,   tourLocation.hamlet,                Messages.Tour_Location_Part_Hamlet);
-         createUI_Content(container,   tourLocation.croft,                 Messages.Tour_Location_Part_Croft);
-         createUI_Content(container,   tourLocation.isolated_dwelling,     Messages.Tour_Location_Part_IsolatedDwelling);
+         createUI_Content(container,   _tourLocation.hamlet,                Messages.Tour_Location_Part_Hamlet);
+         createUI_Content(container,   _tourLocation.croft,                 Messages.Tour_Location_Part_Croft);
+         createUI_Content(container,   _tourLocation.isolated_dwelling,     Messages.Tour_Location_Part_IsolatedDwelling);
 
-         createUI_Content(container,   tourLocation.neighbourhood,         Messages.Tour_Location_Part_Neighbourhood);
-         createUI_Content(container,   tourLocation.allotments,            Messages.Tour_Location_Part_Allotments);
-         createUI_Content(container,   tourLocation.quarter,               Messages.Tour_Location_Part_Quarter);
+         createUI_Content(container,   _tourLocation.neighbourhood,         Messages.Tour_Location_Part_Neighbourhood);
+         createUI_Content(container,   _tourLocation.allotments,            Messages.Tour_Location_Part_Allotments);
+         createUI_Content(container,   _tourLocation.quarter,               Messages.Tour_Location_Part_Quarter);
 
-         createUI_Content(container,   tourLocation.city_block,            Messages.Tour_Location_Part_CityBlock);
-         createUI_Content(container,   tourLocation.residential,           Messages.Tour_Location_Part_Residential);
-         createUI_Content(container,   tourLocation.farm,                  Messages.Tour_Location_Part_Farm);
-         createUI_Content(container,   tourLocation.farmyard,              Messages.Tour_Location_Part_Farmyard);
-         createUI_Content(container,   tourLocation.industrial,            Messages.Tour_Location_Part_Industrial);
-         createUI_Content(container,   tourLocation.commercial,            Messages.Tour_Location_Part_Commercial);
-         createUI_Content(container,   tourLocation.retail,                Messages.Tour_Location_Part_Retail);
+         createUI_Content(container,   _tourLocation.city_block,            Messages.Tour_Location_Part_CityBlock);
+         createUI_Content(container,   _tourLocation.residential,           Messages.Tour_Location_Part_Residential);
+         createUI_Content(container,   _tourLocation.farm,                  Messages.Tour_Location_Part_Farm);
+         createUI_Content(container,   _tourLocation.farmyard,              Messages.Tour_Location_Part_Farmyard);
+         createUI_Content(container,   _tourLocation.industrial,            Messages.Tour_Location_Part_Industrial);
+         createUI_Content(container,   _tourLocation.commercial,            Messages.Tour_Location_Part_Commercial);
+         createUI_Content(container,   _tourLocation.retail,                Messages.Tour_Location_Part_Retail);
 
-         createUI_Content(container,   tourLocation.aerialway,             Messages.Tour_Location_Part_Aerialway);
-         createUI_Content(container,   tourLocation.aeroway,               Messages.Tour_Location_Part_Aeroway);
-         createUI_Content(container,   tourLocation.amenity,               Messages.Tour_Location_Part_Amenity);
-         createUI_Content(container,   tourLocation.boundary,              Messages.Tour_Location_Part_Boundary);
-         createUI_Content(container,   tourLocation.bridge,                Messages.Tour_Location_Part_Bridge);
-         createUI_Content(container,   tourLocation.club,                  Messages.Tour_Location_Part_Club);
-         createUI_Content(container,   tourLocation.craft,                 Messages.Tour_Location_Part_Craft);
-         createUI_Content(container,   tourLocation.emergency,             Messages.Tour_Location_Part_Emergency);
-         createUI_Content(container,   tourLocation.historic,              Messages.Tour_Location_Part_Historic);
-         createUI_Content(container,   tourLocation.landuse,               Messages.Tour_Location_Part_Landuse);
-         createUI_Content(container,   tourLocation.leisure,               Messages.Tour_Location_Part_Leisure);
-         createUI_Content(container,   tourLocation.man_made,              Messages.Tour_Location_Part_ManMade);
-         createUI_Content(container,   tourLocation.military,              Messages.Tour_Location_Part_Military);
-         createUI_Content(container,   tourLocation.mountain_pass,         Messages.Tour_Location_Part_MountainPass);
-         createUI_Content(container,   tourLocation.natural2,              Messages.Tour_Location_Part_Natural);
-         createUI_Content(container,   tourLocation.office,                Messages.Tour_Location_Part_Office);
-         createUI_Content(container,   tourLocation.place,                 Messages.Tour_Location_Part_Place);
-         createUI_Content(container,   tourLocation.railway,               Messages.Tour_Location_Part_Railway);
-         createUI_Content(container,   tourLocation.shop,                  Messages.Tour_Location_Part_Shop);
-         createUI_Content(container,   tourLocation.tourism,               Messages.Tour_Location_Part_Tourism);
-         createUI_Content(container,   tourLocation.tunnel,                Messages.Tour_Location_Part_Tunnel);
-         createUI_Content(container,   tourLocation.waterway,              Messages.Tour_Location_Part_Waterway);
+         createUI_Content(container,   _tourLocation.aerialway,             Messages.Tour_Location_Part_Aerialway);
+         createUI_Content(container,   _tourLocation.aeroway,               Messages.Tour_Location_Part_Aeroway);
+         createUI_Content(container,   _tourLocation.amenity,               Messages.Tour_Location_Part_Amenity);
+         createUI_Content(container,   _tourLocation.boundary,              Messages.Tour_Location_Part_Boundary);
+         createUI_Content(container,   _tourLocation.bridge,                Messages.Tour_Location_Part_Bridge);
+         createUI_Content(container,   _tourLocation.club,                  Messages.Tour_Location_Part_Club);
+         createUI_Content(container,   _tourLocation.craft,                 Messages.Tour_Location_Part_Craft);
+         createUI_Content(container,   _tourLocation.emergency,             Messages.Tour_Location_Part_Emergency);
+         createUI_Content(container,   _tourLocation.historic,              Messages.Tour_Location_Part_Historic);
+         createUI_Content(container,   _tourLocation.landuse,               Messages.Tour_Location_Part_Landuse);
+         createUI_Content(container,   _tourLocation.leisure,               Messages.Tour_Location_Part_Leisure);
+         createUI_Content(container,   _tourLocation.man_made,              Messages.Tour_Location_Part_ManMade);
+         createUI_Content(container,   _tourLocation.military,              Messages.Tour_Location_Part_Military);
+         createUI_Content(container,   _tourLocation.mountain_pass,         Messages.Tour_Location_Part_MountainPass);
+         createUI_Content(container,   _tourLocation.natural2,              Messages.Tour_Location_Part_Natural);
+         createUI_Content(container,   _tourLocation.office,                Messages.Tour_Location_Part_Office);
+         createUI_Content(container,   _tourLocation.place,                 Messages.Tour_Location_Part_Place);
+         createUI_Content(container,   _tourLocation.railway,               Messages.Tour_Location_Part_Railway);
+         createUI_Content(container,   _tourLocation.shop,                  Messages.Tour_Location_Part_Shop);
+         createUI_Content(container,   _tourLocation.tourism,               Messages.Tour_Location_Part_Tourism);
+         createUI_Content(container,   _tourLocation.tunnel,                Messages.Tour_Location_Part_Tunnel);
+         createUI_Content(container,   _tourLocation.waterway,              Messages.Tour_Location_Part_Waterway);
 
 // SET_FORMATTING_ON
 
-         UI.createSpacer_Vertical(container, 16, 2);
+         if (_isLocationView) {
 
-         {
-            /*
-             * Usage
-             */
+            UI.createSpacer_Vertical(container, 16, 2);
 
-            final String usage = USAGE_VALUES.formatted(
+            {
+               /*
+                * Usage
+                */
 
-                  _locationItem.numTourAllLocations,
-                  _locationItem.numTourStartLocations,
-                  _locationItem.numTourEndLocations);
+               final String usage = USAGE_VALUES.formatted(
 
-            UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
-            UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
-         }
-         {
-            /*
-             * Zoomlevel
-             */
-            UI.createLabel(container, Messages.Tour_Location_Label_Zoomlevel);
-            UI.createLabel(container, Integer.toString(tourLocation.zoomlevel));
+                     _tlvLocationItem.numTourAllLocations,
+                     _tlvLocationItem.numTourStartLocations,
+                     _tlvLocationItem.numTourEndLocations);
+
+               UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
+               UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
+            }
+            {
+               /*
+                * Zoomlevel
+                */
+               UI.createLabel(container, Messages.Tour_Location_Label_Zoomlevel);
+               UI.createLabel(container, Integer.toString(_tourLocation.zoomlevel));
+            }
          }
       }
    }
@@ -288,111 +344,254 @@ public class TourLocationToolTip extends ToolTip {
 
       final Point mousePosition = new Point(mouseX, event.y);
 
-      // try to position the tooltip at the bottom of the cell
-      final ViewerCell cell = _tableViewer.getCell(mousePosition);
-
-      if (cell != null) {
-
-         final Rectangle cellBounds = cell.getBounds();
-         final int cellWidth2 = (int) (cellBounds.width * 0.5);
-         final int cellHeight = cellBounds.height;
-
-         final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
-         final int devY = cellBounds.y + cellHeight;
+      if (_isTourbookView) {
 
          /*
-          * Check if the tooltip is outside of the tree, this can happen when the column is very
-          * wide and partly hidden
+          * Tour book view
           */
-         final Rectangle treeBounds = _ttControl.getBounds();
-         boolean isDevXAdjusted = false;
-         int devX = devXDefault;
 
-         if (devXDefault >= treeBounds.width) {
-            devX = treeBounds.width - 40;
-            isDevXAdjusted = true;
+         if (_ttControl.isDisposed()) {
+            return super.getLocation(tipSize, event);
          }
 
-         final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
+         if (_tbvHoveredBounds != null) {
 
-         Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
-         final int tipSizeWidth = tipSize.x;
-         final int tipSizeHeight = tipSize.y;
-
-         if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
-
-            /*
-             * adjust horizontal position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            if (isDevXAdjusted) {
-
-               final int devXAdjusted = devXDefault - cellWidth2 + 20 - tipSizeWidth;
-
-               ttDisplayLocation = _ttControl.toDisplay(devXAdjusted, devY);
-
-            } else {
-
-               int devXAdjusted = ttDisplayLocation.x - tipSizeWidth;
-
-               if (devXAdjusted + tipSizeWidth + 10 > mouseX) {
-
-                  // prevent that the tooltip of the adjusted x position is below the mouse
-
-                  final Point mouseDisplay = _ttControl.toDisplay(mouseX, devY);
-
-                  devXAdjusted = mouseDisplay.x - tipSizeWidth - 10;
-               }
-
-               ttDisplayLocation.x = devXAdjusted;
-            }
+            return getLocation_10(tipSize, mouseX, _tbvHoveredBounds);
          }
 
-         if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
+      } else {
 
-            /*
-             * adjust vertical position, it is outside of the display, prevent default
-             * repositioning
-             */
+         /*
+          * Tour location view
+          */
 
-            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
+         // try to position the tooltip at the bottom of the cell
+         final ViewerCell cell = _columnViewer.getCell(mousePosition);
+
+         if (cell != null) {
+
+            return getLocation_10(tipSize, mouseX, cell.getBounds());
          }
-
-         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
       }
 
       return super.getLocation(tipSize, event);
    }
 
+   private Point getLocation_10(final Point tipSize, final int mouseX, final Rectangle cellBounds) {
+
+      final int cellWidth2 = (int) (cellBounds.width * 0.5);
+      final int cellHeight = cellBounds.height;
+
+      final int devXDefault = cellBounds.x + cellWidth2;
+      final int devY = cellBounds.y + cellHeight;
+
+      /*
+       * Check if the tooltip is outside of the control, this can happen when the column is very
+       * wide and partly hidden
+       */
+      final Rectangle ttControlBounds = _ttControl.getBounds();
+      boolean isDevXAdjusted = false;
+      int devX = devXDefault;
+
+      if (devXDefault >= ttControlBounds.width) {
+         devX = ttControlBounds.width - 40;
+         isDevXAdjusted = true;
+      }
+
+      final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
+
+      Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
+      final int tipSizeWidth = tipSize.x;
+      final int tipSizeHeight = tipSize.y;
+
+      if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
+
+         /*
+          * adjust horizontal position, it is outside of the display, prevent default
+          * repositioning
+          */
+
+         if (isDevXAdjusted) {
+
+            final int devXAdjusted = devXDefault - cellWidth2 + 20 - tipSizeWidth;
+
+            ttDisplayLocation = _ttControl.toDisplay(devXAdjusted, devY);
+
+         } else {
+
+            int devXAdjusted = ttDisplayLocation.x - tipSizeWidth;
+
+            if (devXAdjusted + tipSizeWidth + 10 > mouseX) {
+
+               // prevent that the tooltip of the adjusted x position is below the mouse
+
+               final Point mouseDisplay = _ttControl.toDisplay(mouseX, devY);
+
+               devXAdjusted = mouseDisplay.x - tipSizeWidth - 10;
+            }
+
+            ttDisplayLocation.x = devXAdjusted;
+         }
+      }
+
+      if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
+
+         /*
+          * adjust vertical position, it is outside of the display, prevent default
+          * repositioning
+          */
+
+         ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
+      }
+
+      return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
+   }
+
    @Override
    protected Object getToolTipArea(final Event event) {
 
-      _viewerCell = _tableViewer.getCell(new Point(event.x, event.y));
+      Object ttArea;
 
-      if (_viewerCell != null) {
+      if (_isTourbookView) {
 
-         final CellLabelProvider labelProvider = _tableViewer.getLabelProvider(_viewerCell.getColumnIndex());
+         ttArea = getToolTipArea_NatTable(event);
+
+         _tourLocation = getTourLocation();
+
+      } else {
+
+         ttArea = getToolTipArea_TourLocationView(event);
+
+         _tourLocation = _tlvLocationItem == null ? null : _tlvLocationItem.tourLocation;
+      }
+
+      return _tourLocation == null ? null : ttArea;
+   }
+
+   private Object getToolTipArea_NatTable(final Event event) {
+
+      _tbvHoveredTourId = null;
+      _tbvHoveredBounds = null;
+      _tbvTooltipCellPos = null;
+
+      final int colPosByX = _tbvNatTable.getColumnPositionByX(event.x);
+      final int rowPosByY = _tbvNatTable.getRowPositionByY(event.y);
+
+      if (colPosByX <= 0 || rowPosByY <= 0) {
+
+         // first column or first row (this is the row number or table header) or an empty nattable (rowPosByY == -1)
+
+         return null;
+      }
+
+//!!! this do not work for freezed columns !!!
+//   _hoveredCellPos = _tourBookView.getNatTableLayer_Hover().getCurrentHoveredCellPosition();
+
+//NatTable advanced: With lot of debugging found solution to get absolute row from relative row
+      final int hoveredRowPosition = _tourBookView.getNatTableLayer_Viewport().localToUnderlyingRowPosition(rowPosByY - 1);
+
+      // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
+      final int hoveredColumnIndex = _tbvNatTable.getColumnIndexByPosition(colPosByX);
+      if (hoveredColumnIndex == -1) {
+
+         // a cell is not hovered
+
+         _tbvTooltipCellPos = null;
+
+      } else {
+
+         _tbvTooltipCellPos = new Point(colPosByX, rowPosByY);
+
+         final ArrayList<ColumnDefinition> visibleAndSortedColumns = _tourBookView.getNatTable_ColumnManager().getVisibleAndSortedColumns();
+         final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
+
+         // hide current tooltip when a cell without tooltip is hovered
+         final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
+         if (labelProvider instanceof final NatTable_LabelProvider_WithLocationTooltip tooltipLabelProvider) {
+
+            if (tooltipLabelProvider.isShowTooltip() == false) {
+               _tbvTooltipCellPos = null;
+            }
+
+            _tbvIsStartLocation = tooltipLabelProvider.isStartLocation;
+
+         } else {
+
+            _tbvTooltipCellPos = null;
+         }
+      }
+
+      if (_tbvTooltipCellPos != null) {
+
+         // get hovered tour id
+         final TVITourBookTour hoveredTourItem = _tourBookView.getNatTable_DataProvider().getRowObject(hoveredRowPosition);
+         _tbvHoveredTourId = hoveredTourItem.tourId;
+
+         final int devX = _tbvNatTable.getStartXOfColumnPosition(colPosByX);
+         final int devY = _tbvNatTable.getStartYOfRowPosition(rowPosByY);
+         final int cellWidth = _tbvNatTable.getColumnWidthByPosition(colPosByX);
+         final int cellHeight = _tbvNatTable.getRowHeightByPosition(rowPosByY);
+
+         _tbvHoveredBounds = new Rectangle(devX, devY, cellWidth, cellHeight);
+      }
+
+      return _tbvTooltipCellPos;
+   }
+
+   private Object getToolTipArea_TourLocationView(final Event event) {
+
+      _tlvViewerCell = _columnViewer.getCell(new Point(event.x, event.y));
+
+      if (_tlvViewerCell != null) {
+
+         final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_tlvViewerCell.getColumnIndex());
 
          if (labelProvider instanceof TourLocationView.TooltipLabelProvider) {
 
             // show tooltip for this cell
 
-            final Object cellElement = _viewerCell.getElement();
+            final Object cellElement = _tlvViewerCell.getElement();
 
             if (cellElement instanceof final LocationItem locationItem) {
-               _locationItem = locationItem;
+               _tlvLocationItem = locationItem;
             }
 
          } else {
 
-            // tooltip is not dispalyed for this cell
+            // this tooltip is not dispalyed for the hovered cell
 
-            _viewerCell = null;
+            _tlvViewerCell = null;
          }
       }
 
-      return _viewerCell;
+      return _tlvViewerCell;
+   }
+
+   private TourLocation getTourLocation() {
+
+      TourData tourData = null;
+
+      if (_tbvHoveredTourId != null && _tbvHoveredTourId != -1) {
+
+         // first get data from the tour id when it is set
+         tourData = TourManager.getInstance().getTourData(_tbvHoveredTourId);
+      }
+
+      if (tourData != null) {
+
+         // tour data is available
+
+         if (_tbvIsStartLocation) {
+
+            return tourData.getTourLocationStart();
+
+         } else {
+
+            return tourData.getTourLocationEnd();
+         }
+      }
+
+      return null;
    }
 
    private void initUI(final Composite parent) {
@@ -421,38 +620,60 @@ public class TourLocationToolTip extends ToolTip {
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
-      if (_tourLocationView.isShowLocationTooltip() == false) {
-         return false;
-      }
+      if (_isTourbookView) {
 
-      if (!super.shouldCreateToolTip(event)) {
-         return false;
-      }
+         /*
+          * Tourbook view
+          */
 
-      if (_viewerCell == null) {
+         if (!super.shouldCreateToolTip(event)) {
+            return false;
+         }
 
-         // show default tooltip
-         _ttControl.setToolTipText(null);
+         if (_tbvTooltipCellPos == null || _tbvHoveredTourId == null) {
 
-         return false;
-      }
+            // show default tooltip
+            _ttControl.setToolTipText(null);
 
-      boolean isShowTooltip = false;
+            return false;
 
-      if (_locationItem == null) {
+         } else {
 
-         // show default tooltip
-         _ttControl.setToolTipText(null);
+            // hide default tooltip and display the custom tooltip
+            _ttControl.setToolTipText(UI.EMPTY_STRING);
+
+            return true;
+         }
 
       } else {
 
-         // hide default tooltip and display the custom tooltip
-         _ttControl.setToolTipText(UI.EMPTY_STRING);
+         /*
+          * Tour location view
+          */
 
-         isShowTooltip = true;
+         if (_tourLocationView.isShowLocationTooltip() == false) {
+            return false;
+         }
+
+         if (!super.shouldCreateToolTip(event)) {
+            return false;
+         }
+
+         if (_tlvViewerCell == null || _tlvLocationItem == null) {
+
+            // show default tooltip
+            _ttControl.setToolTipText(null);
+
+            return false;
+
+         } else {
+
+            // hide default tooltip and display the custom tooltip
+            _ttControl.setToolTipText(UI.EMPTY_STRING);
+
+            return true;
+         }
       }
-
-      return isShowTooltip;
    }
 
 }

@@ -29,6 +29,7 @@ import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.NatTable_LabelProvider;
+import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.NatTable_LabelProvider_WithTourTooltip;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -3055,7 +3056,8 @@ class TourBook_ColumnFactory {
    private void defineColumn_Tour_Location_End() {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_LOCATION_END.createColumn(_columnManager_NatTable, _pc);
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithLocationTooltip(false) {
 
          @Override
          public String getValueText(final Object element) {
@@ -3077,6 +3079,12 @@ class TourBook_ColumnFactory {
 
                return tourLocation;
             }
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+
+            return true;
          }
       });
 
@@ -3117,7 +3125,8 @@ class TourBook_ColumnFactory {
    private void defineColumn_Tour_Location_Start() {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_LOCATION_START.createColumn(_columnManager_NatTable, _pc);
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithLocationTooltip(true) {
 
          @Override
          public String getValueText(final Object element) {
@@ -3139,6 +3148,12 @@ class TourBook_ColumnFactory {
 
                return tourLocation;
             }
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+
+            return true;
          }
       });
 
