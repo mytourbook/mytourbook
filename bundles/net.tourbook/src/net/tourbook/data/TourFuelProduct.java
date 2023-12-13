@@ -67,6 +67,10 @@ public class TourFuelProduct {
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
+   //todo fb
+//   @ManyToOne(optional = false)
+//   private Container                  beverageContainer;
+
    private String                     name;
 
    private int                        calories;

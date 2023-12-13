@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
@@ -35,9 +34,9 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -69,7 +68,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import pl.coderion.model.ProductResponse;
 import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
 
-public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
+public class DialogSearchProduct extends Dialog implements PropertyChangeListener {
 
    //todo fb
    //put a link with "Not finding the product you used ? You can create it here"
@@ -239,7 +238,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       super.configureShell(shell);
 
-      shell.setText(Messages.tour_merger_dialog_title);
+      shell.setText("search for a fuel item");
 
       shell.addDisposeListener(disposeEvent -> onDispose());
    }
@@ -258,10 +257,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 //         restoreState();
 //      }
 //      _isInUIInit = false;
-
-      setTitle("search for a fuel item");
-
-      setMessage("search for a fuel item");
 
       enableActions();
 
@@ -289,9 +284,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider("ID");
 
-      //todo fb why doesn't that work !?
-      // set search as default button
-      dlgContainer.getShell().setDefaultButton(_btnSearch);
+      //todo fb
+      // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
 
       restoreState();
 
@@ -337,6 +331,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                // start searching when ENTER is pressed
                onSearchPoi();
             }));
+            _cboSearchQuery.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -441,7 +436,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _iconPlaceholder.dispose();
 
-      _graphImages.values().forEach(Image::dispose);
+      _graphImages.values().forEach(image -> image.dispose());
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
    }
