@@ -87,7 +87,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
 
-   private TourData                      _tourData;
+   private long                          _tourId;
 
    private PixelConverter                _pc;
    private boolean                       _isInUIInit;
@@ -191,10 +191,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    /**
     * @param parentShell
-    * @param tourData
-    *           {@link TourData} for the tour
+    * @param tourId
     */
-   public DialogSearchProduct(final Shell parentShell, final TourData tourData) {
+   public DialogSearchProduct(final Shell parentShell, final long tourId) {
 
       super(parentShell);
 
@@ -204,7 +203,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // set icon for the window
       setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage());
 
-      _tourData = tourData;
+      _tourId = tourId;
       _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
 
    }
@@ -430,10 +429,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
          final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
 
-         final TourFuelProduct tfp = new TourFuelProduct(_tourData, productResponse.getProduct());
-         _tourData.addFuelProduct(tfp);
+         final TourData tourData = TourManager.getTour(_tourId);
+         final TourFuelProduct tfp = new TourFuelProduct(tourData, productResponse.getProduct());
+         tourData.addFuelProduct(tfp);
 
-         TourManager.saveModifiedTour(_tourData);
+         TourManager.saveModifiedTour(tourData);
       });
    }
 

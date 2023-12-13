@@ -72,6 +72,7 @@ public class TourFuelProduct {
    private int                        calories;
    private float                      sodium;
 
+   //to rename to isBeverage
    private boolean                    isFluid;
 
    //link it to an object defined by the user ?
@@ -158,7 +159,7 @@ public class TourFuelProduct {
       return isFluid;
    }
 
-   public void setIsFluid(final boolean booleanValue) {
+   public void setIsBeverage(final boolean booleanValue) {
      isFluid = booleanValue;
 
    }

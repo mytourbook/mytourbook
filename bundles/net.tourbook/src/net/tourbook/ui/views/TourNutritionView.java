@@ -151,7 +151,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       public Object getValue(final Object element, final String property) {
          final TourFuelProduct task = (TourFuelProduct) element;
 
-         if (property.equals("Fluid")) {
+         if (property.equals("Beverage")) {
             return Boolean.valueOf(task.isFluid());
          }
          return UI.EMPTY_STRING;
@@ -165,8 +165,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
          final TourFuelProduct tourFuelProduct = (TourFuelProduct) element;
 
-         if (property.equals("Fluid")) {
-            tourFuelProduct.setIsFluid(((Boolean) value).booleanValue());
+         if (property.equals("Beverage")) {
+            tourFuelProduct.setIsBeverage(((Boolean) value).booleanValue());
          }
          _productsViewer.refresh();
       }
@@ -403,17 +403,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       columnFluid.setText(tableColumns[index++]);
       columnFluid.setWidth(75);
 
-      // Column: Fluid Container Name
+      // Column: Fluid Container
       final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
       columnFluidContainerName.setText(tableColumns[index++]);
       columnFluidContainerName.setWidth(75);
 
-      // Column: Containers
-      final TableColumn columnFluidContainers = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainers.setText(tableColumns[index++]);
-      columnFluidContainers.setWidth(75);
-
-      // Column: Containers Consumed
+      // Column: Consumed Containers
       final TableColumn columnFluidContainersConsumed = new TableColumn(productsTable, SWT.LEFT);
       columnFluidContainersConsumed.setText(tableColumns[index++]);
       columnFluidContainersConsumed.setWidth(75);
@@ -489,8 +484,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Fluid", "Fluid Container Name", "Containers",
-            "Containers Consumed" };
+      final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Fluid Container", "Consumed Containers" };
       createColumns(productsTable, tableColumns);
 
       _productsViewer = new TableViewer(productsTable);

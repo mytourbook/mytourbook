@@ -40,7 +40,7 @@ public class ActionOpenSearchProduct extends Action {
 
    @Override
    public void run() {
-      new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData).open();
+      new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
    }
 
    public void setTourData(final TourData tourData) {
