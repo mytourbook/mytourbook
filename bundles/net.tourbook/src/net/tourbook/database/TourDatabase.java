@@ -4579,7 +4579,7 @@ public class TourDatabase {
 
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            // Version 52 - begin
+            // Version 53 - begin
 
             + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                                    " + NL //$NON-NLS-1$
@@ -4587,7 +4587,7 @@ public class TourDatabase {
             + "   fluid               FLOAT,                                                      " + NL //$NON-NLS-1$
             + "   isFluid             BOOLEAN DEFAULT FALSE                                       " + NL //$NON-NLS-1$
 
-            // Version 52 - end
+            // Version 53 - end
 
             + ")"); //$NON-NLS-1$
    }
@@ -6478,6 +6478,11 @@ public class TourDatabase {
          // 51 -> 52    > 23.10
          if (currentDbVersion == 51) {
             currentDbVersion = _dbDesignVersion_New = updateDb_051_To_052(conn, splashManager);
+         }
+
+         // 52 -> 53    > 24.XX
+         if (currentDbVersion == 52) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_052_To_053(conn, splashManager);
          }
 
          // update db design version number
@@ -10439,6 +10444,24 @@ public class TourDatabase {
          if (isTableAvailable(conn, TABLE_TOUR_LOCATION) == false) {
             createTable_TourLocation(stmt);
          }
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_052_To_053(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 53;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+
          // double check if db already exists
          if (isTableAvailable(conn, TABLE_TOUR_FUEL_PRODUCT) == false) {
             createTable_TourFuelProduct(stmt);
