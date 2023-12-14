@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.ui.SelectionCellLabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.NatTable_LabelProvider;
 import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
@@ -62,19 +63,22 @@ public class TourLocationToolTip extends ToolTip {
    private TourBookView        _tourBookView;
    private TourLocationView    _tourLocationView;
 
-   // TLV: TourLocationView
-   private ViewerCell   _tlvViewerCell;
-   private LocationItem _tlvLocationItem;
+   private boolean             _isLocationView;
+   private boolean             _isTourBookView;
 
-   // TBV: TourBookView
-   private NatTable     _tbvNatTable;
-   private Rectangle    _tbvHoveredBounds;
-   private Long         _tbvHoveredTourId;
-   private Point        _tbvTooltipCellPos;
-   private boolean      _tbvIsStartLocation;
+   private boolean             _isNatTableView;
+   private boolean             _isStartLocation;
+   private boolean             _isShowTooltip;
 
-   private boolean      _isLocationView;
-   private boolean      _isTourbookView;
+   // COL: Column viewer
+   private ViewerCell   _colViewerCell;
+   private LocationItem _colLocationItem;
+
+   // NAT: Nattable viewer
+   private NatTable     _natNatTable;
+   private Rectangle    _natHoveredBounds;
+   private Long         _natHoveredTourId;
+   private Point        _natTooltipCellPos;
 
    private TourLocation _tourLocation;
 
@@ -83,17 +87,33 @@ public class TourLocationToolTip extends ToolTip {
     */
    private Composite _ttContainer;
 
-   public TourLocationToolTip(final TourBookView tourBookView) {
+   public TourLocationToolTip(final TourBookView tourBookView, final boolean isNatTable) {
 
-      super(tourBookView.getNatTable(), NO_RECREATE, false);
+      super(isNatTable
 
-      _isTourbookView = true;
+            ? tourBookView.getNatTable()
+            : tourBookView.getTreeViewer().getTree(),
+
+            NO_RECREATE,
+            false);
+
+      _isTourBookView = true;
 
       _tourBookView = tourBookView;
-      _tbvNatTable = tourBookView.getNatTable();
+      _isNatTableView = isNatTable;
 
-      _ttControl = _tbvNatTable;
-      _columnViewer = tourBookView.getViewer();
+      if (_isNatTableView) {
+
+         _natNatTable = tourBookView.getNatTable();
+
+         _ttControl = _natNatTable;
+
+      } else {
+
+         _ttControl = tourBookView.getTreeViewer().getTree();
+
+         _columnViewer = tourBookView.getTreeViewer();
+      }
 
       setHideOnMouseDown(false);
    }
@@ -119,13 +139,11 @@ public class TourLocationToolTip extends ToolTip {
 
       super.afterHideToolTip(event);
 
-      _tlvViewerCell = null;
+      _colViewerCell = null;
    }
 
    @Override
    public Composite createToolTipContentArea(final Event event, final Composite parent) {
-
-      initUI(parent);
 
       final Composite container = createUI(parent);
 
@@ -178,9 +196,9 @@ public class TourLocationToolTip extends ToolTip {
 
             String locationTitle;
 
-            if (_isTourbookView) {
+            if (_isTourBookView) {
 
-               locationTitle = _tbvIsStartLocation
+               locationTitle = _isStartLocation
 
                      ? Messages.Tour_Tooltip_Label_LocationStart
                      : Messages.Tour_Tooltip_Label_LocationEnd;
@@ -301,9 +319,9 @@ public class TourLocationToolTip extends ToolTip {
 
                final String usage = USAGE_VALUES.formatted(
 
-                     _tlvLocationItem.numTourAllLocations,
-                     _tlvLocationItem.numTourStartLocations,
-                     _tlvLocationItem.numTourEndLocations);
+                     _colLocationItem.numTourAllLocations,
+                     _colLocationItem.numTourStartLocations,
+                     _colLocationItem.numTourEndLocations);
 
                UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
                UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
@@ -344,25 +362,25 @@ public class TourLocationToolTip extends ToolTip {
 
       final Point mousePosition = new Point(mouseX, event.y);
 
-      if (_isTourbookView) {
+      if (_isNatTableView) {
 
          /*
-          * Tour book view
+          * Nattable viewer
           */
 
          if (_ttControl.isDisposed()) {
             return super.getLocation(tipSize, event);
          }
 
-         if (_tbvHoveredBounds != null) {
+         if (_natHoveredBounds != null) {
 
-            return getLocation_10(tipSize, mouseX, _tbvHoveredBounds);
+            return getLocation_10(tipSize, mouseX, _natHoveredBounds);
          }
 
       } else {
 
          /*
-          * Tour location view
+          * Column viewer
           */
 
          // try to position the tooltip at the bottom of the cell
@@ -452,30 +470,75 @@ public class TourLocationToolTip extends ToolTip {
 
       Object ttArea;
 
-      if (_isTourbookView) {
+      if (_isNatTableView) {
 
          ttArea = getToolTipArea_NatTable(event);
 
-         _tourLocation = getTourLocation();
-
       } else {
 
-         ttArea = getToolTipArea_TourLocationView(event);
+         // column viewer
 
-         _tourLocation = _tlvLocationItem == null ? null : _tlvLocationItem.tourLocation;
+         ttArea = getToolTipArea_ColumnViewer(event);
       }
 
       return _tourLocation == null ? null : ttArea;
    }
 
+   private Object getToolTipArea_ColumnViewer(final Event event) {
+
+      _colViewerCell = _columnViewer.getCell(new Point(event.x, event.y));
+
+      if (_colViewerCell != null) {
+
+         final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_colViewerCell.getColumnIndex());
+
+         if (labelProvider instanceof final SelectionCellLabelProvider_WithLocationTooltip tooltipLabelProvider) {
+
+            // tourbook view
+
+            _isStartLocation = tooltipLabelProvider.isStartLocation;
+
+            _isShowTooltip = tooltipLabelProvider.isShowTooltip();
+
+            final Object cellElement = _colViewerCell.getElement();
+
+            if (cellElement instanceof final TVITourBookTour tourItem) {
+
+               _tourLocation = getTourLocation(tourItem.tourId);
+            }
+
+         } else if (labelProvider instanceof TourLocationView.TooltipLabelProvider) {
+
+            // tour location view
+
+            final Object cellElement = _colViewerCell.getElement();
+
+            if (cellElement instanceof final LocationItem locationItem) {
+
+               _colLocationItem = locationItem;
+
+               _tourLocation = locationItem.tourLocation;
+            }
+
+         } else {
+
+            // this tooltip is not dispalyed for the hovered cell
+
+            _colViewerCell = null;
+         }
+      }
+
+      return _colViewerCell;
+   }
+
    private Object getToolTipArea_NatTable(final Event event) {
 
-      _tbvHoveredTourId = null;
-      _tbvHoveredBounds = null;
-      _tbvTooltipCellPos = null;
+      _natHoveredTourId = null;
+      _natHoveredBounds = null;
+      _natTooltipCellPos = null;
 
-      final int colPosByX = _tbvNatTable.getColumnPositionByX(event.x);
-      final int rowPosByY = _tbvNatTable.getRowPositionByY(event.y);
+      final int colPosByX = _natNatTable.getColumnPositionByX(event.x);
+      final int rowPosByY = _natNatTable.getRowPositionByY(event.y);
 
       if (colPosByX <= 0 || rowPosByY <= 0) {
 
@@ -491,16 +554,16 @@ public class TourLocationToolTip extends ToolTip {
       final int hoveredRowPosition = _tourBookView.getNatTableLayer_Viewport().localToUnderlyingRowPosition(rowPosByY - 1);
 
       // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
-      final int hoveredColumnIndex = _tbvNatTable.getColumnIndexByPosition(colPosByX);
+      final int hoveredColumnIndex = _natNatTable.getColumnIndexByPosition(colPosByX);
       if (hoveredColumnIndex == -1) {
 
          // a cell is not hovered
 
-         _tbvTooltipCellPos = null;
+         _natTooltipCellPos = null;
 
       } else {
 
-         _tbvTooltipCellPos = new Point(colPosByX, rowPosByY);
+         _natTooltipCellPos = new Point(colPosByX, rowPosByY);
 
          final ArrayList<ColumnDefinition> visibleAndSortedColumns = _tourBookView.getNatTable_ColumnManager().getVisibleAndSortedColumns();
          final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
@@ -510,92 +573,63 @@ public class TourLocationToolTip extends ToolTip {
          if (labelProvider instanceof final NatTable_LabelProvider_WithLocationTooltip tooltipLabelProvider) {
 
             if (tooltipLabelProvider.isShowTooltip() == false) {
-               _tbvTooltipCellPos = null;
+               _natTooltipCellPos = null;
             }
 
-            _tbvIsStartLocation = tooltipLabelProvider.isStartLocation;
+            _isStartLocation = tooltipLabelProvider.isStartLocation;
 
          } else {
 
-            _tbvTooltipCellPos = null;
+            _natTooltipCellPos = null;
          }
       }
 
-      if (_tbvTooltipCellPos != null) {
+      if (_natTooltipCellPos != null) {
 
          // get hovered tour id
          final TVITourBookTour hoveredTourItem = _tourBookView.getNatTable_DataProvider().getRowObject(hoveredRowPosition);
-         _tbvHoveredTourId = hoveredTourItem.tourId;
+         _natHoveredTourId = hoveredTourItem.tourId;
 
-         final int devX = _tbvNatTable.getStartXOfColumnPosition(colPosByX);
-         final int devY = _tbvNatTable.getStartYOfRowPosition(rowPosByY);
-         final int cellWidth = _tbvNatTable.getColumnWidthByPosition(colPosByX);
-         final int cellHeight = _tbvNatTable.getRowHeightByPosition(rowPosByY);
+         final int devX = _natNatTable.getStartXOfColumnPosition(colPosByX);
+         final int devY = _natNatTable.getStartYOfRowPosition(rowPosByY);
+         final int cellWidth = _natNatTable.getColumnWidthByPosition(colPosByX);
+         final int cellHeight = _natNatTable.getRowHeightByPosition(rowPosByY);
 
-         _tbvHoveredBounds = new Rectangle(devX, devY, cellWidth, cellHeight);
+         _natHoveredBounds = new Rectangle(devX, devY, cellWidth, cellHeight);
+
+         _tourLocation = getTourLocation(_natHoveredTourId);
       }
 
-      return _tbvTooltipCellPos;
+      return _natTooltipCellPos;
    }
 
-   private Object getToolTipArea_TourLocationView(final Event event) {
+   /**
+    * @param tourId
+    *
+    * @return Returns start or end location
+    */
+   private TourLocation getTourLocation(final Long tourId) {
 
-      _tlvViewerCell = _columnViewer.getCell(new Point(event.x, event.y));
+      if (tourId != null && tourId != -1) {
 
-      if (_tlvViewerCell != null) {
+         final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
-         final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_tlvViewerCell.getColumnIndex());
+         if (tourData != null) {
 
-         if (labelProvider instanceof TourLocationView.TooltipLabelProvider) {
+            // tour data is available
 
-            // show tooltip for this cell
+            if (_isStartLocation) {
 
-            final Object cellElement = _tlvViewerCell.getElement();
+               return tourData.getTourLocationStart();
 
-            if (cellElement instanceof final LocationItem locationItem) {
-               _tlvLocationItem = locationItem;
+            } else {
+
+               return tourData.getTourLocationEnd();
             }
-
-         } else {
-
-            // this tooltip is not dispalyed for the hovered cell
-
-            _tlvViewerCell = null;
-         }
-      }
-
-      return _tlvViewerCell;
-   }
-
-   private TourLocation getTourLocation() {
-
-      TourData tourData = null;
-
-      if (_tbvHoveredTourId != null && _tbvHoveredTourId != -1) {
-
-         // first get data from the tour id when it is set
-         tourData = TourManager.getInstance().getTourData(_tbvHoveredTourId);
-      }
-
-      if (tourData != null) {
-
-         // tour data is available
-
-         if (_tbvIsStartLocation) {
-
-            return tourData.getTourLocationStart();
-
-         } else {
-
-            return tourData.getTourLocationEnd();
          }
       }
 
       return null;
-   }
-
-   private void initUI(final Composite parent) {
-
    }
 
    private void setMaxContentWidth(final Control control) {
@@ -620,17 +654,17 @@ public class TourLocationToolTip extends ToolTip {
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
-      if (_isTourbookView) {
+      if (_isNatTableView) {
 
          /*
-          * Tourbook view
+          * NatTable viewer
           */
 
          if (!super.shouldCreateToolTip(event)) {
             return false;
          }
 
-         if (_tbvTooltipCellPos == null || _tbvHoveredTourId == null) {
+         if (_natTooltipCellPos == null || _natHoveredTourId == null) {
 
             // show default tooltip
             _ttControl.setToolTipText(null);
@@ -648,10 +682,10 @@ public class TourLocationToolTip extends ToolTip {
       } else {
 
          /*
-          * Tour location view
+          * Column viewer
           */
 
-         if (_tourLocationView.isShowLocationTooltip() == false) {
+         if (_isLocationView && _tourLocationView.isShowLocationTooltip() == false) {
             return false;
          }
 
@@ -659,7 +693,11 @@ public class TourLocationToolTip extends ToolTip {
             return false;
          }
 
-         if (_tlvViewerCell == null || _tlvLocationItem == null) {
+         if (_isTourBookView && _isShowTooltip == false) {
+            return false;
+         }
+
+         if (_colViewerCell == null || _tourLocation == null) {
 
             // show default tooltip
             _ttControl.setToolTipText(null);

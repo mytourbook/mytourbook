@@ -26,6 +26,7 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.ui.SelectionCellLabelProvider;
+import net.tourbook.common.ui.SelectionCellLabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.NatTable_LabelProvider;
@@ -3089,7 +3090,14 @@ class TourBook_ColumnFactory {
       });
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_LOCATION_END.createColumn(_columnManager_Tree, _pc);
-      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider_WithLocationTooltip(false) {
+
+         @Override
+         public boolean isShowTooltip() {
+
+            return true;
+         }
 
          @Override
          public void update(final ViewerCell cell) {
@@ -3158,7 +3166,13 @@ class TourBook_ColumnFactory {
       });
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_LOCATION_START.createColumn(_columnManager_Tree, _pc);
-      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider_WithLocationTooltip(true) {
+
+         @Override
+         public boolean isShowTooltip() {
+            return true;
+         }
 
          @Override
          public void update(final ViewerCell cell) {

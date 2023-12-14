@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
@@ -71,6 +72,7 @@ import org.eclipse.swt.widgets.Menu;
  * </pre>
  */
 public class ActionSetStartEndLocation extends SubMenu {
+
 
    private static final String          ID           = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
@@ -352,7 +354,9 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       if (tourLocationStart != null) {
 
-         locationText = TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile);
+         locationText = OtherMessages.TOUR_TOOLTIP_LABEL_LOCATION_START
+               + UI.NEW_LINE
+               + TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile);
       }
 
       if (tourLocationEnd != null) {
@@ -362,10 +366,12 @@ public class ActionSetStartEndLocation extends SubMenu {
          if (endLocationText.length() > 0) {
 
             if (locationText.length() > 0) {
-               locationText += UI.NEW_LINE2;
+               locationText += UI.NEW_LINE3;
             }
 
-            locationText += endLocationText;
+            locationText += OtherMessages.TOUR_TOOLTIP_LABEL_LOCATION_END
+                  + UI.NEW_LINE
+                  + endLocationText;
          }
       }
 
@@ -376,7 +382,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       if (locationText.length() > 0) {
 
-         tooltipText += UI.NEW_LINE2 + locationText;
+         tooltipText += UI.NEW_LINE3 + locationText;
       }
 
       return tooltipText;

@@ -1679,7 +1679,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Latitude);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Latitude_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
          }
@@ -1698,7 +1698,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Longitude);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Longitude_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
          }

@@ -1906,7 +1906,7 @@ public class TourBookView extends ViewPart implements
       _tourInfoToolTip_NatTable = new NatTableViewer_TourInfo_ToolTip(this, ToolTip.NO_RECREATE);
 
       // set start/end location info tooltip provider
-      new TourLocationToolTip(this);
+      new TourLocationToolTip(this, true);
 
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
 
@@ -2035,6 +2035,9 @@ public class TourBookView extends ViewPart implements
 
       // set tour info tooltip provider
       _tourInfoToolTip_Tree = new TreeViewerTourInfoToolTip(_tourViewer_Tree);
+
+      // set start/end location info tooltip provider
+      new TourLocationToolTip(this, false);
    }
 
    private void createUI_40_Tree_ColumnImages(final Tree tree) {
