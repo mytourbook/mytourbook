@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,8 +39,8 @@ public class SlideoutMap2_SyncMap extends ToolbarSlideout {
    private Map2View _map2View;
 
    public SlideoutMap2_SyncMap(final Control ownerControl,
-                                final ToolBar toolBar,
-                                final Map2View map2View) {
+                               final ToolBar toolBar,
+                               final Map2View map2View) {
 
       super(ownerControl, toolBar);
 
@@ -95,6 +95,7 @@ public class SlideoutMap2_SyncMap extends ToolbarSlideout {
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Slider_Centered));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ValuePoint));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Photo));
+         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_TourLocation));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_OtherMap));
 
          tbm.update(true);

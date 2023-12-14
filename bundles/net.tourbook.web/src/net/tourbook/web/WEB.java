@@ -113,6 +113,7 @@ public class WEB {
    private static final String          RESPONSE_HEADER_CONTENT_ENCODING         = "Content-Encoding";                        //$NON-NLS-1$
    public static final String           RESPONSE_HEADER_CONTENT_RANGE            = "Content-Range";                           //$NON-NLS-1$
    public static final String           RESPONSE_HEADER_CONTENT_TYPE             = "Content-Type";                            //$NON-NLS-1$
+   public static final String           HTTP_HEADER_USER_AGENT                   = "User-Agent";                              //$NON-NLS-1$
 
    private static final String          CONTENT_ENCODING_GZIP                    = "gzip";                                    //$NON-NLS-1$
 
@@ -184,6 +185,7 @@ public class WEB {
     * Converts <code><br></code> into Java newline.
     *
     * @param text
+    *
     * @return
     */
    public static String convertHTML_Into_JavaLineBreaks(final String text) {
@@ -195,6 +197,7 @@ public class WEB {
     * Converts Java newline into HTML newline.
     *
     * @param text
+    *
     * @return
     */
    public static String convertHTML_LineBreaks(final String text) {
@@ -206,6 +209,7 @@ public class WEB {
     * Convert Java newline into JS newline.
     *
     * @param text
+    *
     * @return
     */
    public static String convertJS_LineBreaks(final String text) {
@@ -252,6 +256,7 @@ public class WEB {
     *           The URL argument to encode
     * @param obfuscateAll
     *           True to force hex-encoding on all argument characters
+    *
     * @return The StringBuffer where the hex-encoded String will be placed
     */
    public static String encodeUrl(final String urlString, final boolean obfuscateAll) {
@@ -289,6 +294,7 @@ public class WEB {
     * https://stackoverflow.com/a/30626898/7066681
     *
     * @param htmlAttribute
+    *
     * @return
     */
    public static String escapeSingleQuote(final String htmlAttribute) {
@@ -298,6 +304,7 @@ public class WEB {
 
    /**
     * @param path
+    *
     * @return Returns the 2nd last extension or <code>null</code> when not available.
     */
    private static String getCompressedExtension(final Path path) {
@@ -347,6 +354,7 @@ public class WEB {
 
    /**
     * @param filePathName
+    *
     * @return Returns a file from the WebContent folder, this folder is the root for path names.
     */
    public static File getFile(final String filePathName) {
@@ -370,6 +378,7 @@ public class WEB {
     *           Absolute file path name which parent is {@value #WEB_CONTENT_FOLDER}.
     * @param isConvertPaths
     *           Converts absolute paths to file paths.
+    *
     * @return Returns the content of a file from the WebContent folder, this folder is the root for
     *         web resources located in {@value #WEB_CONTENT_FOLDER}.
     */
@@ -407,6 +416,7 @@ public class WEB {
 
    /**
     * @param fileName
+    *
     * @return Returns a file from the resource folder {@value #RESOURCE_PATH}.
     */
    public static File getResourceFile(final String fileName) {
@@ -563,7 +573,9 @@ public class WEB {
     * Decodes the raw json data and converts it in a {@link JSONArray}.
     *
     * @param jsonRawData
+    *
     * @return Returns a {@link JSONArray} from the parsed json data.
+    *
     * @throws UnsupportedEncodingException
     */
    public static JSONArray parseJSONArray(final Object jsonRawData) throws UnsupportedEncodingException {
@@ -579,7 +591,9 @@ public class WEB {
     * Decodes the raw json data and converts it in a {@link JSONObject}.
     *
     * @param jsonRawData
+    *
     * @return Returns a {@link JSONObject} from the parsed json data.
+    *
     * @throws UnsupportedEncodingException
     */
    public static JSONObject parseJSONObject(final Object jsonRawData) throws UnsupportedEncodingException {
@@ -641,6 +655,7 @@ public class WEB {
     *
     * @param httpExchange
     * @param file
+    *
     * @return Returns the file extension.
     */
    public static String setResponseHeaderContentType(final HttpExchange httpExchange, final File file) {
@@ -747,6 +762,7 @@ public class WEB {
     *
     * @param ch
     *           The character to test
+    *
     * @return True if the specified character should be hex-encoded in a URL
     */
    private static boolean shouldEncodeArgChar(final char ch) {

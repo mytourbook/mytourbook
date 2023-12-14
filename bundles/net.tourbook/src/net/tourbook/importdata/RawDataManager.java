@@ -343,11 +343,12 @@ public class RawDataManager {
       TIME_SLICES__POWER_AND_SPEED, //
       TIME_SLICES__POWER_AND_PULSE, //
       TIME_SLICES__RUNNING_DYNAMICS, //
+      TIME_SLICES__START_END_LOCATION, //
       TIME_SLICES__SWIMMING, //
       TIME_SLICES__TEMPERATURE_FROMDEVICE, //
       TIME_SLICES__TRAINING, //
       TIME_SLICES__TIME, //
-      TIME_SLICES__TIMER_PAUSES //
+      TIME_SLICES__TIMER_PAUSES, //
    }
 
    private RawDataManager() {}
@@ -602,10 +603,14 @@ public class RawDataManager {
        */
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
 
-         previousData.add(oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
+         previousData.add(UI.EMPTY_STRING
+
+               + oldTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
                + oldTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
 
-         newData.add(newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
+         newData.add(UI.EMPTY_STRING
+
+               + newTourData.getBattery_Percentage_Start() + UI.UNIT_VOLT + UI.SPACE
                + newTourData.getBattery_Percentage_End() + UI.UNIT_VOLT);
       }
 
@@ -615,6 +620,7 @@ public class RawDataManager {
                Math.round(oldTourData.getAvgCadence()) + (oldTourData.isCadenceSpm()
                      ? OtherMessages.VALUE_UNIT_CADENCE_SPM
                      : OtherMessages.VALUE_UNIT_CADENCE));
+
          newData.add(
                Math.round(newTourData.getAvgCadence()) + (newTourData.isCadenceSpm()
                      ? OtherMessages.VALUE_UNIT_CADENCE_SPM
@@ -627,37 +633,45 @@ public class RawDataManager {
 
          final int oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
          final int oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
-         previousData.add(
-               UI.SYMBOL_PLUS + oldAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
-                     + UI.DASH
-                     + oldAltitudeDown
-                     + heightLabel);
+
+         previousData.add(UI.EMPTY_STRING
+
+               + UI.SYMBOL_PLUS + oldAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
+               + UI.DASH + oldAltitudeDown + heightLabel);
 
          final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
          final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
-         newData.add(
-               UI.SYMBOL_PLUS + newAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
-                     + UI.DASH + newAltitudeDown
-                     + heightLabel);
+
+         newData.add(UI.EMPTY_STRING
+
+               + UI.SYMBOL_PLUS + newAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
+               + UI.DASH + newAltitudeDown + heightLabel);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
-         previousData.add(
-               oldTourData.getFrontShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
-                     + UI.COMMA_SPACE + oldTourData.getRearShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
-         newData.add(
-               newTourData.getFrontShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
-                     + UI.COMMA_SPACE + newTourData.getRearShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
+
+         previousData.add(UI.EMPTY_STRING
+
+               + oldTourData.getFrontShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL + UI.COMMA_SPACE
+               + oldTourData.getRearShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
+
+         newData.add(UI.EMPTY_STRING
+
+               + newTourData.getFrontShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL + UI.COMMA_SPACE
+               + newTourData.getRearShiftCount() + UI.SPACE1 + OtherMessages.COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_PULSE) {
 
-         previousData.add(
-               Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-                     + Math.round(oldTourData.getAvgPulse()) + OtherMessages.VALUE_UNIT_PULSE);
-         newData.add(
-               Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-                     + Math.round(newTourData.getAvgPulse()) + OtherMessages.VALUE_UNIT_PULSE);
+         previousData.add(UI.EMPTY_STRING
+
+               + Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
+               + Math.round(oldTourData.getAvgPulse()) + OtherMessages.VALUE_UNIT_PULSE);
+
+         newData.add(UI.EMPTY_STRING
+
+               + Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
+               + Math.round(newTourData.getAvgPulse()) + OtherMessages.VALUE_UNIT_PULSE);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_SPEED) {
@@ -668,53 +682,77 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
-         final String oldAirQuality = oldTourData.getWeather_AirQuality_TextIndex() == 0 ? UI.EMPTY_STRING : IWeather.airQualityTexts[oldTourData
-               .getWeather_AirQuality_TextIndex()];
+         final String oldAirQuality = oldTourData.getWeather_AirQuality_TextIndex() == 0
+               ? UI.EMPTY_STRING
+               : IWeather.airQualityTexts[oldTourData.getWeather_AirQuality_TextIndex()];
 
-         previousData.add(
-               oldTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + UI.COMMA_SPACE +
-                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
-                     + UI.COMMA_SPACE +
-                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min())) + UI.UNIT_LABEL_TEMPERATURE
-                     + UI.COMMA_SPACE +
-                     UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     oldAirQuality);
+         final String newAirQuality = newTourData.getWeather_AirQuality_TextIndex() == 0
+               ? UI.EMPTY_STRING
+               : IWeather.airQualityTexts[newTourData.getWeather_AirQuality_TextIndex()];
 
-         final String newAirQuality = newTourData.getWeather_AirQuality_TextIndex() == 0 ? UI.EMPTY_STRING : IWeather.airQualityTexts[newTourData
-               .getWeather_AirQuality_TextIndex()];
+         previousData.add(UI.EMPTY_STRING
 
-         newData.add(
-               newTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE +
-                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_WindChill()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     newAirQuality);
+               + oldTourData.getWeather() + UI.COMMA_SPACE
+               + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + UI.COMMA_SPACE
+
+               + UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
+               + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min())) + UI.UNIT_LABEL_TEMPERATURE
+               + UI.COMMA_SPACE
+
+               + UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + oldAirQuality);
+
+         newData.add(UI.EMPTY_STRING
+
+               + newTourData.getWeather() + UI.COMMA_SPACE
+               + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE
+
+               + UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
+               + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min())) + UI.UNIT_LABEL_TEMPERATURE
+               + UI.COMMA_SPACE
+
+               + UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_WindChill()))
+               + UI.UNIT_LABEL_TEMPERATURE
+               + UI.COMMA_SPACE
+
+               + newAirQuality);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
 
-         previousData.add(
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average_Device()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max_Device()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min_Device()))
-                     + UI.UNIT_LABEL_TEMPERATURE);
-         newData.add(
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average_Device()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max_Device()))
-                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
-                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min_Device()))
-                     + UI.UNIT_LABEL_TEMPERATURE);
+         previousData.add(UI.EMPTY_STRING
+
+               + UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average_Device()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max_Device()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min_Device()))
+               + UI.UNIT_LABEL_TEMPERATURE);
+
+         newData.add(UI.EMPTY_STRING
+
+               + UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average_Device()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max_Device()))
+               + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE
+
+               + UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min_Device()))
+               + UI.UNIT_LABEL_TEMPERATURE);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1551,6 +1589,11 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_SpeedValues);
          }
 
+         // Start/end location
+         if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__START_END_LOCATION) {
+            dataToModifyDetails.add(Messages.Tour_Data_Text_StartEndLocation);
+         }
+
          // Running Dynamics
          if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__RUNNING_DYNAMICS) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_RunningDynamicsValues);
@@ -1787,6 +1830,13 @@ public class RawDataManager {
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
                tourData.setSpeedSerie(null);
+               break;
+
+            case TIME_SLICES__START_END_LOCATION:
+
+               tourData.setTourStartPlace(null);
+               tourData.setTourEndPlace(null);
+
                break;
 
             case TIME_SLICES__TEMPERATURE_FROMDEVICE:

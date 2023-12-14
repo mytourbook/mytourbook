@@ -108,7 +108,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private ITourEventListener      _tourPropertyListener;
 
    private TableViewer             _sensorViewer;
-   private SensorComparator        _markerComparator               = new SensorComparator();
+   private SensorComparator        _sensorComparator               = new SensorComparator();
    private ColumnManager           _columnManager;
    private SelectionAdapter        _columnSortListener;
 
@@ -358,7 +358,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   class SensorItem {
+   private class SensorItem {
 
       DeviceSensor sensor;
 
@@ -645,15 +645,14 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       _sensorViewer.setUseHashlookup(true);
       _sensorViewer.setContentProvider(new SensorContentProvider());
-      _sensorViewer.setComparator(_markerComparator);
+      _sensorViewer.setComparator(_sensorComparator);
 
       _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
       _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
 
-
       updateUI_SetSortDirection(
-            _markerComparator.__sortColumnId,
-            _markerComparator.__sortDirection);
+            _sensorComparator.__sortColumnId,
+            _sensorComparator.__sortDirection);
 
       createUI_20_ContextMenu();
    }
@@ -1073,6 +1072,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -1359,7 +1359,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          final ISelection selectionBackup = getViewerSelection();
          {
             // update viewer with new sorting
-            _markerComparator.setSortColumn(e.widget);
+            _sensorComparator.setSortColumn(e.widget);
             _sensorViewer.refresh();
          }
          updateUI_SelectSensor(selectionBackup);
@@ -1440,8 +1440,8 @@ public class SensorView extends ViewPart implements ITourViewer {
       final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, SensorComparator.ASCENDING);
 
       // update comparator
-      _markerComparator.__sortColumnId = sortColumnId;
-      _markerComparator.__sortDirection = sortDirection;
+      _sensorComparator.__sortColumnId = sortColumnId;
+      _sensorComparator.__sortDirection = sortDirection;
    }
 
    private void restoreState_WithUI() {
@@ -1498,8 +1498,8 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       _columnManager.saveState(_state);
 
-      _state.put(STATE_SORT_COLUMN_ID, _markerComparator.__sortColumnId);
-      _state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
+      _state.put(STATE_SORT_COLUMN_ID, _sensorComparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION, _sensorComparator.__sortDirection);
 
       // keep selected tours
       Util.setState(_state, STATE_SELECTED_SENSOR_INDICES, _sensorViewer.getTable().getSelectionIndices());

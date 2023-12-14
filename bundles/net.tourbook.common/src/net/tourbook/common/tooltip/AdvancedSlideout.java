@@ -333,9 +333,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
     */
    protected void fillHeaderToolbar(final ToolBarManager toolbarManager) {}
 
+   /**
+    * @return Return bounds of the parent widget which is used to locate the slideout accordingly.
+    */
    protected abstract Rectangle getParentBounds();
 
    protected SlideoutLocation getSlideoutLocation() {
+
       return _slideoutLocation;
    }
 

@@ -477,9 +477,8 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Print double value with a value formatter.
     *
-    * @param cell
     * @param value
-    * @param isDetail
+    *
     * @return
     */
    public String printDoubleValue(final double value) {
@@ -520,9 +519,9 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Print long value with a value formatter.
     *
-    * @param cell
     * @param value
-    * @param isDetail
+    *
+    * @return
     */
    public String printLongValue(final long value) {
 
@@ -648,8 +647,8 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Set text which is displayed in the column header and in the column modification dialog.
     * <p>
-    * This will replace calling {@link #setColumnLabel(String)} and
-    * {@link #setColumnHeaderText(String)} when the same text is displayed.
+    * This is the same for {@link #setColumnLabel(String)} and {@link #setColumnHeaderText(String)}
+    * when setting the same text.
     *
     * @param text
     */

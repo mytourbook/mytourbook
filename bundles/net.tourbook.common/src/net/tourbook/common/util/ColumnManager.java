@@ -884,7 +884,7 @@ public class ColumnManager {
     *
     * @param table
     *           Table control
-    * @param defaultContextMenu
+    * @param defaultContextMenuProvider
     *           Can be <code>null</code> when a default context menu is not available
     */
    public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider) {

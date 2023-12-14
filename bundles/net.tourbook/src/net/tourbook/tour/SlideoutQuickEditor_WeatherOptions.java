@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour data editor options.
  */
-public class SlideoutQuickEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutQuickEditor_WeatherOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
@@ -52,9 +52,9 @@ public class SlideoutQuickEditor_Options extends ToolbarSlideout implements ICol
 
    private Spinner   _spinnerWeatherDescriptionNumLines;
 
-   public SlideoutQuickEditor_Options(final Control ownerControl,
-                                      final ToolBar toolBar,
-                                      final DialogQuickEdit dialogQuickEdit) {
+   public SlideoutQuickEditor_WeatherOptions(final Control ownerControl,
+                                             final ToolBar toolBar,
+                                             final DialogQuickEdit dialogQuickEdit) {
 
       super(ownerControl, toolBar);
 
@@ -109,7 +109,6 @@ public class SlideoutQuickEditor_Options extends ToolbarSlideout implements ICol
 
       return _shellContainer;
    }
-
 
    @Override
    protected boolean isAlignLeft() {
