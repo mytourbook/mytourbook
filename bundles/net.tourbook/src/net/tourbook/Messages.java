@@ -2526,6 +2526,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourLocation_Column_Default;
    public static String        Slideout_TourLocation_Column_Default_Tooltip;
    public static String        Slideout_TourLocation_Column_LocationParts;
+   public static String        Slideout_TourLocation_Column_LocationText;
    public static String        Slideout_TourLocation_Column_Zoomlevel;
    public static String        Slideout_TourLocation_Label_EndLocation_Title;
    public static String        Slideout_TourLocation_Label_LocationParts;

@@ -1,4 +1,4 @@
-23.next.0                                                 ?. March 2023
+24.next.0                                                 ?. January 2024
 
 
 TODO's
@@ -44,9 +44,10 @@ New
   - Import: Automatic completion of start and end location fields
     https://github.com/mytourbook/mytourbook/issues/878
   - Show/modify start/end location in
-    - Locations view
+    - Locations view and location tooltip
+    - Tour Book view location tooltip
     - 2D Map
-    - Tour info
+    - Tour info tooltip
     - Quick tour editor
     - Tour editor
 

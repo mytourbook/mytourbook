@@ -591,12 +591,12 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_Boundary;
    public static String        Tour_Location_Part_Bridge;
    public static String        Tour_Location_Part_City;
-   public static String        Tour_Location_Part_City_Largest;
-   public static String        Tour_Location_Part_City_Smallest;
    public static String        Tour_Location_Part_CityBlock;
    public static String        Tour_Location_Part_CityDistrict;
-   public static String        Tour_Location_Part_CityWithZip_Largest;
-   public static String        Tour_Location_Part_CityWithZip_Smalles;
+//   public static String        Tour_Location_Part_City_Largest;
+//   public static String        Tour_Location_Part_City_Smallest;
+//   public static String        Tour_Location_Part_CityWithZip_Largest;
+//   public static String        Tour_Location_Part_CityWithZip_Smalles;
    public static String        Tour_Location_Part_Commercial;
    public static String        Tour_Location_Part_Continent;
    public static String        Tour_Location_Part_Country;
