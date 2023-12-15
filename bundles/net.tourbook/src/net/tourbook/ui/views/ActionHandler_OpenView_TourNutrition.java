@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,7 +41,6 @@ public class ActionHandler_OpenView_TourNutrition extends AbstractHandler implem
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      //TODO FB icon
-      UI.setThemedIcon(uiElement, Images.TourBlog);
+      UI.setThemedIcon(uiElement, Images.TourNutrition);
    }
 }

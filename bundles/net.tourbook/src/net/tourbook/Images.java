@@ -372,6 +372,7 @@ public class Images {
    public static final String TourMarker_New                             = "tour-marker-new.png";                                 //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                    = "tour-marker-new-disabled.png";                        //$NON-NLS-1$
    public static final String TourNew                                    = "tour-new.png";                                        //$NON-NLS-1$
+   public static final String TourNutrition                              = "tour-nutrition.png";                                  //$NON-NLS-1$
    public static final String TourPauses                                 = "tour-pauses.png";                                     //$NON-NLS-1$
    public static final String TourPauses_Disabled                        = "tour-pauses-disabled.png";                            //$NON-NLS-1$
    public static final String TourSegmenter                              = "tour-segmenter.png";                                  //$NON-NLS-1$

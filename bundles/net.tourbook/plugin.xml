@@ -747,7 +747,7 @@
          <!-- Tour Nutrition TODO FB icons/tour-nutrition.png-->
          <command
             commandId   ="command.net.tourbook.views.TourNutritionView"
-            icon        ="icons/tour-data.png"
+            icon        ="icons/tour-nutrition.png"
             label       ="%View_Name_TourNutrition"
             mnemonic    ="%View_Name_TourNutrition_Mnemonic"/>
 
@@ -1740,7 +1740,7 @@
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.ui.views.TourNutritionView"
             class       ="net.tourbook.ui.views.TourNutritionView"
-            icon        ="icons/tour-data.png"
+            icon        ="icons/tour-nutrition.png"
             name        ="%View_Name_TourNutrition"/>
 
 
