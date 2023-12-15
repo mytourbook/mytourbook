@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -45,7 +44,6 @@ public class ActionUpload extends SubMenu {
    private List<TourbookCloudUploader> _tourbookCloudUploaders = new ArrayList<>();
 
    private List<ActionUploadTour>      _uploadTourActions      = new ArrayList<>();
-   private Menu                        _menu;
 
    private final ITourProvider         _tourProvider;
 
@@ -108,12 +106,6 @@ public class ActionUpload extends SubMenu {
       createActions();
    }
 
-   private void addActionToMenu(final Action action) {
-
-      final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(_menu, -1);
-   }
-
    private void createActions() {
 
       if (_uploadTourActions.size() > 0) {
@@ -130,8 +122,6 @@ public class ActionUpload extends SubMenu {
 
    @Override
    public void fillMenu(final Menu menu) {
-
-      _menu = menu;
 
       _uploadTourActions.forEach(this::addActionToMenu);
    }
@@ -153,6 +143,7 @@ public class ActionUpload extends SubMenu {
     *
     * @param extensionPointName
     *           The extension point name
+    *
     * @return The list of {@link TourbookCloudUploader}.
     */
    private List<TourbookCloudUploader> readCloudUploaderExtensions(final String extensionPointName) {

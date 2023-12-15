@@ -263,6 +263,7 @@ public abstract class AdvancedSlideoutShell {
     *           <p>
     *
     *           <pre>
+    *
     *           horizContentDefaultWidth = 300;
     *           horizContentDefaultHeight = 150;
     *
@@ -662,6 +663,7 @@ public abstract class AdvancedSlideoutShell {
     *
     * @param parent
     *           the parent of the content area
+    *
     * @return the content area created
     */
    protected abstract Composite createSlideoutContentArea(Composite parent);
@@ -890,6 +892,7 @@ public abstract class AdvancedSlideoutShell {
     *
     * @param size
     *           Tooltip size
+    *
     * @return Returns location relative to the device.
     */
    protected abstract Point getToolTipLocation(Point size);
@@ -917,6 +920,7 @@ public abstract class AdvancedSlideoutShell {
 
    /**
     * @see #_isForceBoundsToBeInsideOfViewport
+    *
     * @return
     */
    public boolean isForceBoundsToBeInsideOfViewport() {
@@ -1307,7 +1311,7 @@ public abstract class AdvancedSlideoutShell {
       if (resizeShell == null) {
 
          // fixed NPE which happened during debugging
-         
+
          return;
       }
 
@@ -1612,6 +1616,7 @@ public abstract class AdvancedSlideoutShell {
 
    /**
     * @param isForceBoundsToBeInsideOfViewport
+    *
     * @see #_isForceBoundsToBeInsideOfViewport
     */
    public void setIsForceBoundsToBeInsideOfViewport(final boolean isForceBoundsToBeInsideOfViewport) {

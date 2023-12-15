@@ -35,6 +35,7 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
@@ -159,6 +160,8 @@ public class TourInfoUI {
    private boolean        _hasTourType;
 
    private boolean        _hasTourDescription;
+   private boolean        _hasLocationStart;
+   private boolean        _hasLocationEnd;
    private boolean        _hasWeatherDescription;
 
    private int            _uiWidth_Pixel;
@@ -228,6 +231,8 @@ public class TourInfoUI {
    private Composite        _lowerPartContainer;
 
    private Text             _txtDescription;
+   private Text             _txtLocationEnd;
+   private Text             _txtLocationStart;
    private Text             _txtWeather;
 
    private CLabel           _lblClouds;
@@ -287,6 +292,8 @@ public class TourInfoUI {
    private Label            _lblMovingTime_Unit;
    private Label            _lblElapsedTime;
    private Label            _lblElapsedTime_Unit;
+   private Label            _lblLocationStart;
+   private Label            _lblLocationEnd;
    private Label            _lblPausedTime;
    private Label            _lblPausedTime_Unit;
    private Label            _lblRecordedTime;
@@ -427,8 +434,6 @@ public class TourInfoUI {
       _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 
       final Set<TourTag> tourTags = _tourData.getTourTags();
-      final String tourDescription = _tourData.getTourDescription();
-
       // date/time created/modified
       _uiDtCreated = _tourData.getDateTimeCreated();
       _uiDtModified = _tourData.getDateTimeModified();
@@ -447,7 +452,9 @@ public class TourInfoUI {
       _hasTourType                  = tourType != null;
       _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
 
-      _hasTourDescription           = tourDescription != null && tourDescription.length() > 0;
+      _hasLocationEnd               = StringUtils.hasContent(_tourData.getTourEndPlace());
+      _hasLocationStart             = StringUtils.hasContent(_tourData.getTourStartPlace());
+      _hasTourDescription           = StringUtils.hasContent(_tourData.getTourDescription());
       _hasWeatherDescription        = _tourData.getWeather().length() > 0;
 
 // SET_FORMATTING_ON
@@ -1502,6 +1509,38 @@ public class TourInfoUI {
                gd.heightHint = _descriptionScroll_Height;
             }
          }
+         {
+            /*
+             * Start location
+             */
+            _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_LocationStart);
+            _lblLocationStart.setFont(_boldFont);
+            GridDataFactory.fillDefaults()
+                  .span(numColumns, 1)
+                  .indent(0, 10)
+                  .applyTo(_lblLocationStart);
+
+            _txtLocationStart = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+            _txtLocationStart.setForeground(_fgColor);
+            _txtLocationStart.setBackground(_bgColor);
+            GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationStart);
+         }
+         {
+            /*
+             * End location
+             */
+            _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_LocationEnd);
+            _lblLocationEnd.setFont(_boldFont);
+            GridDataFactory.fillDefaults()
+                  .span(numColumns, 1)
+                  .indent(0, 10)
+                  .applyTo(_lblLocationEnd);
+
+            _txtLocationEnd = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+            _txtLocationEnd.setForeground(_fgColor);
+            _txtLocationEnd.setBackground(_bgColor);
+            GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationEnd);
+         }
       }
    }
 
@@ -1555,7 +1594,7 @@ public class TourInfoUI {
 
    private void createUI_99_CreateModifyTime(final Composite parent) {
 
-      final boolean hasDescription = _hasTourDescription || _hasWeatherDescription;
+      final boolean hasDescription = _hasTourDescription || _hasWeatherDescription || _hasLocationStart || _hasLocationEnd;
 
       final boolean isShowUIWidthControls = hasDescription
 
@@ -2056,7 +2095,15 @@ public class TourInfoUI {
       /*
        * Lower part container contains sensor values, weather, tour type, tags and description
        */
-      UI.showHideControl(_lowerPartContainer, _hasSensorValues || _hasWeatherDescription || _hasTourType || _hasTags || _hasTourDescription);
+      UI.showHideControl(_lowerPartContainer,
+
+            _hasSensorValues
+                  || _hasWeatherDescription
+                  || _hasTourType
+                  || _hasTags
+                  || _hasTourDescription
+                  || _hasLocationStart
+                  || _hasLocationEnd);
 
       /*
        * Weather description
@@ -2100,6 +2147,21 @@ public class TourInfoUI {
          // vertical scrollbar is not necessary
          UI.showHideControl(_txtDescription, _hasTourDescription, _uiWidth_Pixel);
       }
+
+      /*
+       * Start/end location
+       */
+      if (_hasLocationStart) {
+         _txtLocationStart.setText(_tourData.getTourStartPlace());
+      }
+      UI.showHideControl(_lblLocationStart, _hasLocationStart);
+      UI.showHideControl(_txtLocationStart, _hasLocationStart, _uiWidth_Pixel);
+
+      if (_hasLocationEnd) {
+         _txtLocationEnd.setText(_tourData.getTourEndPlace());
+      }
+      UI.showHideControl(_lblLocationEnd, _hasLocationEnd);
+      UI.showHideControl(_txtLocationEnd, _hasLocationEnd, _uiWidth_Pixel);
 
       /*
        * Column: Left

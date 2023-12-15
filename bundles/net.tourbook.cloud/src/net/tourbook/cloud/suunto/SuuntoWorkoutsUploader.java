@@ -284,8 +284,9 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
+      final String[] notificationText = new String[1];
 
-      final Job job = new Job(Messages.Dialog_UploadWorkoutsToSuunto_Task) {
+      final Job job = new Job(NLS.bind(Messages.Dialog_UploadWorkoutsToSuunto_Task, numberOfTours)) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
@@ -296,6 +297,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
+               notificationText[0] = LOG_CLOUDACTION_INVALIDTOKENS;
                return Status.CANCEL_STATUS;
             }
 
@@ -338,17 +340,21 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+            if (PlatformUI.isWorkbenchRunning()) {
 
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
+                  final String infoText = event.getResult().isOK()
+                        ? NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
+                              numberOfUploadedTours[0],
+                              numberOfTours - numberOfUploadedTours[0])
+                        : notificationText[0];
+
                   TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-                  final String infoText = NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
-                        numberOfUploadedTours[0],
-                        numberOfTours - numberOfUploadedTours[0]);
-
-                  UI.openNotificationPopup(Messages.Dialog_UploadWorkoutsToSuunto_Title, infoText);
+                  UI.openNotificationPopup(Messages.Dialog_UploadWorkoutsToSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
+                        infoText);
                });
             }
          }

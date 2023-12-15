@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
@@ -149,5 +150,10 @@ public enum TourEventId {
     * {@link Selection_StatisticValues}.
     */
    STATISTIC_VALUES,
+
+   /**
+    * Tour locations are selected, event data contains a list with all {@link TourLocation}
+    */
+   TOUR_LOCATION_SELECTION,
 
 }

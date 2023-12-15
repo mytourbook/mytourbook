@@ -30,12 +30,7 @@ public class PrefPagePeopleTests extends UITest {
 
    @AfterAll
    static void cleanUp() {
-      setMetricSystem();
-   }
-
-   private static void setMetricSystem() {
-
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Metric);
+      Utils.setMeasurementSystem_Metric(bot);
    }
 
    @Test
@@ -66,22 +61,12 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   private void setDistanceNauticalMile() {
-
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Nautic);
-   }
-
-   private void setImperialSystem() {
-
-      Utils.changeMeasurementSystem(bot, net.tourbook.common.Messages.Measurement_System_Profile_Imperial);
-   }
-
    @Test
    @DisplayName("Verify the BMI")
    void testPeopleBmi() {
 
       //Metric system
-      setMetricSystem();
+      Utils.setMeasurementSystem_Metric(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -102,7 +87,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Imperial system
-      setImperialSystem();
+      Utils.setMeasurementSystem_Imperial(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
@@ -114,7 +99,7 @@ public class PrefPagePeopleTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
 
       // Nautical mile system
-      setDistanceNauticalMile();
+      Utils.setMeasurementSystem_Nautical(bot);
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$

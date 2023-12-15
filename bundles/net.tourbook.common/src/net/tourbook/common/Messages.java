@@ -21,6 +21,7 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.common.messages";               //$NON-NLS-1$
 
+   public static String        App_Action_ApplyAndClose;
    public static String        App_Action_Close_Tooltip;
    public static String        App_Action_New_WithConfirm;
    public static String        App_Action_Remove_NoConfirm;

@@ -15,15 +15,20 @@
  *******************************************************************************/
 package net.tourbook.common.ui;
 
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
-
 import java.util.Arrays;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
+/**
+ * Common code for a submenu of an {@link Action}
+ */
 public abstract class SubMenu extends Action implements IMenuCreator {
 
    private Menu _menu;
@@ -33,6 +38,32 @@ public abstract class SubMenu extends Action implements IMenuCreator {
       super(actionText, style);
 
       setMenuCreator(this);
+   }
+
+   /**
+    * Add an action to this sub menu
+    *
+    * @param action
+    */
+   public void addActionToMenu(final Action action) {
+
+      new ActionContributionItem(action).fill(_menu, -1);
+   }
+
+   /**
+    * Add an action to the provided menu
+    *
+    * @param menu
+    * @param action
+    */
+   public void addActionToMenu(final Menu menu, final Action action) {
+
+      new ActionContributionItem(action).fill(menu, -1);
+   }
+
+   public void addSeparatorToMenu() {
+
+      new MenuItem(_menu, SWT.SEPARATOR);
    }
 
    @Override
@@ -59,14 +90,16 @@ public abstract class SubMenu extends Action implements IMenuCreator {
    public Menu getMenu(final Menu parent) {
 
       dispose();
+
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
+      _menu.addMenuListener(MenuListener.menuShownAdapter(menuEvent -> {
 
          // dispose old menu items
-         Arrays.stream(((Menu) menuEvent.widget).getItems())
-               .forEach(menuItem -> menuItem.dispose());
+         final Menu menu = (Menu) menuEvent.widget;
+
+         Arrays.stream(menu.getItems()).forEach(menuItem -> menuItem.dispose());
 
          fillMenu(_menu);
 

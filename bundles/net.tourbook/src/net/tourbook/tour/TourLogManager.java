@@ -153,6 +153,8 @@ public class TourLogManager {
 
       final TourLog tourLog = new TourLog(TourLogState.ERROR, message);
 
+      Display.getDefault().syncExec(() -> TourLogManager.showLogView(AutoOpenEvent.EXCEPTION));
+
       addLog(tourLog);
    }
 

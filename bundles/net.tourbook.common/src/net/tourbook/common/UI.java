@@ -57,7 +57,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.notifications.NotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -1441,6 +1440,18 @@ public class UI {
    }
 
    /**
+    * Creates a {@link Label} without text.
+    *
+    * @param parent
+    *
+    * @return
+    */
+   public static Label createLabel(final Composite parent) {
+
+      return new Label(parent, SWT.NONE);
+   }
+
+   /**
     * Creates a {@link Label} with text.
     *
     * @param parent
@@ -1473,6 +1484,28 @@ public class UI {
       label.setText(text);
 
       return label;
+   }
+
+   public static Label createLabel(final Composite parent, final String text, final String tooltip) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      label.setText(text);
+      label.setToolTipText(tooltip);
+
+      return label;
+   }
+
+   /**
+    * Create a spacer for one column
+    *
+    * @param parent
+    *
+    * @return
+    */
+   public static Label createSpacer_Horizontal(final Composite parent) {
+
+      return createSpacer_Horizontal(parent, 1);
    }
 
    public static Label createSpacer_Horizontal(final Composite parent, final int columns) {
@@ -2336,17 +2369,19 @@ public class UI {
     * Open a notification popup for the number of seconds configured by the user
     *
     * @param title
+    * @param imageDescriptor
     * @param text
     */
-   public static void openNotificationPopup(final String title, final String text) {
+   public static void openNotificationPopup(final String title, final ImageDescriptor imageDescriptor, final String text) {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
-      final NotificationPopup notication = NotificationPopup.forDisplay(Display.getCurrent())
-            .title(title, false)
-            .text(text)
-            .delay(delay)
-            .build();
+      final MTNotificationPopup notication = new MTNotificationPopup(
+            Display.getCurrent(),
+            imageDescriptor,
+            title,
+            text);
+      notication.setDelayClose(delay);
       notication.open();
    }
 
@@ -2609,6 +2644,26 @@ public class UI {
    public static void setButtonLayoutData(final Button button) {
 
       final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+
+      final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+
+      final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      final int defaultWidth = minSize.x;
+
+      data.widthHint = Math.max(widthHint, defaultWidth);
+
+      button.setLayoutData(data);
+   }
+
+   /**
+    * Set the layout data of the button to a GridData with appropriate heights and widths.
+    *
+    * @param button
+    */
+   public static void setButtonLayoutWidth(final Button button) {
+
+      // keep existing layout data
+      final GridData data = (GridData) button.getLayoutData();
 
       final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 

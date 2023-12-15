@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019, 2022 Wolfgang Schramm and Contributors
+ * Copyright 2019, 2023 Wolfgang Schramm and Contributors
  * Copyright 2019, 2021 Thomas Theussing
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
@@ -170,15 +170,19 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       case 1:
          starText = " *"; //$NON-NLS-1$
          break;
+
       case 2:
          starText = " **"; //$NON-NLS-1$
          break;
+
       case 3:
          starText = " ***"; //$NON-NLS-1$
          break;
+
       case 4:
          starText = " ****"; //$NON-NLS-1$
          break;
+
       case 5:
          starText = " *****"; //$NON-NLS-1$
          break;
@@ -195,6 +199,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @param isShowPhotoTitle
     *           boolean, show photo with title or not
     * @param isPhotoScaled
+    *
     * @return
     */
    public List<MarkerInterface> createPhotoItems(final List<Photo> galleryPhotos) {
@@ -248,6 +253,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @param item
     * @param photo
     * @param isImageLoaded
+    *
     * @return the bitmap
     */
    private Bitmap createPhotoItems_20_CreateBitmap(final MarkerItem item,
@@ -293,6 +299,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @param thumbSize
     *           thumbnail size from slideout
     * @param isImageLoaded
+    *
     * @return
     */
    private ImageState createPhotoItems_30_GetScaledImage(final MarkerItem item,
@@ -333,7 +340,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
          }
 
-         if (photoImage != null) {
+         if (photoImage != null && photoImage.isDisposed() == false) {
 
             if (_mapApp.isPhoto_Scaled() == false) {
                return new ImageState(photoImage, false);

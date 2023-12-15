@@ -82,7 +82,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    public ActionToolbarSlideout() {
 
       _actionImage_Enabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-      _actionImage_Disabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+      _actionImage_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
    }
 
    public ActionToolbarSlideout(final Image graphImage, final Image graphImage_Disabled) {
@@ -206,7 +206,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    }
 
    /**
-    * Is called before the slideout is opened, this allows to close other dialogs
+    * Is called before the slideout is opened, this allows to close other slideouts/dialogs
     */
    protected void onBeforeOpenSlideout() {
 
@@ -277,7 +277,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
       // toggle slideout visibility
       if (_toolbarSlideout.isToolTipVisible()) {
-         
+
          // tooltip is visible -> hide
 
          _toolbarSlideout.close();

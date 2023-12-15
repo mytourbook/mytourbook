@@ -15,10 +15,7 @@
  *******************************************************************************/
 package views;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -29,11 +26,7 @@ public class ConconiViewTests extends UITest {
    @Test
    void ConconiView_DisplayView_ShouldShowGraph() {
 
-      Utils.showTourBookView(bot);
-
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      Utils.getTourWithSRTM(bot);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Conconi Test"); //$NON-NLS-1$
       final SWTBotView conconiView = Utils.showView(bot, "Conconi Test"); //$NON-NLS-1$

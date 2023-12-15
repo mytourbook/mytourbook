@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -50,7 +48,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D Map properties
  */
-public class SlideoutMap2Options extends ToolbarSlideout implements
+public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       IColorSelectorListener,
       IActionResetToDefault,
@@ -73,6 +71,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
     * UI controls
     */
    private Button                _chkIsDimMap;
+   private Button                _chkIsShowTourLocations;
+   private Button                _chkIsShowTourLocations_BoundingBox;
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkSelectInbetweenTimeSlices;
    private Button                _chkShowValuePointTooltip;
@@ -88,10 +88,10 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
     * @param map2View
     * @param map2State
     */
-   public SlideoutMap2Options(final Control ownerControl,
-                              final ToolBar toolBar,
-                              final Map2View map2View,
-                              final IDialogSettings map2State) {
+   public SlideoutMap2_Options(final Control ownerControl,
+                               final ToolBar toolBar,
+                               final Map2View map2View,
+                               final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
@@ -188,11 +188,25 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       {
          {
             /*
+             * Show tour locations
+             */
+            _chkIsShowTourLocations = new Button(container, SWT.CHECK);
+            _chkIsShowTourLocations.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourLocations);
+            _chkIsShowTourLocations.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkIsShowTourLocations);
+
+            _chkIsShowTourLocations_BoundingBox = new Button(container, SWT.CHECK);
+            _chkIsShowTourLocations_BoundingBox.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourLocations_BoundingBox);
+            _chkIsShowTourLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).indent(16, 0).applyTo(_chkIsShowTourLocations_BoundingBox);
+         }
+         {
+            /*
              * Show value point tooltip
              */
             _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
             _chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
-            _chkShowValuePointTooltip.addSelectionListener(widgetSelectedAdapter(selectionEvent -> saveState_ValuePointTooltip()));
+            _chkShowValuePointTooltip.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> saveState_ValuePointTooltip()));
             gdSpan2.applyTo(_chkShowValuePointTooltip);
          }
          {
@@ -252,7 +266,9 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
    private void enableControls() {
 
       final boolean isDimMap = _chkIsDimMap.getSelection();
+      final boolean isShowTouLocations = _chkIsShowTourLocations.getSelection();
 
+      _chkIsShowTourLocations_BoundingBox.setEnabled(isShowTouLocations);
       _colorMapDimmColor.setEnabled(isDimMap);
       _spinnerDimValue.setEnabled(isDimMap);
 
@@ -261,7 +277,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 
    private void initUI(final Composite parent) {
 
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI_UpdateMap());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI_UpdateMap());
 
       _defaultChangePropertyListener = propertyChangeEvent -> onChangeUI_UpdateMap();
 
@@ -297,6 +313,12 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       /*
+       * Tour locations
+       */
+      _chkIsShowTourLocations.setSelection(              Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
+      _chkIsShowTourLocations_BoundingBox.setSelection(  Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
+
+      /*
        * Map dimming
        */
       _chkIsDimMap.setSelection(                   Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
@@ -328,6 +350,12 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       /*
+       * Tour locations
+       */
+      _chkIsShowTourLocations.setSelection(              Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,                Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT));
+      _chkIsShowTourLocations_BoundingBox.setSelection(  Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX,   Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT));
+
+      /*
        * Map dimming
        */
       _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
@@ -348,6 +376,12 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
+
+      /*
+       * Tour locations
+       */
+      _state.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,              _chkIsShowTourLocations.getSelection());
+      _state.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, _chkIsShowTourLocations_BoundingBox.getSelection());
 
       /*
        * Map dimming

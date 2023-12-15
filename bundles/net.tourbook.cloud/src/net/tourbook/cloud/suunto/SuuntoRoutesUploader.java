@@ -280,8 +280,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       final int numberOfTours = selectedTours.size();
       final int[] numberOfUploadedTours = new int[1];
+      final String[] notificationText = new String[1];
 
-      final Job job = new Job(Messages.Dialog_UploadRoutesToSuunto_Task) {
+      final Job job = new Job(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Task, numberOfTours)) {
 
          @Override
          public IStatus run(final IProgressMonitor monitor) {
@@ -292,6 +293,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
                Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
+               notificationText[0] = LOG_CLOUDACTION_INVALIDTOKENS;
                return Status.CANCEL_STATUS;
             }
 
@@ -305,8 +307,10 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
                if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
 
-                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
-                        tourStartTime)));
+                  final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
+                        tourStartTime);
+                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
+                  notificationText[0] = errorMessage;
 
                   monitor.worked(2);
 
@@ -349,17 +353,21 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+            if (PlatformUI.isWorkbenchRunning()) {
 
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
+                  final String infoText = event.getResult().isOK()
+                        ? NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
+                              numberOfUploadedTours[0],
+                              numberOfTours - numberOfUploadedTours[0])
+                        : notificationText[0];
+
                   TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
-                  final String infoText = NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
-                        numberOfUploadedTours[0],
-                        numberOfTours - numberOfUploadedTours[0]);
-
-                  UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title, infoText);
+                  UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
+                        infoText);
                });
             }
          }

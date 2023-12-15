@@ -87,9 +87,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private static final String STATE_GENERAL_SELECTED_TAB = "STATE_GENERAL_SELECTED_TAB";                 //$NON-NLS-1$
 
    // tab folder indices
-   public static final int              TAB_FOLDER_MEASUREMENT_SYSTEM = 0;
-   public static final int              TAB_FOLDER_TIME_ZONE          = 1;
-   public static final int              TAB_FOLDER_CALENDAR_WEEK      = 2;
+   private static final int             TAB_FOLDER_MEASUREMENT_SYSTEM = 0;
+   private static final int             TAB_FOLDER_TIME_ZONE          = 1;
+   private static final int             TAB_FOLDER_CALENDAR_WEEK      = 2;
 
    private IPreferenceStore             _prefStore                    = TourbookPlugin.getPrefStore();
    private IPreferenceStore             _prefStore_Common             = CommonActivator.getPrefStore();
@@ -1013,7 +1013,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _comboSystem_Profile.setItem(_activeSystemProfileIndex, newProfileText);
          _comboSystem_Profile.select(_activeSystemProfileIndex);
 
-         // by default the text is selected -> remove anoying selection
+         // by default the text is selected -> remove annoying selection
          _comboSystem_Profile.clearSelection();
       });
 
@@ -1295,7 +1295,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       _timeZoneId_3 = selectedTimeZone_3.zoneId;
    }
 
-   protected void updateUI_CalendarWeek() {
+   private void updateUI_CalendarWeek() {
 
       _comboWeek_FirstDay.select(_backupFirstDayOfWeek - 1);
       _comboWeek_MinDaysInFirstWeek.select(_backupMinimalDaysInFirstWeek - 1);

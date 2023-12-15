@@ -17,6 +17,8 @@ package net.tourbook.common.util;
 
 import java.util.Arrays;
 
+import net.tourbook.common.map.GeoPosition;
+
 /**
  * MyTourbook Mathematics
  */
@@ -90,13 +92,15 @@ public class MtMath {
     *    }
     *
     *    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  *
-	 *
+    *
     * </pre>
     */
 
    // WGS-84 Ellipsoid
-   private static final double HALBACHSE_A = 6378.137;
-   private static final double HALBACHSE_B = 6356.7523142;
+   private static final double HALBACHSE_A  = 6378.137;
+   private static final double HALBACHSE_B  = 6356.7523142;
+
+   private static final double EARTH_RADIUS = 6371e3;
 
    // = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
    private static final double ABPLATTUNG_F = (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
@@ -126,7 +130,9 @@ public class MtMath {
     *
     * @param p1
     * @param p2
+    *
     * @return - a double from 0 to 360
+    *
     * @source https://stackoverflow.com/questions/2676719/calculating-the-angle-between-the-line-defined-by-two-points
     */
    public static double angleOf(final int x1, final int y1, final int x2, final int y2) {
@@ -141,6 +147,55 @@ public class MtMath {
       final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
 
       return (result < 0) ? (360d + result) : result;
+   }
+
+   /**
+    * Source: http://www.movable-type.co.uk/scripts/latlong.html
+    * <p>
+    * Returns the destination point from ‘this’ point having travelled the given distance on the
+    * given initial bearing (bearing normally varies around path followed).
+    *
+    * @param {number}
+    *           distance - Distance travelled, in same units as earth radius (default: metres).
+    * @param {number}
+    *           bearing - Initial bearing in degrees from north.
+    * @param {number}
+    *           [radius=6371e3] - (Mean) radius of earth (defaults to radius in metres).
+    *
+    *
+    * @returns {LatLon} Destination point.
+    *
+    * @example
+    *          const p1 = new LatLon(51.47788, -0.00147);<br>
+    *          const p2 = p1.destinationPoint(7794, 300.7); // 51.5136°N, 000.0983°W
+    */
+   public static GeoPosition destinationPoint(final double latitude1,
+                                              final double longitude1,
+                                              final double distance,
+                                              final double bearing) {
+
+      // sinφ2 = sinφ1⋅cosδ + cosφ1⋅sinδ⋅cosθ
+      // tanΔλ = sinθ⋅sinδ⋅cosφ1 / cosδ−sinφ1⋅sinφ2
+
+      // see mathforum.org/library/drmath/view/52049.html for derivation
+
+      final double δ = distance / EARTH_RADIUS; // angular distance in radians
+      final double θ = Math.toRadians(bearing);
+
+      final double φ1 = Math.toRadians(latitude1);
+      final double λ1 = Math.toRadians(longitude1);
+
+      final double sinφ2 = Math.sin(φ1) * Math.cos(δ) + Math.cos(φ1) * Math.sin(δ) * Math.cos(θ);
+      final double φ2 = Math.asin(sinφ2);
+
+      final double y = Math.sin(θ) * Math.sin(δ) * Math.cos(φ1);
+      final double x = Math.cos(δ) - Math.sin(φ1) * sinφ2;
+      final double λ2 = λ1 + Math.atan2(y, x);
+
+      final double lat2 = Math.toDegrees(φ2);
+      final double lon2 = Math.toDegrees(λ2);
+
+      return new GeoPosition(lat2, lon2);
    }
 
    /**
@@ -159,6 +214,7 @@ public class MtMath {
     *           lat1, lon1: first point in decimal degrees
     * @param {Number}
     *           lat2, lon2: second point in decimal degrees
+    *
     * @returns (Number} distance in metres between points
     */
    public static double distanceVincenty(final double lat1, final double lon1, final double lat2, final double lon2) {
@@ -267,6 +323,7 @@ public class MtMath {
    /**
     * @param allValues
     * @param value
+    *
     * @return Returns the index for the searched value which is the exact index or the index before
     *         the searched value
     */
@@ -295,6 +352,7 @@ public class MtMath {
    /**
     * @param allValues
     * @param value
+    *
     * @return Returns the index for the searched value which is the exact index or the index before
     *         the searched value
     */
@@ -329,6 +387,7 @@ public class MtMath {
     *
     * @param allValues
     * @param value
+    *
     * @return Returns the index of the nearest value and not the nearest value itself
     */
    public static int searchNearestIndex(final int[] allValues, final int value) {

@@ -63,7 +63,7 @@ public class NatTable_DataLoader {
    private static final String                            SQL_ASCENDING                  = "ASC";                           //$NON-NLS-1$
    private static final String                            SQL_DESCENDING                 = "DESC";                          //$NON-NLS-1$
 
-   private static final String                            SQL_DEFAULT_FIELD              = "TourStartTime";                 //$NON-NLS-1$
+   private static final String                            SQL_DEFAULT_SORT_FIELD         = "TourStartTime";                 //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
@@ -124,7 +124,7 @@ public class NatTable_DataLoader {
     * Contains all tour id's for the current tour filter and tour sorting, this is used
     * to get the row index for a tour.
     */
-   private long[]                                         _allTourIds;
+   private long[]                                         _allSortedTourIds;
 
    private SQLData                                        _tourCollectionFilter          = EMPTY_SQL_DATA;
 
@@ -195,7 +195,7 @@ public class NatTable_DataLoader {
       }
 
       final IntArrayList allRowIndices = new IntArrayList();
-      final int numAllAvailableTourIds = _allTourIds.length;
+      final int numAllAvailableTourIds = _allSortedTourIds.length;
 
       // loop: all requested tour id's
       for (final Long requestedTourId : allRequestedTourIds) {
@@ -203,7 +203,7 @@ public class NatTable_DataLoader {
          // loop: all available tour id's
          for (int rowPosition = 0; rowPosition < numAllAvailableTourIds; rowPosition++) {
 
-            final long loadedTourId = _allTourIds[rowPosition];
+            final long loadedTourId = _allSortedTourIds[rowPosition];
 
             if (loadedTourId == requestedTourId) {
 
@@ -400,7 +400,7 @@ public class NatTable_DataLoader {
          SQL.showException(e, sql);
       }
 
-      _allTourIds = allTourIds.toArray();
+      _allSortedTourIds = allTourIds.toArray();
    }
 
    private int fetchNumberOfTours() {
@@ -731,6 +731,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param hoveredRow
+    *
     * @return Returns the fetched tour by it's row index or <code>null</code> when tour is not yet
     *         fetched from the backend.
     */
@@ -741,6 +742,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param tourId
+    *
     * @return Returns the tour index but only when it was already fetched (which was done for
     *         displayed tour), otherwise -1.
     */
@@ -790,11 +792,12 @@ public class NatTable_DataLoader {
 
    /**
     * @param allRequestedTourIds
+    *
     * @return Returns NatTable row indices from the requested tour id's.
     */
    public CompletableFuture<int[]> getRowIndexFromTourId(final List<Long> allRequestedTourIds) {
 
-      if (_allTourIds == null) {
+      if (_allSortedTourIds == null) {
 
          // firstly load all tour id's
 
@@ -828,6 +831,7 @@ public class NatTable_DataLoader {
     * Maps column field -> database field
     *
     * @param sortColumnId
+    *
     * @return Returns database field
     */
    public String getSqlField_OrderBy(final String sortColumnId) {
@@ -839,10 +843,10 @@ public class NatTable_DataLoader {
             ? "tourDeviceTime_Recorded" //$NON-NLS-1$
             : "tourComputedTime_Moving"; //$NON-NLS-1$
 
-      final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
-      final String sortByPace = "avgPace(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
-
 // SET_FORMATTING_OFF
+
+      final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sortByPace     = "avgPace("  + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
 
       switch (sortColumnId) {
 
@@ -851,7 +855,7 @@ public class NatTable_DataLoader {
        */
 
       // tour date
-      case TableColumnFactory.TIME_DATE_ID:                          return SQL_DEFAULT_FIELD;
+      case TableColumnFactory.TIME_DATE_ID:                          return SQL_DEFAULT_SORT_FIELD;
 
       // tour time, THERE IS CURRENTLY NO DATE ONLY FIELD
       case TableColumnFactory.TIME_TOUR_START_TIME_ID:               return FIELD_WITHOUT_SORTING;
@@ -885,6 +889,7 @@ public class NatTable_DataLoader {
        * DATA
        */
       case TableColumnFactory.DATA_DP_TOLERANCE_ID:                  return "dpTolerance";            //$NON-NLS-1$
+      case TableColumnFactory.DATA_HAS_GEO_DATA_ID:                  return "hasGeoData";
 //    case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:              // see indexed fields
       case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:              return "tourImportFilePath";     //$NON-NLS-1$
       case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:               return "numberOfTimeSlices";     //$NON-NLS-1$
@@ -988,6 +993,8 @@ public class NatTable_DataLoader {
        */
       case TableColumnFactory.TOUR_LOCATION_START_ID:                return "COALESCE(tourStartPlace, '')";                //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "COALESCE(tourEndPlace, '')";                  //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_ID_START_ID:             return "tourLocationStart_LocationID";                //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_ID_END_ID:               return "tourLocationEnd_LocationID";                  //$NON-NLS-1$
       case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;
@@ -1024,14 +1031,14 @@ public class NatTable_DataLoader {
 
       default:
 
-         // ensure a valid field is returned, this case should not happen
+         // ensure a valid field is returned, this case should not happen but it helps during development
 
-         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField()" //$NON-NLS-1$ //$NON-NLS-2$
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField_OrderBy()" //$NON-NLS-1$ //$NON-NLS-2$
                + "\tsortColumnId: \"" + sortColumnId + "\"" //$NON-NLS-1$ //$NON-NLS-2$
                + " has not a valid sql field" //$NON-NLS-1$
                );
 
-         return SQL_DEFAULT_FIELD;
+         return SQL_DEFAULT_SORT_FIELD;
       }
 
    // SET_FORMATTING_ON
@@ -1041,6 +1048,7 @@ public class NatTable_DataLoader {
     * Maps column field -> database field
     *
     * @param sortColumnId
+    *
     * @return Returns database field
     */
    private String getSqlField_SelectFields(final String sortColumnId) {
@@ -1070,6 +1078,7 @@ public class NatTable_DataLoader {
 
    /**
     * @param rowIndex
+    *
     * @return Returns tour item at the requested row index or <code>null</code> when not yet
     *         available. When tour is not yet loaded then the data will be fetched from the backend.
     */
@@ -1149,13 +1158,13 @@ public class NatTable_DataLoader {
 
    long getTourId(final int rowIndex) {
 
-      if (_allTourIds == null) {
+      if (_allSortedTourIds == null) {
 
          return -1;
 
       } else {
 
-         return _allTourIds[rowIndex];
+         return _allSortedTourIds[rowIndex];
       }
    }
 
@@ -1174,7 +1183,7 @@ public class NatTable_DataLoader {
       _pageNumbers_Fetched.clear();
       _pageNumbers_Loading.clear();
 
-      _allTourIds = null;
+      _allSortedTourIds = null;
 
       _numAllTourItems = -1;
 
@@ -1243,6 +1252,7 @@ public class NatTable_DataLoader {
       _allSqlSortFields_SelectFields.clear();
       _allSqlSortDirections.clear();
 
+      boolean isSortedByDateTime = false;
       final int numSortColumns = allSortDirections.size();
 
       for (int columnIndex = 0; columnIndex < numSortColumns; columnIndex++) {
@@ -1255,43 +1265,70 @@ public class NatTable_DataLoader {
           * Ensure that the dummy field is not used in the sql statement, this should not happen but
           * it did during development
           */
-         if (FIELD_WITHOUT_SORTING.equals(sqlField_OrderBy) == false) {
+         if (FIELD_WITHOUT_SORTING.equals(sqlField_OrderBy)) {
 
-            final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
+            // field is not sorted
 
-            // skip field which are not sorted
-            if (sortDirectionEnum.equals(SortDirectionEnum.NONE) == false) {
+            continue;
+         }
 
-               /*
-                * Set sort order
-                */
-               if (sortDirectionEnum == SortDirectionEnum.ASC) {
-                  _allSqlSortDirections.add(SQL_ASCENDING);
-               } else {
-                  _allSqlSortDirections.add(SQL_DESCENDING);
-               }
+         if (SQL_DEFAULT_SORT_FIELD.equals(sqlField_OrderBy)) {
 
-               /*
-                * Set sort field(s)
-                */
-               _allSqlSortFields_OrderBy.add(sqlField_OrderBy);
+            isSortedByDateTime = true;
+         }
 
-               final String sqlField_SelectFields = getSqlField_SelectFields(sortColumnId);
-               if (sqlField_SelectFields != null) {
+         final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
 
-                  // use special "select" fields
+         // skip field which are not sorted
+         if (sortDirectionEnum.equals(SortDirectionEnum.NONE) == false) {
 
-                  _allSqlSortFields_SelectFields.add(sqlField_SelectFields);
-
-               } else {
-
-                  // use "order by" fields
-
-                  _allSqlSortFields_SelectFields.add(sqlField_OrderBy);
-               }
+            /*
+             * Set sort order
+             */
+            if (sortDirectionEnum == SortDirectionEnum.ASC) {
+               _allSqlSortDirections.add(SQL_ASCENDING);
+            } else {
+               _allSqlSortDirections.add(SQL_DESCENDING);
             }
 
+            /*
+             * Set sort field(s)
+             */
+            _allSqlSortFields_OrderBy.add(sqlField_OrderBy);
+
+            final String sqlField_SelectFields = getSqlField_SelectFields(sortColumnId);
+            if (sqlField_SelectFields != null) {
+
+               // use special "select" fields
+
+               _allSqlSortFields_SelectFields.add(sqlField_SelectFields);
+
+            } else {
+
+               // use "order by" fields
+
+               _allSqlSortFields_SelectFields.add(sqlField_OrderBy);
+            }
          }
+      }
+
+      if (isSortedByDateTime == false) {
+
+         /**
+          * Add an additional sorting by date/time.
+          * <p>
+          * Because of the different tour ID retrievals in fetchPagedTourItems() and
+          * fetchAllTourIds(), it happened, that the sorting of the not sorted tours were different
+          * and a selected tour was not the selected display tour because of different tour ID
+          * sortings !!!
+          * <p>
+          * It took me many hours to find/debug this simple workaround.
+          */
+
+         _allSqlSortDirections.add(SQL_ASCENDING);
+
+         _allSqlSortFields_OrderBy.add(SQL_DEFAULT_SORT_FIELD);
+         _allSqlSortFields_SelectFields.add(SQL_DEFAULT_SORT_FIELD);
       }
    }
 
