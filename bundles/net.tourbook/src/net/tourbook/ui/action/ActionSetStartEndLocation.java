@@ -34,6 +34,7 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
@@ -131,7 +132,14 @@ public class ActionSetStartEndLocation extends SubMenu {
          _isSetStartLocation = isSetStartLocation;
          _isSetEndLocation = isSetEndLocation;
 
-         final String profileName = PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
+         final String profileName = (isDefaultProfile
+
+               // show a marker for the default profile
+               ? UI.SYMBOL_STAR + UI.SPACE
+
+               : UI.EMPTY_STRING)
+
+               + PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
 
          setupActionTextAndTooltip(this, locationProfile, profileName, isSetStartLocation, isSetEndLocation);
       }
@@ -267,6 +275,12 @@ public class ActionSetStartEndLocation extends SubMenu {
          final double[] longitudeSerie = tourData.longitudeSerie;
 
          if (latitudeSerie == null || latitudeSerie.length == 0) {
+
+            MessageDialog.openInformation(
+                  _ownerControl.getShell(),
+                  "Open Profile Editor",
+                  "Geo positions are not available");
+
             return;
          }
 
