@@ -193,10 +193,10 @@ public class TourLocationManager {
          Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
          Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
 
-         Map.entry(LocationPartID.CUSTOM_CITY_LARGEST,               Messages.Tour_Location_Part_City_Largest),
-         Map.entry(LocationPartID.CUSTOM_CITY_SMALLEST,              Messages.Tour_Location_Part_City_Smallest),
-         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_LARGEST,      Messages.Tour_Location_Part_CityWithZip_Largest),
-         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_SMALLEST,     Messages.Tour_Location_Part_CityWithZip_Smalles),
+//         Map.entry(LocationPartID.CUSTOM_CITY_LARGEST,               Messages.Tour_Location_Part_City_Largest),
+//         Map.entry(LocationPartID.CUSTOM_CITY_SMALLEST,              Messages.Tour_Location_Part_City_Smallest),
+//         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_LARGEST,      Messages.Tour_Location_Part_CityWithZip_Largest),
+//         Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_SMALLEST,     Messages.Tour_Location_Part_CityWithZip_Smalles),
 
          Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
 
@@ -323,10 +323,10 @@ public class TourLocationManager {
                switch (locationPart) {
                case OSM_DEFAULT_NAME:
                case OSM_NAME:
-               case CUSTOM_CITY_LARGEST:
-               case CUSTOM_CITY_SMALLEST:
-               case CUSTOM_CITY_WITH_ZIP_LARGEST:
-               case CUSTOM_CITY_WITH_ZIP_SMALLEST:
+//               case CUSTOM_CITY_LARGEST:
+//               case CUSTOM_CITY_SMALLEST:
+//               case CUSTOM_CITY_WITH_ZIP_LARGEST:
+//               case CUSTOM_CITY_WITH_ZIP_SMALLEST:
                case CUSTOM_STREET_WITH_HOUSE_NUMBER:
 
                   label = TourLocationManager.createPartName_Combined(locationPart);
@@ -423,11 +423,11 @@ public class TourLocationManager {
          case OSM_DEFAULT_NAME:                 appendPart(tourLocation.display_name);                         break;
          case OSM_NAME:                         appendPart(tourLocation.name);                                 break;
 
-         case CUSTOM_CITY_LARGEST:              appendPart(getCombined_City_Largest(tourLocation));            break;
-         case CUSTOM_CITY_SMALLEST:             appendPart(getCombined_City_Smallest(tourLocation));           break;
-
-         case CUSTOM_CITY_WITH_ZIP_LARGEST:     appendPart(getCombined_CityWithZip_Largest(tourLocation));     break;
-         case CUSTOM_CITY_WITH_ZIP_SMALLEST:    appendPart(getCombined_CityWithZip_Smallest(tourLocation));    break;
+//         case CUSTOM_CITY_LARGEST:              appendPart(getCombined_City_Largest(tourLocation));            break;
+//         case CUSTOM_CITY_SMALLEST:             appendPart(getCombined_City_Smallest(tourLocation));           break;
+//
+//         case CUSTOM_CITY_WITH_ZIP_LARGEST:     appendPart(getCombined_CityWithZip_Largest(tourLocation));     break;
+//         case CUSTOM_CITY_WITH_ZIP_SMALLEST:    appendPart(getCombined_CityWithZip_Smallest(tourLocation));    break;
 
          case CUSTOM_STREET_WITH_HOUSE_NUMBER:  appendPart(getCombined_StreetWithHouseNumber(tourLocation));   break;
 
@@ -859,116 +859,116 @@ public class TourLocationManager {
       return returnResult;
    }
 
-   /**
-    * Places are sorted by number of inhabitants, only some or nothing are available
-    *
-    * place = city,
-    * place = town,
-    * place = village,
-    * place = hamlet
-    * place = isolated_dwelling
-    *
-    * https://wiki.openstreetmap.org/wiki/Key:place
-    *
-    * @param tourLocation
-    *
-    * @return
-    */
-   static String getCombined_City_Largest(final TourLocation tourLocation) {
-
-// SET_FORMATTING_OFF
-
-      final String adrCity                = tourLocation.city;
-      final String adrTown                = tourLocation.town;
-      final String adrVillage             = tourLocation.village;
-      final String adrHamlet              = tourLocation.hamlet;
-      final String adrIsolated_dwelling   = tourLocation.isolated_dwelling;
-
-      String city = null;
-
-      if (adrCity != null) {                    city = adrCity;               }
-      else if (adrTown != null) {               city = adrTown;               }
-      else if (adrVillage != null) {            city = adrVillage;            }
-      else if (adrHamlet != null) {             city = adrHamlet;             }
-      else if (adrIsolated_dwelling != null) {  city = adrIsolated_dwelling;  }
-
-// SET_FORMATTING_ON
-
-      return city;
-   }
-
-   static String getCombined_City_Smallest(final TourLocation tourLocation) {
-
-// SET_FORMATTING_OFF
-
-      final String adrCity                = tourLocation.city;
-      final String adrTown                = tourLocation.town;
-      final String adrVillage             = tourLocation.village;
-      final String adrHamlet              = tourLocation.hamlet;
-      final String adrIsolatedDwelling    = tourLocation.isolated_dwelling;
-
-      String city = null;
-
-      if (adrIsolatedDwelling != null) { city = adrIsolatedDwelling;  }
-      else if (adrHamlet != null) {       city = adrHamlet;             }
-      else if (adrVillage != null) {      city = adrVillage;            }
-      else if (adrTown != null) {         city = adrTown;               }
-      else if (adrCity != null) {         city = adrCity;               }
-
-// SET_FORMATTING_ON
-
-      return city;
-   }
-
-   static String getCombined_CityWithZip_Largest(final TourLocation tourLocation) {
-
-      final String city = getCombined_City_Largest(tourLocation);
-      final String adrPostCode = tourLocation.postcode;
-
-      if (city == null || adrPostCode == null) {
-         return null;
-      }
-
-      final String adrCountryCode = tourLocation.country_code;
-
-      if (COUNTRY_CODE_US.equals(adrCountryCode)) {
-
-         // city + zip code
-
-         return city + UI.SPACE + adrPostCode;
-
-      } else {
-
-         // zip code + city
-
-         return adrPostCode + UI.SPACE + city;
-      }
-   }
-
-   static String getCombined_CityWithZip_Smallest(final TourLocation tourLocation) {
-
-      final String city = getCombined_City_Smallest(tourLocation);
-      final String adrPostCode = tourLocation.postcode;
-
-      if (city == null || adrPostCode == null) {
-         return null;
-      }
-
-      final String adrCountryCode = tourLocation.country_code;
-
-      if (COUNTRY_CODE_US.equals(adrCountryCode)) {
-
-         // city + zip code
-
-         return city + UI.SPACE + adrPostCode;
-
-      } else {
-
-         // zip code + city
-
-         return adrPostCode + UI.SPACE + city;
-      }
-   }
+//   /**
+//    * Places are sorted by number of inhabitants, only some or nothing are available
+//    *
+//    * place = city,
+//    * place = town,
+//    * place = village,
+//    * place = hamlet
+//    * place = isolated_dwelling
+//    *
+//    * https://wiki.openstreetmap.org/wiki/Key:place
+//    *
+//    * @param tourLocation
+//    *
+//    * @return
+//    */
+//   static String getCombined_City_Largest(final TourLocation tourLocation) {
+//
+//// SET_FORMATTING_OFF
+//
+//      final String adrCity                = tourLocation.city;
+//      final String adrTown                = tourLocation.town;
+//      final String adrVillage             = tourLocation.village;
+//      final String adrHamlet              = tourLocation.hamlet;
+//      final String adrIsolated_dwelling   = tourLocation.isolated_dwelling;
+//
+//      String city = null;
+//
+//      if (adrCity != null) {                    city = adrCity;               }
+//      else if (adrTown != null) {               city = adrTown;               }
+//      else if (adrVillage != null) {            city = adrVillage;            }
+//      else if (adrHamlet != null) {             city = adrHamlet;             }
+//      else if (adrIsolated_dwelling != null) {  city = adrIsolated_dwelling;  }
+//
+//// SET_FORMATTING_ON
+//
+//      return city;
+//   }
+//
+//   static String getCombined_City_Smallest(final TourLocation tourLocation) {
+//
+//// SET_FORMATTING_OFF
+//
+//      final String adrCity                = tourLocation.city;
+//      final String adrTown                = tourLocation.town;
+//      final String adrVillage             = tourLocation.village;
+//      final String adrHamlet              = tourLocation.hamlet;
+//      final String adrIsolatedDwelling    = tourLocation.isolated_dwelling;
+//
+//      String city = null;
+//
+//      if (adrIsolatedDwelling != null) { city = adrIsolatedDwelling;  }
+//      else if (adrHamlet != null) {       city = adrHamlet;             }
+//      else if (adrVillage != null) {      city = adrVillage;            }
+//      else if (adrTown != null) {         city = adrTown;               }
+//      else if (adrCity != null) {         city = adrCity;               }
+//
+//// SET_FORMATTING_ON
+//
+//      return city;
+//   }
+//
+//   static String getCombined_CityWithZip_Largest(final TourLocation tourLocation) {
+//
+//      final String city = getCombined_City_Largest(tourLocation);
+//      final String adrPostCode = tourLocation.postcode;
+//
+//      if (city == null || adrPostCode == null) {
+//         return null;
+//      }
+//
+//      final String adrCountryCode = tourLocation.country_code;
+//
+//      if (COUNTRY_CODE_US.equals(adrCountryCode)) {
+//
+//         // city + zip code
+//
+//         return city + UI.SPACE + adrPostCode;
+//
+//      } else {
+//
+//         // zip code + city
+//
+//         return adrPostCode + UI.SPACE + city;
+//      }
+//   }
+//
+//   static String getCombined_CityWithZip_Smallest(final TourLocation tourLocation) {
+//
+//      final String city = getCombined_City_Smallest(tourLocation);
+//      final String adrPostCode = tourLocation.postcode;
+//
+//      if (city == null || adrPostCode == null) {
+//         return null;
+//      }
+//
+//      final String adrCountryCode = tourLocation.country_code;
+//
+//      if (COUNTRY_CODE_US.equals(adrCountryCode)) {
+//
+//         // city + zip code
+//
+//         return city + UI.SPACE + adrPostCode;
+//
+//      } else {
+//
+//         // zip code + city
+//
+//         return adrPostCode + UI.SPACE + city;
+//      }
+//   }
 
    static String getCombined_StreetWithHouseNumber(final TourLocation tourLocation) {
 

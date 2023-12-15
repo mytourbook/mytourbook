@@ -121,6 +121,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private List<MT_DLItem>                 _allDualListItems = new ArrayList<>();
 
    private ITourLocationConsumer           _tourLocationConsumer;
+   private TourLocation                    _tourLocation;
 
    private Rectangle                       _ownerBounds;
 
@@ -274,17 +275,21 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _isStartLocation = isStartLocation;
       _tourData = tourData;
 
+      _tourLocation = isStartLocation
+            ? _tourData.getTourLocationStart()
+            : _tourData.getTourLocationEnd();
+
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
 
-      final String title = _isStartLocation
+      final String title = isStartLocation
             ? Messages.Slideout_TourLocation_Label_StartLocation_Title
             : Messages.Slideout_TourLocation_Label_EndLocation_Title;
 
       setTitleText(title);
    }
 
-   private void addAllAddressParts(final TourLocation tourLocation, final List<MT_DLItem> allItems) {
+   private void addAllAddressParts(final TourLocation tourLocation) {
 
       try {
 
@@ -319,7 +324,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                         TourLocationManager.KEY_LOCATION_PART_ID,
                         locationPart);
 
-                  allItems.add(dlItem);
+                  _allDualListItems.add(dlItem);
                }
             }
          }
@@ -366,6 +371,27 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
    }
 
+   private void createColumn_12_Zoomlevel(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
+      final TableColumn tc = tvc.getColumn();
+
+      tc.setText(Messages.Slideout_TourLocation_Column_Zoomlevel);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
+
+            cell.setText(Integer.toString(profile.getZoomlevel()));
+         }
+      });
+
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
+   }
+
    private void createColumn_20_LocationParts(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
@@ -387,12 +413,12 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
    }
 
-   private void createColumn_30_Zoomlevel(final TableColumnLayout tableLayout) {
+   private void createColumn_30_LocationText(final TableColumnLayout tableLayout) {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
+      final TableViewerColumn tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
       final TableColumn tc = tvc.getColumn();
 
-      tc.setText(Messages.Slideout_TourLocation_Column_Zoomlevel);
+      tc.setText(Messages.Slideout_TourLocation_Column_LocationText);
 
       tvc.setLabelProvider(new CellLabelProvider() {
 
@@ -401,11 +427,11 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
             final TourLocationProfile profile = (TourLocationProfile) cell.getElement();
 
-            cell.setText(Integer.toString(profile.getZoomlevel()));
+            cell.setText(TourLocationManager.createLocationDisplayName(_tourLocation, profile));
          }
       });
 
-      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
+      tableLayout.setColumnData(tc, new ColumnWeightData(2, true));
    }
 
    private void createColumn_40_IsDefaultProfile(final TableColumnLayout tableLayout) {
@@ -517,8 +543,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
        * Create columns
        */
       createColumn_10_ProfileName(tableLayout);
-      createColumn_30_Zoomlevel(tableLayout);
+      createColumn_12_Zoomlevel(tableLayout);
       createColumn_20_LocationParts(tableLayout);
+      createColumn_30_LocationText(tableLayout);
       createColumn_40_IsDefaultProfile(tableLayout);
 
       /*
@@ -1129,10 +1156,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void setupUI() {
 
-      final TourLocation tourLocation = _isStartLocation
-            ? _tourData.getTourLocationStart()
-            : _tourData.getTourLocationEnd();
-
       /*
        * Fill address part widget
        */
@@ -1140,29 +1163,29 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 // SET_FORMATTING_OFF
 
       // add customized parts
-      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(         tourLocation);
-      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(  tourLocation);
-      final String largestCity            = TourLocationManager.getCombined_City_Largest(          tourLocation);
-      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(   tourLocation);
-      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber( tourLocation);
+//      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(         _tourLocation);
+//      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(  _tourLocation);
+//      final String largestCity            = TourLocationManager.getCombined_City_Largest(          _tourLocation);
+//      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(   _tourLocation);
+      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber( _tourLocation);
 
-      boolean isShowSmallestCity = false;
-      if (largestCity != null && largestCity.equals(smallestCity) == false) {
-         isShowSmallestCity = true;
-      }
+//      boolean isShowSmallestCity = false;
+//      if (largestCity != null && largestCity.equals(smallestCity) == false) {
+//         isShowSmallestCity = true;
+//      }
 
-      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                 tourLocation.display_name,    _allDualListItems);
-      addCombinedPart(LocationPartID    .OSM_NAME,                         tourLocation.name,            _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                 _tourLocation.display_name,    _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_NAME,                         _tourLocation.name,            _allDualListItems);
 
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,              largestCity,                  _allDualListItems);
-      if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,             smallestCity,                 _allDualListItems);
-      }
-
-      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,     largestCityWithZip,           _allDualListItems);
-      if (isShowSmallestCity) {
-         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,    smallestCityWithZip,          _allDualListItems);
-      }
+//      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,              largestCity,                  _allDualListItems);
+//      if (isShowSmallestCity) {
+//         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,             smallestCity,                 _allDualListItems);
+//      }
+//
+//      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,     largestCityWithZip,           _allDualListItems);
+//      if (isShowSmallestCity) {
+//         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,    smallestCityWithZip,          _allDualListItems);
+//      }
 
       addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,  streetWithHouseNumber,        _allDualListItems);
 
@@ -1170,7 +1193,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 // SET_FORMATTING_ON
 
       // add address parts
-      addAllAddressParts(tourLocation, _allDualListItems);
+      addAllAddressParts(_tourLocation);
 
       _listLocationParts.setItems(_allDualListItems);
    }

@@ -45,6 +45,8 @@ import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.INatTable_PropertiesProvider;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.NatTable_LabelProvider;
+import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.ToolTip;
@@ -361,6 +363,8 @@ public class TourBookView extends ViewPart implements
    //
    private NatTableViewer_TourInfo_ToolTip    _tourInfoToolTip_NatTable;
    private TreeViewerTourInfoToolTip          _tourInfoToolTip_Tree;
+   private TourLocationToolTip                _tourLocationTooltip_NatTable;
+   private TourLocationToolTip                _tourLocationTooltip_Tree;
    //
    private TagMenuManager                     _tagMenuManager;
    private MenuManager                        _viewerMenuManager_NatTable;
@@ -404,17 +408,18 @@ public class TourBookView extends ViewPart implements
    private ActionSingleExpand_CollapseOthers  _actionContext_SingleExpand_CollapseOthers;
    //
    private PixelConverter                     _pc;
+   //
    /*
     * UI controls
     */
-   private PageBook                           _pageBook;
+   private PageBook  _pageBook;
    //
-   private Composite                          _parent;
-   private Composite                          _viewerContainer_NatTable;
-   private Composite                          _viewerContainer_Tree;
+   private Composite _parent;
+   private Composite _viewerContainer_NatTable;
+   private Composite _viewerContainer_Tree;
    //
-   private Menu                               _contextMenu_NatTable;
-   private Menu                               _contextMenu_Tree;
+   private Menu      _contextMenu_NatTable;
+   private Menu      _contextMenu_Tree;
 
    private class ActionCollapseAll_WithoutSelection extends ActionCollapseAll {
 
@@ -1906,7 +1911,7 @@ public class TourBookView extends ViewPart implements
       _tourInfoToolTip_NatTable = new NatTableViewer_TourInfo_ToolTip(this, ToolTip.NO_RECREATE);
 
       // set start/end location info tooltip provider
-      new TourLocationToolTip(this, true);
+      _tourLocationTooltip_NatTable = new TourLocationToolTip(this, true);
 
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
 
@@ -1947,15 +1952,30 @@ public class TourBookView extends ViewPart implements
       _tourViewer_NatTable.addListener(SWT.MenuDetect, event -> natTable_ContextMenu_OnMenuDetect(event));
 
       contextMenu.addMenuListener(new MenuAdapter() {
+
          @Override
          public void menuHidden(final MenuEvent e) {
+
             _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_NatTable);
+
+            // hide tour location tooltip
+            _tourLocationTooltip_NatTable.hide();
+            _tourLocationTooltip_Tree.hide();
+
+            final Point displayCursorLocation = Display.getCurrent().getCursorLocation();
+
+            setupTourLocationContextMenu(displayCursorLocation);
+
+            _tagMenuManager.onShowMenu(menuEvent,
+                  _tourViewer_NatTable,
+                  displayCursorLocation,
+                  _tourInfoToolTip_NatTable);
          }
+
       });
 
       return contextMenu;
@@ -2037,7 +2057,7 @@ public class TourBookView extends ViewPart implements
       _tourInfoToolTip_Tree = new TreeViewerTourInfoToolTip(_tourViewer_Tree);
 
       // set start/end location info tooltip provider
-      new TourLocationToolTip(this, false);
+      _tourLocationTooltip_Tree = new TourLocationToolTip(this, false);
    }
 
    private void createUI_40_Tree_ColumnImages(final Tree tree) {
@@ -4276,6 +4296,50 @@ public class TourBookView extends ViewPart implements
    void setLinkAndCollapse(final boolean isCollapseOthers) {
 
       _isCollapseOthers = isCollapseOthers;
+   }
+
+   /**
+    * Check if start or end location is hovered
+    *
+    * @param displayCursorLocation
+    */
+   private void setupTourLocationContextMenu(final Point displayCursorLocation) {
+
+      Boolean isStartLocationInContextMenu = null;
+
+      final NatTable natTable = getTourViewer_NatTable();
+
+      final Point controlCursorLocation = natTable.toControl(displayCursorLocation);
+
+      final int devXMouse = controlCursorLocation.x;
+      final int devYMouse = controlCursorLocation.y;
+
+      final int colPosByX = natTable.getColumnPositionByX(devXMouse);
+      final int rowPosByY = natTable.getRowPositionByY(devYMouse);
+
+      if (colPosByX <= 0 || rowPosByY <= 0) {
+
+         // first column or first row (this is the row number or table header) or an empty nattable (rowPosByY == -1)
+
+      } else {
+
+         // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
+         final int hoveredColumnIndex = natTable.getColumnIndexByPosition(colPosByX);
+         if (hoveredColumnIndex > -1) {
+
+            final ArrayList<ColumnDefinition> visibleAndSortedColumns = _columnManager_NatTable.getVisibleAndSortedColumns();
+            final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
+
+            final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
+            if (labelProvider instanceof final NatTable_LabelProvider_WithLocationTooltip locationTooltipLabelProvider) {
+
+               // set true or false
+               isStartLocationInContextMenu = locationTooltipLabelProvider.isStartLocation;
+            }
+         }
+      }
+
+      _actionSetStartEndLocation.setIsStartLocation(isStartLocationInContextMenu);
    }
 
    private void setupTourViewerContent() {

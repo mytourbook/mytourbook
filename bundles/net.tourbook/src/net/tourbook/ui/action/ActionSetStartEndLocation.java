@@ -21,7 +21,6 @@ import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
@@ -73,12 +72,12 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionSetStartEndLocation extends SubMenu {
 
+   private static final String          ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private static final String          ID           = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
+   private static final String          LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
+   private static final String          PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
 
-   private static final String          PROFILE_NAME = "%s - %d";                                          //$NON-NLS-1$
-
-   private static final IDialogSettings _state       = TourbookPlugin.getState(ID);
+   private static final IDialogSettings _state             = TourbookPlugin.getState(ID);
 
    private ITourProvider                _tourProvider;
 
@@ -93,6 +92,11 @@ public class ActionSetStartEndLocation extends SubMenu {
    private Control                      _ownerControl;
 
    private ArrayList<TourData>          _allSelectedTours;
+
+   /**
+    * When <code>null</code> then a start or end location is not hovered
+    */
+   private Boolean                      _isStartLocationInContextMenu;
 
    private class ActionEditProfiles extends Action {
 
@@ -110,15 +114,17 @@ public class ActionSetStartEndLocation extends SubMenu {
    private class ActionLocationProfile extends Action {
 
       private TourLocationProfile _locationProfile;
-      private boolean             _isSetStartLocation;
-      private boolean             _isSetEndLocation;
+
+      private Boolean             _isSetStartLocation;
+      private Boolean             _isSetEndLocation;
 
       public ActionLocationProfile(final TourLocationProfile locationProfile,
                                    final boolean isDefaultProfile,
+
                                    final boolean isSetStartLocation,
                                    final boolean isSetEndLocation) {
 
-         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          _locationProfile = locationProfile;
 
@@ -127,12 +133,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          final String profileName = PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
 
-         setText(profileName);
-         setToolTipText(createLocationTooltipText(locationProfile, _isSetStartLocation, isSetEndLocation));
-
-         if (isDefaultProfile) {
-            setChecked(true);
-         }
+         setupActionTextAndTooltip(this, locationProfile, profileName, isSetStartLocation, isSetEndLocation);
       }
 
       @Override
@@ -295,8 +296,7 @@ public class ActionSetStartEndLocation extends SubMenu {
             ownerBounds,
             _state,
 
-            true // use start location data
-      );
+            _isStartLocationInContextMenu);
 
       slideoutLocationProfiles.open(false);
    }
@@ -340,54 +340,6 @@ public class ActionSetStartEndLocation extends SubMenu {
       _actionSetLocation_End = new ActionSetLocation_End();
    }
 
-   private String createLocationTooltipText(final TourLocationProfile locationProfile,
-                                            final boolean isSetStartLocation,
-                                            final boolean isSetEndLocation) {
-
-      final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
-      final TourData firstTour = _allSelectedTours.get(0);
-
-      final TourLocation tourLocationStart = firstTour.getTourLocationStart();
-      final TourLocation tourLocationEnd = firstTour.getTourLocationEnd();
-
-      String locationText = null;
-
-      if (tourLocationStart != null) {
-
-         locationText = OtherMessages.TOUR_TOOLTIP_LABEL_LOCATION_START
-               + UI.NEW_LINE
-               + TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile);
-      }
-
-      if (tourLocationEnd != null) {
-
-         final String endLocationText = TourLocationManager.createLocationDisplayName(tourLocationEnd, locationProfile);
-
-         if (endLocationText.length() > 0) {
-
-            if (locationText.length() > 0) {
-               locationText += UI.NEW_LINE3;
-            }
-
-            locationText += OtherMessages.TOUR_TOOLTIP_LABEL_LOCATION_END
-                  + UI.NEW_LINE
-                  + endLocationText;
-         }
-      }
-
-      String tooltipText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
-
-            joinedPartNames,
-            locationProfile.getZoomlevel());
-
-      if (locationText.length() > 0) {
-
-         tooltipText += UI.NEW_LINE3 + locationText;
-      }
-
-      return tooltipText;
-   }
-
    @Override
    public void enableActions() {}
 
@@ -420,6 +372,14 @@ public class ActionSetStartEndLocation extends SubMenu {
       addActionToMenu(_actionEditProfiles);
    }
 
+   /**
+    * Fill menu with all profile actions
+    *
+    * @param menu
+    * @param allProfiles
+    * @param isSetStartLocation
+    * @param isSetEndLocation
+    */
    private void fillMenu_AddAllProfileActions(final Menu menu,
                                               final List<TourLocationProfile> allProfiles,
                                               final boolean isSetStartLocation,
@@ -437,11 +397,110 @@ public class ActionSetStartEndLocation extends SubMenu {
          addActionToMenu(menu,
 
                new ActionLocationProfile(
+
                      locationProfile,
                      isDefaultProfile,
 
                      isSetStartLocation,
                      isSetEndLocation));
+      }
+   }
+
+   public void setIsStartLocation(final Boolean isStartLocationInContextMenu) {
+
+      _isStartLocationInContextMenu = isStartLocationInContextMenu;
+   }
+
+   private void setupActionTextAndTooltip(final Action action,
+                                          final TourLocationProfile locationProfile,
+                                          final String profileName,
+                                          final boolean isSetStartLocation,
+                                          final boolean isSetEndLocation) {
+      /*
+       * Get part text
+       */
+      final String partText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
+
+            TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1),
+            locationProfile.getZoomlevel());
+
+      final String locationTooltip = profileName + UI.NEW_LINE2 + partText;
+
+      /*
+       * Get start/end location text
+       */
+      TourLocation tourLocationStart = null;
+      TourLocation tourLocationEnd = null;
+
+      if (_allSelectedTours.size() == 1) {
+
+         final TourData firstTour = _allSelectedTours.get(0);
+
+         tourLocationStart = firstTour.getTourLocationStart();
+         tourLocationEnd = firstTour.getTourLocationEnd();
+      }
+
+      final boolean isStartLocationAvailable = tourLocationStart != null;
+      final boolean isEndLocationAvailable = tourLocationEnd != null;
+
+      final String startLocationText = isStartLocationAvailable
+            ? TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile)
+            : null;
+
+      final String endLocationText = isEndLocationAvailable
+            ? TourLocationManager.createLocationDisplayName(tourLocationEnd, locationProfile)
+            : null;
+
+      boolean isShowDefaultLabel = false;
+
+      /*
+       * Set action text/tooltip
+       */
+      if (isSetStartLocation && isSetEndLocation && isStartLocationAvailable && isEndLocationAvailable) {
+
+         final String locationText = tourLocationStart == tourLocationEnd
+
+               // both locations are the same, display only one location
+               ? startLocationText
+
+               : startLocationText + LOCATION_SEPARATOR + endLocationText;
+
+         action.setText(locationText);
+         action.setToolTipText(locationTooltip);
+
+      } else if (isSetStartLocation) {
+
+         if (isStartLocationAvailable) {
+
+            action.setText(startLocationText);
+            action.setToolTipText(locationTooltip);
+
+         } else {
+
+            isShowDefaultLabel = true;
+         }
+
+      } else if (isSetEndLocation) {
+
+         if (isEndLocationAvailable) {
+
+            action.setText(endLocationText);
+            action.setToolTipText(locationTooltip);
+
+         } else {
+
+            isShowDefaultLabel = true;
+         }
+
+      } else {
+
+         isShowDefaultLabel = true;
+      }
+
+      if (isShowDefaultLabel) {
+
+         action.setText(profileName);
+         action.setToolTipText(partText);
       }
    }
 

@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>23.10.0-SNAPSHOT</version>
+                                             <version>24.1.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <dependencies>
@@ -83,6 +83,11 @@
       <repository>
          <id>eclipse.nattable.2.2.0</id>                                <layout>p2</layout>
          <url>http://download.eclipse.org/nattable/releases/2.2.0/repository/</url>
+      </repository> 
+      
+      <repository>
+         <id>eclipse.nebula.3.0.0</id>                                  <layout>p2</layout>
+         <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
       </repository> 
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->

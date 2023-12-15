@@ -22,13 +22,13 @@ public enum LocationPartID {
    OSM_DEFAULT_NAME, //
    OSM_NAME, //
 
-   CUSTOM_CITY_LARGEST, //
-   CUSTOM_CITY_SMALLEST, //
-   CUSTOM_CITY_WITH_ZIP_LARGEST, //
-   CUSTOM_CITY_WITH_ZIP_SMALLEST, //
+//   CUSTOM_CITY_LARGEST, //
+//   CUSTOM_CITY_SMALLEST, //
+//   CUSTOM_CITY_WITH_ZIP_LARGEST, //
+//   CUSTOM_CITY_WITH_ZIP_SMALLEST, //
 
    CUSTOM_STREET_WITH_HOUSE_NUMBER, //
-   
+
    /**
     * This is a computed part
     */
