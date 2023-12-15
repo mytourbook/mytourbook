@@ -72,11 +72,12 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionSetStartEndLocation extends SubMenu {
 
-   private static final String          ID           = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
+   private static final String          ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private static final String          PROFILE_NAME = "%s - %d";                                          //$NON-NLS-1$
+   private static final String          LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
+   private static final String          PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
 
-   private static final IDialogSettings _state       = TourbookPlugin.getState(ID);
+   private static final IDialogSettings _state             = TourbookPlugin.getState(ID);
 
    private ITourProvider                _tourProvider;
 
@@ -92,6 +93,9 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private ArrayList<TourData>          _allSelectedTours;
 
+   /**
+    * When <code>null</code> then a start or end location is not hovered
+    */
    private Boolean                      _isStartLocationInContextMenu;
 
    private class ActionEditProfiles extends Action {
@@ -117,8 +121,8 @@ public class ActionSetStartEndLocation extends SubMenu {
       public ActionLocationProfile(final TourLocationProfile locationProfile,
                                    final boolean isDefaultProfile,
 
-                                   final Boolean isSetStartLocation,
-                                   final Boolean isSetEndLocation) {
+                                   final boolean isSetStartLocation,
+                                   final boolean isSetEndLocation) {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
@@ -230,14 +234,6 @@ public class ActionSetStartEndLocation extends SubMenu {
       }
    }
 
-   private enum ActionTrigger{
-
-      START_LOCATION_FROM_MENU, //
-      END_LOCATION_FROM_MENU, //
-
-      BOTH_LOCATIONS_FROM_MENU, //
-   }
-
    /**
     * Submenu: Set S&tart/End Location
     *
@@ -300,8 +296,7 @@ public class ActionSetStartEndLocation extends SubMenu {
             ownerBounds,
             _state,
 
-            true // use start location data
-      );
+            _isStartLocationInContextMenu);
 
       slideoutLocationProfiles.open(false);
    }
@@ -361,7 +356,7 @@ public class ActionSetStartEndLocation extends SubMenu {
          addActionToMenu(_actionProfileTitle);
          addSeparatorToMenu();
 
-         fillMenu_AddAllProfileActions(menu, allProfiles, null, null);
+         fillMenu_AddAllProfileActions(menu, allProfiles, true, true);
 
          addSeparatorToMenu();
       }
@@ -387,8 +382,8 @@ public class ActionSetStartEndLocation extends SubMenu {
     */
    private void fillMenu_AddAllProfileActions(final Menu menu,
                                               final List<TourLocationProfile> allProfiles,
-                                              final Boolean isSetStartLocation,
-                                              final Boolean isSetEndLocation) {
+                                              final boolean isSetStartLocation,
+                                              final boolean isSetEndLocation) {
 
       final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
 
@@ -419,9 +414,11 @@ public class ActionSetStartEndLocation extends SubMenu {
    private void setupActionTextAndTooltip(final Action action,
                                           final TourLocationProfile locationProfile,
                                           final String profileName,
-                                          final Boolean isSetStartLocation,
-                                          final Boolean isSetEndLocation) {
-
+                                          final boolean isSetStartLocation,
+                                          final boolean isSetEndLocation) {
+      /*
+       * Get part text
+       */
       final String partText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
 
             TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1),
@@ -429,52 +426,81 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       final String locationTooltip = profileName + UI.NEW_LINE2 + partText;
 
-      final TourData firstTour = _allSelectedTours.get(0);
+      /*
+       * Get start/end location text
+       */
+      TourLocation tourLocationStart = null;
+      TourLocation tourLocationEnd = null;
 
-      final TourLocation tourLocationStart = firstTour.getTourLocationStart();
-      final TourLocation tourLocationEnd = firstTour.getTourLocationEnd();
+      if (_allSelectedTours.size() == 1) {
 
-      final boolean isLocationFromContext = isSetStartLocation == null && isSetEndLocation == null;
+         final TourData firstTour = _allSelectedTours.get(0);
 
-      if (false
+         tourLocationStart = firstTour.getTourLocationStart();
+         tourLocationEnd = firstTour.getTourLocationEnd();
+      }
 
-            // location is not set in the context menu
-            || _isStartLocationInContextMenu == null
+      final boolean isStartLocationAvailable = tourLocationStart != null;
+      final boolean isEndLocationAvailable = tourLocationEnd != null;
 
-            // check if a start location is available
-            || isLocationFromContext && _isStartLocationInContextMenu && tourLocationStart == null
+      final String startLocationText = isStartLocationAvailable
+            ? TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile)
+            : null;
 
-            // check if an end location is available
-            || isLocationFromContext && _isStartLocationInContextMenu == false && tourLocationEnd == null
+      final String endLocationText = isEndLocationAvailable
+            ? TourLocationManager.createLocationDisplayName(tourLocationEnd, locationProfile)
+            : null;
 
-      ) {
+      boolean isShowDefaultLabel = false;
 
-         /*
-          * Any or no location
-          */
+      /*
+       * Set action text/tooltip
+       */
+      if (isSetStartLocation && isSetEndLocation && isStartLocationAvailable && isEndLocationAvailable) {
 
-         action.setText(profileName);
-         action.setToolTipText(partText);
+         final String locationText = tourLocationStart == tourLocationEnd
 
-      } else if (isLocationFromContext && _isStartLocationInContextMenu
+               // both locations are the same, display only one location
+               ? startLocationText
 
-            || isSetStartLocation != null && isSetStartLocation) {
-
-         // start location
-
-         final String locationText = TourLocationManager.createLocationDisplayName(tourLocationStart, locationProfile);
+               : startLocationText + LOCATION_SEPARATOR + endLocationText;
 
          action.setText(locationText);
          action.setToolTipText(locationTooltip);
+
+      } else if (isSetStartLocation) {
+
+         if (isStartLocationAvailable) {
+
+            action.setText(startLocationText);
+            action.setToolTipText(locationTooltip);
+
+         } else {
+
+            isShowDefaultLabel = true;
+         }
+
+      } else if (isSetEndLocation) {
+
+         if (isEndLocationAvailable) {
+
+            action.setText(endLocationText);
+            action.setToolTipText(locationTooltip);
+
+         } else {
+
+            isShowDefaultLabel = true;
+         }
 
       } else {
 
-         // end location
+         isShowDefaultLabel = true;
+      }
 
-         final String locationText = TourLocationManager.createLocationDisplayName(tourLocationEnd, locationProfile);
+      if (isShowDefaultLabel) {
 
-         action.setText(locationText);
-         action.setToolTipText(locationTooltip);
+         action.setText(profileName);
+         action.setToolTipText(partText);
       }
    }
 

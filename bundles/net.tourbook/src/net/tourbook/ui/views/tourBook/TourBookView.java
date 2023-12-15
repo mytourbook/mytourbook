@@ -4333,6 +4333,7 @@ public class TourBookView extends ViewPart implements
             final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
             if (labelProvider instanceof final NatTable_LabelProvider_WithLocationTooltip locationTooltipLabelProvider) {
 
+               // set true or false
                isStartLocationInContextMenu = locationTooltipLabelProvider.isStartLocation;
             }
          }

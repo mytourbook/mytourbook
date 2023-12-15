@@ -115,8 +115,9 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 52;
 
-//   private static final int TOURBOOK_DB_VERSION = 52; // 23.12 ??????
+//   private static final int TOURBOOK_DB_VERSION = 53; // 24.x ??????
 
+//   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
 //   private static final int TOURBOOK_DB_VERSION = 51; // 23.8
 //   private static final int TOURBOOK_DB_VERSION = 50; // 23.5
 //   private static final int TOURBOOK_DB_VERSION = 49; // 23.3
@@ -2192,7 +2193,7 @@ public class TourDatabase {
     * @param latitudeE6
     * @param longitudeE6
     * @param zoomlevel
-    * 
+    *
     * @return
     */
    private static TourLocation getTourLocation(final int latitudeE6, final int longitudeE6, final int zoomlevel) {
