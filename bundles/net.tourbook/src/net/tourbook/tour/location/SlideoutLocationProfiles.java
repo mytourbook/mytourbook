@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -79,29 +77,6 @@ import org.eclipse.swt.widgets.Text;
 public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private static final String             ZOOM_LEVEL_ITEM   = "%3d  %s";                        //$NON-NLS-1$
-
-   /**
-    * Fields in {@link TourLocation} which are not displayed as location part
-    */
-   private static final Set<String>        IGNORED_FIELDS    = Stream.of(
-
-         "ISO3166_2_lvl4",                                                                       //$NON-NLS-1$
-
-         "name",                                                                                 //$NON-NLS-1$
-         "display_name",                                                                         //$NON-NLS-1$
-
-         "latitudeMinE6_Normalized",                                                             //$NON-NLS-1$
-         "latitudeMaxE6_Normalized",                                                             //$NON-NLS-1$
-         "longitudeMinE6_Normalized",                                                            //$NON-NLS-1$
-         "longitudeMaxE6_Normalized",                                                            //$NON-NLS-1$
-
-         "latitudeMinE6_Resized_Normalized",                                                     //$NON-NLS-1$
-         "latitudeMaxE6_Resized_Normalized",                                                     //$NON-NLS-1$
-         "longitudeMinE6_Resized_Normalized",                                                    //$NON-NLS-1$
-         "longitudeMaxE6_Resized_Normalized"                                                     //$NON-NLS-1$
-
-   )
-         .collect(Collectors.toCollection(HashSet::new));
 
    private PixelConverter                  _pc;
 
@@ -301,7 +276,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             final String fieldName = field.getName();
 
             // skip field names which are not address parts
-            if (IGNORED_FIELDS.contains(fieldName)) {
+            if (TourLocation.IGNORED_FIELDS.contains(fieldName)) {
                continue;
             }
 

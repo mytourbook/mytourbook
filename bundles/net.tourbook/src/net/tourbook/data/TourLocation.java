@@ -16,7 +16,11 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -83,20 +87,43 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourLocation implements Serializable {
 
-   private static final long serialVersionUID = 1L;
+   private static final long       serialVersionUID = 1L;
 
-   private static final char NL               = UI.NEW_LINE;
+   private static final char       NL               = UI.NEW_LINE;
 
-   public static final int   DB_FIELD_LENGTH  = 1000;
+   public static final int         DB_FIELD_LENGTH  = 1000;
+
+   /**
+    * Fields which are not displayed as location part
+    */
+   public static final Set<String> IGNORED_FIELDS   = Stream.of(
+
+         "ISO3166_2_lvl4",                                                             //$NON-NLS-1$
+
+         "name",                                                                       //$NON-NLS-1$
+         "display_name",                                                               //$NON-NLS-1$
+
+         "latitudeMinE6_Normalized",                                                   //$NON-NLS-1$
+         "latitudeMaxE6_Normalized",                                                   //$NON-NLS-1$
+         "longitudeMinE6_Normalized",                                                  //$NON-NLS-1$
+         "longitudeMaxE6_Normalized",                                                  //$NON-NLS-1$
+
+         "latitudeMinE6_Resized_Normalized",                                           //$NON-NLS-1$
+         "latitudeMaxE6_Resized_Normalized",                                           //$NON-NLS-1$
+         "longitudeMinE6_Resized_Normalized",                                          //$NON-NLS-1$
+         "longitudeMaxE6_Resized_Normalized"                                           //$NON-NLS-1$
+
+   )
+         .collect(Collectors.toCollection(HashSet::new));
 
    /**
     * Contains the entity id
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long              locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                    locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   public int                zoomlevel;
+   public int                      zoomlevel;
 
    /*
     * Fields from {@link OSMLocation}, the field names are kept from the downloaded location data
@@ -459,7 +486,6 @@ public class TourLocation implements Serializable {
 
          // ignore
       }
-
 
 // SET_FORMATTING_OFF
 

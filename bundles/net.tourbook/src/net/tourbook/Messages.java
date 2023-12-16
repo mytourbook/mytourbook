@@ -3113,6 +3113,7 @@ public class Messages extends NLS {
    public static String        Tour_Info_Label_AllFields;
    public static String        Tour_Info_Label_AllFields_Tooltip;
 
+   public static String        Tour_Location_Action_AppendLocationPart;
    public static String        Tour_Location_Action_BoundingBox_Increase;
    public static String        Tour_Location_Action_BoundingBox_Decrease;
    public static String        Tour_Location_Action_CombineBoundingBox;
@@ -3141,6 +3142,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
    public static String        Tour_Location_Action_SetLocation_End;
+
    public static String        Tour_Location_Action_SetLocation_Start;
    public static String        Tour_Location_Action_SetLocation_StartEnd;
    public static String        Tour_Location_Action_SetLocation_StartEnd_Tooltip;
