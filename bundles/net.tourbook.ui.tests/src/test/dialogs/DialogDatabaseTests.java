@@ -67,7 +67,8 @@ public class DialogDatabaseTests extends UITest {
             "✓" + UI.SPACE2 + "USER.TOURWAYPOINT" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.DB_VERSION_DATA" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.DEVICESENSOR" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
-            "✓" + UI.SPACE2 + "USER.DEVICESENSORVALUE" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
+            "✓" + UI.SPACE2 + "USER.DEVICESENSORVALUE" + UI.NEW_LINE + //$NON-NLS-1$ //$NON-NLS-2$
+            "✓" + UI.SPACE2 + "USER.TOURLOCATION" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 
       assertEquals(message, shell.bot().label(message).getText());
 
