@@ -79,60 +79,44 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionSetStartEndLocation extends SubMenu {
 
-   private static final String           ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
+   private static final String            ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private static final char             NL                 = UI.NEW_LINE;
+   private static final char              NL                 = UI.NEW_LINE;
 
-   private static final String           LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
-   private static final String           PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
+   private static final String            LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
+   private static final String            PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
 
-   private static final IDialogSettings  _state             = TourbookPlugin.getState(ID);
+   private static final IDialogSettings   _state             = TourbookPlugin.getState(ID);
 
-   private ITourProvider                 _tourProvider;
+   private ITourProvider                  _tourProvider;
 
-   private ActionEditProfiles            _actionEditProfiles;
-   private Action                        _actionProfileTitle;
+   private ActionEditProfiles             _actionEditProfiles;
+   private Action                         _actionPartTitle_All;
+   private Action                         _actionPartTitle_Start;
+   private Action                         _actionPartTitle_End;
+   private Action                         _actionProfileTitle_All;
+   private Action                         _actionProfileTitle_Start;
+   private Action                         _actionProfileTitle_End;
 
-   private ActionAppendLocationPart_Menu _actionAppendLocationPart;
-   private ActionRemoveLocation_All      _actionRemoveLocation_All;
-   private ActionRemoveLocation_Start    _actionRemoveLocation_Start;
-   private ActionRemoveLocation_End      _actionRemoveLocation_End;
-   private ActionSetLocation_Start       _actionSetLocation_Start;
-   private ActionSetLocation_End         _actionSetLocation_End;
+   private ActionAppendLocationPart_All   _actionAppendLocationPart_All;
+   private ActionAppendLocationPart_Start _actionAppendLocationPart_Start;
+   private ActionAppendLocationPart_End   _actionAppendLocationPart_End;
+   private ActionRemoveLocation_All       _actionRemoveLocation_All;
+   private ActionRemoveLocation_Start     _actionRemoveLocation_Start;
+   private ActionRemoveLocation_End       _actionRemoveLocation_End;
+   private ActionSetLocation_Start        _actionSetLocation_Start;
+   private ActionSetLocation_End          _actionSetLocation_End;
 
-   private Control                       _ownerControl;
+   private Control                        _ownerControl;
 
-   private ArrayList<TourData>           _allSelectedTours;
+   private ArrayList<TourData>            _allSelectedTours;
 
    /**
     * When <code>null</code> then a start or end location is not hovered
     */
-   private Boolean                       _isStartLocationInContextMenu;
+   private Boolean                        _isStartLocationInContextMenu;
 
-   private class ActionAppendLocationPart_Menu extends SubMenu {
-
-      private boolean _isSetStartLocation;
-      private boolean _isSetEndLocation;
-
-      public ActionAppendLocationPart_Menu(final boolean isSetStartLocation, final boolean isSetEndLocation) {
-
-         super(Messages.Tour_Location_Action_AppendLocationPart, AS_DROP_DOWN_MENU);
-
-         _isSetStartLocation = isSetStartLocation;
-         _isSetEndLocation = isSetEndLocation;
-      }
-
-      @Override
-      public void enableActions() {}
-
-      @Override
-      public void fillMenu(final Menu menu) {
-
-         fillMenu_AllPartActions(menu, _isSetStartLocation, _isSetEndLocation);
-      }
-   }
-
-   private class ActionAppendLocationPart_Part extends Action {
+   private class ActionAppendLocationPart extends Action {
 
       private LocationPartID _partID_Start;
       private LocationPartID _partID_End;
@@ -140,30 +124,32 @@ public class ActionSetStartEndLocation extends SubMenu {
       private boolean        _isSetStartLocation;
       private boolean        _isSetEndLocation;
 
-      public ActionAppendLocationPart_Part(final String actionText,
-                                           final String actionTooltip,
+      public ActionAppendLocationPart(final String actionText,
+                                      final String actionTooltip,
 
-                                           final boolean isSetStartLocation,
-                                           final boolean isSetEndLocation,
+                                      final boolean isSetStartLocation,
+                                      final boolean isSetEndLocation,
 
-                                           final LocationPartID startPartID,
-                                           final LocationPartID endPartID) {
+                                      final LocationPartID startPartID,
+                                      final LocationPartID endPartID) {
 
          super(actionText, AS_PUSH_BUTTON);
+
+         setToolTipText(actionTooltip);
 
          _isSetStartLocation = isSetStartLocation;
          _isSetEndLocation = isSetEndLocation;
 
          _partID_Start = startPartID;
          _partID_End = endPartID;
-
-         setToolTipText(actionTooltip);
       }
 
       @Override
       public void run() {
 
-         actionAppendLocationPart(
+         TourLocationManager.appendLocationPart(
+
+               _allSelectedTours,
 
                _partID_Start,
                _partID_End,
@@ -172,6 +158,64 @@ public class ActionSetStartEndLocation extends SubMenu {
                _isSetEndLocation);
       }
 
+   }
+
+   private class ActionAppendLocationPart_All extends SubMenu {
+
+      public ActionAppendLocationPart_All() {
+
+         super(Messages.Tour_Location_Action_AppendLocationPart_All, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         addActionToMenu(_actionPartTitle_All);
+
+         fillMenu_AllPartActions(menu, true, true);
+      }
+   }
+
+   private class ActionAppendLocationPart_End extends SubMenu {
+
+      public ActionAppendLocationPart_End() {
+
+         super(Messages.Tour_Location_Action_AppendLocationPart_End, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         addActionToMenu(_actionPartTitle_End);
+
+         fillMenu_AllPartActions(menu, false, true);
+      }
+   }
+
+   private class ActionAppendLocationPart_Start extends SubMenu {
+
+      public ActionAppendLocationPart_Start() {
+
+         super(Messages.Tour_Location_Action_AppendLocationPart_Start, AS_DROP_DOWN_MENU);
+
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         addActionToMenu(_actionPartTitle_Start);
+
+         fillMenu_AllPartActions(menu, true, false);
+      }
    }
 
    private class ActionEditProfiles extends Action {
@@ -291,7 +335,7 @@ public class ActionSetStartEndLocation extends SubMenu {
          final int numProfiles = allProfiles.size();
          if (numProfiles > 0) {
 
-            addActionToMenu(_actionProfileTitle);
+            addActionToMenu(_actionProfileTitle_End);
 
             fillMenu_AddAllProfileActions(menu, allProfiles, false, true);
          }
@@ -316,7 +360,7 @@ public class ActionSetStartEndLocation extends SubMenu {
          final int numProfiles = allProfiles.size();
          if (numProfiles > 0) {
 
-            addActionToMenu(_actionProfileTitle);
+            addActionToMenu(_actionProfileTitle_Start);
 
             fillMenu_AddAllProfileActions(menu, allProfiles, true, false);
          }
@@ -388,23 +432,15 @@ public class ActionSetStartEndLocation extends SubMenu {
    public ActionSetStartEndLocation(final ITourProvider tourProvider,
                                     final Control ownerControl) {
 
-      super(Messages.Tour_Location_Action_SetLocation_StartEnd, AS_DROP_DOWN_MENU);
+      super(Messages.Tour_Location_Action_ManageStartEndLocation, AS_DROP_DOWN_MENU);
 
-      setToolTipText(Messages.Tour_Location_Action_SetLocation_StartEnd_Tooltip);
+      setToolTipText(Messages.Tour_Location_Action_ManageStartEndLocation_Tooltip);
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd));
 
       _tourProvider = tourProvider;
       _ownerControl = ownerControl;
 
       createActions();
-   }
-
-   private void actionAppendLocationPart(final LocationPartID partID_Start,
-                                         final LocationPartID partID_End,
-                                         final boolean isSetStartLocation,
-                                         final boolean isSetEndLocation) {
-      // TODO Auto-generated method stub
-
    }
 
    private void actionOpenProfileSlideout() {
@@ -423,8 +459,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             MessageDialog.openInformation(
                   _ownerControl.getShell(),
-                  "Open Profile Editor",
-                  "Geo positions are not available");
+                  Messages.Tour_Location_Dialog_OpenProfileEditor_Title,
+                  Messages.Tour_Location_Dialog_OpenProfileEditor_NoGeoPosition_Message);
 
             return;
          }
@@ -486,18 +522,35 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private void createActions() {
 
-      // create a dummy action for the profile title
-      _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle) {};
-      _actionProfileTitle.setEnabled(false);
+// SET_FORMATTING_OFF
 
-      _actionEditProfiles = new ActionEditProfiles();
+      _actionEditProfiles              = new ActionEditProfiles();
 
-      _actionRemoveLocation_All = new ActionRemoveLocation_All();
-      _actionRemoveLocation_Start = new ActionRemoveLocation_Start();
-      _actionRemoveLocation_End = new ActionRemoveLocation_End();
-      _actionSetLocation_Start = new ActionSetLocation_Start();
-      _actionSetLocation_End = new ActionSetLocation_End();
-      _actionAppendLocationPart = new ActionAppendLocationPart_Menu(true, true);
+      _actionAppendLocationPart_All    = new ActionAppendLocationPart_All();
+      _actionAppendLocationPart_Start  = new ActionAppendLocationPart_Start();
+      _actionAppendLocationPart_End    = new ActionAppendLocationPart_End();
+      _actionRemoveLocation_All        = new ActionRemoveLocation_All();
+      _actionRemoveLocation_Start      = new ActionRemoveLocation_Start();
+      _actionRemoveLocation_End        = new ActionRemoveLocation_End();
+      _actionSetLocation_Start         = new ActionSetLocation_Start();
+      _actionSetLocation_End           = new ActionSetLocation_End();
+
+      // create dummy actions for the part/profile title
+      _actionPartTitle_All             = new Action(Messages.Tour_Location_Action_PartTitle_All) {};
+      _actionPartTitle_Start           = new Action(Messages.Tour_Location_Action_PartTitle_Start) {};
+      _actionPartTitle_End             = new Action(Messages.Tour_Location_Action_PartTitle_End) {};
+      _actionProfileTitle_All          = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
+      _actionProfileTitle_Start        = new Action(Messages.Tour_Location_Action_ProfileTitle_Start) {};
+      _actionProfileTitle_End          = new Action(Messages.Tour_Location_Action_ProfileTitle_End) {};
+
+      _actionPartTitle_All             .setEnabled(false);
+      _actionPartTitle_Start           .setEnabled(false);
+      _actionPartTitle_End             .setEnabled(false);
+      _actionProfileTitle_All          .setEnabled(false);
+      _actionProfileTitle_Start        .setEnabled(false);
+      _actionProfileTitle_End          .setEnabled(false);
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -508,18 +561,21 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       _allSelectedTours = _tourProvider.getSelectedTours();
 
-      addActionToMenu(_actionAppendLocationPart);
-      addActionToMenu(_actionSetLocation_Start);
-      addActionToMenu(_actionSetLocation_End);
+      addActionToMenu(_actionAppendLocationPart_Start);
+      addActionToMenu(_actionAppendLocationPart_End);
+      addActionToMenu(_actionAppendLocationPart_All);
 
       addSeparatorToMenu();
+
+      addActionToMenu(_actionSetLocation_Start);
+      addActionToMenu(_actionSetLocation_End);
 
       // create actions for each profile
       final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
       final int numProfiles = allProfiles.size();
       if (numProfiles > 0) {
 
-         addActionToMenu(_actionProfileTitle);
+         addActionToMenu(_actionProfileTitle_All);
 
          fillMenu_AddAllProfileActions(menu, allProfiles, true, true);
 
@@ -640,12 +696,16 @@ public class ActionSetStartEndLocation extends SubMenu {
          allEndLocationParts = null;
       }
 
+      if (allLocationParts == null) {
+         return;
+      }
+
       /*
        * All parts are now in allLocationParts, when available
        */
       String actionText = null;
       String actionTooltip = null;
-      boolean isShowDefaultLabel = false;
+      boolean isCreateAction = true;
 
       for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
 
@@ -667,7 +727,9 @@ public class ActionSetStartEndLocation extends SubMenu {
             endPartID = partItem.partID_End;
 
             actionText = locationText;
-            actionTooltip = partItem.partLabel_Start;
+            actionTooltip = partItem.partLabel_Start != null
+                  ? partItem.partLabel_Start
+                  : partItem.partLabel_End;
 
          } else if (isSetStartLocation) {
 
@@ -680,7 +742,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             } else {
 
-               isShowDefaultLabel = true;
+               isCreateAction = false;
             }
 
          } else if (isSetEndLocation) {
@@ -694,36 +756,32 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             } else {
 
-               isShowDefaultLabel = true;
+               isCreateAction = false;
             }
 
          } else {
-
-            isShowDefaultLabel = true;
-         }
-
-         if (isShowDefaultLabel) {
 
             actionText = partItem.partLabel_Start;
             actionTooltip = UI.EMPTY_STRING;
          }
 
-         addActionToMenu(menu,
+         if (isCreateAction) {
 
-               new ActionAppendLocationPart_Part(
+            addActionToMenu(menu,
 
-                     actionText,
-                     actionTooltip,
+                  new ActionAppendLocationPart(
 
-                     isSetStartLocation,
-                     isSetEndLocation,
+                        actionText,
+                        actionTooltip,
 
-                     startPartID,
-                     endPartID));
+                        isSetStartLocation,
+                        isSetEndLocation,
+
+                        startPartID,
+                        endPartID));
+         }
 
       }
-
-//      _isStartLocationInContextMenu;
    }
 
    private Map<LocationPartID, PartItem> getAllPartItems(final TourLocation tourLocation, final boolean isSetStartLocation) {

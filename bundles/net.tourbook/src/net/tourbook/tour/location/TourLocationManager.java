@@ -287,6 +287,88 @@ public class TourLocationManager {
    }
 
    /**
+    * Append start/end part to the existing start/end places
+    *
+    * @param allTourData
+    * @param partID_Start
+    * @param partID_End
+    * @param isSetStartLocation
+    * @param isSetEndLocation
+    */
+   public static void appendLocationPart(final ArrayList<TourData> allTourData,
+                                         final LocationPartID partID_Start,
+                                         final LocationPartID partID_End,
+                                         final boolean isSetStartLocation,
+                                         final boolean isSetEndLocation) {
+
+      final ArrayList<TourData> modifiedTours = new ArrayList<>();
+
+      for (final TourData tourData : allTourData) {
+
+         final TourLocation tourLocationStart = tourData.getTourLocationStart();
+         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+         String startPart = null;
+         String endPart = null;
+
+         final boolean isStartLocationAvailable = tourLocationStart != null;
+         final boolean isEndLocationAvailable = tourLocationEnd != null;
+
+         if (isStartLocationAvailable) {
+            startPart = tourLocationStart.getPartValue(partID_Start);
+         }
+
+         if (isEndLocationAvailable) {
+            endPart = tourLocationStart.getPartValue(partID_End);
+         }
+
+         boolean isModified = false;
+
+         if (isSetStartLocation && startPart != null) {
+
+            String tourStartPlace = tourData.getTourStartPlace();
+
+            if (tourStartPlace.length() > 0) {
+
+               tourStartPlace += UI.COMMA_SPACE;
+            }
+
+            tourStartPlace += startPart;
+
+            tourData.setTourStartPlace(tourStartPlace);
+
+            isModified = true;
+         }
+
+         if (isSetEndLocation && endPart != null) {
+
+            String tourEndPlace = tourData.getTourEndPlace();
+
+            if (tourEndPlace.length() > 0) {
+
+               tourEndPlace += UI.COMMA_SPACE;
+            }
+
+            tourEndPlace += endPart;
+
+            tourData.setTourEndPlace(tourEndPlace);
+
+            isModified = true;
+         }
+
+         if (isModified) {
+
+            modifiedTours.add(tourData);
+         }
+      }
+
+      if (modifiedTours.size() > 0) {
+
+         TourManager.saveModifiedTours(modifiedTours);
+      }
+   }
+
+   /**
     * Append text to the display name in {@link #_displayNameBuffer}
     *
     * @param text

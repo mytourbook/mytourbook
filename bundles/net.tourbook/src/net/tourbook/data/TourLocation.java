@@ -16,6 +16,7 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -29,7 +30,9 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.location.LocationPartID;
 
 /**
  * Possible address fields are from <br>
@@ -390,6 +393,37 @@ public class TourLocation implements Serializable {
                   : 0;
 
       return longitudeDiff;
+   }
+
+   /**
+    * @param partID
+    *
+    * @return Returns the field value from the field which name is from the provided partID
+    *         {@link LocationPartID#name()}
+    */
+   public String getPartValue(final LocationPartID partID) {
+
+      if (partID == null) {
+         return null;
+      }
+
+      try {
+
+         final Field addressField = getClass().getField(partID.name());
+
+         final Object fieldValue = addressField.get(this);
+
+         if (fieldValue instanceof final String textValue) {
+
+            return textValue;
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+
+         StatusUtil.log(e);
+      }
+
+      return null;
    }
 
    @Override

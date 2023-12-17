@@ -283,7 +283,7 @@ public class ActionTourLocation extends ContributionItem {
 
    private void createActions() {
 
-      _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle) {};
+      _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
       _actionProfileTitle.setEnabled(false);
 
       _actionRetrieveLocationAgain = new ActionRetrieveLocationAgain();

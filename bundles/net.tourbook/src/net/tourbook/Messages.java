@@ -3113,7 +3113,9 @@ public class Messages extends NLS {
    public static String        Tour_Info_Label_AllFields;
    public static String        Tour_Info_Label_AllFields_Tooltip;
 
-   public static String        Tour_Location_Action_AppendLocationPart;
+   public static String        Tour_Location_Action_AppendLocationPart_All;
+   public static String        Tour_Location_Action_AppendLocationPart_End;
+   public static String        Tour_Location_Action_AppendLocationPart_Start;
    public static String        Tour_Location_Action_BoundingBox_Increase;
    public static String        Tour_Location_Action_BoundingBox_Decrease;
    public static String        Tour_Location_Action_CombineBoundingBox;
@@ -3132,8 +3134,13 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_One;
    public static String        Tour_Location_Action_One_Tooltip;
    public static String        Tour_Location_Action_OpenProfileEditor;
+   public static String        Tour_Location_Action_PartTitle_All;
+   public static String        Tour_Location_Action_PartTitle_End;
+   public static String        Tour_Location_Action_PartTitle_Start;
    public static String        Tour_Location_Action_Profile_Tooltip;
-   public static String        Tour_Location_Action_ProfileTitle;
+   public static String        Tour_Location_Action_ProfileTitle_All;
+   public static String        Tour_Location_Action_ProfileTitle_End;
+   public static String        Tour_Location_Action_ProfileTitle_Start;
    public static String        Tour_Location_Action_RelocateBoundingBox;
    public static String        Tour_Location_Action_RelocateBoundingBox_Tooltip;
    public static String        Tour_Location_Action_RemoveLocation_All;
@@ -3142,12 +3149,13 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
    public static String        Tour_Location_Action_SetLocation_End;
-
    public static String        Tour_Location_Action_SetLocation_Start;
-   public static String        Tour_Location_Action_SetLocation_StartEnd;
-   public static String        Tour_Location_Action_SetLocation_StartEnd_Tooltip;
+   public static String        Tour_Location_Action_ManageStartEndLocation;
+   public static String        Tour_Location_Action_ManageStartEndLocation_Tooltip;
    public static String        Tour_Location_Action_ShowLocationInfo_Tooltip;
    public static String        Tour_Location_DefaultProfileName;
+   public static String        Tour_Location_Dialog_OpenProfileEditor_NoGeoPosition_Message;
+   public static String        Tour_Location_Dialog_OpenProfileEditor_Title;
 
    public static String        Tour_Log_Action_Clear_Tooltip;
    public static String        Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip;
