@@ -203,6 +203,7 @@ public class TourLocationManager {
 
          //                                                          this is a computed part
          Map.entry(LocationPartID.settlementSmall,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementSmall),
+         Map.entry(LocationPartID.settlementLarge,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementLarge),
 
          Map.entry(LocationPartID.continent,                         Messages.Tour_Location_Part_Continent),
          Map.entry(LocationPartID.country,                           Messages.Tour_Location_Part_Country),
@@ -319,7 +320,7 @@ public class TourLocationManager {
          }
 
          if (isEndLocationAvailable) {
-            endPart = tourLocationStart.getPartValue(partID_End);
+            endPart = tourLocationEnd.getPartValue(partID_End);
          }
 
          boolean isModified = false;

@@ -292,6 +292,8 @@ public class TourLocation implements Serializable {
 
    @Transient
    public String settlementSmall;
+   @Transient
+   public String settlementLarge;
 
    @Transient
    public double latitude;
@@ -546,7 +548,37 @@ public class TourLocation implements Serializable {
 
       ;
 
+      settlementLarge =
+
+           city               != null ? city //             > 100'000            Grossstadt
+         : town               != null ? town //               10'000 - 100'000   Stadt
+         : borough            != null ? borough //                               Stadtbezirk
+         : suburb             != null ? suburb //                                Stadtteil
+         : quarter            != null ? quarter //                               Ortsteil
+         : village            != null ? village //           < 10'000            Dorf
+         : city_district      != null ? city_district //                         Stadtviertel
+         : neighbourhood      != null ? neighbourhood //                         Stadtviertel
+         : city_block         != null ? city_block //                            Häuserblock
+         : hamlet             != null ? hamlet //              100-1000          kleine Siedlung / Weiler
+         : isolated_dwelling  != null ? isolated_dwelling //   few               Einzelsiedlung
+         : farm               != null ? farm //                few               Bauernhof
+         : allotments         != null ? allotments //          few               Schrebergärten
+         : null
+
+      ;
+
+      if (settlementLarge == null) {
+
+         settlementLarge =
+
+               state    != null ? state //
+             : county   != null ? county //
+             : country
+         ;
+      }
+
 // SET_FORMATTING_ON
+
    }
 
    @Override
@@ -618,6 +650,7 @@ public class TourLocation implements Serializable {
             + log(" postcode            = ", postcode) //                  //$NON-NLS-1$
 
             + log(" settlementSmall     = ", settlementSmall) //           //$NON-NLS-1$
+            + log(" settlementLarge     = ", settlementLarge) //           //$NON-NLS-1$
 
             + NL
 

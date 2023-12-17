@@ -175,7 +175,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          addActionToMenu(_actionPartTitle_All);
 
-         fillMenu_AllPartActions(menu, true, true);
+         fillMenu_AddAll_PartActions(menu, true, true);
       }
    }
 
@@ -194,7 +194,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          addActionToMenu(_actionPartTitle_End);
 
-         fillMenu_AllPartActions(menu, false, true);
+         fillMenu_AddAll_PartActions(menu, false, true);
       }
    }
 
@@ -214,7 +214,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          addActionToMenu(_actionPartTitle_Start);
 
-         fillMenu_AllPartActions(menu, true, false);
+         fillMenu_AddAll_PartActions(menu, true, false);
       }
    }
 
@@ -337,7 +337,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             addActionToMenu(_actionProfileTitle_End);
 
-            fillMenu_AddAllProfileActions(menu, allProfiles, false, true);
+            fillMenu_AddAll_ProfileActions(menu, allProfiles, false, true);
          }
       }
    }
@@ -362,7 +362,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             addActionToMenu(_actionProfileTitle_Start);
 
-            fillMenu_AddAllProfileActions(menu, allProfiles, true, false);
+            fillMenu_AddAll_ProfileActions(menu, allProfiles, true, false);
          }
       }
    }
@@ -559,6 +559,7 @@ public class ActionSetStartEndLocation extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
+      // get tours which are needed in the menu actions
       _allSelectedTours = _tourProvider.getSelectedTours();
 
       addActionToMenu(_actionAppendLocationPart_Start);
@@ -570,14 +571,13 @@ public class ActionSetStartEndLocation extends SubMenu {
       addActionToMenu(_actionSetLocation_Start);
       addActionToMenu(_actionSetLocation_End);
 
-      // create actions for each profile
+      // create an action for each profile
       final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
-      final int numProfiles = allProfiles.size();
-      if (numProfiles > 0) {
+      if (allProfiles.size() > 0) {
 
          addActionToMenu(_actionProfileTitle_All);
 
-         fillMenu_AddAllProfileActions(menu, allProfiles, true, true);
+         fillMenu_AddAll_ProfileActions(menu, allProfiles, true, true);
 
          addSeparatorToMenu();
       }
@@ -591,43 +591,9 @@ public class ActionSetStartEndLocation extends SubMenu {
       addActionToMenu(_actionEditProfiles);
    }
 
-   /**
-    * Fill menu with all profile actions
-    *
-    * @param menu
-    * @param allProfiles
-    * @param isSetStartLocation
-    * @param isSetEndLocation
-    */
-   private void fillMenu_AddAllProfileActions(final Menu menu,
-                                              final List<TourLocationProfile> allProfiles,
-                                              final boolean isSetStartLocation,
-                                              final boolean isSetEndLocation) {
-
-      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
-
-      // sort profiles by name
-      Collections.sort(allProfiles);
-
-      for (final TourLocationProfile locationProfile : allProfiles) {
-
-         final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
-
-         addActionToMenu(menu,
-
-               new ActionLocationProfile(
-
-                     locationProfile,
-                     isDefaultProfile,
-
-                     isSetStartLocation,
-                     isSetEndLocation));
-      }
-   }
-
-   private void fillMenu_AllPartActions(final Menu menu,
-                                        final boolean isSetStartLocation,
-                                        final boolean isSetEndLocation) {
+   private void fillMenu_AddAll_PartActions(final Menu menu,
+                                            final boolean isSetStartLocation,
+                                            final boolean isSetEndLocation) {
 
       // create actions for each part
 
@@ -648,8 +614,9 @@ public class ActionSetStartEndLocation extends SubMenu {
       Map<LocationPartID, PartItem> allLocationParts = isStartLocationAvailable ? getAllPartItems(tourLocationStart, true) : null;
       Map<LocationPartID, PartItem> allEndLocationParts = isEndLocationAvailable ? getAllPartItems(tourLocationEnd, false) : null;
 
-      // merge both part item maps into one map
       if (isStartLocationAvailable && isEndLocationAvailable) {
+
+         // merge both part item maps into one map
 
          for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
 
@@ -784,6 +751,40 @@ public class ActionSetStartEndLocation extends SubMenu {
       }
    }
 
+   /**
+    * Fill menu with all profile actions
+    *
+    * @param menu
+    * @param allProfiles
+    * @param isSetStartLocation
+    * @param isSetEndLocation
+    */
+   private void fillMenu_AddAll_ProfileActions(final Menu menu,
+                                               final List<TourLocationProfile> allProfiles,
+                                               final boolean isSetStartLocation,
+                                               final boolean isSetEndLocation) {
+
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+      // sort profiles by name
+      Collections.sort(allProfiles);
+
+      for (final TourLocationProfile locationProfile : allProfiles) {
+
+         final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
+
+         addActionToMenu(menu,
+
+               new ActionLocationProfile(
+
+                     locationProfile,
+                     isDefaultProfile,
+
+                     isSetStartLocation,
+                     isSetEndLocation));
+      }
+   }
+
    private Map<LocationPartID, PartItem> getAllPartItems(final TourLocation tourLocation, final boolean isSetStartLocation) {
 
       final Map<LocationPartID, PartItem> allPartItems = new LinkedHashMap<>();
@@ -883,7 +884,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
                : startLocationText + LOCATION_SEPARATOR + endLocationText;
 
-         action.setText(locationText);
+         // indent action to be better visible
+         action.setText(UI.SPACE8 + locationText);
          action.setToolTipText(locationTooltip);
 
       } else if (isSetStartLocation) {
@@ -917,7 +919,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       if (isShowDefaultLabel) {
 
-         action.setText(profileName);
+         // indent action to be better visible
+         action.setText(UI.SPACE8 + profileName);
          action.setToolTipText(partText);
       }
    }

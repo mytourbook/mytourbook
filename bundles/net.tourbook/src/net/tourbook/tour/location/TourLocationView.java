@@ -453,6 +453,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          case TableColumnFactory.LOCATION_PART_Postcode_ID:          rc = comparePostcode(location1,                 location2);                   break;
 
          case TableColumnFactory.LOCATION_PART_SettlementSmall_ID:   rc = compareText(location1.settlementSmall,     location2.settlementSmall);   break;
+         case TableColumnFactory.LOCATION_PART_SettlementLarge_ID:   rc = compareText(location1.settlementLarge,     location2.settlementLarge);   break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
 
@@ -1065,6 +1066,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
       defineColumn_Part_42_SettlementSmall();
+      defineColumn_Part_43_SettlementLarge();
       defineColumn_Part_40_Postcode();
 
       // Road
@@ -1511,6 +1513,22 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             cell.setText(((LocationItem) cell.getElement()).tourLocation.settlementSmall);
+         }
+      });
+   }
+
+   private void defineColumn_Part_43_SettlementLarge() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_PART_SettlementLarge.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new TooltipLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((LocationItem) cell.getElement()).tourLocation.settlementLarge);
          }
       });
    }
