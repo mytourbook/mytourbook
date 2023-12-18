@@ -48,6 +48,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.DialogMarker;
@@ -377,18 +378,18 @@ public class TourBlogView extends ViewPart {
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private void buildWeatherSection(final StringBuilder sb, String tourWeather, final boolean isDescription) {
-      if (UI.IS_SCRAMBLE_DATA) {
-         tourWeather = UI.scrambleText(tourWeather);
-      }
+   private String buildWeatherSection(final Set<TourTag> tourTags) {
 
-      if (isDescription) {
-         // write spacer
-         sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
-      }
+      final StringBuilder sb = new StringBuilder();
 
-      sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+//      if (UI.IS_SCRAMBLE_DATA) {
+//         tourWeather = UI.scrambleText(tourWeather);
+//      }
+
+      sb.append("<div class='title'>" + "Tour TagsMessages.tour_editor_section_weather" + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      //sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+
+      return sb.toString();
    }
 
    private void clearView() {
@@ -557,7 +558,12 @@ public class TourBlogView extends ViewPart {
                 */
                if (isWeather) {
 
-                  buildWeatherSection(sb, tourWeather, isDescription);
+                  if (isDescription) {
+                     // write spacer
+                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+                  }
+
+                  sb.append(buildWeatherSection(_tourData.getTourTags()));
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
