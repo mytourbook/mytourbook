@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -1049,6 +1050,9 @@ public class TourLocationManager {
                                                   final TourLocationData existingLocationData,
                                                   final int zoomlevel) {
 
+// enable logging when debugging
+//    _isLogging_AddressRetrieval = true;
+
       /*
        * Check if tour is contained in existing location data (which is not yet saved)
        */
@@ -1144,26 +1148,35 @@ public class TourLocationManager {
       final long retrievalStartTime = System.currentTimeMillis();
       _lastRetrievalTimeMS = retrievalStartTime;
 
+      final String language = Locale.getDefault().getLanguage();
+
       final String requestUrl = UI.EMPTY_STRING
 
             + "https://nominatim.openstreetmap.org/reverse?" //$NON-NLS-1$
 
-            + "format=json" //               //$NON-NLS-1$
-            + "&addressdetails=1" //         //$NON-NLS-1$
+            + "format=json" //                     //$NON-NLS-1$
+            + "&addressdetails=1" //               //$NON-NLS-1$
 
-            + "&lat=" + latitude //          //$NON-NLS-1$
-            + "&lon=" + longitude //         //$NON-NLS-1$
-            + "&zoom=" + zoomLevel //        //$NON-NLS-1$
+            + "&lat=" + latitude //                //$NON-NLS-1$
+            + "&lon=" + longitude //               //$NON-NLS-1$
+            + "&zoom=" + zoomLevel //              //$NON-NLS-1$
 
-//          + "&polygon_text=1" //           //$NON-NLS-1$
-//          + "&polygon_geojson=1" //        //$NON-NLS-1$
+            + "&accept-language=" + language //    //$NON-NLS-1$
 
-//          + "&extratags=1" //$NON-NLS-1$
-//          + "&namedetails=1" //$NON-NLS-1$
+//          + "&polygon_text=1" //                 //$NON-NLS-1$
+//          + "&polygon_geojson=1" //              //$NON-NLS-1$
+
+//          + "&extratags=1" //                    //$NON-NLS-1$
+//          + "&namedetails=1" //                  //$NON-NLS-1$
+
 //          + "&layer=address,poi,railway,natural,manmade" //$NON-NLS-1$
 
-//          + "&accept-language=1" //$NON-NLS-1$
       ;
+
+      if (_isLogging_AddressRetrieval) {
+
+         System.out.println(requestUrl);
+      }
 
       String downloadedData = UI.EMPTY_STRING;
 

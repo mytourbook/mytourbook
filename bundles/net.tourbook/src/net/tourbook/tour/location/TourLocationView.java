@@ -1065,8 +1065,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_40_City();
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
-      defineColumn_Part_42_SettlementSmall();
       defineColumn_Part_43_SettlementLarge();
+      defineColumn_Part_42_SettlementSmall();
       defineColumn_Part_40_Postcode();
 
       // Road
