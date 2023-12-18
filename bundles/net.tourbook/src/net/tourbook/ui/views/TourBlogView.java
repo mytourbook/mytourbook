@@ -25,6 +25,7 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -389,26 +390,25 @@ public class TourBlogView extends ViewPart {
 //      }
 
       //todo fb take CG code to convert image to base 64
-
-      for (final TourTag tag : tourTags) {
-
-         final Image tagImage = TagManager.getTagImage(tag);
-
-      }
-
+//todo fb refresh the view when tags are modified, just like for the tour data editor view
       sb.append("<div class='title'>" + "Tour TagsMessages.tour_editor_section_weather" + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<table>" + NL); //$NON-NLS-1$
+      sb.append("<table border=\"1\">" + NL); //$NON-NLS-1$
 
+      sb.append("<tr>" + NL); //$NON-NLS-1$
       for (final TourTag tag : tourTags) {
 
          final Image tagImage = TagManager.getTagImage(tag);
-         sb.append("<tr>" + NL); //$NON-NLS-1$
-         sb.append("<td>Maria Anders</td>" + NL); //$NON-NLS-1$
-
-         sb.append("</tr>" + NL); //$NON-NLS-1$
+         final var toto = Util.serializeObject(tagImage);
+         final byte[] encoded = Base64.getEncoder().encode(toto);
+         sb.append("<td>");
+         sb.append(new String(encoded) + NL);
+         sb.append("0h" + NL); //$NON-NLS-1$
+         sb.append("0km"); //$NON-NLS-1$
+         sb.append("</td>");
 
       }
 
+      sb.append("</tr>" + NL); //$NON-NLS-1$
       sb.append("</table>" + NL); //$NON-NLS-1$
       //sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 

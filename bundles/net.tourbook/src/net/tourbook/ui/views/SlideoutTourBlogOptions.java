@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour blog options
  */
-public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToDefault {
+class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE         = net.tourbook.web.Messages.App_Web_Label_ContentFontSize;
    private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP = net.tourbook.web.Messages.App_Web_Label_ContentFontSize_Tooltip;
@@ -60,6 +60,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
    /*
     * UI controls
     */
+   private Button  _chkDisplayTourTags;
    private Button  _chkDrawMarkerWithDefaultColor;
    private Button  _chkShowHiddenMarker;
 
@@ -71,10 +72,10 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
     * @param tourBlogView
     * @param tourBlogState
     */
-   public SlideoutTourBlogOptions(final Control ownerControl,
-                                  final ToolBar toolBar,
-                                  final TourBlogView tourBlogView,
-                                  final IDialogSettings tourBlogState) {
+   SlideoutTourBlogOptions(final Control ownerControl,
+                           final ToolBar toolBar,
+                           final TourBlogView tourBlogView,
+                           final IDialogSettings tourBlogState) {
 
       super(ownerControl, toolBar);
 
@@ -177,6 +178,18 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
             _chkDrawMarkerWithDefaultColor.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
             _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDrawMarkerWithDefaultColor);
+
+         }
+         {
+            /*
+             * Display the tour tags
+             */
+
+            _chkDisplayTourTags = new Button(container, SWT.CHECK);
+            _chkDisplayTourTags.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
+            _chkDisplayTourTags.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
+            _chkDisplayTourTags.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDisplayTourTags);
 
          }
          {
