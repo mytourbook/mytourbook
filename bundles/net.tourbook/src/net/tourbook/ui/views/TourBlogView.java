@@ -51,6 +51,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.DialogQuickEdit;
 import net.tourbook.tour.ITourEventListener;
@@ -87,6 +88,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
@@ -386,7 +388,28 @@ public class TourBlogView extends ViewPart {
 //         tourWeather = UI.scrambleText(tourWeather);
 //      }
 
+      //todo fb take CG code to convert image to base 64
+
+      for (final TourTag tag : tourTags) {
+
+         final Image tagImage = TagManager.getTagImage(tag);
+
+      }
+
       sb.append("<div class='title'>" + "Tour TagsMessages.tour_editor_section_weather" + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<table>" + NL); //$NON-NLS-1$
+
+      for (final TourTag tag : tourTags) {
+
+         final Image tagImage = TagManager.getTagImage(tag);
+         sb.append("<tr>" + NL); //$NON-NLS-1$
+         sb.append("<td>Maria Anders</td>" + NL); //$NON-NLS-1$
+
+         sb.append("</tr>" + NL); //$NON-NLS-1$
+
+      }
+
+      sb.append("</table>" + NL); //$NON-NLS-1$
       //sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
       return sb.toString();
