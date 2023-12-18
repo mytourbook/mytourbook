@@ -380,7 +380,7 @@ public class TourBlogView extends ViewPart {
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private String buildWeatherSection(final Set<TourTag> tourTags) {
+   private String buildTagsSection(final Set<TourTag> tourTags) {
 
       final StringBuilder sb = new StringBuilder();
 
@@ -411,6 +411,20 @@ public class TourBlogView extends ViewPart {
 
       sb.append("</table>" + NL); //$NON-NLS-1$
       //sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+
+      return sb.toString();
+   }
+
+   private String buildWeatherSection(String tourWeather) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourWeather = UI.scrambleText(tourWeather);
+      }
+
+      sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
       return sb.toString();
    }
@@ -586,7 +600,21 @@ public class TourBlogView extends ViewPart {
                      sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
                   }
 
-                  sb.append(buildWeatherSection(_tourData.getTourTags()));
+                  sb.append(buildWeatherSection(tourWeather));
+               }
+
+               /*
+                * Tags
+                */
+               final Set<TourTag> tourTags = _tourData.getTourTags();
+               if (!tourTags.isEmpty()) {
+
+                  if (isDescription || isWeather) {
+                     // write spacer
+                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+                  }
+
+                  sb.append(buildTagsSection(tourTags));
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
