@@ -413,9 +413,10 @@ public class TourBlogView extends ViewPart {
 
       sb.append("</tr>" + NL); //$NON-NLS-1$
       sb.append("</table>" + NL); //$NON-NLS-1$
-      //sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
-      return sb.toString();
+      final String tagsSectionString = WEB.convertHTML_LineBreaks(sb.toString());
+
+      return tagsSectionString;
    }
 
    private String buildWeatherSection(String tourWeather) {
