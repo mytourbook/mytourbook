@@ -384,37 +384,38 @@ public class TourBlogView extends ViewPart {
 
       final StringBuilder sb = new StringBuilder();
 
-//      if (UI.IS_SCRAMBLE_DATA) {
-//         tourWeather = UI.scrambleText(tourWeather);
-//      }
-
-      //todo fb take CG code to convert image to base 64
 //todo fb refresh the view when tags are modified, just like for the tour data editor view
       sb.append("<div class='title'>" + Messages.tour_editor_label_tour_tag + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<table border=\"1\">" + NL); //$NON-NLS-1$
+      sb.append("<table>" + NL); //$NON-NLS-1$
 
       sb.append("<tr>" + NL); //$NON-NLS-1$
+      final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
       for (final TourTag tag : tourTags) {
 
          sb.append("<td>");
 
          final Image tagImage = TagManager.getTagImage(tag);
          if (tagImage != null) {
+
             final String imageBase64 = Util.imageToBase64(tagImage);
             sb.append("<img src=\"data:image/png;base64,");
             sb.append(imageBase64);
             sb.append("\">" + NL);
          }
-         sb.append("0h" + NL); //$NON-NLS-1$
-         sb.append("0km"); //$NON-NLS-1$
-         sb.append("</td>");
+         final String tagText = tag.getTagName() + NL + tourTagsAccumulatedValues.get(tag.getTagId());
 
+         sb.append(tagText);
+         sb.append("</td>");
       }
 
       sb.append("</tr>" + NL); //$NON-NLS-1$
       sb.append("</table>" + NL); //$NON-NLS-1$
 
-      final String tagsSectionString = WEB.convertHTML_LineBreaks(sb.toString());
+      String tagsSectionString = WEB.convertHTML_LineBreaks(sb.toString());
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         tagsSectionString = UI.scrambleText(tagsSectionString);
+      }
 
       return tagsSectionString;
    }
