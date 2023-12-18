@@ -25,7 +25,6 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -397,11 +396,15 @@ public class TourBlogView extends ViewPart {
       sb.append("<tr>" + NL); //$NON-NLS-1$
       for (final TourTag tag : tourTags) {
 
-         final Image tagImage = TagManager.getTagImage(tag);
-         final var toto = Util.serializeObject(tagImage);
-         final byte[] encoded = Base64.getEncoder().encode(toto);
          sb.append("<td>");
-         sb.append(new String(encoded) + NL);
+
+         final Image tagImage = TagManager.getTagImage(tag);
+         if (tagImage != null) {
+         final String imageBase64 = Util.imageToBase64(tagImage);
+         sb.append("<img src=\"data:image/png;base64,");
+         sb.append(imageBase64);
+         sb.append("\">" + NL);
+         }
          sb.append("0h" + NL); //$NON-NLS-1$
          sb.append("0km"); //$NON-NLS-1$
          sb.append("</td>");

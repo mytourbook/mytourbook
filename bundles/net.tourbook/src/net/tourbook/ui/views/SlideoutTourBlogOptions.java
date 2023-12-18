@@ -186,8 +186,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
              */
 
             _chkDisplayTourTags = new Button(container, SWT.CHECK);
-            _chkDisplayTourTags.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
-            _chkDisplayTourTags.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
+            _chkDisplayTourTags.setText("Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor");
+            _chkDisplayTourTags.setToolTipText("Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip");
             _chkDisplayTourTags.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDisplayTourTags);
 
