@@ -280,9 +280,9 @@ public class TourBlogView extends ViewPart {
             return;
          }
 
-         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEventData)) {
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-            final List<TourData> modifiedTours = tourEventData.getModifiedTours();
+            final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
             if (modifiedTours != null) {
 
                // update modified tour
@@ -314,15 +314,15 @@ public class TourBlogView extends ViewPart {
 
             clearView();
 
-         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-            onSelectionChanged(selection);
+            onSelectionChanged((ISelection) eventData);
 
          } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-            if (eventData instanceof final SelectionTourMarker selectionTourMarker) {
+            if (eventData instanceof SelectionTourMarker) {
 
-               final TourData tourData = selectionTourMarker.getTourData();
+               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
 
                if (tourData != _tourData) {
 
@@ -390,7 +390,7 @@ public class TourBlogView extends ViewPart {
 
       //todo fb take CG code to convert image to base 64
 //todo fb refresh the view when tags are modified, just like for the tour data editor view
-      sb.append("<div class='title'>" + "Tour TagsMessages.tour_editor_section_weather" + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<div class='title'>" + Messages.tour_editor_label_tour_tag + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
       sb.append("<table border=\"1\">" + NL); //$NON-NLS-1$
 
       sb.append("<tr>" + NL); //$NON-NLS-1$
@@ -400,10 +400,10 @@ public class TourBlogView extends ViewPart {
 
          final Image tagImage = TagManager.getTagImage(tag);
          if (tagImage != null) {
-         final String imageBase64 = Util.imageToBase64(tagImage);
-         sb.append("<img src=\"data:image/png;base64,");
-         sb.append(imageBase64);
-         sb.append("\">" + NL);
+            final String imageBase64 = Util.imageToBase64(tagImage);
+            sb.append("<img src=\"data:image/png;base64,");
+            sb.append(imageBase64);
+            sb.append("\">" + NL);
          }
          sb.append("0h" + NL); //$NON-NLS-1$
          sb.append("0km"); //$NON-NLS-1$
