@@ -277,9 +277,9 @@ public class TourBlogView extends ViewPart {
             return;
          }
 
-         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEventData)) {
 
-            final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final List<TourData> modifiedTours = tourEventData.getModifiedTours();
             if (modifiedTours != null) {
 
                // update modified tour
@@ -311,15 +311,15 @@ public class TourBlogView extends ViewPart {
 
             clearView();
 
-         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
          } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-            if (eventData instanceof SelectionTourMarker) {
+            if (eventData instanceof final SelectionTourMarker selectionTourMarker) {
 
-               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+               final TourData tourData = selectionTourMarker.getTourData();
 
                if (tourData != _tourData) {
 
@@ -375,6 +375,20 @@ public class TourBlogView extends ViewPart {
       }
 
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   private void buildWeatherSection(final StringBuilder sb, String tourWeather, final boolean isDescription) {
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourWeather = UI.scrambleText(tourWeather);
+      }
+
+      if (isDescription) {
+         // write spacer
+         sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+      }
+
+      sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    private void clearView() {
@@ -483,7 +497,7 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       final String tourDescription = _tourData.getTourDescription();
-      String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
+      final String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
             isSaveWeatherLogInWeatherDescription // isWeatherDataSeparatorNewLine
@@ -543,17 +557,7 @@ public class TourBlogView extends ViewPart {
                 */
                if (isWeather) {
 
-                  if (UI.IS_SCRAMBLE_DATA) {
-                     tourWeather = UI.scrambleText(tourWeather);
-                  }
-
-                  if (isDescription) {
-                     // write spacer
-                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
-                  }
-
-                  sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+                  buildWeatherSection(sb, tourWeather, isDescription);
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
@@ -1066,11 +1070,10 @@ public class TourBlogView extends ViewPart {
 
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          _tourData = tourDataSelection.getTourData();
 
          if (_tourData == null) {
@@ -1080,22 +1083,20 @@ public class TourBlogView extends ViewPart {
             tourId = _tourData.getTourId();
          }
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
          _tourChart = null;
-         tourId = ((SelectionTourId) selection).getTourId();
+         tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = selectionTourIds.getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
@@ -1103,14 +1104,14 @@ public class TourBlogView extends ViewPart {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
          _tourChart = null;
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour firstComparedTour) {
+            tourId = firstComparedTour.getTourId();
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour firstComparedTour) {
+            tourId = firstComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
