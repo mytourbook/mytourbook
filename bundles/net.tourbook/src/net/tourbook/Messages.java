@@ -3144,8 +3144,12 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_RelocateBoundingBox;
    public static String        Tour_Location_Action_RelocateBoundingBox_Tooltip;
    public static String        Tour_Location_Action_RemoveLocation_All;
+   public static String        Tour_Location_Action_RemoveLocation_All_Complete;
    public static String        Tour_Location_Action_RemoveLocation_End;
+   public static String        Tour_Location_Action_RemoveLocation_End_Complete;
    public static String        Tour_Location_Action_RemoveLocation_Start;
+   public static String        Tour_Location_Action_RemoveLocation_Start_Complete;
+   public static String        Tour_Location_Action_RemoveLocation_Tooltip;
    public static String        Tour_Location_Action_ResetBoundingBox;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
    public static String        Tour_Location_Action_SetLocation_End;

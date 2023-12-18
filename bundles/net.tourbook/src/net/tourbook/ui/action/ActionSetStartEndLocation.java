@@ -79,14 +79,16 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionSetStartEndLocation extends SubMenu {
 
-   private static final String            ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
+   private static final String            ID                     = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private static final char              NL                 = UI.NEW_LINE;
+   private static final char              NL                     = UI.NEW_LINE;
 
-   private static final String            LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
-   private static final String            PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
+   private static final String            ALLOWED_FIELDNAME_NAME = "name";                                             //$NON-NLS-1$
 
-   private static final IDialogSettings   _state             = TourbookPlugin.getState(ID);
+   private static final String            LOCATION_SEPARATOR     = "     ·     ";                                      //$NON-NLS-1$
+   private static final String            PROFILE_NAME           = "%s - %d";                                          //$NON-NLS-1$
+
+   private static final IDialogSettings   _state                 = TourbookPlugin.getState(ID);
 
    private ITourProvider                  _tourProvider;
 
@@ -102,8 +104,11 @@ public class ActionSetStartEndLocation extends SubMenu {
    private ActionAppendLocationPart_Start _actionAppendLocationPart_Start;
    private ActionAppendLocationPart_End   _actionAppendLocationPart_End;
    private ActionRemoveLocation_All       _actionRemoveLocation_All;
+   private ActionRemoveLocation_All       _actionRemoveLocation_All_Complete;
    private ActionRemoveLocation_Start     _actionRemoveLocation_Start;
+   private ActionRemoveLocation_Start     _actionRemoveLocation_Start_Complete;
    private ActionRemoveLocation_End       _actionRemoveLocation_End;
+   private ActionRemoveLocation_End       _actionRemoveLocation_End_Complete;
    private ActionSetLocation_Start        _actionSetLocation_Start;
    private ActionSetLocation_End          _actionSetLocation_End;
 
@@ -280,40 +285,70 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private class ActionRemoveLocation_All extends Action {
 
-      public ActionRemoveLocation_All() {
+      private boolean _isCompleteRemoval;
 
-         super(Messages.Tour_Location_Action_RemoveLocation_All, AS_PUSH_BUTTON);
+      public ActionRemoveLocation_All(final boolean isCompleteRemoval) {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setText(isCompleteRemoval
+               ? Messages.Tour_Location_Action_RemoveLocation_All_Complete
+               : Messages.Tour_Location_Action_RemoveLocation_All);
+
+         setToolTipText(Messages.Tour_Location_Action_RemoveLocation_Tooltip);
+
+         _isCompleteRemoval = isCompleteRemoval;
       }
 
       @Override
       public void run() {
-         actionRemoveLocation(true, true);
+         actionRemoveLocation(true, true, _isCompleteRemoval);
       }
    }
 
    private class ActionRemoveLocation_End extends Action {
 
-      public ActionRemoveLocation_End() {
+      private boolean _isCompleteRemoval;
 
-         super(Messages.Tour_Location_Action_RemoveLocation_End, AS_PUSH_BUTTON);
+      public ActionRemoveLocation_End(final boolean isCompleteRemoval) {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setText(isCompleteRemoval
+               ? Messages.Tour_Location_Action_RemoveLocation_End_Complete
+               : Messages.Tour_Location_Action_RemoveLocation_End);
+
+         setToolTipText(Messages.Tour_Location_Action_RemoveLocation_Tooltip);
+
+         _isCompleteRemoval = isCompleteRemoval;
       }
 
       @Override
       public void run() {
-         actionRemoveLocation(false, true);
+         actionRemoveLocation(false, true, _isCompleteRemoval);
       }
    }
 
    private class ActionRemoveLocation_Start extends Action {
 
-      public ActionRemoveLocation_Start() {
+      private boolean _isCompleteRemoval;
 
-         super(Messages.Tour_Location_Action_RemoveLocation_Start, AS_PUSH_BUTTON);
+      public ActionRemoveLocation_Start(final boolean isCompleteRemoval) {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setText(isCompleteRemoval
+               ? Messages.Tour_Location_Action_RemoveLocation_Start_Complete
+               : Messages.Tour_Location_Action_RemoveLocation_Start);
+
+         setToolTipText(Messages.Tour_Location_Action_RemoveLocation_Tooltip);
+
+         _isCompleteRemoval = isCompleteRemoval;
       }
 
       @Override
       public void run() {
-         actionRemoveLocation(true, false);
+         actionRemoveLocation(true, false, _isCompleteRemoval);
       }
    }
 
@@ -496,13 +531,16 @@ public class ActionSetStartEndLocation extends SubMenu {
       slideoutLocationProfiles.open(false);
    }
 
-   private void actionRemoveLocation(final boolean isStartLocation, final boolean isEndLocation) {
+   private void actionRemoveLocation(final boolean isStartLocation,
+                                     final boolean isEndLocation,
+                                     final boolean isCompleteRemoval) {
 
       TourLocationManager.removeTourLocations(
 
             _allSelectedTours,
             isStartLocation,
-            isEndLocation);
+            isEndLocation,
+            isCompleteRemoval);
    }
 
    private void actionSetTourLocation(final TourLocationProfile locationProfile,
@@ -524,31 +562,34 @@ public class ActionSetStartEndLocation extends SubMenu {
 
 // SET_FORMATTING_OFF
 
-      _actionEditProfiles              = new ActionEditProfiles();
+      _actionEditProfiles                    = new ActionEditProfiles();
 
-      _actionAppendLocationPart_All    = new ActionAppendLocationPart_All();
-      _actionAppendLocationPart_Start  = new ActionAppendLocationPart_Start();
-      _actionAppendLocationPart_End    = new ActionAppendLocationPart_End();
-      _actionRemoveLocation_All        = new ActionRemoveLocation_All();
-      _actionRemoveLocation_Start      = new ActionRemoveLocation_Start();
-      _actionRemoveLocation_End        = new ActionRemoveLocation_End();
-      _actionSetLocation_Start         = new ActionSetLocation_Start();
-      _actionSetLocation_End           = new ActionSetLocation_End();
+      _actionAppendLocationPart_All          = new ActionAppendLocationPart_All();
+      _actionAppendLocationPart_Start        = new ActionAppendLocationPart_Start();
+      _actionAppendLocationPart_End          = new ActionAppendLocationPart_End();
+      _actionRemoveLocation_All_Complete     = new ActionRemoveLocation_All(true);
+      _actionRemoveLocation_All              = new ActionRemoveLocation_All(false);
+      _actionRemoveLocation_Start_Complete   = new ActionRemoveLocation_Start(true);
+      _actionRemoveLocation_Start            = new ActionRemoveLocation_Start(false);
+      _actionRemoveLocation_End_Complete     = new ActionRemoveLocation_End(true);
+      _actionRemoveLocation_End              = new ActionRemoveLocation_End(false);
+      _actionSetLocation_Start               = new ActionSetLocation_Start();
+      _actionSetLocation_End                 = new ActionSetLocation_End();
 
       // create dummy actions for the part/profile title
-      _actionPartTitle_All             = new Action(Messages.Tour_Location_Action_PartTitle_All) {};
-      _actionPartTitle_Start           = new Action(Messages.Tour_Location_Action_PartTitle_Start) {};
-      _actionPartTitle_End             = new Action(Messages.Tour_Location_Action_PartTitle_End) {};
-      _actionProfileTitle_All          = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
-      _actionProfileTitle_Start        = new Action(Messages.Tour_Location_Action_ProfileTitle_Start) {};
-      _actionProfileTitle_End          = new Action(Messages.Tour_Location_Action_ProfileTitle_End) {};
+      _actionPartTitle_All                   = new Action(Messages.Tour_Location_Action_PartTitle_All) {};
+      _actionPartTitle_Start                 = new Action(Messages.Tour_Location_Action_PartTitle_Start) {};
+      _actionPartTitle_End                   = new Action(Messages.Tour_Location_Action_PartTitle_End) {};
+      _actionProfileTitle_All                = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
+      _actionProfileTitle_Start              = new Action(Messages.Tour_Location_Action_ProfileTitle_Start) {};
+      _actionProfileTitle_End                = new Action(Messages.Tour_Location_Action_ProfileTitle_End) {};
 
-      _actionPartTitle_All             .setEnabled(false);
-      _actionPartTitle_Start           .setEnabled(false);
-      _actionPartTitle_End             .setEnabled(false);
-      _actionProfileTitle_All          .setEnabled(false);
-      _actionProfileTitle_Start        .setEnabled(false);
-      _actionProfileTitle_End          .setEnabled(false);
+      _actionPartTitle_All                   .setEnabled(false);
+      _actionPartTitle_Start                 .setEnabled(false);
+      _actionPartTitle_End                   .setEnabled(false);
+      _actionProfileTitle_All                .setEnabled(false);
+      _actionProfileTitle_Start              .setEnabled(false);
+      _actionProfileTitle_End                .setEnabled(false);
 
 // SET_FORMATTING_ON
    }
@@ -585,6 +626,12 @@ public class ActionSetStartEndLocation extends SubMenu {
       addActionToMenu(_actionRemoveLocation_All);
       addActionToMenu(_actionRemoveLocation_Start);
       addActionToMenu(_actionRemoveLocation_End);
+
+      addSeparatorToMenu();
+
+      addActionToMenu(_actionRemoveLocation_All_Complete);
+      addActionToMenu(_actionRemoveLocation_Start_Complete);
+      addActionToMenu(_actionRemoveLocation_End_Complete);
 
       addSeparatorToMenu();
 
@@ -796,10 +843,17 @@ public class ActionSetStartEndLocation extends SubMenu {
          // loop: all fields in the retrieved address
          for (final Field field : allAddressFields) {
 
-            final String fieldName = field.getName();
+            String fieldName = field.getName();
 
-            // skip field names which are not address parts
-            if (TourLocation.IGNORED_FIELDS.contains(fieldName)) {
+            if (ALLOWED_FIELDNAME_NAME.equals(fieldName)) {
+
+               // allow this field that it can be selected as part
+
+               fieldName = LocationPartID.OSM_NAME.name();
+
+            } else if (TourLocation.IGNORED_FIELDS.contains(fieldName)) {
+
+               // skip field names which are not address parts
                continue;
             }
 

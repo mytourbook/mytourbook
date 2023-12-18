@@ -371,7 +371,8 @@ public class TourLocationManager {
    }
 
    /**
-    * Append text to the display name in {@link #_displayNameBuffer}
+    * Append text to the display name in {@link #_displayNameBuffer} but prevent duplicate part
+    * labels
     *
     * @param text
     */
@@ -1427,7 +1428,8 @@ public class TourLocationManager {
 
    public static void removeTourLocations(final List<TourData> requestedTours,
                                           final boolean isSetStartLocation,
-                                          final boolean isSetEndLocation) {
+                                          final boolean isSetEndLocation,
+                                          final boolean isCompleteRemoval) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -1458,7 +1460,10 @@ public class TourLocationManager {
                   if (isSetStartLocation) {
 
                      tourData.setTourStartPlace(null);
-                     tourData.setTourLocationStart(null);
+
+                     if (isCompleteRemoval) {
+                        tourData.setTourLocationStart(null);
+                     }
 
                      isModified = true;
 
@@ -1472,7 +1477,10 @@ public class TourLocationManager {
                   if (isSetEndLocation) {
 
                      tourData.setTourEndPlace(null);
-                     tourData.setTourLocationEnd(null);
+
+                     if (isCompleteRemoval) {
+                        tourData.setTourLocationEnd(null);
+                     }
 
                      isModified = true;
 
