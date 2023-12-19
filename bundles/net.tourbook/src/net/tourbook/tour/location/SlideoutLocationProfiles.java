@@ -23,11 +23,14 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.dialog.MessageDialog_OnTop;
+import net.tourbook.common.form.SashBottomFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
@@ -67,6 +70,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -76,7 +80,13 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SlideoutLocationProfiles extends AdvancedSlideout {
 
-   private static final String             ZOOM_LEVEL_ITEM   = "%3d  %s";                        //$NON-NLS-1$
+   private static final String             ID                = "net.tourbook.tour.location.SlideoutLocationProfiles"; //$NON-NLS-1$
+
+   private static final String             ZOOM_LEVEL_ITEM   = "%3d  %s";                                             //$NON-NLS-1$
+
+   private static final String             STATE_SASH_HEIGHT = "STATE_SASH_HEIGHT";                                   //$NON-NLS-1$
+
+   private static final IDialogSettings    _state            = TourbookPlugin.getState(ID);
 
    private PixelConverter                  _pc;
 
@@ -103,23 +113,28 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    /*
     * UI controls
     */
-   private Composite   _parent;
-   private MT_DualList _listLocationParts;
+   private Composite           _parent;
+   private MT_DualList         _listLocationParts;
 
-   private Button      _btnApplyAndClose;
-   private Button      _btnCopyProfile;
-   private Button      _btnDefaultProfile;
-   private Button      _btnDeleteProfile;
+   private SashBottomFixedForm _sashForm;
+   private Sash                _sashSlider;
+   private Composite           _sashTop_Flex;
+   private Composite           _sashBottom_Fixed;
 
-   private Combo       _comboZoomlevel;
+   private Button              _btnApplyAndClose;
+   private Button              _btnCopyProfile;
+   private Button              _btnDefaultProfile;
+   private Button              _btnDeleteProfile;
 
-   private Label       _lblLocationParts;
-   private Label       _lblProfileName;
-   private Label       _lblProfiles;
-   private Label       _lblSelectedLocationParts;
+   private Combo               _comboZoomlevel;
 
-   private Text        _txtProfileName;
-   private Text        _txtSelectedLocationParts;
+   private Label               _lblLocationParts;
+   private Label               _lblProfileName;
+   private Label               _lblProfiles;
+   private Label               _lblSelectedLocationParts;
+
+   private Text                _txtProfileName;
+   private Text                _txtSelectedLocationParts;
 
    private class LocationProfileComparator extends ViewerComparator {
 
@@ -454,25 +469,31 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(true, true)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_YELLOW);
+      final Composite sashContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(sashContainer);
+//    container.setBackground(UI.SYS_COLOR_YELLOW);
       {
-         createUI_20_Profiles(container);
-         createUI_50_LocationParts(container);
-         createUI_90_Remarks(container);
+         // top part
+         _sashTop_Flex = createUI_20_Profiles(sashContainer);
+
+         // sash
+         _sashSlider = new Sash(sashContainer, SWT.HORIZONTAL);
+         UI.addSashColorHandler(_sashSlider);
+
+         // bottom part
+         _sashBottom_Fixed = createUI_40_Parts(sashContainer);
+
+         _sashForm = new SashBottomFixedForm(
+               sashContainer,
+               _sashTop_Flex,
+               _sashSlider,
+               _sashBottom_Fixed);
       }
    }
 
    private Composite createUI_20_Profiles(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(15))
-            .applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .applyTo(container);
@@ -608,7 +629,19 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       }
    }
 
-   private void createUI_50_LocationParts(final Composite parent) {
+   private Composite createUI_40_Parts(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         createUI_50_PartData(container);
+         createUI_60_PartSelector(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_50_PartData(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -687,34 +720,31 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             UI.setButtonLayoutWidth(_btnApplyAndClose);
          }
       }
-      {
-         // dual list with location parts
-
-         _lblLocationParts = new Label(parent, SWT.NONE);
-         _lblLocationParts.setText(Messages.Slideout_TourLocation_Label_LocationParts);
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.END)
-               .applyTo(_lblLocationParts);
-
-         _listLocationParts = new MT_DualList(parent, SWT.NONE);
-         _listLocationParts.addSelectionChangeListener(selectionChangeListener -> updateModelAndUI_FromSelectedParts());
-         GridDataFactory.fillDefaults()
-               .grab(true, true)
-               .applyTo(_listLocationParts);
-      }
    }
 
-   private void createUI_90_Remarks(final Composite parent) {
+   private void createUI_60_PartSelector(final Composite parent) {
 
       {
-         // Label: Remarks
+         /*
+          * Part dual list
+          */
+
+         // label
+         _lblLocationParts = new Label(parent, SWT.NONE);
+         _lblLocationParts.setText(Messages.Slideout_TourLocation_Label_LocationParts);
+
+         // dual list
+         _listLocationParts = new MT_DualList(parent, SWT.NONE);
+         _listLocationParts.addSelectionChangeListener(selectionChangeListener -> onSelectParts());
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_listLocationParts);
+      }
+      {
+         /*
+          * Remarks
+          */
 
          final Label label = new Label(parent, SWT.WRAP);
          label.setText(Messages.Slideout_TourFilter_Label_Remarks);
-         GridDataFactory.fillDefaults()
-               .grab(true, false)
-               .align(SWT.FILL, SWT.BEGINNING)
-               .applyTo(label);
       }
    }
 
@@ -811,12 +841,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       // cleanup previous slideout openings
       _selectedProfile = null;
       _allDualListItems.clear();
-   }
 
-   @Override
-   protected void onDispose() {
-
-      super.onDispose();
+      // allow this slideout to can have the max screen height
+      setMaxHeightFactor(1);
    }
 
    @Override
@@ -943,7 +970,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
          _selectedProfile = null;
 
-         updateModelAndUI_FromSelectedParts();
+         onSelectParts();
 
       } else {
 
@@ -990,9 +1017,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
          // a new profile is not selected
 
-         _isInUpdateUI = false;
-
-         return;
+//         _isInUpdateUI = false;
+//
+//         return;
       }
 
       _selectedProfile = selectedProfile;
@@ -1034,6 +1061,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
       allRemainingProfileParts.addAll(allProfileParts);
 
+      final List<MT_DLItem> allNotSelectedItems = new ArrayList<>();
+      final List<MT_DLItem> allSelectedItems = new ArrayList<>();
+      final List<MT_DLItem> allSelectedAndSortedItems = new ArrayList<>();
+
       nextPart:
 
       // loop: all available parts
@@ -1047,6 +1078,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             if (dualListPart.equals(profilePart)) {
 
                // part is selected
+
+               allSelectedItems.add(dualListItem);
+
                dualListItem.setLastAction(MT_DLItem.LAST_ACTION.SELECTION);
 
                // update remaining parts
@@ -1058,7 +1092,26 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          }
 
          // part is not selected
+
+         allNotSelectedItems.add(dualListItem);
+
          dualListItem.setLastAction(MT_DLItem.LAST_ACTION.DESELECTION);
+      }
+
+      // resort selected items to be sorted like in the profile
+      for (final LocationPartID profilePartID : allProfileParts) {
+
+         for (final MT_DLItem dlItem : allSelectedItems) {
+
+            final LocationPartID dlItemPartId = (LocationPartID) dlItem.getData(TourLocationManager.KEY_LOCATION_PART_ID);
+
+            if (profilePartID.equals(dlItemPartId)) {
+
+               allSelectedAndSortedItems.add(dlItem);
+
+               continue;
+            }
+         }
       }
 
       // add profile parts which are not available in the downloaded parts
@@ -1078,105 +1131,29 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          // show it in the selection list
          dlItem.setLastAction(MT_DLItem.LAST_ACTION.SELECTION);
 
+         allSelectedAndSortedItems.add(dlItem);
+
          _allDualListItems.add(dlItem);
       }
 
+      // complicated, recreate item list that they are sorted correctly
+      _allDualListItems.clear();
+      _allDualListItems.addAll(allSelectedAndSortedItems);
+      _allDualListItems.addAll(allNotSelectedItems);
+
       _listLocationParts.setItems(_allDualListItems);
 
-      updateModelAndUI_FromSelectedParts();
+      onSelectParts();
 
       enableControls();
 
       _isInUpdateUI = false;
    }
 
-   private void restoreState() {
-
-      /*
-       * Get previous default profile
-       */
-      TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
-
-      if (defaultProfile == null) {
-
-         // select first profile
-
-         defaultProfile = (TourLocationProfile) _profileViewer.getElementAt(0);
-      }
-
-      if (defaultProfile != null) {
-         selectProfile(defaultProfile);
-      }
-
-      enableControls();
-   }
-
-   @Override
-   protected void saveState() {
-
-      // save slideout position/size
-      super.saveState();
-   }
-
-   private void selectProfile(final TourLocationProfile selectedProfile) {
-
-      final int zoomlevel = selectedProfile.getZoomlevel();
-      _comboZoomlevel.select(TourLocationManager.getZoomlevelIndex(zoomlevel));
-
-      _profileViewer.setSelection(new StructuredSelection(selectedProfile));
-
-      final Table table = _profileViewer.getTable();
-      table.setSelection(table.getSelectionIndices());
-   }
-
-   private void setupUI() {
-
-      /*
-       * Fill address part widget
-       */
-
-// SET_FORMATTING_OFF
-
-      // add customized parts
-//      final String smallestCity           = TourLocationManager.getCombined_City_Smallest(         _tourLocation);
-//      final String smallestCityWithZip    = TourLocationManager.getCombined_CityWithZip_Smallest(  _tourLocation);
-//      final String largestCity            = TourLocationManager.getCombined_City_Largest(          _tourLocation);
-//      final String largestCityWithZip     = TourLocationManager.getCombined_CityWithZip_Largest(   _tourLocation);
-      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber( _tourLocation);
-
-//      boolean isShowSmallestCity = false;
-//      if (largestCity != null && largestCity.equals(smallestCity) == false) {
-//         isShowSmallestCity = true;
-//      }
-
-      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                 _tourLocation.display_name,    _allDualListItems);
-      addCombinedPart(LocationPartID    .OSM_NAME,                         _tourLocation.name,            _allDualListItems);
-
-//      addCombinedPart(LocationPartID    .CUSTOM_CITY_LARGEST,              largestCity,                  _allDualListItems);
-//      if (isShowSmallestCity) {
-//         addCombinedPart(LocationPartID .CUSTOM_CITY_SMALLEST,             smallestCity,                 _allDualListItems);
-//      }
-//
-//      addCombinedPart(LocationPartID    .CUSTOM_CITY_WITH_ZIP_LARGEST,     largestCityWithZip,           _allDualListItems);
-//      if (isShowSmallestCity) {
-//         addCombinedPart(LocationPartID .CUSTOM_CITY_WITH_ZIP_SMALLEST,    smallestCityWithZip,          _allDualListItems);
-//      }
-
-      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,  streetWithHouseNumber,        _allDualListItems);
-
-
-// SET_FORMATTING_ON
-
-      // add address parts
-      addAllAddressParts(_tourLocation);
-
-      _listLocationParts.setItems(_allDualListItems);
-   }
-
    /**
     * Update model/UI from the selected parts
     */
-   private void updateModelAndUI_FromSelectedParts() {
+   private void onSelectParts() {
 
       if (_selectedProfile == null) {
          return;
@@ -1229,6 +1206,83 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                ? UI.SYS_COLOR_YELLOW
                : UI.SYS_COLOR_BLUE);
       });
+   }
+
+   private void restoreState() {
+
+      /*
+       * Get previous default profile
+       */
+      TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+      if (defaultProfile == null) {
+
+         // select first profile
+
+         defaultProfile = (TourLocationProfile) _profileViewer.getElementAt(0);
+      }
+
+      if (defaultProfile != null) {
+         selectProfile(defaultProfile);
+      }
+
+      final int bottomPartHeight = Util.getStateInt(_state, STATE_SASH_HEIGHT, _pc.convertWidthInCharsToPixels(10));
+      _sashForm.setFixedHeight(bottomPartHeight);
+
+      enableControls();
+   }
+
+   @Override
+   protected void saveState() {
+
+      // save slideout position/size
+      super.saveState();
+   }
+
+   @Override
+   protected void saveState_BeforeDisposed() {
+
+      final int sashFixedHeight = _sashBottom_Fixed.getSize().y;
+      final int sashSliderHeight = _sashSlider.getSize().y;
+
+      _state.put(STATE_SASH_HEIGHT, sashFixedHeight - sashSliderHeight);
+   }
+
+   private void selectProfile(final TourLocationProfile selectedProfile) {
+
+      final int zoomlevel = selectedProfile.getZoomlevel();
+      _comboZoomlevel.select(TourLocationManager.getZoomlevelIndex(zoomlevel));
+
+      _profileViewer.setSelection(new StructuredSelection(selectedProfile));
+
+      final Table table = _profileViewer.getTable();
+      table.setSelection(table.getSelectionIndices());
+   }
+
+   private void setupUI() {
+
+      /*
+       * Fill address part widget
+       */
+
+// SET_FORMATTING_OFF
+
+      // add customized parts
+      final String streetWithHouseNumber  = TourLocationManager.getCombined_StreetWithHouseNumber( _tourLocation);
+
+      addCombinedPart(LocationPartID    .OSM_DEFAULT_NAME,                 _tourLocation.display_name,    _allDualListItems);
+      addCombinedPart(LocationPartID    .OSM_NAME,                         _tourLocation.name,            _allDualListItems);
+
+
+      addCombinedPart(LocationPartID    .CUSTOM_STREET_WITH_HOUSE_NUMBER,  streetWithHouseNumber,        _allDualListItems);
+
+
+// SET_FORMATTING_ON
+
+      // add address parts
+      addAllAddressParts(_tourLocation);
+
+      _listLocationParts.setItems(_allDualListItems);
    }
 
 }
