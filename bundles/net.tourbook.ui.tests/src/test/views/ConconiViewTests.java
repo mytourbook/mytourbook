@@ -24,7 +24,7 @@ import utils.Utils;
 public class ConconiViewTests extends UITest {
 
    @Test
-   void ConconiView_DisplayView_ShouldShowGraph() {
+   void conconiView_DisplayView_ShouldShowGraph() {
 
       Utils.getTourWithSRTM(bot);
 
