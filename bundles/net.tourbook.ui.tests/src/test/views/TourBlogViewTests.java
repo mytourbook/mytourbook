@@ -15,11 +15,15 @@
  *******************************************************************************/
 package views;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.tourbook.Messages;
 
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +69,26 @@ public class TourBlogViewTests extends UITest {
 
       //Change back the measurement system to metric
       Utils.setMeasurementSystem_Metric(bot);
+
+      tourBookView = Utils.showTourBookView(bot);
+      //Activating the NatTable
+      bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
+      bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
+
+      // NatTable is slow to appear so we wait a bit otherwise the test will fail
+      bot.sleep(3000);
+
+      final SWTBotNatTable botNatTable = new SWTBotNatTable(
+            tourBookView.bot().widget(widgetOfType(NatTable.class)));
+      final int rowCount = botNatTable.rowCount();
+      assertTrue(rowCount > 0);
+
+      for (int index = 1; index < rowCount; ++index) {
+         botNatTable.click(index, 1);
+      }
+
+      //Deactivating the NatTable
+      bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
 
       tourBlogView.close();
    }
