@@ -2548,6 +2548,9 @@ public class Messages extends NLS {
    public static String        Slideout_TourLogOptions_Radio_OpenLog_Never;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_SelectedEvents;
 
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags;
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip;
+
    public static String        Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
    public static String        Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
    public static String        Slideout_TourMarkerFilter_Label_GeoFilter;

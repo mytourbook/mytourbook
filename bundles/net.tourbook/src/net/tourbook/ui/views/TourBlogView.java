@@ -111,6 +111,8 @@ public class TourBlogView extends ViewPart {
    static final boolean        STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT = false;
    static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
+   static final String         STATE_IS_SHOW_TOUR_TAGS                         = "STATE_IS_SHOW_TOUR_TAGS";                 //$NON-NLS-1$
+   static final boolean        STATE_IS_SHOW_TOUR_TAGS_DEFAULT                 = true;
 
    private static final String EXTERNAL_LINK_URL                               = "http";                                    //$NON-NLS-1$
    private static final String HREF_TOKEN                                      = "#";                                       //$NON-NLS-1$
@@ -280,7 +282,7 @@ public class TourBlogView extends ViewPart {
             return;
          }
 
-         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if (((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent))) {
 
             final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
             if (modifiedTours != null) {
@@ -331,6 +333,19 @@ public class TourBlogView extends ViewPart {
                   updateUI();
                }
             }
+         } else if (eventId == TourEventId.TAG_CONTENT_CHANGED ||
+               eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+            final Long tourId = _tourData.getTourId();
+            final TourManager tourManager = TourManager.getInstance();
+
+            tourManager.removeTourFromCache(tourId);
+
+            _tourData = tourManager.getTourDataFromDb(tourId);
+
+            // removed old tour data from the selection provider
+            _postSelectionProvider.clearSelection();
+
+            updateUI();
          }
       };
 
@@ -347,30 +362,29 @@ public class TourBlogView extends ViewPart {
       final UrlDetector parser = new UrlDetector(tourDescription, UrlDetectorOptions.JAVASCRIPT);
       final List<Url> detectedUrls = parser.detect();
 
-      if (detectedUrls.isEmpty()) {
-         return UI.EMPTY_STRING;
-      }
+      if (!detectedUrls.isEmpty()) {
 
-      // Because the tour description can contain similar URLs, this can create
-      // an issue when URLs can be replaced several times when replacing original
-      // text to formatted URLs.
-      // To avoid this, original URLs are first replaced by a unique random string
-      // and then this string is replaced by the formatted URL
-      final HashMap<String, Url> detectedUrlMap = new HashMap<>();
-      for (final Url detectedUrl : detectedUrls) {
+         // Because the tour description can contain similar URLs, this can create
+         // an issue when URLs can be replaced several times when replacing original
+         // text to formatted URLs.
+         // To avoid this, original URLs are first replaced by a unique random string
+         // and then this string is replaced by the formatted URL
+         final HashMap<String, Url> detectedUrlMap = new HashMap<>();
+         for (final Url detectedUrl : detectedUrls) {
 
-         final String randomString = RandomStringUtils.random(10, true, true);
-         detectedUrlMap.put(randomString, detectedUrl);
+            final String randomString = RandomStringUtils.random(10, true, true);
+            detectedUrlMap.put(randomString, detectedUrl);
 
-         final String originalUrl = detectedUrl.getOriginalUrl();
-         tourDescription = StringUtils.replaceOnce(tourDescription, originalUrl, randomString);
-      }
+            final String originalUrl = detectedUrl.getOriginalUrl();
+            tourDescription = StringUtils.replaceOnce(tourDescription, originalUrl, randomString);
+         }
 
-      for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
+         for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
 
-         final String fullUrl = set.getValue().getFullUrl();
-         tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            final String fullUrl = set.getValue().getFullUrl();
+            tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+         }
       }
 
       if (UI.IS_SCRAMBLE_DATA) {
@@ -380,36 +394,45 @@ public class TourBlogView extends ViewPart {
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private String buildTagsSection(final Set<TourTag> tourTags) {
+   private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
+
+      final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
+      if (!showTourTags) {
+         return UI.EMPTY_STRING;
+      }
 
       final StringBuilder sb = new StringBuilder();
 
-//todo fb refresh the view when tags are modified, just like for the tour data editor view
-      sb.append("<div class='title'>" + Messages.tour_editor_label_tour_tag + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<table>" + NL); //$NON-NLS-1$
+      if (addSpacer) {
+         // write spacer
+         sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+      }
 
-      sb.append("<tr>" + NL); //$NON-NLS-1$
+      sb.append("<div class='title'>" + Messages.tour_editor_label_tour_tag + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<table>"); //$NON-NLS-1$
+
+      sb.append("<tr>"); //$NON-NLS-1$
       final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
       for (final TourTag tag : tourTags) {
 
-         sb.append("<td>");
+         sb.append("<td>"); //$NON-NLS-1$
 
          final Image tagImage = TagManager.getTagImage(tag);
          if (tagImage != null) {
 
             final String imageBase64 = Util.imageToBase64(tagImage);
-            sb.append("<img src=\"data:image/png;base64,");
+            sb.append("<img src=\"data:image/png;base64,"); //$NON-NLS-1$
             sb.append(imageBase64);
-            sb.append("\">" + NL);
+            sb.append("\">"); //$NON-NLS-1$
          }
-         final String tagText = tag.getTagName() + NL + tourTagsAccumulatedValues.get(tag.getTagId());
+         final String tagText = NL + tag.getTagName() + NL + tourTagsAccumulatedValues.get(tag.getTagId());
 
          sb.append(tagText);
-         sb.append("</td>");
+         sb.append("</td>"); //$NON-NLS-1$
       }
 
-      sb.append("</tr>" + NL); //$NON-NLS-1$
-      sb.append("</table>" + NL); //$NON-NLS-1$
+      sb.append("</tr>"); //$NON-NLS-1$
+      sb.append("</table>"); //$NON-NLS-1$
 
       String tagsSectionString = WEB.convertHTML_LineBreaks(sb.toString());
 
@@ -420,9 +443,14 @@ public class TourBlogView extends ViewPart {
       return tagsSectionString;
    }
 
-   private String buildWeatherSection(String tourWeather) {
+   private String buildWeatherSection(String tourWeather, final boolean addSpacer) {
 
       final StringBuilder sb = new StringBuilder();
+
+      if (addSpacer) {
+         // write spacer
+         sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+      }
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourWeather = UI.scrambleText(tourWeather);
@@ -549,8 +577,9 @@ public class TourBlogView extends ViewPart {
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
       final boolean isWeather = tourWeather.length() > 0;
+      final boolean isTourTags = _tourData.getTourTags().size() > 0;
 
-      if (isDescription || isTitle || isWeather) {
+      if (isDescription || isTitle || isWeather || isTourTags) {
 
          sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
@@ -600,33 +629,22 @@ public class TourBlogView extends ViewPart {
                 */
                if (isWeather) {
 
-                  if (isDescription) {
-                     // write spacer
-                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
-                  }
-
-                  sb.append(buildWeatherSection(tourWeather));
+                  sb.append(buildWeatherSection(tourWeather, isDescription));
                }
 
                /*
                 * Tags
                 */
                final Set<TourTag> tourTags = _tourData.getTourTags();
-               if (!tourTags.isEmpty()) {
-
-                  if (isDescription || isWeather) {
-                     // write spacer
-                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
-                  }
-
-                  sb.append(buildTagsSection(tourTags));
-               }
+               sb.append(buildTagsSection(tourTags, isDescription || isWeather));
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
          }
          sb.append("</div>" + NL); //$NON-NLS-1$
 
-      } else {
+      } else
+
+      {
 
          // there is no tour header, set some spacing
 

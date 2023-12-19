@@ -60,9 +60,9 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
    /*
     * UI controls
     */
-   private Button  _chkDisplayTourTags;
    private Button  _chkDrawMarkerWithDefaultColor;
    private Button  _chkShowHiddenMarker;
+   private Button  _chkShowTourTags;
 
    private Spinner _spinnerFontSize;
 
@@ -185,11 +185,11 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
              * Display the tour tags
              */
 
-            _chkDisplayTourTags = new Button(container, SWT.CHECK);
-            _chkDisplayTourTags.setText("Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor");
-            _chkDisplayTourTags.setToolTipText("Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip");
-            _chkDisplayTourTags.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDisplayTourTags);
+            _chkShowTourTags = new Button(container, SWT.CHECK);
+            _chkShowTourTags.setText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourTags);
+            _chkShowTourTags.setToolTipText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip);
+            _chkShowTourTags.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowTourTags);
 
          }
          {
@@ -248,6 +248,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _chkDrawMarkerWithDefaultColor.setSelection(    TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _chkShowHiddenMarker.setSelection(              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _chkShowTourTags.setSelection(                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
 
       _spinnerFontSize.setSelection(                  WEB.STATE_BODY_FONT_SIZE_DEFAULT);
 
@@ -262,6 +263,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _chkDrawMarkerWithDefaultColor.setSelection(    Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
       _chkShowHiddenMarker.setSelection(              Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
+      _chkShowTourTags.setSelection(                  Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT));
 
       _spinnerFontSize.setSelection(                  Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT));
 
@@ -277,6 +279,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor.getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker.getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  _chkShowTourTags.getSelection());
 
       _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize.getSelection());
 
