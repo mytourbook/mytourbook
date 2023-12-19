@@ -29,6 +29,7 @@ import utils.Utils;
 public class TourBlogViewTests extends UITest {
 
    private void changeTagName(final String currentTagName, final String newTagName) {
+
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
 
