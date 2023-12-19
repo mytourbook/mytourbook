@@ -570,6 +570,7 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       final String tourDescription = _tourData.getTourDescription();
+      final Set<TourTag> tourTags = _tourData.getTourTags();
       final String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
@@ -578,8 +579,8 @@ public class TourBlogView extends ViewPart {
 
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
+      final boolean isTourTags = tourTags.size() > 0;
       final boolean isWeather = tourWeather.length() > 0;
-      final boolean isTourTags = _tourData.getTourTags().size() > 0;
 
       if (isDescription || isTitle || isWeather || isTourTags) {
 
@@ -623,6 +624,7 @@ public class TourBlogView extends ViewPart {
                 * Description
                 */
                if (isDescription) {
+
                   sb.append(buildDescription(tourDescription));
                }
 
@@ -638,7 +640,8 @@ public class TourBlogView extends ViewPart {
                 * Tags
                 */
                if (isTourTags) {
-                  sb.append(buildTagsSection(_tourData.getTourTags(), isDescription || isWeather));
+
+                  sb.append(buildTagsSection(tourTags, isDescription || isWeather));
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
