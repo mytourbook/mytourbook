@@ -2100,7 +2100,7 @@ public class Util {
          ImageIO.write(bufferedImage, "png", output); //$NON-NLS-1$
          imageBytes = output.toByteArray();
 
-      } catch (final Exception e) {
+      } catch (final IOException e) {
          StatusUtil.log(e);
       }
 
