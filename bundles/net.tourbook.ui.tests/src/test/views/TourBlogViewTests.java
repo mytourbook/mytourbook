@@ -15,6 +15,8 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.junit.jupiter.api.Test;
 
@@ -67,6 +69,9 @@ public class TourBlogViewTests extends UITest {
       tourBlogView.show();
 
       bot.sleep(2000);
+
+      assertNotNull(null);
+      //todo fb remove once the screenshot is ok
 
       tourBlogView.close();
    }
