@@ -410,9 +410,8 @@ public class TourBlogView extends ViewPart {
       }
 
       sb.append("<div class='title'>" + Messages.tour_editor_label_tour_tag + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<table>"); //$NON-NLS-1$
+      sb.append("<table><tr>"); //$NON-NLS-1$
 
-      sb.append("<tr>"); //$NON-NLS-1$
       final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
       for (final TourTag tag : tourTags) {
 
@@ -422,18 +421,16 @@ public class TourBlogView extends ViewPart {
          if (tagImage != null) {
 
             final String imageBase64 = Util.imageToBase64(tagImage);
-            sb.append("<img src=\"data:image/png;base64,"); //$NON-NLS-1$
-            sb.append(imageBase64);
-            sb.append("\">"); //$NON-NLS-1$
+            sb.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
          }
          final String tagText = NL + tag.getTagName() + NL + tourTagsAccumulatedValues.get(tag.getTagId());
 
          sb.append(tagText);
+
          sb.append("</td>"); //$NON-NLS-1$
       }
 
-      sb.append("</tr>"); //$NON-NLS-1$
-      sb.append("</table>"); //$NON-NLS-1$
+      sb.append("</tr></table>"); //$NON-NLS-1$
 
       String tagsSectionString = WEB.convertHTML_LineBreaks(sb.toString());
 
