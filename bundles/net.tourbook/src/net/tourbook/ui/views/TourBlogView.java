@@ -386,7 +386,6 @@ public class TourBlogView extends ViewPart {
 
             final String fullUrl = set.getValue().getFullUrl();
             tourDescription = tourDescription.replace(set.getKey(), "<a href=\"" + fullUrl + "\">" + fullUrl + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
          }
       }
 
