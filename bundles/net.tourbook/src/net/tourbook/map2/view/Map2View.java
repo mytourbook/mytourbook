@@ -3256,6 +3256,7 @@ public class Map2View extends ViewPart implements
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
+
          if (tourIdSelection.isSetBreadcrumbOnly()) {
 
             // special case :-)
@@ -3269,6 +3270,16 @@ public class Map2View extends ViewPart implements
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
             paintToursAndPhotos(tourData, selection);
+
+            // recenter map AFTER it was centered in the paint... method
+            if (_isMapSyncWith_TourLocation) {
+
+               final GeoPosition hoveredTourLocation = tourIdSelection.getHoveredTourLocation();
+
+               if (hoveredTourLocation != null) {
+                  _map.setMapCenter(hoveredTourLocation);
+               }
+            }
          }
 
       } else if (selection instanceof SelectionTourIds) {
