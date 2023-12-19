@@ -15,13 +15,33 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourBlogViewTests extends UITest {
+
+   private void changeTagName(final String currentTagName, final String newTagName) {
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
+
+      final SWTBotTreeItem existingTag = bot.tree(1).getTreeItem(currentTagName).select();
+      assertNotNull(existingTag);
+
+      //Change the tag name
+      bot.button(Messages.Action_Tag_Edit).click();
+      bot.textWithLabel(Messages.Dialog_TourTag_Label_TagName).setText(newTagName);
+      Utils.clickButton(Messages.App_Action_Save, bot);
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
 
    private SWTBotView getTourBlogView() {
 
@@ -66,7 +86,14 @@ public class TourBlogViewTests extends UITest {
       final SWTBotView tourBlogView = getTourBlogView();
       tourBlogView.show();
 
-      bot.sleep(2000);
+      final String currentTagName = "Shoes 2"; //$NON-NLS-1$
+      final String newTagName = "Renamed Tag"; //$NON-NLS-1$
+
+      //Change the name of the tag to trigger the update of the tour blog view
+      changeTagName(currentTagName, newTagName);
+
+      //Revert to the original name
+      changeTagName(newTagName, currentTagName);
 
       tourBlogView.close();
    }
