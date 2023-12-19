@@ -47,4 +47,17 @@ public class TourBlogViewTests extends UITest {
 
       tourBlogView.close();
    }
+
+   @Test
+   void testBlogView_Tags() {
+
+      Utils.getTourWithTags(bot);
+
+      final SWTBotView tourBlogView = getTourBlogView();
+      tourBlogView.show();
+
+      bot.sleep(2000);
+
+      tourBlogView.close();
+   }
 }
