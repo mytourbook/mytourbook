@@ -398,7 +398,7 @@ public class TourBlogView extends ViewPart {
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
 
       final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
-      if (!showTourTags || tourTags.isEmpty()) {
+      if (!showTourTags) {
          return UI.EMPTY_STRING;
       }
 
@@ -636,8 +636,9 @@ public class TourBlogView extends ViewPart {
                /*
                 * Tags
                 */
-               final Set<TourTag> tourTags = _tourData.getTourTags();
-               sb.append(buildTagsSection(tourTags, isDescription || isWeather));
+               if (isTourTags) {
+                  sb.append(buildTagsSection(_tourData.getTourTags(), isDescription || isWeather));
+               }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
          }
