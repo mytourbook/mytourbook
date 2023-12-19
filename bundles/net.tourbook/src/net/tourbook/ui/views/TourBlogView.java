@@ -105,6 +105,8 @@ public class TourBlogView extends ViewPart {
 
    private static final String NL                                              = UI.NEW_LINE1;
 
+   private static final String SPACER                                          = "<div>&nbsp;</div>";                       //$NON-NLS-1$
+
    private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
 
    static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
@@ -405,8 +407,7 @@ public class TourBlogView extends ViewPart {
       final StringBuilder sb = new StringBuilder();
 
       if (addSpacer) {
-         // write spacer
-         sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+         sb.append(SPACER);
       }
 
       sb.append("<div class='title'>" + Messages.tour_editor_label_tour_tag + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
@@ -450,7 +451,7 @@ public class TourBlogView extends ViewPart {
 
       if (addSpacer) {
          // write spacer
-         sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+         sb.append(SPACER);
       }
 
       if (UI.IS_SCRAMBLE_DATA) {
