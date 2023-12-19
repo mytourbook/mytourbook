@@ -282,7 +282,7 @@ public class TourBlogView extends ViewPart {
             return;
          }
 
-         if (((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent))) {
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
             final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
             if (modifiedTours != null) {
