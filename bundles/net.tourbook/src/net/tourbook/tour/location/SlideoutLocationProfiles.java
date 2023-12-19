@@ -697,7 +697,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
                .applyTo(_lblLocationParts);
 
          _listLocationParts = new MT_DualList(parent, SWT.NONE);
-         _listLocationParts.addSelectionChangeListener(selectionChangeListener -> updateModelAndUI_FromSelectedParts());
+         _listLocationParts.addSelectionChangeListener(selectionChangeListener -> onSelectParts());
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_listLocationParts);
@@ -943,7 +943,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
          _selectedProfile = null;
 
-         updateModelAndUI_FromSelectedParts();
+         onSelectParts();
 
       } else {
 
@@ -990,9 +990,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
          // a new profile is not selected
 
-         _isInUpdateUI = false;
-
-         return;
+//         _isInUpdateUI = false;
+//
+//         return;
       }
 
       _selectedProfile = selectedProfile;
@@ -1034,6 +1034,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
       allRemainingProfileParts.addAll(allProfileParts);
 
+      final List<MT_DLItem> allNotSelectedItems = new ArrayList<>();
+      final List<MT_DLItem> allSelectedItems = new ArrayList<>();
+      final List<MT_DLItem> allSelectedAndSortedItems = new ArrayList<>();
+
       nextPart:
 
       // loop: all available parts
@@ -1047,6 +1051,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
             if (dualListPart.equals(profilePart)) {
 
                // part is selected
+
+               allSelectedItems.add(dualListItem);
+
                dualListItem.setLastAction(MT_DLItem.LAST_ACTION.SELECTION);
 
                // update remaining parts
@@ -1058,7 +1065,26 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          }
 
          // part is not selected
+
+         allNotSelectedItems.add(dualListItem);
+
          dualListItem.setLastAction(MT_DLItem.LAST_ACTION.DESELECTION);
+      }
+
+      // resort selected items to be sorted like in the profile
+      for (final LocationPartID profilePartID : allProfileParts) {
+
+         for (final MT_DLItem dlItem : allSelectedItems) {
+
+            final LocationPartID dlItemPartId = (LocationPartID) dlItem.getData(TourLocationManager.KEY_LOCATION_PART_ID);
+
+            if (profilePartID.equals(dlItemPartId)) {
+
+               allSelectedAndSortedItems.add(dlItem);
+
+               continue;
+            }
+         }
       }
 
       // add profile parts which are not available in the downloaded parts
@@ -1078,16 +1104,81 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          // show it in the selection list
          dlItem.setLastAction(MT_DLItem.LAST_ACTION.SELECTION);
 
+         allSelectedAndSortedItems.add(dlItem);
+
          _allDualListItems.add(dlItem);
       }
 
+      // complicated, recreate item list that they are sorted correctly
+      _allDualListItems.clear();
+      _allDualListItems.addAll(allSelectedAndSortedItems);
+      _allDualListItems.addAll(allNotSelectedItems);
+
       _listLocationParts.setItems(_allDualListItems);
 
-      updateModelAndUI_FromSelectedParts();
+      onSelectParts();
 
       enableControls();
 
       _isInUpdateUI = false;
+   }
+
+   /**
+    * Update model/UI from the selected parts
+    */
+   private void onSelectParts() {
+
+      if (_selectedProfile == null) {
+         return;
+      }
+
+      // get selected parts
+      final List<MT_DLItem> allSelectedItems = _listLocationParts.getSelectionAsList();
+
+      final List<LocationPartID> allProfileParts = _selectedProfile.allParts;
+
+      final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
+      allRemainingProfileParts.addAll(allProfileParts);
+
+      /*
+       * Update model
+       */
+      allProfileParts.clear();
+
+      for (final MT_DLItem partItem : allSelectedItems) {
+
+         // !!! a part item can contain also deselected items when all items are removed from the right side !!!
+
+         if (partItem.getLastAction().equals(MT_DLItem.LAST_ACTION.SELECTION)) {
+
+            final LocationPartID locationPart = (LocationPartID) partItem.getData(TourLocationManager.KEY_LOCATION_PART_ID);
+
+            allProfileParts.add(locationPart);
+
+            allRemainingProfileParts.remove(locationPart);
+         }
+      }
+
+      /*
+       * Update UI
+       */
+      final String locationDisplayName = TourLocationManager.createLocationDisplayName(allSelectedItems);
+      _txtSelectedLocationParts.setText(locationDisplayName);
+
+      // update viewer
+      _profileViewer.refresh(_selectedProfile, true, true);
+
+      // color needs to be set very late otherwise the dark theme do not display it (overwrite it)
+      _parent.getDisplay().asyncExec(() -> {
+
+         if (_txtSelectedLocationParts.isDisposed()) {
+            return;
+         }
+
+         _txtSelectedLocationParts.setForeground(UI.IS_DARK_THEME
+               ? UI.SYS_COLOR_YELLOW
+               : UI.SYS_COLOR_BLUE);
+      });
    }
 
    private void restoreState() {
@@ -1171,64 +1262,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       addAllAddressParts(_tourLocation);
 
       _listLocationParts.setItems(_allDualListItems);
-   }
-
-   /**
-    * Update model/UI from the selected parts
-    */
-   private void updateModelAndUI_FromSelectedParts() {
-
-      if (_selectedProfile == null) {
-         return;
-      }
-
-      // get selected parts
-      final List<MT_DLItem> allSelectedItems = _listLocationParts.getSelectionAsList();
-
-      final List<LocationPartID> allProfileParts = _selectedProfile.allParts;
-
-      final Set<LocationPartID> allRemainingProfileParts = new HashSet<>();
-      allRemainingProfileParts.addAll(allProfileParts);
-
-      /*
-       * Update model
-       */
-      allProfileParts.clear();
-
-      for (final MT_DLItem partItem : allSelectedItems) {
-
-         // !!! a part item can contain also deselected items when all items are removed from the right side !!!
-
-         if (partItem.getLastAction().equals(MT_DLItem.LAST_ACTION.SELECTION)) {
-
-            final LocationPartID locationPart = (LocationPartID) partItem.getData(TourLocationManager.KEY_LOCATION_PART_ID);
-
-            allProfileParts.add(locationPart);
-
-            allRemainingProfileParts.remove(locationPart);
-         }
-      }
-
-      /*
-       * Update UI
-       */
-      final String locationDisplayName = TourLocationManager.createLocationDisplayName(allSelectedItems);
-      _txtSelectedLocationParts.setText(locationDisplayName);
-
-      // update viewer
-      _profileViewer.refresh(_selectedProfile, true, true);
-
-      // color needs to be set very late otherwise the dark theme do not display it (overwrite it)
-      _parent.getDisplay().asyncExec(() -> {
-
-         if (_txtSelectedLocationParts.isDisposed()) {
-            return;
-         }
-
-         _txtSelectedLocationParts.setForeground(UI.IS_DARK_THEME
-               ? UI.SYS_COLOR_YELLOW
-               : UI.SYS_COLOR_BLUE);
-      });
    }
 
 }
