@@ -1186,16 +1186,12 @@ public class TourBlogView extends ViewPart {
 
       } else if (selection instanceof StructuredSelection) {
 
-      }
-      _tourChart = null;
-      final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-      if (firstElement instanceof TVIRefTour_ComparedTour) {
-         if (firstElement instanceof final TVIRefTour_ComparedTour firstComparedTour) {
+         _tourChart = null;
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         if (firstElement instanceof TVIRefTour_ComparedTour) {
             tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-            tourId = firstComparedTour.getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {} else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour firstComparedTour) {
+         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
             tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
-            tourId = firstComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
