@@ -38,7 +38,7 @@ public class TourBlogViewTests extends UITest {
       //Change the tag name
       bot.button(Messages.Action_Tag_Edit).click();
       bot.textWithLabel(Messages.Dialog_TourTag_Label_TagName).setText(newTagName);
-      Utils.clickButton(Messages.App_Action_Save, bot);
+      bot.button(Messages.App_Action_Save).click();
 
       Utils.clickApplyAndCloseButton(bot);
    }

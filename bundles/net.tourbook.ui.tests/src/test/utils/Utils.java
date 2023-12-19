@@ -124,7 +124,7 @@ public class Utils {
       clickButton("Apply and Close", bot); //$NON-NLS-1$
    }
 
-   public static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
+   private static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
 
       return bot.button(mnemonicText).click();
    }
