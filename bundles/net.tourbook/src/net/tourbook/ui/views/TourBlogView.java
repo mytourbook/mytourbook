@@ -1163,20 +1163,22 @@ public class TourBlogView extends ViewPart {
             tourId = _tourData.getTourId();
          }
 
-      } else if (selection instanceof final SelectionTourId selectionTourId) {
+      } else if (selection instanceof SelectionTourId) {
 
          _tourChart = null;
-         tourId = selectionTourId.getTourId();
+         tourId = ((SelectionTourId) selection).getTourId();
 
-      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
+      } else if (selection instanceof SelectionTourIds) {
 
-         final List<Long> tourIds = selectionTourIds.getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
          }
 
-      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
+      } else if (selection instanceof SelectionReferenceTourView) {
+
+         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
