@@ -98,7 +98,6 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       final Composite ui = createUI(parent);
 
       restoreState();
-      enableControls();
 
       return ui;
    }
@@ -218,10 +217,6 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
          }
       }
-   }
-
-   private void enableControls() {
-
    }
 
    private void initUI() {
