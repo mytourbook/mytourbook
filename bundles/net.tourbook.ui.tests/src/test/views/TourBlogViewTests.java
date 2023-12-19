@@ -53,7 +53,7 @@ public class TourBlogViewTests extends UITest {
    /**
     * The below SQL statement was run to attach an image that can be found when
     * running the unit tests on GitHub.
-    * This might be to be tweaked if GitHub changes the root folder D:\a
+    * This might need to be tweaked if/when GitHub changes the root folder D:\a
     *
     * UPDATE "USER".TOURTAG
     * SET IMAGEFILEPATH =
