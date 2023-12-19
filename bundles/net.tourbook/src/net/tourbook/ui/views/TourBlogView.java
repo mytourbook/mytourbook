@@ -398,7 +398,7 @@ public class TourBlogView extends ViewPart {
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
 
       final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
-      if (!showTourTags || tourTags.size() == 0) {
+      if (!showTourTags || tourTags.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
