@@ -2097,7 +2097,7 @@ public class Util {
          final BufferedImage bufferedImage = ImageConverter.convertIntoAWT(image);
 
          final ByteArrayOutputStream output = new ByteArrayOutputStream();
-         ImageIO.write(bufferedImage, "png", output);
+         ImageIO.write(bufferedImage, "png", output); //$NON-NLS-1$
          imageBytes = output.toByteArray();
 
       } catch (final Exception e) {
