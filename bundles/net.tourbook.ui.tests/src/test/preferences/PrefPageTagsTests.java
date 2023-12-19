@@ -29,7 +29,7 @@ import utils.Utils;
 public class PrefPageTagsTests extends UITest {
 
    @Test
-   void PrefPageTags_TagsList_CreateAndDeleteTag() {
+   void prefPageTags_TagsList_CreateAndDeleteTag() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
@@ -59,7 +59,7 @@ public class PrefPageTagsTests extends UITest {
    }
 
    @Test
-   void PrefPageTags_TagsList_EditTag() {
+   void prefPageTags_TagsList_EditTag() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
