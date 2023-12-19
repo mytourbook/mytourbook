@@ -1150,11 +1150,11 @@ public class TourBlogView extends ViewPart {
 
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-      if (selection instanceof final SelectionTourData tourDataSelection) {
+      if (selection instanceof SelectionTourData) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         _tourData = tourDataSelection.getTourData();
+         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 
          if (_tourData == null) {
             _tourChart = null;
