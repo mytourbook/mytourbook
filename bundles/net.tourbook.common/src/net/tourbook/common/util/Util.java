@@ -2093,16 +2093,17 @@ public class Util {
    public static String imageToBase64(final Image image) {
 
       byte[] imageBytes = null;
-      try {
-         final BufferedImage bufferedImage = ImageConverter.convertIntoAWT(image);
+      final BufferedImage bufferedImage = ImageConverter.convertIntoAWT(image);
 
-         final ByteArrayOutputStream output = new ByteArrayOutputStream();
+      try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+
          ImageIO.write(bufferedImage, "png", output); //$NON-NLS-1$
          imageBytes = output.toByteArray();
 
       } catch (final Exception e) {
          StatusUtil.log(e);
       }
+
       final byte[] encoded = Base64.getEncoder().encode(imageBytes);
       return new String(encoded);
    }
