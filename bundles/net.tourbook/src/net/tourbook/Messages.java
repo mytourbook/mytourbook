@@ -2374,7 +2374,10 @@ public class Messages extends NLS {
    public static String        Slideout_TMVOptions_Radio_MovingTime;
    public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags;
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip;
    public static String        Slideout_TourBlogOptions_Label_Title;
+
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip;
    public static String        Slideout_TourBookOptions_Label_Title;
@@ -2547,9 +2550,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourLogOptions_Radio_OpenLog_AllEvents;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_Never;
    public static String        Slideout_TourLogOptions_Radio_OpenLog_SelectedEvents;
-
-   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags;
-   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip;
 
    public static String        Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
    public static String        Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;
