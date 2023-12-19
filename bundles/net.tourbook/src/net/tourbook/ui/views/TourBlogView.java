@@ -1155,6 +1155,7 @@ public class TourBlogView extends ViewPart {
          // a tour was selected, get the chart and update the marker viewer
 
          final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+         _tourData = tourDataSelection.getTourData();
 
          if (_tourData == null) {
             _tourChart = null;
