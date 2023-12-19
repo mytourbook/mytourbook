@@ -642,9 +642,7 @@ public class TourBlogView extends ViewPart {
          }
          sb.append("</div>" + NL); //$NON-NLS-1$
 
-      } else
-
-      {
+      } else {
 
          // there is no tour header, set some spacing
 
