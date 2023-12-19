@@ -335,6 +335,7 @@ public class TourBlogView extends ViewPart {
             }
          } else if (eventId == TourEventId.TAG_CONTENT_CHANGED ||
                eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+
             final Long tourId = _tourData.getTourId();
             final TourManager tourManager = TourManager.getInstance();
 
