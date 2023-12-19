@@ -48,6 +48,16 @@ public class TourBlogViewTests extends UITest {
       tourBlogView.close();
    }
 
+   /**
+    * The below SQL statement was run to attach an image that can be found when
+    * running the unit tests on GitHub.
+    * This might be to be tweaked if GitHub changes the root folder D:\a
+    *
+    * UPDATE "USER".TOURTAG
+    * SET IMAGEFILEPATH =
+    * 'D:\a\mytourbook-BUILD-autocreated\core\net.tourbook\icons\application\tourbook32.png'
+    * WHERE TAGID = 0
+    */
    @Test
    void testBlogView_Tags() {
 
