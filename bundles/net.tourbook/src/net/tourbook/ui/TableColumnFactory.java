@@ -266,6 +266,8 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory LOCATION_PART_SettlementSmall;
    public static final String             LOCATION_PART_SettlementSmall_ID                   = "LOCATION_PART_SettlementSmall_ID";                //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_SettlementLarge;
+   public static final String             LOCATION_PART_SettlementLarge_ID                   = "LOCATION_PART_SettlementLarge_ID";                //$NON-NLS-1$
 
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_GAIN_DELTA;
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_LOSS_DELTA;
@@ -1902,6 +1904,7 @@ public abstract class TableColumnFactory {
       LOCATION_PART_Waterway         = createColumn_Address(      categoryOther,    LOCATION_PART_Waterway_ID,           Messages.Tour_Location_Part_Waterway);
 
       LOCATION_PART_SettlementSmall  = createColumn_Address(      categoryCity,     LOCATION_PART_SettlementSmall_ID,    Messages.Tour_Location_Part_SettlementSmall);
+      LOCATION_PART_SettlementLarge  = createColumn_Address(      categoryCity,     LOCATION_PART_SettlementLarge_ID,    Messages.Tour_Location_Part_SettlementLarge);
 
       /*
        * Marker

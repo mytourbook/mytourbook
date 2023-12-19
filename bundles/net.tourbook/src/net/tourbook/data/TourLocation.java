@@ -16,7 +16,12 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +30,9 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.location.LocationPartID;
 
 /**
  * Possible address fields are from <br>
@@ -83,20 +90,43 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourLocation implements Serializable {
 
-   private static final long serialVersionUID = 1L;
+   private static final long       serialVersionUID = 1L;
 
-   private static final char NL               = UI.NEW_LINE;
+   private static final char       NL               = UI.NEW_LINE;
 
-   public static final int   DB_FIELD_LENGTH  = 1000;
+   public static final int         DB_FIELD_LENGTH  = 1000;
+
+   /**
+    * Fields which are not displayed as location part
+    */
+   public static final Set<String> IGNORED_FIELDS   = Stream.of(
+
+         "ISO3166_2_lvl4",                                                             //$NON-NLS-1$
+
+         "name",                                                                       //$NON-NLS-1$
+         "display_name",                                                               //$NON-NLS-1$
+
+         "latitudeMinE6_Normalized",                                                   //$NON-NLS-1$
+         "latitudeMaxE6_Normalized",                                                   //$NON-NLS-1$
+         "longitudeMinE6_Normalized",                                                  //$NON-NLS-1$
+         "longitudeMaxE6_Normalized",                                                  //$NON-NLS-1$
+
+         "latitudeMinE6_Resized_Normalized",                                           //$NON-NLS-1$
+         "latitudeMaxE6_Resized_Normalized",                                           //$NON-NLS-1$
+         "longitudeMinE6_Resized_Normalized",                                          //$NON-NLS-1$
+         "longitudeMaxE6_Resized_Normalized"                                           //$NON-NLS-1$
+
+   )
+         .collect(Collectors.toCollection(HashSet::new));
 
    /**
     * Contains the entity id
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long              locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                    locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   public int                zoomlevel;
+   public int                      zoomlevel;
 
    /*
     * Fields from {@link OSMLocation}, the field names are kept from the downloaded location data
@@ -262,6 +292,8 @@ public class TourLocation implements Serializable {
 
    @Transient
    public String settlementSmall;
+   @Transient
+   public String settlementLarge;
 
    @Transient
    public double latitude;
@@ -365,6 +397,37 @@ public class TourLocation implements Serializable {
       return longitudeDiff;
    }
 
+   /**
+    * @param partID
+    *
+    * @return Returns the field value from the field which name is from the provided partID
+    *         {@link LocationPartID#name()}
+    */
+   public String getPartValue(final LocationPartID partID) {
+
+      if (partID == null) {
+         return null;
+      }
+
+      try {
+
+         final Field addressField = getClass().getField(partID.name());
+
+         final Object fieldValue = addressField.get(this);
+
+         if (fieldValue instanceof final String textValue) {
+
+            return textValue;
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+
+         StatusUtil.log(e);
+      }
+
+      return null;
+   }
+
    @Override
    public int hashCode() {
 
@@ -460,7 +523,6 @@ public class TourLocation implements Serializable {
          // ignore
       }
 
-
 // SET_FORMATTING_OFF
 
       // https://wiki.openstreetmap.org/wiki/Template:Generic:Map_Features:place
@@ -486,7 +548,37 @@ public class TourLocation implements Serializable {
 
       ;
 
+      settlementLarge =
+
+           city               != null ? city //             > 100'000            Grossstadt
+         : town               != null ? town //               10'000 - 100'000   Stadt
+         : borough            != null ? borough //                               Stadtbezirk
+         : suburb             != null ? suburb //                                Stadtteil
+         : quarter            != null ? quarter //                               Ortsteil
+         : village            != null ? village //           < 10'000            Dorf
+         : city_district      != null ? city_district //                         Stadtviertel
+         : neighbourhood      != null ? neighbourhood //                         Stadtviertel
+         : city_block         != null ? city_block //                            Häuserblock
+         : hamlet             != null ? hamlet //              100-1000          kleine Siedlung / Weiler
+         : isolated_dwelling  != null ? isolated_dwelling //   few               Einzelsiedlung
+         : farm               != null ? farm //                few               Bauernhof
+         : allotments         != null ? allotments //          few               Schrebergärten
+         : null
+
+      ;
+
+      if (settlementLarge == null) {
+
+         settlementLarge =
+
+               state    != null ? state //
+             : county   != null ? county //
+             : country
+         ;
+      }
+
 // SET_FORMATTING_ON
+
    }
 
    @Override
@@ -558,6 +650,7 @@ public class TourLocation implements Serializable {
             + log(" postcode            = ", postcode) //                  //$NON-NLS-1$
 
             + log(" settlementSmall     = ", settlementSmall) //           //$NON-NLS-1$
+            + log(" settlementLarge     = ", settlementLarge) //           //$NON-NLS-1$
 
             + NL
 

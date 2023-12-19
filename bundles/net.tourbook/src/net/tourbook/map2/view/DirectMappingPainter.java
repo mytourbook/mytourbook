@@ -522,7 +522,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final int viewportX = viewport.x;
       final int viewportY = viewport.y;
 
-      final int arcSize = 12;
+      final int arcSize = 20;
       final int arcSize2 = arcSize / 2;
 
       gc.setAntialias(SWT.ON);

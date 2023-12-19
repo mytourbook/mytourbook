@@ -16,6 +16,7 @@
 package net.tourbook.tour.location;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -57,6 +58,18 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
    public TourLocationProfile() {
 
       profileId = ++_idCounter;
+   }
+
+   public TourLocationProfile(final String name,
+                              final int zoomlevel,
+                              final LocationPartID... allParts) {
+
+      profileId = ++_idCounter;
+
+      this.name = name;
+      this.zoomlevel = zoomlevel;
+
+      this.allParts.addAll(Arrays.asList(allParts));
    }
 
    @Override

@@ -2919,7 +2919,14 @@ public class TourBookView extends ViewPart implements
          selectTours_NatTable(new int[] { hoveredRow }, true, false, false, true);
 
          // show context menu again
-         _pageBook.getDisplay().timerExec(10, () -> UI.openContextMenu(_tourViewer_NatTable));
+         _pageBook.getDisplay().timerExec(10, () -> {
+
+//            final Set<Long> allSelectedRowPositions2 = getSelectedTourIDs();
+//
+//            final int numSelectedRows2 = allSelectedRowPositions2.size();
+
+            UI.openContextMenu(_tourViewer_NatTable);
+         });
 
          fillContextMenu(manager, false);
 
@@ -4339,6 +4346,7 @@ public class TourBookView extends ViewPart implements
          }
       }
 
+      // set true/false/null
       _actionSetStartEndLocation.setIsStartLocation(isStartLocationInContextMenu);
    }
 
