@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -370,7 +371,8 @@ public class TourLocationManager {
    }
 
    /**
-    * Append text to the display name in {@link #_displayNameBuffer}
+    * Append text to the display name in {@link #_displayNameBuffer} but prevent duplicate part
+    * labels
     *
     * @param text
     */
@@ -1049,6 +1051,9 @@ public class TourLocationManager {
                                                   final TourLocationData existingLocationData,
                                                   final int zoomlevel) {
 
+// enable logging when debugging
+//    _isLogging_AddressRetrieval = true;
+
       /*
        * Check if tour is contained in existing location data (which is not yet saved)
        */
@@ -1144,26 +1149,35 @@ public class TourLocationManager {
       final long retrievalStartTime = System.currentTimeMillis();
       _lastRetrievalTimeMS = retrievalStartTime;
 
+      final String language = Locale.getDefault().getLanguage();
+
       final String requestUrl = UI.EMPTY_STRING
 
             + "https://nominatim.openstreetmap.org/reverse?" //$NON-NLS-1$
 
-            + "format=json" //               //$NON-NLS-1$
-            + "&addressdetails=1" //         //$NON-NLS-1$
+            + "format=json" //                     //$NON-NLS-1$
+            + "&addressdetails=1" //               //$NON-NLS-1$
 
-            + "&lat=" + latitude //          //$NON-NLS-1$
-            + "&lon=" + longitude //         //$NON-NLS-1$
-            + "&zoom=" + zoomLevel //        //$NON-NLS-1$
+            + "&lat=" + latitude //                //$NON-NLS-1$
+            + "&lon=" + longitude //               //$NON-NLS-1$
+            + "&zoom=" + zoomLevel //              //$NON-NLS-1$
 
-//          + "&polygon_text=1" //           //$NON-NLS-1$
-//          + "&polygon_geojson=1" //        //$NON-NLS-1$
+            + "&accept-language=" + language //    //$NON-NLS-1$
 
-//          + "&extratags=1" //$NON-NLS-1$
-//          + "&namedetails=1" //$NON-NLS-1$
+//          + "&polygon_text=1" //                 //$NON-NLS-1$
+//          + "&polygon_geojson=1" //              //$NON-NLS-1$
+
+//          + "&extratags=1" //                    //$NON-NLS-1$
+//          + "&namedetails=1" //                  //$NON-NLS-1$
+
 //          + "&layer=address,poi,railway,natural,manmade" //$NON-NLS-1$
 
-//          + "&accept-language=1" //$NON-NLS-1$
       ;
+
+      if (_isLogging_AddressRetrieval) {
+
+         System.out.println(requestUrl);
+      }
 
       String downloadedData = UI.EMPTY_STRING;
 
@@ -1414,7 +1428,8 @@ public class TourLocationManager {
 
    public static void removeTourLocations(final List<TourData> requestedTours,
                                           final boolean isSetStartLocation,
-                                          final boolean isSetEndLocation) {
+                                          final boolean isSetEndLocation,
+                                          final boolean isCompleteRemoval) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -1445,7 +1460,10 @@ public class TourLocationManager {
                   if (isSetStartLocation) {
 
                      tourData.setTourStartPlace(null);
-                     tourData.setTourLocationStart(null);
+
+                     if (isCompleteRemoval) {
+                        tourData.setTourLocationStart(null);
+                     }
 
                      isModified = true;
 
@@ -1459,7 +1477,10 @@ public class TourLocationManager {
                   if (isSetEndLocation) {
 
                      tourData.setTourEndPlace(null);
-                     tourData.setTourLocationEnd(null);
+
+                     if (isCompleteRemoval) {
+                        tourData.setTourLocationEnd(null);
+                     }
 
                      isModified = true;
 

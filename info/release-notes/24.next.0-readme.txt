@@ -58,6 +58,10 @@ New
   - Added action to rebuild a corrupted fulltext search index
     https://github.com/mytourbook/mytourbook/issues/1232
 
+* Tour Blog View (Frederic)
+  - Show tour tag images and information
+    https://github.com/mytourbook/mytourbook/issues/1026
+
 Improvements
 ============
 

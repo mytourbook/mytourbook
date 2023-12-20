@@ -567,6 +567,16 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             rc = compareText(location1.village, location2.village);
          }
 
+         // nth sort by largest settlement
+         if (rc == 0) {
+            rc = compareText(location1.settlementLarge, location2.settlementLarge);
+         }
+
+         // nth sort by smallest settlement
+         if (rc == 0) {
+            rc = compareText(location1.settlementSmall, location2.settlementSmall);
+         }
+
          // nth sort by road
          if (rc == 0) {
             rc = compareText(location1.road, location2.road);
@@ -1065,8 +1075,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       defineColumn_Part_40_City();
       defineColumn_Part_40_Town();
       defineColumn_Part_40_Village();
-      defineColumn_Part_42_SettlementSmall();
       defineColumn_Part_43_SettlementLarge();
+      defineColumn_Part_42_SettlementSmall();
       defineColumn_Part_40_Postcode();
 
       // Road
@@ -1277,7 +1287,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1323,7 +1333,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1339,7 +1349,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1354,7 +1364,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1369,7 +1379,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1384,7 +1394,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1399,7 +1409,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1414,7 +1424,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1430,7 +1440,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1445,7 +1455,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1460,7 +1470,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1476,7 +1486,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1492,7 +1502,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1539,7 +1549,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1555,7 +1565,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1571,7 +1581,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1586,7 +1596,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1601,7 +1611,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1616,7 +1626,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1631,7 +1641,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1646,7 +1656,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1661,7 +1671,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1676,7 +1686,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1691,7 +1701,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1706,7 +1716,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1721,7 +1731,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1736,7 +1746,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1751,7 +1761,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1766,7 +1776,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1781,7 +1791,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1796,7 +1806,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1811,7 +1821,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1826,7 +1836,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1841,7 +1851,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1856,7 +1866,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1871,7 +1881,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1886,7 +1896,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1901,7 +1911,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1916,7 +1926,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1931,7 +1941,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1946,7 +1956,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1961,7 +1971,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1976,7 +1986,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1991,7 +2001,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2006,7 +2016,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2021,7 +2031,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2036,7 +2046,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2051,7 +2061,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2066,7 +2076,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2081,7 +2091,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2096,7 +2106,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2111,7 +2121,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2126,7 +2136,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2141,7 +2151,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2156,7 +2166,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -2171,7 +2181,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new TooltipLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
