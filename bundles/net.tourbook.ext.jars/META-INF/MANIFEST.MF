@@ -6,13 +6,13 @@ Bundle-Version: 24.1.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
- joda-time-2.10.14.jar,
+ joda-time-2.12.5.jar,
  c3p0-0.9.5.5.jar,
  mchange-commons-java-0.2.20.jar,
  caffeine-3.1.4.jar,
  imgscalr-lib-4.2.jar,
  commons-imaging-1.0-alpha1.jar,
- commons-lang3-3.13.0.jar,
+ commons-lang3-3.14.0.jar,
  commons-suncalc-3.4.jar,
  commons-text-1.11.0.jar,
  json-20231013.jar,
