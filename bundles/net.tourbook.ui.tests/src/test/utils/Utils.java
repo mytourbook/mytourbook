@@ -104,7 +104,7 @@ public class Utils {
          // empty string in the preferences.
          // As a result, we restore the default preferences for which metric is
          // the selected measurement system
-         Utils.clickButton("Restore Defaults", bot);
+         Utils.clickButton("Restore Defaults", bot); //$NON-NLS-1$
       }
       Utils.clickApplyAndCloseButton(bot);
    }
