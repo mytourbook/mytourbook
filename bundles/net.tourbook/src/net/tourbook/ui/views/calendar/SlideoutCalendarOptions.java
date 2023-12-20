@@ -2846,6 +2846,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
    /**
     * @param comboFormat
     * @param dataFormatter
+    *
     * @return
     */
    private int fillUI_Formats(final Combo comboFormat, final DataFormatter dataFormatter) {
@@ -3406,7 +3407,8 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       if (_isUpdateUI) {
          return;
       }
-
+      // update text in profile combo
+      final int selectedIndex = _comboProfiles.getSelectionIndex();
       final CalendarProfile selectedProfile = getSelectedProfile();
 
       /*
@@ -3414,9 +3416,10 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
        */
       final String modifiedProfileName = _txtProfileName.getText();
 
-      // update text in profile combo
-      final int selectedIndex = _comboProfiles.getSelectionIndex();
+
+      final var toto = _comboProfiles.getItem(selectedIndex);
       _comboProfiles.setItem(selectedIndex, modifiedProfileName);
+      _comboProfiles.select(selectedIndex);
 
       // update combo in calendar view
       _calendarView.updateUI_ProfileName(selectedProfile, modifiedProfileName);

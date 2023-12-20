@@ -1035,6 +1035,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       final int selectedIndex = _comboName.getSelectionIndex();
 
       _comboName.setItem(selectedIndex, _textConfigName.getText());
+      _comboName.select(selectedIndex);
 
       saveState();
    }
