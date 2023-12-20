@@ -593,10 +593,6 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_City;
    public static String        Tour_Location_Part_CityBlock;
    public static String        Tour_Location_Part_CityDistrict;
-//   public static String        Tour_Location_Part_City_Largest;
-//   public static String        Tour_Location_Part_City_Smallest;
-//   public static String        Tour_Location_Part_CityWithZip_Largest;
-//   public static String        Tour_Location_Part_CityWithZip_Smalles;
    public static String        Tour_Location_Part_Commercial;
    public static String        Tour_Location_Part_Continent;
    public static String        Tour_Location_Part_Country;
@@ -644,6 +640,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_Town;
    public static String        Tour_Location_Part_Tunnel;
    public static String        Tour_Location_Part_Village;
+   public static String        Tour_Location_Part_SettlementLarge;
    public static String        Tour_Location_Part_SettlementSmall;
    public static String        Tour_Location_Part_Waterway;
    public static String        Tour_Location_Task_RemovingTourLocations;

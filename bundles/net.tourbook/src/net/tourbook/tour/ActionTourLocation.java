@@ -86,23 +86,23 @@ public class ActionTourLocation extends ContributionItem {
 
       public ActionLocationProfile(final TourLocationProfile locationProfile, final boolean isDefaultProfile) {
 
-         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          _locationProfile = locationProfile;
 
-         final String profileName = _locationProfile.getName();
-         final String locationName = createProfileDisplayName(_locationProfile);
+         String locationName = createProfileDisplayName(_locationProfile);
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
+
+         if (isDefaultProfile) {
+
+            locationName = UI.SYMBOL_STAR + UI.SPACE + locationName;
+         }
 
          setText(locationName);
          setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(
-//               profileName,
                joinedPartNames,
                locationProfile.getZoomlevel()));
 
-         if (isDefaultProfile) {
-            setChecked(true);
-         }
       }
 
       @Override
@@ -283,7 +283,7 @@ public class ActionTourLocation extends ContributionItem {
 
    private void createActions() {
 
-      _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle) {};
+      _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
       _actionProfileTitle.setEnabled(false);
 
       _actionRetrieveLocationAgain = new ActionRetrieveLocationAgain();

@@ -30,9 +30,10 @@ public enum LocationPartID {
    CUSTOM_STREET_WITH_HOUSE_NUMBER, //
 
    /**
-    * This is a computed part
+    * These are a computed parts
     */
    settlementSmall, //
+   settlementLarge, //
 
    /**
     * The following names are all from <a href=
