@@ -358,7 +358,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
                   final String infoText = event.getResult().isOK()
-                        ? NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
+                        ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
                               numberOfUploadedTours[0],
                               numberOfTours - numberOfUploadedTours[0])
                         : notificationText[0];
