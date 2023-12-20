@@ -433,7 +433,7 @@ public class TourBlogView extends ViewPart {
             final String imageBase64 = Util.imageToBase64(tagImage);
             cellContent.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
          }
-         final String tagText = NL + tag.getTagName() + NL + tourTagsAccumulatedValues.get(tag.getTagId());
+         final String tagText = NL + tag.getTagName() + NL + "<i>" + tourTagsAccumulatedValues.get(tag.getTagId()) + "</i>"; //$NON-NLS-1$ //$NON-NLS-2$
 
          cellContent.append(tagText);
 
