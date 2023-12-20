@@ -23,6 +23,7 @@
 
    <properties>
       <tycho.version>3.0.5</tycho.version>
+      <surefire.version>3.2.3</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -168,7 +169,7 @@
 
       <plugin>
          <artifactId>maven-surefire-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.2.1</version>
+                                                               <version>${surefire.version}</version>
          <configuration>
             <skipTests>true</skipTests>
          </configuration>
@@ -177,7 +178,7 @@
                <!-- This is to force Maven Surefire to use JUnit 5 as, otherwise, JUnit 4 is used and tests are not detected/run!? -->
                <groupId>org.apache.maven.surefire</groupId>
                <artifactId>surefire-junit-platform</artifactId>
-               <version>3.1.2</version>
+               <version>${surefire.version}</version>
             </dependency>
          </dependencies>
          <executions>

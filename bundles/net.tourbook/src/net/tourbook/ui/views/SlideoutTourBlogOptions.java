@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour blog options
  */
-public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToDefault {
+class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE         = net.tourbook.web.Messages.App_Web_Label_ContentFontSize;
    private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP = net.tourbook.web.Messages.App_Web_Label_ContentFontSize_Tooltip;
@@ -62,6 +62,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
     */
    private Button  _chkDrawMarkerWithDefaultColor;
    private Button  _chkShowHiddenMarker;
+   private Button  _chkShowTourTags;
 
    private Spinner _spinnerFontSize;
 
@@ -71,10 +72,10 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
     * @param tourBlogView
     * @param tourBlogState
     */
-   public SlideoutTourBlogOptions(final Control ownerControl,
-                                  final ToolBar toolBar,
-                                  final TourBlogView tourBlogView,
-                                  final IDialogSettings tourBlogState) {
+   SlideoutTourBlogOptions(final Control ownerControl,
+                           final ToolBar toolBar,
+                           final TourBlogView tourBlogView,
+                           final IDialogSettings tourBlogState) {
 
       super(ownerControl, toolBar);
 
@@ -97,7 +98,6 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
       final Composite ui = createUI(parent);
 
       restoreState();
-      enableControls();
 
       return ui;
    }
@@ -181,6 +181,18 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
          }
          {
             /*
+             * Display the tour tags
+             */
+
+            _chkShowTourTags = new Button(container, SWT.CHECK);
+            _chkShowTourTags.setText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourTags);
+            _chkShowTourTags.setToolTipText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip);
+            _chkShowTourTags.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowTourTags);
+
+         }
+         {
+            /*
              * Font size
              */
 
@@ -207,10 +219,6 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
       }
    }
 
-   private void enableControls() {
-
-   }
-
    private void initUI() {
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
@@ -235,6 +243,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
 
       _chkDrawMarkerWithDefaultColor.setSelection(    TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _chkShowHiddenMarker.setSelection(              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _chkShowTourTags.setSelection(                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
 
       _spinnerFontSize.setSelection(                  WEB.STATE_BODY_FONT_SIZE_DEFAULT);
 
@@ -249,6 +258,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
 
       _chkDrawMarkerWithDefaultColor.setSelection(    Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
       _chkShowHiddenMarker.setSelection(              Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
+      _chkShowTourTags.setSelection(                  Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT));
 
       _spinnerFontSize.setSelection(                  Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT));
 
@@ -264,6 +274,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionR
 
       _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor.getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker.getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  _chkShowTourTags.getSelection());
 
       _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize.getSelection());
 

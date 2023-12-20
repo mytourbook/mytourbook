@@ -29,13 +29,13 @@ import utils.Utils;
 public class PrefPageTagsTests extends UITest {
 
    @Test
-   void PrefPageTags_TagsList_CreateAndDeleteTag() {
+   void prefPageTags_TagsList_CreateAndDeleteTag() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
 
-      //assert that there is 1 tag
-      assertEquals(1, bot.tree(1).rowCount());
+      //assert that there are 2 tags
+      assertEquals(2, bot.tree(1).rowCount());
 
       //Create a new tag
       bot.button(Messages.pref_tourtag_btn_new_tag).click();
@@ -45,21 +45,21 @@ public class PrefPageTagsTests extends UITest {
       final SWTBotTreeItem newTag = bot.tree(1).getTreeItem(newTagName).select();
       assertNotNull(newTag);
 
-      //assert that there are 2 tags
-      assertEquals(2, bot.tree(1).rowCount());
+      //assert that there are 3 tags
+      assertEquals(3, bot.tree(1).rowCount());
 
       //Delete the new tag
       newTag.contextMenu(Messages.Action_Tag_Delete).click();
       bot.button(Messages.Tag_Manager_Action_DeleteTag).click();
 
-      //assert that there is 1 tag
-      assertEquals(1, bot.tree(1).rowCount());
+      //assert that there are 2 tags
+      assertEquals(2, bot.tree(1).rowCount());
 
       Utils.clickApplyAndCloseButton(bot);
    }
 
    @Test
-   void PrefPageTags_TagsList_EditTag() {
+   void prefPageTags_TagsList_EditTag() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$

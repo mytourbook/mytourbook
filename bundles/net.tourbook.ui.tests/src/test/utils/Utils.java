@@ -337,6 +337,20 @@ public class Utils {
       return tour;
    }
 
+   /**
+    * Select a tour for which tags are assigned
+    */
+   public static SWTBotTreeItem getTourWithTags(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
    public static void importTour(final SWTWorkbenchBot bot, final String fileName) {
 
       showImportView(bot);
