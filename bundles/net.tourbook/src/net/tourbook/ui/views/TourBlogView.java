@@ -396,6 +396,11 @@ public class TourBlogView extends ViewPart {
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
+   private String buildSectionTitle(final String titleText) {
+
+      return "<div class='title'>" + titleText + "</div>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
 
       final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
@@ -409,7 +414,7 @@ public class TourBlogView extends ViewPart {
          sb.append(SPACER);
       }
 
-      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Tags + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(buildSectionTitle(Messages.Tour_Blog_Section_Tags));
       sb.append("<table><tr>"); //$NON-NLS-1$
 
       final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
@@ -454,7 +459,7 @@ public class TourBlogView extends ViewPart {
          tourWeather = UI.scrambleText(tourWeather);
       }
 
-      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(buildSectionTitle(Messages.Tour_Blog_Section_Weather));
       sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
       return sb.toString();
