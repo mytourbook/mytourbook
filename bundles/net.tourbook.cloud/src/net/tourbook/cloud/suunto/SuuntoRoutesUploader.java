@@ -169,35 +169,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return UI.EMPTY_STRING;
    }
 
-   private Map<String, String> getToursWithGpsSeries(final List<TourData> selectedTours,
-                                                     final IProgressMonitor monitor) {
-
-      final Map<String, String> toursWithGpsSeries = new HashMap<>();
-
-      for (int index = 0; index < selectedTours.size() && !monitor.isCanceled(); ++index) {
-
-         final TourData tourData = selectedTours.get(index);
-         final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
-
-         if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
-
-            final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
-                  tourStartTime);
-            Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
-
-            monitor.worked(2);
-
-         } else {
-
-            toursWithGpsSeries.put(tourStartTime, convertTourToGpx(tourData));
-
-            monitor.worked(1);
-         }
-      }
-
-      return toursWithGpsSeries;
-   }
-
    @Override
    protected boolean isReady() {
 
@@ -328,7 +299,27 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
-            final Map<String, String> toursWithGpsSeries = getToursWithGpsSeries(selectedTours, monitor);
+            final Map<String, String> toursWithGpsSeries = new HashMap<>();
+            for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
+
+               final TourData tourData = selectedTours.get(index);
+               final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
+
+               if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
+
+                  final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
+                        tourStartTime);
+                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
+
+                  monitor.worked(2);
+
+               } else {
+
+                  toursWithGpsSeries.put(tourStartTime, convertTourToGpx(tourData));
+
+                  monitor.worked(1);
+               }
+            }
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
