@@ -3407,6 +3407,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       if (_isUpdateUI) {
          return;
       }
+
       final CalendarProfile selectedProfile = getSelectedProfile();
 
       /*
