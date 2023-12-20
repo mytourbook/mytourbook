@@ -401,6 +401,11 @@ public class TourBlogView extends ViewPart {
       return "<div class='title'>" + titleText + "</div>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
+   private String buildTableCell(final String cellContent) {
+
+      return "<td>" + cellContent + "</td>"; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
 
       final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
@@ -420,19 +425,19 @@ public class TourBlogView extends ViewPart {
       final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
       for (final TourTag tag : tourTags) {
 
-         sb.append("<td>"); //$NON-NLS-1$
+         final StringBuilder cellContent = new StringBuilder();
 
          final Image tagImage = TagManager.getTagImage(tag);
          if (tagImage != null) {
 
             final String imageBase64 = Util.imageToBase64(tagImage);
-            sb.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
+            cellContent.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
          }
          final String tagText = NL + tag.getTagName() + NL + tourTagsAccumulatedValues.get(tag.getTagId());
 
-         sb.append(tagText);
+         cellContent.append(tagText);
 
-         sb.append("</td>"); //$NON-NLS-1$
+         sb.append(buildTableCell(cellContent.toString()));
       }
 
       sb.append("</tr></table>"); //$NON-NLS-1$
@@ -713,8 +718,8 @@ public class TourBlogView extends ViewPart {
       final String htmlActionContainer = UI.EMPTY_STRING //
             + "<div class='action-container'>" //$NON-NLS-1$
             + ("<table><tbody><tr>") //$NON-NLS-1$
-            + ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
+            + buildTableCell(htmlActionShowHideMarker)
+            + buildTableCell(createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit))
             + "</tr></tbody></table>" // //$NON-NLS-1$
             + "</div>" + NL; //$NON-NLS-1$
 
