@@ -4275,6 +4275,10 @@ public class TourBookView extends ViewPart implements
 
       if (_isLayoutNatTable) {
 
+         if (_tourViewer_NatTable.isDisposed()) {
+            return;
+         }
+
 // this do not work, the workaround is to select a row:
 //
 //         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Grid_BodyLayer, 0, 80, false, false));
