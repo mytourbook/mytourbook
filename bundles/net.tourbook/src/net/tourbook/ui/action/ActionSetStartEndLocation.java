@@ -83,7 +83,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private static final char              NL                     = UI.NEW_LINE;
 
-   private static final String            ALLOWED_FIELDNAME_NAME = "name";                                             //$NON-NLS-1$
+   public static final String             ALLOWED_FIELDNAME_NAME = "name";                                             //$NON-NLS-1$
 
    private static final String            LOCATION_SEPARATOR     = "     ·     ";                                      //$NON-NLS-1$
    private static final String            PROFILE_NAME           = "%s - %d";                                          //$NON-NLS-1$
@@ -236,53 +236,6 @@ public class ActionSetStartEndLocation extends SubMenu {
       }
    }
 
-   private class ActionLocationProfile extends Action {
-
-      private TourLocationProfile _locationProfile;
-
-      private Boolean             _isSetStartLocation;
-      private Boolean             _isSetEndLocation;
-
-      public ActionLocationProfile(final TourLocationProfile locationProfile,
-                                   final boolean isDefaultProfile,
-
-                                   final boolean isSetStartLocation,
-                                   final boolean isSetEndLocation) {
-
-         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
-
-         _locationProfile = locationProfile;
-
-         _isSetStartLocation = isSetStartLocation;
-         _isSetEndLocation = isSetEndLocation;
-
-         final String profileName = (isDefaultProfile
-
-               // show a marker for the default profile
-               ? UI.SYMBOL_STAR + UI.SPACE
-
-               : UI.EMPTY_STRING)
-
-               + PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
-
-         setupActionTextAndTooltip_Profile(
-
-               this,
-
-               locationProfile,
-               profileName,
-
-               isSetStartLocation,
-               isSetEndLocation);
-      }
-
-      @Override
-      public void run() {
-
-         actionSetTourLocation(_locationProfile, _isSetStartLocation, _isSetEndLocation);
-      }
-   }
-
    private class ActionRemoveLocation_All extends Action {
 
       private boolean _isCompleteRemoval;
@@ -349,6 +302,59 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void run() {
          actionRemoveLocation(true, false, _isCompleteRemoval);
+      }
+   }
+
+   private class ActionSetLocation extends Action {
+
+      private TourLocationProfile _locationProfile;
+
+      private Boolean             _isSetStartLocation;
+      private Boolean             _isSetEndLocation;
+
+      /**
+       * @param locationProfile
+       * @param isDefaultProfile
+       * @param isSetStartLocation
+       * @param isSetEndLocation
+       */
+      public ActionSetLocation(final TourLocationProfile locationProfile,
+                               final boolean isDefaultProfile,
+
+                               final boolean isSetStartLocation,
+                               final boolean isSetEndLocation) {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         _locationProfile = locationProfile;
+
+         _isSetStartLocation = isSetStartLocation;
+         _isSetEndLocation = isSetEndLocation;
+
+         final String profileName = (isDefaultProfile
+
+               // show a marker for the default profile
+               ? UI.SYMBOL_STAR + UI.SPACE
+
+               : UI.EMPTY_STRING)
+
+               + PROFILE_NAME.formatted(_locationProfile.getName(), _locationProfile.getZoomlevel());
+
+         setupActionTextAndTooltip_Profile(
+
+               this,
+
+               locationProfile,
+               profileName,
+
+               isSetStartLocation,
+               isSetEndLocation);
+      }
+
+      @Override
+      public void run() {
+
+         actionSetTourLocation(_locationProfile, _isSetStartLocation, _isSetEndLocation);
       }
    }
 
@@ -556,6 +562,93 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             false // isForceReloadLocation
       );
+   }
+
+   private TourLocation[] checkSameLocations() {
+
+      TourLocation tourLocationStart = null;
+      TourLocation tourLocationEnd = null;
+
+      boolean canSetStartLocation = true;
+      boolean canSetEndLocation = true;
+
+      for (final TourData tourData : _allSelectedTours) {
+
+         final TourLocation locationStart = tourData.getTourLocationStart();
+         final TourLocation locationEnd = tourData.getTourLocationEnd();
+
+         if (tourLocationStart == null) {
+
+            // location is not yet set
+
+            if (canSetStartLocation) {
+
+               tourLocationStart = locationStart;
+            }
+
+         } else {
+
+            // location is already set
+
+            if (locationStart == null) {
+
+               // needs to be location which can be compared
+
+            } else {
+
+               if (tourLocationStart.getLocationId() == locationStart.getLocationId()) {
+
+                  // it's the same location
+
+               } else {
+
+                  // it's a different location -> there is no common location
+
+                  tourLocationStart = null;
+
+                  canSetStartLocation = false;
+               }
+            }
+
+         }
+
+         if (tourLocationEnd == null) {
+
+            // location is not yet set
+
+            if (canSetEndLocation) {
+
+               tourLocationEnd = locationEnd;
+            }
+
+         } else {
+
+            // location is already set
+
+            if (locationEnd == null) {
+
+               // needs to be location which can be compared
+
+            } else {
+
+               if (tourLocationEnd.getLocationId() == locationEnd.getLocationId()) {
+
+                  // it's the same location
+
+               } else {
+
+                  // it's a different location -> there is no common location
+
+                  tourLocationEnd = null;
+
+                  canSetEndLocation = false;
+               }
+            }
+
+         }
+      }
+
+      return new TourLocation[] { tourLocationStart, tourLocationEnd };
    }
 
    private void createActions() {
@@ -822,7 +915,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          addActionToMenu(menu,
 
-               new ActionLocationProfile(
+               new ActionSetLocation(
 
                      locationProfile,
                      isDefaultProfile,
@@ -911,6 +1004,15 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          tourLocationStart = firstTour.getTourLocationStart();
          tourLocationEnd = firstTour.getTourLocationEnd();
+
+      } else {
+
+         // check if locations of all tours are the same
+
+         final TourLocation[] sameLocations = checkSameLocations();
+
+         tourLocationStart = sameLocations[0];
+         tourLocationEnd = sameLocations[1];
       }
 
       final boolean isStartLocationAvailable = tourLocationStart != null;
@@ -937,6 +1039,21 @@ public class ActionSetStartEndLocation extends SubMenu {
                ? startLocationText
 
                : startLocationText + LOCATION_SEPARATOR + endLocationText;
+
+         // indent action to be better visible
+         action.setText(UI.SPACE8 + locationText);
+         action.setToolTipText(locationTooltip);
+
+      } else if (isSetStartLocation && isSetEndLocation
+
+            && (isStartLocationAvailable || isEndLocationAvailable)) {
+
+         // only one location is available
+
+         final String locationText = tourLocationStart != null
+
+               ? startLocationText + LOCATION_SEPARATOR + profileName
+               : profileName + LOCATION_SEPARATOR + endLocationText;
 
          // indent action to be better visible
          action.setText(UI.SPACE8 + locationText);

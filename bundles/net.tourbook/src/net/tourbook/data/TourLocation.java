@@ -33,6 +33,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.location.LocationPartID;
+import net.tourbook.ui.action.ActionSetStartEndLocation;
 
 /**
  * Possible address fields are from <br>
@@ -411,7 +412,16 @@ public class TourLocation implements Serializable {
 
       try {
 
-         final Field addressField = getClass().getField(partID.name());
+         final String partName = partID.name();
+         final String fieldName;
+
+         if (LocationPartID.OSM_NAME.equals(partID)) {
+            fieldName = ActionSetStartEndLocation.ALLOWED_FIELDNAME_NAME;
+         } else {
+            fieldName = partName;
+         }
+
+         final Field addressField = getClass().getField(fieldName);
 
          final Object fieldValue = addressField.get(this);
 

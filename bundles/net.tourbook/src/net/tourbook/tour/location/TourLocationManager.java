@@ -195,16 +195,12 @@ public class TourLocationManager {
          Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
          Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
 
-//       Map.entry(LocationPartID.CUSTOM_CITY_LARGEST,               Messages.Tour_Location_Part_City_Largest),
-//       Map.entry(LocationPartID.CUSTOM_CITY_SMALLEST,              Messages.Tour_Location_Part_City_Smallest),
-//       Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_LARGEST,      Messages.Tour_Location_Part_CityWithZip_Largest),
-//       Map.entry(LocationPartID.CUSTOM_CITY_WITH_ZIP_SMALLEST,     Messages.Tour_Location_Part_CityWithZip_Smalles),
-
          Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
 
-         //                                                          this is a computed part
+         // this is a computed part
          Map.entry(LocationPartID.settlementSmall,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementSmall),
          Map.entry(LocationPartID.settlementLarge,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementLarge),
+
 
          Map.entry(LocationPartID.continent,                         Messages.Tour_Location_Part_Continent),
          Map.entry(LocationPartID.country,                           Messages.Tour_Location_Part_Country),
@@ -392,7 +388,6 @@ public class TourLocationManager {
       }
 
       _displayNameBuffer.append(text);
-
       _usedDisplayNames.add(text);
    }
 
@@ -402,34 +397,69 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-            new TourLocationProfile("A : City",             10,   LocationPartID.town,
-                                                                  LocationPartID.OSM_NAME),
+         new TourLocationProfile("0 : Name",   18,
 
-            new TourLocationProfile("B : Town / Borough",   12,   LocationPartID.town,
-                                                                  LocationPartID.OSM_NAME),
+            LocationPartID.OSM_NAME),
 
-            new TourLocationProfile("C : Village / Suburb", 13,   LocationPartID.suburb,
-                                                                  LocationPartID.OSM_NAME),
+         new TourLocationProfile("1 : Street + House #",   18,
 
-            new TourLocationProfile("D : Neighbourhood",    14,   LocationPartID.neighbourhood,
-                                                                  LocationPartID.OSM_NAME),
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-            // default default profile - 4
-            new TourLocationProfile("E : Settlement",       15,   LocationPartID.settlementSmall,
-                                                                  LocationPartID.OSM_NAME),
+         new TourLocationProfile("A : State",   18,
 
-            new TourLocationProfile("F : Major Street",     16,   LocationPartID.road,
-                                                                  LocationPartID.settlementSmall,
-                                                                  LocationPartID.OSM_NAME),
+            LocationPartID.state,
+            LocationPartID.OSM_NAME),
 
-            new TourLocationProfile("G : Minor Street",     17,   LocationPartID.road,
-                                                                  LocationPartID.OSM_NAME),
+         new TourLocationProfile("B : City",   10,
 
-            new TourLocationProfile("H : Building",         18,   LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
-                                                                  LocationPartID.settlementSmall,
-                                                                  LocationPartID.OSM_NAME),
+            LocationPartID.settlementLarge,
+            LocationPartID.state,
+            LocationPartID.city,
+            LocationPartID.OSM_NAME),
 
-            new TourLocationProfile("H : Street + House #", 18,   LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)
+         new TourLocationProfile("C : Town / Borough",   12,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME,
+            LocationPartID.town),
+
+         new TourLocationProfile("D : Village / Suburb",   13,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.suburb,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("E : Neighbourhood",   14,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.neighbourhood,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("F : Settlement",   15,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("G : Major Street",   16,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.road,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("H : Minor Street",   17,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.road,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("I : Building",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME)
 
 // SET_FORMATTING_ON
 
@@ -438,6 +468,66 @@ public class TourLocationManager {
       _allLocationProfiles.addAll(Arrays.asList(allProfiles));
 
       _defaultProfile = allProfiles[4];
+   }
+
+   /**
+    * Generate Java code to easily define the default profiles
+    */
+   public static void createDefaultProfiles_JavaCode() {
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append("      final TourLocationProfile[] allProfiles = {"); //$NON-NLS-1$
+      sb.append(NL);
+      sb.append(NL);
+
+      sb.append("// SET_FORMATTING_OFF"); //$NON-NLS-1$
+      sb.append(NL);
+      sb.append(NL);
+
+      final int numProfiles = _allLocationProfiles.size();
+      for (int profileIndex = 0; profileIndex < numProfiles; profileIndex++) {
+
+         final TourLocationProfile profile = _allLocationProfiles.get(profileIndex);
+
+         sb.append("         new TourLocationProfile(\"" + profile.name + "\",   " + profile.zoomlevel + ","); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         sb.append(NL);
+
+         final List<LocationPartID> allParts = profile.allParts;
+         final int numParts = allParts.size();
+
+         for (int partIndex = 0; partIndex < numParts; partIndex++) {
+
+            sb.append(NL);
+
+            final LocationPartID partID = allParts.get(partIndex);
+
+            sb.append("            LocationPartID." + partID.name()); //$NON-NLS-1$
+
+            if (partIndex < numParts - 1) {
+               sb.append(","); //$NON-NLS-1$
+            }
+         }
+
+         sb.append(")"); //$NON-NLS-1$
+
+         if (profileIndex < numProfiles - 1) {
+            sb.append(","); //$NON-NLS-1$
+         }
+
+         sb.append(NL);
+         sb.append(NL);
+      }
+
+      sb.append("// SET_FORMATTING_ON"); //$NON-NLS-1$
+      sb.append(NL);
+      sb.append(NL);
+
+      sb.append("      };"); //$NON-NLS-1$
+      sb.append(NL);
+      sb.append(NL);
+
+      System.out.println(sb.toString());
    }
 
    public static String createJoinedPartNames(final TourLocationProfile profile, final String delimiter) {
@@ -453,10 +543,6 @@ public class TourLocationManager {
                switch (locationPart) {
                case OSM_DEFAULT_NAME:
                case OSM_NAME:
-//               case CUSTOM_CITY_LARGEST:
-//               case CUSTOM_CITY_SMALLEST:
-//               case CUSTOM_CITY_WITH_ZIP_LARGEST:
-//               case CUSTOM_CITY_WITH_ZIP_SMALLEST:
                case CUSTOM_STREET_WITH_HOUSE_NUMBER:
 
                   label = TourLocationManager.createPartName_Combined(locationPart);
@@ -552,12 +638,6 @@ public class TourLocationManager {
 
          case OSM_DEFAULT_NAME:                 appendPart(tourLocation.display_name);                         break;
          case OSM_NAME:                         appendPart(tourLocation.name);                                 break;
-
-//         case CUSTOM_CITY_LARGEST:              appendPart(getCombined_City_Largest(tourLocation));            break;
-//         case CUSTOM_CITY_SMALLEST:             appendPart(getCombined_City_Smallest(tourLocation));           break;
-//
-//         case CUSTOM_CITY_WITH_ZIP_LARGEST:     appendPart(getCombined_CityWithZip_Largest(tourLocation));     break;
-//         case CUSTOM_CITY_WITH_ZIP_SMALLEST:    appendPart(getCombined_CityWithZip_Smallest(tourLocation));    break;
 
          case CUSTOM_STREET_WITH_HOUSE_NUMBER:  appendPart(getCombined_StreetWithHouseNumber(tourLocation));   break;
 
@@ -1854,116 +1934,5 @@ public class TourLocationManager {
 
       return xmlRoot;
    }
-
-// /**
-//  * Places are sorted by number of inhabitants, only some or nothing are available
-//  *
-//  * place = city,
-//  * place = town,
-//  * place = village,
-//  * place = hamlet
-//  * place = isolated_dwelling
-//  *
-//  * https://wiki.openstreetmap.org/wiki/Key:place
-//  *
-//  * @param tourLocation
-//  *
-//  * @return
-//  */
-// static String getCombined_City_Largest(final TourLocation tourLocation) {
-//
-////SET_FORMATTING_OFF
-//
-//    final String adrCity                = tourLocation.city;
-//    final String adrTown                = tourLocation.town;
-//    final String adrVillage             = tourLocation.village;
-//    final String adrHamlet              = tourLocation.hamlet;
-//    final String adrIsolated_dwelling   = tourLocation.isolated_dwelling;
-//
-//    String city = null;
-//
-//    if (adrCity != null) {                    city = adrCity;               }
-//    else if (adrTown != null) {               city = adrTown;               }
-//    else if (adrVillage != null) {            city = adrVillage;            }
-//    else if (adrHamlet != null) {             city = adrHamlet;             }
-//    else if (adrIsolated_dwelling != null) {  city = adrIsolated_dwelling;  }
-//
-////SET_FORMATTING_ON
-//
-//    return city;
-// }
-//
-// static String getCombined_City_Smallest(final TourLocation tourLocation) {
-//
-////SET_FORMATTING_OFF
-//
-//    final String adrCity                = tourLocation.city;
-//    final String adrTown                = tourLocation.town;
-//    final String adrVillage             = tourLocation.village;
-//    final String adrHamlet              = tourLocation.hamlet;
-//    final String adrIsolatedDwelling    = tourLocation.isolated_dwelling;
-//
-//    String city = null;
-//
-//    if (adrIsolatedDwelling != null) { city = adrIsolatedDwelling;  }
-//    else if (adrHamlet != null) {       city = adrHamlet;             }
-//    else if (adrVillage != null) {      city = adrVillage;            }
-//    else if (adrTown != null) {         city = adrTown;               }
-//    else if (adrCity != null) {         city = adrCity;               }
-//
-////SET_FORMATTING_ON
-//
-//    return city;
-// }
-//
-// static String getCombined_CityWithZip_Largest(final TourLocation tourLocation) {
-//
-//    final String city = getCombined_City_Largest(tourLocation);
-//    final String adrPostCode = tourLocation.postcode;
-//
-//    if (city == null || adrPostCode == null) {
-//       return null;
-//    }
-//
-//    final String adrCountryCode = tourLocation.country_code;
-//
-//    if (COUNTRY_CODE_US.equals(adrCountryCode)) {
-//
-//       // city + zip code
-//
-//       return city + UI.SPACE + adrPostCode;
-//
-//    } else {
-//
-//       // zip code + city
-//
-//       return adrPostCode + UI.SPACE + city;
-//    }
-// }
-//
-// static String getCombined_CityWithZip_Smallest(final TourLocation tourLocation) {
-//
-//    final String city = getCombined_City_Smallest(tourLocation);
-//    final String adrPostCode = tourLocation.postcode;
-//
-//    if (city == null || adrPostCode == null) {
-//       return null;
-//    }
-//
-//    final String adrCountryCode = tourLocation.country_code;
-//
-//    if (COUNTRY_CODE_US.equals(adrCountryCode)) {
-//
-//       // city + zip code
-//
-//       return city + UI.SPACE + adrPostCode;
-//
-//    } else {
-//
-//       // zip code + city
-//
-//       return adrPostCode + UI.SPACE + city;
-//    }
-// }
 
 }
