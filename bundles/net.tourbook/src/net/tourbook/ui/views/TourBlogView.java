@@ -396,16 +396,6 @@ public class TourBlogView extends ViewPart {
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private String buildSectionTitle(final String titleText) {
-
-      return "<div class='title'>" + titleText + "</div>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
-   }
-
-   private String buildTableCell(final String cellContent) {
-
-      return "<td>" + cellContent + "</td>"; //$NON-NLS-1$ //$NON-NLS-2$
-   }
-
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
 
       final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
@@ -419,25 +409,25 @@ public class TourBlogView extends ViewPart {
          sb.append(SPACER);
       }
 
-      sb.append(buildSectionTitle(Messages.Tour_Blog_Section_Tags));
+      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Tags + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
       sb.append("<table><tr>"); //$NON-NLS-1$
 
       final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
       for (final TourTag tag : tourTags) {
 
-         final StringBuilder cellContent = new StringBuilder();
+         sb.append("<td>"); //$NON-NLS-1$
 
          final Image tagImage = TagManager.getTagImage(tag);
          if (tagImage != null) {
 
             final String imageBase64 = Util.imageToBase64(tagImage);
-            cellContent.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
          }
          final String tagText = NL + tag.getTagName() + NL + "<i>" + tourTagsAccumulatedValues.get(tag.getTagId()) + "</i>"; //$NON-NLS-1$ //$NON-NLS-2$
 
-         cellContent.append(tagText);
+         sb.append(tagText);
 
-         sb.append(buildTableCell(cellContent.toString()));
+         sb.append("</td>"); //$NON-NLS-1$
       }
 
       sb.append("</tr></table>"); //$NON-NLS-1$
@@ -464,7 +454,7 @@ public class TourBlogView extends ViewPart {
          tourWeather = UI.scrambleText(tourWeather);
       }
 
-      sb.append(buildSectionTitle(Messages.Tour_Blog_Section_Weather));
+      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Weather + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
       sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
       return sb.toString();
@@ -718,8 +708,8 @@ public class TourBlogView extends ViewPart {
       final String htmlActionContainer = UI.EMPTY_STRING //
             + "<div class='action-container'>" //$NON-NLS-1$
             + ("<table><tbody><tr>") //$NON-NLS-1$
-            + buildTableCell(htmlActionShowHideMarker)
-            + buildTableCell(createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit))
+            + ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
             + "</tr></tbody></table>" // //$NON-NLS-1$
             + "</div>" + NL; //$NON-NLS-1$
 
