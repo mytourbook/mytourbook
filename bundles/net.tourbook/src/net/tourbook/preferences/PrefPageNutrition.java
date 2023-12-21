@@ -36,6 +36,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageNutrition extends PreferencePage implements IWorkbenchPreferencePage {
 
+
    public static final String ID = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
 
    private PixelConverter     _pixelConverter;
@@ -48,6 +49,9 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
     * UI controls
     */
    private Spinner _spinnerCaloriesPerHourTarget;
+   //todo fb Tooltip
+   // p 109 Performance Nutrition for runners M. Fitzgerald
+   // "Research has shown...."
    private Button             _chkIgnoreFirstHour;
 
    @Override
