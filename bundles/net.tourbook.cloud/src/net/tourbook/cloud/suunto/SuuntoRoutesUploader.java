@@ -313,19 +313,18 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                final TourData tourData = selectedTours.get(index);
                final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
 
-               if (!isTourContainsGpsData(tourData)) {
+               if (isTourContainsGpsData(tourData)) {
+
+                  toursWithGpsSeries.put(tourStartTime, convertTourToGpx(tourData));
+
+                  monitor.worked(1);
+               } else {
 
                   final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
                         tourStartTime);
                   Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
 
                   monitor.worked(2);
-
-               } else {
-
-                  toursWithGpsSeries.put(tourStartTime, convertTourToGpx(tourData));
-
-                  monitor.worked(1);
                }
             }
 
