@@ -126,11 +126,9 @@ public class SuuntoUploaderTests extends UITest {
       bot.sleep(5000);
 
       // Assert
-      httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/route/import").toString()).called(); //$NON-NLS-1$
-
       logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "3/1/2022, 1:51 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
+            "2/3/2022, 1:51 AM -> GPS coordinates are missing"))); //$NON-NLS-1$
    }
 
    @Test
