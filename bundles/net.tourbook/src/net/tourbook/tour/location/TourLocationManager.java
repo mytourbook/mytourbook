@@ -25,10 +25,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.HttpTimeoutException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -143,6 +143,8 @@ public class TourLocationManager {
          .newBuilder()
          .connectTimeout(Duration.ofSeconds(10))
          .build();
+
+   private static final Duration                  _httpTimeoutDuration        = Duration.ofSeconds(5);
 
    private static final StringBuilder             _displayNameBuffer          = new StringBuilder();
    private static final Set<String>               _usedDisplayNames           = new HashSet<>();
@@ -1153,7 +1155,7 @@ public class TourLocationManager {
       /*
        * Retrieve location
        */
-      final TourLocationData tourLocationData = getLocationData_10_RetrieveData(latitude, longitude, zoomlevel);
+      final TourLocationData tourLocationData = getLocationData_10_Download_Prepare(latitude, longitude, zoomlevel);
 
       if (tourLocationData == null) {
          return null;
@@ -1194,9 +1196,9 @@ public class TourLocationManager {
     *
     * @return Returns <code>null</code> or {@link TourLocationData}
     */
-   private static TourLocationData getLocationData_10_RetrieveData(final double latitude,
-                                                                   final double longitude,
-                                                                   final int zoomLevel) {
+   private static TourLocationData getLocationData_10_Download_Prepare(final double latitude,
+                                                                       final double longitude,
+                                                                       final int zoomLevel) {
 
       final long now = System.currentTimeMillis();
       long waitingTime = now - _lastRetrievalTimeMS;
@@ -1259,49 +1261,70 @@ public class TourLocationManager {
          System.out.println(requestUrl);
       }
 
-      String downloadedData = UI.EMPTY_STRING;
+      final String[] downloadedData = { null };
+
+      if (Display.getCurrent() == null) {
+
+         // this code is running not in the display thread, potentially in the progress thread
+
+         getLocationData_15_Download_HttpRequest(requestUrl, downloadedData);
+
+      } else {
+
+         BusyIndicator.showWhile(Display.getDefault(), () -> {
+
+            getLocationData_15_Download_HttpRequest(requestUrl, downloadedData);
+         });
+      }
+
+      if (downloadedData[0] == null) {
+         return null;
+      }
+
+      final long retrievalEndTime = System.currentTimeMillis();
+      final long retrievalDuration = retrievalEndTime - retrievalStartTime;
+
+      return new TourLocationData(downloadedData[0], retrievalDuration, waitingTime);
+   }
+
+   private static void getLocationData_15_Download_HttpRequest(final String requestUrl, final String[] downloadedData) {
 
       try {
 
          final HttpRequest request = HttpRequest
                .newBuilder(URI.create(requestUrl))
                .header(WEB.HTTP_HEADER_USER_AGENT, _userAgent)
+               .timeout(_httpTimeoutDuration)
                .GET()
                .build();
 
          final HttpResponse<String> response = _httpClient.send(request, BodyHandlers.ofString());
 
-         downloadedData = response.body();
+         downloadedData[0] = response.body();
 
          if (response.statusCode() != HttpURLConnection.HTTP_OK) {
 
-            logError(downloadedData);
+            logError(downloadedData[0]);
 
-            return null;
+            downloadedData[0] = null;
          }
 
-      } catch (final HttpConnectTimeoutException ex) {
+      } catch (final HttpTimeoutException ex) {
 
-         StatusUtil.showStatus(ex);
+         StatusUtil.showStatus(requestUrl, ex);
 
-         logException(ex);
+         logException(requestUrl, ex);
 
-         return null;
+         downloadedData[0] = null;
 
       } catch (final Exception ex) {
 
-         logException(ex);
+         logException(requestUrl, ex);
 
 //       Thread.currentThread().interrupt();
 
-         return null;
+         downloadedData[0] = null;
       }
-
-      final long retrievalEndTime = System.currentTimeMillis();
-
-      final long retrievalDuration = retrievalEndTime - retrievalStartTime;
-
-      return new TourLocationData(downloadedData, retrievalDuration, waitingTime);
    }
 
    private static OSMLocation getLocationData_20_DeserializeData(final String osmLocationString) {
@@ -1327,6 +1350,19 @@ public class TourLocationManager {
    public static List<TourLocationProfile> getProfiles() {
 
       return _allLocationProfiles;
+   }
+
+   /**
+    * @return Returns the zoomlevel of the default profile, when not available then the default
+    *         zoomlevel
+    */
+   public static int getProfileZoomlevel() {
+
+      return _defaultProfile == null
+
+            ? DEFAULT_ZOOM_LEVEL_VALUE
+
+            : _defaultProfile.getZoomlevel();
    }
 
    /**
@@ -1501,9 +1537,9 @@ public class TourLocationManager {
             exceptionMessage));
    }
 
-   private static void logException(final Exception ex) {
+   private static void logException(final String requestUrl, final Exception ex) {
 
-      TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving tour location data", ex); //$NON-NLS-1$
+      TourLogManager.log_EXCEPTION_WithStacktrace("Error while retrieving tour location data: " + requestUrl + NL, ex); //$NON-NLS-1$
    }
 
    public static void removeTourLocations(final List<TourData> requestedTours,

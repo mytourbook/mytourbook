@@ -506,11 +506,12 @@ public class ActionSetStartEndLocation extends SubMenu {
             return;
          }
 
+
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
                latitudeSerie[0],
                longitudeSerie[0],
                null,
-               TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
+               TourLocationManager.getProfileZoomlevel());
 
          if (retrievedLocationData == null) {
             return;
