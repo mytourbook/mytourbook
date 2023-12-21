@@ -182,6 +182,14 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
    }
 
+   private boolean isTourContainsGpsData(final TourData tourData) {
+
+      return tourData.latitudeSerie != null &&
+            tourData.latitudeSerie.length > 0 &&
+            tourData.longitudeSerie != null &&
+            tourData.longitudeSerie.length > 0;
+   }
+
    private boolean logUploadResult(final RouteUpload routeUpload) {
 
       boolean isRouteUploaded = false;
@@ -305,7 +313,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                final TourData tourData = selectedTours.get(index);
                final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
 
-               if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
+               if (!isTourContainsGpsData(tourData)) {
 
                   final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
                         tourStartTime);
