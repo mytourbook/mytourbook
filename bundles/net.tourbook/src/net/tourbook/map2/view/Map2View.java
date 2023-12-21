@@ -5154,10 +5154,11 @@ public class Map2View extends ViewPart implements
             return;
          }
 
-         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
-         if (tourDataList != null) {
+         final ArrayList<TourData> allSelectedTours = TourManager.getSelectedTours();
+         if (allSelectedTours != null) {
 
-            setTourData(tourDataList);
+            setTourData(allSelectedTours);
+
             _hash_AllTourData = _allTourData.hashCode();
 
             paintTours_10_All();
