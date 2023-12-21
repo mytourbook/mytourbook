@@ -1264,6 +1264,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final int selectedIndex = _comboName.getSelectionIndex();
 
       _comboName.setItem(selectedIndex, _textConfigName.getText());
+      _comboName.select(selectedIndex);
 
       saveState();
    }
