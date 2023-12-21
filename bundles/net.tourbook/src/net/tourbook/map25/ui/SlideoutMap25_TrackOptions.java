@@ -459,7 +459,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                   _spinnerLine_Opacity.addSelectionListener(_defaultSelectionListener);
                   _spinnerLine_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
                }
-               {}
             }
          }
       }
