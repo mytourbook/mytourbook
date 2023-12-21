@@ -352,24 +352,23 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning() == false) {
-               return;
+            if (PlatformUI.isWorkbenchRunning()) {
+
+               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+                  final String infoText = event.getResult().isOK()
+                        ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
+                              numberOfUploadedTours[0],
+                              numberOfTours - numberOfUploadedTours[0])
+                        : notificationText[0];
+
+                  TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+
+                  UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
+                        infoText);
+               });
             }
-
-            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-
-               final String infoText = event.getResult().isOK()
-                     ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
-                           numberOfUploadedTours[0],
-                           numberOfTours - numberOfUploadedTours[0])
-                     : notificationText[0];
-
-               TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
-
-               UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title,
-                     Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
-                     infoText);
-            });
          }
       });
    }
