@@ -24,7 +24,7 @@ public class ApplicationVersion {
    /**
     * Copyright year which is displayed in the splash screen.
     */
-   public static final String SPLASH_COPYRIGHT_YEAR = "2023"; //$NON-NLS-1$
+   static final String SPLASH_COPYRIGHT_YEAR = "2024"; //$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
    private static final String DEVELOPMENT_VERSION_TEXT = UI.EMPTY_STRING;

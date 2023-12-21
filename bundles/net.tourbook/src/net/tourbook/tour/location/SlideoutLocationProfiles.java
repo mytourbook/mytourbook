@@ -1237,6 +1237,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       // save slideout position/size
       super.saveState();
+
+// create Java code for the default profiles
+//
+//      TourLocationManager.createDefaultProfiles_JavaCode();
    }
 
    @Override

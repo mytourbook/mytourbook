@@ -1584,55 +1584,71 @@ public class TourManager {
     */
    public static ArrayList<TourData> getSelectedTours(final boolean isOnlyGeoTour) {
 
-      final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+      // loop all tourProviders
 
-      // get all tourProviders
-      for (final IWorkbenchWindow wbWindow : wbWindows) {
+      for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
 
-         final IWorkbenchPage[] pages = wbWindow.getPages();
-         for (final IWorkbenchPage wbPage : pages) {
+         for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
 
-            final IViewReference[] viewRefs = wbPage.getViewReferences();
-            for (final IViewReference viewRef : viewRefs) {
+            for (final IViewReference viewRef : wbPage.getViewReferences()) {
 
                final IViewPart view = viewRef.getView(false);
-               if (view instanceof ITourProvider) {
 
-                  final ITourProvider tourProvider = (ITourProvider) view;
-                  final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+               if (view instanceof final ITourProvider tourProvider) {
 
-                  if (selectedTours != null) {
+                  final ArrayList<TourData> allSelectedTours = tourProvider.getSelectedTours();
 
-                     if (isOnlyGeoTour) {
+                  if (allSelectedTours == null) {
+                     continue;
+                  }
 
-                        // return only geo tours
+                  if (isOnlyGeoTour) {
 
-                        final ArrayList<TourData> geoTours = new ArrayList<>();
+                     // return only geo tours
 
-                        for (final TourData tourData : selectedTours) {
+                     final ArrayList<TourData> geoTours = new ArrayList<>();
 
-                           final double[] latitudeSerie = tourData.latitudeSerie;
+                     for (final TourData tourData : allSelectedTours) {
 
-                           if (latitudeSerie != null && latitudeSerie.length > 0) {
-                              geoTours.add(tourData);
-                           }
+                        if (tourData == null) {
+                           continue;
                         }
 
-                        if (geoTours.size() > 0) {
-                           return geoTours;
+                        final double[] latitudeSerie = tourData.latitudeSerie;
+
+                        if (latitudeSerie != null && latitudeSerie.length > 0) {
+                           geoTours.add(tourData);
                         }
+                     }
 
-                     } else {
+                     if (geoTours.size() > 0) {
+                        return geoTours;
+                     }
 
-                        // return all tours
+                  } else {
 
-                        if (selectedTours.size() > 0) {
+                     // return all tours
 
-                           /*
-                            * a tour provider is found which also provides tours
-                            */
-                           return selectedTours;
+                     /**
+                      * Ensure that tourdata is not null to fix
+                      * https://github.com/mytourbook/mytourbook/issues/878#issuecomment-1864875688
+                      * there are currently 41 tour providers which could return a null value
+                      */
+                     final ArrayList<TourData> allNotNullTourData = new ArrayList<>();
+
+                     for (final TourData tourData : allSelectedTours) {
+
+                        if (tourData != null) {
+                           allNotNullTourData.add(tourData);
                         }
+                     }
+
+                     if (allNotNullTourData.size() > 0) {
+
+                        /*
+                         * A tour provider is found which also provides tours
+                         */
+                        return allNotNullTourData;
                      }
                   }
                }
@@ -2996,7 +3012,7 @@ public class TourManager {
          // no progress when only 1 tour is saved
 
          saveModifiedTours_OneTour(
-               
+
                savedTours,
                tourDataEditorSavedTour,
                doFireChangeEvent,
@@ -3023,7 +3039,7 @@ public class TourManager {
                            tourSize));
 
                      saveModifiedTours_OneTour(
-                           
+
                            savedTours,
                            tourDataEditorSavedTour,
                            doFireChangeEvent,
