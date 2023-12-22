@@ -2828,6 +2828,8 @@ public class Messages extends NLS {
    public static String        Tour_Blog_Action_HideMarker_Tooltip;
    public static String        Tour_Blog_Action_OpenMarker_Tooltip;
    public static String        Tour_Blog_Action_ShowMarker_Tooltip;
+   public static String        Tour_Blog_Section_Tags;
+   public static String        Tour_Blog_Section_Weather;
 
    public static String        Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String        Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;

@@ -124,6 +124,10 @@ Bugfix
   - The air quality texts were saved using the translated texts instead of a unique id.
     https://github.com/mytourbook/mytourbook/issues/1193
 
+* Slideout Calendar Profiles (Frederic)
+  - Fixed a bug when creating new profiles (Linux only)
+    https://github.com/mytourbook/mytourbook/issues/1241
+
 
 Translation    
 ===========

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -296,7 +296,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
          _comboName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
          _comboName.setVisibleItemCount(20);
          _comboName.addFocusListener(_keepOpenListener);
-         _comboName.addSelectionListener(widgetSelectedAdapter(this::onSelectConfig));
+         _comboName.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectConfig()));
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .align(SWT.BEGINNING, SWT.CENTER)
@@ -310,7 +310,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
          _btnReset = new Button(container, SWT.PUSH);
          _btnReset.setText(Messages.TourTrack_Properties_Button_Default);
          _btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
-         _btnReset.addSelectionListener(widgetSelectedAdapter(this::onSelectDefaultConfig));
+         _btnReset.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectDefaultConfig(selectionEvent)));
          GridDataFactory.fillDefaults()
                .align(SWT.END, SWT.CENTER)
                .applyTo(_btnReset);
@@ -972,6 +972,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
 
    /**
     * @param combo
+    *
     * @return Returns combo selection index or 0 when nothing is selected.
     */
    private int getComboIndex(final Combo combo) {
@@ -1035,11 +1036,12 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       final int selectedIndex = _comboName.getSelectionIndex();
 
       _comboName.setItem(selectedIndex, _textConfigName.getText());
+      _comboName.select(selectedIndex);
 
       saveState();
    }
 
-   private void onSelectConfig(final SelectionEvent selectionEvent) {
+   private void onSelectConfig() {
 
       final int selectedIndex = _comboName.getSelectionIndex();
       final List<TourTrackConfig> allConfigurations = TourTrackConfigManager.getAllConfigurations();
@@ -1152,7 +1154,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
    /**
     * Restores state values from the tour track configuration and update the UI.
     */
-   public void restoreState() {
+   private void restoreState() {
 
       _isUpdateUI = true;
 
