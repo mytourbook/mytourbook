@@ -329,7 +329,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
              * button: search
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
-            _btnSearch.setText("Messages.Poi_View_Button_Search");
+            _btnSearch.setText(Messages.Dialog_SearchProduct_Button_Search);
             _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
          }
          {
@@ -337,7 +337,8 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
              * Button: Add
              */
             _btnAdd = new Button(queryContainer, SWT.PUSH);
-            _btnAdd.setText("Add");
+            _btnAdd.setText(Messages.Dialog_SearchProduct_Button_Add);
+            _btnAdd.setToolTipText(Messages.Dialog_SearchProduct_Button_Add_Tooltip);
             _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAddProduct()));
          }
       }
