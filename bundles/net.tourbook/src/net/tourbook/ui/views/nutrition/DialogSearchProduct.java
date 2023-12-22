@@ -137,11 +137,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       @Override
       public Object[] getElements(final Object parent) {
 
-         if (_products == null) {
-            return new String[] {};
-         } else {
-            return _products.toArray();
-         }
+         return _products == null ? new String[] {} : _products.toArray();
       }
 
       @Override
