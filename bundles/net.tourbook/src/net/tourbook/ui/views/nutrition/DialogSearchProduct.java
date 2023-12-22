@@ -249,7 +249,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       // create UI widgets
       super.create();
 
-      createActions();
 //      _isInUIInit = true;
 //      {
 //         restoreState();
@@ -257,10 +256,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 //      _isInUIInit = false;
 
       enableActions();
-
-   }
-
-   private void createActions() {
 
    }
 
@@ -351,7 +346,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
    private void createUI_20_Viewer(final Composite parent) {
 
       /*
-       * table viewer: poi items
+       * table viewer: products
        */
       final Table productsTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
@@ -377,14 +372,15 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
          final ISelection selection = selectionChangedEvent.getSelection();
          final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-         final Product selectedPoi = (Product) firstElement;
+         final Product selectedProduct = (Product) firstElement;
 
-         _postSelectionProvider.setSelection(selectedPoi);
+         _postSelectionProvider.setSelection(selectedProduct);
       });
    }
 
    private void enableActions() {
 
+      _btnAdd.setEnabled(_productsViewer.getSelection() != null);
    }
 
    @Override
