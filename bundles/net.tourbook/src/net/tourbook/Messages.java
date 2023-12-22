@@ -878,6 +878,8 @@ public class Messages extends NLS {
    public static String        Dialog_SaveTags_Radio_ReplaceTags;
    public static String        Dialog_SaveTags_Wizard_Title;
 
+   public static String        Dialog_SearchProduct_Title;
+
    public static String        Dialog_Sensor_EditSensor_Title;
    public static String        Dialog_Sensor_Label_SensorType;
 

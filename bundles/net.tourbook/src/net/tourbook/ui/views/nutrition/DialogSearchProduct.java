@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
@@ -60,7 +61,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -136,6 +136,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       @Override
       public Object[] getElements(final Object parent) {
+
          if (_products == null) {
             return new String[] {};
          } else {
@@ -153,13 +154,11 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       @Override
       public Image getColumnImage(final Object obj, final int index) {
-         switch (index) {
-         case 0:
-            return getImage(obj);
 
-         default:
-            return null;
+         if (index == 0) {
+            return getImage(obj);
          }
+         return null;
       }
 
       @Override
@@ -172,7 +171,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
             return product.code();
 
          case 1:
-
             return product.productName();
 
          default:
@@ -200,7 +198,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage());
 
       _tourId = tourId;
       _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
@@ -238,7 +236,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       super.configureShell(shell);
 
-      shell.setText("search for a fuel item");
+      shell.setText(Messages.Dialog_SearchProduct_Title);
 
       shell.addDisposeListener(disposeEvent -> onDispose());
    }
@@ -315,22 +313,11 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       {
          {
             /*
-             * label: POI
-             */
-            final Label label = new Label(queryContainer, SWT.NONE);
-            label.setText("Messages.Poi_View_Label_POI");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-         }
-         {
-            /*
              * combo: search
              */
             _cboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _cboSearchQuery.setVisibleItemCount(30);
-            _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               // start searching when ENTER is pressed
-               onSearchPoi();
-            }));
+            _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
             _cboSearchQuery.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
@@ -343,7 +330,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText("Messages.Poi_View_Button_Search");
-            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
+            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
          }
          {
             /*
@@ -441,7 +428,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       _prefStore.removePropertyChangeListener(_prefChangeListener);
    }
 
-   private void onSearchPoi() {
+   private void onSearchProduct() {
 
       // disable search controls
       _cboSearchQuery.setEnabled(false);
@@ -486,10 +473,10 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          _productsViewer.setInput(new Object());
 
          // select first entry, if there is one
-         final Table poiTable = _productsViewer.getTable();
-         if (poiTable.getItemCount() > 0) {
+         final Table productsTable = _productsViewer.getTable();
+         if (productsTable.getItemCount() > 0) {
 
-            final Object firstData = poiTable.getItem(0).getData();
+            final Object firstData = productsTable.getItem(0).getData();
             if (firstData instanceof Product) {
 
                _productsViewer.setSelection(new StructuredSelection(firstData));
