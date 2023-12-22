@@ -182,6 +182,14 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
    }
 
+   private boolean isTourContainsGpsData(final TourData tourData) {
+
+      return tourData.latitudeSerie != null &&
+            tourData.latitudeSerie.length > 0 &&
+            tourData.longitudeSerie != null &&
+            tourData.longitudeSerie.length > 0;
+   }
+
    private boolean logUploadResult(final RouteUpload routeUpload) {
 
       boolean isRouteUploaded = false;
@@ -305,20 +313,18 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                final TourData tourData = selectedTours.get(index);
                final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
 
-               if (tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) {
-
-                  final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
-                        tourStartTime);
-                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
-                  notificationText[0] = errorMessage;
-
-                  monitor.worked(2);
-
-               } else {
+               if (isTourContainsGpsData(tourData)) {
 
                   toursWithGpsSeries.put(tourStartTime, convertTourToGpx(tourData));
 
                   monitor.worked(1);
+               } else {
+
+                  final String errorMessage = NLS.bind(Messages.Log_UploadRoutesToSuunto_002_NoGpsCoordinate,
+                        tourStartTime);
+                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(errorMessage));
+
+                  monitor.worked(2);
                }
             }
 
@@ -358,7 +364,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
                   final String infoText = event.getResult().isOK()
-                        ? NLS.bind(Messages.Dialog_UploadToursToSuunto_Message,
+                        ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
                               numberOfUploadedTours[0],
                               numberOfTours - numberOfUploadedTours[0])
                         : notificationText[0];

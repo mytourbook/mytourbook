@@ -7,15 +7,15 @@
 	<classpathentry exported="true" kind="lib" path="mchange-commons-java-0.2.20.jar"/> <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
 	<classpathentry exported="true" kind="lib" path="caffeine-3.1.4.jar"/> <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
 	<classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
-	<classpathentry exported="true" kind="lib" path="commons-lang3-3.13.0.jar" sourcepath="jar-sources/commons-lang3-3.13.0-sources.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+	<classpathentry exported="true" kind="lib" path="commons-lang3-3.14.0.jar" sourcepath="jar-sources/commons-lang3-3.14.0-sources.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 	<classpathentry exported="true" kind="lib" path="commons-text-1.11.0.jar" sourcepath="jar-sources/commons-text-1.11.0-sources.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/> <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
 	<classpathentry exported="true" kind="lib" path="jackson-core-2.16.0.jar" sourcepath="/Jackson Core"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 	<classpathentry exported="true" kind="lib" path="jackson-databind-2.16.0.jar" sourcepath="/Jackson Databind"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.16.0.jar" sourcepath="/Jackson Annotations"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
-   <classpathentry exported="true" kind="lib" path="joda-time-2.10.14.jar"> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+   <classpathentry exported="true" kind="lib" path="joda-time-2.12.5.jar"> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
 		<attributes>
-			<attribute name="javadoc_location" value="https://www.javadoc.io/doc/joda-time/joda-time/2.10.14"/>
+			<attribute name="javadoc_location" value="https://www.javadoc.io/doc/joda-time/joda-time/2.12.5"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="json-20231013.jar"/> <!-- https://mvnrepository.com/artifact/org.json/json -->
