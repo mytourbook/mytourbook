@@ -116,6 +116,8 @@ public class TourLocationToolTip extends ToolTip {
       }
 
       setHideOnMouseDown(false);
+
+      setPopupDelay(20);
    }
 
    public TourLocationToolTip(final TourLocationView tourLocationView) {
@@ -132,6 +134,8 @@ public class TourLocationToolTip extends ToolTip {
       _columnViewer = locationViewer;
 
       setHideOnMouseDown(false);
+
+      setPopupDelay(20);
    }
 
    @Override
