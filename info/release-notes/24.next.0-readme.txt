@@ -40,6 +40,9 @@ Experimental
 New
 ===
 
+* Splashscreen (Barbara / Frederic)
+  https://github.com/mytourbook/mytourbook/discussions/1215#discussioncomment-7961052
+
 * Start/End Location
   - Import: Automatic completion of start and end location fields
     https://github.com/mytourbook/mytourbook/issues/878
@@ -51,12 +54,12 @@ New
     - Quick tour editor
     - Tour editor
 
-* All Tour Markers View (Frederic)
-  - Added the ability to delete markers
-
 * Fulltext search
   - Added action to rebuild a corrupted fulltext search index
     https://github.com/mytourbook/mytourbook/issues/1232
+
+* All Tour Markers View (Frederic)
+  - Added the ability to delete markers
 
 * Tour Blog View (Frederic)
   - Show tour tag images and information
