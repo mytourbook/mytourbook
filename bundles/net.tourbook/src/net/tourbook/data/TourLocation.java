@@ -155,56 +155,56 @@ public class TourLocation implements Serializable {
    public int longitudeE6_Normalized;
 
    /**
-    * Contains the normalized latitude min value
+    * Contains the normalized latitude min value, it's the cardinal direction south
     * <p>
     * <code>normalized = latitude + 90</code>
     */
    public int latitudeMinE6_Normalized;
 
    /**
-    * Contains the normalized latitude max value
+    * Contains the normalized latitude max value, it's the cardinal direction north
     * <p>
     * normalized = latitude + 90
     */
    public int latitudeMaxE6_Normalized;
 
    /**
-    * Contains the normalized longitude min value
+    * Contains the normalized longitude min value, it's the cardinal direction west
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMinE6_Normalized;
 
    /**
-    * Contains the normalized longitude max value
+    * Contains the normalized longitude max value, it's the cardinal direction east
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMaxE6_Normalized;
 
    /**
-    * Contains the resized normalized latitude min value
+    * Contains the resized normalized latitude min value, it's the cardinal direction south
     * <p>
     * <code>normalized = latitude + 90</code>
     */
    public int latitudeMinE6_Resized_Normalized;
 
    /**
-    * Contains the resized normalized latitude max value
+    * Contains the resized normalized latitude max value, it's the cardinal direction north
     * <p>
     * normalized = latitude + 90
     */
    public int latitudeMaxE6_Resized_Normalized;
 
    /**
-    * Contains the resized normalized longitude min value
+    * Contains the resized normalized longitude min value, it's the cardinal direction west
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMinE6_Resized_Normalized;
 
    /**
-    * Contains the resized normalized longitude max value
+    * Contains the resized normalized longitude max value, it's the cardinal direction east
     * <p>
     * normalized = longitude + 180
     */
@@ -306,21 +306,35 @@ public class TourLocation implements Serializable {
    @Transient
    public int    longitudeE6;
 
+   /** Cardinal direction: South */
    @Transient
    public double latitudeMin;
+
+   /** Cardinal direction: North */
    @Transient
    public double latitudeMax;
+
+   /** Cardinal direction: West */
    @Transient
    public double longitudeMin;
+
+   /** Cardinal direction: East */
    @Transient
    public double longitudeMax;
 
+   /** Cardinal direction: South */
    @Transient
    public double latitudeMin_Resized;
+
+   /** Cardinal direction: North */
    @Transient
    public double latitudeMax_Resized;
+
+   /** Cardinal direction: West */
    @Transient
    public double longitudeMin_Resized;
+
+   /** Cardinal direction: East */
    @Transient
    public double longitudeMax_Resized;
 

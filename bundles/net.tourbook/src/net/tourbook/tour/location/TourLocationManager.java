@@ -1652,6 +1652,56 @@ public class TourLocationManager {
    }
 
    /**
+    * Set in the database the resized bounding box for the tour location ID
+    *
+    * @param locationId
+    * @param latitudeMinE6_Normalized
+    * @param latitudeMaxE6_Normalized
+    * @param longitudeMinE6_Normalized
+    * @param longitudeMaxE6_Normalized
+    */
+   public static void setResizedBoundingBox(final long locationId,
+
+                                            final int latitudeMinE6_Normalized,
+                                            final int latitudeMaxE6_Normalized,
+
+                                            final int longitudeMinE6_Normalized,
+                                            final int longitudeMaxE6_Normalized) {
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sql = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_LOCATION + NL //      //$NON-NLS-1$
+
+               + "SET" + NL //                                             //$NON-NLS-1$
+
+               + " latitudeMinE6_Resized_Normalized  = ?," + NL //      1  //$NON-NLS-1$
+               + " latitudeMaxE6_Resized_Normalized  = ?," + NL //      2  //$NON-NLS-1$
+
+               + " longitudeMinE6_Resized_Normalized = ?," + NL //      3  //$NON-NLS-1$
+               + " longitudeMaxE6_Resized_Normalized = ? " + NL //      4  //$NON-NLS-1$
+
+               + " WHERE locationID = ?"; //                            5  //$NON-NLS-1$
+
+         final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
+
+         sqlUpdate.setInt(1, latitudeMinE6_Normalized);
+         sqlUpdate.setInt(2, latitudeMaxE6_Normalized);
+         sqlUpdate.setInt(3, longitudeMinE6_Normalized);
+         sqlUpdate.setInt(4, longitudeMaxE6_Normalized);
+
+         sqlUpdate.setLong(5, locationId);
+
+         sqlUpdate.executeUpdate();
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+      }
+   }
+
+   /**
     * Set tour locations for the requested tours, when not available, then download and save tour
     * locations
     *

@@ -31,6 +31,7 @@ import java.util.Formatter;
 import java.util.Random;
 
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -262,6 +263,9 @@ public class UI {
    public static final String       INCREMENTER_1                        = "1";                                         //$NON-NLS-1$
    public static final String       INCREMENTER_10                       = "10";                                        //$NON-NLS-1$
    public static final String       INCREMENTER_100                      = "100";                                       //$NON-NLS-1$
+   public static final String       INCREMENTER_1_000                    = FormatManager.formatNumber_0(1_000);
+   public static final String       INCREMENTER_10_000                   = FormatManager.formatNumber_0(10_000);
+   public static final String       INCREMENTER_100_000                  = FormatManager.formatNumber_0(100_000);
 
    private static final char[]      INVALID_FILENAME_CHARS               = new char[] {
          '\\',

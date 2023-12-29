@@ -865,6 +865,16 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Radio_ReplaceThis;
    public static String        Dialog_ReplaceImportFilename_Title;
 
+   public static String        Dialog_ResizeTourLocation_Action_ResetValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Action_Resize;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_East;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_North;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_South;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_West;
+   public static String        Dialog_ResizeTourLocation_Label_PageValue;
+   public static String        Dialog_ResizeTourLocation_Label_PageValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Title;
+
    public static String        Dialog_RetrieveWeather_Dialog_Title;
 
    public static String        Dialog_SaveTags_Dialog_Title;
