@@ -3107,7 +3107,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
          final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
 
-         final double resizeValueMeter = resizeValue / UI.UNIT_VALUE_DISTANCE_SMALL;
+         final double resizeValueMeter = resizeValue * 0.5 / UI.UNIT_VALUE_DISTANCE_SMALL;
 
          final GeoPosition destinationPointVertical = MtMath.destinationPoint(
 
