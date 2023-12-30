@@ -866,13 +866,15 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Title;
 
    public static String        Dialog_ResizeTourLocation_Action_ResetValue_Tooltip;
-   public static String        Dialog_ResizeTourLocation_Action_Resize;
-   public static String        Dialog_ResizeTourLocation_Label_Orientation_East;
-   public static String        Dialog_ResizeTourLocation_Label_Orientation_North;
-   public static String        Dialog_ResizeTourLocation_Label_Orientation_South;
-   public static String        Dialog_ResizeTourLocation_Label_Orientation_West;
-   public static String        Dialog_ResizeTourLocation_Label_PageValue;
+   public static String        Dialog_ResizeTourLocation_Label_BoundingBox_DefaultSize;
+   public static String        Dialog_ResizeTourLocation_Label_BoundingBox_ResizedSize;
+   public static String        Dialog_ResizeTourLocation_Label_IncrementDecrementValue;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Bottom;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Left;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Right;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Top;
    public static String        Dialog_ResizeTourLocation_Label_PageValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Message;
    public static String        Dialog_ResizeTourLocation_Title;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
