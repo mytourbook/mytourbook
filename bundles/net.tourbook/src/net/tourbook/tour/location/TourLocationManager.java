@@ -1652,7 +1652,7 @@ public class TourLocationManager {
    }
 
    /**
-    * Set in the database the resized bounding box for the tour location ID
+    * Save resized bounding box in the database for the provided tour location ID
     *
     * @param locationId
     * @param latitudeMinE6_Normalized
@@ -1698,6 +1698,81 @@ public class TourLocationManager {
       } catch (final SQLException e) {
 
          UI.showSQLException(e);
+      }
+   }
+
+   public static void setResizedBoundingBox_IncludeGeoPosition(final List<TourLocation> allSelectedLocations) {
+
+      for (final TourLocation tourLocation : allSelectedLocations) {
+
+         final int latitudeE6_Normalized = tourLocation.latitudeE6_Normalized;
+         final int longitudeE6_Normalized = tourLocation.longitudeE6_Normalized;
+
+         final int latitudeMinE6_Resized_Normalized = Math.min(latitudeE6_Normalized, tourLocation.latitudeMinE6_Resized_Normalized);
+         final int latitudeMaxE6_Resized_Normalized = Math.max(latitudeE6_Normalized, tourLocation.latitudeMaxE6_Resized_Normalized);
+
+         final int longitudeMinE6_Resized_Normalized = Math.min(longitudeE6_Normalized, tourLocation.longitudeMinE6_Resized_Normalized);
+         final int longitudeMaxE6_Resized_Normalized = Math.max(longitudeE6_Normalized, tourLocation.longitudeMaxE6_Resized_Normalized);
+
+         setResizedBoundingBox(tourLocation.getLocationId(),
+
+               latitudeMinE6_Resized_Normalized,
+               latitudeMaxE6_Resized_Normalized,
+
+               longitudeMinE6_Resized_Normalized,
+               longitudeMaxE6_Resized_Normalized);
+
+         /*
+          * Update model
+          */
+         tourLocation.latitudeMinE6_Resized_Normalized = latitudeMinE6_Resized_Normalized;
+         tourLocation.latitudeMaxE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
+         tourLocation.longitudeMinE6_Resized_Normalized = longitudeMinE6_Resized_Normalized;
+         tourLocation.longitudeMaxE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
+
+         tourLocation.setTransientValues(true);
+      }
+   }
+
+   public static void setResizedBoundingBox_Relocate(final List<TourLocation> allSelectedLocations) {
+
+      for (final TourLocation tourLocation : allSelectedLocations) {
+
+         final int latitudeE6_Normalized = tourLocation.latitudeE6_Normalized;
+         final int longitudeE6_Normalized = tourLocation.longitudeE6_Normalized;
+
+         int latitudeMinE6_Resized_Normalized = tourLocation.latitudeMinE6_Resized_Normalized;
+         int latitudeMaxE6_Resized_Normalized = tourLocation.latitudeMaxE6_Resized_Normalized;
+
+         int longitudeMinE6_Resized_Normalized = tourLocation.longitudeMinE6_Resized_Normalized;
+         int longitudeMaxE6_Resized_Normalized = tourLocation.longitudeMaxE6_Resized_Normalized;
+
+         final int latDiff2 = (latitudeMaxE6_Resized_Normalized - latitudeMinE6_Resized_Normalized) / 2;
+         final int lonDiff2 = (longitudeMaxE6_Resized_Normalized - longitudeMinE6_Resized_Normalized) / 2;
+
+         latitudeMinE6_Resized_Normalized = latitudeE6_Normalized - latDiff2;
+         latitudeMaxE6_Resized_Normalized = latitudeE6_Normalized + latDiff2;
+
+         longitudeMinE6_Resized_Normalized = longitudeE6_Normalized - lonDiff2;
+         longitudeMaxE6_Resized_Normalized = longitudeE6_Normalized + lonDiff2;
+
+         setResizedBoundingBox(tourLocation.getLocationId(),
+
+               latitudeMinE6_Resized_Normalized,
+               latitudeMaxE6_Resized_Normalized,
+
+               longitudeMinE6_Resized_Normalized,
+               longitudeMaxE6_Resized_Normalized);
+
+         /*
+          * Update model
+          */
+         tourLocation.latitudeMinE6_Resized_Normalized = latitudeMinE6_Resized_Normalized;
+         tourLocation.latitudeMaxE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
+         tourLocation.longitudeMinE6_Resized_Normalized = longitudeMinE6_Resized_Normalized;
+         tourLocation.longitudeMaxE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
+
+         tourLocation.setTransientValues(true);
       }
    }
 

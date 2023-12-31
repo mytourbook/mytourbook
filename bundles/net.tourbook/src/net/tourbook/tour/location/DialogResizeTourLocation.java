@@ -39,6 +39,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -80,6 +81,10 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
     */
    private Combo            _comboMouseWheelIncrementer;
 
+   private Button           _btnIncludeGeoPosition;
+   private Button           _btnRelocateBBox;
+   private Button           _btnResetBBox;
+
    private Label            _lblBBoxDefaultSize;
    private Label            _lblBBoxResizedSize;
    private Label            _lblDistance_Top;
@@ -115,7 +120,6 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
          onResetValue(_spinner);
       }
-
    }
 
    public DialogResizeTourLocation(final TourLocationView tourLocationView, final TourLocation tourLocation) {
@@ -167,9 +171,20 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 //      shellContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
          createUI_10_LocationName(shellContainer);
-         createUI_20_BoundingBox(shellContainer);
-         createUI_30_Size(shellContainer);
-         createUI_90_Footer(shellContainer);
+
+         UI.createSpacer_Horizontal(shellContainer, 2);
+
+         final Composite container = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+            createUI_20_BoundingBox(container);
+            createUI_30_Size(container);
+         }
+
+         createUI_50_Actions(shellContainer);
+
+         createUI_90_Footer(container);
       }
 
       fillUI();
@@ -206,8 +221,6 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
       final int minDistance = -10_000_000;
       final int maxDistance = +10_000_000;
-
-      UI.createSpacer_Horizontal(parent, 2);
 
       final Composite containerTopBottom = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(containerTopBottom);
@@ -320,7 +333,7 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
    private void createUI_30_Size(final Composite parent) {
 
-      UI.createSpacer_Horizontal(parent, 2);
+      UI.createSpacer_Horizontal(parent, 3);
 
       final Composite containerLeft = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(containerLeft);
@@ -360,6 +373,42 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       }
    }
 
+   private void createUI_50_Actions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         /*
+          * Include
+          */
+         _btnIncludeGeoPosition = new Button(container, SWT.NONE);
+         _btnIncludeGeoPosition.setText(Messages.Tour_Location_Action_IncludeGeoPosition_Short);
+         _btnIncludeGeoPosition.setToolTipText(Messages.Tour_Location_Action_IncludeGeoPosition_Tooltip);
+         _btnIncludeGeoPosition.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onBoundingBox_IncludeGeoPos()));
+         setButtonLayoutData(_btnIncludeGeoPosition);
+
+         /*
+          * Relocate
+          */
+         _btnRelocateBBox = new Button(container, SWT.NONE);
+         _btnRelocateBBox.setText(Messages.Tour_Location_Action_RelocateBoundingBox_Short);
+         _btnRelocateBBox.setToolTipText(Messages.Tour_Location_Action_RelocateBoundingBox_Tooltip);
+         _btnRelocateBBox.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onBoundingBox_Relocate()));
+         setButtonLayoutData(_btnRelocateBBox);
+
+         /*
+          * Reset
+          */
+         _btnResetBBox = new Button(container, SWT.NONE);
+         _btnResetBBox.setText(Messages.Tour_Location_Action_ResetBoundingBox_Short);
+         _btnResetBBox.setToolTipText(Messages.Tour_Location_Action_ResetBoundingBox_Tooltip);
+         _btnResetBBox.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onBoundingBox_Reset()));
+         setButtonLayoutData(_btnResetBBox);
+      }
+   }
+
    private void createUI_90_Footer(final Composite parent) {
 
       UI.createSpacer_Horizontal(parent, 2);
@@ -368,7 +417,6 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .span(2, 1)
-//            .indent(0, 120)
             .grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
@@ -459,7 +507,7 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       // keep window size and position
       return _state;
 
-      // for debugging: test default position/size
+// for debugging: test default position/size
 //    return null;
    }
 
@@ -474,11 +522,11 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
       _pc = new PixelConverter(parent);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onResizeBoundingBox());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onBoundingBox_Resize());
 
       _defaultMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, _mouseWheelIncrementer);
-         onResizeBoundingBox();
+         onBoundingBox_Resize();
       };
 
    }
@@ -531,6 +579,43 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       super.okPressed();
    }
 
+   private void onBoundingBox_IncludeGeoPos() {
+
+      TourLocationManager.setResizedBoundingBox_IncludeGeoPosition(Arrays.asList(_tourLocation));
+
+      updateUIfromModel();
+
+      enableControls();
+
+      fireModifyEvent();
+   }
+
+   private void onBoundingBox_Relocate() {
+
+      TourLocationManager.setResizedBoundingBox_Relocate(Arrays.asList(_tourLocation));
+
+      updateUIfromModel();
+
+      enableControls();
+
+      fireModifyEvent();
+   }
+
+   private void onBoundingBox_Reset() {
+
+      _spinnerDistance_Top.setSelection(0);
+      _spinnerDistance_Bottom.setSelection(0);
+      _spinnerDistance_Left.setSelection(0);
+      _spinnerDistance_Right.setSelection(0);
+
+      updateModelFromUI_AndFireEvent();
+   }
+
+   private void onBoundingBox_Resize() {
+
+      updateModelFromUI_AndFireEvent();
+   }
+
    private void onMouseWheelIncrementer() {
 
       final int selectionIndex = _comboMouseWheelIncrementer.getSelectionIndex();
@@ -543,29 +628,21 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       _spinnerDistance_Right.setPageIncrement(_mouseWheelIncrementer);
    }
 
+   /**
+    * Reset value for one spinner control
+    *
+    * @param spinner
+    */
    private void onResetValue(final Spinner spinner) {
 
       spinner.setSelection(0);
 
-      updateUIandModel();
-
-      enableControls();
-
-      fireModifyEvent();
-   }
-
-   private void onResizeBoundingBox() {
-
-      updateUIandModel();
-
-      enableControls();
-
-      fireModifyEvent();
+      updateModelFromUI_AndFireEvent();
    }
 
    private void restoreState() {
 
-      updateUI();
+      updateUIfromModel();
 
       _mouseWheelIncrementer = Util.getStateInt(_state, STATE_MOUSE_WHEEL_INCREMENTER, STATE_MOUSE_WHEEL_INCREMENTER_DEFAULT);
 
@@ -577,91 +654,7 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       _state.put(STATE_MOUSE_WHEEL_INCREMENTER, _mouseWheelIncrementer);
    }
 
-   /**
-    * @param isRestore
-    * @param isUpdateModel
-    */
-   private void updateUI() {
-
-// SET_FORMATTING_OFF
-
-      final double latitudeMin               = _tourLocation.latitudeMin;
-      final double latitudeMax               = _tourLocation.latitudeMax;
-      final double longitudeMin              = _tourLocation.longitudeMin;
-      final double longitudeMax              = _tourLocation.longitudeMax;
-
-      final double latitudeMin_Resized       = _tourLocation.latitudeMin_Resized;
-      final double latitudeMax_Resized       = _tourLocation.latitudeMax_Resized;
-      final double longitudeMin_Resized      = _tourLocation.longitudeMin_Resized;
-      final double longitudeMax_Resized      = _tourLocation.longitudeMax_Resized;
-
-      final int latitudeMinE6_Resized        = (int) (latitudeMin_Resized * 1E6);
-      final int latitudeMaxE6_Resized        = (int) (latitudeMax_Resized * 1E6);
-      final int longitudeMinE6_Resized       = (int) (longitudeMin_Resized * 1E6);
-      final int longitudeMaxE6_Resized       = (int) (longitudeMax_Resized * 1E6);
-
-      int latitudeMinE6_Resized_Normalized   = latitudeMinE6_Resized + 90_000_000;
-      int latitudeMaxE6_Resized_Normalized   = latitudeMaxE6_Resized + 90_000_000;
-      int longitudeMinE6_Resized_Normalized  = longitudeMinE6_Resized + 180_000_000;
-      int longitudeMaxE6_Resized_Normalized  = longitudeMaxE6_Resized + 180_000_000;
-
-      final double bboxWidth           = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin, longitudeMax) / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxHeight          = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMax, longitudeMin) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-      final double bboxWidth_Resized    = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMin_Resized, longitudeMax_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxHeight_Resized   = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMax_Resized, longitudeMin_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-      final double bboxTopDiff         = MtMath.distanceVincenty(latitudeMax, longitudeMax, latitudeMax_Resized,  longitudeMax)           / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxBottomDiff      = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin_Resized,  longitudeMin)           / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxLeftDiff        = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin,          longitudeMin_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxRightDiff       = MtMath.distanceVincenty(latitudeMin, longitudeMax, latitudeMin,          longitudeMax_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-// SET_FORMATTING_ON
-
-      // ensure that min < max
-      if (latitudeMinE6_Resized_Normalized > latitudeMaxE6_Resized_Normalized) {
-
-         final int swapValue = latitudeMinE6_Resized_Normalized;
-
-         latitudeMinE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
-         latitudeMaxE6_Resized_Normalized = swapValue;
-      }
-
-      if (longitudeMinE6_Resized_Normalized > longitudeMaxE6_Resized_Normalized) {
-
-         final int swapValue = longitudeMinE6_Resized_Normalized;
-
-         longitudeMinE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
-         longitudeMaxE6_Resized_Normalized = swapValue;
-      }
-
-      /*
-       * Update UI
-       */
-      _lblBBoxDefaultSize.setText(BOUNDING_BOX_SIZE.formatted(
-
-            FormatManager.formatNumber_0(bboxWidth),
-            FormatManager.formatNumber_0(bboxHeight),
-
-            UI.UNIT_LABEL_DISTANCE_M_OR_YD));
-
-      _lblBBoxResizedSize.setText(BOUNDING_BOX_SIZE.formatted(
-
-            FormatManager.formatNumber_0(bboxWidth_Resized),
-            FormatManager.formatNumber_0(bboxHeight_Resized),
-
-            UI.UNIT_LABEL_DISTANCE_M_OR_YD));
-
-      _spinnerDistance_Top.setSelection((int) (bboxTopDiff + 0.5));
-      _spinnerDistance_Bottom.setSelection((int) (bboxBottomDiff + 0.5));
-      _spinnerDistance_Left.setSelection((int) (bboxLeftDiff + 0.5));
-      _spinnerDistance_Right.setSelection((int) (bboxRightDiff + 0.5));
-   }
-
-   /**
-    * @param isRestore
-    */
-   private void updateUIandModel() {
+   private void updateModelFromUI() {
 
 // SET_FORMATTING_OFF
 
@@ -760,6 +753,95 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
             UI.UNIT_LABEL_DISTANCE_M_OR_YD));
 
       _tourLocationView.updateUI(_tourLocation);
+   }
+
+   private void updateModelFromUI_AndFireEvent() {
+
+      updateModelFromUI();
+
+      enableControls();
+
+      fireModifyEvent();
+   }
+
+   /**
+    * Update UI from {@link #_tourLocation}
+    */
+   private void updateUIfromModel() {
+
+// SET_FORMATTING_OFF
+
+      final double latitudeMin               = _tourLocation.latitudeMin;
+      final double latitudeMax               = _tourLocation.latitudeMax;
+      final double longitudeMin              = _tourLocation.longitudeMin;
+      final double longitudeMax              = _tourLocation.longitudeMax;
+
+      final double latitudeMin_Resized       = _tourLocation.latitudeMin_Resized;
+      final double latitudeMax_Resized       = _tourLocation.latitudeMax_Resized;
+      final double longitudeMin_Resized      = _tourLocation.longitudeMin_Resized;
+      final double longitudeMax_Resized      = _tourLocation.longitudeMax_Resized;
+
+      final int latitudeMinE6_Resized        = (int) (latitudeMin_Resized * 1E6);
+      final int latitudeMaxE6_Resized        = (int) (latitudeMax_Resized * 1E6);
+      final int longitudeMinE6_Resized       = (int) (longitudeMin_Resized * 1E6);
+      final int longitudeMaxE6_Resized       = (int) (longitudeMax_Resized * 1E6);
+
+      int latitudeMinE6_Resized_Normalized   = latitudeMinE6_Resized + 90_000_000;
+      int latitudeMaxE6_Resized_Normalized   = latitudeMaxE6_Resized + 90_000_000;
+      int longitudeMinE6_Resized_Normalized  = longitudeMinE6_Resized + 180_000_000;
+      int longitudeMaxE6_Resized_Normalized  = longitudeMaxE6_Resized + 180_000_000;
+
+      final double bboxWidth           = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin, longitudeMax) / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxHeight          = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMax, longitudeMin) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      final double bboxWidth_Resized    = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMin_Resized, longitudeMax_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxHeight_Resized   = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMax_Resized, longitudeMin_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      final double bboxTopDiff         = MtMath.distanceVincenty(latitudeMax, longitudeMax, latitudeMax_Resized,  longitudeMax)           / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxBottomDiff      = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin_Resized,  longitudeMin)           / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxLeftDiff        = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin,          longitudeMin_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxRightDiff       = MtMath.distanceVincenty(latitudeMin, longitudeMax, latitudeMin,          longitudeMax_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+// SET_FORMATTING_ON
+
+      // ensure that min < max
+      if (latitudeMinE6_Resized_Normalized > latitudeMaxE6_Resized_Normalized) {
+
+         final int swapValue = latitudeMinE6_Resized_Normalized;
+
+         latitudeMinE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
+         latitudeMaxE6_Resized_Normalized = swapValue;
+      }
+
+      if (longitudeMinE6_Resized_Normalized > longitudeMaxE6_Resized_Normalized) {
+
+         final int swapValue = longitudeMinE6_Resized_Normalized;
+
+         longitudeMinE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
+         longitudeMaxE6_Resized_Normalized = swapValue;
+      }
+
+      /*
+       * Update UI
+       */
+      _lblBBoxDefaultSize.setText(BOUNDING_BOX_SIZE.formatted(
+
+            FormatManager.formatNumber_0(bboxWidth),
+            FormatManager.formatNumber_0(bboxHeight),
+
+            UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+
+      _lblBBoxResizedSize.setText(BOUNDING_BOX_SIZE.formatted(
+
+            FormatManager.formatNumber_0(bboxWidth_Resized),
+            FormatManager.formatNumber_0(bboxHeight_Resized),
+
+            UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+
+      _spinnerDistance_Top.setSelection((int) (bboxTopDiff + 0.5));
+      _spinnerDistance_Bottom.setSelection((int) (bboxBottomDiff + 0.5));
+      _spinnerDistance_Left.setSelection((int) (bboxLeftDiff + 0.5));
+      _spinnerDistance_Right.setSelection((int) (bboxRightDiff + 0.5));
    }
 
 }

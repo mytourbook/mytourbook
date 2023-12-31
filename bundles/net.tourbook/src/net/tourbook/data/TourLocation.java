@@ -487,7 +487,19 @@ public class TourLocation implements Serializable {
     */
    public void setTransientValues() {
 
-      if (latitudeMin != 0 || longitudeMin != 0) {
+      setTransientValues(false);
+   }
+
+   /**
+    * Set values which are not saved in the database
+    *
+    * @param isUpdateValues
+    *           When <code>true</code> then transient values are set even when they are already set,
+    *           this is used to update transient values
+    */
+   public void setTransientValues(final boolean isUpdateValues) {
+
+      if (isUpdateValues == false && (latitudeMin != 0 || longitudeMin != 0)) {
          return;
       }
 
