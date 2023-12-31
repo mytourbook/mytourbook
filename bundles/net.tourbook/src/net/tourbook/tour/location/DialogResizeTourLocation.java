@@ -781,45 +781,28 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       final double longitudeMin_Resized      = _tourLocation.longitudeMin_Resized;
       final double longitudeMax_Resized      = _tourLocation.longitudeMax_Resized;
 
-      final int latitudeMinE6_Resized        = (int) (latitudeMin_Resized * 1E6);
-      final int latitudeMaxE6_Resized        = (int) (latitudeMax_Resized * 1E6);
-      final int longitudeMinE6_Resized       = (int) (longitudeMin_Resized * 1E6);
-      final int longitudeMaxE6_Resized       = (int) (longitudeMax_Resized * 1E6);
-
-      int latitudeMinE6_Resized_Normalized   = latitudeMinE6_Resized + 90_000_000;
-      int latitudeMaxE6_Resized_Normalized   = latitudeMaxE6_Resized + 90_000_000;
-      int longitudeMinE6_Resized_Normalized  = longitudeMinE6_Resized + 180_000_000;
-      int longitudeMaxE6_Resized_Normalized  = longitudeMaxE6_Resized + 180_000_000;
+      final int signumLatMin           = latitudeMin  <= latitudeMin_Resized  ? -1 :  1;
+      final int signumLatMax           = latitudeMax  <= latitudeMax_Resized  ?  1 : -1;
+      final int signumLonMin           = longitudeMin <= longitudeMin_Resized ? -1 :  1;
+      final int signumLonMax           = longitudeMax <= longitudeMax_Resized ?  1 : -1;
 
       final double bboxWidth           = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin, longitudeMax) / UI.UNIT_VALUE_DISTANCE_SMALL;
       final double bboxHeight          = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMax, longitudeMin) / UI.UNIT_VALUE_DISTANCE_SMALL;
 
-      final double bboxWidth_Resized    = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMin_Resized, longitudeMax_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxHeight_Resized   = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMax_Resized, longitudeMin_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxWidth_Resized   = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMin_Resized, longitudeMax_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double bboxHeight_Resized  = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMax_Resized, longitudeMin_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
 
-      final double bboxTopDiff         = MtMath.distanceVincenty(latitudeMax, longitudeMax, latitudeMax_Resized,  longitudeMax)           / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxBottomDiff      = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin_Resized,  longitudeMin)           / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxLeftDiff        = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin,          longitudeMin_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final double bboxRightDiff       = MtMath.distanceVincenty(latitudeMin, longitudeMax, latitudeMin,          longitudeMax_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxTopDiff         = MtMath.distanceVincenty(latitudeMax, longitudeMax, latitudeMax_Resized,  longitudeMax)           / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxBottomDiff      = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin_Resized,  longitudeMin)           / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxLeftDiff        = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin,          longitudeMin_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxRightDiff       = MtMath.distanceVincenty(latitudeMin, longitudeMax, latitudeMin,          longitudeMax_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      bboxTopDiff    *= signumLatMax;
+      bboxBottomDiff *= signumLatMin;
+      bboxLeftDiff   *= signumLonMin;
+      bboxRightDiff  *= signumLonMax;
 
 // SET_FORMATTING_ON
-
-      // ensure that min < max
-      if (latitudeMinE6_Resized_Normalized > latitudeMaxE6_Resized_Normalized) {
-
-         final int swapValue = latitudeMinE6_Resized_Normalized;
-
-         latitudeMinE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
-         latitudeMaxE6_Resized_Normalized = swapValue;
-      }
-
-      if (longitudeMinE6_Resized_Normalized > longitudeMaxE6_Resized_Normalized) {
-
-         final int swapValue = longitudeMinE6_Resized_Normalized;
-
-         longitudeMinE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
-         longitudeMaxE6_Resized_Normalized = swapValue;
-      }
 
       /*
        * Update UI
@@ -838,10 +821,10 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
             UI.UNIT_LABEL_DISTANCE_M_OR_YD));
 
-      _spinnerDistance_Top.setSelection((int) (bboxTopDiff + 0.5));
-      _spinnerDistance_Bottom.setSelection((int) (bboxBottomDiff + 0.5));
-      _spinnerDistance_Left.setSelection((int) (bboxLeftDiff + 0.5));
-      _spinnerDistance_Right.setSelection((int) (bboxRightDiff + 0.5));
+      _spinnerDistance_Top.setSelection((int) Math.round(bboxTopDiff));
+      _spinnerDistance_Bottom.setSelection((int) Math.round(bboxBottomDiff));
+      _spinnerDistance_Left.setSelection((int) (Math.round(bboxLeftDiff)));
+      _spinnerDistance_Right.setSelection((int) (Math.round(bboxRightDiff)));
    }
 
 }
