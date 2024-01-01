@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -866,6 +866,7 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Title;
 
    public static String        Dialog_ResizeTourLocation_Action_ResetValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Checkbox_ResizeAllTogether;
    public static String        Dialog_ResizeTourLocation_Label_BoundingBox_DefaultSize;
    public static String        Dialog_ResizeTourLocation_Label_BoundingBox_ResizedSize;
    public static String        Dialog_ResizeTourLocation_Label_IncrementDecrementValue;
@@ -3133,8 +3134,6 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_AppendLocationPart_All;
    public static String        Tour_Location_Action_AppendLocationPart_End;
    public static String        Tour_Location_Action_AppendLocationPart_Start;
-   public static String        Tour_Location_Action_BoundingBox_Increase;
-   public static String        Tour_Location_Action_BoundingBox_Decrease;
    public static String        Tour_Location_Action_CombineBoundingBox;
    public static String        Tour_Location_Action_CombineBoundingBox_Tooltip;
    public static String        Tour_Location_Action_Customize_Start_Tooltip;

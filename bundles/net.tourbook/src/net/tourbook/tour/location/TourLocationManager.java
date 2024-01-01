@@ -1655,18 +1655,40 @@ public class TourLocationManager {
     * Save resized bounding box in the database for the provided tour location ID
     *
     * @param locationId
-    * @param latitudeMinE6_Normalized
-    * @param latitudeMaxE6_Normalized
-    * @param longitudeMinE6_Normalized
-    * @param longitudeMaxE6_Normalized
+    * @param latitudeMinE6_Resized_Normalized
+    * @param latitudeMaxE6_Resized_Normalized
+    * @param longitudeMinE6_Resized_Normalized
+    * @param longitudeMaxE6_Resized_Normalized
     */
    public static void setResizedBoundingBox(final long locationId,
 
-                                            final int latitudeMinE6_Normalized,
-                                            final int latitudeMaxE6_Normalized,
+                                            final int latitudeMinE6_Resized_Normalized,
+                                            final int latitudeMaxE6_Resized_Normalized,
 
-                                            final int longitudeMinE6_Normalized,
-                                            final int longitudeMaxE6_Normalized) {
+                                            final int longitudeMinE6_Resized_Normalized,
+                                            final int longitudeMaxE6_Resized_Normalized) {
+
+      int latitudeMinE6 = latitudeMinE6_Resized_Normalized;
+      int latitudeMaxE6 = latitudeMaxE6_Resized_Normalized;
+      int longitudeMinE6 = longitudeMinE6_Resized_Normalized;
+      int longitudeMaxE6 = longitudeMaxE6_Resized_Normalized;
+
+      // ensure that min < max
+      if (latitudeMinE6 > latitudeMaxE6) {
+
+         final int swapValue = latitudeMinE6;
+
+         latitudeMinE6 = latitudeMaxE6;
+         latitudeMaxE6 = swapValue;
+      }
+
+      if (longitudeMinE6 > longitudeMaxE6) {
+
+         final int swapValue = longitudeMinE6;
+
+         longitudeMinE6 = longitudeMaxE6;
+         longitudeMaxE6 = swapValue;
+      }
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -1686,10 +1708,10 @@ public class TourLocationManager {
 
          final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
 
-         sqlUpdate.setInt(1, latitudeMinE6_Normalized);
-         sqlUpdate.setInt(2, latitudeMaxE6_Normalized);
-         sqlUpdate.setInt(3, longitudeMinE6_Normalized);
-         sqlUpdate.setInt(4, longitudeMaxE6_Normalized);
+         sqlUpdate.setInt(1, latitudeMinE6);
+         sqlUpdate.setInt(2, latitudeMaxE6);
+         sqlUpdate.setInt(3, longitudeMinE6);
+         sqlUpdate.setInt(4, longitudeMaxE6);
 
          sqlUpdate.setLong(5, locationId);
 

@@ -61,9 +61,11 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
    private static final String STATE_MOUSE_WHEEL_INCREMENTER         = "STATE_MOUSE_WHEEL_INCREMENTER"; //$NON-NLS-1$
    private static final int    STATE_MOUSE_WHEEL_INCREMENTER_DEFAULT = 10;
+   private static final String STATE_RESIZE_ALL_TOGETHER             = "STATE_RESIZE_ALL_TOGETHER";     //$NON-NLS-1$
 
    private PixelConverter      _pc;
 
+   private TourLocationView    _tourLocationView;
    private TourLocation        _tourLocation;
 
    private int                 _mouseWheelIncrementer;
@@ -76,28 +78,33 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
    private Action_ResetValue   _actionResetValue_Left;
    private Action_ResetValue   _actionResetValue_Right;
 
+   private int                 _currentDistance_Top;
+   private int                 _currentDistance_Bottom;
+   private int                 _currentDistance_Left;
+   private int                 _currentDistance_Right;
+
    /*
     * UI controls
     */
-   private Combo            _comboMouseWheelIncrementer;
+   private Combo   _comboMouseWheelIncrementer;
 
-   private Button           _btnIncludeGeoPosition;
-   private Button           _btnRelocateBBox;
-   private Button           _btnResetBBox;
+   private Button  _btnIncludeGeoPosition;
+   private Button  _btnRelocateBBox;
+   private Button  _btnResetBBox;
 
-   private Label            _lblBBoxDefaultSize;
-   private Label            _lblBBoxResizedSize;
-   private Label            _lblDistance_Top;
-   private Label            _lblDistance_Bottom;
-   private Label            _lblDistance_Left;
-   private Label            _lblDistance_Right;
+   private Button  _chkOneForAll4;
 
-   private Spinner          _spinnerDistance_Top;
-   private Spinner          _spinnerDistance_Bottom;
-   private Spinner          _spinnerDistance_Left;
-   private Spinner          _spinnerDistance_Right;
+   private Label   _lblBBoxDefaultSize;
+   private Label   _lblBBoxResizedSize;
+   private Label   _lblDistance_Top;
+   private Label   _lblDistance_Bottom;
+   private Label   _lblDistance_Left;
+   private Label   _lblDistance_Right;
 
-   private TourLocationView _tourLocationView;
+   private Spinner _spinnerDistance_Top;
+   private Spinner _spinnerDistance_Bottom;
+   private Spinner _spinnerDistance_Left;
+   private Spinner _spinnerDistance_Right;
 
    /**
     * Reset spinner value
@@ -179,24 +186,20 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
             createUI_20_BoundingBox(container);
-            createUI_30_Size(container);
+            createUI_30_OneForAll4(container);
+            createUI_40_Size(container);
          }
 
          createUI_50_Actions(shellContainer);
-
-         createUI_90_Footer(container);
       }
 
       fillUI();
 
-      // wait until the OK button is also created, otherwise it is null
-      parent.getDisplay().asyncExec(() -> {
+      restoreState();
 
-         restoreState();
-         enableControls();
+      enableControls();
 
-         _spinnerDistance_Top.setFocus();
-      });
+      _spinnerDistance_Top.setFocus();
 
       return shellContainer;
    }
@@ -331,7 +334,46 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       }
    }
 
-   private void createUI_30_Size(final Composite parent) {
+   private void createUI_30_OneForAll4(final Composite parent) {
+
+      UI.createSpacer_Horizontal(parent, 2);
+
+      _chkOneForAll4 = new Button(parent, SWT.CHECK);
+      _chkOneForAll4.setText(Messages.Dialog_ResizeTourLocation_Checkbox_ResizeAllTogether);
+      _chkOneForAll4.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> saveState()));
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         {
+            /*
+             * Page values
+             */
+
+            final String tooltip = Messages.Dialog_ResizeTourLocation_Label_PageValue_Tooltip;
+
+            UI.createLabel(container, Messages.Dialog_ResizeTourLocation_Label_IncrementDecrementValue, tooltip);
+
+            // Combo: Mouse wheel incrementer
+            _comboMouseWheelIncrementer = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboMouseWheelIncrementer.setVisibleItemCount(10);
+            _comboMouseWheelIncrementer.setToolTipText(tooltip);
+
+            _comboMouseWheelIncrementer.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onMouseWheelIncrementer()));
+
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer);
+
+            // m / yd
+            UI.createLabel(container, UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+         }
+      }
+   }
+
+   private void createUI_40_Size(final Composite parent) {
 
       UI.createSpacer_Horizontal(parent, 3);
 
@@ -346,11 +388,7 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
             UI.createLabel(containerLeft, Messages.Dialog_ResizeTourLocation_Label_BoundingBox_ResizedSize);
 
             _lblBBoxResizedSize = UI.createLabel(containerLeft, UI.EMPTY_STRING);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-//                  .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
-//                  .indent(_pc.convertWidthInCharsToPixels(10), 0)
-                  .applyTo(_lblBBoxResizedSize);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblBBoxResizedSize);
          }
       }
 
@@ -407,43 +445,6 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
          _btnResetBBox.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onBoundingBox_Reset()));
          setButtonLayoutData(_btnResetBBox);
       }
-   }
-
-   private void createUI_90_Footer(final Composite parent) {
-
-      UI.createSpacer_Horizontal(parent, 2);
-      UI.createSpacer_Horizontal(parent, 2);
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .span(2, 1)
-            .grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-      {
-         {
-            /*
-             * Page values
-             */
-
-            final String tooltip = Messages.Dialog_ResizeTourLocation_Label_PageValue_Tooltip;
-
-            UI.createLabel(container, Messages.Dialog_ResizeTourLocation_Label_IncrementDecrementValue, tooltip);
-
-            // Combo: Mouse wheel incrementer
-            _comboMouseWheelIncrementer = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _comboMouseWheelIncrementer.setVisibleItemCount(10);
-            _comboMouseWheelIncrementer.setToolTipText(tooltip);
-
-            _comboMouseWheelIncrementer.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> onMouseWheelIncrementer()));
-
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboMouseWheelIncrementer);
-
-            // m / yd
-            UI.createLabel(container, UI.UNIT_LABEL_DISTANCE_M_OR_YD);
-         }
-      }
-
    }
 
    private Action_ResetValue createUI_Action_ResetValue(final Composite parent, final Spinner spinner) {
@@ -515,6 +516,7 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
    protected int getDialogBoundsStrategy() {
 
       // persist only the location, dialog cannot be resized
+
       return DIALOG_PERSISTLOCATION;
    }
 
@@ -528,7 +530,6 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, _mouseWheelIncrementer);
          onBoundingBox_Resize();
       };
-
    }
 
    /**
@@ -574,7 +575,7 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      saveState();
+      // OK button is not available, all changes are live updated
 
       super.okPressed();
    }
@@ -603,6 +604,11 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
    private void onBoundingBox_Reset() {
 
+      _currentDistance_Top = 0;
+      _currentDistance_Bottom = 0;
+      _currentDistance_Left = 0;
+      _currentDistance_Right = 0;
+
       _spinnerDistance_Top.setSelection(0);
       _spinnerDistance_Bottom.setSelection(0);
       _spinnerDistance_Left.setSelection(0);
@@ -626,6 +632,8 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       _spinnerDistance_Bottom.setPageIncrement(_mouseWheelIncrementer);
       _spinnerDistance_Left.setPageIncrement(_mouseWheelIncrementer);
       _spinnerDistance_Right.setPageIncrement(_mouseWheelIncrementer);
+
+      saveState();
    }
 
    /**
@@ -635,7 +643,17 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
     */
    private void onResetValue(final Spinner spinner) {
 
-      spinner.setSelection(0);
+      if (_chkOneForAll4.getSelection()) {
+
+         _spinnerDistance_Top.setSelection(0);
+         _spinnerDistance_Bottom.setSelection(0);
+         _spinnerDistance_Left.setSelection(0);
+         _spinnerDistance_Right.setSelection(0);
+
+      } else {
+
+         spinner.setSelection(0);
+      }
 
       updateModelFromUI_AndFireEvent();
    }
@@ -647,21 +665,110 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       _mouseWheelIncrementer = Util.getStateInt(_state, STATE_MOUSE_WHEEL_INCREMENTER, STATE_MOUSE_WHEEL_INCREMENTER_DEFAULT);
 
       _comboMouseWheelIncrementer.select(mouseWheelIncrementer_GetIndex());
+
+      _chkOneForAll4.setSelection(Util.getStateBoolean(_state, STATE_RESIZE_ALL_TOGETHER, false));
    }
 
    private void saveState() {
 
       _state.put(STATE_MOUSE_WHEEL_INCREMENTER, _mouseWheelIncrementer);
+      _state.put(STATE_RESIZE_ALL_TOGETHER, _chkOneForAll4.getSelection());
    }
 
    private void updateModelFromUI() {
 
 // SET_FORMATTING_OFF
 
-      final float resizedTop     = _spinnerDistance_Top     .getSelection() / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final float resizedBottom  = _spinnerDistance_Bottom  .getSelection() / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final float resizedLeft    = _spinnerDistance_Left    .getSelection() / UI.UNIT_VALUE_DISTANCE_SMALL;
-      final float resizedRight   = _spinnerDistance_Right   .getSelection() / UI.UNIT_VALUE_DISTANCE_SMALL;
+      int resizeValue_Top     = _spinnerDistance_Top     .getSelection();
+      int resizeValue_Bottom  = _spinnerDistance_Bottom  .getSelection();
+      int resizeValue_Left    = _spinnerDistance_Left    .getSelection();
+      int resizeValue_Right   = _spinnerDistance_Right   .getSelection();
+
+// SET_FORMATTING_ON
+
+      if (_chkOneForAll4.getSelection()) {
+
+         // increment/decrement all with the same diff value
+
+         int valueDiff = 0;
+         Spinner spinnerDiff = null;
+
+         // ckeck which value was modified
+         if (resizeValue_Top != _currentDistance_Top) {
+
+            valueDiff = resizeValue_Top - _currentDistance_Top;
+            spinnerDiff = _spinnerDistance_Top;
+
+         } else if (resizeValue_Bottom != _currentDistance_Bottom) {
+
+            valueDiff = resizeValue_Bottom - _currentDistance_Bottom;
+            spinnerDiff = _spinnerDistance_Bottom;
+
+         } else if (resizeValue_Left != _currentDistance_Left) {
+
+            valueDiff = resizeValue_Left - _currentDistance_Left;
+            spinnerDiff = _spinnerDistance_Left;
+
+         } else if (resizeValue_Right != _currentDistance_Right) {
+
+            valueDiff = resizeValue_Right - _currentDistance_Right;
+            spinnerDiff = _spinnerDistance_Right;
+         }
+
+         // adjust other values
+         if (spinnerDiff == _spinnerDistance_Top) {
+
+            resizeValue_Bottom += valueDiff;
+            resizeValue_Left += valueDiff;
+            resizeValue_Right += valueDiff;
+
+            _spinnerDistance_Bottom.setSelection(resizeValue_Bottom);
+            _spinnerDistance_Left.setSelection(resizeValue_Left);
+            _spinnerDistance_Right.setSelection(resizeValue_Right);
+
+         } else if (spinnerDiff == _spinnerDistance_Bottom) {
+
+            resizeValue_Top += valueDiff;
+            resizeValue_Left += valueDiff;
+            resizeValue_Right += valueDiff;
+
+            _spinnerDistance_Top.setSelection(resizeValue_Top);
+            _spinnerDistance_Left.setSelection(resizeValue_Left);
+            _spinnerDistance_Right.setSelection(resizeValue_Right);
+
+         } else if (spinnerDiff == _spinnerDistance_Left) {
+
+            resizeValue_Top += valueDiff;
+            resizeValue_Bottom += valueDiff;
+            resizeValue_Right += valueDiff;
+
+            _spinnerDistance_Top.setSelection(resizeValue_Top);
+            _spinnerDistance_Bottom.setSelection(resizeValue_Bottom);
+            _spinnerDistance_Right.setSelection(resizeValue_Right);
+
+         } else if (spinnerDiff == _spinnerDistance_Right) {
+
+            resizeValue_Top += valueDiff;
+            resizeValue_Bottom += valueDiff;
+            resizeValue_Left += valueDiff;
+
+            _spinnerDistance_Top.setSelection(resizeValue_Top);
+            _spinnerDistance_Bottom.setSelection(resizeValue_Bottom);
+            _spinnerDistance_Left.setSelection(resizeValue_Left);
+         }
+      }
+
+// SET_FORMATTING_OFF
+
+      _currentDistance_Top       = resizeValue_Top;
+      _currentDistance_Bottom    = resizeValue_Bottom;
+      _currentDistance_Left      = resizeValue_Left;
+      _currentDistance_Right     = resizeValue_Right;
+
+      final float resizedTop     = resizeValue_Top    / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final float resizedBottom  = resizeValue_Bottom / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final float resizedLeft    = resizeValue_Left   / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final float resizedRight   = resizeValue_Right  / UI.UNIT_VALUE_DISTANCE_SMALL;
 
       final double latitudeMin   = _tourLocation.latitudeMin;
       final double latitudeMax   = _tourLocation.latitudeMax;
@@ -792,10 +899,10 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
       final double bboxWidth_Resized   = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMin_Resized, longitudeMax_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
       final double bboxHeight_Resized  = MtMath.distanceVincenty(latitudeMin_Resized, longitudeMin_Resized, latitudeMax_Resized, longitudeMin_Resized) / UI.UNIT_VALUE_DISTANCE_SMALL;
 
-      double bboxTopDiff         = MtMath.distanceVincenty(latitudeMax, longitudeMax, latitudeMax_Resized,  longitudeMax)           / UI.UNIT_VALUE_DISTANCE_SMALL;
-      double bboxBottomDiff      = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin_Resized,  longitudeMin)           / UI.UNIT_VALUE_DISTANCE_SMALL;
-      double bboxLeftDiff        = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin,          longitudeMin_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
-      double bboxRightDiff       = MtMath.distanceVincenty(latitudeMin, longitudeMax, latitudeMin,          longitudeMax_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxTopDiff      = MtMath.distanceVincenty(latitudeMax, longitudeMax, latitudeMax_Resized,  longitudeMax)           / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxBottomDiff   = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin_Resized,  longitudeMin)           / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxLeftDiff     = MtMath.distanceVincenty(latitudeMin, longitudeMin, latitudeMin,          longitudeMin_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
+      double bboxRightDiff    = MtMath.distanceVincenty(latitudeMin, longitudeMax, latitudeMin,          longitudeMax_Resized)   / UI.UNIT_VALUE_DISTANCE_SMALL;
 
       bboxTopDiff    *= signumLatMax;
       bboxBottomDiff *= signumLatMin;
