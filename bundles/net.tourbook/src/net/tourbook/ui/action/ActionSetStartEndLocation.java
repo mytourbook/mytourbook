@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -112,6 +112,7 @@ public class ActionSetStartEndLocation extends SubMenu {
    private ActionSetLocation_Start        _actionSetLocation_Start;
    private ActionSetLocation_End          _actionSetLocation_End;
 
+   private SlideoutLocationProfiles       _slideoutLocationProfiles;
    private Control                        _ownerControl;
 
    private ArrayList<TourData>            _allSelectedTours;
@@ -486,6 +487,14 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private void actionOpenProfileSlideout() {
 
+      if (_slideoutLocationProfiles != null) {
+
+         // close previous slideout otherwise they could be conflicting
+
+         _slideoutLocationProfiles.close();
+         _slideoutLocationProfiles = null;
+      }
+
       final List<TourData> selectedTours = _tourProvider.getSelectedTours();
       final TourData tourData = selectedTours.get(0);
 
@@ -506,7 +515,6 @@ public class ActionSetStartEndLocation extends SubMenu {
             return;
          }
 
-
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
                latitudeSerie[0],
                longitudeSerie[0],
@@ -524,8 +532,10 @@ public class ActionSetStartEndLocation extends SubMenu {
       final Point cursorLocation = Display.getCurrent().getCursorLocation();
       final Rectangle ownerBounds = new Rectangle(cursorLocation.x, cursorLocation.y, 0, 0);
 
+      final boolean isStartLocation = _isStartLocationInContextMenu == null ? true : _isStartLocationInContextMenu;
+
       // !!! must be created lately otherwise the UI is not fully setup !!!
-      final SlideoutLocationProfiles slideoutLocationProfiles = new SlideoutLocationProfiles(
+      _slideoutLocationProfiles = new SlideoutLocationProfiles(
 
             null,
             tourData,
@@ -533,9 +543,9 @@ public class ActionSetStartEndLocation extends SubMenu {
             ownerBounds,
             _state,
 
-            _isStartLocationInContextMenu == null ? true : _isStartLocationInContextMenu);
+            isStartLocation);
 
-      slideoutLocationProfiles.open(false);
+      _slideoutLocationProfiles.open(false);
    }
 
    private void actionRemoveLocation(final boolean isStartLocation,

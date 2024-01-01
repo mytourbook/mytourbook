@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -864,6 +864,19 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Radio_ReplaceAll;
    public static String        Dialog_ReplaceImportFilename_Radio_ReplaceThis;
    public static String        Dialog_ReplaceImportFilename_Title;
+
+   public static String        Dialog_ResizeTourLocation_Action_ResetValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Checkbox_ResizeAllTogether;
+   public static String        Dialog_ResizeTourLocation_Label_BoundingBox_DefaultSize;
+   public static String        Dialog_ResizeTourLocation_Label_BoundingBox_ResizedSize;
+   public static String        Dialog_ResizeTourLocation_Label_IncrementDecrementValue;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Bottom;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Left;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Right;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Top;
+   public static String        Dialog_ResizeTourLocation_Label_PageValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Message;
+   public static String        Dialog_ResizeTourLocation_Title;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
 
@@ -3126,8 +3139,6 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_AppendLocationPart_All;
    public static String        Tour_Location_Action_AppendLocationPart_End;
    public static String        Tour_Location_Action_AppendLocationPart_Start;
-   public static String        Tour_Location_Action_BoundingBox_Increase;
-   public static String        Tour_Location_Action_BoundingBox_Decrease;
    public static String        Tour_Location_Action_CombineBoundingBox;
    public static String        Tour_Location_Action_CombineBoundingBox_Tooltip;
    public static String        Tour_Location_Action_Customize_Start_Tooltip;
@@ -3140,6 +3151,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_Download_WithProfile_Start_Tooltip;
    public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;
    public static String        Tour_Location_Action_IncludeGeoPosition;
+   public static String        Tour_Location_Action_IncludeGeoPosition_Short;
    public static String        Tour_Location_Action_IncludeGeoPosition_Tooltip;
    public static String        Tour_Location_Action_One;
    public static String        Tour_Location_Action_One_Tooltip;
@@ -3152,6 +3164,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ProfileTitle_End;
    public static String        Tour_Location_Action_ProfileTitle_Start;
    public static String        Tour_Location_Action_RelocateBoundingBox;
+   public static String        Tour_Location_Action_RelocateBoundingBox_Short;
    public static String        Tour_Location_Action_RelocateBoundingBox_Tooltip;
    public static String        Tour_Location_Action_RemoveLocation_All;
    public static String        Tour_Location_Action_RemoveLocation_All_Complete;
@@ -3161,7 +3174,9 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_RemoveLocation_Start_Complete;
    public static String        Tour_Location_Action_RemoveLocation_Tooltip;
    public static String        Tour_Location_Action_ResetBoundingBox;
+   public static String        Tour_Location_Action_ResetBoundingBox_Short;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
+   public static String        Tour_Location_Action_ResizeBoundingBox;
    public static String        Tour_Location_Action_SetLocation_End;
    public static String        Tour_Location_Action_SetLocation_Start;
    public static String        Tour_Location_Action_ManageStartEndLocation;

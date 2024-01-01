@@ -1553,9 +1553,9 @@ public class Map2View extends ViewPart implements
 
             resetMap();
 
-         } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEvent)) {
 
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
             if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
                setTourData(modifiedTours);
@@ -1574,25 +1574,23 @@ public class Map2View extends ViewPart implements
                onSelection_TourMarker((SelectionTourMarker) eventData, false);
             }
 
-         } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+         } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof final SelectionTourPause selectionTourPause) {
 
-            onSelection_TourPause((SelectionTourPause) eventData, false);
+            onSelection_TourPause(selectionTourPause, false);
 
-         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelection((ISelection) eventData);
+            onSelection(selection);
 
-         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-            onSelection((ISelection) eventData);
+            onSelection(selection);
 
          } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
-            if (eventData instanceof TourGeoFilter) {
+            if (eventData instanceof final TourGeoFilter tourGeoFilter) {
 
                // show geo filter
-
-               final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
                // show geo search rectangle
                _map.showGeoSearchGrid(tourGeoFilter);
@@ -3255,7 +3253,6 @@ public class Map2View extends ViewPart implements
          hideGeoGrid();
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-
 
          if (tourIdSelection.isSetBreadcrumbOnly()) {
 

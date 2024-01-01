@@ -1652,6 +1652,153 @@ public class TourLocationManager {
    }
 
    /**
+    * Save resized bounding box in the database for the provided tour location ID
+    *
+    * @param locationId
+    * @param latitudeMinE6_Resized_Normalized
+    * @param latitudeMaxE6_Resized_Normalized
+    * @param longitudeMinE6_Resized_Normalized
+    * @param longitudeMaxE6_Resized_Normalized
+    */
+   public static void setResizedBoundingBox(final long locationId,
+
+                                            final int latitudeMinE6_Resized_Normalized,
+                                            final int latitudeMaxE6_Resized_Normalized,
+
+                                            final int longitudeMinE6_Resized_Normalized,
+                                            final int longitudeMaxE6_Resized_Normalized) {
+
+      int latitudeMinE6 = latitudeMinE6_Resized_Normalized;
+      int latitudeMaxE6 = latitudeMaxE6_Resized_Normalized;
+      int longitudeMinE6 = longitudeMinE6_Resized_Normalized;
+      int longitudeMaxE6 = longitudeMaxE6_Resized_Normalized;
+
+      // ensure that min < max
+      if (latitudeMinE6 > latitudeMaxE6) {
+
+         final int swapValue = latitudeMinE6;
+
+         latitudeMinE6 = latitudeMaxE6;
+         latitudeMaxE6 = swapValue;
+      }
+
+      if (longitudeMinE6 > longitudeMaxE6) {
+
+         final int swapValue = longitudeMinE6;
+
+         longitudeMinE6 = longitudeMaxE6;
+         longitudeMaxE6 = swapValue;
+      }
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sql = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_LOCATION + NL //      //$NON-NLS-1$
+
+               + "SET" + NL //                                             //$NON-NLS-1$
+
+               + " latitudeMinE6_Resized_Normalized  = ?," + NL //      1  //$NON-NLS-1$
+               + " latitudeMaxE6_Resized_Normalized  = ?," + NL //      2  //$NON-NLS-1$
+
+               + " longitudeMinE6_Resized_Normalized = ?," + NL //      3  //$NON-NLS-1$
+               + " longitudeMaxE6_Resized_Normalized = ? " + NL //      4  //$NON-NLS-1$
+
+               + " WHERE locationID = ?"; //                            5  //$NON-NLS-1$
+
+         final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
+
+         sqlUpdate.setInt(1, latitudeMinE6);
+         sqlUpdate.setInt(2, latitudeMaxE6);
+         sqlUpdate.setInt(3, longitudeMinE6);
+         sqlUpdate.setInt(4, longitudeMaxE6);
+
+         sqlUpdate.setLong(5, locationId);
+
+         sqlUpdate.executeUpdate();
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+      }
+   }
+
+   public static void setResizedBoundingBox_IncludeGeoPosition(final List<TourLocation> allSelectedLocations) {
+
+      for (final TourLocation tourLocation : allSelectedLocations) {
+
+         final int latitudeE6_Normalized = tourLocation.latitudeE6_Normalized;
+         final int longitudeE6_Normalized = tourLocation.longitudeE6_Normalized;
+
+         final int latitudeMinE6_Resized_Normalized = Math.min(latitudeE6_Normalized, tourLocation.latitudeMinE6_Resized_Normalized);
+         final int latitudeMaxE6_Resized_Normalized = Math.max(latitudeE6_Normalized, tourLocation.latitudeMaxE6_Resized_Normalized);
+
+         final int longitudeMinE6_Resized_Normalized = Math.min(longitudeE6_Normalized, tourLocation.longitudeMinE6_Resized_Normalized);
+         final int longitudeMaxE6_Resized_Normalized = Math.max(longitudeE6_Normalized, tourLocation.longitudeMaxE6_Resized_Normalized);
+
+         setResizedBoundingBox(tourLocation.getLocationId(),
+
+               latitudeMinE6_Resized_Normalized,
+               latitudeMaxE6_Resized_Normalized,
+
+               longitudeMinE6_Resized_Normalized,
+               longitudeMaxE6_Resized_Normalized);
+
+         /*
+          * Update model
+          */
+         tourLocation.latitudeMinE6_Resized_Normalized = latitudeMinE6_Resized_Normalized;
+         tourLocation.latitudeMaxE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
+         tourLocation.longitudeMinE6_Resized_Normalized = longitudeMinE6_Resized_Normalized;
+         tourLocation.longitudeMaxE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
+
+         tourLocation.setTransientValues(true);
+      }
+   }
+
+   public static void setResizedBoundingBox_Relocate(final List<TourLocation> allSelectedLocations) {
+
+      for (final TourLocation tourLocation : allSelectedLocations) {
+
+         final int latitudeE6_Normalized = tourLocation.latitudeE6_Normalized;
+         final int longitudeE6_Normalized = tourLocation.longitudeE6_Normalized;
+
+         int latitudeMinE6_Resized_Normalized = tourLocation.latitudeMinE6_Resized_Normalized;
+         int latitudeMaxE6_Resized_Normalized = tourLocation.latitudeMaxE6_Resized_Normalized;
+
+         int longitudeMinE6_Resized_Normalized = tourLocation.longitudeMinE6_Resized_Normalized;
+         int longitudeMaxE6_Resized_Normalized = tourLocation.longitudeMaxE6_Resized_Normalized;
+
+         final int latDiff2 = (latitudeMaxE6_Resized_Normalized - latitudeMinE6_Resized_Normalized) / 2;
+         final int lonDiff2 = (longitudeMaxE6_Resized_Normalized - longitudeMinE6_Resized_Normalized) / 2;
+
+         latitudeMinE6_Resized_Normalized = latitudeE6_Normalized - latDiff2;
+         latitudeMaxE6_Resized_Normalized = latitudeE6_Normalized + latDiff2;
+
+         longitudeMinE6_Resized_Normalized = longitudeE6_Normalized - lonDiff2;
+         longitudeMaxE6_Resized_Normalized = longitudeE6_Normalized + lonDiff2;
+
+         setResizedBoundingBox(tourLocation.getLocationId(),
+
+               latitudeMinE6_Resized_Normalized,
+               latitudeMaxE6_Resized_Normalized,
+
+               longitudeMinE6_Resized_Normalized,
+               longitudeMaxE6_Resized_Normalized);
+
+         /*
+          * Update model
+          */
+         tourLocation.latitudeMinE6_Resized_Normalized = latitudeMinE6_Resized_Normalized;
+         tourLocation.latitudeMaxE6_Resized_Normalized = latitudeMaxE6_Resized_Normalized;
+         tourLocation.longitudeMinE6_Resized_Normalized = longitudeMinE6_Resized_Normalized;
+         tourLocation.longitudeMaxE6_Resized_Normalized = longitudeMaxE6_Resized_Normalized;
+
+         tourLocation.setTransientValues(true);
+      }
+   }
+
+   /**
     * Set tour locations for the requested tours, when not available, then download and save tour
     * locations
     *

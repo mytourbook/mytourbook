@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -117,8 +117,7 @@ public class TourLocation implements Serializable {
          "longitudeMinE6_Resized_Normalized",                                          //$NON-NLS-1$
          "longitudeMaxE6_Resized_Normalized"                                           //$NON-NLS-1$
 
-   )
-         .collect(Collectors.toCollection(HashSet::new));
+   ).collect(Collectors.toCollection(HashSet::new));
 
    /**
     * Contains the entity id
@@ -155,56 +154,72 @@ public class TourLocation implements Serializable {
    public int longitudeE6_Normalized;
 
    /**
-    * Contains the normalized latitude min value
+    * Contains the normalized latitude min value, it's the cardinal direction south.
+    * <p>
+    * The min value could be larger than the max value when bounding box is resized.
     * <p>
     * <code>normalized = latitude + 90</code>
     */
    public int latitudeMinE6_Normalized;
 
    /**
-    * Contains the normalized latitude max value
+    * Contains the normalized latitude max value, it's the cardinal direction north
+    * <p>
+    * The min value could be larger than the max value when bounding box is resized.
     * <p>
     * normalized = latitude + 90
     */
    public int latitudeMaxE6_Normalized;
 
    /**
-    * Contains the normalized longitude min value
+    * Contains the normalized longitude min value, it's the cardinal direction west
+    * <p>
+    * The min value could be larger than the max value when bounding box is resized.
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMinE6_Normalized;
 
    /**
-    * Contains the normalized longitude max value
+    * Contains the normalized longitude max value, it's the cardinal direction east
+    * <p>
+    * The min value could be larger than the max value when bounding box is resized.
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMaxE6_Normalized;
 
    /**
-    * Contains the resized normalized latitude min value
+    * Contains the resized normalized latitude min value, it's the cardinal direction south
+    * <p>
+    * The min value must be smaller than the max value because this value is used to find a location
     * <p>
     * <code>normalized = latitude + 90</code>
     */
    public int latitudeMinE6_Resized_Normalized;
 
    /**
-    * Contains the resized normalized latitude max value
+    * Contains the resized normalized latitude max value, it's the cardinal direction north
+    * <p>
+    * The min value must be smaller than the max value because this value is used to find a location
     * <p>
     * normalized = latitude + 90
     */
    public int latitudeMaxE6_Resized_Normalized;
 
    /**
-    * Contains the resized normalized longitude min value
+    * Contains the resized normalized longitude min value, it's the cardinal direction west
+    * <p>
+    * The min value must be smaller than the max value because this value is used to find a location
     * <p>
     * normalized = longitude + 180
     */
    public int longitudeMinE6_Resized_Normalized;
 
    /**
-    * Contains the resized normalized longitude max value
+    * Contains the resized normalized longitude max value, it's the cardinal direction east
+    * <p>
+    * The min value must be smaller than the max value because this value is used to find a location
     * <p>
     * normalized = longitude + 180
     */
@@ -306,21 +321,35 @@ public class TourLocation implements Serializable {
    @Transient
    public int    longitudeE6;
 
+   /** Cardinal direction: South */
    @Transient
    public double latitudeMin;
+
+   /** Cardinal direction: North */
    @Transient
    public double latitudeMax;
+
+   /** Cardinal direction: West */
    @Transient
    public double longitudeMin;
+
+   /** Cardinal direction: East */
    @Transient
    public double longitudeMax;
 
+   /** Cardinal direction: South */
    @Transient
    public double latitudeMin_Resized;
+
+   /** Cardinal direction: North */
    @Transient
    public double latitudeMax_Resized;
+
+   /** Cardinal direction: West */
    @Transient
    public double longitudeMin_Resized;
+
+   /** Cardinal direction: East */
    @Transient
    public double longitudeMax_Resized;
 
@@ -473,7 +502,19 @@ public class TourLocation implements Serializable {
     */
    public void setTransientValues() {
 
-      if (latitudeMin != 0 || longitudeMin != 0) {
+      setTransientValues(false);
+   }
+
+   /**
+    * Set values which are not saved in the database
+    *
+    * @param isUpdateValues
+    *           When <code>true</code> then transient values are set even when they are already set,
+    *           this is used to update transient values
+    */
+   public void setTransientValues(final boolean isUpdateValues) {
+
+      if (isUpdateValues == false && (latitudeMin != 0 || longitudeMin != 0)) {
          return;
       }
 

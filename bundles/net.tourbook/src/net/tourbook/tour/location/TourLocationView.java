@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -92,66 +92,59 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourLocationView extends ViewPart implements ITourViewer {
 
-   public static final String           ID                              = "net.tourbook.tour.location.TourLocationView"; //$NON-NLS-1$
+   public static final String                   ID                              = "net.tourbook.tour.location.TourLocationView"; //$NON-NLS-1$
 
-   private static final char            NL                              = UI.NEW_LINE;
+   private static final char                    NL                              = UI.NEW_LINE;
 
-   private static final String          STATE_IS_LINK_WITH_OTHER_VIEWS  = "STATE_IS_LINK_WITH_OTHER_VIEWS";              //$NON-NLS-1$
-   private static final String          STATE_IS_SHOW_INFO_TOOLTIP      = "STATE_IS_SHOW_INFO_TOOLTIP";                  //$NON-NLS-1$
-   private static final String          STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
-   private static final String          STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
-   private static final String          STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
+   private static final String                  STATE_IS_LINK_WITH_OTHER_VIEWS  = "STATE_IS_LINK_WITH_OTHER_VIEWS";              //$NON-NLS-1$
+   private static final String                  STATE_IS_SHOW_INFO_TOOLTIP      = "STATE_IS_SHOW_INFO_TOOLTIP";                  //$NON-NLS-1$
+   private static final String                  STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
+   private static final String                  STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
+   private static final String                  STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
-   private final IPreferenceStore       _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore       _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings        _state                          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore               _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore               _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings                _state                          = TourbookPlugin.getState(ID);
 
-   private IPartListener2               _partListener;
-   private ISelectionListener           _postSelectionListener;
-   private IPropertyChangeListener      _prefChangeListener;
-   private IPropertyChangeListener      _prefChangeListener_Common;
-   private ITourEventListener           _tourPropertyListener;
+   private IPartListener2                       _partListener;
+   private ISelectionListener                   _postSelectionListener;
+   private IPropertyChangeListener              _prefChangeListener;
+   private IPropertyChangeListener              _prefChangeListener_Common;
+   private ITourEventListener                   _tourPropertyListener;
 
-   private TableViewer                  _locationViewer;
-   private LocationComparator           _locationComparator             = new LocationComparator();
-   private ColumnManager                _columnManager;
-   private SelectionAdapter             _columnSortListener;
+   private TableViewer                          _locationViewer;
+   private LocationComparator                   _locationComparator             = new LocationComparator();
+   private ColumnManager                        _columnManager;
+   private SelectionAdapter                     _columnSortListener;
 
-   private List<LocationItem>           _allLocationItems               = new ArrayList<>();
+   private List<LocationItem>                   _allLocationItems               = new ArrayList<>();
 
    /**
     * Contains all {@link LocationItem}s which are displayed in the viewer, the key is
     * {@link TourLocation#locationID}
     */
-   private Map<Long, LocationItem>      _locationItemsMap               = new HashMap<>();
+   private Map<Long, LocationItem>              _locationItemsMap               = new HashMap<>();
 
-   private MenuManager                  _viewerMenuManager;
-   private IContextMenuProvider         _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager                          _viewerMenuManager;
+   private IContextMenuProvider                 _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private boolean                      _isInUIUpdate;
+   private boolean                              _isInUIUpdate;
 
-   private ActionCombineBoundingBox     _actionCombineBoundingBoxes;
-   private ActionDeleteAndRetrieveAgain _actionDeleteAndRetrieveAgain;
-   private ActionDeleteLocation         _actionDeleteLocation;
-   private ActionIncludeGeoPosition     _actionIncludeGeoPosition;
-   private ActionLinkWithOtherViews     _actionLinkWithOtherViews;
-   private ActionOne                    _actionOne;
-   private ActionRelocateBoundingBox    _actionRelocateBoundingBox;
-   private ActionShowLocationInfo       _actionShowLocationInfo;
+   private ActionCombineBoundingBox             _actionCombineBoundingBoxes;
+   private ActionDeleteAndRetrieveAgain         _actionDeleteAndRetrieveAgain;
+   private ActionDeleteLocation                 _actionDeleteLocation;
+   private ActionIncludeGeoPosition             _actionIncludeGeoPosition;
+   private ActionLinkWithOtherViews             _actionLinkWithOtherViews;
+   private ActionOne                            _actionOne;
+   private ActionRelocateBoundingBox            _actionRelocateBoundingBox;
+   private ActionShowLocationInfo               _actionShowLocationInfo;
 
-   private ActionResizeBoundingBox      _actionResetBoundingBox;
-   private ActionResizeBoundingBox      _actionBoundingBox_Increase_1;
-   private ActionResizeBoundingBox      _actionBoundingBox_Increase_10;
-   private ActionResizeBoundingBox      _actionBoundingBox_Increase_100;
-   private ActionResizeBoundingBox      _actionBoundingBox_Increase_1000;
-   private ActionResizeBoundingBox      _actionBoundingBox_Decrease_1;
-   private ActionResizeBoundingBox      _actionBoundingBox_Decrease_10;
-   private ActionResizeBoundingBox      _actionBoundingBox_Decrease_100;
-   private ActionResizeBoundingBox      _actionBoundingBox_Decrease_1000;
+   private ActionResizeBoundingBox_Reset        _actionBoundingBox_Reset;
+   private ActionResizeBoundingBox_FlexibleSize _actionBoundingBox_ResizeFlexible;
 
-   private final NumberFormat           _nf1                            = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf3                            = NumberFormat.getNumberInstance();
-   private final NumberFormat           _nf6                            = NumberFormat.getNumberInstance();
+   private final NumberFormat                   _nf1                            = NumberFormat.getNumberInstance();
+   private final NumberFormat                   _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat                   _nf6                            = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -278,31 +271,32 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
    }
 
-   private class ActionResizeBoundingBox extends Action {
+   private class ActionResizeBoundingBox_FlexibleSize extends Action {
 
-      private int resizeValue;
+      public ActionResizeBoundingBox_FlexibleSize() {
 
-      public ActionResizeBoundingBox() {}
-
-      public ActionResizeBoundingBox(final String label, final String tooltip) {
-
-         // reset bounding box
-
-         setText(label);
-         setToolTipText(tooltip);
+         super(Messages.Tour_Location_Action_ResizeBoundingBox);
       }
 
       @Override
       public void run() {
 
-         onAction_ResizeBoundingBox(resizeValue);
+         onAction_ResizeBoundingBox_FlexibleSize();
+      }
+   }
+
+   private class ActionResizeBoundingBox_Reset extends Action {
+
+      public ActionResizeBoundingBox_Reset() {
+
+         setText(Messages.Tour_Location_Action_ResetBoundingBox);
+         setToolTipText(Messages.Tour_Location_Action_ResetBoundingBox_Tooltip);
       }
 
-      public void setLabel(final String label, final int resizeValue) {
+      @Override
+      public void run() {
 
-         this.resizeValue = resizeValue;
-
-         setText(label.formatted(Math.abs(resizeValue), UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+         onAction_ResizeBoundingBox_Reset();
       }
    }
 
@@ -839,9 +833,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
                // measurement system has changed
 
-               // update action label after measurement is changed
-               updateUI_Actions();
-
                loadAllLocations();
 
                _columnManager.saveState(_state);
@@ -893,9 +884,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             reloadViewer();
 
-         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
          }
       };
 
@@ -915,21 +906,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _actionRelocateBoundingBox          = new ActionRelocateBoundingBox();
       _actionShowLocationInfo             = new ActionShowLocationInfo();
 
-      _actionBoundingBox_Increase_1       = new ActionResizeBoundingBox();
-      _actionBoundingBox_Increase_10      = new ActionResizeBoundingBox();
-      _actionBoundingBox_Increase_100     = new ActionResizeBoundingBox();
-      _actionBoundingBox_Increase_1000    = new ActionResizeBoundingBox();
+      _actionBoundingBox_ResizeFlexible   = new ActionResizeBoundingBox_FlexibleSize();
+      _actionBoundingBox_Reset            = new ActionResizeBoundingBox_Reset();
 
-      _actionBoundingBox_Decrease_1       = new ActionResizeBoundingBox();
-      _actionBoundingBox_Decrease_10      = new ActionResizeBoundingBox();
-      _actionBoundingBox_Decrease_100     = new ActionResizeBoundingBox();
-      _actionBoundingBox_Decrease_1000    = new ActionResizeBoundingBox();
-
-      _actionResetBoundingBox             = new ActionResizeBoundingBox(Messages.Tour_Location_Action_ResetBoundingBox,
-                                                                        Messages.Tour_Location_Action_ResetBoundingBox_Tooltip);
 // SET_FORMATTING_ON
 
-      updateUI_Actions();
    }
 
    private void createMenuManager() {
@@ -1009,10 +990,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationViewer.setUseHashlookup(true);
       _locationViewer.setContentProvider(new LocationContentProvider());
       _locationViewer.setComparator(_locationComparator);
-//      _locationViewer.setFilters(_locationFilter);
 
       _locationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectLocation());
-//    _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
+      _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_ResizeBoundingBox_FlexibleSize());
 
       updateUI_SetSortDirection(
             _locationComparator.__sortColumnId,
@@ -2290,23 +2270,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
-      _actionCombineBoundingBoxes      .setEnabled(numLocations > 1);
-      _actionDeleteLocation            .setEnabled(isLocationSelected);
-      _actionDeleteAndRetrieveAgain    .setEnabled(isLocationSelected);
-      _actionIncludeGeoPosition        .setEnabled(isLocationSelected);
-      _actionOne                       .setEnabled(isLocationSelected);
-      _actionRelocateBoundingBox       .setEnabled(isLocationSelected);
-      _actionResetBoundingBox          .setEnabled(isLocationSelected);
+      _actionCombineBoundingBoxes         .setEnabled(numLocations > 1);
+      _actionDeleteLocation               .setEnabled(isLocationSelected);
+      _actionDeleteAndRetrieveAgain       .setEnabled(isLocationSelected);
+      _actionIncludeGeoPosition           .setEnabled(isLocationSelected);
+      _actionOne                          .setEnabled(isLocationSelected);
+      _actionRelocateBoundingBox          .setEnabled(isLocationSelected);
 
-      _actionBoundingBox_Increase_1    .setEnabled(isOneLocation);
-      _actionBoundingBox_Increase_10   .setEnabled(isOneLocation);
-      _actionBoundingBox_Increase_100  .setEnabled(isOneLocation);
-      _actionBoundingBox_Increase_1000 .setEnabled(isOneLocation);
-
-      _actionBoundingBox_Decrease_1    .setEnabled(isOneLocation);
-      _actionBoundingBox_Decrease_10   .setEnabled(isOneLocation);
-      _actionBoundingBox_Decrease_100  .setEnabled(isOneLocation);
-      _actionBoundingBox_Decrease_1000 .setEnabled(isOneLocation);
+      _actionBoundingBox_Reset            .setEnabled(isLocationSelected);
+      _actionBoundingBox_ResizeFlexible   .setEnabled(isOneLocation);
 
 // SET_FORMATTING_ON
    }
@@ -2317,24 +2289,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
        * Fill menu
        */
 
+      menuMgr.add(_actionBoundingBox_ResizeFlexible);
       menuMgr.add(_actionIncludeGeoPosition);
       menuMgr.add(_actionCombineBoundingBoxes);
       menuMgr.add(_actionRelocateBoundingBox);
-      menuMgr.add(_actionResetBoundingBox);
-
-      menuMgr.add(new Separator());
-
-      menuMgr.add(_actionBoundingBox_Increase_1);
-      menuMgr.add(_actionBoundingBox_Increase_10);
-      menuMgr.add(_actionBoundingBox_Increase_100);
-      menuMgr.add(_actionBoundingBox_Increase_1000);
-
-      menuMgr.add(new Separator());
-
-      menuMgr.add(_actionBoundingBox_Decrease_1);
-      menuMgr.add(_actionBoundingBox_Decrease_10);
-      menuMgr.add(_actionBoundingBox_Decrease_100);
-      menuMgr.add(_actionBoundingBox_Decrease_1000);
+      menuMgr.add(_actionBoundingBox_Reset);
 
       menuMgr.add(new Separator());
 
@@ -2361,6 +2320,30 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       tbm.add(_actionLinkWithOtherViews);
    }
 
+   private void fireLocationSelection() {
+
+      final IStructuredSelection selection = _locationViewer.getStructuredSelection();
+
+      if (selection.isEmpty()) {
+         return;
+      }
+
+      final List<TourLocation> allTourLocations = new ArrayList<>();
+
+      for (final Object object : selection.toArray()) {
+
+         if (object instanceof final LocationItem locationItem) {
+            allTourLocations.add(locationItem.tourLocation);
+         }
+      }
+
+      // this view could be inactive -> selection is not fired with the SelectionProvider interface
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_LOCATION_SELECTION,
+            allTourLocations,
+            this);
+   }
+
    private void fireUpdateUI() {
 
       // cached tours are not valid any more
@@ -2368,6 +2351,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       // fire modify event
       TourManager.fireEvent(TourEventId.UPDATE_UI);
+
+      // fire selection to update the map
+      fireLocationSelection();
    }
 
    @Override
@@ -2667,125 +2653,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             tourLocation.longitudeMinE6_Resized_Normalized  = longitudeMinE6_Resized_Normalized;
             tourLocation.longitudeMaxE6_Resized_Normalized  = longitudeMaxE6_Resized_Normalized;
 
-            tourLocation.setTransientValues();
-
-            final double latitude               = tourLocation.latitude;
-            final double longitude              = tourLocation.longitude;
-
-            final double latitudeMin            = tourLocation.latitudeMin;
-            final double latitudeMax            = tourLocation.latitudeMax;
-            final double longitudeMin           = tourLocation.longitudeMin;
-            final double longitudeMax           = tourLocation.longitudeMax;
-
-            final double latitudeMin_Resized    = tourLocation.latitudeMin_Resized;
-            final double latitudeMax_Resized    = tourLocation.latitudeMax_Resized;
-            final double longitudeMin_Resized   = tourLocation.longitudeMin_Resized;
-            final double longitudeMax_Resized   = tourLocation.longitudeMax_Resized;
-
-            locationItem.latitude_Text    = _nf6.format(latitude);
-            locationItem.longitude_Text   = _nf6.format(longitude);
-
 //SET_FORMATTING_ON
 
-            final int latitudeDiff_Normalized =
+            tourLocation.setTransientValues();
 
-                  latitudeE6_Normalized < latitudeMinE6_Normalized
-
-                        ? latitudeE6_Normalized - latitudeMinE6_Normalized
-                        : latitudeE6_Normalized > latitudeMaxE6_Normalized
-
-                              ? latitudeE6_Normalized - latitudeMaxE6_Normalized
-                              : 0;
-
-            final int longitudeDiff_Normalized =
-
-                  longitudeE6_Normalized < longitudeMinE6_Normalized
-
-                        ? longitudeE6_Normalized - longitudeMinE6_Normalized
-                        : longitudeE6_Normalized > longitudeMaxE6_Normalized
-
-                              ? longitudeE6_Normalized - longitudeMaxE6_Normalized
-                              : 0;
-
-            final int latitudeHeight_Normalized = latitudeMaxE6_Resized_Normalized - latitudeMinE6_Resized_Normalized;
-            final int longitudeWidth_Normalized = longitudeMaxE6_Resized_Normalized - longitudeMinE6_Resized_Normalized;
-
-            final double bboxHeight_Distance = MtMath.distanceVincenty(
-
-                  latitudeMin_Resized,
-                  longitudeMin_Resized,
-                  latitudeMax_Resized,
-                  longitudeMin_Resized
-
-            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-            final double bboxWidth_Distance = MtMath.distanceVincenty(
-
-                  latitudeMin_Resized,
-                  longitudeMin_Resized,
-                  latitudeMin_Resized,
-                  longitudeMax_Resized
-
-            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-            final double latitudeDiff_Distance = MtMath.distanceVincenty(
-
-                  latitude,
-                  longitude,
-
-                  latitude + (latitudeDiff_Normalized / 10e5),
-                  longitude
-
-            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-            final double longitudeDiff_Distance = MtMath.distanceVincenty(
-
-                  latitude,
-                  longitude,
-
-                  latitude,
-                  longitude + (longitudeDiff_Normalized / 10e5)
-
-            ) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-            // create formatted text
-            final String latDiffText = latitudeDiff_Normalized == 0
-
-                  ? UI.EMPTY_STRING
-                  : latitudeDiff_Normalized < 0
-
-                        ? UI.DASH + Integer.toString((int) (latitudeDiff_Distance + 0.5))
-                        : Integer.toString((int) (latitudeDiff_Distance + 0.5));
-
-            final String lonDiffText = longitudeDiff_Normalized == 0
-
-                  ? UI.EMPTY_STRING
-                  : longitudeDiff_Normalized < 0
-
-                        ? UI.DASH + Integer.toString((int) (longitudeDiff_Distance + 0.5))
-                        : Integer.toString((int) (longitudeDiff_Distance + 0.5));
-
-            final boolean isBBoxResized = false
-
-                  || latitudeMin != tourLocation.latitudeMin_Resized
-                  || latitudeMax != tourLocation.latitudeMax_Resized
-
-                  || longitudeMin != tourLocation.longitudeMin_Resized
-                  || longitudeMax != tourLocation.longitudeMax_Resized;
-
-            locationItem.latitudeDiff_Value = latitudeDiff_Normalized;
-            locationItem.longitudeDiff_Value = longitudeDiff_Normalized;
-
-            locationItem.latitudeDiff_Text = latDiffText;
-            locationItem.longitudeDiff_Text = lonDiffText;
-
-            locationItem.boundingBoxHeight_Value = latitudeHeight_Normalized;
-            locationItem.boundingBoxWidth_Value = longitudeWidth_Normalized;
-
-            locationItem.boundingBoxHeight_Text = Integer.toString((int) (bboxHeight_Distance + 0.5));
-            locationItem.boundingBoxWidth_Text = Integer.toString((int) (bboxWidth_Distance + 0.5));
-
-            locationItem.isResizedBoundingBox = isBBoxResized;
+            updateUI_LocationItem(locationItem, tourLocation);
 
             /*
              * Keep location
@@ -2920,7 +2792,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          longitudeMaxE6_Normalized = Math.max(longitudeMaxE6_Normalized, tourLocation.longitudeMaxE6_Resized_Normalized);
       }
 
-      setResizedBoundingBox(allSelectedLocations.get(0).getLocationId(),
+      TourLocationManager.setResizedBoundingBox(allSelectedLocations.get(0).getLocationId(),
 
             latitudeMinE6_Normalized,
             latitudeMaxE6_Normalized,
@@ -2995,25 +2867,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      for (final TourLocation tourLocation : allSelectedLocations) {
-
-         final int latitudeE6_Normalized = tourLocation.latitudeE6_Normalized;
-         final int longitudeE6_Normalized = tourLocation.longitudeE6_Normalized;
-
-         final int latitudeMinE6_Normalized = Math.min(latitudeE6_Normalized, tourLocation.latitudeMinE6_Resized_Normalized);
-         final int latitudeMaxE6_Normalized = Math.max(latitudeE6_Normalized, tourLocation.latitudeMaxE6_Resized_Normalized);
-
-         final int longitudeMinE6_Normalized = Math.min(longitudeE6_Normalized, tourLocation.longitudeMinE6_Resized_Normalized);
-         final int longitudeMaxE6_Normalized = Math.max(longitudeE6_Normalized, tourLocation.longitudeMaxE6_Resized_Normalized);
-
-         setResizedBoundingBox(tourLocation.getLocationId(),
-
-               latitudeMinE6_Normalized,
-               latitudeMaxE6_Normalized,
-
-               longitudeMinE6_Normalized,
-               longitudeMaxE6_Normalized);
-      }
+      TourLocationManager.setResizedBoundingBox_IncludeGeoPosition(allSelectedLocations);
 
       fireUpdateUI();
    }
@@ -3035,39 +2889,26 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      for (final TourLocation tourLocation : allSelectedLocations) {
-
-         final int latitudeE6_Normalized = tourLocation.latitudeE6_Normalized;
-         final int longitudeE6_Normalized = tourLocation.longitudeE6_Normalized;
-
-         int latitudeMinE6_Normalized = tourLocation.latitudeMinE6_Resized_Normalized;
-         int latitudeMaxE6_Normalized = tourLocation.latitudeMaxE6_Resized_Normalized;
-
-         int longitudeMinE6_Normalized = tourLocation.longitudeMinE6_Resized_Normalized;
-         int longitudeMaxE6_Normalized = tourLocation.longitudeMaxE6_Resized_Normalized;
-
-         final int latDiff2 = (latitudeMaxE6_Normalized - latitudeMinE6_Normalized) / 2;
-         final int lonDiff2 = (longitudeMaxE6_Normalized - longitudeMinE6_Normalized) / 2;
-
-         latitudeMinE6_Normalized = latitudeE6_Normalized - latDiff2;
-         latitudeMaxE6_Normalized = latitudeE6_Normalized + latDiff2;
-
-         longitudeMinE6_Normalized = longitudeE6_Normalized - lonDiff2;
-         longitudeMaxE6_Normalized = longitudeE6_Normalized + lonDiff2;
-
-         setResizedBoundingBox(tourLocation.getLocationId(),
-
-               latitudeMinE6_Normalized,
-               latitudeMaxE6_Normalized,
-
-               longitudeMinE6_Normalized,
-               longitudeMaxE6_Normalized);
-      }
+      TourLocationManager.setResizedBoundingBox_Relocate(allSelectedLocations);
 
       fireUpdateUI();
    }
 
-   private void onAction_ResizeBoundingBox(final int resizeValue) {
+   private void onAction_ResizeBoundingBox_FlexibleSize() {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final TourLocation tourLocation = getSelectedLocations().get(0);
+
+      new DialogResizeTourLocation(this, tourLocation).open();
+   }
+
+   /**
+    */
+   private void onAction_ResizeBoundingBox_Reset() {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -3076,97 +2917,16 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      if (resizeValue == 0) {
 
-         /*
-          * Reset bounding box
-          */
+      for (final TourLocation tourLocation : allSelectedLocations) {
 
-         for (final TourLocation tourLocation : allSelectedLocations) {
+         TourLocationManager.setResizedBoundingBox(tourLocation.getLocationId(),
 
-            setResizedBoundingBox(tourLocation.getLocationId(),
+               tourLocation.latitudeMinE6_Normalized,
+               tourLocation.latitudeMaxE6_Normalized,
 
-                  tourLocation.latitudeMinE6_Normalized,
-                  tourLocation.latitudeMaxE6_Normalized,
-
-                  tourLocation.longitudeMinE6_Normalized,
-                  tourLocation.longitudeMaxE6_Normalized);
-         }
-
-      } else {
-
-         /*
-          * Set resized bouncing box is supported only for ONE location
-          */
-
-         final TourLocation tourLocation = allSelectedLocations.get(0);
-
-         // resize already resized box
-         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
-         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
-         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
-         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
-
-         final double resizeValueMeter = resizeValue / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-         final GeoPosition destinationPointVertical = MtMath.destinationPoint(
-
-               latitudeMin_Resized,
-               longitudeMin_Resized,
-               resizeValueMeter,
-               0);
-
-         final GeoPosition destinationPointHorizontal = MtMath.destinationPoint(
-               latitudeMin_Resized,
-               longitudeMin_Resized,
-               resizeValueMeter,
-               90);
-
-         final double signum = Math.signum(resizeValueMeter);
-
-         final double latDiff = Math.abs(latitudeMin_Resized - destinationPointVertical.latitude);
-         final double lonDiff = Math.abs(longitudeMin_Resized - destinationPointHorizontal.longitude);
-
-         final double latitudeMin_WithDiff = latitudeMin_Resized - signum * latDiff;
-         final double latitudeMax_WithDiff = latitudeMax_Resized + signum * latDiff;
-
-         final double longitudeMin_WithDiff = longitudeMin_Resized - signum * lonDiff;
-         final double longitudeMax_WithDiff = longitudeMax_Resized + signum * lonDiff;
-
-         final int latitudeMin_WithDiffE6 = (int) (latitudeMin_WithDiff * 1E6);
-         final int latitudeMax_WithDiffE6 = (int) (latitudeMax_WithDiff * 1E6);
-         final int longitudeMin_WithDiffE6 = (int) (longitudeMin_WithDiff * 1E6);
-         final int longitudeMax_WithDiffE6 = (int) (longitudeMax_WithDiff * 1E6);
-
-         int latitudeMin_WithDiffE6_Normalized = latitudeMin_WithDiffE6 + 90_000_000;
-         int latitudeMax_WithDiffE6_Normalized = latitudeMax_WithDiffE6 + 90_000_000;
-         int longitudeMin_WithDiffE6_Normalized = longitudeMin_WithDiffE6 + 180_000_000;
-         int longitudeMax_WithDiffE6_Normalized = longitudeMax_WithDiffE6 + 180_000_000;
-
-         // ensure that min < max
-         if (latitudeMin_WithDiffE6_Normalized > latitudeMax_WithDiffE6_Normalized) {
-
-            final int swapValue = latitudeMin_WithDiffE6_Normalized;
-
-            latitudeMin_WithDiffE6_Normalized = latitudeMax_WithDiffE6_Normalized;
-            latitudeMax_WithDiffE6_Normalized = swapValue;
-         }
-
-         if (longitudeMin_WithDiffE6_Normalized > longitudeMax_WithDiffE6_Normalized) {
-
-            final int swapValue = longitudeMin_WithDiffE6_Normalized;
-
-            longitudeMin_WithDiffE6_Normalized = longitudeMax_WithDiffE6_Normalized;
-            longitudeMax_WithDiffE6_Normalized = swapValue;
-         }
-
-         final long locationId = tourLocation.getLocationId();
-
-         setResizedBoundingBox(locationId,
-               latitudeMin_WithDiffE6_Normalized,
-               latitudeMax_WithDiffE6_Normalized,
-               longitudeMin_WithDiffE6_Normalized,
-               longitudeMax_WithDiffE6_Normalized);
+               tourLocation.longitudeMinE6_Normalized,
+               tourLocation.longitudeMaxE6_Normalized);
       }
 
       fireUpdateUI();
@@ -3184,7 +2944,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             _locationViewer.refresh();
          }
-         updateUI_SelectLocation(selectionBackup);
+         selectSelectionInViewer(selectionBackup);
       }
       _viewerContainer.setRedraw(true);
    }
@@ -3196,17 +2956,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       // select tour locations for the selected tours
-      if (selection instanceof SelectionTourId) {
+      if (selection instanceof final SelectionTourId selectionTourId) {
 
-         final long tourId = ((SelectionTourId) selection).getTourId();
+         final long tourId = selectionTourId.getTourId();
          final TourData tourData = TourManager.getTour(tourId);
          final List<TourData> tourDataList = List.of(tourData);
 
          selectTourLocations(tourDataList);
 
-      } else if (selection instanceof SelectionTourIds) {
-
-         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
          final List<Long> allTourIds = selectionTourIds.getTourIds();
          final List<TourData> allTourData = new ArrayList<>();
@@ -3226,26 +2984,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          return;
       }
 
-      final IStructuredSelection selection = _locationViewer.getStructuredSelection();
-
-      if (selection.isEmpty()) {
-         return;
-      }
-
-      final List<TourLocation> allTourLocations = new ArrayList<>();
-
-      for (final Object object : selection.toArray()) {
-
-         if (object instanceof final LocationItem locationItem) {
-            allTourLocations.add(locationItem.tourLocation);
-         }
-      }
-
-      // this view could be inactive -> selection is not fired with the SelectionProvider interface
-      TourManager.fireEventWithCustomData(
-            TourEventId.TOUR_LOCATION_SELECTION,
-            allTourLocations,
-            this);
+      fireLocationSelection();
    }
 
    @Override
@@ -3266,7 +3005,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             // update the viewer
             updateUI_SetViewerInput();
          }
-         updateUI_SelectLocation(selectionBackup);
+         selectSelectionInViewer(selectionBackup);
       }
       _viewerContainer.setRedraw(true);
 
@@ -3287,7 +3026,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          {
             updateUI_SetViewerInput();
          }
-         updateUI_SelectLocation(selectionBackup);
+         selectSelectionInViewer(selectionBackup);
       }
       _viewerContainer.setRedraw(true);
    }
@@ -3370,6 +3109,24 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       Util.setState(_state, STATE_SELECTED_SENSOR_INDICES, _locationViewer.getTable().getSelectionIndices());
    }
 
+   /**
+    * Select and reveal tour location item
+    *
+    * @param selection
+    * @param checkedElements
+    */
+   private void selectSelectionInViewer(final ISelection selection) {
+
+      _isInUIUpdate = true;
+      {
+         _locationViewer.setSelection(selection, true);
+
+         final Table table = _locationViewer.getTable();
+         table.showSelection();
+      }
+      _isInUIUpdate = false;
+   }
+
    private void selectTourLocations(final List<TourData> allTourData) {
 
       final List<TourLocation> allTourLocations = TourLocationManager.getTourLocations(allTourData);
@@ -3389,87 +3146,168 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final StructuredSelection selection = new StructuredSelection(allLocationItems.toArray());
 
-      updateUI_SelectLocation(selection);
+      selectSelectionInViewer(selection);
    }
 
    @Override
    public void setFocus() {
+
       _locationViewer.getTable().setFocus();
-   }
-
-   private void setResizedBoundingBox(final long locationId,
-
-                                      final int latitudeMinE6_Normalized,
-                                      final int latitudeMaxE6_Normalized,
-
-                                      final int longitudeMinE6_Normalized,
-                                      final int longitudeMaxE6_Normalized) {
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final String sql = UI.EMPTY_STRING
-
-               + "UPDATE " + TourDatabase.TABLE_TOUR_LOCATION + NL //      //$NON-NLS-1$
-
-               + "SET" + NL //                                             //$NON-NLS-1$
-
-               + " latitudeMinE6_Resized_Normalized  = ?," + NL //      1  //$NON-NLS-1$
-               + " latitudeMaxE6_Resized_Normalized  = ?," + NL //      2  //$NON-NLS-1$
-
-               + " longitudeMinE6_Resized_Normalized = ?," + NL //      3  //$NON-NLS-1$
-               + " longitudeMaxE6_Resized_Normalized = ? " + NL //      4  //$NON-NLS-1$
-
-               + " WHERE locationID = ?"; //                            5  //$NON-NLS-1$
-
-         final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
-
-         sqlUpdate.setInt(1, latitudeMinE6_Normalized);
-         sqlUpdate.setInt(2, latitudeMaxE6_Normalized);
-         sqlUpdate.setInt(3, longitudeMinE6_Normalized);
-         sqlUpdate.setInt(4, longitudeMaxE6_Normalized);
-
-         sqlUpdate.setLong(5, locationId);
-
-         sqlUpdate.executeUpdate();
-
-      } catch (final SQLException e) {
-
-         UI.showSQLException(e);
-      }
    }
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   private void updateUI_Actions() {
+   void updateUI(final TourLocation tourLocation) {
 
-      _actionBoundingBox_Increase_1.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 1);
-      _actionBoundingBox_Increase_10.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 10);
-      _actionBoundingBox_Increase_100.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 100);
-      _actionBoundingBox_Increase_1000.setLabel(Messages.Tour_Location_Action_BoundingBox_Increase, 1000);
+      final LocationItem locationItem = _locationItemsMap.get(tourLocation.getLocationId());
 
-      _actionBoundingBox_Decrease_1.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -1);
-      _actionBoundingBox_Decrease_10.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -10);
-      _actionBoundingBox_Decrease_100.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -100);
-      _actionBoundingBox_Decrease_1000.setLabel(Messages.Tour_Location_Action_BoundingBox_Decrease, -1000);
+      if (locationItem != null) {
+
+         updateUI_LocationItem(locationItem, tourLocation);
+
+         _locationViewer.update(locationItem, null);
+      }
    }
 
-   /**
-    * Select and reveal tour marker item.
-    *
-    * @param selection
-    * @param checkedElements
-    */
-   private void updateUI_SelectLocation(final ISelection selection) {
+   private void updateUI_LocationItem(final LocationItem locationItem,
+                                      final TourLocation tourLocation) {
 
-      _isInUIUpdate = true;
-      {
-         _locationViewer.setSelection(selection, true);
+// SET_FORMATTING_OFF
 
-         final Table table = _locationViewer.getTable();
-         table.showSelection();
-      }
-      _isInUIUpdate = false;
+      final double latitude                        = tourLocation.latitude;
+      final double longitude                       = tourLocation.longitude;
+
+      final double latitudeMin                     = tourLocation.latitudeMin;
+      final double latitudeMax                     = tourLocation.latitudeMax;
+      final double longitudeMin                    = tourLocation.longitudeMin;
+      final double longitudeMax                    = tourLocation.longitudeMax;
+
+      final double latitudeMin_Resized             = tourLocation.latitudeMin_Resized;
+      final double latitudeMax_Resized             = tourLocation.latitudeMax_Resized;
+      final double longitudeMin_Resized            = tourLocation.longitudeMin_Resized;
+      final double longitudeMax_Resized            = tourLocation.longitudeMax_Resized;
+
+      final int latitudeE6_Normalized              = tourLocation.latitudeE6_Normalized;
+      final int longitudeE6_Normalized             = tourLocation.longitudeE6_Normalized;
+
+      final int latitudeMinE6_Normalized           = tourLocation.latitudeMinE6_Normalized;
+      final int latitudeMaxE6_Normalized           = tourLocation.latitudeMaxE6_Normalized;
+      final int longitudeMinE6_Normalized          = tourLocation.longitudeMinE6_Normalized;
+      final int longitudeMaxE6_Normalized          = tourLocation.longitudeMaxE6_Normalized;
+
+      final int latitudeMinE6_Resized_Normalized   = tourLocation.latitudeMinE6_Resized_Normalized;
+      final int latitudeMaxE6_Resized_Normalized   = tourLocation.latitudeMaxE6_Resized_Normalized;
+      final int longitudeMinE6_Resized_Normalized  = tourLocation.longitudeMinE6_Resized_Normalized;
+      final int longitudeMaxE6_Resized_Normalized  = tourLocation.longitudeMaxE6_Resized_Normalized;
+
+// SET_FORMATTING_ON
+
+      final int latitudeDiff_Normalized =
+
+            latitudeE6_Normalized < latitudeMinE6_Normalized
+
+                  ? latitudeE6_Normalized - latitudeMinE6_Normalized
+                  : latitudeE6_Normalized > latitudeMaxE6_Normalized
+
+                        ? latitudeE6_Normalized - latitudeMaxE6_Normalized
+                        : 0;
+
+      final int longitudeDiff_Normalized =
+
+            longitudeE6_Normalized < longitudeMinE6_Normalized
+
+                  ? longitudeE6_Normalized - longitudeMinE6_Normalized
+                  : longitudeE6_Normalized > longitudeMaxE6_Normalized
+
+                        ? longitudeE6_Normalized - longitudeMaxE6_Normalized
+                        : 0;
+
+      final int latitudeHeight_Normalized = latitudeMaxE6_Resized_Normalized - latitudeMinE6_Resized_Normalized;
+      final int longitudeWidth_Normalized = longitudeMaxE6_Resized_Normalized - longitudeMinE6_Resized_Normalized;
+
+      final double bboxHeight_Distance = MtMath.distanceVincenty(
+
+            latitudeMin_Resized,
+            longitudeMin_Resized,
+            latitudeMax_Resized,
+            longitudeMin_Resized
+
+      ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      final double bboxWidth_Distance = MtMath.distanceVincenty(
+
+            latitudeMin_Resized,
+            longitudeMin_Resized,
+            latitudeMin_Resized,
+            longitudeMax_Resized
+
+      ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      final double latitudeDiff_Distance = MtMath.distanceVincenty(
+
+            latitude,
+            longitude,
+
+            latitude + (latitudeDiff_Normalized / 10e5),
+            longitude
+
+      ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      final double longitudeDiff_Distance = MtMath.distanceVincenty(
+
+            latitude,
+            longitude,
+
+            latitude,
+            longitude + (longitudeDiff_Normalized / 10e5)
+
+      ) / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+      // create formatted text
+      final String latDiffText = latitudeDiff_Normalized == 0
+
+            ? UI.EMPTY_STRING
+            : latitudeDiff_Normalized < 0
+
+                  ? UI.DASH + Integer.toString((int) (latitudeDiff_Distance + 0.5))
+                  : Integer.toString((int) (latitudeDiff_Distance + 0.5));
+
+      final String lonDiffText = longitudeDiff_Normalized == 0
+
+            ? UI.EMPTY_STRING
+            : longitudeDiff_Normalized < 0
+
+                  ? UI.DASH + Integer.toString((int) (longitudeDiff_Distance + 0.5))
+                  : Integer.toString((int) (longitudeDiff_Distance + 0.5));
+
+      final boolean isBBoxResized = false
+
+            || latitudeMin != tourLocation.latitudeMin_Resized
+            || latitudeMax != tourLocation.latitudeMax_Resized
+
+            || longitudeMin != tourLocation.longitudeMin_Resized
+            || longitudeMax != tourLocation.longitudeMax_Resized;
+
+      /*
+       * Update model
+       */
+      locationItem.latitude_Text = _nf6.format(latitude);
+      locationItem.longitude_Text = _nf6.format(longitude);
+
+      locationItem.latitudeDiff_Value = latitudeDiff_Normalized;
+      locationItem.longitudeDiff_Value = longitudeDiff_Normalized;
+
+      locationItem.latitudeDiff_Text = latDiffText;
+      locationItem.longitudeDiff_Text = lonDiffText;
+
+      locationItem.boundingBoxHeight_Value = latitudeHeight_Normalized;
+      locationItem.boundingBoxWidth_Value = longitudeWidth_Normalized;
+
+      locationItem.boundingBoxHeight_Text = FormatManager.formatNumber_0(bboxHeight_Distance);
+      locationItem.boundingBoxWidth_Text = FormatManager.formatNumber_0(bboxWidth_Distance);
+
+      locationItem.isResizedBoundingBox = isBBoxResized;
    }
 
    /**
