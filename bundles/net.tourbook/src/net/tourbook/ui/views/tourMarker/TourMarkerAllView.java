@@ -1578,12 +1578,16 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
    private void onTourEvent_TourMarker(final Object eventData) {
 
-      if (eventData instanceof SelectionTourMarker) {
+      if (eventData instanceof final SelectionTourMarker selection) {
 
          // select the tour marker item in the view
 
-         final SelectionTourMarker selection = (SelectionTourMarker) eventData;
          final ArrayList<TourMarker> allTourMarker = selection.getSelectedTourMarker();
+
+         // ensure that at least one marker is available
+         if (allTourMarker.size() == 0) {
+            return;
+         }
 
          final long selectedTourMarkerId = allTourMarker.get(0).getMarkerId();
 
