@@ -118,7 +118,7 @@ public class SplashManager {
 
    public void close() {
 
-      if (_splashShell.isDisposed() == false) {
+      if (_splashShell != null && _splashShell.isDisposed() == false) {
          _splashShell.close();
       }
 
@@ -237,16 +237,19 @@ public class SplashManager {
       // log message if the splash screen do not show it
       System.out.println(UI.timeStamp() + "[Splash message] " + message); //$NON-NLS-1$
 
-      _splashShell.getDisplay().syncExec(() -> {
+      if (_splashShell != null && _splashShell.isDisposed() == false) {
 
-         if (_lblProgressMessage.isDisposed()) {
-            return;
-         }
+         _splashShell.getDisplay().syncExec(() -> {
 
-         _lblProgressMessage.setText(message);
+            if (_lblProgressMessage.isDisposed()) {
+               return;
+            }
 
-         _splashShell.update();
-      });
+            _lblProgressMessage.setText(message);
+
+            _splashShell.update();
+         });
+      }
    }
 
 }
