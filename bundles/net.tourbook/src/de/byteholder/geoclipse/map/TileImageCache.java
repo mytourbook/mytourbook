@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
@@ -165,7 +166,22 @@ public class TileImageCache {
             }
          }
 
-         for (final Image image : _allImages) {
+         for (int imageIndex = 0; imageIndex < _allImages.size(); imageIndex++) {
+
+            Image image = null;
+
+            try {
+
+               // use imageIndex to prevent foreach loop !!!
+               @SuppressWarnings("unused")
+               final int dummy = imageIndex;
+
+               image = _allImages.get(imageIndex);
+
+            } catch (final ConcurrentModificationException e) {
+               // ignore
+            }
+
             if (image != null) {
                try {
                   image.dispose();
@@ -182,6 +198,7 @@ public class TileImageCache {
 
    /**
     * @param tileImagePath
+    *
     * @return Returns the path for the offline image or <code>null</code> when the image is not
     *         available
     */
@@ -221,6 +238,7 @@ public class TileImageCache {
     * Loads the tile image from the offline image file
     *
     * @param tile
+    *
     * @return Returns image from offline image file or <code>null</code> when loading fails
     */
    Image getOfflineImage(final Tile tile) {
@@ -353,6 +371,7 @@ public class TileImageCache {
 
    /**
     * @param tile
+    *
     * @return Returns the tile image from the cache, returns <code>null</code> when the image is
     *         not available in the cache or is disposed
     */
@@ -377,6 +396,7 @@ public class TileImageCache {
 
    /**
     * @param tile
+    *
     * @return Returns the tile image os file path or <code>null</code> when the path is not
     *         available
     */
@@ -653,6 +673,7 @@ public class TileImageCache {
     * @param tileKey
     * @param isSaveImage
     * @param isChildError
+    *
     * @return
     */
    Image setupImage(final ImageData loadedImageData,
@@ -678,6 +699,7 @@ public class TileImageCache {
     *           tile key which is used to keep the image in the cache
     * @param loadedImageData
     * @param tileOfflineImage
+    *
     * @return
     */
    private Image setupImageInternal(final Tile tile,
