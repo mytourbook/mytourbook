@@ -527,7 +527,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       final String[] items = new String[2];
       items[0] = "flask (0.5L";
       items[1] = "bladder (1.5L)";
-      editors[5] = new ComboBoxCellEditor(productsTable, items);
+      editors[5] = new ComboBoxCellEditor(productsTable, items, SWT.READ_ONLY);
       // example
       // Flask (0.5L)
       // bladder (1.5L)
