@@ -90,6 +90,7 @@ public class TourNutritionProduct {
       final Nutriments nutriments = product.getNutriments();
       calories = nutriments.getEnergyKcalServing();
       sodium = nutriments.getSodiumServing();
+      //todo fb  isFluid = product.agry
    }
 
    /**

@@ -104,6 +104,7 @@ public class NutritionUtils {
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
 
             final ObjectMapper mapper = new ObjectMapper();
+            final String toto = response.body();
             final String productsResults = mapper.readValue(response.body(), JsonNode.class)
                   .get("products") //$NON-NLS-1$
                   .toString();
