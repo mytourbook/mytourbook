@@ -2067,9 +2067,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public TourData() {}
 
-   public void addFuelProduct(final TourNutritionProduct fuelProduct) {
+   public void addNutritionProduct(final TourNutritionProduct nutritionProduct) {
 
-      tourNutritionProducts.add(fuelProduct);
+      tourNutritionProducts.add(nutritionProduct);
    }
 
    /**

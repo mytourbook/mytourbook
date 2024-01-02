@@ -237,7 +237,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                             //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                           //$NON-NLS-1$
    private static final String ENTITY_ID_MARKER              = "MarkerID";                                             //$NON-NLS-1$
-   private static final String ENTITY_ID_FUELPRODUCT         = "ProductCode";                                          //$NON-NLS-1$
+   private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductCode";                                          //$NON-NLS-1$
    private static final String ENTITY_ID_PERSON              = "PersonID";                                             //$NON-NLS-1$
    private static final String ENTITY_ID_PHOTO               = "PhotoID";                                              //$NON-NLS-1$
    private static final String ENTITY_ID_REF                 = "RefID";                                                //$NON-NLS-1$
@@ -4786,7 +4786,7 @@ public class TourDatabase {
        */
       exec(stmt, "CREATE TABLE " + TABLE_TOUR_NUTRITION_PRODUCT + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + SQL.CreateField_EntityId(ENTITY_ID_FUELPRODUCT, true)
+            + SQL.CreateField_EntityId(ENTITY_ID_NUTRITIONPRODUCT, true)
 
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 

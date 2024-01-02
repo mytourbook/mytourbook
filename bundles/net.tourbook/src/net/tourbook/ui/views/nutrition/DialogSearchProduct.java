@@ -406,7 +406,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
          final TourData tourData = TourManager.getTour(_tourId);
          final TourNutritionProduct tfp = new TourNutritionProduct(tourData, productResponse.getProduct());
-         tourData.addFuelProduct(tfp);
+         tourData.addNutritionProduct(tfp);
 
          TourManager.saveModifiedTour(tourData);
       });
