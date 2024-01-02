@@ -3151,9 +3151,12 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_One;
    public static String        Tour_Location_Action_One_Tooltip;
    public static String        Tour_Location_Action_OpenProfileEditor;
-   public static String        Tour_Location_Action_PartTitle_All;
-   public static String        Tour_Location_Action_PartTitle_End;
-   public static String        Tour_Location_Action_PartTitle_Start;
+   public static String        Tour_Location_Action_PartTitle_Append_All;
+   public static String        Tour_Location_Action_PartTitle_Append_End;
+   public static String        Tour_Location_Action_PartTitle_Append_Start;
+   public static String        Tour_Location_Action_PartTitle_Set_All;
+   public static String        Tour_Location_Action_PartTitle_Set_End;
+   public static String        Tour_Location_Action_PartTitle_Set_Start;
    public static String        Tour_Location_Action_Profile_Tooltip;
    public static String        Tour_Location_Action_ProfileTitle_All;
    public static String        Tour_Location_Action_ProfileTitle_End;
@@ -3174,6 +3177,9 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ResizeBoundingBox;
    public static String        Tour_Location_Action_SetLocation_End;
    public static String        Tour_Location_Action_SetLocation_Start;
+   public static String        Tour_Location_Action_SetLocationPart_All;
+   public static String        Tour_Location_Action_SetLocationPart_End;
+   public static String        Tour_Location_Action_SetLocationPart_Start;
    public static String        Tour_Location_Action_ManageStartEndLocation;
    public static String        Tour_Location_Action_ManageStartEndLocation_Tooltip;
    public static String        Tour_Location_Action_ShowLocationInfo_Tooltip;

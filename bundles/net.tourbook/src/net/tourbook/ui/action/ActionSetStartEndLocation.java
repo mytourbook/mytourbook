@@ -79,48 +79,54 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionSetStartEndLocation extends SubMenu {
 
-   private static final String            ID                     = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
+   private static final String             ID                     = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private static final char              NL                     = UI.NEW_LINE;
+   private static final char               NL                     = UI.NEW_LINE;
 
-   public static final String             ALLOWED_FIELDNAME_NAME = "name";                                             //$NON-NLS-1$
+   public static final String              ALLOWED_FIELDNAME_NAME = "name";                                             //$NON-NLS-1$
 
-   private static final String            LOCATION_SEPARATOR     = "     ·     ";                                      //$NON-NLS-1$
-   private static final String            PROFILE_NAME           = "%s - %d";                                          //$NON-NLS-1$
+   private static final String             LOCATION_SEPARATOR     = "     ·     ";                                      //$NON-NLS-1$
+   private static final String             PROFILE_NAME           = "%s - %d";                                          //$NON-NLS-1$
 
-   private static final IDialogSettings   _state                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings    _state                 = TourbookPlugin.getState(ID);
 
-   private ITourProvider                  _tourProvider;
+   private ITourProvider                   _tourProvider;
 
-   private ActionEditProfiles             _actionEditProfiles;
-   private Action                         _actionPartTitle_All;
-   private Action                         _actionPartTitle_Start;
-   private Action                         _actionPartTitle_End;
-   private Action                         _actionProfileTitle_All;
-   private Action                         _actionProfileTitle_Start;
-   private Action                         _actionProfileTitle_End;
+   private Action                          _actionPartTitle_Append_All;
+   private Action                          _actionPartTitle_Append_Start;
+   private Action                          _actionPartTitle_Append_End;
+   private Action                          _actionPartTitle_Set_All;
+   private Action                          _actionPartTitle_Set_Start;
+   private Action                          _actionPartTitle_Set_End;
+   private Action                          _actionProfileTitle_All;
+   private Action                          _actionProfileTitle_Start;
+   private Action                          _actionProfileTitle_End;
 
-   private ActionAppendLocationPart_All   _actionAppendLocationPart_All;
-   private ActionAppendLocationPart_Start _actionAppendLocationPart_Start;
-   private ActionAppendLocationPart_End   _actionAppendLocationPart_End;
-   private ActionRemoveLocation_All       _actionRemoveLocation_All;
-   private ActionRemoveLocation_All       _actionRemoveLocation_All_Complete;
-   private ActionRemoveLocation_Start     _actionRemoveLocation_Start;
-   private ActionRemoveLocation_Start     _actionRemoveLocation_Start_Complete;
-   private ActionRemoveLocation_End       _actionRemoveLocation_End;
-   private ActionRemoveLocation_End       _actionRemoveLocation_End_Complete;
-   private ActionSetLocation_Start        _actionSetLocation_Start;
-   private ActionSetLocation_End          _actionSetLocation_End;
+   private ActionEditProfiles              _actionEditProfiles;
+   private ActionLocationPart_Append_All   _actionLocationPart_Append_All;
+   private ActionLocationPart_Append_Start _actionLocationPart_Append_Start;
+   private ActionLocationPart_Append_End   _actionLocationPart_Append_End;
+   private ActionLocationPart_Set_All      _actionLocationPart_Set_All;
+   private ActionLocationPart_Set_Start    _actionLocationPart_Set_Start;
+   private ActionLocationPart_Set_End      _actionLocationPart_Set_End;
+   private ActionRemoveLocation_All        _actionRemoveLocation_All;
+   private ActionRemoveLocation_All        _actionRemoveLocation_All_Complete;
+   private ActionRemoveLocation_Start      _actionRemoveLocation_Start;
+   private ActionRemoveLocation_Start      _actionRemoveLocation_Start_Complete;
+   private ActionRemoveLocation_End        _actionRemoveLocation_End;
+   private ActionRemoveLocation_End        _actionRemoveLocation_End_Complete;
+   private ActionSetLocation_Start         _actionSetLocation_Start;
+   private ActionSetLocation_End           _actionSetLocation_End;
 
-   private SlideoutLocationProfiles       _slideoutLocationProfiles;
-   private Control                        _ownerControl;
+   private SlideoutLocationProfiles        _slideoutLocationProfiles;
+   private Control                         _ownerControl;
 
-   private ArrayList<TourData>            _allSelectedTours;
+   private ArrayList<TourData>             _allSelectedTours;
 
    /**
     * When <code>null</code> then a start or end location is not hovered
     */
-   private Boolean                        _isStartLocationInContextMenu;
+   private Boolean                         _isStartLocationInContextMenu;
 
    private class ActionAppendLocationPart extends Action {
 
@@ -153,7 +159,7 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void run() {
 
-         TourLocationManager.appendLocationPart(
+         TourLocationManager.locationPart_Append(
 
                _allSelectedTours,
 
@@ -166,9 +172,22 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    }
 
-   private class ActionAppendLocationPart_All extends SubMenu {
+   private class ActionEditProfiles extends Action {
 
-      public ActionAppendLocationPart_All() {
+      public ActionEditProfiles() {
+
+         super(Messages.Tour_Location_Action_OpenProfileEditor, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+         actionOpenProfileSlideout();
+      }
+   }
+
+   private class ActionLocationPart_Append_All extends SubMenu {
+
+      public ActionLocationPart_Append_All() {
 
          super(Messages.Tour_Location_Action_AppendLocationPart_All, AS_DROP_DOWN_MENU);
       }
@@ -179,15 +198,21 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void fillMenu(final Menu menu) {
 
-         addActionToMenu(_actionPartTitle_All);
+         addActionToMenu(_actionPartTitle_Append_All);
 
-         fillMenu_AddAll_PartActions(menu, true, true);
+         fillMenu_AddAll_PartActions(menu,
+
+               true, // isStart
+               true, // isEnd
+
+               true // isAppend
+         );
       }
    }
 
-   private class ActionAppendLocationPart_End extends SubMenu {
+   private class ActionLocationPart_Append_End extends SubMenu {
 
-      public ActionAppendLocationPart_End() {
+      public ActionLocationPart_Append_End() {
 
          super(Messages.Tour_Location_Action_AppendLocationPart_End, AS_DROP_DOWN_MENU);
       }
@@ -198,15 +223,21 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void fillMenu(final Menu menu) {
 
-         addActionToMenu(_actionPartTitle_End);
+         addActionToMenu(_actionPartTitle_Append_End);
 
-         fillMenu_AddAll_PartActions(menu, false, true);
+         fillMenu_AddAll_PartActions(menu,
+
+               false, // isStart
+               true, // isEnd
+
+               true // isAppend
+         );
       }
    }
 
-   private class ActionAppendLocationPart_Start extends SubMenu {
+   private class ActionLocationPart_Append_Start extends SubMenu {
 
-      public ActionAppendLocationPart_Start() {
+      public ActionLocationPart_Append_Start() {
 
          super(Messages.Tour_Location_Action_AppendLocationPart_Start, AS_DROP_DOWN_MENU);
 
@@ -218,22 +249,92 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void fillMenu(final Menu menu) {
 
-         addActionToMenu(_actionPartTitle_Start);
+         addActionToMenu(_actionPartTitle_Append_Start);
 
-         fillMenu_AddAll_PartActions(menu, true, false);
+         fillMenu_AddAll_PartActions(menu,
+
+               true, // isStart
+               false, // isEnd
+
+               true // isAppend
+         );
       }
    }
 
-   private class ActionEditProfiles extends Action {
+   private class ActionLocationPart_Set_All extends SubMenu {
 
-      public ActionEditProfiles() {
+      public ActionLocationPart_Set_All() {
 
-         super(Messages.Tour_Location_Action_OpenProfileEditor, AS_PUSH_BUTTON);
+         super(Messages.Tour_Location_Action_SetLocationPart_All, AS_DROP_DOWN_MENU);
       }
 
       @Override
-      public void run() {
-         actionOpenProfileSlideout();
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         addActionToMenu(_actionPartTitle_Set_All);
+
+         fillMenu_AddAll_PartActions(menu,
+
+               true, // isStart
+               true, // isEnd
+
+               false // isAppend
+         );
+      }
+   }
+
+   private class ActionLocationPart_Set_End extends SubMenu {
+
+      public ActionLocationPart_Set_End() {
+
+         super(Messages.Tour_Location_Action_SetLocationPart_End, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         addActionToMenu(_actionPartTitle_Set_End);
+
+         fillMenu_AddAll_PartActions(menu,
+
+               false, // isStart
+               true, // isEnd
+
+               false // isAppend
+         );
+      }
+   }
+
+   private class ActionLocationPart_Set_Start extends SubMenu {
+
+      public ActionLocationPart_Set_Start() {
+
+         super(Messages.Tour_Location_Action_SetLocationPart_Start, AS_DROP_DOWN_MENU);
+
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         addActionToMenu(_actionPartTitle_Set_Start);
+
+         fillMenu_AddAll_PartActions(menu,
+
+               true, // isStart
+               false, // isEnd
+
+               false // isAppend
+         );
+
       }
    }
 
@@ -406,6 +507,49 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             fillMenu_AddAll_ProfileActions(menu, allProfiles, true, false);
          }
+      }
+   }
+
+   private class ActionSetLocationPart extends Action {
+
+      private LocationPartID _partID_Start;
+      private LocationPartID _partID_End;
+
+      private boolean        _isSetStartLocation;
+      private boolean        _isSetEndLocation;
+
+      public ActionSetLocationPart(final String actionText,
+                                   final String actionTooltip,
+
+                                   final boolean isSetStartLocation,
+                                   final boolean isSetEndLocation,
+
+                                   final LocationPartID startPartID,
+                                   final LocationPartID endPartID) {
+
+         super(actionText, AS_PUSH_BUTTON);
+
+         setToolTipText(actionTooltip);
+
+         _isSetStartLocation = isSetStartLocation;
+         _isSetEndLocation = isSetEndLocation;
+
+         _partID_Start = startPartID;
+         _partID_End = endPartID;
+      }
+
+      @Override
+      public void run() {
+
+         TourLocationManager.locationPart_Set(
+
+               _allSelectedTours,
+
+               _partID_Start,
+               _partID_End,
+
+               _isSetStartLocation,
+               _isSetEndLocation);
       }
    }
 
@@ -668,9 +812,12 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       _actionEditProfiles                    = new ActionEditProfiles();
 
-      _actionAppendLocationPart_All          = new ActionAppendLocationPart_All();
-      _actionAppendLocationPart_Start        = new ActionAppendLocationPart_Start();
-      _actionAppendLocationPart_End          = new ActionAppendLocationPart_End();
+      _actionLocationPart_Append_All         = new ActionLocationPart_Append_All();
+      _actionLocationPart_Append_Start       = new ActionLocationPart_Append_Start();
+      _actionLocationPart_Append_End         = new ActionLocationPart_Append_End();
+      _actionLocationPart_Set_All            = new ActionLocationPart_Set_All();
+      _actionLocationPart_Set_Start          = new ActionLocationPart_Set_Start();
+      _actionLocationPart_Set_End            = new ActionLocationPart_Set_End();
       _actionRemoveLocation_All_Complete     = new ActionRemoveLocation_All(true);
       _actionRemoveLocation_All              = new ActionRemoveLocation_All(false);
       _actionRemoveLocation_Start_Complete   = new ActionRemoveLocation_Start(true);
@@ -681,16 +828,22 @@ public class ActionSetStartEndLocation extends SubMenu {
       _actionSetLocation_End                 = new ActionSetLocation_End();
 
       // create dummy actions for the part/profile title
-      _actionPartTitle_All                   = new Action(Messages.Tour_Location_Action_PartTitle_All) {};
-      _actionPartTitle_Start                 = new Action(Messages.Tour_Location_Action_PartTitle_Start) {};
-      _actionPartTitle_End                   = new Action(Messages.Tour_Location_Action_PartTitle_End) {};
+      _actionPartTitle_Append_All            = new Action(Messages.Tour_Location_Action_PartTitle_Append_All) {};
+      _actionPartTitle_Append_Start          = new Action(Messages.Tour_Location_Action_PartTitle_Append_Start) {};
+      _actionPartTitle_Append_End            = new Action(Messages.Tour_Location_Action_PartTitle_Append_End) {};
+      _actionPartTitle_Set_All               = new Action(Messages.Tour_Location_Action_PartTitle_Set_All) {};
+      _actionPartTitle_Set_Start             = new Action(Messages.Tour_Location_Action_PartTitle_Set_Start) {};
+      _actionPartTitle_Set_End               = new Action(Messages.Tour_Location_Action_PartTitle_Set_End) {};
       _actionProfileTitle_All                = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
       _actionProfileTitle_Start              = new Action(Messages.Tour_Location_Action_ProfileTitle_Start) {};
       _actionProfileTitle_End                = new Action(Messages.Tour_Location_Action_ProfileTitle_End) {};
 
-      _actionPartTitle_All                   .setEnabled(false);
-      _actionPartTitle_Start                 .setEnabled(false);
-      _actionPartTitle_End                   .setEnabled(false);
+      _actionPartTitle_Append_All            .setEnabled(false);
+      _actionPartTitle_Append_Start          .setEnabled(false);
+      _actionPartTitle_Append_End            .setEnabled(false);
+      _actionPartTitle_Set_All               .setEnabled(false);
+      _actionPartTitle_Set_Start             .setEnabled(false);
+      _actionPartTitle_Set_End               .setEnabled(false);
       _actionProfileTitle_All                .setEnabled(false);
       _actionProfileTitle_Start              .setEnabled(false);
       _actionProfileTitle_End                .setEnabled(false);
@@ -707,9 +860,13 @@ public class ActionSetStartEndLocation extends SubMenu {
       // get tours which are needed in the menu actions
       _allSelectedTours = _tourProvider.getSelectedTours();
 
-      addActionToMenu(_actionAppendLocationPart_Start);
-      addActionToMenu(_actionAppendLocationPart_End);
-      addActionToMenu(_actionAppendLocationPart_All);
+      addActionToMenu(_actionLocationPart_Set_Start);
+      addActionToMenu(_actionLocationPart_Set_End);
+      addActionToMenu(_actionLocationPart_Set_All);
+
+      addActionToMenu(_actionLocationPart_Append_Start);
+      addActionToMenu(_actionLocationPart_Append_End);
+      addActionToMenu(_actionLocationPart_Append_All);
 
       addSeparatorToMenu();
 
@@ -744,7 +901,8 @@ public class ActionSetStartEndLocation extends SubMenu {
 
    private void fillMenu_AddAll_PartActions(final Menu menu,
                                             final boolean isSetStartLocation,
-                                            final boolean isSetEndLocation) {
+                                            final boolean isSetEndLocation,
+                                            final boolean isAppend) {
 
       // create actions for each part
 
@@ -885,18 +1043,40 @@ public class ActionSetStartEndLocation extends SubMenu {
 
          if (isCreateAction) {
 
-            addActionToMenu(menu,
+            if (isAppend) {
 
-                  new ActionAppendLocationPart(
+               // append part
 
-                        actionText,
-                        actionTooltip,
+               addActionToMenu(menu,
 
-                        isSetStartLocation,
-                        isSetEndLocation,
+                     new ActionAppendLocationPart(
 
-                        startPartID,
-                        endPartID));
+                           actionText,
+                           actionTooltip,
+
+                           isSetStartLocation,
+                           isSetEndLocation,
+
+                           startPartID,
+                           endPartID));
+
+            } else {
+
+               // set part
+
+               addActionToMenu(menu,
+
+                     new ActionSetLocationPart(
+
+                           actionText,
+                           actionTooltip,
+
+                           isSetStartLocation,
+                           isSetEndLocation,
+
+                           startPartID,
+                           endPartID));
+            }
          }
 
       }

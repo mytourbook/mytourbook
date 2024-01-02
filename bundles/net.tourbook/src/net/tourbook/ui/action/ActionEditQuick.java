@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,7 +51,9 @@ public class ActionEditQuick extends Action {
          return;
       }
 
-      if (new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0)).open() == Window.OK) {
+      final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0));
+
+      if (dialogQuickEdit.open() == Window.OK) {
 
          // save all tours with the new tour type
          TourManager.saveModifiedTours(selectedTours);
