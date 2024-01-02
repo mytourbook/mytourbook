@@ -462,6 +462,13 @@
          id="net.tourbook.preferences.PrefPageNutrition"
          class="net.tourbook.preferences.PrefPageNutrition"
       />
+      
+      <!-- Beverage containers -->
+       <page category    ="net.tourbook.preferences.PrefPageNutrition"
+            class="net.tourbook.nutrition.PrefPageBeverageContainers"
+            id="net.tourbook.nutrition.PrefPageBeverageContainers"
+            name="%Pref_Page_BeverageContainers">
+         </page>
 
    </extension>
 

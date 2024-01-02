@@ -65,15 +65,18 @@ public class TourNutritionProduct {
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
-   @ManyToOne(optional = false)
-   private TourBeverageContainer      tourBeverageContainer;
+   //todo fb
+   //Caused by: ERROR 42X04: Column 'TOURNUTRIT0_.TOURBEVERAGECONTAINER_CONTAINERCODE' is either not in any table in the FROM list or appears within a join specification and is outside the scope of the join specification or appears in a HAVING clause and is not in the GROUP BY list. If this is a CREATE or ALTER TABLE  statement then 'TOURNUTRIT0_.TOURBEVERAGECONTAINER_CONTAINERCODE' is not a column in the target table.
 
-   private String                     name;
+//   @ManyToOne
+//   private TourBeverageContainer      tourBeverageContainer;
 
-   private int                        calories;
-   private float                      sodium;
+   private String  name;
 
-   private boolean                    isBeverage;
+   private int     calories;
+   private float   sodium;
+
+   private boolean isBeverage;
 
    //link it to an object defined by the user ?
 //   private double                     containerName;
