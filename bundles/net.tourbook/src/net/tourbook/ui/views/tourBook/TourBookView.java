@@ -1845,8 +1845,13 @@ public class TourBookView extends ViewPart implements
       final UiBindingRegistry uiBindingRegistry = _tourViewer_NatTable.getUiBindingRegistry();
 
       // add mouse double click listener
-      final IMouseAction mouseDoubleClickAction = (natTable, mouseEvent) -> TourManager.getInstance()
-            .tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+      final IMouseAction mouseDoubleClickAction = (natTable, mouseEvent) -> {
+
+         _tourDoubleClickState.tourLocationFocus = getTourLocation_HoverState();
+
+         TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+      };
+
       uiBindingRegistry.registerDoubleClickBinding(MouseEventMatcher.bodyLeftClick(SWT.NONE), mouseDoubleClickAction);
 
       // setup selection listener for the nattable
@@ -2009,6 +2014,8 @@ public class TourBookView extends ViewPart implements
          final Object selection = ((IStructuredSelection) _tourViewer_Tree.getSelection()).getFirstElement();
 
          if (selection instanceof TVITourBookTour) {
+
+            _tourDoubleClickState.tourLocationFocus = getTourLocation_HoverState();
 
             TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
 
@@ -2468,6 +2475,8 @@ public class TourBookView extends ViewPart implements
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTourMenu);
 
+      ActionEditQuick.setTourLocationFocus(getTourLocation_HoverState());
+
       enableActions();
    }
 
@@ -2493,7 +2502,7 @@ public class TourBookView extends ViewPart implements
          _selectedTourIds.addAll(tourIds);
 
          final Boolean tourLocationHoverState = getTourLocation_HoverState();
-         
+
          final GeoPosition hoveredTourLocationPosition = tourLocationHoverState == null
                ? null
                : getTourLocation_Position(tourLocationHoverState, _selectedTourIds.get(0));
