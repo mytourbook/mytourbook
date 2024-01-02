@@ -63,6 +63,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
+import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
@@ -192,6 +193,7 @@ public class TourDatabase {
 
    public static final String  TABLE_DEVICE_SENSOR                        = "DeviceSensor";                                          //$NON-NLS-1$
    public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
+   public static final String  TABLE_TOUR_BEVERAGE_CONTAINER              = "TOURBEVERAGECONTAINER";                                 //$NON-NLS-1$
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
@@ -230,6 +232,7 @@ public class TourDatabase {
     */
    public static final int     ENTITY_IS_NOT_SAVED           = -1;
    //
+   private static final String ENTITY_ID_BEVERAGECONTAINER   = "containerCode";                                        //$NON-NLS-1$
    private static final String ENTITY_ID_BIKE                = "BikeID";                                               //$NON-NLS-1$
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                           //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                             //$NON-NLS-1$
@@ -4083,6 +4086,34 @@ public class TourDatabase {
    }
 
    /**
+    * Create table {@link #TABLE_TOUR_BEVERAGE_CONTAINER} for {@link TourBeverageContainer}.
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_TourBeverageContainer(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourNutritionProduct
+       */
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_BEVERAGE_CONTAINER + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
+
+            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // Version 53 - begin
+
+            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
+
+            // Version 53 - end
+
+            + ")"); //$NON-NLS-1$
+   }
+
+   /**
     * create table {@link #TABLE_TOUR_BIKE}
     *
     * @param stmt
@@ -5862,6 +5893,7 @@ public class TourDatabase {
             createTable_TourPerson(stmt);
             createTable_TourPersonHRZone(stmt);
             createTable_TourType(stmt);
+            createTable_TourBeverageContainer(stmt);
             createTable_TourNutritionProduct(stmt);
             createTable_TourMarker(stmt);
             createTable_TourPhoto(stmt);
