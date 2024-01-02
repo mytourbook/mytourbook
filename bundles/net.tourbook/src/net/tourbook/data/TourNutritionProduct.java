@@ -29,9 +29,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.openfoodfacts.Product;
 
 import pl.coderion.model.Nutriments;
-import pl.coderion.model.Product;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
@@ -84,9 +84,9 @@ public class TourNutritionProduct {
    public TourNutritionProduct(final TourData tourData, final Product product) {
 
       this.tourData = tourData;
-      name = product.getProductName();
+      name = product.productName();
 
-      final Nutriments nutriments = product.getNutriments();
+      final Nutriments nutriments = product.nutriments();
       calories = nutriments.getEnergyKcalServing();
       sodium = nutriments.getSodiumServing();
       //todo fb  isFluid = product.agry

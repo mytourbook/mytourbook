@@ -65,9 +65,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import pl.coderion.model.ProductResponse;
-import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
-
 public class DialogSearchProduct extends Dialog implements PropertyChangeListener {
 
    //todo fb
@@ -401,11 +398,11 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
          final Product selectedProduct = (Product) firstElement;
 
-         final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
-         final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
+//         final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
+//         final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
 
          final TourData tourData = TourManager.getTour(_tourId);
-         final TourNutritionProduct tfp = new TourNutritionProduct(tourData, productResponse.getProduct());
+         final TourNutritionProduct tfp = new TourNutritionProduct(tourData, selectedProduct);
          tourData.addNutritionProduct(tfp);
 
          TourManager.saveModifiedTour(tourData);

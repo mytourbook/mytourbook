@@ -86,7 +86,7 @@ public class NutritionQuery implements Runnable {
          final List<Product> searchProductResults = NutritionUtils.searchProduct(_query);
 
          if (searchProductResults.isEmpty()) {
-            searchProductResults.add(new Product("Not found", "not found"));
+            searchProductResults.add(new Product("Not found", null, null, "not found"));
          }
          _searchResult.addAll(searchProductResults);
 
