@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.nutrition.DialogSearchProduct;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
@@ -66,6 +69,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -477,7 +481,23 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
    }
 
-   private void createUI_210_Viewer(final Composite parent) {
+   private void createUI_210_Actions(final Composite parent) {
+
+      /*
+       * Clean-up button
+       */
+      final Button _btnCleanup = new Button(parent, SWT.NONE);
+      _btnCleanup.setText("Messages.PrefPage_CloudConnectivity_Label_Cleanup");
+      //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+      _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
+      }));
+      //todo fb dispose image
+      _btnCleanup.setImage(TourbookPlugin.getThemedImageDescriptor(Images.App_Add).createImage());
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
+   }
+
+   private void createUI_220_Viewer(final Composite parent) {
 
       /*
        * table viewer: products
@@ -620,7 +640,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          // todo fb create buttons (remove item, add recent item, define container (flask...)
-         createUI_210_Viewer(container);
+         createUI_210_Actions(container);
+         createUI_220_Viewer(container);
       }
    }
 
