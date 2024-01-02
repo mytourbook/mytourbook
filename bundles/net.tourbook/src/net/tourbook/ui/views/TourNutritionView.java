@@ -203,10 +203,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          switch (index) {
          case 4:
-            if (tourNutritionProduct.isBeverage()) {
-               return TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
-            }
-            return TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+
+            final String imageDescriptorPath = tourNutritionProduct.isBeverage()
+                  ? Images.Checkbox_Checked
+                  : Images.Checkbox_Uncheck;
+
+            return TourbookPlugin.getImageDescriptor(imageDescriptorPath).createImage();
 
          default:
             return null;
