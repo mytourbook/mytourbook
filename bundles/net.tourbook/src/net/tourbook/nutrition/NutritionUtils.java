@@ -57,7 +57,7 @@ public class NutritionUtils {
          sb.append(i.getServingsConsumed() + " serving of " + i.getName() + UI.NEW_LINE);
 
          //todo fb
-         if (i.isFluid()) {
+         if (i.isBeverage()) {
             // 1.5 flask (.75L) of Gu Brew
             //sb.append(i.getServingsConsumed() + " serving of " + i.getName() + UI.NEW_LINE);
 

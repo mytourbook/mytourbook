@@ -4796,7 +4796,7 @@ public class TourDatabase {
             + "   calories            INTEGER,                                                    " + NL //$NON-NLS-1$
             + "   sodium              FLOAT,                                                      " + NL //$NON-NLS-1$
             + "   fluid               FLOAT,                                                      " + NL //$NON-NLS-1$
-            + "   isFluid             BOOLEAN DEFAULT FALSE                                       " + NL //$NON-NLS-1$
+            + "   isBeverage          BOOLEAN DEFAULT FALSE                                       " + NL //$NON-NLS-1$
 
             // Version 53 - end
 

@@ -149,10 +149,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       @Override
       public Object getValue(final Object element, final String property) {
+
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
          if (property.equals("Beverage")) {
-            return Boolean.valueOf(task.isFluid());
+            return Boolean.valueOf(task.isBeverage());
          }
          return UI.EMPTY_STRING;
       }
@@ -202,7 +203,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          switch (index) {
          case 4:
-            if (tourNutritionProduct.isFluid()) {
+            if (tourNutritionProduct.isBeverage()) {
                return TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
             }
             return TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();

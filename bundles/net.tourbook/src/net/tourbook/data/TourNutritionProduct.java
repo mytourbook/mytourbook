@@ -69,13 +69,12 @@ public class TourNutritionProduct {
 //   @ManyToOne(optional = false)
 //   private Container                  beverageContainer;
 
-   private String                     name;
+   private String  name;
 
-   private int                        calories;
-   private float                      sodium;
+   private int     calories;
+   private float   sodium;
 
-   //to rename to isBeverage
-   private boolean                    isFluid;
+   private boolean isBeverage;
 
    //link it to an object defined by the user ?
 //   private double                     containerName;
@@ -158,13 +157,12 @@ public class TourNutritionProduct {
       return tourData;
    }
 
-   public boolean isFluid() {
-      return isFluid;
+   public boolean isBeverage() {
+      return isBeverage;
    }
 
-   public void setIsBeverage(final boolean booleanValue) {
-     isFluid = booleanValue;
-
+   public void setIsBeverage(final boolean isBeverage) {
+      this.isBeverage = isBeverage;
    }
 
    public void setupDeepClone(final TourData tourDataFromClone) {
