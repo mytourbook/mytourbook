@@ -160,6 +160,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          if (property.equals("Beverage")) {
             return Boolean.valueOf(task.isBeverage());
          }
+         if (property.equals("Beverage Container")) {
+            return 0;
+         }
          return UI.EMPTY_STRING;
       }
 
@@ -237,6 +240,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          case 3:
             return String.valueOf(tourNutritionProduct.getSodium());
+
+         case 5:
+            return "flask (0.5L";
 
          case 4:
          default:
