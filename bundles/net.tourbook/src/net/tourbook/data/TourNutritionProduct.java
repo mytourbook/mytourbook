@@ -78,6 +78,8 @@ public class TourNutritionProduct {
 
    private boolean isBeverage;
 
+   // private double or float quantityBeverageContainerConsumed_Fraction;
+
    //link it to an object defined by the user ?
 //   private double                     containerName;
 //

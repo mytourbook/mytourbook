@@ -517,6 +517,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 //      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 //      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 
+      //editors[5] = new dropdown
+      // example
+      // Flask (0.5L)
+      // bladder (1.5L)
+      // not the append of the capacity
+
       // Assign the cell editors to the viewer
       _productsViewer.setCellEditors(editors);
       _productsViewer.setCellModifier(new TourNutritionProductCellModifier(_productsViewer));
