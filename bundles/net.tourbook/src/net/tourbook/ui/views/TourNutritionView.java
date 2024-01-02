@@ -120,6 +120,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    /*
     * UI controls
     */
+   private Image                   _imageAdd;
+
+   private Button                  _btnAddProduct;
+
    private PageBook                _pageBook;
    private Composite               _pageNoData;
    private Composite               _viewerContainer;
@@ -473,6 +477,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       _tk = new FormToolkit(parent.getDisplay());
 
+      _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
       {
@@ -484,17 +490,16 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private void createUI_210_Actions(final Composite parent) {
 
       /*
-       * Clean-up button
+       * Add product button
        */
-      final Button _btnCleanup = new Button(parent, SWT.NONE);
-      _btnCleanup.setText("Messages.PrefPage_CloudConnectivity_Label_Cleanup");
+      _btnAddProduct = new Button(parent, SWT.NONE);
+      _btnAddProduct.setText("Messages.PrefPage_CloudConnectivity_Label_Cleanup");
       //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
-      _btnCleanup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+      _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
          new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
       }));
-      //todo fb dispose image
-      _btnCleanup.setImage(TourbookPlugin.getThemedImageDescriptor(Images.App_Add).createImage());
-      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnCleanup);
+      _btnAddProduct.setImage(_imageAdd);
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnAddProduct);
    }
 
    private void createUI_220_Viewer(final Composite parent) {
@@ -651,6 +656,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       _nutritionQuery.removePropertyChangeListener(this);
+      UI.disposeResource(_imageAdd);
 
       super.dispose();
    }
