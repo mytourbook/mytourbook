@@ -68,12 +68,12 @@ public class TourNutritionProduct {
    @ManyToOne(optional = false)
    private TourBeverageContainer      tourBeverageContainer;
 
-   private String  name;
+   private String                     name;
 
-   private int     calories;
-   private float   sodium;
+   private int                        calories;
+   private float                      sodium;
 
-   private boolean isBeverage;
+   private boolean                    isBeverage;
 
    //link it to an object defined by the user ?
 //   private double                     containerName;
