@@ -550,8 +550,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
           * Title: Summary report card
           */
          {
-            final Label label = UI.createLabel(container, "Summary/Report card");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_ReportCard);
+            label.setToolTipText(Messages.Tour_Nutrition_Label_ReportCard_Tooltip);
             GridDataFactory.fillDefaults().span(4, 1).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
 

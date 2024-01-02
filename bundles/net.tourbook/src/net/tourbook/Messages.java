@@ -3258,6 +3258,9 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
 
+   public static String        Tour_Nutrition_Label_ReportCard;
+   public static String        Tour_Nutrition_Label_ReportCard_Tooltip;
+
    public static String        Tour_Pauses_Checkbox_Duration_Hours;
    public static String        Tour_Pauses_Checkbox_Duration_Minutes;
    public static String        Tour_Pauses_Checkbox_Duration_Seconds;
