@@ -56,6 +56,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -399,12 +400,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       columnSodium.setText(tableColumns[index++]);
       columnSodium.setWidth(75);
 
-      // Column: Fluid
+      // Column: Beverage
       final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
       columnFluid.setText(tableColumns[index++]);
       columnFluid.setWidth(75);
 
-      // Column: Fluid Container
+      // Column: Beverage Container
       final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
       columnFluidContainerName.setText(tableColumns[index++]);
       columnFluidContainerName.setWidth(75);
@@ -499,7 +500,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Fluid Container", "Consumed Containers" };
+      final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Beverage Container", "Consumed Containers" };
       createColumns(productsTable, tableColumns);
 
       _productsViewer = new TableViewer(productsTable);
@@ -517,7 +518,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 //      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 //      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 
-      //editors[5] = new dropdown
+      final String[] items = new String[2];
+      items[0] = "flask (0.5L";
+      items[1] = "bladder (1.5L)";
+      editors[5] = new ComboBoxCellEditor(productsTable, items);
       // example
       // Flask (0.5L)
       // bladder (1.5L)
