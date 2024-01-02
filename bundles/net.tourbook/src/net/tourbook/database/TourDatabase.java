@@ -232,7 +232,7 @@ public class TourDatabase {
     */
    public static final int     ENTITY_IS_NOT_SAVED           = -1;
    //
-   private static final String ENTITY_ID_BEVERAGECONTAINER   = "containerCode";                                        //$NON-NLS-1$
+   private static final String ENTITY_ID_BEVERAGECONTAINER   = "ContainerCode";                                        //$NON-NLS-1$
    private static final String ENTITY_ID_BIKE                = "BikeID";                                               //$NON-NLS-1$
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                           //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                             //$NON-NLS-1$
@@ -10497,6 +10497,8 @@ public class TourDatabase {
 
          // double check if db already exists
          if (isTableAvailable(conn, TABLE_TOUR_NUTRITION_PRODUCT) == false) {
+
+            createTable_TourBeverageContainer(stmt);
             createTable_TourNutritionProduct(stmt);
          }
       }
