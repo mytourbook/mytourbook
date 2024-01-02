@@ -34,7 +34,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ActionOpenSearchProduct;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -50,8 +49,6 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -120,27 +117,26 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    /*
     * UI controls
     */
-   private Image                   _imageAdd;
+   private Image       _imageAdd;
 
-   private Button                  _btnAddProduct;
+   private Button      _btnAddProduct;
 
-   private PageBook                _pageBook;
-   private Composite               _pageNoData;
-   private Composite               _viewerContainer;
-   private boolean                 _isInUpdate;
+   private PageBook    _pageBook;
+   private Composite   _pageNoData;
+   private Composite   _viewerContainer;
+   private boolean     _isInUpdate;
 
-   private Text                    _txtCalories_Average;
-   private Text                    _txtCalories_Total;
-   private Text                    _txtFluid_Average;
-   private Text                    _txtFluid_Total;
-   private Text                    _txtSodium_Average;
-   private Text                    _txtSodium_Total;
+   private Text        _txtCalories_Average;
+   private Text        _txtCalories_Total;
+   private Text        _txtFluid_Average;
+   private Text        _txtFluid_Total;
+   private Text        _txtSodium_Average;
+   private Text        _txtSodium_Total;
 
-   private Combo                   _cboSearchQuery;
+   private Combo       _cboSearchQuery;
 
-   private Section                 _sectionProductsList;
-   private FormToolkit             _tk;
-   private ActionOpenSearchProduct _actionOpenSearchProduct;
+   private Section     _sectionProductsList;
+   private FormToolkit _tk;
 
    class TourNutritionProductCellModifier implements ICellModifier {
 
@@ -379,12 +375,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       return total * 60 / (tourDeviceTime_Recorded / 60);
    }
 
-   private void createActions() {
-
-      _actionOpenSearchProduct = new ActionOpenSearchProduct();
-
-   }
-
    private void createColumns(final Table productsTable, final String[] tableColumns) {
 
       int index = 0;
@@ -432,9 +422,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       addSelectionListener();
       addTourEventListener();
-
-      createActions();
-      fillToolbar();
 
       addPrefListener();
 
@@ -665,20 +652,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       final boolean isTourSelected = _tourData != null;
 
-      _actionOpenSearchProduct.setEnabled(isTourSelected);
-   }
-
-   private void fillToolbar() {
-
-      /*
-       * fill view toolbar
-       */
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(new Separator());
-      tbm.add(_actionOpenSearchProduct);
-
-      tbm.update(true);
+      //_actionOpenSearchProduct.setEnabled(isTourSelected);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -748,7 +722,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          _tourData = tourData;
       }
-      _actionOpenSearchProduct.setTourData(_tourData);
 
       updateUI_ProductViewer();
    }
