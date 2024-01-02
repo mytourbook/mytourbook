@@ -65,9 +65,9 @@ import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourFuelProduct;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourPhoto;
@@ -195,7 +195,7 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
-   public static final String  TABLE_TOUR_FUEL_PRODUCT                    = "TOURFUELPRODUCT";                                       //$NON-NLS-1$
+   public static final String  TABLE_TOUR_NUTRITION_PRODUCT               = "TOURNUTRITIONPRODUCT";                                  //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_LOCATION                        = "TourLocation";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_MARKER                          = "TOURMARKER";                                            //$NON-NLS-1$
@@ -4563,37 +4563,6 @@ public class TourDatabase {
    }
 
    /**
-    * Create table {@link #TABLE_TOUR_FUEL_PRODUCT} for {@link TourFuelProduct}.
-    *
-    * @param stmt
-    *
-    * @throws SQLException
-    */
-   private void createTable_TourFuelProduct(final Statement stmt) throws SQLException {
-
-      /*
-       * CREATE TABLE TourFuelProduct
-       */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_FUEL_PRODUCT + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.CreateField_EntityId(ENTITY_ID_FUELPRODUCT, true)
-
-            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            // Version 53 - begin
-
-            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   calories            INTEGER,                                                    " + NL //$NON-NLS-1$
-            + "   sodium              FLOAT,                                                      " + NL //$NON-NLS-1$
-            + "   fluid               FLOAT,                                                      " + NL //$NON-NLS-1$
-            + "   isFluid             BOOLEAN DEFAULT FALSE                                       " + NL //$NON-NLS-1$
-
-            // Version 53 - end
-
-            + ")"); //$NON-NLS-1$
-   }
-
-   /**
     * create table {@link #}
     *
     * @param stmt
@@ -4799,6 +4768,37 @@ public class TourDatabase {
             + "   labelXOffset               INTEGER,                                  " + NL //$NON-NLS-1$
             + "   labelYOffset               INTEGER,                                  " + NL //$NON-NLS-1$
             + "   markerType                 BIGINT                                    " + NL //$NON-NLS-1$
+
+            + ")"); //$NON-NLS-1$
+   }
+
+   /**
+    * Create table {@link #TABLE_TOUR_NUTRITION_PRODUCT} for {@link TourNutritionProduct}.
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_TourNutritionProduct(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourNutritionProduct
+       */
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_NUTRITION_PRODUCT + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.CreateField_EntityId(ENTITY_ID_FUELPRODUCT, true)
+
+            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // Version 53 - begin
+
+            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   calories            INTEGER,                                                    " + NL //$NON-NLS-1$
+            + "   sodium              FLOAT,                                                      " + NL //$NON-NLS-1$
+            + "   fluid               FLOAT,                                                      " + NL //$NON-NLS-1$
+            + "   isFluid             BOOLEAN DEFAULT FALSE                                       " + NL //$NON-NLS-1$
+
+            // Version 53 - end
 
             + ")"); //$NON-NLS-1$
    }
@@ -5862,7 +5862,7 @@ public class TourDatabase {
             createTable_TourPerson(stmt);
             createTable_TourPersonHRZone(stmt);
             createTable_TourType(stmt);
-            createTable_TourFuelProduct(stmt);
+            createTable_TourNutritionProduct(stmt);
             createTable_TourMarker(stmt);
             createTable_TourPhoto(stmt);
             createTable_TourReference(stmt);
@@ -10464,8 +10464,8 @@ public class TourDatabase {
       {
 
          // double check if db already exists
-         if (isTableAvailable(conn, TABLE_TOUR_FUEL_PRODUCT) == false) {
-            createTable_TourFuelProduct(stmt);
+         if (isTableAvailable(conn, TABLE_TOUR_NUTRITION_PRODUCT) == false) {
+            createTable_TourNutritionProduct(stmt);
          }
       }
       stmt.close();

@@ -35,9 +35,7 @@ import pl.coderion.model.Product;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
-public class TourFuelProduct {
-
-   // todo fb rename to TourNutritionItem ? TourNutritionProduct ?
+public class TourNutritionProduct {
 
    //todo fb implement swt.del on the table
    // fluidContainerName
@@ -57,7 +55,7 @@ public class TourFuelProduct {
    @Transient
    private long                       _createId      = 0;
    /**
-    * Unique id for the {@link TourFuelProduct} entity
+    * Unique id for the {@link TourNutritionProduct} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,9 +80,9 @@ public class TourFuelProduct {
    //link it to an object defined by the user ?
 //   private double                     containerName;
 //
-   public TourFuelProduct() {}
+   public TourNutritionProduct() {}
 
-   public TourFuelProduct(final TourData tourData, final Product product) {
+   public TourNutritionProduct(final TourData tourData, final Product product) {
 
       this.tourData = tourData;
       name = product.getProductName();
@@ -95,8 +93,8 @@ public class TourFuelProduct {
    }
 
    /**
-    * Tourmarker is compared with the {@link TourFuelProduct#markerId} or
-    * {@link TourFuelProduct#_createId}
+    * Tourmarker is compared with the {@link TourNutritionProduct#markerId} or
+    * {@link TourNutritionProduct#_createId}
     * <p>
     * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
     * markers are deleted</b>
@@ -112,11 +110,11 @@ public class TourFuelProduct {
       if (obj == null) {
          return false;
       }
-      if (!(obj instanceof TourFuelProduct)) {
+      if (!(obj instanceof TourNutritionProduct)) {
          return false;
       }
 
-      final TourFuelProduct otherMarker = (TourFuelProduct) obj;
+      final TourNutritionProduct otherMarker = (TourNutritionProduct) obj;
 
       if (productCode == TourDatabase.ENTITY_IS_NOT_SAVED) {
 

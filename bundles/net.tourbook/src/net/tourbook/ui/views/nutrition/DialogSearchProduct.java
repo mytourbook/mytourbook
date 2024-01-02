@@ -29,7 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourFuelProduct;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -405,7 +405,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
 
          final TourData tourData = TourManager.getTour(_tourId);
-         final TourFuelProduct tfp = new TourFuelProduct(tourData, productResponse.getProduct());
+         final TourNutritionProduct tfp = new TourNutritionProduct(tourData, productResponse.getProduct());
          tourData.addFuelProduct(tfp);
 
          TourManager.saveModifiedTour(tourData);

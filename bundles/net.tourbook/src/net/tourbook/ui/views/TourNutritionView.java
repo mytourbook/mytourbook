@@ -27,7 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourFuelProduct;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.NutritionUtils;
@@ -134,11 +134,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private FormToolkit             _tk;
    private ActionOpenSearchProduct _actionOpenSearchProduct;
 
-   class TourFuelProductCellModifier implements ICellModifier {
+   class TourNutritionProductCellModifier implements ICellModifier {
 
       private Viewer viewer;
 
-      public TourFuelProductCellModifier(final Viewer viewer) {
+      public TourNutritionProductCellModifier(final Viewer viewer) {
          this.viewer = viewer;
       }
 
@@ -149,7 +149,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       @Override
       public Object getValue(final Object element, final String property) {
-         final TourFuelProduct task = (TourFuelProduct) element;
+         final TourNutritionProduct task = (TourNutritionProduct) element;
 
          if (property.equals("Beverage")) {
             return Boolean.valueOf(task.isFluid());
@@ -163,10 +163,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          if (element instanceof final Item elementItem) {
             element = (elementItem).getData();
          }
-         final TourFuelProduct tourFuelProduct = (TourFuelProduct) element;
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
 
          if (property.equals("Beverage")) {
-            tourFuelProduct.setIsBeverage(((Boolean) value).booleanValue());
+            tourNutritionProduct.setIsBeverage(((Boolean) value).booleanValue());
          }
          _productsViewer.refresh();
       }
@@ -184,7 +184,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return new Object[0];
          }
 
-         return _tourData.getTourFuelProducts().toArray();
+         return _tourData.getTourNutritionProducts().toArray();
       }
 
       @Override
@@ -198,11 +198,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public Image getColumnImage(final Object obj, final int index) {
 
-         final TourFuelProduct tourFuelProduct = (TourFuelProduct) obj;
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) obj;
 
          switch (index) {
          case 4:
-            if (tourFuelProduct.isFluid()) {
+            if (tourNutritionProduct.isFluid()) {
                return TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
             }
             return TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
@@ -215,20 +215,20 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       @Override
       public String getColumnText(final Object obj, final int index) {
 
-         final TourFuelProduct tourFuelProduct = (TourFuelProduct) obj;
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) obj;
 
          switch (index) {
          case 0:
-            return String.valueOf(tourFuelProduct.getServingsConsumed());
+            return String.valueOf(tourNutritionProduct.getServingsConsumed());
 
          case 1:
-            return tourFuelProduct.getName();
+            return tourNutritionProduct.getName();
 
          case 2:
-            return String.valueOf(tourFuelProduct.getCalories());
+            return String.valueOf(tourNutritionProduct.getCalories());
 
          case 3:
-            return String.valueOf(tourFuelProduct.getSodium());
+            return String.valueOf(tourNutritionProduct.getSodium());
 
          case 4:
          default:
@@ -504,7 +504,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       // Assign the cell editors to the viewer
       _productsViewer.setCellEditors(editors);
-      _productsViewer.setCellModifier(new TourFuelProductCellModifier(_productsViewer));
+      _productsViewer.setCellModifier(new TourNutritionProductCellModifier(_productsViewer));
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());
@@ -787,13 +787,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void updateUI_SummaryFromModel() {
 
-      final int totalCalories = NutritionUtils.getTotalCalories(_tourData.getTourFuelProducts());
+      final int totalCalories = NutritionUtils.getTotalCalories(_tourData.getTourNutritionProducts());
       _txtCalories_Total.setText(String.valueOf(totalCalories));
 
-      final int totalFluid = (int) Math.round(NutritionUtils.getTotalFluids(_tourData.getTourFuelProducts()));
+      final int totalFluid = (int) Math.round(NutritionUtils.getTotalFluids(_tourData.getTourNutritionProducts()));
       _txtFluid_Total.setText(String.valueOf(totalFluid));
 
-      final int totalSodium = (int) NutritionUtils.getTotalSodium(_tourData.getTourFuelProducts());
+      final int totalSodium = (int) NutritionUtils.getTotalSodium(_tourData.getTourNutritionProducts());
       _txtSodium_Total.setText(String.valueOf(totalSodium));
 
       final long averageCaloriesPerHour = computeAveragePerHour(totalCalories);

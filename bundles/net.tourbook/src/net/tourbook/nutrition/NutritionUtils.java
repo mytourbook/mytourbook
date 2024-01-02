@@ -33,7 +33,7 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.data.TourFuelProduct;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
 public class NutritionUtils {
@@ -43,7 +43,7 @@ public class NutritionUtils {
 
    private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
-   public static String buildNutritionDataString(final Set<TourFuelProduct> set) {
+   public static String buildNutritionDataString(final Set<TourNutritionProduct> set) {
 
       if (set.isEmpty()) {
          return UI.EMPTY_STRING;
@@ -67,14 +67,14 @@ public class NutritionUtils {
       return sb.toString();
    }
 
-   public static int getTotalCalories(final Set<TourFuelProduct> tourFuelProducts) {
+   public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final int totalCalories = tourFuelProducts.stream().mapToInt(i -> i.getCalories() * i.getServingsConsumed()).sum();
+      final int totalCalories = tourNutritionProducts.stream().mapToInt(i -> i.getCalories() * i.getServingsConsumed()).sum();
 
       return totalCalories;
    }
 
-   public static double getTotalFluids(final Set<TourFuelProduct> tourFuelProducts) {
+   public static double getTotalFluids(final Set<TourNutritionProduct> tourNutritionProducts) {
 
       //todo fb
       //final double totalFluids = tourFuelProducts.stream().mapToDouble(i -> i.getFluid() * i.getServingsConsumed()).sum();
@@ -82,9 +82,9 @@ public class NutritionUtils {
       return 0;
    }
 
-   public static double getTotalSodium(final Set<TourFuelProduct> tourFuelProducts) {
+   public static double getTotalSodium(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final double totalSodium = tourFuelProducts.stream().mapToDouble(i -> i.getSodium() * i.getServingsConsumed()).sum();
+      final double totalSodium = tourNutritionProducts.stream().mapToDouble(i -> i.getSodium() * i.getServingsConsumed()).sum();
 
       return totalSodium;
    }
