@@ -160,6 +160,8 @@ public class TourInfoUI {
    private boolean        _hasTourType;
 
    private boolean        _hasTourDescription;
+   private boolean        _hasLocationStart;
+   private boolean        _hasLocationEnd;
    private boolean        _hasWeatherDescription;
 
    private int            _uiWidth_Pixel;
@@ -229,6 +231,8 @@ public class TourInfoUI {
    private Composite        _lowerPartContainer;
 
    private Text             _txtDescription;
+   private Text             _txtLocationEnd;
+   private Text             _txtLocationStart;
    private Text             _txtWeather;
 
    private CLabel           _lblClouds;
@@ -288,6 +292,8 @@ public class TourInfoUI {
    private Label            _lblMovingTime_Unit;
    private Label            _lblElapsedTime;
    private Label            _lblElapsedTime_Unit;
+   private Label            _lblLocationStart;
+   private Label            _lblLocationEnd;
    private Label            _lblPausedTime;
    private Label            _lblPausedTime_Unit;
    private Label            _lblRecordedTime;
@@ -409,6 +415,7 @@ public class TourInfoUI {
     * @param tourData
     * @param tourToolTipProvider
     * @param tourProvider
+    *
     * @return Returns the content area control
     */
    public Composite createContentArea(final Composite parent,
@@ -427,8 +434,6 @@ public class TourInfoUI {
       _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 
       final Set<TourTag> tourTags = _tourData.getTourTags();
-      final String tourDescription = _tourData.getTourDescription();
-
       // date/time created/modified
       _uiDtCreated = _tourData.getDateTimeCreated();
       _uiDtModified = _tourData.getDateTimeModified();
@@ -447,7 +452,9 @@ public class TourInfoUI {
       _hasTourType                  = tourType != null;
       _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
 
-      _hasTourDescription           = tourDescription != null && tourDescription.length() > 0;
+      _hasLocationEnd               = StringUtils.hasContent(_tourData.getTourEndPlace());
+      _hasLocationStart             = StringUtils.hasContent(_tourData.getTourStartPlace());
+      _hasTourDescription           = StringUtils.hasContent(_tourData.getTourDescription());
       _hasWeatherDescription        = _tourData.getWeather().length() > 0;
 
 // SET_FORMATTING_ON
@@ -1196,7 +1203,7 @@ public class TourInfoUI {
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
 
-      _lblAirQuality = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblAirQuality = createUI_LabelValue(parent, SWT.CENTER);
    }
 
    private void createUI_48_Battery(final Composite parent) {
@@ -1502,6 +1509,38 @@ public class TourInfoUI {
                gd.heightHint = _descriptionScroll_Height;
             }
          }
+         {
+            /*
+             * Start location
+             */
+            _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_LocationStart);
+            _lblLocationStart.setFont(_boldFont);
+            GridDataFactory.fillDefaults()
+                  .span(numColumns, 1)
+                  .indent(0, 10)
+                  .applyTo(_lblLocationStart);
+
+            _txtLocationStart = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+            _txtLocationStart.setForeground(_fgColor);
+            _txtLocationStart.setBackground(_bgColor);
+            GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationStart);
+         }
+         {
+            /*
+             * End location
+             */
+            _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_LocationEnd);
+            _lblLocationEnd.setFont(_boldFont);
+            GridDataFactory.fillDefaults()
+                  .span(numColumns, 1)
+                  .indent(0, 10)
+                  .applyTo(_lblLocationEnd);
+
+            _txtLocationEnd = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+            _txtLocationEnd.setForeground(_fgColor);
+            _txtLocationEnd.setBackground(_bgColor);
+            GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationEnd);
+         }
       }
    }
 
@@ -1555,7 +1594,7 @@ public class TourInfoUI {
 
    private void createUI_99_CreateModifyTime(final Composite parent) {
 
-      final boolean hasDescription = _hasTourDescription || _hasWeatherDescription;
+      final boolean hasDescription = _hasTourDescription || _hasWeatherDescription || _hasLocationStart || _hasLocationEnd;
 
       final boolean isShowUIWidthControls = hasDescription
 
@@ -2056,7 +2095,15 @@ public class TourInfoUI {
       /*
        * Lower part container contains sensor values, weather, tour type, tags and description
        */
-      UI.showHideControl(_lowerPartContainer, _hasSensorValues || _hasWeatherDescription || _hasTourType || _hasTags || _hasTourDescription);
+      UI.showHideControl(_lowerPartContainer,
+
+            _hasSensorValues
+                  || _hasWeatherDescription
+                  || _hasTourType
+                  || _hasTags
+                  || _hasTourDescription
+                  || _hasLocationStart
+                  || _hasLocationEnd);
 
       /*
        * Weather description
@@ -2100,6 +2147,21 @@ public class TourInfoUI {
          // vertical scrollbar is not necessary
          UI.showHideControl(_txtDescription, _hasTourDescription, _uiWidth_Pixel);
       }
+
+      /*
+       * Start/end location
+       */
+      if (_hasLocationStart) {
+         _txtLocationStart.setText(_tourData.getTourStartPlace());
+      }
+      UI.showHideControl(_lblLocationStart, _hasLocationStart);
+      UI.showHideControl(_txtLocationStart, _hasLocationStart, _uiWidth_Pixel);
+
+      if (_hasLocationEnd) {
+         _txtLocationEnd.setText(_tourData.getTourEndPlace());
+      }
+      UI.showHideControl(_lblLocationEnd, _hasLocationEnd);
+      UI.showHideControl(_txtLocationEnd, _hasLocationEnd, _uiWidth_Pixel);
 
       /*
        * Column: Left
@@ -2210,14 +2272,39 @@ public class TourInfoUI {
                UI.getCardinalDirectionText(weatherWindDirectionDegree)));
       }
 
-      // Air Quality
-      final String airQuality = _tourData.getWeather_AirQuality();
-      if (StringUtils.hasContent(airQuality) && !airQuality.equals(IWeather.airQualityIsNotDefined)) {
+      /*
+       * Air Quality
+       */
+      final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
+      if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(airQuality);
+         _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
+
+         final int colorIndex = airQualityTextIndex * 2;
+
+         // run asyc otherwise in the dark mode the colors are not displayed
+         _parent.getDisplay().asyncExec(() -> {
+
+            if (_parent.isDisposed()) {
+               return;
+            }
+
+            if (UI.IS_DARK_THEME) {
+
+               _lblAirQuality.setForeground(IWeather.airQualityColors_DarkTheme[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.airQualityColors_DarkTheme[colorIndex + 1]);
+
+            } else {
+
+               _lblAirQuality.setForeground(IWeather.airQualityColors_BrightTheme[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.airQualityColors_BrightTheme[colorIndex + 1]);
+            }
+         });
       }
 
-      // Average temperature
+      /*
+       * Average temperature
+       */
       final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
       final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
 
@@ -2227,6 +2314,7 @@ public class TourInfoUI {
       final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
             ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
             : FormatManager.formatTemperature(convertedTemperature_NoDevice);
+
       final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
             ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
             : FormatManager.formatTemperature(convertedTemperature_FromDevice);
@@ -2322,7 +2410,7 @@ public class TourInfoUI {
       final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
       final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
 
-      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss;
+      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
       final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
       final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
@@ -2340,9 +2428,9 @@ public class TourInfoUI {
       _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
       _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(vertSpeed_TimeFlat / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(vertSpeed_TimeGain / sumTime * 100f));
-      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(vertSpeed_TimeLoss / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative((double)vertSpeed_TimeFlat / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative((double)vertSpeed_TimeGain / sumTime * 100f));
+      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative((double)vertSpeed_TimeLoss / sumTime * 100f));
 
       _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
       _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));

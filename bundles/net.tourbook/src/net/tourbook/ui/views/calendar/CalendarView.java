@@ -798,6 +798,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       _comboProfiles.setItem(
             selectedIndex,
             CalendarProfileManager.getProfileName(selectedProfile, modifiedProfileName));
+      _comboProfiles.select(selectedIndex);
    }
 
    void updateUI_Title(final LocalDate calendarFirstDay, final LocalDate calendarLastDay) {

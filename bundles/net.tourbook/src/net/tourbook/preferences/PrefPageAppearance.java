@@ -104,6 +104,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Label   _lblAutoTagDelay;
 
    private Spinner _spinnerAutoOpenDelay;
+   private Spinner _spinnerNotificationMessagesDuration;
    private Spinner _spinnerRecentTags;
 
    public PrefPageAppearance() {
@@ -317,6 +318,32 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
       {
          /*
+          * Duration of notification messages
+          */
+         final Composite notificationMessagesDurationContainer = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(notificationMessagesDurationContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(notificationMessagesDurationContainer);
+         {
+            // label: duration
+            final Label lblNotificationMessagesDuration = UI.createLabel(notificationMessagesDurationContainer,
+                  Messages.Pref_Appearance_Label_NotificationMessagesDuration);
+            lblNotificationMessagesDuration.setToolTipText(Messages.Pref_Appearance_Label_NotificationMessagesDuration_Tooltip);
+
+            // spinner
+            _spinnerNotificationMessagesDuration = new Spinner(notificationMessagesDurationContainer, SWT.BORDER);
+            _spinnerNotificationMessagesDuration.setToolTipText(Messages.Pref_Appearance_Label_NotificationMessagesDuration_Tooltip);
+            _spinnerNotificationMessagesDuration.setMinimum(1);
+            _spinnerNotificationMessagesDuration.setMaximum(10);
+            _spinnerNotificationMessagesDuration.addSelectionListener(_defaultSelectionListener);
+            _spinnerNotificationMessagesDuration.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinnerNotificationMessagesDuration);
+         }
+      }
+      {
+         /*
           * Reset all toggle dialogs
           */
          _btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
@@ -482,16 +509,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 // SET_FORMATTING_OFF
 
-      _spinnerRecentTags            .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _spinnerRecentTags                  .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _spinnerNotificationMessagesDuration.setSelection(_prefStore_Common.getDefaultInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION));
 
-      _chkAutoOpenTagging           .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-      _chkTaggingAnimation          .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-      _spinnerAutoOpenDelay         .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _chkAutoOpenTagging                 .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation                .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay               .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
-      _chkShowInApp_MemoryMonitor   .setSelection(false);
-      _chkShowInApp_RestartApp      .setSelection(false);
-      _chkShowInApp_ScrambleData    .setSelection(false);
-      _chkShowInApp_ThemeSelector   .setSelection(false);
+      _chkShowInApp_MemoryMonitor         .setSelection(false);
+      _chkShowInApp_RestartApp            .setSelection(false);
+      _chkShowInApp_ScrambleData          .setSelection(false);
+      _chkShowInApp_ThemeSelector         .setSelection(false);
 
 // SET_FORMATTING_ON
 
@@ -634,15 +662,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _isShowInApp_ScrambleData  = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP);
       _isShowInApp_ThemeSelector = _prefStore_Common.getBoolean(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP);
 
-      _chkShowInApp_MemoryMonitor   .setSelection(_isShowInApp_MemoryMonitor);
-      _chkShowInApp_RestartApp      .setSelection(_isShowInApp_RestartApp);
-      _chkShowInApp_ScrambleData    .setSelection(_isShowInApp_ScrambleData);
-      _chkShowInApp_ThemeSelector   .setSelection(_isShowInApp_ThemeSelector);
+      _spinnerNotificationMessagesDuration.setSelection(_prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION));
 
-      _chkAutoOpenTagging           .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
-      _chkTaggingAnimation          .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-      _spinnerAutoOpenDelay         .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
-      _spinnerRecentTags            .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _chkShowInApp_MemoryMonitor         .setSelection(_isShowInApp_MemoryMonitor);
+      _chkShowInApp_RestartApp            .setSelection(_isShowInApp_RestartApp);
+      _chkShowInApp_ScrambleData          .setSelection(_isShowInApp_ScrambleData);
+      _chkShowInApp_ThemeSelector         .setSelection(_isShowInApp_ThemeSelector);
+
+      _chkAutoOpenTagging                 .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
+      _chkTaggingAnimation                .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
+      _spinnerAutoOpenDelay               .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _spinnerRecentTags                  .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
       _logMessageFontEditor.setPreferenceStore(_prefStore);
       _logMessageFontEditor.load();
@@ -659,6 +689,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,         _chkShowInApp_MemoryMonitor.getSelection());
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP,     _chkShowInApp_RestartApp.getSelection());
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP,   _chkShowInApp_ScrambleData.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION,        _spinnerNotificationMessagesDuration.getSelection());
       _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,              _chkShowInApp_ThemeSelector.getSelection());
 
 // SET_FORMATTING_ON

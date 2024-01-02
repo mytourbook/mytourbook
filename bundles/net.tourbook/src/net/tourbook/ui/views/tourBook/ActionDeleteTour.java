@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
@@ -308,7 +309,7 @@ public class ActionDeleteTour extends Action {
       }
 
       // log deletions
-      TourLogManager.showLogView();
+      TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
       final SelectionDeletedTours selectionForDeletedTours = new SelectionDeletedTours();
 
@@ -349,7 +350,7 @@ public class ActionDeleteTour extends Action {
       if (isLayoutNatTable) {
 
          // select tour at the same position as the first deleted tour
-         _tourBookView.selectTours_NatTable(firstDeletePosition, true, true, true);
+         _tourBookView.selectTours_NatTable(firstDeletePosition, true, true, true, true);
 
       } else {
 

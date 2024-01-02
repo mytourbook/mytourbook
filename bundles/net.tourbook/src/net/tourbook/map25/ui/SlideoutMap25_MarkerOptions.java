@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
@@ -224,12 +223,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
             _comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
             _comboConfigName.setVisibleItemCount(20);
             _comboConfigName.addFocusListener(_keepOpenListener);
-            _comboConfigName.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectConfig();
-               }
-            });
+            _comboConfigName.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectConfig()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -243,12 +237,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
             _btnReset = new Button(container, SWT.PUSH);
             _btnReset.setText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT);
             _btnReset.setToolTipText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP);
-            _btnReset.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectConfig_Default(e);
-               }
-            });
+            _btnReset.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectConfig_Default(selectionEvent)));
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(_btnReset);
@@ -303,12 +292,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
             _btnSwapMarkerColor = new Button(container, SWT.PUSH);
             _btnSwapMarkerColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
             _btnSwapMarkerColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapMarkerColor.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSwapMarkerColor(e);
-               }
-            });
+            _btnSwapMarkerColor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSwapMarkerColor()));
          }
       }
       {
@@ -411,12 +395,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
             _comboMarkerOrientation = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
             _comboMarkerOrientation.setVisibleItemCount(20);
             _comboMarkerOrientation.addFocusListener(_keepOpenListener);
-            _comboMarkerOrientation.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onModifyConfig();
-               }
-            });
+            _comboMarkerOrientation.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyConfig()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -478,12 +457,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
             _btnSwapClusterSymbolColor = new Button(container, SWT.PUSH);
             _btnSwapClusterSymbolColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
             _btnSwapClusterSymbolColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapClusterSymbolColor.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSwapClusterColor(e);
-               }
-            });
+            _btnSwapClusterSymbolColor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSwapClusterColor()));
          }
       }
       {
@@ -598,17 +572,12 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
          }
          {
             /*
-             * Combo: Orientaion
+             * Combo: Orientation
              */
             _comboClusterOrientation = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
             _comboClusterOrientation.setVisibleItemCount(20);
             _comboClusterOrientation.addFocusListener(_keepOpenListener);
-            _comboClusterOrientation.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onModifyConfig();
-               }
-            });
+            _comboClusterOrientation.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyConfig()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -638,12 +607,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
             _comboClusterAlgorithm = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
             _comboClusterAlgorithm.setVisibleItemCount(20);
             _comboClusterAlgorithm.addFocusListener(_keepOpenListener);
-            _comboClusterAlgorithm.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onModifyConfig();
-               }
-            });
+            _comboClusterAlgorithm.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyConfig()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -802,7 +766,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
          }
       }
 
-      // this should not occure
+      // this should not occur
       return 0;
    }
 
@@ -890,6 +854,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
       final int selectedIndex = _comboConfigName.getSelectionIndex();
 
       _comboConfigName.setItem(selectedIndex, _textConfigName.getText());
+      _comboConfigName.select(selectedIndex);
 
       saveState();
    }
@@ -942,7 +907,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
       updateUI_Map();
    }
 
-   private void onSwapClusterColor(final SelectionEvent e) {
+   private void onSwapClusterColor() {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -956,7 +921,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
       onModifyConfig();
    }
 
-   private void onSwapMarkerColor(final SelectionEvent event) {
+   private void onSwapMarkerColor() {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -975,7 +940,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
    /**
     * Restores state values from the tour marker configuration and update the UI.
     */
-   public void restoreState() {
+   private void restoreState() {
 
       _isUpdateUI = true;
       {

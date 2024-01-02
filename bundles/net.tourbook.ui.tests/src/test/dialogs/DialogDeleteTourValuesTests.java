@@ -31,8 +31,9 @@ public class DialogDeleteTourValuesTests extends UITest {
    @Test
    void deleteTourValues_Calories_Weather() {
 
+      SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
+
       //Check the initial values
-      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
       assertEquals("2", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
 
       tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
@@ -44,11 +45,9 @@ public class DialogDeleteTourValuesTests extends UITest {
 
       bot.sleep(1000);
 
-      //Setting the focus again on the Tourbook view
-      Utils.showTourBookView(bot);
-
       //Check that the calories were deleted
-      tour = Utils.getTourWithSRTM(bot);
+      tour = Utils.selectDuplicatedTour(bot);
       assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_Calories_Column_Index));
+      Utils.deleteTour(bot, tour);
    }
 }

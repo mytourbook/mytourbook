@@ -126,17 +126,28 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
    @Override
    public String toString() {
 
-      return NL
+      boolean isShortInfo = true;
+      isShortInfo = isShortInfo == true;
 
-            + "TVITourBookYearCategorized" + NL //             //$NON-NLS-1$
+      if (isShortInfo) {
 
-            + "[" + NL //                                      //$NON-NLS-1$
+         return "TVITourBookYearCategorized  tourYearSub = " + tourYearSub; //$NON-NLS-1$
 
-            + "tourYear    = " + tourYear + NL //              //$NON-NLS-1$
-            + "tourYearSub = " + tourYearSub + NL //           //$NON-NLS-1$
-            + "_viewLayout = " + _viewLayout + NL //           //$NON-NLS-1$
 
-            + "]" + NL //                                      //$NON-NLS-1$
-      ;
+      } else {
+
+         return NL
+
+               + "TVITourBookYearCategorized" + NL //             //$NON-NLS-1$
+
+               + "[" + NL //                                      //$NON-NLS-1$
+
+               + "tourYear    = " + tourYear + NL //              //$NON-NLS-1$
+               + "tourYearSub = " + tourYearSub + NL //           //$NON-NLS-1$
+               + "_viewLayout = " + _viewLayout + NL //           //$NON-NLS-1$
+
+               + "]" + NL //                                      //$NON-NLS-1$
+         ;
+      }
    }
 }

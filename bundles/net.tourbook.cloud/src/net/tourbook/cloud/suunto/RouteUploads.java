@@ -20,7 +20,4 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class RouteUploads {
-
-   public List<RouteUpload> items;
-}
+public record RouteUploads(List<RouteUpload> items) {}

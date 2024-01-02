@@ -31,6 +31,7 @@ import java.util.Formatter;
 import java.util.Random;
 
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -262,6 +263,9 @@ public class UI {
    public static final String       INCREMENTER_1                        = "1";                                         //$NON-NLS-1$
    public static final String       INCREMENTER_10                       = "10";                                        //$NON-NLS-1$
    public static final String       INCREMENTER_100                      = "100";                                       //$NON-NLS-1$
+   public static final String       INCREMENTER_1_000                    = FormatManager.formatNumber_0(1_000);
+   public static final String       INCREMENTER_10_000                   = FormatManager.formatNumber_0(10_000);
+   public static final String       INCREMENTER_100_000                  = FormatManager.formatNumber_0(100_000);
 
    private static final char[]      INVALID_FILENAME_CHARS               = new char[] {
          '\\',
@@ -1440,6 +1444,18 @@ public class UI {
    }
 
    /**
+    * Creates a {@link Label} without text.
+    *
+    * @param parent
+    *
+    * @return
+    */
+   public static Label createLabel(final Composite parent) {
+
+      return new Label(parent, SWT.NONE);
+   }
+
+   /**
     * Creates a {@link Label} with text.
     *
     * @param parent
@@ -1472,6 +1488,28 @@ public class UI {
       label.setText(text);
 
       return label;
+   }
+
+   public static Label createLabel(final Composite parent, final String text, final String tooltip) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      label.setText(text);
+      label.setToolTipText(tooltip);
+
+      return label;
+   }
+
+   /**
+    * Create a spacer for one column
+    *
+    * @param parent
+    *
+    * @return
+    */
+   public static Label createSpacer_Horizontal(final Composite parent) {
+
+      return createSpacer_Horizontal(parent, 1);
    }
 
    public static Label createSpacer_Horizontal(final Composite parent, final int columns) {
@@ -1820,7 +1858,7 @@ public class UI {
       ).toString();
    }
 
-   public static String FormatDoubleMinMaxElevationMeter(final double value) {
+   public static String formatDoubleMinMaxElevationMeter(final double value) {
 
       if (value == -Double.MAX_VALUE) {
          return SYMBOL_INFINITY_MIN;
@@ -2331,6 +2369,26 @@ public class UI {
       }
    }
 
+   /**
+    * Open a notification popup for the number of seconds configured by the user
+    *
+    * @param title
+    * @param imageDescriptor
+    * @param text
+    */
+   public static void openNotificationPopup(final String title, final ImageDescriptor imageDescriptor, final String text) {
+
+      final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
+
+      final MTNotificationPopup notication = new MTNotificationPopup(
+            Display.getCurrent(),
+            imageDescriptor,
+            title,
+            text);
+      notication.setDelayClose(delay);
+      notication.open();
+   }
+
    public static void paintImageCentered(final Event event, final Image image, final int availableWidth) {
 
       final Rectangle imageRect = image.getBounds();
@@ -2590,6 +2648,26 @@ public class UI {
    public static void setButtonLayoutData(final Button button) {
 
       final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+
+      final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+
+      final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      final int defaultWidth = minSize.x;
+
+      data.widthHint = Math.max(widthHint, defaultWidth);
+
+      button.setLayoutData(data);
+   }
+
+   /**
+    * Set the layout data of the button to a GridData with appropriate heights and widths.
+    *
+    * @param button
+    */
+   public static void setButtonLayoutWidth(final Button button) {
+
+      // keep existing layout data
+      final GridData data = (GridData) button.getLayoutData();
 
       final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 
@@ -3182,8 +3260,9 @@ public class UI {
 
          statusLineMgr.setMessage(statusMessage);
 
+         final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
          // cleanup message
-         Display.getDefault().timerExec(3000, () -> statusLineMgr.setMessage(null));
+         Display.getDefault().timerExec(delay, () -> statusLineMgr.setMessage(null));
       }
    }
 

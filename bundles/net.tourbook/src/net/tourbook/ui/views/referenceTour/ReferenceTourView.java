@@ -199,6 +199,7 @@ public class ReferenceTourView extends ViewPart implements
    private boolean                             _isInRestore;
    private boolean                             _isPartVisible;
    private int                                 _expandRunnableCounter;
+   private long                                _lastExpandSelectionTime;
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
    private TourDoubleClickState                _tourDoubleClickState                    = new TourDoubleClickState();
@@ -1851,7 +1852,7 @@ public class ReferenceTourView extends ViewPart implements
          return;
       }
 
-      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection, selectedTreePath);
+      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection);
    }
 
    /**
@@ -1860,10 +1861,8 @@ public class ReferenceTourView extends ViewPart implements
     * tree is clicked.
     *
     * @param treeSelection
-    * @param selectedTreePath
     */
-   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection,
-                                                            final TreePath selectedTreePath) {
+   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection) {
 
       if (_isInCollapseAll) {
 
@@ -1883,7 +1882,6 @@ public class ReferenceTourView extends ViewPart implements
             private long           __expandRunnableCounter = ++_expandRunnableCounter;
 
             private ITreeSelection __treeSelection         = treeSelection;
-            private TreePath       __selectedTreePath      = selectedTreePath;
 
             @Override
             public void run() {
@@ -1897,9 +1895,17 @@ public class ReferenceTourView extends ViewPart implements
                   return;
                }
 
-               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(
-                     __treeSelection,
-                     __selectedTreePath);
+               /*
+                * With Linux the selection event is fired twice when a subcategory, e.g. month is
+                * selected which causes an endless loop !!!
+                */
+               final long now = System.currentTimeMillis();
+               final long timeDiff = now - _lastExpandSelectionTime;
+               if (timeDiff < 200) {
+                  return;
+               }
+
+               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(__treeSelection);
             }
          });
 
@@ -1908,6 +1914,9 @@ public class ReferenceTourView extends ViewPart implements
          if (_isBehaviour_OnSelect_ExpandCollapse) {
 
             // expand folder with one mouse click but not with the keyboard
+
+            final TreePath selectedTreePath = treeSelection.getPaths()[0];
+
             expandCollapseItem((TreeViewerItem) selectedTreePath.getLastSegment());
          }
       }
@@ -1917,10 +1926,21 @@ public class ReferenceTourView extends ViewPart implements
     * This behavior is complex and still have possible problems.
     *
     * @param treeSelection
-    * @param selectedTreePath
     */
-   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection,
-                                                                     final TreePath selectedTreePath) {
+   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection) {
+
+      /*
+       * Create expanded elements from the tree selection
+       */
+      final TreePath selectedTreePath = treeSelection.getPaths()[0];
+      final int numSegments = selectedTreePath.getSegmentCount();
+
+      final Object[] expandedElements = new Object[numSegments];
+
+      for (int segmentIndex = 0; segmentIndex < numSegments; segmentIndex++) {
+         expandedElements[segmentIndex] = selectedTreePath.getSegment(segmentIndex);
+      }
+
       _isInExpandingSelection = true;
       {
          final Tree tree = _tourViewer.getTree();
@@ -1942,7 +1962,7 @@ public class ReferenceTourView extends ViewPart implements
             /*
              * Expand and select selected folder
              */
-            _tourViewer.setExpandedTreePaths(selectedTreePath);
+            _tourViewer.setExpandedElements(expandedElements);
             _tourViewer.setSelection(treeSelection, true);
 
             if (_isBehaviour_OnSelect_ExpandCollapse && isExpanded) {
@@ -1955,7 +1975,7 @@ public class ReferenceTourView extends ViewPart implements
              * Set top item to the previous top item, otherwise the expanded/collapse item is
              * positioned at the bottom and the UI is jumping all the time
              * <p>
-             * win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * Win behaviour: When an item is set to top which was collapsed before, it will be
              * expanded
              */
             if (topItem.isDisposed() == false) {
@@ -1965,6 +1985,7 @@ public class ReferenceTourView extends ViewPart implements
          tree.setRedraw(true);
       }
       _isInExpandingSelection = false;
+      _lastExpandSelectionTime = System.currentTimeMillis();
    }
 
    /**

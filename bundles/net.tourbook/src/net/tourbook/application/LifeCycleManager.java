@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,25 +27,20 @@ import org.osgi.service.event.EventHandler;
 
 public class LifeCycleManager {
 
-   private static final String SPLASH_IMAGE_FILE_NAME = "splash.bmp";//$NON-NLS-1$
-
    @PostContextCreate
-   void postContextCreate3(final IEventBroker eventBroker,
-                           final IApplicationContext appContext,
-                           final IEclipseContext workbenchContext) {
+   void postContextCreate(final IEventBroker eventBroker,
+                          final IApplicationContext appContext,
+                          final IEclipseContext workbenchContext) {
 
       /*
        * Setup splash, this was needed in e4 to show db update messages
        */
       final SplashManager splashManager = SplashManager.getInstance();
 
-      splashManager.setSplashPluginId(TourbookPlugin.PLUGIN_ID);
-
-      splashManager.setSplashImagePath(SPLASH_IMAGE_FILE_NAME);
       splashManager.open();
       splashManager.setMessage(Messages.App_SplashMessage_StartingApplication);
 
-      // The should be a better way to close the splash, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=376821
+      // This should be a better way to close the splash, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=376821
       eventBroker.subscribe(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE, new EventHandler() {
 
          @Override

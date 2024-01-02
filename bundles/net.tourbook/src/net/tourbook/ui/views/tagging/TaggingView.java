@@ -190,6 +190,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private boolean                             _isInCollapseAll;
    private boolean                             _isInExpandingSelection;
    private int                                 _expandRunnableCounter;
+   private long                                _lastExpandSelectionTime;
 
    private TourDoubleClickState                _tourDoubleClickState                    = new TourDoubleClickState();
 
@@ -1935,6 +1936,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    /**
     * @param item
+    *
     * @return Returns <code>true</code> when the item is in the current tag filter visible
     */
    private boolean isInTagItemFilter(final Object item) {
@@ -2252,7 +2254,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          return;
       }
 
-      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection, selectedTreePath);
+      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection);
    }
 
    /**
@@ -2261,10 +2263,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * tree is clicked.
     *
     * @param treeSelection
-    * @param selectedTreePath
     */
-   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection,
-                                                            final TreePath selectedTreePath) {
+   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection) {
 
       if (_isInCollapseAll) {
 
@@ -2283,7 +2283,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             private long           __expandRunnableCounter = ++_expandRunnableCounter;
 
             private ITreeSelection __treeSelection         = treeSelection;
-            private TreePath       __selectedTreePath      = selectedTreePath;
 
             @Override
             public void run() {
@@ -2297,9 +2296,17 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                   return;
                }
 
-               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(
-                     __treeSelection,
-                     __selectedTreePath);
+               /*
+                * With Linux the selection event is fired twice when a subcategory, e.g. month is
+                * selected which causes an endless loop !!!
+                */
+               final long now = System.currentTimeMillis();
+               final long timeDiff = now - _lastExpandSelectionTime;
+               if (timeDiff < 200) {
+                  return;
+               }
+
+               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(__treeSelection);
             }
          });
 
@@ -2308,6 +2315,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          if (_isBehaviour_OnSelect_ExpandCollapse) {
 
             // expand folder with one mouse click but not with the keyboard
+
+            final TreePath selectedTreePath = treeSelection.getPaths()[0];
+
             expandCollapseItem((TreeViewerItem) selectedTreePath.getLastSegment());
          }
       }
@@ -2317,10 +2327,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * This behavior is complex and still have possible problems.
     *
     * @param treeSelection
-    * @param selectedTreePath
     */
-   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection,
-                                                                     final TreePath selectedTreePath) {
+   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection) {
+
+      /*
+       * Create expanded elements from the tree selection
+       */
+      final TreePath selectedTreePath = treeSelection.getPaths()[0];
+      final int numSegments = selectedTreePath.getSegmentCount();
+
+      final Object[] expandedElements = new Object[numSegments];
+
+      for (int segmentIndex = 0; segmentIndex < numSegments; segmentIndex++) {
+         expandedElements[segmentIndex] = selectedTreePath.getSegment(segmentIndex);
+      }
+
       _isInExpandingSelection = true;
       {
          final Tree tree = _tagViewer.getTree();
@@ -2342,7 +2363,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             /*
              * expand and select selected folder
              */
-            _tagViewer.setExpandedTreePaths(selectedTreePath);
+            _tagViewer.setExpandedElements(expandedElements);
             _tagViewer.setSelection(treeSelection, true);
 
             if (_isBehaviour_OnSelect_ExpandCollapse && isExpanded) {
@@ -2352,10 +2373,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             /**
-             * set top item to the previous top item, otherwise the expanded/collapse item is
+             * Set top item to the previous top item, otherwise the expanded/collapse item is
              * positioned at the bottom and the UI is jumping all the time
              * <p>
-             * win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * Win behaviour: When an item is set to top which was collapsed before, it will be
              * expanded
              */
             if (topItem.isDisposed() == false) {
@@ -2365,6 +2386,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          tree.setRedraw(true);
       }
       _isInExpandingSelection = false;
+      _lastExpandSelectionTime = System.currentTimeMillis();
    }
 
    /**
@@ -2622,6 +2644,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * @param pathSegments
     * @param treeItems
     * @param stateSegment
+    *
     * @return Returns children when it could be expanded otherwise <code>null</code>.
     */
    private ArrayList<TreeViewerItem> restoreState_Viewer_ExpandItem(final ArrayList<Object> pathSegments,

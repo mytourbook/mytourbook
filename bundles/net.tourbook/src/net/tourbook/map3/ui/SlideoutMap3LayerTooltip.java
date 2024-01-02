@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -157,9 +157,9 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
           */
          label = new Label(container, SWT.NONE);
 
-         label.setText(UI.FormatDoubleMinMaxElevationMeter(minActiveAltitude)
+         label.setText(UI.formatDoubleMinMaxElevationMeter(minActiveAltitude)
                + UI.ELLIPSIS_WITH_SPACE
-               + UI.FormatDoubleMinMaxElevationMeter(maxActiveAltitude));
+               + UI.formatDoubleMinMaxElevationMeter(maxActiveAltitude));
          label.setToolTipText(Messages.Prop_Viewer_Label_AltitudeRange_Tooltip);
       }
    }

@@ -155,6 +155,10 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
       // try to position the tooltip at the bottom of the cell
 
+      if (_ttControl.isDisposed()) {
+         return super.getLocation(tipSize, event);
+      }
+
       if (_hoveredBounds != null) {
 
          final Rectangle cellBounds = _hoveredBounds;
@@ -338,7 +342,6 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
-
 
       if (!super.shouldCreateToolTip(event)) {
 

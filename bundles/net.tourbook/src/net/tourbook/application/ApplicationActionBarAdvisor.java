@@ -312,19 +312,19 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             final IToolBarManager tbMgr = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 
-            if (isShowRestartApp) {
-
-               tbMgr.add(_contribItem_RestartApp);
-
-               final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
-               coolBarMgr.add(tbContribItem);
-            }
-
             if (isShowScambleData) {
 
                tbMgr.add(_contribItem_ScrambleData);
 
                final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "scambleData"); //$NON-NLS-1$
+               coolBarMgr.add(tbContribItem);
+            }
+
+            if (isShowRestartApp) {
+
+               tbMgr.add(_contribItem_RestartApp);
+
+               final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbMgr, "restartApp"); //$NON-NLS-1$
                coolBarMgr.add(tbContribItem);
             }
          }

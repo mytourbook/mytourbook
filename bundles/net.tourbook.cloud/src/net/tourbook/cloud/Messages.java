@@ -79,10 +79,11 @@ public class Messages extends NLS {
    public static String Dialog_UploadRoutesToSuunto_SubTask;
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
-   public static String Dialog_UploadToursToSuunto_Message;
+   public static String Dialog_UploadRoutesToSuunto_Message;
    public static String Dialog_UploadWorkoutsToSuunto_SubTask;
    public static String Dialog_UploadWorkoutsToSuunto_Task;
    public static String Dialog_UploadWorkoutsToSuunto_Title;
+   public static String Dialog_UploadWorkoutsToSuunto_Message;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String Filename_Component_ActivityType;
    public static String Filename_Component_ActivityType_Abbr;
@@ -111,7 +112,6 @@ public class Messages extends NLS {
    public static String Log_DownloadWorkoutsFromSuunto_001_Start;
    public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
    public static String Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
-   public static String Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder;
    public static String Log_DownloadWorkoutsFromSuunto_005_DownloadStatus;
    public static String Log_DownloadWorkoutsFromSuunto_006_FileAlreadyExists;
    public static String Log_DownloadWorkoutsFromSuunto_007_Error;

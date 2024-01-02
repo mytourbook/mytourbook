@@ -64,6 +64,9 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
    private Image _imageDisabled;
    private Image _imageSelected;
 
+   /**
+    * Use {@link CommonImages#TourOptions} as default action image
+    */
    public ActionToolbarSlideoutAdv() {
 
       _imageEnabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
@@ -187,12 +190,12 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
        */
 
       if (_isImageCreated_EnabledDisabled && _imageEnabled != null && _imageEnabled.isDisposed() == false) {
-         
+
          _imageEnabled.dispose();
       }
 
       if (_isImageCreated_EnabledDisabled && _imageDisabled != null && _imageDisabled.isDisposed() == false) {
-         
+
          _imageDisabled.dispose();
       }
 

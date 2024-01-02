@@ -119,6 +119,8 @@ public abstract class AdvancedSlideoutShell {
 
    private int                        _fadeOutDelayCounter;
 
+   private double                     _maxHeightFactor                    = 0.8;
+
    private int                        _horizContentWidth                  = MIN_SHELL_HORIZ_WIDTH;
    private int                        _horizContentHeight                 = MIN_SHELL_HORIZ_HEIGHT;
    private int                        _vertContentWidth                   = MIN_SHELL_VERT_WIDTH;
@@ -263,6 +265,7 @@ public abstract class AdvancedSlideoutShell {
     *           <p>
     *
     *           <pre>
+    *
     *           horizContentDefaultWidth = 300;
     *           horizContentDefaultHeight = 150;
     *
@@ -662,6 +665,7 @@ public abstract class AdvancedSlideoutShell {
     *
     * @param parent
     *           the parent of the content area
+    *
     * @return the content area created
     */
    protected abstract Composite createSlideoutContentArea(Composite parent);
@@ -890,6 +894,7 @@ public abstract class AdvancedSlideoutShell {
     *
     * @param size
     *           Tooltip size
+    *
     * @return Returns location relative to the device.
     */
    protected abstract Point getToolTipLocation(Point size);
@@ -917,6 +922,7 @@ public abstract class AdvancedSlideoutShell {
 
    /**
     * @see #_isForceBoundsToBeInsideOfViewport
+    *
     * @return
     */
    public boolean isForceBoundsToBeInsideOfViewport() {
@@ -1307,7 +1313,7 @@ public abstract class AdvancedSlideoutShell {
       if (resizeShell == null) {
 
          // fixed NPE which happened during debugging
-         
+
          return;
       }
 
@@ -1315,7 +1321,7 @@ public abstract class AdvancedSlideoutShell {
 
       // ensure tooltip is not too large
       final Rectangle displayBounds = getDisplayBounds(shellLocation);
-      final double maxHeight = displayBounds.height * 0.8;
+      final double maxHeight = displayBounds.height * _maxHeightFactor;
       final double maxWidth = displayBounds.width * 0.95;
 
       boolean isResizeAdjusted = false;
@@ -1612,6 +1618,7 @@ public abstract class AdvancedSlideoutShell {
 
    /**
     * @param isForceBoundsToBeInsideOfViewport
+    *
     * @see #_isForceBoundsToBeInsideOfViewport
     */
    public void setIsForceBoundsToBeInsideOfViewport(final boolean isForceBoundsToBeInsideOfViewport) {
@@ -1645,6 +1652,16 @@ public abstract class AdvancedSlideoutShell {
       if (isPinned) {
          setSlideoutPinnedLocation();
       }
+   }
+
+   /**
+    * This factor is multiplied with the display height to force the max height of this slideout
+    *
+    * @param maxHeightFactor
+    */
+   public void setMaxHeightFactor(final double maxHeightFactor) {
+
+      _maxHeightFactor = maxHeightFactor;
    }
 
    protected void setShellFadeInSteps(final int shellFadeInSteps) {

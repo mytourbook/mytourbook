@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,12 +19,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class SensorViewTests extends UITest {
+
+   @AfterAll
+   static void cleanUp() {
+
+      Utils.deleteTourWithSensors(bot);
+   }
+
+   @BeforeAll
+   static void initialize() {
+
+      // A tour with sensor needs to be imported because the sensors are supported
+      // since MT v21.12
+      Utils.importTourWithSensors(bot);
+   }
 
    @Test
    void selectSensors() {
@@ -46,5 +62,4 @@ public class SensorViewTests extends UITest {
       sensorChartView.close();
       sensorView.close();
    }
-
 }

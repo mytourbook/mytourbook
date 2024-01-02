@@ -109,7 +109,7 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -2758,11 +2758,13 @@ public class Map2 extends Canvas {
 
       if (TextTransfer.getInstance().isSupportedType(transferDataType)) {
 
-         if (event.data instanceof String) {
-            isPOI = parseAndDisplayPOIText((String) event.data);
+         if (event.data instanceof final String eventData) {
+
+            isPOI = parseAndDisplayPOIText(eventData);
          }
 
       } else if (URLTransfer.getInstance().isSupportedType(transferDataType)) {
+
          isPOI = parseAndDisplayPOIText((String) event.data);
       }
 
@@ -4505,7 +4507,7 @@ public class Map2 extends Canvas {
 //         // paint hovered rectangle
 //         gc.setLineWidth(1);
 //
-//         for (final Point hoveredPoint : _allDevHoveredPoints) {
+//         for (final Point hoveredPoint : _allHoveredDevPoints) {
 //
 //            gc.setAlpha(0x60);
 //            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -7377,8 +7379,8 @@ public class Map2 extends Canvas {
          return -1;
       }
 
-      final Set<GeoPosition> positions = getBoundingBoxPositions(boundingBox);
-      if (positions == null) {
+      final Set<GeoPosition> latLonPositions = getBoundingBoxPositions(boundingBox);
+      if (latLonPositions == null) {
          return -1;
       }
 
@@ -7387,7 +7389,7 @@ public class Map2 extends Canvas {
       final int maximumZoomLevel = mp.getMaximumZoomLevel();
       int zoom = mp.getMinimumZoomLevel();
 
-      Rectangle positionRect = getWorldPixelFromGeoPositions(positions, zoom);
+      Rectangle positionRect = getWorldPixelFromGeoPositions(latLonPositions, zoom);
       Rectangle viewport = getWorldPixelViewport();
 
       // zoom in until bounding box is larger than the viewport
@@ -7409,7 +7411,7 @@ public class Map2 extends Canvas {
 
          setZoom(zoom);
 
-         positionRect = getWorldPixelFromGeoPositions(positions, zoom);
+         positionRect = getWorldPixelFromGeoPositions(latLonPositions, zoom);
          viewport = getWorldPixelViewport();
       }
 

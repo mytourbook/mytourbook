@@ -1399,6 +1399,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
     * @param parentItems
     * @param tagItems
     * @param tagId
+    *
     * @return Returns <code>true</code> when the tag id is found
     */
    private boolean getTagItems(final ArrayList<TreeViewerItem> parentItems,
@@ -2213,6 +2214,17 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       for (final long tagId : tagIds_Unchecked) {
 
          final TourTag tourTag = allTourTags.get(tagId);
+
+         if (tourTag == null) {
+
+            /*
+             * It is possible that the tour tag in the tour tag filter is already deleted and the
+             * tour tag filter is not yet updated
+             */
+
+            continue;
+         }
+
          final TagCloud tagCloud = new TagCloud(tagId, tourTag.getTagName());
 
          /*

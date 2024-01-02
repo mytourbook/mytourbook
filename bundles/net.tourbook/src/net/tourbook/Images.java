@@ -311,6 +311,7 @@ public class Images {
    public static final String SyncWith_Slider_Disabled                   = "synch-with-tour-slider-disabled.png";                 //$NON-NLS-1$
    public static final String SyncWith_Tour                              = "synch-with-tour.png";                                 //$NON-NLS-1$
    public static final String SyncWith_Tour_Disabled                     = "synch-with-tour-disabled.png";                        //$NON-NLS-1$
+   public static final String SyncWith_TourLocation                      = "synch-with-tour-location.png";                        //$NON-NLS-1$
    public static final String Tag                                        = "tag-tag.png";                                         //$NON-NLS-1$
    public static final String Tag_Category                               = "tag-category.png";                                    //$NON-NLS-1$
    public static final String Tag_Root                                   = "tag-tag-root.png";                                    //$NON-NLS-1$
@@ -323,6 +324,7 @@ public class Images {
    public static final String TagsChecked_Disabled                       = "tags-checked-disabled.png";                           //$NON-NLS-1$
    public static final String Tour_Duplicate                             = "tour-duplicate.png";                                  //$NON-NLS-1$
    public static final String Tour_Duplicate_Disabled                    = "tour-duplicate-disabled.png";                         //$NON-NLS-1$
+   public static final String Tour_StartEnd                              = "tour-start-end.png";                                  //$NON-NLS-1$
    public static final String TourAnalyzer                               = "tour-analyzer.png";                                   //$NON-NLS-1$
    public static final String TourBlog                                   = "tour-blog.png";                                       //$NON-NLS-1$
    public static final String TourBook_Month                             = "tourbook-month.png";                                  //$NON-NLS-1$
@@ -360,6 +362,7 @@ public class Images {
    public static final String TourInfo                                   = "tour-info.png";                                       //$NON-NLS-1$
    public static final String TourInfo_Disabled                          = "tour-info-disabled.png";                              //$NON-NLS-1$
    public static final String TourInfo_Hovered                           = "tour-info-hovered.png";                               //$NON-NLS-1$
+   public static final String TourLocations                              = "tour-locations.png";                                  //$NON-NLS-1$
    public static final String TourLog                                    = "tour-log.png";                                        //$NON-NLS-1$
    public static final String TourLog_Layout_Color                       = "tour-log-layout-color.png";                           //$NON-NLS-1$
    public static final String TourLog_Layout_Simple                      = "tour-log-layout-simple.png";                          //$NON-NLS-1$

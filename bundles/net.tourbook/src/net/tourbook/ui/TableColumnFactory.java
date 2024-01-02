@@ -85,6 +85,8 @@ public abstract class TableColumnFactory {
    public static final String             DATA_DP_TOLERANCE_ID                               = "DATA_DP_TOLERANCE";                               //$NON-NLS-1$
    public static final TableColumnFactory DATA_FIRST_COLUMN;
    public static final String             DATA_FIRST_COLUMN_ID                               = "DATA_FIRST_COLUMN";                               //$NON-NLS-1$
+   public static final TableColumnFactory DATA_HAS_GEO_DATA;
+   public static final String             DATA_HAS_GEO_DATA_ID                               = "DATA_HAS_GEO_DATA";                               //$NON-NLS-1$
    public static final TableColumnFactory DATA_IMPORT_FILE_NAME;
    public static final String             DATA_IMPORT_FILE_NAME_ID                           = "DATA_IMPORT_FILE_NAME";                           //$NON-NLS-1$
    public static final TableColumnFactory DATA_IMPORT_FILE_PATH;
@@ -109,6 +111,163 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory DEVICE_NAME;
    public static final String             DEVICE_NAME_ID                                     = "DEVICE_NAME";                                     //$NON-NLS-1$
    public static final TableColumnFactory DEVICE_PROFILE;
+
+   public static final TableColumnFactory LOCATION_DATA_ID;
+   public static final String             LOCATION_DATA_ID_ID                                = "LOCATION_DATA_ID_ID";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_HEIGHT;
+   public static final String             LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID                = "LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID";             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_WIDTH;
+   public static final String             LOCATION_GEO_BOUNDING_BOX_WIDTH_ID                 = "LOCATION_GEO_BOUNDING_BOX_WIDTH_ID";              //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_IS_RESIZED_BOUNDING_BOX;
+   public static final String             LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID            = "LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID";         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LATITUDE;
+   public static final String             LOCATION_GEO_LATITUDE_ID                           = "LOCATION_GEO_LATITUDE_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LATITUDE_DIFF;
+   public static final String             LOCATION_GEO_LATITUDE_DIFF_ID                      = "LOCATION_GEO_LATITUDE_DIFF_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LONGITUDE;
+   public static final String             LOCATION_GEO_LONGITUDE_ID                          = "LOCATION_GEO_LONGITUDE_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_LONGITUDE_DIFF;
+   public static final String             LOCATION_GEO_LONGITUDE_DIFF_ID                     = "LOCATION_GEO_LONGITUDE_DIFF_ID";                  //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_GEO_ZOOMLEVEL;
+   public static final String             LOCATION_GEO_ZOOMLEVEL_ID                          = "LOCATION_GEO_ZOOMLEVEL_ID";                       //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_TOUR_USAGE;
+   public static final String             LOCATION_TOUR_USAGE_ID                             = "LOCATION_TOUR_USAGE";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_TOUR_USAGE_START_LOCATIONS;
+   public static final String             LOCATION_TOUR_USAGE_START_LOCATIONS_ID             = "LOCATION_TOUR_USAGE_START_LOCATIONS_ID";          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_TOUR_USAGE_END_LOCATIONS;
+   public static final String             LOCATION_TOUR_USAGE_END_LOCATIONS_ID               = "LOCATION_TOUR_USAGE_END_LOCATIONS_ID";            //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_DisplayName;
+   public static final String             LOCATION_PART_DisplayName_ID                       = "LOCATION_PART_DisplayName_ID";                    //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Name;
+   public static final String             LOCATION_PART_Name_ID                              = "LOCATION_PART_Name";                              //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Continent;
+   public static final String             LOCATION_PART_Continent_ID                         = "LOCATION_PART_Continent_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Country;
+   public static final String             LOCATION_PART_Country_ID                           = "LOCATION_PART_Country_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_CountryCode;
+   public static final String             LOCATION_PART_CountryCode_ID                       = "LOCATION_PART_CountryCode_ID";                    //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Region;
+   public static final String             LOCATION_PART_Region_ID                            = "LOCATION_PART_Region_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_State;
+   public static final String             LOCATION_PART_State_ID                             = "LOCATION_PART_State_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_StateDistrict;
+   public static final String             LOCATION_PART_StateDistrict_ID                     = "LOCATION_PART_StateDistrict_ID";                  //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_County;
+   public static final String             LOCATION_PART_County_ID                            = "LOCATION_PART_County_ID";                         //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Municipality;
+   public static final String             LOCATION_PART_Municipality_ID                      = "LOCATION_PART_Municipality_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_City;
+   public static final String             LOCATION_PART_City_ID                              = "LOCATION_PART_City_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Town;
+   public static final String             LOCATION_PART_Town_ID                              = "LOCATION_PART_Town_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Village;
+   public static final String             LOCATION_PART_Village_ID                           = "LOCATION_PART_Village_ID";                        //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_CityDistrict;
+   public static final String             LOCATION_PART_CityDistrict_ID                      = "LOCATION_PART_CityDistrict_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_District;
+   public static final String             LOCATION_PART_District_ID                          = "LOCATION_PART_District_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Borough;
+   public static final String             LOCATION_PART_Borough_ID                           = "LOCATION_PART_Borough_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Suburb;
+   public static final String             LOCATION_PART_Suburb_ID                            = "LOCATION_PART_Suburb_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Subdivision;
+   public static final String             LOCATION_PART_Subdivision_ID                       = "LOCATION_PART_Subdivision_ID";                    //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Hamlet;
+   public static final String             LOCATION_PART_Hamlet_ID                            = "LOCATION_PART_Hamlet_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Croft;
+   public static final String             LOCATION_PART_Croft_ID                             = "LOCATION_PART_Croft_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_IsolatedDwelling;
+   public static final String             LOCATION_PART_IsolatedDwelling_ID                  = "LOCATION_PART_IsolatedDwelling_ID";               //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Neighbourhood;
+   public static final String             LOCATION_PART_Neighbourhood_ID                     = "LOCATION_PART_Neighbourhood_ID";                  //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Allotments;
+   public static final String             LOCATION_PART_Allotments_ID                        = "LOCATION_PART_Allotments_ID";                     //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Quarter;
+   public static final String             LOCATION_PART_Quarter_ID                           = "LOCATION_PART_Quarter_ID";                        //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_CityBlock;
+   public static final String             LOCATION_PART_CityBlock_ID                         = "LOCATION_PART_CityBlock_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Residential;
+   public static final String             LOCATION_PART_Residential_ID                       = "LOCATION_PART_Residential_ID";                    //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Farm;
+   public static final String             LOCATION_PART_Farm_ID                              = "LOCATION_PART_Farm_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Farmyard;
+   public static final String             LOCATION_PART_Farmyard_ID                          = "LOCATION_PART_Farmyard_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Industrial;
+   public static final String             LOCATION_PART_Industrial_ID                        = "LOCATION_PART_Industrial_ID";                     //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Commercial;
+   public static final String             LOCATION_PART_Commercial_ID                        = "LOCATION_PART_Commercial_ID";                     //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Retail;
+   public static final String             LOCATION_PART_Retail_ID                            = "LOCATION_PART_Retail_ID";                         //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Road;
+   public static final String             LOCATION_PART_Road_ID                              = "LOCATION_PART_Road_ID";                           //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_HouseName;
+   public static final String             LOCATION_PART_HouseName_ID                         = "LOCATION_PART_HouseName_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_HouseNumber;
+   public static final String             LOCATION_PART_HouseNumber_ID                       = "LOCATION_PART_HouseNumber_ID";                    //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Aerialway;
+   public static final String             LOCATION_PART_Aerialway_ID                         = "LOCATION_PART_Aerialway_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Aeroway;
+   public static final String             LOCATION_PART_Aeroway_ID                           = "LOCATION_PART_Aeroway_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Amenity;
+   public static final String             LOCATION_PART_Amenity_ID                           = "LOCATION_PART_Amenity_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Boundary;
+   public static final String             LOCATION_PART_Boundary_ID                          = "LOCATION_PART_Boundary_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Bridge;
+   public static final String             LOCATION_PART_Bridge_ID                            = "LOCATION_PART_Bridge_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Club;
+   public static final String             LOCATION_PART_Club_ID                              = "LOCATION_PART_Club_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Craft;
+   public static final String             LOCATION_PART_Craft_ID                             = "LOCATION_PART_Craft_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Emergency;
+   public static final String             LOCATION_PART_Emergency_ID                         = "LOCATION_PART_Emergency_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Historic;
+   public static final String             LOCATION_PART_Historic_ID                          = "LOCATION_PART_Historic_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Landuse;
+   public static final String             LOCATION_PART_Landuse_ID                           = "LOCATION_PART_Landuse_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Leisure;
+   public static final String             LOCATION_PART_Leisure_ID                           = "LOCATION_PART_Leisure_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_ManMade;
+   public static final String             LOCATION_PART_ManMade_ID                           = "LOCATION_PART_ManMade_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Military;
+   public static final String             LOCATION_PART_Military_ID                          = "LOCATION_PART_Military_ID";                       //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_MountainPass;
+   public static final String             LOCATION_PART_MountainPass_ID                      = "LOCATION_PART_MountainPass_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Natural;
+   public static final String             LOCATION_PART_Natural_ID                           = "LOCATION_PART_Natural_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Office;
+   public static final String             LOCATION_PART_Office_ID                            = "LOCATION_PART_Office_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Place;
+   public static final String             LOCATION_PART_Place_ID                             = "LOCATION_PART_Place_ID";                          //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Railway;
+   public static final String             LOCATION_PART_Railway_ID                           = "LOCATION_PART_Railway_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Shop;
+   public static final String             LOCATION_PART_Shop_ID                              = "LOCATION_PART_Shop_ID";                           //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Tourism;
+   public static final String             LOCATION_PART_Tourism_ID                           = "LOCATION_PART_Tourism_ID";                        //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Tunnel;
+   public static final String             LOCATION_PART_Tunnel_ID                            = "LOCATION_PART_Tunnel_ID";                         //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_Waterway;
+   public static final String             LOCATION_PART_Waterway_ID                          = "LOCATION_PART_Waterway_ID";                       //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_Postcode;
+   public static final String             LOCATION_PART_Postcode_ID                          = "LOCATION_PART_Postcode_ID";                       //$NON-NLS-1$
+
+   public static final TableColumnFactory LOCATION_PART_SettlementSmall;
+   public static final String             LOCATION_PART_SettlementSmall_ID                   = "LOCATION_PART_SettlementSmall_ID";                //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_PART_SettlementLarge;
+   public static final String             LOCATION_PART_SettlementLarge_ID                   = "LOCATION_PART_SettlementLarge_ID";                //$NON-NLS-1$
 
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_GAIN_DELTA;
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_LOSS_DELTA;
@@ -311,6 +470,10 @@ public abstract class TableColumnFactory {
    public static final String             TOUR_LOCATION_START_ID                             = "TOUR_LOCATION_START";                             //$NON-NLS-1$
    public static final TableColumnFactory TOUR_LOCATION_END;
    public static final String             TOUR_LOCATION_END_ID                               = "TOUR_LOCATION_END";                               //$NON-NLS-1$
+   public static final TableColumnFactory TOUR_LOCATION_ID_START;
+   public static final String             TOUR_LOCATION_ID_START_ID                          = "TOUR_LOCATION_ID_START";                          //$NON-NLS-1$
+   public static final TableColumnFactory TOUR_LOCATION_ID_END;
+   public static final String             TOUR_LOCATION_ID_END_ID                            = "TOUR_LOCATION_ID_END";                            //$NON-NLS-1$
    public static final TableColumnFactory TOUR_NUM_MARKERS;
    public static final String             TOUR_NUM_MARKERS_ID                                = "TOUR_NUM_MARKERS";                                //$NON-NLS-1$
    public static final TableColumnFactory TOUR_NUM_PHOTOS;
@@ -340,9 +503,9 @@ public abstract class TableColumnFactory {
    public static final String             TRAINING_STRESS_SCORE_ID                           = "TRAINING_STRESS_SCORE";                           //$NON-NLS-1$
 
    public static final TableColumnFactory WAYPOINT_ALTITUDE;
-   public static final TableColumnFactory WAYPOINT_DATE;
    public static final TableColumnFactory WAYPOINT_CATEGORY;
    public static final TableColumnFactory WAYPOINT_COMMENT;
+   public static final TableColumnFactory WAYPOINT_DATE;
    public static final TableColumnFactory WAYPOINT_DESCRIPTION;
    public static final TableColumnFactory WAYPOINT_ID;
    public static final TableColumnFactory WAYPOINT_NAME;
@@ -352,11 +515,11 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory WEATHER_CLOUDS;
    public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";                                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG;
-   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG_ID";                      //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
    public static final String             WEATHER_TEMPERATURE_AVG_COMBINED_ID                = "WEATHER_TEMPERATURE_AVG_COMBINED_ID";             //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
    public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG_DEVICE";                  //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG_ID";                      //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN;
    public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN_ID";                      //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_COMBINED;
@@ -1156,6 +1319,26 @@ public abstract class TableColumnFactory {
          }
       };
 
+      DATA_HAS_GEO_DATA = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DATA_HAS_GEO_DATA_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_HasGeoData_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_HasGeoData_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_HasGeoData_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+            return colDef;
+         }
+      };
+
       DATA_IMPORT_FILE_NAME = new TableColumnFactory() {
 
          @Override
@@ -1397,6 +1580,331 @@ public abstract class TableColumnFactory {
             return colDef;
          }
       };
+
+
+      /*
+       * Location
+       */
+
+      LOCATION_DATA_ID = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_DATA_ID_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Data_LocationID_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Data_LocationID_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Data_LocationID_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BOUNDING_BOX_WIDTH = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BOUNDING_BOX_WIDTH_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_BoundingBox_Width_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_BoundingBox_Width_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BoundingBox_Width_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_BOUNDING_BOX_HEIGHT = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_BoundingBox_Height_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_BoundingBox_Height_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_BoundingBox_Height_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_IS_RESIZED_BOUNDING_BOX = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_IS_RESIZED_BOUNDING_BOX_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_LATITUDE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LATITUDE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Latitude);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Latitude_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_LONGITUDE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LONGITUDE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_Geo_Longitude);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Longitude_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_LATITUDE_DIFF = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LATITUDE_DIFF_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_LatitudeDiff_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_LatitudeDiff_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LatitudeDiff_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_LONGITUDE_DIFF = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_LONGITUDE_DIFF_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_LongitudeDiff_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_LongitudeDiff_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_LongitudeDiff_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE_M_OR_YD));
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE_M_OR_YD);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_GEO_ZOOMLEVEL = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_GEO_ZOOMLEVEL_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Geo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_Zoomlevel_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_Zoomlevel_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_Zoomlevel_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_TOUR_USAGE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_TOUR_USAGE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_TourUsage);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_TourUsage_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_TOUR_USAGE_START_LOCATIONS= new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_TOUR_USAGE_START_LOCATIONS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_TourUsage_StartLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_TourUsage_StartLocations_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_TOUR_USAGE_END_LOCATIONS = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_TOUR_USAGE_END_LOCATIONS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnName(               Messages.ColumnFactory_Location_TourUsage_EndLocations);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_TourUsage_EndLocations_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      final String categoryName     = Messages.ColumnFactory_Category_AddressName;
+      final String categoryCountry  = Messages.ColumnFactory_Category_AddressCountry;
+      final String categoryState    = Messages.ColumnFactory_Category_AddressState;
+      final String categoryCity     = Messages.ColumnFactory_Category_AddressCity;
+      final String categoryRoad     = Messages.ColumnFactory_Category_AddressRoad;
+      final String categoryArea1    = Messages.ColumnFactory_Category_AddressArea1;
+      final String categoryArea2    = Messages.ColumnFactory_Category_AddressArea2;
+      final String categoryArea3    = Messages.ColumnFactory_Category_AddressArea3;
+      final String categoryArea4    = Messages.ColumnFactory_Category_AddressArea4;
+      final String categoryOther    = Messages.ColumnFactory_Category_AddressOther;
+
+      LOCATION_PART_DisplayName      = createColumn_Address(      categoryName,     LOCATION_PART_DisplayName_ID,        Messages.Tour_Location_Part_OsmDefaultName);
+      LOCATION_PART_Name             = createColumn_Address(      categoryName,     LOCATION_PART_Name_ID,               Messages.Tour_Location_Part_OsmName);
+
+      LOCATION_PART_Country          = createColumn_Address(      categoryCountry,  LOCATION_PART_Country_ID,            Messages.Tour_Location_Part_Country);
+      LOCATION_PART_CountryCode      = createColumn_Address(      categoryCountry,  LOCATION_PART_CountryCode_ID,        Messages.Tour_Location_Part_CountryCode);
+      LOCATION_PART_Continent        = createColumn_Address(      categoryCountry,  LOCATION_PART_Continent_ID,          Messages.Tour_Location_Part_Continent);
+
+      LOCATION_PART_Region           = createColumn_Address(      categoryState,    LOCATION_PART_Region_ID,             Messages.Tour_Location_Part_Region);
+      LOCATION_PART_State            = createColumn_Address(      categoryState,    LOCATION_PART_State_ID,              Messages.Tour_Location_Part_State);
+      LOCATION_PART_StateDistrict    = createColumn_Address(      categoryState,    LOCATION_PART_StateDistrict_ID,      Messages.Tour_Location_Part_StateDistrict);
+      LOCATION_PART_County           = createColumn_Address(      categoryState,    LOCATION_PART_County_ID,             Messages.Tour_Location_Part_County);
+
+      LOCATION_PART_Municipality     = createColumn_Address(      categoryCity,     LOCATION_PART_Municipality_ID,       Messages.Tour_Location_Part_Municipality);
+      LOCATION_PART_City             = createColumn_Address(      categoryCity,     LOCATION_PART_City_ID,               Messages.Tour_Location_Part_City);
+      LOCATION_PART_Town             = createColumn_Address(      categoryCity,     LOCATION_PART_Town_ID,               Messages.Tour_Location_Part_Town);
+      LOCATION_PART_Village          = createColumn_Address(      categoryCity,     LOCATION_PART_Village_ID,            Messages.Tour_Location_Part_Village);
+      LOCATION_PART_Postcode         = createColumn_Address_Trail(categoryCity,     LOCATION_PART_Postcode_ID,           Messages.Tour_Location_Part_Postcode);
+
+      LOCATION_PART_Road             = createColumn_Address(      categoryRoad,     LOCATION_PART_Road_ID,               Messages.Tour_Location_Part_Road);
+      LOCATION_PART_HouseName        = createColumn_Address(      categoryRoad,     LOCATION_PART_HouseName_ID,          Messages.Tour_Location_Part_HouseName);
+      LOCATION_PART_HouseNumber      = createColumn_Address_Trail(categoryRoad,     LOCATION_PART_HouseNumber_ID,        Messages.Tour_Location_Part_HouseNumber);
+
+      LOCATION_PART_CityDistrict     = createColumn_Address(      categoryArea1,    LOCATION_PART_CityDistrict_ID,       Messages.Tour_Location_Part_CityDistrict);
+      LOCATION_PART_District         = createColumn_Address(      categoryArea1,    LOCATION_PART_District_ID,           Messages.Tour_Location_Part_District);
+      LOCATION_PART_Borough          = createColumn_Address(      categoryArea1,    LOCATION_PART_Borough_ID,            Messages.Tour_Location_Part_Borough);
+      LOCATION_PART_Suburb           = createColumn_Address(      categoryArea1,    LOCATION_PART_Suburb_ID,             Messages.Tour_Location_Part_Suburb);
+      LOCATION_PART_Subdivision      = createColumn_Address(      categoryArea1,    LOCATION_PART_Subdivision_ID,        Messages.Tour_Location_Part_Subdivision);
+
+      LOCATION_PART_Hamlet           = createColumn_Address(      categoryArea2,    LOCATION_PART_Hamlet_ID,             Messages.Tour_Location_Part_Hamlet);
+      LOCATION_PART_Croft            = createColumn_Address(      categoryArea2,    LOCATION_PART_Croft_ID,              Messages.Tour_Location_Part_Croft);
+      LOCATION_PART_IsolatedDwelling = createColumn_Address(      categoryArea2,    LOCATION_PART_IsolatedDwelling_ID,   Messages.Tour_Location_Part_IsolatedDwelling);
+
+      LOCATION_PART_Neighbourhood    = createColumn_Address(      categoryArea3,    LOCATION_PART_Neighbourhood_ID,      Messages.Tour_Location_Part_Neighbourhood);
+      LOCATION_PART_Allotments       = createColumn_Address(      categoryArea3,    LOCATION_PART_Allotments_ID,         Messages.Tour_Location_Part_Allotments);
+      LOCATION_PART_Quarter          = createColumn_Address(      categoryArea3,    LOCATION_PART_Quarter_ID,            Messages.Tour_Location_Part_Quarter);
+
+      LOCATION_PART_CityBlock        = createColumn_Address(      categoryArea4,    LOCATION_PART_CityBlock_ID,          Messages.Tour_Location_Part_CityBlock);
+      LOCATION_PART_Residential      = createColumn_Address(      categoryArea4,    LOCATION_PART_Residential_ID,        Messages.Tour_Location_Part_Residential);
+      LOCATION_PART_Farm             = createColumn_Address(      categoryArea4,    LOCATION_PART_Farm_ID,               Messages.Tour_Location_Part_Farm);
+      LOCATION_PART_Farmyard         = createColumn_Address(      categoryArea4,    LOCATION_PART_Farmyard_ID,           Messages.Tour_Location_Part_Farmyard);
+      LOCATION_PART_Industrial       = createColumn_Address(      categoryArea4,    LOCATION_PART_Industrial_ID,         Messages.Tour_Location_Part_Industrial);
+      LOCATION_PART_Commercial       = createColumn_Address(      categoryArea4,    LOCATION_PART_Commercial_ID,         Messages.Tour_Location_Part_Commercial);
+      LOCATION_PART_Retail           = createColumn_Address(      categoryArea4,    LOCATION_PART_Retail_ID,             Messages.Tour_Location_Part_Retail);
+
+      LOCATION_PART_Aerialway        = createColumn_Address(      categoryOther,    LOCATION_PART_Aerialway_ID,          Messages.Tour_Location_Part_Aerialway);
+      LOCATION_PART_Aeroway          = createColumn_Address(      categoryOther,    LOCATION_PART_Aeroway_ID,            Messages.Tour_Location_Part_Aeroway);
+      LOCATION_PART_Amenity          = createColumn_Address(      categoryOther,    LOCATION_PART_Amenity_ID,            Messages.Tour_Location_Part_Amenity);
+      LOCATION_PART_Boundary         = createColumn_Address(      categoryOther,    LOCATION_PART_Boundary_ID,           Messages.Tour_Location_Part_Boundary);
+      LOCATION_PART_Bridge           = createColumn_Address(      categoryOther,    LOCATION_PART_Bridge_ID,             Messages.Tour_Location_Part_Bridge);
+      LOCATION_PART_Club             = createColumn_Address(      categoryOther,    LOCATION_PART_Club_ID,               Messages.Tour_Location_Part_Club);
+      LOCATION_PART_Craft            = createColumn_Address(      categoryOther,    LOCATION_PART_Craft_ID,              Messages.Tour_Location_Part_Craft);
+      LOCATION_PART_Emergency        = createColumn_Address(      categoryOther,    LOCATION_PART_Emergency_ID,          Messages.Tour_Location_Part_Emergency);
+      LOCATION_PART_Historic         = createColumn_Address(      categoryOther,    LOCATION_PART_Historic_ID,           Messages.Tour_Location_Part_Historic);
+      LOCATION_PART_Landuse          = createColumn_Address(      categoryOther,    LOCATION_PART_Landuse_ID,            Messages.Tour_Location_Part_Landuse);
+      LOCATION_PART_Leisure          = createColumn_Address(      categoryOther,    LOCATION_PART_Leisure_ID,            Messages.Tour_Location_Part_Leisure);
+      LOCATION_PART_ManMade          = createColumn_Address(      categoryOther,    LOCATION_PART_ManMade_ID,            Messages.Tour_Location_Part_ManMade);
+      LOCATION_PART_Military         = createColumn_Address(      categoryOther,    LOCATION_PART_Military_ID,           Messages.Tour_Location_Part_Military);
+      LOCATION_PART_MountainPass     = createColumn_Address(      categoryOther,    LOCATION_PART_MountainPass_ID,       Messages.Tour_Location_Part_MountainPass);
+      LOCATION_PART_Natural          = createColumn_Address(      categoryOther,    LOCATION_PART_Natural_ID,            Messages.Tour_Location_Part_Natural);
+      LOCATION_PART_Office           = createColumn_Address(      categoryOther,    LOCATION_PART_Office_ID,             Messages.Tour_Location_Part_Office);
+      LOCATION_PART_Place            = createColumn_Address(      categoryOther,    LOCATION_PART_Place_ID,              Messages.Tour_Location_Part_Place);
+      LOCATION_PART_Railway          = createColumn_Address(      categoryOther,    LOCATION_PART_Railway_ID,            Messages.Tour_Location_Part_Railway);
+      LOCATION_PART_Shop             = createColumn_Address(      categoryOther,    LOCATION_PART_Shop_ID,               Messages.Tour_Location_Part_Shop);
+      LOCATION_PART_Tourism          = createColumn_Address(      categoryOther,    LOCATION_PART_Tourism_ID,            Messages.Tour_Location_Part_Tourism);
+      LOCATION_PART_Tunnel           = createColumn_Address(      categoryOther,    LOCATION_PART_Tunnel_ID,             Messages.Tour_Location_Part_Tunnel);
+      LOCATION_PART_Waterway         = createColumn_Address(      categoryOther,    LOCATION_PART_Waterway_ID,           Messages.Tour_Location_Part_Waterway);
+
+      LOCATION_PART_SettlementSmall  = createColumn_Address(      categoryCity,     LOCATION_PART_SettlementSmall_ID,    Messages.Tour_Location_Part_SettlementSmall);
+      LOCATION_PART_SettlementLarge  = createColumn_Address(      categoryCity,     LOCATION_PART_SettlementLarge_ID,    Messages.Tour_Location_Part_SettlementLarge);
 
       /*
        * Marker
@@ -4025,6 +4533,25 @@ public abstract class TableColumnFactory {
          }
       };
 
+      TOUR_LOCATION_START = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_LOCATION_START_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Tour_LocationStart_Title);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Tour_LocationStart_Title);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Tour_LocationStart_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
       TOUR_LOCATION_END = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
@@ -4044,18 +4571,37 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TOUR_LOCATION_START = new TableColumnFactory() {
+      TOUR_LOCATION_ID_START = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_LOCATION_START_ID, SWT.LEAD);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_LOCATION_ID_START_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Tour_LocationStart_Title);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Tour_LocationStart_Title);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Tour_LocationStart_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Tour_LocationID_Start);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Tour_LocationID_Start_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_LocationID_Start);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
+      TOUR_LOCATION_ID_END = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_LOCATION_ID_END_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Tour_LocationID_End);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Tour_LocationID_End_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Tour_LocationID_End);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
@@ -4575,55 +5121,55 @@ public abstract class TableColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_AVG = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_AVG = createColumn_Temperature(
             WEATHER_TEMPERATURE_AVG_ID,
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Label,
             Messages.ColumnFactory_Temperature_Avg_Tooltip);
 
-      WEATHER_TEMPERATURE_AVG_COMBINED = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_AVG_COMBINED = createColumn_Temperature(
             WEATHER_TEMPERATURE_AVG_COMBINED_ID,
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Combined_Label,
             Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
 
-      WEATHER_TEMPERATURE_AVG_DEVICE = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_AVG_DEVICE = createColumn_Temperature(
             WEATHER_TEMPERATURE_AVG_DEVICE_ID,
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Device_Label,
             Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MIN = createColumn_Temperature(
             WEATHER_TEMPERATURE_MIN_ID,
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Label,
             Messages.ColumnFactory_Temperature_Min_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN_COMBINED = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MIN_COMBINED = createColumn_Temperature(
             WEATHER_TEMPERATURE_MIN_COMBINED_ID,
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Combined_Label,
             Messages.ColumnFactory_Temperature_Min_Combined_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN_DEVICE = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MIN_DEVICE = createColumn_Temperature(
             WEATHER_TEMPERATURE_MIN_DEVICE_ID,
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Device_Label,
             Messages.ColumnFactory_Temperature_Min_Device_Tooltip);
 
-      WEATHER_TEMPERATURE_MAX = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MAX = createColumn_Temperature(
             WEATHER_TEMPERATURE_MAX_ID,
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Label,
             Messages.ColumnFactory_Temperature_Max_Tooltip);
 
-      WEATHER_TEMPERATURE_MAX_COMBINED = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MAX_COMBINED = createColumn_Temperature(
             WEATHER_TEMPERATURE_MAX_COMBINED_ID,
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Combined_Label,
             Messages.ColumnFactory_Temperature_Max_Combined_Tooltip);
 
-      WEATHER_TEMPERATURE_MAX_DEVICE = createTableColumnFactory_Temperature(
+      WEATHER_TEMPERATURE_MAX_DEVICE = createColumn_Temperature(
             WEATHER_TEMPERATURE_MAX_DEVICE_ID,
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Device_Label,
@@ -4694,12 +5240,62 @@ public abstract class TableColumnFactory {
       };
    }
 
-   private static TableColumnFactory createTableColumnFactory_Temperature(final String columnId,
-                                                                          final String symbol,
-                                                                          final String columnLabel,
-                                                                          final String columnHeaderToolTipText) {
+
+// SET_FORMATTING_ON
+
+   private static TableColumnFactory createColumn_Address(final String category,
+                                                          final String columnID,
+                                                          final String columnLabel) {
 
       return new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, columnID, SWT.LEAD);
+
+            colDef.setColumnCategory(category);
+
+            colDef.setColumnLabel(columnLabel);
+            colDef.setColumnHeaderText(columnLabel);
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+   }
+
+   private static TableColumnFactory createColumn_Address_Trail(final String category,
+                                                                final String columnID,
+                                                                final String columnLabel) {
+
+      return new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, columnID, SWT.TRAIL);
+
+            colDef.setColumnCategory(category);
+
+            colDef.setColumnLabel(columnLabel);
+            colDef.setColumnHeaderText(columnLabel);
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+   }
+
+   private static TableColumnFactory createColumn_Temperature(final String columnId,
+                                                              final String symbol,
+                                                              final String columnLabel,
+                                                              final String columnHeaderToolTipText) {
+
+      return new TableColumnFactory() {
+
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
@@ -4708,12 +5304,12 @@ public abstract class TableColumnFactory {
 
             final String unitLabel = symbol + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              columnLabel);
-            colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  columnHeaderToolTipText);
-            colDef.setColumnUnit(               unitLabel);
+            colDef.setColumnLabel(columnLabel);
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnHeaderToolTipText(columnHeaderToolTipText);
+            colDef.setColumnUnit(unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
             colDef.setValueFormats(
@@ -4727,11 +5323,10 @@ public abstract class TableColumnFactory {
       };
    }
 
-// SET_FORMATTING_ON
-
    /**
     * @param columnManager
     * @param pixelConverter
+    *
     * @return Returns a {@link TableColumnDefinition}
     */
    public abstract TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter);

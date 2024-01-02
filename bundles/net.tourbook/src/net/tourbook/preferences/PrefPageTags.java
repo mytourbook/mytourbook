@@ -50,6 +50,7 @@ import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
@@ -1297,7 +1298,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         TourLogManager.showLogView();
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
          TourLogManager.log_TITLE("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
          {

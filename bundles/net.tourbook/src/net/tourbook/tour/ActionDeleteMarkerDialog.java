@@ -39,8 +39,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteMarkerDialog extends Action {
 
-   private ITourProvider         _tourProvider;
-   private ArrayList<TourMarker> _tourMarkers;
+   private ITourProvider    _tourProvider;
+   private List<TourMarker> _tourMarkers;
 
    public ActionDeleteMarkerDialog(final ITourProvider tourProvider) {
 
@@ -53,28 +53,17 @@ public class ActionDeleteMarkerDialog extends Action {
       setEnabled(false);
    }
 
-   private void doAction() {
+   private boolean askUserConfirmation() {
 
-      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final String dialogTitle = _tourMarkers.size() == 1
+            ? Messages.Dlg_TourMarker_MsgBox_delete_marker_title
+            : Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
 
-      // check if one tour is selected
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null ||
-            _tourMarkers == null || _tourMarkers.isEmpty() || _tourMarkers.get(0) == null) {
-         return;
-      }
+      String dialogMessage;
+      if (_tourMarkers.size() == 1) {
 
-      final TourData tourData = selectedTours.get(0);
-
-      if (tourData.isManualTour()) {
-         // a manually created tour does not have time slices -> no markers
-         return;
-      }
-
-      String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
-      String dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (_tourMarkers.get(0)).getLabel());
-
-      if (_tourMarkers.size() > 1) {
-         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
+         dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (_tourMarkers.get(0)).getLabel());
+      } else {
 
          final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
          for (final TourMarker tourMarker : _tourMarkers) {
@@ -87,35 +76,57 @@ public class ActionDeleteMarkerDialog extends Action {
          dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
       }
 
-      if (MessageDialog.openQuestion(
+      return MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
             dialogTitle,
-            dialogMessage) == false) {
+            dialogMessage);
+   }
+
+   private void doAction() {
+
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+
+      if (selectedTours == null || selectedTours.isEmpty() ||
+            _tourMarkers == null || _tourMarkers.isEmpty()) {
          return;
       }
 
-      final List<TourMarker> _originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
-
-      for (final TourMarker selectedTourMarker : _tourMarkers) {
-         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
+      final boolean isUserProceeding = askUserConfirmation();
+      if (!isUserProceeding) {
+         return;
       }
 
-      final Set<TourMarker> _newTourMarkers = new HashSet<>();
+      // a manually created tour does not have time slices -> no markers
+      selectedTours.removeIf(tour -> tour.isManualTour());
 
-      for (final TourMarker tourMarker : _originalTourMarkers) {
-         _newTourMarkers.add(tourMarker.clone());
+      for (final TourData tourData : selectedTours) {
+
+         final List<TourMarker> originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
+
+         for (final TourMarker selectedTourMarker : _tourMarkers) {
+            originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
+         }
+
+         final Set<TourMarker> newTourMarkers = new HashSet<>();
+
+         for (final TourMarker tourMarker : originalTourMarkers) {
+            newTourMarkers.add(tourMarker.clone());
+         }
+
+         tourData.setTourMarkers(newTourMarkers);
       }
-
-      tourData.setTourMarkers(_newTourMarkers);
 
       TourManager.saveModifiedTours(selectedTours);
-
    }
 
    @Override
    public void run() {
       BusyIndicator.showWhile(Display.getCurrent(), () -> doAction());
+   }
 
+   public void setTourMarkers(final List<TourMarker> tourMarkers) {
+
+      _tourMarkers = tourMarkers;
    }
 
    public void setTourMarkers(final Object[] tourMarkers) {

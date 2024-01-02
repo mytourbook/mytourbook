@@ -36,8 +36,8 @@ public class TourMarkerViewTests extends UITest {
 
       Utils.showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
-            .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   2").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       final SWTBotView tourEditorView = Utils.showView(bot, Utils.VIEW_NAME_TOUREDITOR);
@@ -68,7 +68,7 @@ public class TourMarkerViewTests extends UITest {
 
       tableMarkers.select(0);
       tableMarkers.contextMenu(Messages.App_Action_DeleteTourMarker).click();
-      bot.button("Yes").click(); //$NON-NLS-1$
+      Utils.clickYesButton(bot);
 
       //Make sure that the tour contains 2 markers
       assertEquals(2, tableMarkers.rowCount());

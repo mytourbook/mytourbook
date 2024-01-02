@@ -28,6 +28,7 @@ public class OtherMessages {
 
 // SET_FORMATTING_OFF
 
+   public static final String APP_ACTION_APPLY_AND_CLOSE                   = net.tourbook.common.Messages.App_Action_ApplyAndClose;
    public static final String APP_ACTION_CLOSE_TOOLTIP                     = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    public static final String APP_ACTION_RESTORE_DEFAULT                   = net.tourbook.common.Messages.App_Action_RestoreDefault;
 
@@ -163,11 +164,11 @@ public class OtherMessages {
    public static final String TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME           = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
    public static final String TOUR_TOOLTIP_LABEL_DISTANCE                  = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    public static final String TOUR_TOOLTIP_LABEL_ELEVATION_UP              = net.tourbook.ui.Messages.Tour_Tooltip_Label_AltitudeUp;
+   public static final String TOUR_TOOLTIP_LABEL_LOCATION_START            = net.tourbook.ui.Messages.Tour_Tooltip_Label_LocationStart;
+   public static final String TOUR_TOOLTIP_LABEL_LOCATION_END              = net.tourbook.ui.Messages.Tour_Tooltip_Label_LocationEnd;
    public static final String TOUR_TOOLTIP_LABEL_MOVING_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
    public static final String TOUR_TOOLTIP_LABEL_NO_GEO_TOUR               = net.tourbook.ui.Messages.Tour_Tooltip_Label_NoGeoTour;
    public static final String TOUR_TOOLTIP_LABEL_RECORDED_TIME             = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
-
-
 
    public static final String VALUE_UNIT_CALORIES                         = net.tourbook.ui.Messages.Value_Unit_Calories;
    public static final String VALUE_UNIT_CADENCE                          = net.tourbook.ui.Messages.Value_Unit_Cadence;
@@ -185,11 +186,12 @@ public class OtherMessages {
    public static final String THEME_FONT_LOGGING_PREVIEW_TEXT             = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
    public static final String THEME_FONT_LOGGING                          = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
-   public static final String WEATHER_AIRQUAlITY_1_GOOD    = net.tourbook.common.Messages.Weather_AirQuality_1_Good;
-   public static final String WEATHER_AIRQUAlITY_1_FAIR    = net.tourbook.common.Messages.Weather_AirQuality_2_Fair;
-   public static final String WEATHER_AIRQUAlITY_1_MODERATE    = net.tourbook.common.Messages.Weather_AirQuality_3_Moderate;
-   public static final String WEATHER_AIRQUAlITY_1_POOR    = net.tourbook.common.Messages.Weather_AirQuality_4_Poor;
-   public static final String WEATHER_AIRQUAlITY_1_VERYPOOR    = net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor;
+   public static final String WEATHER_AIRQUAlITY_0_IS_NOT_DEFINED         = net.tourbook.common.Messages.Weather_AirQuality_0_IsNotDefined;
+   public static final String WEATHER_AIRQUAlITY_1_GOOD                   = net.tourbook.common.Messages.Weather_AirQuality_1_Good;
+   public static final String WEATHER_AIRQUAlITY_2_FAIR                   = net.tourbook.common.Messages.Weather_AirQuality_2_Fair;
+   public static final String WEATHER_AIRQUAlITY_3_MODERATE               = net.tourbook.common.Messages.Weather_AirQuality_3_Moderate;
+   public static final String WEATHER_AIRQUAlITY_4_POOR                   = net.tourbook.common.Messages.Weather_AirQuality_4_Poor;
+   public static final String WEATHER_AIRQUAlITY_5_VERYPOOR               = net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor;
 
 // SET_FORMATTING_ON
 }
