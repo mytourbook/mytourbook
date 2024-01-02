@@ -40,7 +40,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -71,10 +70,14 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
    //put a link with "Not finding the product you used ? You can create it here"
    //https://world.openfoodfacts.org/cgi/product.pl
 
+   // set the default size
+
    //todo fb
    // enable the "add" button only if an element is selected in the table
    //todo fb
    //Sync error after adding a 2nd product
+
+   public static final String            ID                     = "net.tourbook.ui.views.nutrition.DialogSearchProduct";                         //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$
@@ -85,7 +88,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
    private long                          _tourId;
 
-   private PixelConverter                _pc;
    private boolean                       _isInUIInit;
 
    /*
@@ -179,10 +181,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       }
    }
 
-   /**
-    * @param parentShell
-    * @param tourId
-    */
    public DialogSearchProduct(final Shell parentShell, final long tourId) {
 
       super(parentShell);
@@ -242,13 +240,13 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       // create UI widgets
       super.create();
 
-//      _isInUIInit = true;
-//      {
-//         restoreState();
-//      }
-//      _isInUIInit = false;
+      _isInUIInit = true;
+      {
+         restoreState();
+      }
+      _isInUIInit = false;
 
-      enableActions();
+      enableControls();
 
    }
 
@@ -268,7 +266,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       createUI(dlgContainer);
 
       // this part is a selection provider
-      _postSelectionProvider = new PostSelectionProvider("ID");
+      _postSelectionProvider = new PostSelectionProvider(ID);
 
       //todo fb
       // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
@@ -341,19 +339,19 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       /*
        * table viewer: products
        */
-      final Table productsTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      final Table productsTable = new Table(parent, SWT.SINGLE | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
       // column: category
       final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
-      columnCategory.setText("Category"); //$NON-NLS-1$
+      columnCategory.setText(Messages.Dialog_SearchProduct_TableHeader_Code);
       columnCategory.setWidth(75);
 
       // column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText("Name"); //$NON-NLS-1$
+      columnName.setText(Messages.Dialog_SearchProduct_TableHeader_Name);
       columnName.setWidth(300);
 
       _productsViewer = new TableViewer(productsTable);
@@ -368,26 +366,21 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          final Product selectedProduct = (Product) firstElement;
 
          _postSelectionProvider.setSelection(selectedProduct);
+         enableControls();
       });
    }
 
-   private void enableActions() {
+   private void enableControls() {
 
-      _btnAdd.setEnabled(_productsViewer.getSelection() != null);
+      final ISelection selection = _productsViewer.getSelection();
+      _btnAdd.setEnabled(!selection.isEmpty());
    }
 
    @Override
    protected IDialogSettings getDialogBoundsSettings() {
 
       // keep window size and position
-//		return null;
       return _state;
-   }
-
-   @Override
-   protected void okPressed() {
-
-      super.okPressed();
    }
 
    private void onAddProduct() {
@@ -397,9 +390,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          final ISelection selection = _productsViewer.getSelection();
          final Object firstElement = ((IStructuredSelection) selection).getFirstElement();
          final Product selectedProduct = (Product) firstElement;
-
-//         final OpenFoodFactsWrapperImpl wrapper = new OpenFoodFactsWrapperImpl();
-//         final ProductResponse productResponse = wrapper.fetchProductByCode(selectedProduct.code());
 
          final TourData tourData = TourManager.getTour(_tourId);
          final TourNutritionProduct tfp = new TourNutritionProduct(tourData, selectedProduct);
