@@ -15,6 +15,7 @@
  *******************************************************************************/
 package preferences;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -26,7 +27,11 @@ public class PrefPageNutritionTests extends UITest {
    void openCloudPages() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Nutrition").select(); //$NON-NLS-1$
+      SWTBotTreeItem nutritionTreeItem = bot.tree().getTreeItem("Nutrition").select(); //$NON-NLS-1$
+
+      nutritionTreeItem = nutritionTreeItem.expand();
+
+      nutritionTreeItem.getNode("Beverage Containers").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }

@@ -33,6 +33,7 @@ import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -92,39 +93,39 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String                 ID                     = "net.tourbook.cloud.PrefPageBeverageContainers";            //$NON-NLS-1$
-   private static final String[]              SORT_PROPERTY      = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
+   public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers";            //$NON-NLS-1$
+   private static final String[]       SORT_PROPERTY      = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
 
-   private final IPreferenceStore             _prefStore             = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
 
-   private GraphColorPainter                  _graphColorPainter;
+   private GraphColorPainter           _graphColorPainter;
 
-   private ColorDefinition                    _expandedItem;
+   private ColorDefinition             _expandedItem;
 
-   private GraphColorItem                     _selectedGraphColor;
-   private ArrayList<TourType>                _dbTourTypes;
+   private GraphColorItem              _selectedGraphColor;
+   private List<TourBeverageContainer> _dbTourTypes;
 
-   private boolean                            _isModified;
-   private boolean                            _isLayoutModified;
+   private boolean                     _isModified;
+   private boolean                     _isLayoutModified;
 
-   private boolean                            _isNavigationKeyPressed;
+   private boolean                     _isNavigationKeyPressed;
 
-   private boolean                            _canModifyTourType     = true;
+   private boolean                     _canModifyTourType = true;
 
    /*
     * UI controls
     */
-   private TreeViewer            _tourTypeViewer;
+   private TreeViewer _tourTypeViewer;
 
-   private Button                _btnAdd;
-   private Button                _btnDelete;
-   private Button                _btnRename;
+   private Button     _btnAdd;
+   private Button     _btnDelete;
+   private Button     _btnRename;
 
-   private Combo                 _comboFillColor1;
-   private Combo                 _comboFillColor2;
-   private Combo                 _comboFillLayout;
-   private Combo                 _comboBorderColor;
-   private Combo                 _comboBorderLayout;
+   private Combo      _comboFillColor1;
+   private Combo      _comboFillColor2;
+   private Combo      _comboFillLayout;
+   private Combo      _comboBorderColor;
+   private Combo      _comboBorderLayout;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -223,19 +224,16 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          return label;
       }
 
-
       final Composite ui = createUI(parent);
 
       fillUI();
 
       // read tour types from the database
-      _dbTourTypes = TourDatabase.getAllTourTypes();
+      _dbTourTypes = TourDatabase.getTourBeverageContainers();
 
       if (_dbTourTypes != null) {
 
-         for (final TourType tourType : _dbTourTypes) {
-
-            final long typeId = tourType.getTypeId();
+         for (final TourBeverageContainer tourType : _dbTourTypes) {
 
          }
       }
@@ -293,6 +291,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       // must be set after the viewer is created
       return container;
    }
+
    private void createUI_10_ColorViewer(final Composite parent) {
 
       final Display display = parent.getDisplay();
@@ -490,8 +489,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    }
 
    private void createUI_30_ImageLayout(final Composite parent) {
-
-
 
       final GridDataFactory gridData_AlignVerticalCenter = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER);
@@ -846,8 +843,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       return selectedColorDefinition;
    }
 
-
-
    /**
     * @return Returns the selected color definitions in the color viewer
     */
@@ -938,7 +933,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    }
 
-
    @Override
    public boolean okToLeave() {
 
@@ -967,7 +961,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          _selectedGraphColor = graphColor;
 
-
          if (isNavigationKeyPressed == false) {
 
             // open color dialog only when not navigated with the keyboard
@@ -986,7 +979,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       setFocusToViewer();
    }
-
 
    private void onTourType_Add() {
 
@@ -1044,7 +1036,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          createGraphColorItems(newColorDefinition);
 
          // update internal tour type list
-         _dbTourTypes.add(savedTourType);
+         //_dbTourTypes.add(savedTourType);
 
          // update UI
          _tourTypeViewer.add(this, newColorDefinition);
@@ -1156,7 +1148,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       // replace tour type with new one
       _dbTourTypes.remove(oldTourType);
-      _dbTourTypes.add(savedTourType);
+      //_dbTourTypes.add(savedTourType);
 
       /*
        * Update UI
@@ -1219,7 +1211,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          // replace tour type with new one
          _dbTourTypes.remove(selectedTourType);
-         _dbTourTypes.add(savedTourType);
+         // _dbTourTypes.add(savedTourType);
 
          // update viewer, resort types when necessary
          _tourTypeViewer.update(selectedColorDefinition, SORT_PROPERTY);
