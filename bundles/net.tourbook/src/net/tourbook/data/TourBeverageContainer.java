@@ -48,4 +48,8 @@ public class TourBeverageContainer {
    public String getName() {
       return name;
    }
+
+   public double getCapacity() {
+      return capacity;
+   }
 }
