@@ -85,50 +85,8 @@ public class TourNutritionProduct {
       calories = nutriments.getEnergyKcalServing();
       sodium = nutriments.getSodiumServing();
       isBeverage = product.nutriScoreData() != null ? product.nutriScoreData().isBeverage() : false;
-   }
 
-   /**
-    * Tourmarker is compared with the {@link TourNutritionProduct#markerId} or
-    * {@link TourNutritionProduct#_createId}
-    * <p>
-    * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
-    * markers are deleted</b>
-    *
-    * @see java.lang.Object#equals(java.lang.Object)
-    */
-   @Override
-   public boolean equals(final Object obj) {
-
-      if (this == obj) {
-         return true;
-      }
-      if (obj == null) {
-         return false;
-      }
-      if (!(obj instanceof TourNutritionProduct)) {
-         return false;
-      }
-
-      final TourNutritionProduct otherMarker = (TourNutritionProduct) obj;
-
-      if (productCode == TourDatabase.ENTITY_IS_NOT_SAVED) {
-
-         // marker was create or imported
-
-//         if (_createId == otherMarker._createId) {
-//            return true;
-//         }
-
-      } else {
-
-         // marker is from the database
-
-         if (productCode == otherMarker.productCode) {
-            return true;
-         }
-      }
-
-      return false;
+      _createId = _createCounter.incrementAndGet();
    }
 
    public int getCalories() {

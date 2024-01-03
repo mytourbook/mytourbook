@@ -15,121 +15,37 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourBeverageContainer implements Comparable<Object>, Serializable {
+public class TourBeverageContainer {
 
-   private static final long serialVersionUID = 1L;
-
-   //todo fb remove all the references to marker
-   /**
-    * manually created marker or imported marker create a unique id to identify them, saved marker
-    * are compared with the marker id
-    */
-   private static final AtomicInteger _createCounter = new AtomicInteger();
-
-   /**
-    * Unique id for manually created markers because the {@link #productCode} is 0 when the marker
-    * is
-    * not persisted
-    */
-   @Transient
-   private long                       _createId      = 0;
    /**
     * Unique id for the {@link TourBeverageContainer} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       containerCode  = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long   containerCode = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   private String                     name;
+   private String name;
 
    // in mL?
    private double capacity;
 
    public TourBeverageContainer() {}
 
-   public TourBeverageContainer(final String name) {
+   public TourBeverageContainer(final String name, final double capacity) {
 
       this.name = name;
-   }
-
-   @Override
-   public int compareTo(final Object other) {
-
-      // default sorting for tour types is by name
-      if (other instanceof final TourBeverageContainer otherTourBeverageContainer) {
-
-         return name.compareTo(otherTourBeverageContainer.getName());
-      }
-
-      return 0;
-   }
-
-   /**
-    * TourBeverageContainer is compared with the {@link TourBeverageContainer#containerCode} or
-    * {@link TourBeverageContainer#_createId}
-    * <p>
-    * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
-    * markers are deleted</b>
-    *
-    * @see java.lang.Object#equals(java.lang.Object)
-    */
-   @Override
-   public boolean equals(final Object obj) {
-
-      if (this == obj) {
-         return true;
-      }
-      if (obj == null) {
-         return false;
-      }
-      if (!(obj instanceof TourBeverageContainer)) {
-         return false;
-      }
-
-      final TourBeverageContainer otherMarker = (TourBeverageContainer) obj;
-
-      if (containerCode == TourDatabase.ENTITY_IS_NOT_SAVED) {
-
-         // marker was create or imported
-
-//         if (_createId == otherMarker._createId) {
-//            return true;
-//         }
-
-      } else {
-
-         // marker is from the database
-
-         if (containerCode == otherMarker.containerCode) {
-            return true;
-         }
-      }
-
-      return false;
+      this.capacity = capacity;
    }
 
    public String getName() {
       return name;
    }
-
-   public void setupDeepClone(final TourData tourDataFromClone) {
-
-      _createId = _createCounter.incrementAndGet();
-
-      containerCode = TourDatabase.ENTITY_IS_NOT_SAVED;
-
-   }
-
 }

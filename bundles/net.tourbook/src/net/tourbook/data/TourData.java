@@ -10811,10 +10811,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourEndTime;
    }
 
-   public Set<TourNutritionProduct> getTourNutritionProducts() {
-      return tourNutritionProducts;
-   }
-
    /**
     * @return Returns the unique key in the database for this {@link TourData} entity
     */
@@ -10855,6 +10851,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             (tourMarker1, tourMarker2) -> tourMarker1.getSerieIndex() - tourMarker2.getSerieIndex());
 
       return _sortedMarkers;
+   }
+
+   public Set<TourNutritionProduct> getTourNutritionProducts() {
+      return tourNutritionProducts;
    }
 
    /**
