@@ -41,15 +41,9 @@ import net.tourbook.preferences.GraphColorPainter;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeBorder;
-import net.tourbook.tourType.TourTypeColor;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeImageConfig;
-import net.tourbook.tourType.TourTypeLayout;
 import net.tourbook.tourType.TourTypeManager;
-import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
-import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
-import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -80,7 +74,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -120,12 +113,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private Button     _btnAdd;
    private Button     _btnDelete;
    private Button     _btnRename;
-
-   private Combo      _comboFillColor1;
-   private Combo      _comboFillColor2;
-   private Combo      _comboFillLayout;
-   private Combo      _comboBorderColor;
-   private Combo      _comboBorderLayout;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -226,7 +213,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final Composite ui = createUI(parent);
 
-      fillUI();
+      //fillUI();
 
       // read tour types from the database
       _dbTourTypes = TourDatabase.getTourBeverageContainers();
@@ -285,7 +272,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       {
          createUI_10_ColorViewer(container);
          createUI_20_Actions(container);
-         createUI_30_ImageLayout(container);
       }
 
       // must be set after the viewer is created
@@ -486,69 +472,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
             setButtonLayoutData(_btnDelete);
          }
       }
-   }
-
-   private void createUI_30_ImageLayout(final Composite parent) {
-
-      final GridDataFactory gridData_AlignVerticalCenter = GridDataFactory.fillDefaults()
-            .align(SWT.FILL, SWT.CENTER);
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            /*
-             * Image layout
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_TourTypes_Label_ImageLayout);
-            gridData_AlignVerticalCenter.applyTo(label);
-
-            final Composite containerImage = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerImage);
-            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerImage);
-            {
-               // combo fill layout
-               _comboFillLayout = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
-               _comboFillLayout.setVisibleItemCount(20);
-
-               // combo color 1
-               _comboFillColor1 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
-               _comboFillColor1.setVisibleItemCount(20);
-
-               // combo color 2
-               _comboFillColor2 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
-               _comboFillColor2.setVisibleItemCount(20);
-            }
-         }
-         {
-            /*
-             * Border layout
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_TourTypes_Label_BorderLayout);
-            gridData_AlignVerticalCenter.applyTo(label);
-
-            final Composite containerBorder = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBorder);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorder);
-            {
-               // combo
-               _comboBorderLayout = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
-               _comboBorderLayout.setVisibleItemCount(20);
-
-               // combo color
-               _comboBorderColor = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
-               _comboBorderColor.setVisibleItemCount(20);
-            }
-         }
-      }
-
    }
 
    /**
@@ -752,40 +675,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       _btnRename.setEnabled(numSelectedItems == 1);
    }
 
-   private void enableLayoutControls() {
-
-      final TourTypeLayoutData layoutData = getSelectedTourTypeLayoutData();
-
-      _comboFillColor1.setEnabled(layoutData.isColor1);
-      _comboFillColor2.setEnabled(layoutData.isColor2);
-   }
-
-   private void fillUI() {
-
-      /*
-       * Image layout
-       */
-      for (final TourTypeLayoutData data : TourTypeManager.getAllTourTypeLayoutData()) {
-         _comboFillLayout.add(data.label);
-      }
-      for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
-         _comboFillColor1.add(data.label);
-      }
-      for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
-         _comboFillColor2.add(data.label);
-      }
-
-      /*
-       * Border layout
-       */
-      for (final TourTypeBorderData data : TourTypeManager.getAllTourTypeBorderData()) {
-         _comboBorderLayout.add(data.label);
-      }
-      for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
-         _comboBorderColor.add(data.label);
-      }
-   }
-
    private void fireModifyEvent() {
 
       if (_isModified) {
@@ -867,52 +756,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
 
       return allSelectedColorDefinitions;
-   }
-
-   private TourTypeBorder getSelectedTourTypeBorderLayout() {
-
-      final int selectedIndex = _comboBorderLayout.getSelectionIndex();
-
-      if (selectedIndex < 0) {
-         return TourTypeManager.DEFAULT_BORDER_LAYOUT;
-      }
-
-      return TourTypeManager.getAllTourTypeBorderData()[selectedIndex].tourTypeBorder;
-   }
-
-   private TourTypeColor getSelectedTourTypeColor(final Combo comboColor) {
-
-      final int selectedIndex = comboColor.getSelectionIndex();
-
-      if (selectedIndex < 0) {
-         return TourTypeManager.DEFAULT_BORDER_COLOR;
-      }
-
-      return TourTypeManager.getAllTourTypeColorData()[selectedIndex].tourTypeColor;
-   }
-
-   private TourTypeLayout getSelectedTourTypeLayout() {
-
-      final int selectedIndex = _comboFillLayout.getSelectionIndex();
-
-      if (selectedIndex < 0) {
-         return TourTypeManager.DEFAULT_IMAGE_LAYOUT;
-      }
-
-      return TourTypeManager.getAllTourTypeLayoutData()[selectedIndex].tourTypeLayout;
-   }
-
-   private TourTypeLayoutData getSelectedTourTypeLayoutData() {
-
-      final TourTypeLayoutData[] allTourTypeLayoutData = TourTypeManager.getAllTourTypeLayoutData();
-
-      final int selectedIndex = _comboFillLayout.getSelectionIndex();
-
-      if (selectedIndex < 0) {
-         return allTourTypeLayoutData[0];
-      }
-
-      return allTourTypeLayoutData[selectedIndex];
    }
 
    @Override
@@ -1238,13 +1081,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       if (_canModifyTourType) {
 
-         _comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_BORDER_COLOR));
-         _comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(TourTypeManager.DEFAULT_BORDER_LAYOUT));
-
-         _comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR1));
-         _comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR2));
-         _comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(TourTypeManager.DEFAULT_IMAGE_LAYOUT));
-
       }
 
       super.performDefaults();
@@ -1265,14 +1101,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
 
-      _comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(imageConfig.borderColor));
-      _comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(imageConfig.borderLayout));
-
-      _comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor1));
-      _comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor2));
-      _comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(imageConfig.imageLayout));
-
-      enableLayoutControls();
    }
 
    private TourType saveTourType(final TourType tourType) {
