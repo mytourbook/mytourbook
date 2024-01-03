@@ -317,13 +317,21 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-         new TourLocationProfile("0 : Name",   18,
+         new TourLocationProfile("1 : Name",   18,
 
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("1 : Street + House #",   18,
+         new TourLocationProfile("2 : Street + House #",   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("3: Smallest Settlement",   18,
+
+            LocationPartID.settlementSmall),
+
+         new TourLocationProfile("4: Largest Settlement",   18,
+
+            LocationPartID.settlementLarge),
 
          new TourLocationProfile("A : State",   18,
 
@@ -340,8 +348,8 @@ public class TourLocationManager {
          new TourLocationProfile("C : Town / Borough",   12,
 
             LocationPartID.settlementLarge,
-            LocationPartID.OSM_NAME,
-            LocationPartID.town),
+            LocationPartID.town,
+            LocationPartID.OSM_NAME),
 
          new TourLocationProfile("D : Village / Suburb",   13,
 
@@ -387,7 +395,7 @@ public class TourLocationManager {
 
       _allLocationProfiles.addAll(Arrays.asList(allProfiles));
 
-      _defaultProfile = allProfiles[4];
+      _defaultProfile = allProfiles[6];
    }
 
    /**
@@ -749,12 +757,12 @@ public class TourLocationManager {
     * Firstly the locations are deleted and the contained tours are retrieved again
     *
     * @param allLocations
-    * @param isSkipFirstLocation
+    * @param isOneAction
     *
     * @return
     */
    public static boolean deleteAndReapply(final List<TourLocation> allLocations,
-                                          final boolean isSkipFirstLocation) {
+                                          final boolean isOneAction) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -768,7 +776,7 @@ public class TourLocationManager {
 
       List<TourLocation> allDelReapplyLocations;
 
-      if (isSkipFirstLocation) {
+      if (isOneAction) {
 
          final int numLocations = allLocations.size();
 
@@ -789,7 +797,7 @@ public class TourLocationManager {
       // get all tour IDs before locations are deleted !!!
       final ArrayList<Long> allTourIds = getToursWithLocations(allDelReapplyLocations);
 
-      if (deleteTourLocations(allDelReapplyLocations) == false) {
+      if (deleteTourLocations(allDelReapplyLocations, isOneAction) == false) {
          return false;
       }
 
@@ -804,7 +812,7 @@ public class TourLocationManager {
             true, // is set start
             true, // is set end
 
-            true // isForceReloadLocation
+            true // isOneAction
       );
 
       return true;
@@ -812,10 +820,11 @@ public class TourLocationManager {
 
    /**
     * @param allLocations
+    * @param isOneAction
     *
     * @return Returns <code>true</code> when tour locations were deleted
     */
-   public static boolean deleteTourLocations(final List<TourLocation> allLocations) {
+   public static boolean deleteTourLocations(final List<TourLocation> allLocations, final boolean isOneAction) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -873,7 +882,7 @@ public class TourLocationManager {
 
          BusyIndicator.showWhile(display, () -> {
 
-            if (deleteTourLocations_10(allLocations)) {
+            if (deleteTourLocations_10(allLocations, isOneAction)) {
 
                TourManager.getInstance().clearTourDataCache();
 
@@ -885,9 +894,22 @@ public class TourLocationManager {
       return returnValue[0];
    }
 
-   private static boolean deleteTourLocations_10(final List<TourLocation> allLocations) {
+   private static boolean deleteTourLocations_10(final List<TourLocation> allLocations, final boolean isOneAction) {
 
       boolean returnResult = false;
+
+      String sqlTourStartPlace = UI.EMPTY_STRING;
+      String sqlTourEndPlace = UI.EMPTY_STRING;
+
+      if (isOneAction) {
+
+         // don't remove start/end location text
+
+      } else {
+
+         sqlTourStartPlace = " tourStartPlace    = NULL,"; //$NON-NLS-1$
+         sqlTourEndPlace = " tourEndPlace       = NULL,"; //$NON-NLS-1$
+      }
 
       PreparedStatement prepStmt_TourData_Start = null;
       PreparedStatement prepStmt_TourData_End = null;
@@ -902,7 +924,7 @@ public class TourLocationManager {
 
                + "SET" + NL //                                             //$NON-NLS-1$
 
-               + " tourStartPlace               = NULL," + NL //           //$NON-NLS-1$
+               + sqlTourStartPlace + NL //
                + " tourLocationStart_LocationID = NULL" + NL //            //$NON-NLS-1$
 
                + "WHERE tourLocationStart_LocationID = ?" + NL //       1  //$NON-NLS-1$
@@ -914,7 +936,7 @@ public class TourLocationManager {
 
                + "SET" + NL //                                             //$NON-NLS-1$
 
-               + " tourEndPlace               = NULL," + NL //             //$NON-NLS-1$
+               + sqlTourEndPlace + NL //
                + " tourLocationEnd_LocationID = NULL" + NL //              //$NON-NLS-1$
 
                + "WHERE tourLocationEnd_LocationID = ?" + NL //         1  //$NON-NLS-1$
@@ -1870,7 +1892,7 @@ public class TourLocationManager {
     * @param locationProfile
     * @param isSetStartLocation
     * @param isSetEndLocation
-    * @param isForceReloadLocation
+    * @param isOneAction
     *           When <code>true</code> then existing locations are ignored and retrieved again from
     *           the DB or location provider
     */
@@ -1878,7 +1900,7 @@ public class TourLocationManager {
                                        final TourLocationProfile locationProfile,
                                        final boolean isSetStartLocation,
                                        final boolean isSetEndLocation,
-                                       final boolean isForceReloadLocation) {
+                                       final boolean isOneAction) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -1930,8 +1952,11 @@ public class TourLocationManager {
 
                      waitingTime = 0;
 
-                     if (isForceReloadLocation) {
-                        tourData.setTourStartPlace(null);
+                     if (isOneAction) {
+
+                        // keep location text
+//                      tourData.setTourStartPlace(null);
+
                         tourData.setTourLocationStart(null);
                      }
 
@@ -1956,7 +1981,10 @@ public class TourLocationManager {
 
                         final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
 
-                        tourData.setTourStartPlace(startLocationText);
+                        if (isOneAction == false) {
+                           tourData.setTourStartPlace(startLocationText);
+                        }
+
                         tourData.setTourLocationStart(tourLocationStart);
 
                         isModified = true;
@@ -1973,8 +2001,11 @@ public class TourLocationManager {
 
                      waitingTime = 0;
 
-                     if (isForceReloadLocation) {
-                        tourData.setTourEndPlace(null);
+                     if (isOneAction) {
+
+                        // keep location text
+//                      tourData.setTourEndPlace(null);
+
                         tourData.setTourLocationEnd(null);
                      }
 
@@ -2002,7 +2033,10 @@ public class TourLocationManager {
 
                         final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
 
-                        tourData.setTourEndPlace(endLocationText);
+                        if (isOneAction == false) {
+                           tourData.setTourEndPlace(endLocationText);
+                        }
+
                         tourData.setTourLocationEnd(tourLocationEnd);
 
                         isModified = true;

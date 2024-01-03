@@ -31,7 +31,6 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
 
@@ -90,7 +89,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private PixelConverter                  _pc;
 
-   private TourData                        _tourData;
    private boolean                         _isStartLocation;
 
    private TableViewer                     _profileViewer;
@@ -105,6 +103,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private List<MT_DLItem>                 _allDualListItems = new ArrayList<>();
 
+   /**
+    * Can be <code>null</code>
+    */
    private ITourLocationConsumer           _tourLocationConsumer;
    private TourLocation                    _tourLocation;
 
@@ -251,7 +252,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
     * @param isStartLocation
     */
    public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
-                                   final TourData tourData,
+                                   final TourLocation tourLocation,
                                    final Control ownerControl,
                                    final Rectangle ownerBounds,
                                    final IDialogSettings state,
@@ -262,12 +263,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _ownerBounds = ownerBounds;
 
       _tourLocationConsumer = tourLocationConsumer;
+      _tourLocation = tourLocation;
       _isStartLocation = isStartLocation;
-      _tourData = tourData;
-
-      _tourLocation = isStartLocation
-            ? _tourData.getTourLocationStart()
-            : _tourData.getTourLocationEnd();
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);

@@ -570,11 +570,20 @@ public class ActionSetStartEndLocation extends SubMenu {
          _slideoutLocationProfiles = null;
       }
 
+      final boolean isStartLocation = _isStartLocationInContextMenu == null
+            ? true
+            : _isStartLocationInContextMenu;
+
       final List<TourData> selectedTours = _tourProvider.getSelectedTours();
       final TourData tourData = selectedTours.get(0);
 
-      // ensure that location data are available
-      final TourLocationData tourLocationData = tourData.tourLocationData_Start;
+      /*
+       * Ensure that location data are available
+       */
+      TourLocationData tourLocationData = isStartLocation
+            ? tourData.tourLocationData_Start
+            : tourData.tourLocationData_End;
+
       if (tourLocationData == null) {
 
          final double[] latitudeSerie = tourData.latitudeSerie;
@@ -590,9 +599,14 @@ public class ActionSetStartEndLocation extends SubMenu {
             return;
          }
 
+         final int lastIndex = latitudeSerie.length - 1;
+
+         final double latitude = isStartLocation ? latitudeSerie[0] : latitudeSerie[lastIndex];
+         final double longitude = isStartLocation ? longitudeSerie[0] : longitudeSerie[lastIndex];
+
          final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
-               latitudeSerie[0],
-               longitudeSerie[0],
+               latitude,
+               longitude,
                null,
                TourLocationManager.getProfileZoomlevel());
 
@@ -600,20 +614,35 @@ public class ActionSetStartEndLocation extends SubMenu {
             return;
          }
 
-         tourData.setTourLocationStart(retrievedLocationData.tourLocation);
-         tourData.tourLocationData_Start = retrievedLocationData;
+         tourLocationData = retrievedLocationData;
+      }
+
+      final TourLocation tourLocation = tourLocationData.tourLocation;
+
+      if (tourLocation == null) {
+         return;
+      }
+
+      if (isStartLocation) {
+
+         tourData.setTourLocationStart(tourLocation);
+         tourData.tourLocationData_Start = tourLocationData;
+
+      } else {
+
+         tourData.setTourLocationEnd(tourLocation);
+         tourData.tourLocationData_End = tourLocationData;
       }
 
       final Point cursorLocation = Display.getCurrent().getCursorLocation();
       final Rectangle ownerBounds = new Rectangle(cursorLocation.x, cursorLocation.y, 0, 0);
 
-      final boolean isStartLocation = _isStartLocationInContextMenu == null ? true : _isStartLocationInContextMenu;
-
       // !!! must be created lately otherwise the UI is not fully setup !!!
       _slideoutLocationProfiles = new SlideoutLocationProfiles(
 
             null,
-            tourData,
+            tourLocation,
+
             _ownerControl,
             ownerBounds,
             _state,
@@ -646,95 +675,8 @@ public class ActionSetStartEndLocation extends SubMenu {
             isSetStartLocation,
             isSetEndLocation,
 
-            false // isForceReloadLocation
+            false // isOneAction
       );
-   }
-
-   private TourLocation[] checkSameLocations() {
-
-      TourLocation tourLocationStart = null;
-      TourLocation tourLocationEnd = null;
-
-      boolean canSetStartLocation = true;
-      boolean canSetEndLocation = true;
-
-      for (final TourData tourData : _allSelectedTours) {
-
-         final TourLocation locationStart = tourData.getTourLocationStart();
-         final TourLocation locationEnd = tourData.getTourLocationEnd();
-
-         if (tourLocationStart == null) {
-
-            // location is not yet set
-
-            if (canSetStartLocation) {
-
-               tourLocationStart = locationStart;
-            }
-
-         } else {
-
-            // location is already set
-
-            if (locationStart == null) {
-
-               // needs to be location which can be compared
-
-            } else {
-
-               if (tourLocationStart.getLocationId() == locationStart.getLocationId()) {
-
-                  // it's the same location
-
-               } else {
-
-                  // it's a different location -> there is no common location
-
-                  tourLocationStart = null;
-
-                  canSetStartLocation = false;
-               }
-            }
-
-         }
-
-         if (tourLocationEnd == null) {
-
-            // location is not yet set
-
-            if (canSetEndLocation) {
-
-               tourLocationEnd = locationEnd;
-            }
-
-         } else {
-
-            // location is already set
-
-            if (locationEnd == null) {
-
-               // needs to be location which can be compared
-
-            } else {
-
-               if (tourLocationEnd.getLocationId() == locationEnd.getLocationId()) {
-
-                  // it's the same location
-
-               } else {
-
-                  // it's a different location -> there is no common location
-
-                  tourLocationEnd = null;
-
-                  canSetEndLocation = false;
-               }
-            }
-
-         }
-      }
-
-      return new TourLocation[] { tourLocationStart, tourLocationEnd };
    }
 
    private void createActions() {
@@ -842,10 +784,19 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       if (_allSelectedTours.size() == 1) {
 
-         final TourData tourData = _allSelectedTours.get(0);
+         final TourData firstTour = _allSelectedTours.get(0);
 
-         tourLocationStart = tourData.getTourLocationStart();
-         tourLocationEnd = tourData.getTourLocationEnd();
+         tourLocationStart = firstTour.getTourLocationStart();
+         tourLocationEnd = firstTour.getTourLocationEnd();
+
+      } else {
+
+         // check if locations of all tours are the same
+
+         final TourLocation[] sameLocations = getSameLocations();
+
+         tourLocationStart = sameLocations[0];
+         tourLocationEnd = sameLocations[1];
       }
 
       final boolean isStartLocationAvailable = tourLocationStart != null;
@@ -923,22 +874,31 @@ public class ActionSetStartEndLocation extends SubMenu {
          LocationPartID startPartID = null;
          LocationPartID endPartID = null;
 
-         if (isSetStartLocation && isSetEndLocation && isStartLocationAvailable && isEndLocationAvailable) {
+         if (isSetStartLocation && isSetEndLocation) {
 
-            final String locationText = tourLocationStart == tourLocationEnd
+            if (isStartLocationAvailable && isEndLocationAvailable) {
 
-                  // both locations are the same, display only one location
-                  ? partItem.locationLabel_Start
+               final String locationText = tourLocationStart == tourLocationEnd
 
-                  : partItem.locationLabel_Start + LOCATION_SEPARATOR + partItem.locationLabel_End;
+                     // both locations are the same, display only one location
+                     ? partItem.locationLabel_Start
 
-            startPartID = partItem.partID_Start;
-            endPartID = partItem.partID_End;
+                     : partItem.locationLabel_Start + LOCATION_SEPARATOR + partItem.locationLabel_End;
 
-            actionText = locationText;
-            actionTooltip = partItem.partLabel_Start != null
-                  ? partItem.partLabel_Start
-                  : partItem.partLabel_End;
+               startPartID = partItem.partID_Start;
+               endPartID = partItem.partID_End;
+
+               actionText = locationText;
+               actionTooltip = partItem.partLabel_Start != null
+                     ? partItem.partLabel_Start
+                     : partItem.partLabel_End;
+
+            } else {
+
+               // start and end locations are needed but both are not available
+
+               break;
+            }
 
          } else if (isSetStartLocation) {
 
@@ -1018,7 +978,6 @@ public class ActionSetStartEndLocation extends SubMenu {
                            endPartID));
             }
          }
-
       }
    }
 
@@ -1082,7 +1041,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             // check if locations of all tours are the same
 
-            final TourLocation[] sameLocations = checkSameLocations();
+            final TourLocation[] sameLocations = getSameLocations();
 
             tourLocationStart = sameLocations[0];
             tourLocationEnd = sameLocations[1];
@@ -1193,8 +1152,102 @@ public class ActionSetStartEndLocation extends SubMenu {
                         actionText,
                         tooltipText));
          }
-
       }
+   }
+
+   private TourLocation[] getSameLocations() {
+
+      TourLocation tourLocationStart = null;
+      TourLocation tourLocationEnd = null;
+
+      boolean canSetStartLocation = true;
+      boolean canSetEndLocation = true;
+
+      for (final TourData tourData : _allSelectedTours) {
+
+         final TourLocation locationStart = tourData.getTourLocationStart();
+         final TourLocation locationEnd = tourData.getTourLocationEnd();
+
+         if (tourLocationStart == null) {
+
+            // location is not yet set
+
+            if (canSetStartLocation) {
+
+               tourLocationStart = locationStart;
+            }
+
+         } else {
+
+            // location is already set
+
+            if (locationStart == null) {
+
+               // needs to be location which can be compared
+
+               tourLocationStart = null;
+
+               canSetStartLocation = false;
+
+            } else {
+
+               if (tourLocationStart.getLocationId() == locationStart.getLocationId()) {
+
+                  // it's the same location
+
+               } else {
+
+                  // it's a different location -> there is no common location
+
+                  tourLocationStart = null;
+
+                  canSetStartLocation = false;
+               }
+            }
+
+         }
+
+         if (tourLocationEnd == null) {
+
+            // location is not yet set
+
+            if (canSetEndLocation) {
+
+               tourLocationEnd = locationEnd;
+            }
+
+         } else {
+
+            // location is already set
+
+            if (locationEnd == null) {
+
+               // needs to be location which can be compared
+
+               tourLocationEnd = null;
+
+               canSetEndLocation = false;
+
+            } else {
+
+               if (tourLocationEnd.getLocationId() == locationEnd.getLocationId()) {
+
+                  // it's the same location
+
+               } else {
+
+                  // it's a different location -> there is no common location
+
+                  tourLocationEnd = null;
+
+                  canSetEndLocation = false;
+               }
+            }
+
+         }
+      }
+
+      return new TourLocation[] { tourLocationStart, tourLocationEnd };
    }
 
    public void setIsStartLocation(final Boolean isStartLocationInContextMenu) {

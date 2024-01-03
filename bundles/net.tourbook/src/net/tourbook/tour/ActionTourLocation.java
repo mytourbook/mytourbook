@@ -232,10 +232,15 @@ public class ActionTourLocation extends ContributionItem {
          itemBounds.x = itemDisplayPosition.x;
          itemBounds.y = itemDisplayPosition.y;
 
+         final TourLocation tourLocation = _isStartLocation
+               ? _tourData.getTourLocationStart()
+               : _tourData.getTourLocationEnd();
+
          _slideoutLocationProfiles = new SlideoutLocationProfiles(
 
                _tourLocationConsumer,
-               _tourData,
+               tourLocation,
+
                _toolbar,
                itemBounds,
                _state,

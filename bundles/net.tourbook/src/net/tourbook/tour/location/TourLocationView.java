@@ -245,7 +245,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       public ActionOne() {
 
-         setText(Messages.Tour_Location_Action_One);
          setToolTipText(Messages.Tour_Location_Action_One_Tooltip);
       }
 
@@ -2285,6 +2284,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
+      // show default profile name in the One action
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+      final String tooltip = defaultProfile == null
+            ? Messages.Tour_Location_Action_One
+            : Messages.Tour_Location_Action_One + UI.DASH_WITH_DOUBLE_SPACE + defaultProfile.name;
+
+      _actionOne.setText(tooltip);
+
       /*
        * Fill menu
        */
@@ -2803,11 +2811,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       fireUpdateUI();
    }
 
-   private void onAction_DeleteAndReapply(final boolean isSkipFirstLocation) {
+   private void onAction_DeleteAndReapply(final boolean isOneAction) {
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      if (TourLocationManager.deleteAndReapply(allSelectedLocations, isSkipFirstLocation)) {
+      if (TourLocationManager.deleteAndReapply(allSelectedLocations, isOneAction)) {
 
          fireUpdateUI();
       }
@@ -2817,7 +2825,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      if (TourLocationManager.deleteTourLocations(allSelectedLocations) == false) {
+      if (TourLocationManager.deleteTourLocations(allSelectedLocations, false) == false) {
          return;
       }
 
@@ -2916,7 +2924,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
-
 
       for (final TourLocation tourLocation : allSelectedLocations) {
 
