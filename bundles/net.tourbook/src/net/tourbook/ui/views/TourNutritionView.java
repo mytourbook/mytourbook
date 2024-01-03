@@ -242,7 +242,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return String.valueOf(tourNutritionProduct.getSodium());
 
          case 5:
-            return "flask (0.5L";
+            return tourNutritionProduct.getTourBeverageContainerName();
 
          case 4:
          default:
@@ -524,9 +524,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 //      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 //      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
 
-      final String[] items = new String[2];
-      items[0] = "flask (0.5L";
-      items[1] = "bladder (1.5L)";
+      final var toto = TourDatabase.getTourBeverageContainers();
+      final String[] items = new String[toto.size()];
+      for (int index2 = 0; index2 < toto.size(); ++index2) {
+         items[index2] = toto.get(index2).getName();
+      }
       editors[5] = new ComboBoxCellEditor(productsTable, items, SWT.READ_ONLY);
       // example
       // Flask (0.5L)

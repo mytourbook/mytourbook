@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
@@ -107,6 +108,19 @@ public class TourNutritionProduct {
 
    public float getSodium() {
       return Math.round(sodium / 1000);
+   }
+
+   public TourBeverageContainer getTourBeverageContainer() {
+      return tourBeverageContainer;
+   }
+
+   public String getTourBeverageContainerName() {
+
+      if (tourBeverageContainer != null) {
+         return tourBeverageContainer.getName();
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    public TourData getTourData() {
