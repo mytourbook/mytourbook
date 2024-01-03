@@ -82,9 +82,15 @@ public class TourNutritionProduct {
       name = product.productName();
 
       final Nutriments nutriments = product.nutriments();
-      calories = nutriments.getEnergyKcalServing();
-      sodium = nutriments.getSodiumServing();
-      isBeverage = product.nutriScoreData() != null ? product.nutriScoreData().isBeverage() : false;
+      if (nutriments != null) {
+
+         calories = nutriments.getEnergyKcalServing();
+         sodium = nutriments.getSodiumServing();
+      }
+
+      isBeverage = product.nutriScoreData() != null
+            ? product.nutriScoreData().isBeverage()
+            : false;
 
       _createId = _createCounter.incrementAndGet();
    }
