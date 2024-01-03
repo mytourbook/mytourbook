@@ -2145,7 +2145,7 @@ public class TourDatabase {
     * @return Returns all tour beverage containers in the db sorted by name
     */
    @SuppressWarnings("unchecked")
-   public static ArrayList<TourBeverageContainer> getTourBeverageContainers() {
+   public static List<TourBeverageContainer> getTourBeverageContainers() {
 
       ArrayList<TourBeverageContainer> beverageContainersList = new ArrayList<>();
 
