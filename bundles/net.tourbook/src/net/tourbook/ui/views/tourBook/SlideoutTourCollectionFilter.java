@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -267,7 +267,7 @@ public class SlideoutTourCollectionFilter extends ToolbarSlideout {
 
    void updateUI() {
 
-      if (_lblNumAllTours_Value != null && _lblNumAllTours_Value.isDisposed()) {
+      if (_lblNumAllTours_Value == null || _lblNumAllTours_Value.isDisposed()) {
          return;
       }
 
