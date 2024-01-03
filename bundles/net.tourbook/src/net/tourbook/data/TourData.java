@@ -6356,6 +6356,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourPhoto.setupDeepClone(tourData_DeepCopy);
       }
 
+      //todo fb deepclone to also clone beverage containers
       for (final TourNutritionProduct tourNutritionProduct : tourData_DeepCopy.tourNutritionProducts) {
          tourNutritionProduct.setupDeepClone(tourData_DeepCopy);
       }

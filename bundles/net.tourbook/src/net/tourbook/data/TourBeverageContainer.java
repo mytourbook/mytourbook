@@ -34,7 +34,7 @@ public class TourBeverageContainer {
 
    private String name;
 
-   // in mL?
+   //todo fb in mL?
    private double capacity;
 
    public TourBeverageContainer() {}
