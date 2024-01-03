@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -34,7 +30,6 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 import pl.coderion.model.Nutriments;
 
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productCode")
 public class TourNutritionProduct {
 
    //todo fb implement swt.del on the table
@@ -59,7 +54,6 @@ public class TourNutritionProduct {
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @JsonProperty
    private long                       productCode    = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
@@ -80,9 +74,6 @@ public class TourNutritionProduct {
 
    // private double or float quantityBeverageContainerConsumed_Fraction;
 
-   //link it to an object defined by the user ?
-//   private double                     containerName;
-//
    public TourNutritionProduct() {}
 
    public TourNutritionProduct(final TourData tourData, final Product product) {

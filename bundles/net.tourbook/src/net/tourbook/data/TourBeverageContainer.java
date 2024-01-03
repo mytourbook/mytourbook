@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,7 +27,6 @@ import javax.persistence.Transient;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "containerCode")
 public class TourBeverageContainer implements Comparable<Object>, Serializable {
 
    private static final long serialVersionUID = 1L;
@@ -55,7 +50,6 @@ public class TourBeverageContainer implements Comparable<Object>, Serializable {
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @JsonProperty
    private long                       containerCode  = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    private String                     name;

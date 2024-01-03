@@ -2142,6 +2142,32 @@ public class TourDatabase {
    }
 
    /**
+    * @return Returns all tour beverage containers in the db sorted by name
+    */
+   @SuppressWarnings("unchecked")
+   public static ArrayList<TourBeverageContainer> getTourBeverageContainers() {
+
+      ArrayList<TourBeverageContainer> beverageContainersList = new ArrayList<>();
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+      if (em != null) {
+
+         final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+               + "SELECT tourBeverageContainer" //$NON-NLS-1$
+               + " FROM TourBeverageContainer AS tourBeverageContainer " //$NON-NLS-1$
+               + " ORDER  BY tourBeverageContainer.name"); //$NON-NLS-1$
+
+         beverageContainersList = (ArrayList<TourBeverageContainer>) emQuery.getResultList();
+
+         em.close();
+      }
+
+      return beverageContainersList;
+   }
+
+   /**
     * @return Returns all tour types in the db sorted by name
     */
    @SuppressWarnings("unchecked")
@@ -4098,19 +4124,20 @@ public class TourDatabase {
        * CREATE TABLE TourBeverageContainer
        */
 
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_BEVERAGE_CONTAINER + "   (                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt,
+            "CREATE TABLE " + TABLE_TOUR_BEVERAGE_CONTAINER + "   (                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
+                  + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
 
-            // Version 53 - begin
+                  // Version 53 - begin
 
-            + "   name                VARCHAR(" + TourType.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   name                VARCHAR(" + TourType.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
+                  + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
 
-            // Version 53 - end
+                  // Version 53 - end
 
-            + ")"); //$NON-NLS-1$
+                  + ")"); //$NON-NLS-1$
    }
 
    /**
