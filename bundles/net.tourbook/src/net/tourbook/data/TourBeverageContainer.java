@@ -30,7 +30,7 @@ public class TourBeverageContainer {
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long   containerCode = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long   containerId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    private String name;
 
@@ -45,11 +45,11 @@ public class TourBeverageContainer {
       this.capacity = capacity;
    }
 
-   public String getName() {
-      return name;
-   }
-
    public double getCapacity() {
       return capacity;
+   }
+
+   public String getName() {
+      return name;
    }
 }
