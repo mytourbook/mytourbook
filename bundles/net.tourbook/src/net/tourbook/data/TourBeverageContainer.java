@@ -77,7 +77,7 @@ public class TourBeverageContainer implements Comparable<Object>, Serializable {
    }
 
    /**
-    * Tourmarker is compared with the {@link TourBeverageContainer#markerId} or
+    * TourBeverageContainer is compared with the {@link TourBeverageContainer#containerCode} or
     * {@link TourBeverageContainer#_createId}
     * <p>
     * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
