@@ -102,6 +102,7 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
    @Override
    public int compareTo(final Object obj) {
 
+      // the default sort is by name
       if (obj instanceof final TourLocationProfile otherProfile) {
          return name.compareTo(otherProfile.name);
       }
