@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -31,7 +32,9 @@ import net.tourbook.database.TourDatabase;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "containerCode")
-public class TourBeverageContainer {
+public class TourBeverageContainer implements Comparable<Object>, Serializable {
+
+   private static final long serialVersionUID = 1L;
 
    //todo fb remove all the references to marker
    /**
@@ -55,7 +58,7 @@ public class TourBeverageContainer {
    @JsonProperty
    private long                       containerCode  = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   private String  name;
+   private String                     name;
 
    // in mL?
    private double capacity;
@@ -65,7 +68,18 @@ public class TourBeverageContainer {
    public TourBeverageContainer(final String name) {
 
       this.name = name;
+   }
 
+   @Override
+   public int compareTo(final Object other) {
+
+      // default sorting for tour types is by name
+      if (other instanceof final TourBeverageContainer otherTourBeverageContainer) {
+
+         return name.compareTo(otherTourBeverageContainer.getName());
+      }
+
+      return 0;
    }
 
    /**
@@ -112,12 +126,9 @@ public class TourBeverageContainer {
       return false;
    }
 
-
    public String getName() {
       return name;
    }
-
-
 
    public void setupDeepClone(final TourData tourDataFromClone) {
 

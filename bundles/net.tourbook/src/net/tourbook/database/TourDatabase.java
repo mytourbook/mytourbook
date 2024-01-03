@@ -4095,17 +4095,17 @@ public class TourDatabase {
    private void createTable_TourBeverageContainer(final Statement stmt) throws SQLException {
 
       /*
-       * CREATE TABLE TourNutritionProduct
+       * CREATE TABLE TourBeverageContainer
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_BEVERAGE_CONTAINER + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
 
-            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_BEVERAGE_CONTAINER + "   (                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
 
             // Version 53 - begin
 
-            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                VARCHAR(" + TourType.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
             + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
 
             // Version 53 - end
