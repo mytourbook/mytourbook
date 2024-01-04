@@ -2149,6 +2149,7 @@ public class TourDatabase {
    public static List<TourBeverageContainer> getTourBeverageContainers() {
 
       ArrayList<TourBeverageContainer> beverageContainersList = new ArrayList<>();
+      beverageContainersList.add(new TourBeverageContainer("", 0));
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
 

@@ -161,7 +161,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             return Boolean.valueOf(task.isBeverage());
          }
          if (property.equals("Beverage Container")) {
-            return 0;
+            return 1;// task.getTourBeverageContainerName();
          }
          return UI.EMPTY_STRING;
       }
@@ -177,6 +177,16 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          if (property.equals("Beverage")) {
             tourNutritionProduct.setIsBeverage(((Boolean) value).booleanValue());
          }
+
+         if (property.equals("Beverage Container")) {
+            final var toto = TourDatabase.getTourBeverageContainers();
+
+            tourNutritionProduct.setTourBeverageContainer(toto.get(0));
+         }
+
+         TourManager.saveModifiedTour(_tourData);
+
+         //todo fb save tour
          _productsViewer.refresh();
       }
    }

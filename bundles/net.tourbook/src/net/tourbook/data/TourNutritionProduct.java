@@ -144,4 +144,8 @@ public class TourNutritionProduct {
       tourData = tourDataFromClone;
    }
 
+   public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
+      this.tourBeverageContainer = tourBeverageContainer;
+   }
+
 }
