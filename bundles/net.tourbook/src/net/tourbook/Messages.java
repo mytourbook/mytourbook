@@ -3177,6 +3177,8 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ResizeBoundingBox;
    public static String        Tour_Location_Action_SetLocation_End;
    public static String        Tour_Location_Action_SetLocation_Start;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Part;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Profile;
    public static String        Tour_Location_Action_SetLocationPart_All;
    public static String        Tour_Location_Action_SetLocationPart_End;
    public static String        Tour_Location_Action_SetLocationPart_Start;

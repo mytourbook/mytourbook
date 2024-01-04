@@ -1924,7 +1924,9 @@ public class TourBookView extends ViewPart implements
       // ensure that tooltips are hidden
       _tourViewer_NatTable.addListener(SWT.MouseExit, event -> {
 
-         _tourInfoToolTip_NatTable.hide();
+// !!! this would disable the hovering of the tooltip !!!
+//         _tourInfoToolTip_NatTable.hide();
+
          _tourLocationTooltip_NatTable.hide();
       });
 
@@ -2079,7 +2081,9 @@ public class TourBookView extends ViewPart implements
       // ensure that tooltips are hidden
       tree.addListener(SWT.MouseExit, event -> {
 
-         _tourInfoToolTip_Tree.hide();
+// !!! this would disable the hovering of the tooltip !!!
+//       _tourInfoToolTip_Tree.hide();
+
          _tourLocationTooltip_Tree.hide();
       });
    }

@@ -1738,6 +1738,61 @@ public class TourLocationManager {
    }
 
    /**
+    * Set location text into the tour start/end location fields for all tours which have the tour
+    * location
+    *
+    * @param locationLabel
+    * @param tourLocation
+    */
+   public static void setLocationIntoTour(final String locationLabel, final TourLocation tourLocation) {
+
+      final long locationId = tourLocation.getLocationId();
+
+      PreparedStatement stmtStart = null;
+      PreparedStatement stmtEnd = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sqlStartLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+               + "SET tourStartPlace = ?" + NL //                       1  //$NON-NLS-1$
+
+               + "WHERE tourLocationStart_LocationID = ?" + NL //       2  //$NON-NLS-1$
+         ;
+
+         final String sqlEndLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+               + "SET tourEndPlace = ?" + NL //                         1  //$NON-NLS-1$
+
+               + "WHERE tourLocationEnd_LocationID = ?" + NL //         2  //$NON-NLS-1$
+         ;
+
+         stmtStart = conn.prepareStatement(sqlStartLocation);
+         stmtStart.setString(1, locationLabel);
+         stmtStart.setLong(2, locationId);
+         stmtStart.executeUpdate();
+
+         stmtEnd = conn.prepareStatement(sqlEndLocation);
+         stmtEnd.setString(1, locationLabel);
+         stmtEnd.setLong(2, locationId);
+         stmtEnd.executeUpdate();
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(stmtStart);
+         Util.closeSql(stmtEnd);
+      }
+   }
+
+   /**
     * Save resized bounding box in the database for the provided tour location ID
     *
     * @param locationId

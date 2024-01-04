@@ -21,10 +21,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -33,6 +37,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -53,6 +58,7 @@ import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -92,59 +98,68 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourLocationView extends ViewPart implements ITourViewer {
 
-   public static final String                   ID                              = "net.tourbook.tour.location.TourLocationView"; //$NON-NLS-1$
-
-   private static final char                    NL                              = UI.NEW_LINE;
-
-   private static final String                  STATE_IS_LINK_WITH_OTHER_VIEWS  = "STATE_IS_LINK_WITH_OTHER_VIEWS";              //$NON-NLS-1$
-   private static final String                  STATE_IS_SHOW_INFO_TOOLTIP      = "STATE_IS_SHOW_INFO_TOOLTIP";                  //$NON-NLS-1$
-   private static final String                  STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
-   private static final String                  STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
-   private static final String                  STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
-
-   private final IPreferenceStore               _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore               _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings                _state                          = TourbookPlugin.getState(ID);
-
-   private IPartListener2                       _partListener;
-   private ISelectionListener                   _postSelectionListener;
-   private IPropertyChangeListener              _prefChangeListener;
-   private IPropertyChangeListener              _prefChangeListener_Common;
-   private ITourEventListener                   _tourPropertyListener;
-
-   private TableViewer                          _locationViewer;
-   private LocationComparator                   _locationComparator             = new LocationComparator();
-   private ColumnManager                        _columnManager;
-   private SelectionAdapter                     _columnSortListener;
-
-   private List<LocationItem>                   _allLocationItems               = new ArrayList<>();
-
+   public static final String                ID                              = "net.tourbook.tour.location.TourLocationView"; //$NON-NLS-1$
+   //
+   private static final char                 NL                              = UI.NEW_LINE;
+   //
+   private static final String               STATE_IS_LINK_WITH_OTHER_VIEWS  = "STATE_IS_LINK_WITH_OTHER_VIEWS";              //$NON-NLS-1$
+   private static final String               STATE_IS_SHOW_INFO_TOOLTIP      = "STATE_IS_SHOW_INFO_TOOLTIP";                  //$NON-NLS-1$
+   private static final String               STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
+   private static final String               STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
+   private static final String               STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
+   //
+   private static final String               PROFILE_NAME                    = "%s - %d";                                     //$NON-NLS-1$
+   //
+   /**
+    * This set is used to prevent duplicated action names
+    */
+   private static final Set<String>          _usedDisplayNames               = new HashSet<>();
+   //
+   private final IPreferenceStore            _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore            _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings             _state                          = TourbookPlugin.getState(ID);
+   //
+   private IPartListener2                    _partListener;
+   private ISelectionListener                _postSelectionListener;
+   private IPropertyChangeListener           _prefChangeListener;
+   private IPropertyChangeListener           _prefChangeListener_Common;
+   private ITourEventListener                _tourPropertyListener;
+   //
+   private TableViewer                       _locationViewer;
+   private LocationComparator                _locationComparator             = new LocationComparator();
+   private List<LocationItem>                _allLocationItems               = new ArrayList<>();
+   //
+   private ColumnManager                     _columnManager;
+   private SelectionAdapter                  _columnSortListener;
+   //
    /**
     * Contains all {@link LocationItem}s which are displayed in the viewer, the key is
     * {@link TourLocation#locationID}
     */
-   private Map<Long, LocationItem>              _locationItemsMap               = new HashMap<>();
+   private Map<Long, LocationItem>           _locationItemsMap               = new HashMap<>();
+   private MenuManager                       _viewerMenuManager;
+   //
+   private IContextMenuProvider              _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   //
+   private boolean                           _isInUIUpdate;
+   //
+   private ActionBoundingBox_Reset           _actionBoundingBox_Reset;
+   private ActionBoundingBox_Resize          _actionBoundingBox_Resize;
+   private ActionCombineBoundingBox          _actionCombineBoundingBoxes;
+   private ActionDeleteAndRetrieveAgain      _actionDeleteAndRetrieveAgain;
+   private ActionDeleteLocation              _actionDeleteLocation;
+   private ActionIncludeGeoPosition          _actionIncludeGeoPosition;
+   private ActionLinkWithOtherViews          _actionLinkWithOtherViews;
+   private ActionOne                         _actionOne;
+   private ActionRelocateBoundingBox         _actionRelocateBoundingBox;
+   private ActionSetLocationIntoTour_Part    _actionSetLocationIntoTour_Part;
+   private ActionSetLocationIntoTour_Profile _actionSetLocationIntoTour_Profile;
+   private ActionShowLocationInfo            _actionShowLocationInfo;
+   //
+   private final NumberFormat                _nf1                            = NumberFormat.getNumberInstance();
+   private final NumberFormat                _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat                _nf6                            = NumberFormat.getNumberInstance();
 
-   private MenuManager                          _viewerMenuManager;
-   private IContextMenuProvider                 _tableViewerContextMenuProvider = new TableContextMenuProvider();
-
-   private boolean                              _isInUIUpdate;
-
-   private ActionCombineBoundingBox             _actionCombineBoundingBoxes;
-   private ActionDeleteAndRetrieveAgain         _actionDeleteAndRetrieveAgain;
-   private ActionDeleteLocation                 _actionDeleteLocation;
-   private ActionIncludeGeoPosition             _actionIncludeGeoPosition;
-   private ActionLinkWithOtherViews             _actionLinkWithOtherViews;
-   private ActionOne                            _actionOne;
-   private ActionRelocateBoundingBox            _actionRelocateBoundingBox;
-   private ActionShowLocationInfo               _actionShowLocationInfo;
-
-   private ActionResizeBoundingBox_Reset        _actionBoundingBox_Reset;
-   private ActionResizeBoundingBox_FlexibleSize _actionBoundingBox_ResizeFlexible;
-
-   private final NumberFormat                   _nf1                            = NumberFormat.getNumberInstance();
-   private final NumberFormat                   _nf3                            = NumberFormat.getNumberInstance();
-   private final NumberFormat                   _nf6                            = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -163,6 +178,35 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private Composite      _viewerContainer;
 
    private Menu           _tableContextMenu;
+
+   private class ActionBoundingBox_Reset extends Action {
+
+      public ActionBoundingBox_Reset() {
+
+         setText(Messages.Tour_Location_Action_ResetBoundingBox);
+         setToolTipText(Messages.Tour_Location_Action_ResetBoundingBox_Tooltip);
+      }
+
+      @Override
+      public void run() {
+
+         onAction_BoundingBox_Reset();
+      }
+   }
+
+   private class ActionBoundingBox_Resize extends Action {
+
+      public ActionBoundingBox_Resize() {
+
+         super(Messages.Tour_Location_Action_ResizeBoundingBox);
+      }
+
+      @Override
+      public void run() {
+
+         onAction_BoundingBox_Resize();
+      }
+   }
 
    private class ActionCombineBoundingBox extends Action {
 
@@ -270,33 +314,63 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
    }
 
-   private class ActionResizeBoundingBox_FlexibleSize extends Action {
+   private class ActionSetLocationIntoTour_One extends Action {
 
-      public ActionResizeBoundingBox_FlexibleSize() {
+      private TourLocation _tourLocation;
+      private String       _locationLabel;
 
-         super(Messages.Tour_Location_Action_ResizeBoundingBox);
+      public ActionSetLocationIntoTour_One(final String locationLabel,
+                                           final String actionTooltip,
+                                           final TourLocation tourLocation) {
+
+         super(locationLabel, AS_PUSH_BUTTON);
+
+         _locationLabel = locationLabel;
+         _tourLocation = tourLocation;
+
+         setToolTipText(actionTooltip);
       }
 
       @Override
       public void run() {
 
-         onAction_ResizeBoundingBox_FlexibleSize();
+         onAction_SetLocationIntoTour(_locationLabel, _tourLocation);
       }
    }
 
-   private class ActionResizeBoundingBox_Reset extends Action {
+   private class ActionSetLocationIntoTour_Part extends SubMenu {
 
-      public ActionResizeBoundingBox_Reset() {
+      public ActionSetLocationIntoTour_Part() {
 
-         setText(Messages.Tour_Location_Action_ResetBoundingBox);
-         setToolTipText(Messages.Tour_Location_Action_ResetBoundingBox_Tooltip);
+         super(Messages.Tour_Location_Action_SetLocationIntoTour_Part, AS_DROP_DOWN_MENU);
       }
 
       @Override
-      public void run() {
+      public void enableActions() {}
 
-         onAction_ResizeBoundingBox_Reset();
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         fillMenu_SetLoctionIntoTour_Part(menu);
       }
+   }
+
+   private class ActionSetLocationIntoTour_Profile extends SubMenu {
+
+      public ActionSetLocationIntoTour_Profile() {
+
+         super(Messages.Tour_Location_Action_SetLocationIntoTour_Profile, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         fillMenu_SetLoctionIntoTour_Profile(menu);
+      }
+
    }
 
    private class ActionShowLocationInfo extends Action {
@@ -773,6 +847,17 @@ public class TourLocationView extends ViewPart implements ITourViewer {
     */
    public abstract class TooltipLabelProvider extends CellLabelProvider {}
 
+   /**
+    * Add an action to the provided menu
+    *
+    * @param menu
+    * @param action
+    */
+   private void addActionToMenu(final Menu menu, final Action action) {
+
+      new ActionContributionItem(action).fill(menu, -1);
+   }
+
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
@@ -896,6 +981,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
+      _actionBoundingBox_Reset            = new ActionBoundingBox_Reset();
+      _actionBoundingBox_Resize           = new ActionBoundingBox_Resize();
       _actionCombineBoundingBoxes         = new ActionCombineBoundingBox();
       _actionDeleteAndRetrieveAgain       = new ActionDeleteAndRetrieveAgain();
       _actionDeleteLocation               = new ActionDeleteLocation();
@@ -903,10 +990,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _actionLinkWithOtherViews           = new ActionLinkWithOtherViews();
       _actionOne                          = new ActionOne();
       _actionRelocateBoundingBox          = new ActionRelocateBoundingBox();
+      _actionSetLocationIntoTour_Part     = new ActionSetLocationIntoTour_Part();
+      _actionSetLocationIntoTour_Profile  = new ActionSetLocationIntoTour_Profile();
       _actionShowLocationInfo             = new ActionShowLocationInfo();
-
-      _actionBoundingBox_ResizeFlexible   = new ActionResizeBoundingBox_FlexibleSize();
-      _actionBoundingBox_Reset            = new ActionResizeBoundingBox_Reset();
 
 // SET_FORMATTING_ON
 
@@ -991,7 +1077,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationViewer.setComparator(_locationComparator);
 
       _locationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectLocation());
-      _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_ResizeBoundingBox_FlexibleSize());
+      _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_BoundingBox_Resize());
 
       updateUI_SetSortDirection(
             _locationComparator.__sortColumnId,
@@ -2275,15 +2361,16 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
+      _actionBoundingBox_Reset            .setEnabled(isLocationSelected);
+      _actionBoundingBox_Resize           .setEnabled(isOneLocation);
       _actionCombineBoundingBoxes         .setEnabled(numLocations > 1);
       _actionDeleteLocation               .setEnabled(isLocationSelected);
       _actionDeleteAndRetrieveAgain       .setEnabled(isLocationSelected);
       _actionIncludeGeoPosition           .setEnabled(isLocationSelected);
       _actionOne                          .setEnabled(isLocationSelected);
       _actionRelocateBoundingBox          .setEnabled(isLocationSelected);
-
-      _actionBoundingBox_Reset            .setEnabled(isLocationSelected);
-      _actionBoundingBox_ResizeFlexible   .setEnabled(isOneLocation);
+      _actionSetLocationIntoTour_Part     .setEnabled(isOneLocation);
+      _actionSetLocationIntoTour_Profile  .setEnabled(isOneLocation);
 
 // SET_FORMATTING_ON
    }
@@ -2303,22 +2390,115 @@ public class TourLocationView extends ViewPart implements ITourViewer {
        * Fill menu
        */
 
-      menuMgr.add(_actionBoundingBox_ResizeFlexible);
+      menuMgr.add(_actionSetLocationIntoTour_Part);
+      menuMgr.add(_actionSetLocationIntoTour_Profile);
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionBoundingBox_Resize);
       menuMgr.add(_actionIncludeGeoPosition);
       menuMgr.add(_actionCombineBoundingBoxes);
       menuMgr.add(_actionRelocateBoundingBox);
       menuMgr.add(_actionBoundingBox_Reset);
 
       menuMgr.add(new Separator());
-
       menuMgr.add(_actionDeleteAndRetrieveAgain);
       menuMgr.add(_actionDeleteLocation);
 
       menuMgr.add(new Separator());
-
       menuMgr.add(_actionOne);
 
       enableActions();
+   }
+
+   private void fillMenu_SetLoctionIntoTour_Part(final Menu menu) {
+
+      final TourLocation tourLocation = getSelectedLocations().get(0);
+
+      final Map<LocationPartID, PartItem> allLocationParts = PartItem.getAllPartItems(tourLocation, true);
+
+      if (allLocationParts == null) {
+         return;
+      }
+
+      _usedDisplayNames.clear();
+
+      for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
+
+         final PartItem partItem = entry.getValue();
+
+         final String locationLabel = partItem.locationLabel_Start;
+         final String actionTooltip = partItem.partLabel_Start;
+
+         if (locationLabel.length() > 0
+
+               // prevent to display duplicated labels
+               && _usedDisplayNames.contains(locationLabel) == false) {
+
+            _usedDisplayNames.add(locationLabel);
+
+            addActionToMenu(menu,
+
+                  new ActionSetLocationIntoTour_One(
+
+                        locationLabel,
+                        actionTooltip,
+
+                        tourLocation));
+         }
+      }
+   }
+
+   private void fillMenu_SetLoctionIntoTour_Profile(final Menu menu) {
+
+      final TourLocation tourLocation = getSelectedLocations().get(0);
+
+      final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
+
+      final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
+
+      // sort profiles by name
+      Collections.sort(allProfiles);
+
+      _usedDisplayNames.clear();
+
+      for (final TourLocationProfile locationProfile : allProfiles) {
+
+         final String locationLabel = TourLocationManager.createLocationDisplayName(tourLocation, locationProfile);
+
+         if (locationLabel.length() > 0
+
+               // prevent duplicate names
+               && _usedDisplayNames.contains(locationLabel) == false) {
+
+            _usedDisplayNames.add(locationLabel);
+
+            final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
+            final String defaultMarker = isDefaultProfile
+
+                  // show a marker for the default profile
+                  ? UI.SYMBOL_STAR + UI.SPACE
+
+                  : UI.EMPTY_STRING;
+
+            final String profileName = defaultMarker + PROFILE_NAME.formatted(locationProfile.getName(), locationProfile.getZoomlevel());
+
+            final String partText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
+
+                  TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1),
+                  locationProfile.getZoomlevel());
+
+            final String locationTooltip = profileName + UI.NEW_LINE2 + partText;
+
+            addActionToMenu(menu,
+
+                  new ActionSetLocationIntoTour_One(
+
+                        locationLabel,
+                        locationTooltip,
+
+                        tourLocation));
+         }
+      }
    }
 
    private void fillToolbar() {
@@ -2766,6 +2946,43 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
    }
 
+   /**
+    */
+   private void onAction_BoundingBox_Reset() {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final List<TourLocation> allSelectedLocations = getSelectedLocations();
+
+      for (final TourLocation tourLocation : allSelectedLocations) {
+
+         TourLocationManager.setResizedBoundingBox(tourLocation.getLocationId(),
+
+               tourLocation.latitudeMinE6_Normalized,
+               tourLocation.latitudeMaxE6_Normalized,
+
+               tourLocation.longitudeMinE6_Normalized,
+               tourLocation.longitudeMaxE6_Normalized);
+      }
+
+      fireUpdateUI();
+   }
+
+   private void onAction_BoundingBox_Resize() {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final TourLocation tourLocation = getSelectedLocations().get(0);
+
+      new DialogResizeTourLocation(this, tourLocation).open();
+   }
+
    private void onAction_CombineBoundingBox() {
 
       // ensure that a tour is NOT modified in the tour editor
@@ -2908,39 +3125,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       fireUpdateUI();
    }
 
-   private void onAction_ResizeBoundingBox_FlexibleSize() {
+   private void onAction_SetLocationIntoTour(final String locationLabel, final TourLocation tourLocation) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
          return;
       }
 
-      final TourLocation tourLocation = getSelectedLocations().get(0);
-
-      new DialogResizeTourLocation(this, tourLocation).open();
-   }
-
-   /**
-    */
-   private void onAction_ResizeBoundingBox_Reset() {
-
-      // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
-
-      final List<TourLocation> allSelectedLocations = getSelectedLocations();
-
-      for (final TourLocation tourLocation : allSelectedLocations) {
-
-         TourLocationManager.setResizedBoundingBox(tourLocation.getLocationId(),
-
-               tourLocation.latitudeMinE6_Normalized,
-               tourLocation.latitudeMaxE6_Normalized,
-
-               tourLocation.longitudeMinE6_Normalized,
-               tourLocation.longitudeMaxE6_Normalized);
-      }
+      TourLocationManager.setLocationIntoTour(locationLabel, tourLocation);
 
       fireUpdateUI();
    }
