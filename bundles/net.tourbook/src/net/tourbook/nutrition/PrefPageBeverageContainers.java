@@ -108,11 +108,11 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    /*
     * UI controls
     */
-   private TreeViewer _tourTypeViewer;
+   private TreeViewer _tourBeverageContainerViewer;
 
    private Button     _btnAdd;
    private Button     _btnDelete;
-   private Button     _btnRename;
+   private Button     _btnEdit;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -122,9 +122,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       @Override
       public Object[] getChildren(final Object parentElement) {
 
-         if (parentElement instanceof ColorDefinition) {
+         if (parentElement instanceof final ColorDefinition colorDefinition) {
 
-            return ((ColorDefinition) parentElement).getGraphColorItems();
+            return colorDefinition.getGraphColorItems();
          }
 
          return null;
@@ -231,7 +231,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       /*
        * MUST be run async otherwise the background color is NOT themed !!!
        */
-      parent.getDisplay().asyncExec(() -> _tourTypeViewer.setInput(this));
+      parent.getDisplay().asyncExec(() -> _tourBeverageContainerViewer.setInput(this));
 
       return ui;
    }
@@ -308,17 +308,17 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       tree.setHeaderVisible(false);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      _tourTypeViewer = new TreeViewer(tree);
+      _tourBeverageContainerViewer = new TreeViewer(tree);
       defineAllColumns(treeLayout, tree);
 
-      _tourTypeViewer.setContentProvider(new ColorDefinitionContentProvider());
+      _tourBeverageContainerViewer.setContentProvider(new ColorDefinitionContentProvider());
 
-      _tourTypeViewer.setComparator(new TourTypeComparator());
-      _tourTypeViewer.setComparer(new TourTypeComparer());
+      _tourBeverageContainerViewer.setComparator(new TourTypeComparator());
+      _tourBeverageContainerViewer.setComparer(new TourTypeComparer());
 
-      _tourTypeViewer.setUseHashlookup(true);
+      _tourBeverageContainerViewer.setUseHashlookup(true);
 
-      _tourTypeViewer.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
+      _tourBeverageContainerViewer.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
 
          _isNavigationKeyPressed = false;
 
@@ -339,7 +339,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          case SWT.F2:
 
-            if (_btnRename.isEnabled()) {
+            if (_btnEdit.isEnabled()) {
                onTourType_Rename();
             }
 
@@ -347,9 +347,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          }
       }));
 
-      _tourTypeViewer.addSelectionChangedListener(selectionChangedEvent -> {
+      _tourBeverageContainerViewer.addSelectionChangedListener(selectionChangedEvent -> {
 
-         final Object selection = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
+         final Object selection = ((IStructuredSelection) _tourBeverageContainerViewer.getSelection()).getFirstElement();
 
          final boolean isNavigationKeyPressed = _isNavigationKeyPressed;
 
@@ -368,20 +368,20 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
                // expand/collapse current item
                final ColorDefinition treeItem = (ColorDefinition) selection;
 
-               if (_tourTypeViewer.getExpandedState(treeItem)) {
+               if (_tourBeverageContainerViewer.getExpandedState(treeItem)) {
 
                   // item is expanded -> collapse
 
-                  _tourTypeViewer.collapseToLevel(treeItem, 1);
+                  _tourBeverageContainerViewer.collapseToLevel(treeItem, 1);
 
                } else {
 
                   // item is collapsed -> expand
 
                   if (_expandedItem != null) {
-                     _tourTypeViewer.collapseToLevel(_expandedItem, 1);
+                     _tourBeverageContainerViewer.collapseToLevel(_expandedItem, 1);
                   }
-                  _tourTypeViewer.expandToLevel(treeItem, 1);
+                  _tourBeverageContainerViewer.expandToLevel(treeItem, 1);
                   _expandedItem = treeItem;
 
                   // expanding the triangle, the layout is correctly done but not with double click
@@ -394,7 +394,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          enableActions();
       });
 
-      _tourTypeViewer.addTreeListener(new ITreeViewerListener() {
+      _tourBeverageContainerViewer.addTreeListener(new ITreeViewerListener() {
 
          @Override
          public void treeCollapsed(final TreeExpansionEvent event) {
@@ -419,10 +419,10 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
                display.asyncExec(() -> {
 
                   if (_expandedItem != null) {
-                     _tourTypeViewer.collapseToLevel(_expandedItem, 1);
+                     _tourBeverageContainerViewer.collapseToLevel(_expandedItem, 1);
                   }
 
-                  _tourTypeViewer.expandToLevel(treeItem, 1);
+                  _tourBeverageContainerViewer.expandToLevel(treeItem, 1);
                   _expandedItem = treeItem;
                });
             }
@@ -450,14 +450,12 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          }
          {
             /*
-             * Rename
+             * Edit
              */
-            _btnRename = new Button(container, SWT.NONE);
-            _btnRename.setText(Messages.Pref_TourTypes_Button_rename);
-            _btnRename.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               onTourType_Rename();
-            }));
-            setButtonLayoutData(_btnRename);
+            _btnEdit = new Button(container, SWT.NONE);
+            _btnEdit.setText(Messages.Pref_TourTypes_Button_rename);
+            _btnEdit.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTourType_Rename()));
+            setButtonLayoutData(_btnEdit);
          }
          {
             /*
@@ -485,7 +483,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void defineColumn_10_TourTypeImage(final TreeColumnLayout treeLayout) {
 
-      final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
+      final TreeViewerColumn tvc = new TreeViewerColumn(_tourBeverageContainerViewer, SWT.LEAD);
       final TreeColumn tc = tvc.getColumn();
       tvc.setLabelProvider(new StyledCellLabelProvider() {
          @Override
@@ -523,7 +521,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
     */
    private void defineColumn_20_UpdatedTourTypeImage(final TreeColumnLayout treeLayout) {
 
-      final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
+      final TreeViewerColumn tvc = new TreeViewerColumn(_tourBeverageContainerViewer, SWT.LEAD);
       final TreeColumn tc = tvc.getColumn();
       tvc.setLabelProvider(new StyledCellLabelProvider() {
          @Override
@@ -654,7 +652,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void enableActions() {
 
-      final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
+      final StructuredSelection selectedItems = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
       final Object firstSelectedItem = selectedItems.getFirstElement();
       final int numSelectedItems = selectedItems.size();
 
@@ -672,7 +670,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
 
       _btnDelete.setEnabled(canDeleteColor);
-      _btnRename.setEnabled(numSelectedItems == 1);
+      _btnEdit.setEnabled(numSelectedItems == 1);
    }
 
    private void fireModifyEvent() {
@@ -716,7 +714,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       TourTypeColorDefinition selectedColorDefinition = null;
 
-      final Object selectedItem = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
+      final Object selectedItem = ((IStructuredSelection) _tourBeverageContainerViewer.getSelection()).getFirstElement();
 
       if (selectedItem instanceof GraphColorItem) {
 
@@ -739,7 +737,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final List<TourTypeColorDefinition> allSelectedColorDefinitions = new ArrayList<>();
 
-      final StructuredSelection allSelectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
+      final StructuredSelection allSelectedItems = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
 
       for (final Object selectedItem : allSelectedItems) {
 
@@ -796,7 +794,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       _selectedGraphColor = null;
 
-      final Object firstElement = _tourTypeViewer.getStructuredSelection().getFirstElement();
+      final Object firstElement = _tourBeverageContainerViewer.getStructuredSelection().getFirstElement();
 
       if (firstElement instanceof GraphColorItem) {
 
@@ -812,7 +810,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Run async that the UI do display the selected color in the color button when the
              * color dialog is opened
              */
-            _tourTypeViewer.getTree().getDisplay().asyncExec(() -> {
+            _tourBeverageContainerViewer.getTree().getDisplay().asyncExec(() -> {
 
                // open color selection dialog
 
@@ -882,12 +880,12 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          //_dbTourTypes.add(savedTourType);
 
          // update UI
-         _tourTypeViewer.add(this, newColorDefinition);
+         _tourBeverageContainerViewer.add(this, newColorDefinition);
 
-         _tourTypeViewer.setSelection(new StructuredSelection(newColorDefinition), true);
+         _tourBeverageContainerViewer.setSelection(new StructuredSelection(newColorDefinition), true);
 
-         _tourTypeViewer.collapseAll();
-         _tourTypeViewer.expandToLevel(newColorDefinition, 1);
+         _tourBeverageContainerViewer.collapseAll();
+         _tourBeverageContainerViewer.expandToLevel(newColorDefinition, 1);
 
          _isModified = true;
 
@@ -940,7 +938,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
                _dbTourTypes.remove(selectedTourType);
 
                // update UI
-               _tourTypeViewer.remove(selectedColorDefinition);
+               _tourBeverageContainerViewer.remove(selectedColorDefinition);
 
 // a tour type image cannot be deleted otherwise an image dispose exception can occur
 //             TourTypeImage.deleteTourTypeImage(selectedTourType.getTypeId());
@@ -1007,11 +1005,11 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       /*
        * update the tree viewer, the color images will be recreated in the label provider
        */
-      _tourTypeViewer.update(_selectedGraphColor, null);
-      _tourTypeViewer.update(selectedColorDef, null);
+      _tourBeverageContainerViewer.update(_selectedGraphColor, null);
+      _tourBeverageContainerViewer.update(selectedColorDef, null);
 
       // without a repaint the color def image is not updated
-      _tourTypeViewer.getTree().redraw();
+      _tourBeverageContainerViewer.getTree().redraw();
 
       _isModified = true;
    }
@@ -1057,7 +1055,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          // _dbTourTypes.add(savedTourType);
 
          // update viewer, resort types when necessary
-         _tourTypeViewer.update(selectedColorDefinition, SORT_PROPERTY);
+         _tourBeverageContainerViewer.update(selectedColorDefinition, SORT_PROPERTY);
 
          _isModified = true;
       }
@@ -1114,6 +1112,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private void setFocusToViewer() {
 
       // set focus back to the tree
-      _tourTypeViewer.getTree().setFocus();
+      _tourBeverageContainerViewer.getTree().setFocus();
    }
 }
