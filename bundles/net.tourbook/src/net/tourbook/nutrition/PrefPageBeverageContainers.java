@@ -310,12 +310,12 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       // Column: Name
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
       columnServings.setText(tableColumns[index++]);
-      columnServings.setWidth(25);
+      columnServings.setWidth(300);
 
       // Column: Capacity
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(tableColumns[index++]);
-      columnName.setWidth(300);
+      columnName.setWidth(100);
    }
 
    private boolean deleteTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {

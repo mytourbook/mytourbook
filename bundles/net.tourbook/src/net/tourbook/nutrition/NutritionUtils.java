@@ -73,19 +73,18 @@ public class NutritionUtils {
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final int totalCalories = tourNutritionProducts.stream().mapToInt(i -> i.getCalories() * i.getServingsConsumed()).sum();
+      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> product.getCalories() * product.getServingsConsumed()).sum();
 
       return totalCalories;
    }
 
    public static double getTotalFluids(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-//      final double totalFluids = tourNutritionProducts.stream().mapToDouble(i -> {
-//         i.isBeverage() ?
-//         1
-//      : 0
-//      });
+//      final double totalFluids = tourNutritionProducts.stream().mapToDouble(product -> {
 //
+//         product.isBeverage() ? 1.0 : 0.0
+//      });
+
 //      return totalFluids;
 
       return 0;
