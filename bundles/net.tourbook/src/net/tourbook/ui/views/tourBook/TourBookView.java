@@ -2181,7 +2181,7 @@ public class TourBookView extends ViewPart implements
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       if (_natTable_DataLoader != null) {
-         _natTable_DataLoader.resetTourItems();
+         _natTable_DataLoader.resetTourItems(true);
          _natTable_DataLoader = null;
       }
       if (_rootItem_Tree != null) {
@@ -3721,7 +3721,7 @@ public class TourBookView extends ViewPart implements
       final int[] allRowPositions = selectionModel.getFullySelectedRowPositions(0);
 
       // maybe prevent memory leaks
-      _natTable_DataLoader.resetTourItems();
+      _natTable_DataLoader.resetTourItems(true);
 
       _viewerContainer_NatTable.setRedraw(false);
       {
@@ -3770,7 +3770,7 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
-      _natTable_DataLoader.resetTourItems();
+      _natTable_DataLoader.resetTourItems(true);
 
       if (_isLayoutNatTable) {
 
@@ -4536,7 +4536,7 @@ public class TourBookView extends ViewPart implements
 
    private void updateUI_NatTable(final TourCollectionFilter tourSelectionFilterInDataLoader) {
 
-      _natTable_DataLoader.resetTourItems();
+      _natTable_DataLoader.resetTourItems(true);
 
       _natTable_DataLoader.setTourCollectionFilter(tourSelectionFilterInDataLoader, _selectedTourIds);
 

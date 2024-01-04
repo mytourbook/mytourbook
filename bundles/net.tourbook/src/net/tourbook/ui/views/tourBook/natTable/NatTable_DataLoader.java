@@ -1170,8 +1170,10 @@ public class NatTable_DataLoader {
 
    /**
     * Cleanup all loaded data that the next time they are newly fetched when requested.
+    *
+    * @param isResetTourCollectionFilter
     */
-   public void resetTourItems() {
+   public void resetTourItems(final boolean isResetTourCollectionFilter) {
 
       for (final TVITourBookTour tourItem : _fetchedTourItems.values()) {
          tourItem.clearChildren();
@@ -1187,7 +1189,9 @@ public class NatTable_DataLoader {
 
       _numAllTourItems = -1;
 
-      _tourCollectionFilter = EMPTY_SQL_DATA;
+      if (isResetTourCollectionFilter) {
+         _tourCollectionFilter = EMPTY_SQL_DATA;
+      }
    }
 
    public void setTourCollectionFilter(final TourCollectionFilter tourCollectionFilter, final ArrayList<Long> allTourIds) {
@@ -1243,7 +1247,7 @@ public class NatTable_DataLoader {
    public void setupSortColumns(final String[] allSortColumnIds, final List<SortDirectionEnum> allSortDirections) {
 
       // cleanup old fetched tours
-      resetTourItems();
+      resetTourItems(false);
 
       _allSortColumnIds = allSortColumnIds;
       _allSortDirections = allSortDirections;
