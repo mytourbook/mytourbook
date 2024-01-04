@@ -54,7 +54,6 @@ public class NutritionUtils {
 
          //todo fb serving (eng), portion (french)
 
-         //todo fb
          if (product.isBeverage() && StringUtils.hasContent(product.getTourBeverageContainerName())) {
 
             stringBuilder.append(UI.NEW_LINE);
@@ -62,8 +61,6 @@ public class NutritionUtils {
                   " (" + product.getTourBeverageContainer().getCapacity() + " L)" +
                   " of "
                   + product.getName());
-            // 1.5 flask (.75L) of Gu Brew
-            //sb.append(i.getServingsConsumed() + " serving of " + i.getName() + UI.NEW_LINE);
 
          } else {
             stringBuilder.append(UI.NEW_LINE);
@@ -83,8 +80,13 @@ public class NutritionUtils {
 
    public static double getTotalFluids(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      //todo fb
-      //final double totalFluids = tourFuelProducts.stream().mapToDouble(i -> i.getFluid() * i.getServingsConsumed()).sum();
+//      final double totalFluids = tourNutritionProducts.stream().mapToDouble(i -> {
+//         i.isBeverage() ?
+//         1
+//      : 0
+//      });
+//
+//      return totalFluids;
 
       return 0;
    }
