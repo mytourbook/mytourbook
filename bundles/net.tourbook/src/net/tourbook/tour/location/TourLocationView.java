@@ -1000,6 +1000,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       // set info tooltip provider
       _locationTooltip = new TourLocationToolTip(this);
 
+      // ensure that tooltips are hidden
+      table.addListener(SWT.MouseExit, event -> {
+
+         _locationTooltip.hide();
+      });
+
       createUI_20_ContextMenu();
    }
 

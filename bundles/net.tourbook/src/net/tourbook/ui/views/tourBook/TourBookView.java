@@ -1921,6 +1921,13 @@ public class TourBookView extends ViewPart implements
       // set start/end location info tooltip provider
       _tourLocationTooltip_NatTable = new TourLocationToolTip(this, true);
 
+      // ensure that tooltips are hidden
+      _tourViewer_NatTable.addListener(SWT.MouseExit, event -> {
+
+         _tourInfoToolTip_NatTable.hide();
+         _tourLocationTooltip_NatTable.hide();
+      });
+
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
 
       // this must be run async otherwise the dark theme is not yet initialized !!!
@@ -2051,6 +2058,7 @@ public class TourBookView extends ViewPart implements
          }
       }));
 
+
       /*
        * Center images horizontally
        */
@@ -2067,6 +2075,13 @@ public class TourBookView extends ViewPart implements
 
       // set start/end location info tooltip provider
       _tourLocationTooltip_Tree = new TourLocationToolTip(this, false);
+
+      // ensure that tooltips are hidden
+      tree.addListener(SWT.MouseExit, event -> {
+
+         _tourInfoToolTip_Tree.hide();
+         _tourLocationTooltip_Tree.hide();
+      });
    }
 
    private void createUI_40_Tree_ColumnImages(final Tree tree) {
