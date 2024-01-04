@@ -55,7 +55,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -66,7 +65,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -86,6 +84,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
+   //todo fb hide the resore defaults button if possible
    public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers";            //$NON-NLS-1$
    private static final String[]       SORT_PROPERTY      = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
 
@@ -117,7 +116,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
       @Override
-      public void dispose() {}
+      public void dispose() {
+         // Nothing to do
+      }
 
       @Override
       public Object[] getChildren(final Object parentElement) {
@@ -127,7 +128,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
             return colorDefinition.getGraphColorItems();
          }
 
-         return null;
+         return new Object[] {};
       }
 
       @Override
@@ -142,57 +143,15 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       @Override
       public boolean hasChildren(final Object element) {
-         if (element instanceof ColorDefinition) {
-            return true;
-         }
-         return false;
+
+         return element instanceof ColorDefinition;
       }
 
       @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-
-   }
-
-   private static final class TourTypeComparator extends ViewerComparator {
-
-      @Override
-      public int compare(final Viewer viewer, final Object e1, final Object e2) {
-
-         if (e1 instanceof TourTypeColorDefinition && e2 instanceof TourTypeColorDefinition) {
-
-            final TourTypeColorDefinition ttcDef1 = (TourTypeColorDefinition) e1;
-            final TourTypeColorDefinition ttcDef2 = (TourTypeColorDefinition) e2;
-
-            return ttcDef1.compareTo(ttcDef2);
-         }
-
-         return 0;
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+         // Nothing to do
       }
 
-      @Override
-      public boolean isSorterProperty(final Object element, final String property) {
-
-         // sort when the name has changed
-         return true;
-      }
-   }
-
-   public class TourTypeComparer implements IElementComparer {
-
-      @Override
-      public boolean equals(final Object a, final Object b) {
-
-         if (a == b) {
-            return true;
-         }
-
-         return false;
-      }
-
-      @Override
-      public int hashCode(final Object element) {
-         return 0;
-      }
    }
 
    @Override
@@ -312,9 +271,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       defineAllColumns(treeLayout, tree);
 
       _tourBeverageContainerViewer.setContentProvider(new ColorDefinitionContentProvider());
-
-      _tourBeverageContainerViewer.setComparator(new TourTypeComparator());
-      _tourBeverageContainerViewer.setComparer(new TourTypeComparer());
 
       _tourBeverageContainerViewer.setUseHashlookup(true);
 
@@ -761,17 +717,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       setPreferenceStore(_prefStore);
 
-      /*
-       * Ensure that a tour is NOT modified because changing the tour type needs an app restart
-       * because the tour type images are DISPOSED
-       */
-      if (TourManager.isTourEditorModified(false)) {
-
-         _canModifyTourType = false;
-
-         noDefaultAndApplyButton();
-      }
-
+      noDefaultAndApplyButton();
    }
 
    @Override
