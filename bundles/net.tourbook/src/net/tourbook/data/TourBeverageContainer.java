@@ -52,4 +52,8 @@ public class TourBeverageContainer {
    public String getName() {
       return name;
    }
+
+   public long getContainerId() {
+      return containerId;
+   }
 }

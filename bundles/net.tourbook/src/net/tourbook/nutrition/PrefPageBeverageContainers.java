@@ -113,7 +113,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private Button     _btnDelete;
    private Button     _btnEdit;
 
-   private class ColorDefinitionContentProvider implements ITreeContentProvider {
+   private class BeverageContainerContentProvider implements ITreeContentProvider {
 
       @Override
       public void dispose() {
@@ -122,11 +122,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       @Override
       public Object[] getChildren(final Object parentElement) {
-
-         if (parentElement instanceof final ColorDefinition colorDefinition) {
-
-            return colorDefinition.getGraphColorItems();
-         }
 
          return new Object[] {};
       }
@@ -261,7 +256,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
             SWT.H_SCROLL
                   | SWT.V_SCROLL
                   | SWT.BORDER
-                  | SWT.MULTI
                   | SWT.FULL_SELECTION);
 
       tree.setHeaderVisible(false);
@@ -270,7 +264,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       _tourBeverageContainerViewer = new TreeViewer(tree);
       defineAllColumns(treeLayout, tree);
 
-      _tourBeverageContainerViewer.setContentProvider(new ColorDefinitionContentProvider());
+      _tourBeverageContainerViewer.setContentProvider(new BeverageContainerContentProvider());
 
       _tourBeverageContainerViewer.setUseHashlookup(true);
 
@@ -399,7 +393,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
             _btnAdd = new Button(container, SWT.NONE);
             _btnAdd.setText(Messages.Pref_TourTypes_Button_add);
             _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               onTourType_Add();
+               onTourBeverageContainer_Add();
                enableActions();
             }));
             setButtonLayoutData(_btnAdd);
@@ -767,7 +761,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       setFocusToViewer();
    }
 
-   private void onTourType_Add() {
+   private void onTourBeverageContainer_Add() {
 
       // ask for the tour type name
       final InputDialog inputDialog = new InputDialog(
@@ -785,26 +779,12 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final String tourTypeName = inputDialog.getValue();
 
       // create new tour type
-      final TourType newTourType = new TourType(tourTypeName);
-
-      /*
-       * Create a dummy definition to get the default colors
-       */
-      final TourTypeColorDefinition dummyColorDef = new TourTypeColorDefinition(
-            newTourType,
-            UI.EMPTY_STRING,
-            UI.EMPTY_STRING);
-
-      newTourType.setColor_Gradient_Bright(dummyColorDef.getGradientBright_Default());
-      newTourType.setColor_Gradient_Dark(dummyColorDef.getGradientDark_Default());
-
-      newTourType.setColor_Line(dummyColorDef.getLineColor_Default_Light(), dummyColorDef.getLineColor_Default_Dark());
-      newTourType.setColor_Text(dummyColorDef.getTextColor_Default_Light(), dummyColorDef.getTextColor_Default_Dark());
+      final TourBeverageContainer newTourBeverageContainer = new TourBeverageContainer(tourTypeName, 0);
 
       // add new entity to db
-      final TourType savedTourType = saveTourType(newTourType);
+      final TourBeverageContainer savedTourBeverageContainer = saveTourBeverageContainer(newTourBeverageContainer);
 
-      if (savedTourType != null) {
+      if (savedTourBeverageContainer != null) {
 
          /*
           * Create a color definition WITH THE SAVED tour type, this fixes a VEEEEEEEEEEERY long
@@ -812,26 +792,26 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
           * definition image.
           */
          // create the same color definition but with the correct id's
-         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
-               savedTourType,
-               "tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
-               tourTypeName);
-
-         // overwrite tour type object
-         newColorDefinition.setTourType(savedTourType);
-
-         createGraphColorItems(newColorDefinition);
+//         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
+//               savedTourType,
+//               "tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
+//               tourTypeName);
+//
+//         // overwrite tour type object
+//         newColorDefinition.setTourType(savedTourType);
+//
+//         createGraphColorItems(newColorDefinition);
 
          // update internal tour type list
          //_dbTourTypes.add(savedTourType);
 
          // update UI
-         _tourBeverageContainerViewer.add(this, newColorDefinition);
+         _tourBeverageContainerViewer.add(this, savedTourBeverageContainer);
 
-         _tourBeverageContainerViewer.setSelection(new StructuredSelection(newColorDefinition), true);
+         _tourBeverageContainerViewer.setSelection(new StructuredSelection(savedTourBeverageContainer), true);
 
          _tourBeverageContainerViewer.collapseAll();
-         _tourBeverageContainerViewer.expandToLevel(newColorDefinition, 1);
+         _tourBeverageContainerViewer.expandToLevel(savedTourBeverageContainer, 1);
 
          _isModified = true;
 
@@ -929,9 +909,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       oldTourType.setColor_Line(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
       oldTourType.setColor_Text(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
 
-      final TourType savedTourType = saveTourType(oldTourType);
-
-      selectedColorDef.setTourType(savedTourType);
+      //final TourBeverageContainer savedTourBeverageContainer = saveTourBeverageContainer(oldTourType);
 
       // replace tour type with new one
       _dbTourTypes.remove(oldTourType);
@@ -989,22 +967,22 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       selectedColorDefinition.setVisibleName(newTourTypeName);
 
       // update entity in the db
-      final TourType savedTourType = saveTourType(selectedTourType);
+      final TourBeverageContainer savedTourType;/// = saveTourBeverageContainer(selectedTourType);
 
-      if (savedTourType != null) {
-
-         // update model
-         selectedColorDefinition.setTourType(savedTourType);
-
-         // replace tour type with new one
-         _dbTourTypes.remove(selectedTourType);
-         // _dbTourTypes.add(savedTourType);
-
-         // update viewer, resort types when necessary
-         _tourBeverageContainerViewer.update(selectedColorDefinition, SORT_PROPERTY);
-
-         _isModified = true;
-      }
+//      if (savedTourType != null) {
+//
+//         // update model
+//         //   selectedColorDefinition.setTourType(savedTourType);
+//
+//         // replace tour type with new one
+//         _dbTourTypes.remove(selectedTourType);
+//         // _dbTourTypes.add(savedTourType);
+//
+//         // update viewer, resort types when necessary
+//         _tourBeverageContainerViewer.update(selectedColorDefinition, SORT_PROPERTY);
+//
+//         _isModified = true;
+//      }
 
       setFocusToViewer();
    }
@@ -1047,12 +1025,12 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    }
 
-   private TourType saveTourType(final TourType tourType) {
+   private TourBeverageContainer saveTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
 
       return TourDatabase.saveEntity(
-            tourType,
-            tourType.getTypeId(),
-            TourType.class);
+            tourBeverageContainer,
+            tourBeverageContainer.getContainerId(),
+            TourBeverageContainer.class);
    }
 
    private void setFocusToViewer() {
