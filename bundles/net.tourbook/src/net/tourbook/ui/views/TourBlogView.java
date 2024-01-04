@@ -581,7 +581,7 @@ public class TourBlogView extends ViewPart {
       final boolean isTourTags = tourTags.size() > 0;
       final boolean isWeather = tourWeather.length() > 0;
 
-      if (isDescription || isTitle || isWeather || isTourTags) {
+      if (isDescription || isTitle || isWeather || isTourTags || isNutrition) {
 
          sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
