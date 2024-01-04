@@ -28,9 +28,7 @@ import javax.persistence.Query;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourBeverageContainer;
@@ -42,7 +40,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.tourType.TourTypeImageConfig;
 import net.tourbook.tourType.TourTypeManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -52,7 +49,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -65,7 +61,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -79,14 +74,11 @@ import org.eclipse.ui.PlatformUI;
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
    //todo fb hide the resore defaults button if possible
-   public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers";            //$NON-NLS-1$
-   private static final String[]       SORT_PROPERTY      = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
+   public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
    private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
 
    private GraphColorPainter           _graphColorPainter;
-
-   private ColorDefinition             _expandedItem;
 
    private GraphColorItem              _selectedGraphColor;
    private List<TourBeverageContainer> _dbTourTypes;
@@ -201,7 +193,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          }
       }
 
-      restoreState();
       enableActions();
 
       /*
@@ -210,28 +201,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       parent.getDisplay().asyncExec(() -> _tourBeverageContainerViewer.setInput(this));
 
       return ui;
-   }
-
-   /**
-    * Create the different color names (childs) for the color definition.
-    */
-   private void createGraphColorItems(final ColorDefinition colorDefinition) {
-
-      // use the first 4 color, the mapping color is not used in tour types
-      final int graphNamesLength = GraphColorManager.colorNames.length - 1;
-
-      final GraphColorItem[] graphColors = new GraphColorItem[graphNamesLength];
-
-      for (int nameIndex = 0; nameIndex < graphNamesLength; nameIndex++) {
-
-         graphColors[nameIndex] = new GraphColorItem(
-               colorDefinition,
-               GraphColorManager.colorNames[nameIndex][0],
-               GraphColorManager.colorNames[nameIndex][1],
-               false);
-      }
-
-      colorDefinition.setColorItems(graphColors);
    }
 
    private Composite createUI(final Composite parent) {
@@ -246,7 +215,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_10_ColorViewer(container);
+         createUI_10_BeverageContainersViewer(container);
          createUI_20_Actions(container);
       }
 
@@ -254,7 +223,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       return container;
    }
 
-   private void createUI_10_ColorViewer(final Composite parent) {
+   private void createUI_10_BeverageContainersViewer(final Composite parent) {
 
       /*
        * table viewer: products
@@ -525,21 +494,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private void enableActions() {
 
       final StructuredSelection selectedItems = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
-      final Object firstSelectedItem = selectedItems.getFirstElement();
       final int numSelectedItems = selectedItems.size();
 
-      boolean canDeleteColor = false;
-      boolean isGraphSelected = false;
-
-      if (firstSelectedItem instanceof GraphColorItem) {
-
-         isGraphSelected = true;
-         canDeleteColor = true;
-
-      } else if (firstSelectedItem instanceof TourTypeColorDefinition) {
-
-         canDeleteColor = true;
-      }
+      final boolean canDeleteColor = selectedItems.size() > 0;
 
       _btnDelete.setEnabled(canDeleteColor);
       _btnEdit.setEnabled(numSelectedItems == 1);
@@ -768,58 +725,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       setFocusToViewer();
    }
 
-   /**
-    * This is called when the color in the color selector is modified
-    *
-    * @param event
-    */
-   private void onTourType_Modify(final PropertyChangeEvent event) {
-
-      final RGB oldRGB = (RGB) event.getOldValue();
-      final RGB newRGB = (RGB) event.getNewValue();
-
-      if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
-         return;
-      }
-
-      // color has changed
-
-      // update model
-      _selectedGraphColor.setRGB(newRGB);
-
-      final TourTypeColorDefinition selectedColorDef = (TourTypeColorDefinition) _selectedGraphColor.getColorDefinition();
-
-      /*
-       * update tour type in the db
-       */
-      final TourType oldTourType = selectedColorDef.getTourType();
-
-      oldTourType.setColor_Gradient_Bright(selectedColorDef.getGradientBright_New());
-      oldTourType.setColor_Gradient_Dark(selectedColorDef.getGradientDark_New());
-
-      oldTourType.setColor_Line(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
-      oldTourType.setColor_Text(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
-
-      //final TourBeverageContainer savedTourBeverageContainer = saveTourBeverageContainer(oldTourType);
-
-      // replace tour type with new one
-      _dbTourTypes.remove(oldTourType);
-      //_dbTourTypes.add(savedTourType);
-
-      /*
-       * Update UI
-       */
-      // invalidate old color/image from the graph and color definition to force the recreation
-      _graphColorPainter.invalidateResources(
-            _selectedGraphColor.getColorId(),
-            selectedColorDef.getColorDefinitionId());
-
-      // update UI
-      TourTypeImage.setTourTypeImagesDirty();
-
-      _isModified = true;
-   }
-
    private void onTourType_Rename() {
 
       final TourTypeColorDefinition selectedColorDefinition = getFirstSelectedColorDefinition();
@@ -899,12 +804,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
 
       return super.performOk();
-   }
-
-   private void restoreState() {
-
-      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
-
    }
 
    private TourBeverageContainer saveTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
